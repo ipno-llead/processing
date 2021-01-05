@@ -1,5 +1,8 @@
-PERSONEL_COLUMNS = ["Last Name", "Middle Name", "First Name", "Badge #", "Employee ID #", "Department #", "Department",
-                    "Rank Number #", "Rank", "Birth Date", "Birth Year", "Hire Date", "Termination Date", "Pay Prog Start Date", "Annual Salary", "Hourly Salary"]
+PERSONEL_COLUMNS = [
+    "Employee ID", "Last Name", "Middle Name", "First Name", "Badge #",
+    "Employee ID #", "Department #", "Department", "Rank Number #", "Rank",
+    "Birth Date", "Birth Year", "Hire Date", "Termination Date",
+    "Pay Prog Start Date", "Annual Salary", "Hourly Salary"]
 
 
 def rearrange_personel_columns(df):

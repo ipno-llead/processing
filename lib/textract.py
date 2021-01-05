@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 
 
 def realign_series_ws(series):
@@ -20,11 +21,12 @@ def realign_series_val(series, to_split):
 
 
 def parse_textract_datetime(series):
-    date_comp = series.str.split("/")
-    date_comp = date_comp.map(lambda x: [
+    date_comp = series.fillna("").str.split("/")
+    date_comp = date_comp.map(lambda x: [""] if len(x) <= 1 else [
         x[0].rjust(2, "0"),
         x[1].rjust(2, "0"),
         x[2] if len(x[2]) == 4 else (
             "20"+x[2] if int(x[2][0]) <= 2 else "19"+x[2]),
     ])
-    return pd.to_datetime(date_comp.str.join("/"), format="%m/%d/%Y")
+    return pd.to_datetime(date_comp.str.join("/")
+                          .where(lambda x: x != "", np.NaN), format="%m/%d/%Y")
