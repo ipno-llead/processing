@@ -6,7 +6,7 @@ def remove_unnamed_cols(df):
 
 
 def clean_pprr(orig_df):
-    df = orig_df[["Birthdate - Personal Dta", "Department ID - Job Dta",
+    df = orig_df[["Birthdate - Personal Dta", "Department ID - Job Dta", "Empl ID",
                   "Badge Nbr", "Job Code - Job Dta", "Description - Job Code Info"]]
     name_df = orig_df["Name - Personal Dta"].str.split(",", expand=True)
     df.loc[:, "Last Name"] = name_df.iloc[:, 0]
@@ -18,6 +18,7 @@ def clean_pprr(orig_df):
         "Department ID - Job Dta": "Department #",
         "Badge Nbr": "Badge #",
         "Job Code - Job Dta": "Rank Number #",
-        "Description - Job Code Info": "Rank"
+        "Description - Job Code Info": "Rank",
+        "Empl ID": "Employee ID #"
     }, inplace=True)
     return rearrange_personel_columns(df)
