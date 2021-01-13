@@ -102,7 +102,7 @@ def clean_excels(input_dfs):
     return history, personel
 
 
-def clean():
+def clean_personel():
     excel_dfs = read_excel_files()
     history, personel = clean_excels(excel_dfs)
     personel_18, history_18 = clean_2018_pprr()

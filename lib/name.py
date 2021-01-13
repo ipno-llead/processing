@@ -14,12 +14,12 @@ def punctuation_strip(string):
 
     Examples
     --------
-    >>> string_strip("Mary-Ellen.", False)
+    >>> punctuation_strip("Mary-Ellen.")
     'Mary-Ellen'
-    >>> string_strip("     SADOWSKY,  J.R", False)
+    >>> punctuation_strip("     SADOWSKY,  J.R")
     'SADOWSKY JR'
     """
-    stripped_string = re.sub(r'\s+', ' ', re.sub(r'\.|\,', '', string))
+    stripped_string = re.sub(r'\s+', ' ', re.sub(r'[^\w-]', '', string))
     return ' '.join(stripped_string.split())
 
 

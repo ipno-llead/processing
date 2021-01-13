@@ -6,15 +6,9 @@ from Levenshtein import distance
 
 def match_records(a, b, columns, sep=", ", threshold=2):
     # ensure a[columns] is unique
-    df_a = a[columns]
-    if len(df_a[df_a.duplicated()]):
-        raise Exception("DataFrame a is not unique:\n%s" %
-                        df_a[df_a.duplicated()].to_string())
+    df_a = a[columns].drop_duplicates()
     # ensure b[columns] is unique
-    df_b = b[columns]
-    if len(df_b[df_b.duplicated()]):
-        raise Exception("DataFrame b is not unique:\n%s" %
-                        df_b[df_b.duplicated()].to_string())
+    df_b = b[columns].drop_duplicates()
     # for each entry in b find 1 entry in a that fit threshold
     # or exactly the same in which case remove entry from a
     joined_a = df_a.astype("str").agg(sep.join, axis=1).tolist()
@@ -79,3 +73,24 @@ def concat_dfs(dfs):
             if col not in df.columns:
                 df.loc[:, col] = ""
     return pd.concat(dfs)
+
+
+def show_similar_rows(a, b, cols):
+    """
+    Show rows with the same values between a and b for `cols`
+    """
+    a = a.set_index(cols)
+    b = b.set_index(cols)
+
+    i = 0
+    for k, v in a.iterrows():
+        try:
+            s = b.loc[k]
+        except KeyError:
+            continue
+        print(k)
+        print("  %s" % v.to_frame().transpose().to_string())
+        print("  %s" % s.to_string())
+        i += 1
+        if i == 20:
+            break
