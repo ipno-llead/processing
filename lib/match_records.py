@@ -48,7 +48,7 @@ def match_records(a, b, columns, sep=", ", threshold=2):
     )
 
 
-def gen_uid(df, id_cols, keep_chars=10, uid_name="UID"):
+def gen_uid(df, id_cols, keep_chars=10, uid_name="uid"):
     df.loc[:, uid_name] = df[id_cols].astype("str").agg(', '.join, axis=1).map(
         lambda x: hashlib.md5(x.encode('utf-8')).hexdigest()[:keep_chars]
     )

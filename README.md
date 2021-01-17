@@ -16,6 +16,15 @@ pip install -r requirements.txt # OR
 conda install --file requirements.txt
 ```
 
+## Get started
+
+```bash
+# Download input data files from Dropbox
+scripts/download_input.py
+# process all data files, check `ouput` folder for all generated files.
+make
+```
+
 ## Workflow
 
 Every data integration workflow including this one has these steps:
@@ -37,15 +46,17 @@ Each major step above should output CSV files which can then be saved in a versi
 
 ## Project layout
 
-- **scripts**: Scripts that can be called directly go here. This folder contains entry to the whole workflow.
-- **clean**: This folder correspond to the `Standardization & cleaning` step above. Each module should be dedicated to clean only 1 file or a group of files with similar format (i.e. yearly data from a single police department). Each module take input data from `data` folder and output CSV files to `output` folder with name like `clean_{data_type}_{agency_name}_{optional_date}.csv`.
-- **match**: This folder correspond to the `Data matching` step. Each module take cleaned data from the previous step, do any matching and save to `output` folder with name like `match_{data_type}_{agency_name}_{optional_date}.csv`.
-- **fuse**: This folder correspond to the `Data fusion` step. Data files from previous steps are combined and saved to `output` folder with name like `fuse_{data_type}.csv` (agency name and date info should be present in the data itself).
+- **scripts**: Scripts that can be called directly go here.
+  - **download_input.py**: Download relevant input files from Dropbox to folder `data` if they don't already exist.
+  - **commit_data.py**: Check that any code changes are already commit and commit any updated data files to [WRGL](https://www.wrgl.co).
+- **clean**: This folder correspond to the `Standardization & cleaning` step above. Each module should be dedicated to clean only 1 file or a group of files with similar format (i.e. yearly data from a single police department). Each module take input data from `data` folder and output CSV files back to `data/clean` with name like `{data_type}_{agency_name}_{optional_date}.csv`.
+- **match**: This folder correspond to the `Data matching` step. Each module take cleaned data from the previous step, do any matching and save to `data/match` folder with name like `{data_type}_{agency_name}_{optional_date}.csv`.
+- **fuse**: This folder correspond to the `Data fusion` step. Data files from previous steps are combined and saved to `data/fuse` folder with name like `{data_type}.csv` (agency name and date info should be present in the data itself).
 - **lib**: Any shared Python code go in here.
 - **references**: Any data table kept for consultation in standardization step live here.
-- **data**: Input data go here. This folder is ignored and should never appear in Git repo. Can be populated by hand or preferably via scripts.
-- **output**: Output of any step are saved here for manual inspection and/or to be moved to a data versioning system. This folder is also never commited to Git.
+- **data**: Data files downloaded from Dropbox or produced by scripts go here.
 - **notebooks**: Keep all Jupyter notebooks for exploration or demonstration purpose.
+- **Makefile**: Contain file & processing dependencies. Anytime data or code change, run `make` once to re-process only files which might be affected.
 
 ## Naming conventions
 
