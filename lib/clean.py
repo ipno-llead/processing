@@ -16,5 +16,11 @@ def clean_name(series):
     return series.str.strip().str.replace(r"[^\w-]+", " ").str.replace(r"\s+", " ").str.lower().str.strip().fillna("")
 
 
+def clean_names(df, cols):
+    for col in cols:
+        df.loc[:, col] = clean_name(df[col])
+    return df
+
+
 def clean_rank(series):
     return series.str.strip().str.lower()

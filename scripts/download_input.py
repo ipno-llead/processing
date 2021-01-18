@@ -33,6 +33,10 @@ DATA_FILES = {
         "https://www.dropbox.com/sh/nv366qnl1vmhgny/AADch5Cbc00xyaKat_OHl3A_a/Data%20Collected/New%20Orleans%20PD/Administrative%20Data/New%20Orleans_PD_PPRR_2017.csv?dl=1",  # noqa
         "https://www.dropbox.com/sh/nv366qnl1vmhgny/AAAdK7KHdebOrtXSxhiLi64ha/Data%20Collected/New%20Orleans%20PD/Administrative%20Data/New%20Orleans_PD_PPRR_2018.csv?dl=1",  # noqa
         "https://www.dropbox.com/sh/nv366qnl1vmhgny/AAD-Hi1Ae45yLjdPx9XFT3p_a/Data%20Collected/New%20Orleans%20PD/Administrative%20Data/New%20Orleans_PD_PPRR_2019.csv?dl=1"  # noqa
+    ],
+    "new_orleans_csd": [
+        "https://www.dropbox.com/sh/nv366qnl1vmhgny/AABGwHMKbzSeu0Yd4gspSXg2a/Data%20Collected/New%20Orleans%20Civil%20Service%20Department/Administrative%20Data/New%20Orleans_CSD_PPRR_2009.csv?dl=1",  # noqa
+        "https://www.dropbox.com/sh/nv366qnl1vmhgny/AABVFv9T2bwTOI0XuHULfbD-a/Data%20Collected/New%20Orleans%20Civil%20Service%20Department/Administrative%20Data/New%20Orleans_CSD_PPRR_2014.csv?dl=1"  # noqa
     ]
 }
 _current_dir = os.path.dirname(os.path.realpath(__file__))

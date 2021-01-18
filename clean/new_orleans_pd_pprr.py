@@ -31,7 +31,7 @@ def extract_rank_map(matched_dfs):
     df = pd.concat(rank_dfs+[rank_codes]).drop_duplicates().sort_values(
         "rank_code").set_index("rank_code", drop=True)
     return df.loc[(df.rank_desc != "POLICE OFFICER 1") & (df.rank_desc != "POLICE OFFICER 4")]\
-        .rank_desc.str.title().to_dict()
+        .rank_desc.str.lower().to_dict()
 
 
 def match_schema(input_dfs):
