@@ -13,7 +13,7 @@ def clean_salary(series):
 
 
 def clean_name(series):
-    return series.str.strip().str.replace(r"[^\w-]+", " ").str.replace(r"\s+", " ").str.lower()
+    return series.str.strip().str.replace(r"[^\w-]+", " ").str.replace(r"\s+", " ").str.lower().str.strip().fillna("")
 
 
 def clean_rank(series):
