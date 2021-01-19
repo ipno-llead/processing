@@ -32,16 +32,34 @@ PERSONEL_HISTORY_COLUMNS = [
 ]
 
 COMPLAINT_COLUMNS = [
-    "Last Name", "First Name", "Middle Name", "Badge #", "Employee ID #",
-    "Incident Type", "Complaint Tracking Number", "Date Complaint Occurred",
-    "Date Complaint Received", "Date Complaint Investigation Complete",
-    "Investigation Status", "Disposition", "Complaint Classification",
-    "Bureau of Complainant", "Division of Complainant", "Unit of Complainant",
-    "Unit Additional Details of Complainant", "Working Status of Complainant",
-    "Shift of Complainant", "Rule Violation", "Paragraph Violation",
-    "Unique Officer Allegation ID", "Officer Race Ethnicity", "Officer Gender",
-    "Officer Age", "Officer Years of Service", "Complainant Gender",
-    "Complainant Ethnicity", "Complainant Age"
+    "uid",  # officer unique identifier
+    "tracking_number",  # identifier for complaint
+    "occur_date",
+    "receive_date",
+    "investigation_complete_date",
+    "investigation_status",
+    "disposition",
+    "rule_code",
+    "rule_violation",
+    "paragraph_code",
+    "paragraph_violation",
+    "unique_officer_allegation_id",
+    "officer_ethnicity",
+    "officer_gender",
+    "officer_age",
+    "officer_years_of_service",
+    "complainant_gender",
+    "complainant_ethnicity",
+    "complainant_age"
+    # include "action" column?
+    "Incident Type",  # ?
+    "Complaint Classification",  # ?
+    "Bureau of Complainant",  # ?
+    "Division of Complainant",  # ?
+    "Unit of Complainant",  # ?
+    "Unit Additional Details of Complainant",  # ?
+    "Working Status of Complainant",  # ?
+    "Shift of Complainant",  # ?
 ]
 
 
