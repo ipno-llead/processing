@@ -7,3 +7,5 @@ __pycache__
 *.xlsx
 *.csv
 *.pdf
+
+.wrglmod.yaml
