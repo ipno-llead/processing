@@ -8,8 +8,20 @@ def clean_date(series):
         if isinstance(x, list) else pd.NaT)
 
 
+def parse_dates(df, cols, format):
+    for col in cols:
+        df.loc[:, col] = pd.to_datetime(df[col], format=format)
+    return df
+
+
 def clean_salary(series):
-    return series.str.strip().str.replace("$", "", regex=False).astype("float64")
+    return series.str.strip().str.replace(r"[^\d\.]", "").astype("float64")
+
+
+def clean_salaries(df, cols):
+    for col in cols:
+        df.loc[:, col] = clean_salary(df[col])
+    return df
 
 
 def clean_name(series):
@@ -22,5 +34,11 @@ def clean_names(df, cols):
     return df
 
 
-def clean_rank(series):
+def standardize_desc(series):
     return series.str.strip().str.lower()
+
+
+def standardize_desc_cols(df, cols):
+    for col in cols:
+        df.loc[:, col] = standardize_desc(df[col])
+    return df
