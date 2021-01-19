@@ -1,0 +1,19 @@
+username: ipno
+repos:
+  clean-pprr-new-orleans-csd-2009:
+    fileName: clean/pprr_new_orleans_csd_2009.csv
+  clean-pprr-new-orleans-csd-2014:
+    fileName: clean/pprr_new_orleans_csd_2014.csv
+  clean-pprr-new-orleans-harbor-pd-2020:
+    fileName: clean/pprr_new_orleans_harbor_pd_2020.csv
+  clean-pprr-new-orlenas-pd:
+    fileName: clean/pprr_new_orleans_pd.csv
+commit:
+  messageTemplate: |-
+    {{.GitCommit.Link}}
+
+    {{.GitCommit.Message}}
+  gitRemote:
+    host: github.com
+    dir: ppact/processing
+  gitRoot: ..
