@@ -8,6 +8,14 @@ repos:
     fileName: clean/pprr_new_orleans_harbor_pd_2020.csv
   clean-pprr-new-orlenas-pd:
     fileName: clean/pprr_new_orleans_pd.csv
+  clean-cprr-baton-rouge-pd-2018:
+    fileName: clean/cprr_baton_rouge_pd_2018.csv
+  personel:
+    fileName: fuse/personel.csv
+  personel_history:
+    fileName: fuse/personel_history.csv
+  complaint:
+    fileName: fuse/complaint.csv
 commit:
   messageTemplate: |-
     {{.GitCommit.Link}}

@@ -1,5 +1,6 @@
 from lib.columns import clean_column_names
-from lib.clean import clean_dates, clean_salaries, standardize_desc_cols
+from lib.clean import clean_dates, standardize_desc_cols
+from lib.match_records import gen_uid
 from lib.standardize import standardize_from_lookup_table
 from lib.path import data_file_path, ensure_data_dir
 import pandas as pd
@@ -184,6 +185,17 @@ def standardize_action_18(df):
     return standardize_from_lookup_table(df, "action", actions_lookup)
 
 
+def assign_data_production_year_18(df):
+    df.loc[:, "data_production_year"] = df.occur_year.where(
+        df.occur_year != "", df.receive_year)
+    return df
+
+
+def assign_agency_18(df):
+    df.loc[:, "agency"] = "Baton Rouge PD"
+    return df
+
+
 def clean_18():
     df = realign_18()
     df = clean_column_names(df)
@@ -200,7 +212,11 @@ def clean_18():
              "paragraph_violation", "investigation_status"])\
         .pipe(clean_dates, ["receive_date", "occur_date"])\
         .pipe(assign_tracking_num_18)\
-        .pipe(standardize_action_18)
+        .pipe(standardize_action_18)\
+        .pipe(gen_uid, ["first_name", "middle_initial", "last_name"])\
+        .pipe(assign_agency_18)\
+        .pipe(assign_data_production_year_18)
+
     return df
 
 

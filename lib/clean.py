@@ -1,5 +1,6 @@
 import re
 import pandas as pd
+import numpy as np
 
 
 mdy_date_pattern_1 = re.compile(r"^\d{1,2}/\d{1,2}/\d{2}$")
@@ -89,4 +90,20 @@ def standardize_desc(series):
 def standardize_desc_cols(df, cols):
     for col in cols:
         df.loc[:, col] = standardize_desc(df[col])
+    return df
+
+
+def float_to_int_str(df, cols):
+    """
+    Turn float column to str column
+    e.g. [1973.0, np.nan] => ["1973", ""]
+    """
+    cols_set = set(df.columns)
+    for col in cols:
+        if col not in cols_set:
+            continue
+        if df[col].dtype != np.float64:
+            continue
+        df.loc[:, col] = df[col].fillna(0).astype(
+            "int64").astype(str).str.replace(r"^0$", "", regex=True)
     return df

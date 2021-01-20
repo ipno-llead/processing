@@ -34,6 +34,8 @@ def clean_personel():
     df2.loc[:, "rank_desc"] = standardize_desc(df2.rank_desc)
     df2 = gen_uid(df2, ["first_name", "last_name", "middle_initial", "term_year",
                         "term_month", "term_day", "hire_year", "hire_month", "hire_day"])
+    df2.loc[:, "agency"] = "New Orleans Harbor PD"
+    df2.loc[:, "data_production_year"] = 2020
     return df2
 
 

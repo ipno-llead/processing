@@ -67,16 +67,16 @@ COMPLAINT_COLUMNS = [
     "officer_years_of_service",
     "complainant_gender",
     "complainant_ethnicity",
-    "complainant_age"
-    # include "action" column?
-    "Incident Type",  # ?
-    "Complaint Classification",  # ?
-    "Bureau of Complainant",  # ?
-    "Division of Complainant",  # ?
-    "Unit of Complainant",  # ?
-    "Unit Additional Details of Complainant",  # ?
-    "Working Status of Complainant",  # ?
-    "Shift of Complainant",  # ?
+    "complainant_age",
+    "action"  # list of actions taken separated by '; '
+    # "Incident Type",  # ?
+    # "Complaint Classification",  # ?
+    # "Bureau of Complainant",  # ?
+    # "Division of Complainant",  # ?
+    # "Unit of Complainant",  # ?
+    # "Unit Additional Details of Complainant",  # ?
+    # "Working Status of Complainant",  # ?
+    # "Shift of Complainant",  # ?
 ]
 
 
