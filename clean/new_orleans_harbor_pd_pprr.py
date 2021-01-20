@@ -1,6 +1,6 @@
 import pandas as pd
 from lib.clean import (
-    clean_date, clean_salary, clean_name, standardize_desc
+    clean_dates, clean_salary, clean_name, standardize_desc
 )
 from lib.path import data_file_path, ensure_data_dir
 from lib.columns import clean_column_names
@@ -28,12 +28,12 @@ def clean_personel():
     }, inplace=True)
     for col in ["last_name", "middle_initial", "first_name"]:
         df2.loc[:, col] = clean_name(df2[col])
-    for col in ["term_date", "hire_date", "pay_effective_date"]:
-        df2.loc[:, col] = clean_date(df2[col])
+    df2 = clean_dates(
+        df2, ["term_date", "hire_date", "pay_effective_date"])
     df2.loc[:, "hourly_salary"] = clean_salary(df2.hourly_salary)
     df2.loc[:, "rank_desc"] = standardize_desc(df2.rank_desc)
-    df2 = gen_uid(df2, ["first_name", "last_name",
-                        "middle_initial", "term_date", "hire_date"])
+    df2 = gen_uid(df2, ["first_name", "last_name", "middle_initial", "term_year",
+                        "term_month", "term_day", "hire_year", "hire_month", "hire_day"])
     return df2
 
 

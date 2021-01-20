@@ -1,5 +1,5 @@
 from lib.columns import clean_column_names
-from lib.clean import clean_names, parse_dates, clean_salaries, standardize_desc_cols
+from lib.clean import clean_names, parse_dates_with_known_format, clean_salaries, standardize_desc_cols
 from lib.path import data_file_path, ensure_data_dir
 import pandas as pd
 import sys
@@ -33,9 +33,9 @@ def clean_17():
     })
     df = df\
         .pipe(clean_names, ["first_name", "last_name", "middle_initial"])\
-        .pipe(parse_dates, ["hire_date", "term_date"], "%m/%d/%Y")\
         .pipe(clean_salaries, ["annual_salary"])\
         .pipe(standardize_desc_cols, ["department_desc", "rank_desc"])\
+        .pipe(parse_dates_with_known_format, ["hire_date", "term_date"], "%m/%d/%Y")\
         .pipe(assign_agency)
     return df
 
@@ -62,9 +62,9 @@ def clean_19():
     })
     df = df\
         .pipe(clean_names, ["first_name", "last_name", "middle_initial"])\
-        .pipe(parse_dates, ["hire_date", "term_date"], "%m/%d/%Y")\
         .pipe(clean_salaries, ["annual_salary"])\
         .pipe(standardize_desc_cols, ["department_desc", "rank_desc"])\
+        .pipe(parse_dates_with_known_format, ["hire_date", "term_date"], "%m/%d/%Y")\
         .pipe(assign_agency)
     return df
 

@@ -2,7 +2,7 @@ from lib.columns import (
     clean_column_names
 )
 from lib.path import data_file_path, ensure_data_dir
-from lib.clean import clean_names
+from lib.clean import clean_names, parse_dates_with_known_format
 import pandas as pd
 import numpy as np
 import sys
@@ -20,12 +20,6 @@ def match_schema_2014(df):
         "title_desc": "rank_desc",
         "termination_date": "term_date"
     })
-    return df
-
-
-def parse_date_2014(df):
-    for col in ['birth_date', 'hire_date', 'term_date', 'pay_prog_start_date']:
-        df.loc[:, col] = pd.to_datetime(df[col], format="%m/%d/%Y")
     return df
 
 
@@ -60,7 +54,8 @@ def clean_2014():
         "new_orleans_csd/new_orleans_csd_pprr_2014.csv"))
     df = df\
         .pipe(match_schema_2014)\
-        .pipe(parse_date_2014)\
+        .pipe(
+            parse_dates_with_known_format, ['birth_date', 'hire_date', 'term_date', 'pay_prog_start_date'], "%m/%d/%Y")\
         .pipe(clean_names, ["first_name", "last_name"])\
         .pipe(parse_salary_2014)\
         .pipe(standardize_rank_2014)\
@@ -77,12 +72,6 @@ def match_schema_2009(df):
         "titl_e_code": "rank_code",
         "title_desc": "rank_desc"
     })
-    return df
-
-
-def parse_date_2009(df):
-    for col in ['term_date', 'pay_prog_start_date']:
-        df.loc[:, col] = pd.to_datetime(df[col], format="%m/%d/%Y")
     return df
 
 
@@ -115,7 +104,8 @@ def clean_2009():
         "new_orleans_csd/new_orleans_csd_pprr_2009.csv"))
     df = df\
         .pipe(match_schema_2009)\
-        .pipe(parse_date_2009)\
+        .pipe(
+            parse_dates_with_known_format, ['term_date', 'pay_prog_start_date'], "%m/%d/%Y")\
         .pipe(clean_names, ["first_name", "last_name"])\
         .pipe(parse_salary_2009)\
         .pipe(standardize_rank_2009)\

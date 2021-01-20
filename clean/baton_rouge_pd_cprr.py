@@ -1,5 +1,5 @@
 from lib.columns import clean_column_names
-from lib.clean import clean_names, parse_dates, clean_salaries, standardize_desc_cols
+from lib.clean import clean_names, clean_dates, clean_salaries, standardize_desc_cols
 from lib.path import data_file_path, ensure_data_dir
 import pandas as pd
 import re
@@ -91,6 +91,8 @@ def realign_18():
         .str.replace(r"\< *\d+.+$", "").str.replace(r"^\.", "")\
         .str.replace("Exoneraled", "Exonerated", regex=False)\
         .str.replace("Sustaned", "Sustained", regex=False).str.strip().fillna("")
+    df.loc[:, "Action"] = df["Action"].str.replace(
+        "Slops", "Stops", regex=False)
 
     df.drop([84, 129, 133], inplace=True)
     df.loc[:, "1A Seq"] = df["1A Seq"].str.rjust(3, "0")
@@ -142,14 +144,18 @@ def assign_tracking_num_18(df):
 
 def clean_18():
     df = realign_18()
-    df = df\
-        .pipe(clean_column_names)\
-        .pipe(parse_officer_name_18)\
-        .pipe(standardize_desc_cols, ["department_desc"])\
-        .pipe(parse_complaint_18)\
-        .pipe(assign_tracking_num_18)
+    df = clean_column_names(df)
     df = df.rename(columns={
         "status": "investigation_status",
         "received": "receive_date",
     })
+    df = df\
+        .pipe(parse_officer_name_18)\
+        .pipe(parse_complaint_18)\
+        .pipe(
+            standardize_desc_cols,
+            ["department_desc", "action", "disposition", "rule_violation",
+             "paragraph_violation", "investigation_status"])\
+        .pipe(clean_dates, ["receive_date", "occur_date"])\
+        .pipe(assign_tracking_num_18)
     return df

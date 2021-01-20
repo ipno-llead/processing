@@ -8,8 +8,9 @@ PERSONEL_COLUMNS = [
     "middle_initial",  # lowercase middle initial
     "first_name",  # lowercase first name
     "employee_id",  # employee ID given to the person by the agency.
-    "birth_year",  # year of birth
-    "birth_date",  # date of birth
+    "birth_year",
+    "birth_month",
+    "birth_day"
 ]
 
 PERSONEL_HISTORY_COLUMNS = [
@@ -19,11 +20,21 @@ PERSONEL_HISTORY_COLUMNS = [
     "department_desc",  # department title or description
     "rank_code",  # rank code
     "rank_desc",  # rank title or description
-    "rank_date",
-    "hire_date",  # hire date
-    "term_date",  # termination date
-    "pay_prog_start_date",  # pay program start date
-    "pay_effective_date",  # pay effective date,
+    "rank_year",
+    "rank_month",
+    "rank_day",
+    "hire_year",
+    "hire_month",
+    "hire_day",
+    "term_year",  # termination year
+    "term_month",
+    "term_day",
+    "pay_prog_start_year",
+    "pay_prog_start_month",
+    "pay_prog_start_day",
+    "pay_effective_year",
+    "pay_effective_month",
+    "pay_effective_day",
     "employment_status",
     "annual_salary",  # annual salary
     "hourly_salary",  # hourly salary
@@ -34,9 +45,15 @@ PERSONEL_HISTORY_COLUMNS = [
 COMPLAINT_COLUMNS = [
     "uid",  # officer unique identifier
     "tracking_number",  # identifier for complaint
-    "occur_date",
-    "receive_date",
-    "investigation_complete_date",
+    "occur_year",
+    "occur_month",
+    "occur_day",
+    "receive_year",
+    "receive_month",
+    "receive_day",
+    "investigation_complete_year",
+    "investigation_complete_month",
+    "investigation_complete_day",
     "investigation_status",
     "disposition",
     "rule_code",

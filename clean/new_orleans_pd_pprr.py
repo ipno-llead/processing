@@ -1,7 +1,7 @@
 from lib.columns import clean_column_names
 from lib.match_records import gen_uid
 from lib.path import data_file_path, ensure_data_dir
-from lib.clean import clean_name
+from lib.clean import clean_name, parse_dates_with_known_format
 import pandas as pd
 import numpy as np
 import re
@@ -68,7 +68,7 @@ def match_schema_2018(orig_df):
 def normalize_2018(df):
     df.loc[:, "department_code"] = df.department_code.astype(
         "str").map(lambda x: "%s027%s" % (x[:2], x[2:])).astype("int64")
-    df.loc[:, "hire_date"] = pd.to_datetime(df.hire_date, format="%m/%d/%Y")
+    df = parse_dates_with_known_format(df, ["hire_date"], "%m/%d/%Y")
     df.loc[:, "middle_initial"] = df.middle_name.map(
         lambda x: x if x == "" else x[0])
     df.loc[:, "middle_name"] = df.middle_name.where(
