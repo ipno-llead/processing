@@ -21,7 +21,7 @@ conda install --file requirements.txt
 ```bash
 # Download input data files from Dropbox
 scripts/download_input.py
-# process all data files, check `ouput` folder for all generated files.
+# process all data files, check `data` folder for all generated files.
 make
 ```
 

@@ -1,10 +1,45 @@
 from lib.columns import clean_column_names
-from lib.clean import clean_names, clean_dates, clean_salaries, standardize_desc_cols
+from lib.clean import clean_dates, clean_salaries, standardize_desc_cols
+from lib.standardize import standardize_from_lookup_table
 from lib.path import data_file_path, ensure_data_dir
 import pandas as pd
 import re
 import sys
 sys.path.append("../")
+
+actions_lookup = [
+    ['exonerated'],
+    ['not sustained'],
+    ['resigned'],
+    ['office investigation'],
+    ['hold in abeyance'],
+    ['counseled'],
+    ['30-day suspension'],
+    ['letter of caution'],
+    ['2-day suspension'],
+    ['verbal judo training', 'verbal judo class'],
+    ['attaining respect class'],
+    ['early intervention'],
+    ['tactical training in reasonable suspicion & felony stops'],
+    ['letter of reprimand'],
+    ['peer intervention training'],
+    ['21-day suspension'],
+    ['1-day suspension'],
+    ['termination'],
+    ['letter of caution'],
+    ['firearm safety training'],
+    ['range master'],
+    ['1 day driving school'],
+    ['letter of instruction'],
+    ['conference worksheet'],
+    ['9-day suspension'],
+    ['65-day suspension'],
+    ['demotion - from sgt. to cpl.'],
+    ['7-day suspension'],
+    ['de-escalation, r/s & p/c training'],
+    ['uof training'],
+    ['5-day suspension']
+]
 
 
 def realign_18():
@@ -142,6 +177,13 @@ def assign_tracking_num_18(df):
     return df
 
 
+def standardize_action_18(df):
+    df.loc[:, "action"] = df.action\
+        .str.replace(r"(\d) day suspension", r"\1-day suspension")\
+        .str.replace("de- escalation", "de-escalation", regex=False)
+    return standardize_from_lookup_table(df, "action", actions_lookup)
+
+
 def clean_18():
     df = realign_18()
     df = clean_column_names(df)
@@ -157,5 +199,14 @@ def clean_18():
             ["department_desc", "action", "disposition", "rule_violation",
              "paragraph_violation", "investigation_status"])\
         .pipe(clean_dates, ["receive_date", "occur_date"])\
-        .pipe(assign_tracking_num_18)
+        .pipe(assign_tracking_num_18)\
+        .pipe(standardize_action_18)
     return df
+
+
+if __name__ == "__main__":
+    df = clean_18()
+    ensure_data_dir("clean")
+    df.to_csv(
+        data_file_path("clean/cprr_baton_rouge_pd_2018.csv"),
+        index=False)
