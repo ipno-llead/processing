@@ -20,7 +20,7 @@ def clean_17():
              'job_code', 'job_title', 'current_hire_date', 'employment_end_date',
              'employment_status', 'gross_pay']]
     df = df.rename(columns={
-        "year": "data_production_year",
+        # "year": "data_production_year",
         "employee_num": "employee_id",
         "middle_init": "middle_initial",
         "division_num": "department_code",

@@ -7,6 +7,7 @@ mdy_date_pattern_1 = re.compile(r"^\d{1,2}/\d{1,2}/\d{2}$")
 mdy_date_pattern_2 = re.compile(r"^\d{1,2}/\d{1,2}/\d{4}$")
 year_pattern = re.compile(r"^(19|20)\d{2}$")
 year_month_pattern = re.compile(r"^(19|20)\d{4}$")
+datetime_pattern_1 = re.compile(r"^\d{1,2}/\d{1,2}/\d{2,4}\s+\d{2}:\d{2}$")
 
 
 def clean_date(val):
@@ -36,10 +37,6 @@ def clean_date(val):
     raise ValueError("unknown date format \"%s\"" % val)
 
 
-def clean_date_series(series):
-    return pd.DataFrame.from_records(series.str.strip().map(clean_date))
-
-
 def clean_dates(df, cols):
     for col in cols:
         assert col.endswith("_date")
@@ -51,6 +48,12 @@ def clean_dates(df, cols):
     return df
 
 
+# def clean_datetime(val):
+#     if val == "" or pd.isnull(val):
+#         return "", "", "", "", ""
+#     m = datetime_pattern_1.match(val)
+
+
 def parse_dates_with_known_format(df, cols, format):
     for col in cols:
         assert col.endswith("_date")
@@ -60,6 +63,20 @@ def parse_dates_with_known_format(df, cols, format):
         dates.columns = [prefix+"_year", prefix+"_month", prefix+"_day"]
         df = pd.concat([df, dates], axis=1)
     df = df.drop(columns=cols)
+    return df
+
+
+def clean_sexes(df, cols):
+    for col in cols:
+        df.loc[:, col] = df[col].str.strip().str.lower()\
+            .str.replace(r"^m$", "male").str.replace(r"^f$", "female")
+    return df
+
+
+def clean_races(df, cols):
+    for col in cols:
+        df.loc[:, col] = df[col].str.strip().str.lower()\
+            .str.replace(r"^w$", "white").str.replace(r"^b$", "black")
     return df
 
 

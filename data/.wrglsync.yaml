@@ -12,6 +12,8 @@ repos:
     fileName: clean/cprr_baton_rouge_pd_2018.csv
   personel:
     fileName: fuse/personel.csv
+    primaryKey:
+      - uid
   personel_history:
     fileName: fuse/personel_history.csv
   complaint:

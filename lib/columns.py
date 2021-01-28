@@ -10,7 +10,9 @@ PERSONEL_COLUMNS = [
     "employee_id",  # employee ID given to the person by the agency.
     "birth_year",
     "birth_month",
-    "birth_day"
+    "birth_day",
+    "race",
+    "sex"
 ]
 
 PERSONEL_HISTORY_COLUMNS = [
