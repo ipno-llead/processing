@@ -7,7 +7,7 @@ mdy_date_pattern_1 = re.compile(r"^\d{1,2}/\d{1,2}/\d{2}$")
 mdy_date_pattern_2 = re.compile(r"^\d{1,2}/\d{1,2}/\d{4}$")
 year_pattern = re.compile(r"^(19|20)\d{2}$")
 year_month_pattern = re.compile(r"^(19|20)\d{4}$")
-datetime_pattern_1 = re.compile(r"^\d{1,2}/\d{1,2}/\d{2,4}\s+\d{2}:\d{2}$")
+datetime_pattern_1 = re.compile(r"^\d{1,2}/\d{1,2}/\d{2,4}\s+\d{1,2}:\d{1,2}$")
 
 
 def clean_date(val):
@@ -48,10 +48,29 @@ def clean_dates(df, cols):
     return df
 
 
-# def clean_datetime(val):
-#     if val == "" or pd.isnull(val):
-#         return "", "", "", "", ""
-#     m = datetime_pattern_1.match(val)
+def clean_datetime(val):
+    if val == "" or pd.isnull(val):
+        return "", "", "", "", ""
+    m = datetime_pattern_1.match(val)
+    if m is not None:
+        [date, time] = re.split(r"\s+", val)
+        [hour, minute] = time.split(":")
+        year, month, day = clean_date(date)
+        return year, month, day, "%s:%s" % (hour.zfill(2), minute.zfill(2))
+    raise ValueError("unknown datetime format \"%s\"" % val)
+
+
+def clean_datetimes(df, cols):
+    for col in cols:
+        assert col.endswith("_datetime")
+        dates = pd.DataFrame.from_records(
+            df[col].str.strip().map(clean_datetime))
+        prefix = col[:-9]
+        dates.columns = [prefix+"_year", prefix +
+                         "_month", prefix+"_day", prefix+"_time"]
+        df = pd.concat([df, dates], axis=1)
+    df = df.drop(columns=cols)
+    return df
 
 
 def parse_dates_with_known_format(df, cols, format):

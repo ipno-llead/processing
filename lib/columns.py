@@ -51,6 +51,7 @@ COMPLAINT_COLUMNS = [
     "occur_year",
     "occur_month",
     "occur_day",
+    "occur_time",
     "receive_year",
     "receive_month",
     "receive_day",
@@ -72,7 +73,9 @@ COMPLAINT_COLUMNS = [
     "complainant_ethnicity",
     "complainant_age",
     "action",  # list of actions taken separated by '; '
-    "complainant_type"
+    "complainant_type",
+    "data_production_year",  # year of data
+    "agency",  # name of agency (e.g. "New Orleans CSD")
     # "Incident Type",  # ?
     # "Complaint Classification",  # ?
     # "Bureau of Complainant",  # ?

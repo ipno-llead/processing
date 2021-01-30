@@ -12,8 +12,14 @@ repos:
     fileName: clean/cprr_baton_rouge_pd_2018.csv
   com-baton-rouge-pd:
     fileName: fuse/com_baton_rouge_pd.csv
+  com-baton-rouge-so:
+    fileName: fuse/com_baton_rouge_so.csv
   per-baton-rouge-pd:
     fileName: fuse/per_baton_rouge_pd.csv
+    primaryKey:
+      - uid
+  per-baton-rouge-so:
+    fileName: fuse/per_baton_rouge_so.csv
     primaryKey:
       - uid
   per-new-orleans-harbor-pd:
@@ -26,6 +32,8 @@ repos:
       - uid
   perhist-baton-rouge-pd:
     fileName: fuse/perhist_baton_rouge_pd.csv
+  perhist-baton-rouge-so:
+    fileName: fuse/perhist_baton_rouge_so.csv
   perhist-new-orleans-harbor-pd:
     fileName: fuse/perhist_new_orleans_harbor_pd.csv
   perhist-new-orleans-pd:
