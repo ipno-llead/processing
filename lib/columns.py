@@ -1,4 +1,5 @@
 import re
+from .clean import float_to_int_str
 
 
 PERSONEL_COLUMNS = [
@@ -70,7 +71,8 @@ COMPLAINT_COLUMNS = [
     "complainant_gender",
     "complainant_ethnicity",
     "complainant_age",
-    "action"  # list of actions taken separated by '; '
+    "action",  # list of actions taken separated by '; '
+    "complainant_type"
     # "Incident Type",  # ?
     # "Complaint Classification",  # ?
     # "Bureau of Complainant",  # ?
@@ -95,18 +97,53 @@ def clean_column_names(df):
 
 def rearrange_personel_columns(df):
     existing_cols = set(df.columns)
-    return df[[col for col in PERSONEL_COLUMNS if col in existing_cols]]\
-        .drop_duplicates(ignore_index=True)
+    return float_to_int_str(
+        df[[col for col in PERSONEL_COLUMNS if col in existing_cols]]
+        .drop_duplicates(ignore_index=True),
+        ["employee_id", "birth_year", "birth_month", "birth_day"])
 
 
 def rearrange_personel_history_columns(df):
     existing_cols = set(df.columns)
-    return df[[
-        col for col in PERSONEL_HISTORY_COLUMNS if col in existing_cols
-    ]].drop_duplicates(ignore_index=True)
+    return float_to_int_str(
+        df[[
+            col for col in PERSONEL_HISTORY_COLUMNS if col in existing_cols
+        ]].drop_duplicates(ignore_index=True),
+        [
+            "badge_no",
+            "rank_year",
+            "rank_month",
+            "rank_day",
+            "hire_year",
+            "hire_month",
+            "hire_day",
+            "term_year",
+            "term_month",
+            "term_day",
+            "pay_prog_start_year",
+            "pay_prog_start_month",
+            "pay_prog_start_day",
+            "pay_effective_year",
+            "pay_effective_month",
+            "pay_effective_day",
+            "data_production_year"
+        ])
 
 
 def rearrange_complaint_columns(df):
     existing_cols = set(df.columns)
-    return df[[col for col in COMPLAINT_COLUMNS if col in existing_cols]]\
-        .drop_duplicates(ignore_index=True)
+    return float_to_int_str(
+        df[[col for col in COMPLAINT_COLUMNS if col in existing_cols]]
+        .drop_duplicates(ignore_index=True),
+        [
+            "occur_year",
+            "occur_month",
+            "occur_day",
+            "receive_year",
+            "receive_month",
+            "receive_day",
+            "investigation_complete_year",
+            "investigation_complete_month",
+            "investigation_complete_day",
+            "paragraph_code"
+        ])

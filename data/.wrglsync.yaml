@@ -10,14 +10,26 @@ repos:
     fileName: clean/pprr_new_orleans_pd.csv
   clean-cprr-baton-rouge-pd-2018:
     fileName: clean/cprr_baton_rouge_pd_2018.csv
-  personel:
-    fileName: fuse/personel.csv
+  com-baton-rouge-pd:
+    fileName: fuse/com_baton_rouge_pd.csv
+  per-baton-rouge-pd:
+    fileName: fuse/per_baton_rouge_pd.csv
     primaryKey:
       - uid
-  personel_history:
-    fileName: fuse/personel_history.csv
-  complaint:
-    fileName: fuse/complaint.csv
+  per-new-orleans-harbor-pd:
+    fileName: fuse/per_new_orleans_harbor_pd.csv
+    primaryKey:
+      - uid
+  per-new-orleans-pd:
+    fileName: fuse/per_new_orleans_pd.csv
+    primaryKey:
+      - uid
+  perhist-baton-rouge-pd:
+    fileName: fuse/perhist_baton_rouge_pd.csv
+  perhist-new-orleans-harbor-pd:
+    fileName: fuse/perhist_new_orleans_harbor_pd.csv
+  perhist-new-orleans-pd:
+    fileName: fuse/perhist_new_orleans_pd.csv
 commit:
   messageTemplate: |-
     {{.GitCommit.Link}}
