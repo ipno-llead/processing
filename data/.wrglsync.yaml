@@ -10,6 +10,8 @@ repos:
     fileName: clean/pprr_new_orleans_pd.csv
   clean-cprr-baton-rouge-pd-2018:
     fileName: clean/cprr_baton_rouge_pd_2018.csv
+  clean-cprr-baton-rouge-so-2018:
+    fileName: clean/cprr_baton_rouge_so_2018.csv
   com-baton-rouge-pd:
     fileName: fuse/com_baton_rouge_pd.csv
   com-baton-rouge-so:
