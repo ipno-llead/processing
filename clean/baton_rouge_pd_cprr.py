@@ -158,14 +158,14 @@ def parse_officer_name_18(df):
     dep.loc[:, "name"] = dep["name"].str.replace(
         r"\.", "").str.strip().str.lower()
 
-    names = dep["name"].str.replace(
-        r"^(\w+(?: (?:Iii?|Iv|V|Jr|Sr))?) (\w+)(?: (\w+|N\/A))?$", r"\1 # \2 # \3").str.split(" # ", expand=True)
+    names = dep["name"].str.lower().str.replace(r"\s+", " ").str.replace(
+        r"^(\w+(?: (?:iii?|iv|v|jr|sr))?) (\w+)(?: (\w+|n\/a))?$", r"\1 # \2 # \3").str.split(" # ", expand=True)
     names.columns = ["last_name", "first_name", "middle_initial"]
-    names.loc[:, "middle_initial"] = names["middle_initial"].str.replace(
-        "N/A", "", regex=False).fillna("")
-    names.loc[:, "last_name"] = names["last_name"]\
-        .str.replace(r"^(.+) (Iii?|Iv)$", lambda m: "%s %s" % (m.group(1), m.group(2).upper())).fillna("")
-    names.loc[:, "first_name"] = names["first_name"].fillna("")
+    names.loc[:, "middle_initial"] = names["middle_initial"]\
+        .str.replace("n/a", "", regex=False).fillna("")
+    names.loc[:, "middle_name"] = names.middle_initial.map(
+        lambda v: "" if len(v) < 2 else v)
+    names.loc[:, "middle_initial"] = names.middle_initial.map(lambda v: v[:1])
 
     df = pd.concat([df, dep, names], axis=1)
     df.drop(columns=["officer_name", "name"], inplace=True)
