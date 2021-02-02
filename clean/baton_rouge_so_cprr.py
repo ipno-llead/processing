@@ -1,5 +1,5 @@
 from lib.columns import clean_column_names
-from lib.match_records import gen_uid
+from lib.uid import gen_uid
 from lib.path import data_file_path, ensure_data_dir
 from lib.clean import (
     clean_name, standardize_desc_cols, clean_dates, clean_sexes, clean_races, clean_datetimes

@@ -1,6 +1,6 @@
 from lib.columns import clean_column_names
 from lib.clean import clean_dates, standardize_desc_cols
-from lib.match_records import gen_uid
+from lib.uid import gen_uid
 from lib.standardize import standardize_from_lookup_table
 from lib.path import data_file_path, ensure_data_dir
 import pandas as pd

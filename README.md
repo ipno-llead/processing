@@ -65,8 +65,8 @@ Each major step above should output CSV files which can then be saved in a versi
 - Possible `data_type` that might appear in file names:
   - **pprr**: Personnel Public Records Request.
   - **cprr**: Complaints Public Records Request.
-  - **personel**: Unique personel list.
-  - **personel_hist**: Personel history.
+  - **personnel**: Unique personnel list.
+  - **personnel_hist**: Personnel history.
 - Abbreviations that might appear in file names and agency names:
   - **pd**: Police Department
   - **so**: Sheriff’s Office

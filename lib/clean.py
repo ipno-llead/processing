@@ -95,7 +95,8 @@ def clean_sexes(df, cols):
 def clean_races(df, cols):
     for col in cols:
         df.loc[:, col] = df[col].str.strip().str.lower()\
-            .str.replace(r"^w$", "white").str.replace(r"^b$", "black")
+            .str.replace(r"^w$", "white").str.replace(r"^b$", "black")\
+            .str.replace(r"^h$", "hispanic")
     return df
 
 
@@ -120,7 +121,7 @@ def clean_names(df, cols):
 
 
 def standardize_desc(series):
-    return series.str.strip().str.lower()
+    return series.str.strip().str.lower().fillna("")
 
 
 def standardize_desc_cols(df, cols):

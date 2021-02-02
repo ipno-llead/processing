@@ -4,7 +4,7 @@ from lib.clean import (
 )
 from lib.path import data_file_path, ensure_data_dir
 from lib.columns import clean_column_names
-from lib.match_records import gen_uid
+from lib.uid import gen_uid
 import sys
 sys.path.append("../")
 
@@ -16,7 +16,7 @@ def read_input():
     return df.dropna(how="all")
 
 
-def clean_personel():
+def clean_personnel():
     df = read_input()
     df2 = df[["first_name", "last_name", "position_rank", "date_hired",
               "term_date", "hourly_pay", "mi", "pay_effective_date"]]
@@ -32,15 +32,15 @@ def clean_personel():
         df2, ["term_date", "hire_date", "pay_effective_date"])
     df2.loc[:, "hourly_salary"] = clean_salary(df2.hourly_salary)
     df2.loc[:, "rank_desc"] = standardize_desc(df2.rank_desc)
-    df2 = gen_uid(df2, ["first_name", "last_name", "middle_initial", "term_year",
-                        "term_month", "term_day", "hire_year", "hire_month", "hire_day"])
+    df2 = gen_uid(df2, ["first_name", "last_name",
+                        "middle_initial", "hire_year", "hire_month", "hire_day"])
     df2.loc[:, "agency"] = "New Orleans Harbor PD"
     df2.loc[:, "data_production_year"] = 2020
     return df2
 
 
 if __name__ == "__main__":
-    df = clean_personel()
+    df = clean_personnel()
     ensure_data_dir("clean")
     df.to_csv(
         data_file_path("clean/pprr_new_orleans_harbor_pd_2020.csv"),

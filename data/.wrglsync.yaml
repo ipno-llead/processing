@@ -12,10 +12,16 @@ repos:
     fileName: clean/cprr_baton_rouge_pd_2018.csv
   clean-cprr-baton-rouge-so-2018:
     fileName: clean/cprr_baton_rouge_so_2018.csv
+  clean-cprr-new-orleans-harbor-pd-2020:
+    fileName: clean/cprr_new_orleans_harbor_pd_2020.csv
+  match-cprr-new-orleans-harbor-pd-2020:
+    fileName: match/cprr_new_orleans_harbor_pd_2020.csv
   com-baton-rouge-pd:
     fileName: fuse/com_baton_rouge_pd.csv
   com-baton-rouge-so:
     fileName: fuse/com_baton_rouge_so.csv
+  com-new-orleans-harbor-pd:
+    fileName: fuse/com_new_orleans_harbor_pd.csv
   per-baton-rouge-pd:
     fileName: fuse/per_baton_rouge_pd.csv
     primaryKey:
