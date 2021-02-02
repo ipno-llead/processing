@@ -9,6 +9,12 @@ class MatchStatus(Enum):
 
 
 class ThresholdClassifier(object):
+    """
+    For each pair compute similarity vector and combine into a single
+    similarity value using euclidean distance and normalize so it fit into 0-1 range.
+    Finally classify into matches, potential matches, non-matches with 2 thresholds.
+    """
+
     def __init__(self, fields, thresholds=[1, 0.5]):
         self._fields = fields
         self._thresholds = thresholds

@@ -17,7 +17,7 @@ class DateSimilarity(object):
         d = a - b
         if b > a:
             d = b - a
-        if d.days <= self._days_max_diff:
+        if d.days < self._days_max_diff:
             return 1 - d.days / self._days_max_diff
         if a.year == b.year and a.month == b.day and a.day == b.month:
             return 0.5

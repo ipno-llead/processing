@@ -72,3 +72,9 @@ Each major step above should output CSV files which can then be saved in a versi
   - **so**: Sheriff’s Office
   - **csd**: Civil Service Department
   - **csc**: Civil Service Commission
+
+## Run tests
+
+```bash
+scripts/test.sh
+```
