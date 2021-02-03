@@ -25,7 +25,8 @@ def fuse():
         data_file_path("clean/pprr_new_orleans_pd.csv"))
 
     return (
-        deduplicate_personnel_data(rearrange_personnel_columns(df)),
+        rearrange_personnel_columns(
+            deduplicate_personnel_data(rearrange_personnel_columns(df))),
         rearrange_personnel_history_columns(df)
     )
 
