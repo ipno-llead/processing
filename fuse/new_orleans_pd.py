@@ -8,11 +8,24 @@ import sys
 sys.path.append("../")
 
 
+def deduplicate_personnel_data(df):
+    records = dict()
+    for _, row in df.iterrows():
+        if row.uid not in records:
+            records[row.uid] = {"uid": row.uid}
+        record = records[row.uid]
+        for col in ["last_name", "middle_name", "middle_initial", "first_name", "birth_year"]:
+            if not pd.isnull(row[col]):
+                record[col] = row[col]
+    return pd.DataFrame.from_records(list(records.values()))
+
+
 def fuse():
     df = pd.read_csv(
         data_file_path("clean/pprr_new_orleans_pd.csv"))
+
     return (
-        rearrange_personnel_columns(df),
+        deduplicate_personnel_data(rearrange_personnel_columns(df)),
         rearrange_personnel_history_columns(df)
     )
 
