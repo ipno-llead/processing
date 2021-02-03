@@ -1,7 +1,9 @@
 from lib.columns import clean_column_names
 from lib.uid import gen_uid
 from lib.path import data_file_path, ensure_data_dir
-from lib.clean import clean_name, parse_dates_with_known_format
+from lib.clean import (
+    clean_name, parse_dates_with_known_format, standardize_desc_cols
+)
 import pandas as pd
 import numpy as np
 import re
@@ -128,6 +130,7 @@ def clean():
                 .pipe(assign_agency_col)\
                 .pipe(normalize_badge_no)\
                 .pipe(gen_uid, ["employee_id"])\
+                .pipe(standardize_desc_cols, ["department_desc"])\
                 .pipe(normalize_2018)
         else:
             df = df\
