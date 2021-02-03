@@ -54,6 +54,12 @@ DATA_FILES = {
     ],
     "louisianna_state_csc": [
         "https://www.dropbox.com/sh/9zndy2dz3w60etq/AAAqcTxDk8GVj3uvQbUto3XBa/Log%20Records/LouisianaState_CSC_LPRR_1991-2020.csv?dl=1"  # noqa
+    ],
+    "brusly_pd": [
+        "https://www.dropbox.com/sh/s3qchv84i0j5tsd/AAAx1lt_f2iqEERkEjK7wj2_a/Complaints%20Data/Brusly_PD_CPRR_2020.csv?dl=1"  # noqa
+    ],
+    "post_council": [
+        "https://www.dropbox.com/sh/9fafm0yxbk4z8zt/AAC22Rm_L4FVRzuIZ-Rc_UL4a/POST_PPRR_11-6-2020.csv?dl=1"  # noqa
     ]
 }
 _current_dir = os.path.dirname(os.path.realpath(__file__))
