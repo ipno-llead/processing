@@ -50,7 +50,7 @@ class ColumnsIndex(object):
             if result is None:
                 result = df[self._cols[ind]] == val
             else:
-                result = result & df[self._cols[ind]] == val
+                result = result & (df[self._cols[ind]] == val)
         return result
 
     def __next__(self):

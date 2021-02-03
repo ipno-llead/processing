@@ -1,5 +1,8 @@
 from lib.columns import clean_column_names
-from lib.clean import clean_names, parse_dates_with_known_format, clean_salaries, standardize_desc_cols
+from lib.clean import (
+    clean_names, parse_dates_with_known_format, clean_salaries, standardize_desc_cols,
+    clean_employment_status
+)
 from lib.path import data_file_path, ensure_data_dir
 import pandas as pd
 import sys
@@ -31,6 +34,7 @@ def clean_17():
         "employment_end_date": "term_date",
         "gross_pay": "annual_salary"
     })
+    df.loc[:, "data_production_year"] = "2017"
     df = df\
         .pipe(clean_names, ["first_name", "last_name", "middle_initial"])\
         .pipe(clean_salaries, ["annual_salary"])\
@@ -49,7 +53,7 @@ def clean_19():
              'job_code', 'job_title', 'current_hire_date', 'employment_end_date',
              'employment_status', 'gross_pay', 'uniqueid']]
     df = df.rename(columns={
-        "year": "data_production_year",
+        # "year": "data_production_year",
         "middle_init": "middle_initial",
         "pay_location_code": "department_code",
         "pay_location_description": "department_desc",
@@ -60,11 +64,13 @@ def clean_19():
         "gross_pay": "annual_salary",
         "uniqueid": "employee_id"
     })
+    df.loc[:, "data_production_year"] = "2019"
     df = df\
         .pipe(clean_names, ["first_name", "last_name", "middle_initial"])\
         .pipe(clean_salaries, ["annual_salary"])\
         .pipe(standardize_desc_cols, ["department_desc", "rank_desc"])\
         .pipe(parse_dates_with_known_format, ["hire_date", "term_date"], "%m/%d/%Y")\
+        .pipe(clean_employment_status, ["employment_status"])\
         .pipe(assign_agency)
     return df
 

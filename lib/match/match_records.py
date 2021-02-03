@@ -28,6 +28,9 @@ def match_records(index, classifier, dfa, dfb):
 
 
 def print_match_result(dfa, dfb, matches, potential_matches, non_matches):
+    print("matches: %d\npotential matches: %d\nnon-matches: %d" % (
+        len(matches), len(potential_matches), len(non_matches)
+    ))
     pd.set_option('display.max_rows', 500)
     pd.set_option('display.max_columns', 500)
     pd.set_option('display.width', 1000)

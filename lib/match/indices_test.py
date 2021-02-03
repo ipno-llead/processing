@@ -43,3 +43,18 @@ class TestColumnsIndex(BaseIndexTestCase):
             (pd.DataFrame([[2, 4]], index=["y"], columns=cols),
              pd.DataFrame([[2, 7]], index=["w"], columns=cols))
         ])
+
+    def test_multi_index(self):
+        cols = ["c", "d"]
+        dfa = pd.DataFrame(
+            [[1, 2], [2, 4], [3, 4], [7, 8]], index=["z", "x", "c", "v"], columns=cols)
+        dfb = pd.DataFrame(
+            [[1, 6], [3, 4], [7, 8], [2, 7]], index=["q", "w", "e", "r"], columns=cols)
+        idx = ColumnsIndex(["c", "d"])
+        idx.index(dfa, dfb)
+        self.assert_pairs_list_equal(list(idx), [
+            (pd.DataFrame([[3, 4]], index=["c"], columns=cols),
+             pd.DataFrame([[3, 4]], index=["w"], columns=cols)),
+            (pd.DataFrame([[7, 8]], index=["v"], columns=cols),
+             pd.DataFrame([[7, 8]], index=["e"], columns=cols))
+        ])

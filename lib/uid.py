@@ -1,6 +1,10 @@
 import hashlib
 
 
+def gen_uid_from_row(series, id_cols):
+    return hashlib.md5(series[id_cols].astype("str").agg(', '.join, axis=1).encode('utf-8')).hexdigest()
+
+
 def gen_uid(df, id_cols, uid_name="uid"):
     df.loc[:, uid_name] = df[id_cols].astype("str").agg(', '.join, axis=1).map(
         lambda x: hashlib.md5(x.encode('utf-8')).hexdigest()

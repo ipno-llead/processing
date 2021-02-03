@@ -8,7 +8,6 @@ PERSONNEL_COLUMNS = [
     "middle_name",  # lowercase middle name
     "middle_initial",  # lowercase middle initial
     "first_name",  # lowercase first name
-    "employee_id",  # employee ID given to the person by the agency.
     "birth_year",
     "birth_month",
     "birth_day",
@@ -19,6 +18,7 @@ PERSONNEL_COLUMNS = [
 PERSONNEL_HISTORY_COLUMNS = [
     "uid",  # officer unique identifier
     "badge_no",  # badge number
+    "employee_id",  # employee ID given to the person by the agency.
     "department_code",  # department code or id
     "department_desc",  # department title or description
     "rank_code",  # rank code
@@ -104,7 +104,7 @@ def rearrange_personnel_columns(df):
     return float_to_int_str(
         df[[col for col in PERSONNEL_COLUMNS if col in existing_cols]]
         .drop_duplicates(ignore_index=True),
-        ["employee_id", "birth_year", "birth_month", "birth_day"])
+        ["birth_year", "birth_month", "birth_day"])
 
 
 def rearrange_personnel_history_columns(df):
@@ -115,6 +115,7 @@ def rearrange_personnel_history_columns(df):
         ]].drop_duplicates(ignore_index=True),
         [
             "badge_no",
+            "employee_id",
             "appoint_year",
             "appoint_month",
             "appoint_day",

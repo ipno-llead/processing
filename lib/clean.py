@@ -100,6 +100,13 @@ def clean_races(df, cols):
     return df
 
 
+def clean_employment_status(df, cols):
+    for col in cols:
+        df.loc[:, col] = df[col].str.strip().str.lower()\
+            .str.replace(r"^i$", "inactive").str.replace(r"^a$", "active")
+    return df
+
+
 def clean_salary(series):
     return series.str.strip().str.replace(r"[^\d\.]", "").astype("float64")
 
