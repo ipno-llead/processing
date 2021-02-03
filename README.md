@@ -1,6 +1,6 @@
 # PPACT data integration
 
-Notebooks and Python scripts to combine & integrate PPACT data.
+Notebooks and Python scripts to combine & integrate PPACT data. All generated data are kept in [WRGL](https://www.wrgl.co/@ipno).
 
 ## Install Jupyter & Python dependencies
 
@@ -48,7 +48,7 @@ Each major step above should output CSV files which can then be saved in a versi
 
 - **scripts**: Scripts that can be called directly go here.
   - **download_input.py**: Download relevant input files from Dropbox to folder `data` if they don't already exist.
-  - **commit_data.py**: Check that any code changes are already commit and commit any updated data files to [WRGL](https://www.wrgl.co).
+  - **test.sh**: Run tests against `lib/` folder.
 - **clean**: This folder correspond to the `Standardization & cleaning` step above. Each module should be dedicated to clean only 1 file or a group of files with similar format (i.e. yearly data from a single police department). Each module take input data from `data` folder and output CSV files back to `data/clean` with name like `{data_type}_{agency_name}_{optional_date}.csv`.
 - **match**: This folder correspond to the `Data matching` step. Each module take cleaned data from the previous step, do any matching and save to `data/match` folder with name like `{data_type}_{agency_name}_{optional_date}.csv`.
 - **fuse**: This folder correspond to the `Data fusion` step. Data files from previous steps are combined and saved to `data/fuse` folder with name like `{data_type}.csv` (agency name and date info should be present in the data itself).
@@ -65,8 +65,10 @@ Each major step above should output CSV files which can then be saved in a versi
 - Possible `data_type` that might appear in file names:
   - **pprr**: Personnel Public Records Request.
   - **cprr**: Complaints Public Records Request.
-  - **personnel**: Unique personnel list.
-  - **personnel_hist**: Personnel history.
+- WRGL repo prefixes:
+  - **per-**: Personnel data.
+  - **perhist-**: Personnel history data.
+  - **com-**: Complaint data.
 - Abbreviations that might appear in file names and agency names:
   - **pd**: Police Department
   - **so**: Sheriff’s Office
