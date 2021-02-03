@@ -12,3 +12,9 @@ def to_datetime_series(series):
             return pd.to_datetime(series, format='%m/%d/%Y', errors='raise')
         raise Exception("unknown format: %s" % series[0])
     raise Exception("to_datetime can't deal with series: %s", series)
+
+
+def combine_date_columns(df, year_col, month_col, day_col):
+    dates = df[[year_col, month_col, day_col]]
+    dates.columns = ["year", "month", "day"]
+    return pd.to_datetime(dates)

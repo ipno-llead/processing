@@ -16,6 +16,10 @@ repos:
     fileName: clean/cprr_new_orleans_harbor_pd_2020.csv
   match-cprr-new-orleans-harbor-pd-2020:
     fileName: match/cprr_new_orleans_harbor_pd_2020.csv
+  match-pprr-baton-rouge-csd-2019:
+    fileName: match/pprr_baton_rouge_csd_2019.csv
+  match-pprr-new-orleans-csd-2014:
+    fileName: match/pprr_new_orleans_csd_2014.csv
   com-baton-rouge-pd:
     fileName: fuse/com_baton_rouge_pd.csv
   com-baton-rouge-so:
@@ -38,6 +42,10 @@ repos:
     fileName: fuse/per_new_orleans_pd.csv
     primaryKey:
       - uid
+  per-new-orleans-csd:
+    fileName: fuse/per_new_orleans_csd.csv
+    primaryKey:
+      - uid
   perhist-baton-rouge-pd:
     fileName: fuse/perhist_baton_rouge_pd.csv
   perhist-baton-rouge-so:
@@ -46,6 +54,8 @@ repos:
     fileName: fuse/perhist_new_orleans_harbor_pd.csv
   perhist-new-orleans-pd:
     fileName: fuse/perhist_new_orleans_pd.csv
+  perhist-new-orleans-csd:
+    fileName: fuse/perhist_new_orleans_csd.csv
 commit:
   messageTemplate: |-
     {{.GitCommit.Link}}

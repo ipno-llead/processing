@@ -8,7 +8,7 @@ def match_records(index, classifier, dfa, dfb):
     """
     if dfa.index.duplicated().any() or dfb.index.duplicated().any():
         raise ValueError(
-            "Dataframe index contains duplicates. Both dateframes need to have index free of duplicates.")
+            "Dataframe index contains duplicates. Both frames need to have index free of duplicates.")
     index.index(dfa, dfb)
 
     matches = []
@@ -28,18 +28,21 @@ def match_records(index, classifier, dfa, dfb):
 
 
 def print_match_result(dfa, dfb, matches, potential_matches, non_matches):
+    pd.set_option('display.max_rows', 500)
+    pd.set_option('display.max_columns', 500)
+    pd.set_option('display.width', 1000)
     if len(matches) > 0:
-        print("*** MATCHES ***")
+        print("\n*** MATCHES ***\n")
         for idx_a, idx_b in matches:
             print(pd.DataFrame([dfa.loc[idx_a], dfb.loc[idx_b]]))
             print()
     if len(potential_matches) > 0:
-        print("*** POTENTIAL MATCHES ***")
+        print("\n*** POTENTIAL MATCHES ***\n")
         for idx_a, idx_b in potential_matches:
             print(pd.DataFrame([dfa.loc[idx_a], dfb.loc[idx_b]]))
             print()
     if len(non_matches) > 0:
-        print("*** NON-MATCHES ***")
+        print("\n*** NON-MATCHES ***\n")
         for idx_a, idx_b in non_matches:
             print(pd.DataFrame([dfa.loc[idx_a], dfb.loc[idx_b]]))
             print()

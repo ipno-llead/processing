@@ -1,4 +1,5 @@
-from Levenshtein import ratio
+from Levenshtein import ratio, jaro_winkler
+from unidecode import unidecode
 
 
 class StringSimilarity(object):
@@ -6,7 +7,19 @@ class StringSimilarity(object):
         pass
 
     def sim(self, a, b):
-        return ratio(a, b)
+        return ratio(unidecode(a), unidecode(b))
+
+
+class JaroWinklerSimilarity(object):
+    """
+    Similar to StringSimilarity but give extra weight to common prefix
+    """
+
+    def __init__(self, prefix_weight=0.1):
+        self._prefix_weight = prefix_weight
+
+    def sim(self, a, b):
+        return jaro_winkler(unidecode(a), unidecode(b), self._prefix_weight)
 
 
 class DateSimilarity(object):

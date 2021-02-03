@@ -1,5 +1,6 @@
 import math
 from enum import Enum
+import pandas as pd
 
 
 class MatchStatus(Enum):
@@ -22,7 +23,10 @@ class ThresholdClassifier(object):
     def classify(self, rec_a, rec_b):
         sim_vec = dict()
         for k, scls in self._fields.items():
-            sim_vec[k] = scls.sim(rec_a[k], rec_b[k])
+            if pd.isnull(rec_a[k]) or pd.isnull(rec_b[k]):
+                sim_vec[k] = 0
+            else:
+                sim_vec[k] = scls.sim(rec_a[k], rec_b[k])
         sim = math.sqrt(
             sum(v * v for v in sim_vec.values()) / len(self._fields))
         if sim >= self._thresholds[0]:

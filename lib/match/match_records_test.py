@@ -20,7 +20,7 @@ class TestMatchRecords(unittest.TestCase):
             [
                 ["ab", "cd"],
                 ["ae", "vb"],
-                ["rt", "qw"],
+                ["rt", "qw"]
             ],
             columns=cols
         )
@@ -33,3 +33,20 @@ class TestMatchRecords(unittest.TestCase):
         self.assertEqual(matches, [(0, 0)])
         self.assertEqual(potential_matches, [(0, 1)])
         self.assertEqual(non_matches, [(0, 2)])
+
+    def test_ensure_unique_index(self):
+        dfa = pd.DataFrame(
+            [[1, 2], [3, 4]], index=["a", "a"]
+        )
+        dfb = pd.DataFrame(
+            [[5, 6], [7, 8]], index=["a", "b"]
+        )
+        with self.assertRaisesRegex(
+                ValueError,
+                "Dataframe index contains duplicates. Both frames need to have index free of duplicates."):
+            match_records(
+                NoopIndex(),
+                ThresholdClassifier({"a": StringSimilarity()}),
+                dfa,
+                dfb
+            )

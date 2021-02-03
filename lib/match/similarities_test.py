@@ -1,7 +1,7 @@
 import unittest
 from datetime import date
 
-from .similarities import StringSimilarity, DateSimilarity
+from .similarities import StringSimilarity, DateSimilarity, JaroWinklerSimilarity
 
 
 class TestStringSimilarity(unittest.TestCase):
@@ -10,6 +10,16 @@ class TestStringSimilarity(unittest.TestCase):
         self.assertEqual(obj.sim("abc", "abc"), 1)
         self.assertEqual(obj.sim("abc", "123"), 0)
         self.assertEqual(obj.sim("abce", "abcd"), 0.75)
+        self.assertEqual(obj.sim("thang", "thăng"), 1)
+
+
+class TestJaroWinklerSimilarity(unittest.TestCase):
+    def test_sim(self):
+        obj = JaroWinklerSimilarity(0.2)
+        self.assertEqual(obj.sim("abc", "abc"), 1)
+        self.assertEqual(obj.sim("abc", "123"), 0)
+        self.assertEqual(obj.sim("abce", "abcd"), 0.9333333333333333)
+        self.assertEqual(obj.sim("wbcd", "abcd"), 0.8333333333333334)
 
 
 class TestDateSimilarity(unittest.TestCase):

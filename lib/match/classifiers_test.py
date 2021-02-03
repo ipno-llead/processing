@@ -1,4 +1,5 @@
 import unittest
+import numpy as np
 import pandas as pd
 
 from .classifiers import ThresholdClassifier, MatchStatus
@@ -21,5 +22,10 @@ class TestThresholdClassifier(unittest.TestCase):
         self.assertEqual(
             classifier.classify(
                 pd.Series(["abc", 123], index=["a", "b"]),
+                pd.Series(["def", 456], index=["a", "b"]),),
+            MatchStatus.NO)
+        self.assertEqual(
+            classifier.classify(
+                pd.Series([np.nan, 123], index=["a", "b"]),
                 pd.Series(["def", 456], index=["a", "b"]),),
             MatchStatus.NO)

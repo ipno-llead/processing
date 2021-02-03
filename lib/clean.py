@@ -111,7 +111,8 @@ def clean_salaries(df, cols):
 
 
 def clean_name(series):
-    return series.str.strip().str.replace(r"[^\w-]+", " ").str.replace(r"\s+", " ").str.lower().str.strip().fillna("")
+    return series.str.strip().str.replace(r"[^\w-]+", " ").str.replace(r"\s+", " ")\
+        .str.replace(r"\s*-\s*", "-").str.lower().str.strip().fillna("")
 
 
 def clean_names(df, cols):

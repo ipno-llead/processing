@@ -2,7 +2,8 @@ from lib.columns import (
     clean_column_names
 )
 from lib.path import data_file_path, ensure_data_dir
-from lib.clean import clean_names, parse_dates_with_known_format
+from lib.uid import gen_uid
+from lib.clean import clean_names, parse_dates_with_known_format, standardize_desc_cols
 import pandas as pd
 import numpy as np
 import sys
@@ -59,6 +60,11 @@ def clean_2014():
         .pipe(clean_names, ["first_name", "last_name"])\
         .pipe(parse_salary_2014)\
         .pipe(standardize_rank_2014)\
+        .pipe(standardize_desc_cols, ["department_desc"])\
+        .pipe(
+            gen_uid,  # "mid" is match id, used to match against 2009 data
+            ["first_name", "last_name", "hire_year", "hire_month", "hire_day"],
+            "mid")\
         .pipe(assign_cols_2014)
     return df
 
@@ -109,6 +115,12 @@ def clean_2009():
         .pipe(clean_names, ["first_name", "last_name"])\
         .pipe(parse_salary_2009)\
         .pipe(standardize_rank_2009)\
+        .pipe(standardize_desc_cols, ["department_desc"])\
+        .pipe(
+            gen_uid,  # "mid" is match id, used to match against 2014 data
+            ["first_name", "last_name", "pay_prog_start_year",
+                "pay_prog_start_month", "pay_prog_start_day"],
+            "mid")\
         .pipe(assign_cols_2009)
     return df
 
