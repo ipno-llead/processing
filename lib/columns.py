@@ -180,5 +180,11 @@ def rearrange_complaint_columns(df):
             "investigation_complete_year",
             "investigation_complete_month",
             "investigation_complete_day",
-            "paragraph_code"
+            "paragraph_code",
+            "suspension_start_year",
+            "suspension_start_month",
+            "suspension_start_day",
+            "suspension_end_year",
+            "suspension_end_month",
+            "suspension_end_day"
         ])

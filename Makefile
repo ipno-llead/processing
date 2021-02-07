@@ -9,7 +9,7 @@ all: data/fuse/per_baton_rouge_pd.csv data/fuse/perhist_baton_rouge_pd.csv data/
 all: data/fuse/per_baton_rouge_so.csv data/fuse/perhist_baton_rouge_so.csv data/fuse/com_baton_rouge_so.csv
 all: data/fuse/per_new_orleans_csd.csv data/fuse/perhist_new_orleans_csd.csv
 all: data/fuse/per_baton_rouge_csd.csv data/fuse/perhist_baton_rouge_csd.csv
-all: data/fuse/per_brusly_pd.csv data/fuse/perhist_brusly_pd.csv data/match/cprr_brusly_pd_2020.csv
+all: data/fuse/per_brusly_pd.csv data/fuse/perhist_brusly_pd.csv data/fuse/com_brusly_pd.csv
 
 data/fuse/per_new_orleans_pd.csv data/fuse/perhist_new_orleans_pd.csv: fuse/new_orleans_pd.py data/clean/pprr_new_orleans_pd.csv
 	python fuse/new_orleans_pd.py
@@ -29,7 +29,7 @@ data/fuse/per_new_orleans_csd.csv data/fuse/perhist_new_orleans_csd.csv: fuse/ne
 data/fuse/per_baton_rouge_csd.csv data/fuse/perhist_baton_rouge_csd.csv: fuse/baton_rouge_csd.py data/match/pprr_baton_rouge_csd_2017.csv data/match/pprr_baton_rouge_csd_2019.csv
 	python fuse/baton_rouge_csd.py
 
-data/fuse/per_brusly_pd.csv data/fuse/perhist_brusly_pd.csv: fuse/brusly_pd.py data/clean/pprr_brusly_pd_2020.csv
+data/fuse/per_brusly_pd.csv data/fuse/perhist_brusly_pd.csv data/fuse/com_brusly_pd.csv: fuse/brusly_pd.py data/clean/pprr_brusly_pd_2020.csv data/match/cprr_brusly_pd_2020.csv
 	python fuse/brusly_pd.py
 
 

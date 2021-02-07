@@ -19,8 +19,14 @@ def fuse():
 
 if __name__ == "__main__":
     personnel_df, history_df = fuse()
+    com_df = rearrange_complaint_columns(
+        pd.read_csv(data_file_path("match/cprr_brusly_pd_2020.csv"))
+    )
     ensure_data_dir("fuse")
     personnel_df.to_csv(data_file_path(
         "fuse/per_brusly_pd.csv"), index=False)
     history_df.to_csv(data_file_path(
         "fuse/perhist_brusly_pd.csv"), index=False)
+    com_df.to_csv(data_file_path(
+        "fuse/com_brusly_pd.csv"
+    ), index=False)

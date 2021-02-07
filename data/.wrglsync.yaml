@@ -32,14 +32,16 @@ repos:
     fileName: match/pprr_baton_rouge_csd_2017.csv
   match-pprr-baton-rouge-csd-2019:
     fileName: match/pprr_baton_rouge_csd_2019.csv
+  match-brusly-pd-2020:
+    fileName: match/cprr_brusly_pd_2020.csv
   com-baton-rouge-pd:
     fileName: fuse/com_baton_rouge_pd.csv
   com-baton-rouge-so:
     fileName: fuse/com_baton_rouge_so.csv
   com-new-orleans-harbor-pd:
     fileName: fuse/com_new_orleans_harbor_pd.csv
-  com-brusly-pd-2020:
-    fileName: match/cprr_brusly_pd_2020.csv
+  com-brusly-pd:
+    fileName: fuse/com_brusly_pd.csv
   per-baton-rouge-pd:
     fileName: fuse/per_baton_rouge_pd.csv
     primaryKey:
