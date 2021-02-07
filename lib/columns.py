@@ -61,6 +61,12 @@ COMPLAINT_COLUMNS = [
     "investigation_complete_year",
     "investigation_complete_month",
     "investigation_complete_day",
+    'suspension_start_year',
+    'suspension_start_month',
+    'suspension_start_day',
+    'suspension_end_year',
+    'suspension_end_month',
+    'suspension_end_day',
     "investigation_status",
     "disposition",
     "rule_code",
@@ -77,7 +83,9 @@ COMPLAINT_COLUMNS = [
     "complainant_type",
     "data_production_year",  # year of data
     "agency",  # name of agency (e.g. "New Orleans CSD")
-    "incident_type",  # ?
+    "incident_type",
+    "supervisor_uid",
+    "supervisor_rank"
     # "Complaint Classification",  # ?
     # "Bureau of Complainant",  # ?
     # "Division of Complainant",  # ?
