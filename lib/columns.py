@@ -87,6 +87,25 @@ COMPLAINT_COLUMNS = [
     # "Shift of Complainant",  # ?
 ]
 
+DISCIPLINARY_APPEAL_HEARING_COLUMNS = [
+    "docker_no",
+    "uid",
+    "representative",
+    "filed_year",
+    "filed_month",
+    "filed_day",
+    "hearing_year",
+    "hearing_month",
+    "hearing_day",
+    "rendered_year",
+    "rendered_month",
+    "rendered_day",
+    "resolution",
+    "action",
+    "delay",
+    "appealed"
+]
+
 
 def clean_column_names(df):
     """

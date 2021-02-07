@@ -52,7 +52,7 @@ DATA_FILES = {
     "baton_rouge_so": [
         "https://www.dropbox.com/sh/7s3ernm7fea479k/AAAXbtXwRx59xb0zPe6ExzMFa/Baton_Rouge_SO_CPRR_2018.csv?dl=1"  # noqa
     ],
-    "louisianna_state_csc": [
+    "louisiana_state_csc": [
         "https://www.dropbox.com/sh/9zndy2dz3w60etq/AAAqcTxDk8GVj3uvQbUto3XBa/Log%20Records/LouisianaState_CSC_LPRR_1991-2020.csv?dl=1"  # noqa
     ],
     "brusly_pd": [

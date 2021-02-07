@@ -56,3 +56,9 @@ data/clean/cprr_baton_rouge_so_2018.csv: clean/baton_rouge_so_cprr.py data/baton
 
 data/clean/cprr_new_orleans_harbor_pd_2020.csv: clean/new_orleans_harbor_pd_cprr.py data/new_orleans_harbor_pd/new_orleans_harbor_pd_cprr_2014-2020.csv
 	python clean/new_orleans_harbor_pd_cprr.py
+
+data/clean/lprr_louisiana_state_csc_1991_2020.csv: clean/louisiana_state_csc_lprr.py data/louisiana_state_csc/louisianastate_csc_lprr_1991-2020.csv
+	python clean/louisiana_state_csc_lprr.py
+
+data/clean/lprr_baton_rouge_fpcsb_1992_2012.csv: clean/baton_rouge_fpcsb_lprr.py data/baton_rouge_fpcsb/baton_rouge_fpcsb_logs_1992-2012.csv
+	python clean/baton_rouge_fpcsb_lprr.py
