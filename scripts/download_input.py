@@ -64,6 +64,9 @@ DATA_FILES = {
     ],
     "port_allen_pd": [
         "https://www.dropbox.com/sh/8zs58ak2rpah9iu/AAC6iWLPwTHpXGr6NvEBNzgQa/Port_Allen_CPRR_2019.csv?dl=1"  # noqa
+    ],
+    "madisonville_pd": [
+        "https://www.dropbox.com/sh/90sdcixmq1e8vkf/AAD8qeKMbpZKD0NghKUU3qY1a/Madisonville_CSD_PPRR_2021.csv?dl=1"  # noqa
     ]
 }
 _current_dir = os.path.dirname(os.path.realpath(__file__))
