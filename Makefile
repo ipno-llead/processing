@@ -10,6 +10,7 @@ all: data/fuse/per_baton_rouge_so.csv data/fuse/perhist_baton_rouge_so.csv data/
 all: data/fuse/per_new_orleans_csd.csv data/fuse/perhist_new_orleans_csd.csv
 all: data/fuse/per_baton_rouge_csd.csv data/fuse/perhist_baton_rouge_csd.csv
 all: data/fuse/per_brusly_pd.csv data/fuse/perhist_brusly_pd.csv data/fuse/com_brusly_pd.csv
+all: data/fuse/per_port_allen_pd.csv data/fuse/perhist_port_allen_pd.csv data/fuse/com_port_allen_pd.csv
 
 data/fuse/per_new_orleans_pd.csv data/fuse/perhist_new_orleans_pd.csv: fuse/new_orleans_pd.py data/clean/pprr_new_orleans_pd.csv
 	python fuse/new_orleans_pd.py
@@ -31,6 +32,9 @@ data/fuse/per_baton_rouge_csd.csv data/fuse/perhist_baton_rouge_csd.csv: fuse/ba
 
 data/fuse/per_brusly_pd.csv data/fuse/perhist_brusly_pd.csv data/fuse/com_brusly_pd.csv: fuse/brusly_pd.py data/clean/pprr_brusly_pd_2020.csv data/match/cprr_brusly_pd_2020.csv
 	python fuse/brusly_pd.py
+
+data/fuse/per_port_allen_pd.csv data/fuse/perhist_port_allen_pd.csv data/fuse/com_port_allen_pd.csv: fuse/port_allen_pd.py data/clean/cprr_port_allen_pd_2019.csv
+	python fuse/port_allen_pd.py
 
 
 
@@ -77,3 +81,6 @@ data/clean/lprr_baton_rouge_fpcsb_1992_2012.csv: clean/baton_rouge_fpcsb_lprr.py
 
 data/clean/pprr_brusly_pd_2020.csv data/clean/cprr_brusly_pd_2020.csv: clean/brusly_pd.py data/brusly_pd/brusly_pd_pprr_2020.csv data/brusly_pd/brusly_pd_cprr_2020.csv
 	python clean/brusly_pd.py
+
+data/clean/cprr_port_allen_pd_2019.csv: clean/port_allen_pd_cprr.py data/port_allen_pd/port_allen_cprr_2019.csv
+	python clean/port_allen_pd_cprr.py

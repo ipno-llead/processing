@@ -2,6 +2,8 @@ import pandas as pd
 
 
 def duplicate_row(df, idx, n=2):
+    if n == 1:
+        return df
     assert isinstance(df.index, pd.RangeIndex)
     row = df.iloc[idx]
     upper_rows = df.iloc[:idx]
