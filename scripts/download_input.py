@@ -67,6 +67,9 @@ DATA_FILES = {
     ],
     "madisonville_pd": [
         "https://www.dropbox.com/sh/90sdcixmq1e8vkf/AAD8qeKMbpZKD0NghKUU3qY1a/Madisonville_CSD_PPRR_2021.csv?dl=1"  # noqa
+    ],
+    "baton_rouge_da": [
+        "https://www.dropbox.com/sh/vdpyhf3lbi7lxy9/AAB_Qc3S4usW8QMatRXimi_za/Baton_Rouge_DA_CPRR_2021.csv?dl=1"  # noqa
     ]
 }
 _current_dir = os.path.dirname(os.path.realpath(__file__))

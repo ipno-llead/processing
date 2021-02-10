@@ -26,7 +26,10 @@ def clean_occur_time(df):
             return ""
         p = s.split(":")
         if len(p) == 1:
-            p.append("00")
+            if int(p[0]) > 12:
+                p = ["00"]+p
+            else:
+                p.append("00")
         return ":".join([v.zfill(2) for v in p])
 
     df.loc[:, "occur_time"] = df.occur_time.str.strip().fillna("")\
