@@ -31,7 +31,8 @@ def split_infraction(df):
     rules = df.infraction.str.replace(
         r"^([A-Za-z ,]+)(\d.+)?$", r"\1@@\2").str.split("@@", expand=True)
     df.loc[:, "rule_violation"] = rules.iloc[:, 0].str.strip()
-    df.loc[:, "rule_code"] = rules.iloc[:, 1].str.strip().fillna("")
+    df.loc[:, "rule_code"] = rules.iloc[:, 1]\
+        .str.strip().fillna("").str.replace(r"-(\d+)$", r".\1")
     df = df.drop(columns=["infraction"])
     return df
 
