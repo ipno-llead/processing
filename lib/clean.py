@@ -1,6 +1,7 @@
 import re
 import pandas as pd
 import numpy as np
+import datetime
 
 
 mdy_date_pattern_1 = re.compile(r"^\d{1,2}/\d{1,2}/\d{2}$")
@@ -8,6 +9,7 @@ mdy_date_pattern_2 = re.compile(r"^\d{1,2}/\d{1,2}/\d{4}$")
 year_pattern = re.compile(r"^(19|20)\d{2}$")
 year_month_pattern = re.compile(r"^(19|20)\d{4}$")
 datetime_pattern_1 = re.compile(r"^\d{1,2}/\d{1,2}/\d{2,4}\s+\d{1,2}:\d{1,2}$")
+month_day_pattern = re.compile(r"^[A-Z][a-z]{2}-\d{1,2}$")
 
 
 def clean_date(val):
@@ -34,6 +36,10 @@ def clean_date(val):
     m = year_pattern.match(val)
     if m is not None:
         return val, "", ""
+    m = month_day_pattern.match(val)
+    if m is not None:
+        dt = datetime.datetime.strptime(val, "%b-%d")
+        return "", str(dt.month).zfill(2), str(dt.day).zfill(2)
     raise ValueError("unknown date format \"%s\"" % val)
 
 

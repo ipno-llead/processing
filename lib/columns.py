@@ -75,6 +75,7 @@ COMPLAINT_COLUMNS = [
     "paragraph_violation",
     "unique_officer_allegation_id",
     "officer_years_of_service",
+    "complainant_name",
     "complainant_sex",
     "complainant_race",
     "complainant_age",

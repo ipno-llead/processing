@@ -40,14 +40,19 @@ def split_rows_by_salary(df):
             df.loc[idx+j, "data_production_year"] = k
             j += 1
         idx += salaries_count
-    # df = df.drop(columns=salary_cols)
-    # df.loc[:, "annual_salary"] = df.annual_salary.astype("float64")
+    df = df.drop(columns=salary_cols)
+    df.loc[:, "annual_salary"] = df.annual_salary.astype("float64")
+    return df
+
+
+def assign_agency(df):
+    df.loc[:, "agency"] = "Madisonville CSD"
     return df
 
 
 def clean():
     df = pd.read_csv(data_file_path(
-        "madisonville_pd/madisonville_csd_pprr_2021.csv"))
+        "madisonville_csd/madisonville_csd_pprr_2019.csv"))
     df = clean_column_names(df)
     df.columns = [
         'name', 'badge_no', 'hire_date', '2012', '2013', '2014', '2015',
@@ -57,5 +62,14 @@ def clean():
         .pipe(split_names)\
         .pipe(clean_names, ["first_name", "last_name"])\
         .pipe(clean_dates, ["hire_date"])\
-        .pipe(gen_uid, ["first_name", "last_name", "badge_no"])
+        .pipe(gen_uid, ["first_name", "last_name", "badge_no"])\
+        .pipe(split_rows_by_salary)\
+        .pipe(assign_agency)
     return df
+
+
+if __name__ == "__main__":
+    df = clean()
+    ensure_data_dir("clean")
+    df.to_csv(data_file_path(
+        "clean/pprr_madisonville_csd_2019.csv"), index=False)

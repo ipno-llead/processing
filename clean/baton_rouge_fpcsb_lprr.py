@@ -215,7 +215,7 @@ def extract_appellant_rank(df):
         "ofc": "officer",
         "sgt": "sergeant",
         "lt": "lieutenant",
-        "col": "Colonel",
+        "col": "colonel",
     }
     df.loc[:, "rank_desc"] = rank_name_df.loc[:, 0].str.lower()\
         .map(lambda x: rank_m.get(x, x))

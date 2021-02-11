@@ -66,7 +66,10 @@ DATA_FILES = {
         "https://www.dropbox.com/sh/8zs58ak2rpah9iu/AAC6iWLPwTHpXGr6NvEBNzgQa/Port_Allen_CPRR_2019.csv?dl=1"  # noqa
     ],
     "madisonville_pd": [
-        "https://www.dropbox.com/sh/90sdcixmq1e8vkf/AAD8qeKMbpZKD0NghKUU3qY1a/Madisonville_CSD_PPRR_2021.csv?dl=1"  # noqa
+        "https://www.dropbox.com/sh/bv473hrxugw65qn/AAC-288ely1bv-Wl_o_kF2q2a/Madisonville_PD_CPRR_2010-2020.csv?dl=1"  # noqa
+    ],
+    "madisonville_csd": [
+        "https://www.dropbox.com/s/ovbrufp86phrc75/Madisonville_CSD_PPRR_2019.csv?dl=1"  # noqa
     ],
     "baton_rouge_da": [
         "https://www.dropbox.com/sh/vdpyhf3lbi7lxy9/AAB_Qc3S4usW8QMatRXimi_za/Baton_Rouge_DA_CPRR_2021.csv?dl=1"  # noqa
@@ -87,6 +90,9 @@ def download_data_files():
             if os.path.isfile(full_filename):
                 continue
             resp = requests.get(url, allow_redirects=True)
+            if resp.status_code >= 400:
+                raise Exception("Error getting %s, status code = %d" %
+                                (filename, resp.status_code))
             with open(full_filename, "wb") as f:
                 f.write(resp.content)
             print("downloaded data/%s/%s" % (folder, filename))
