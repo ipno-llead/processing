@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import itertools
 import math
 from bisect import bisect_left, bisect
 from operator import itemgetter
@@ -109,10 +110,17 @@ class ThresholdMatcher(object):
             records,
             index=["pair_idx", "sim_score", "row_key"])
 
-    def save_pairs_to_excel(self, name, sample_counts=5, lower_bound=0.7, upper_bound=1, step=0.05):
+    def save_pairs_to_excel(self, name, match_threshold, sample_counts=5, lower_bound=0.7, upper_bound=1, step=0.05):
         samples = self.get_sample_pairs(
             sample_counts, lower_bound, upper_bound, step)
         pairs = self.get_all_pairs(lower_bound, upper_bound)
+        dec = {
+            "match_threshold": match_threshold,
+            "match_pairs": len(self._keys) - bisect_left(self._keys, match_threshold)
+        }
+        dec_tups = list(itertools.zip_longest(*dec.items()))
+        dec_sr = pd.Series(list(dec_tups[1]), index=list(dec_tups[0]))
         with pd.ExcelWriter(name) as writer:
-            samples.to_excel(writer, sheet_name='Sample records')
+            samples.to_excel(writer, sheet_name='Sample pairs')
             pairs.to_excel(writer, sheet_name='All pairs')
+            dec_sr.to_excel(writer, sheet_name="Decision")
