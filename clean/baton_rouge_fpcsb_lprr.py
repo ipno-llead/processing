@@ -189,13 +189,13 @@ def standardize_hearing_date(df):
     return df
 
 
-def extract_representative(df):
+def extract_counsel(df):
     names = df.name.str.strip().str.replace("Tat Chi-Lam", "Tat-Chi Lam")\
         .str.replace("Ashton-Dewey", "Ashton Dewey")\
         .str.replace("Brian S. Ramey Floyd", "Brian S. Ramey - Floyd")\
         .str.replace(r"\s*-\s*(\w+)$", r" - \1").str.replace(r" \((.+)\)$", r" - \1")\
         .str.replace(r"(\w+) fire$", r"\1 - fd").str.split(r" - ", n=1, expand=True)
-    df.loc[:, "representative"] = names.loc[:, 1].str.lower().fillna("").str.strip()\
+    df.loc[:, "counsel"] = names.loc[:, 1].str.lower().fillna("").str.strip()\
         .str.replace(r"\.", "").str.replace(r"\b(dec|aug|nov|july|june|sept)\b", "")\
         .str.replace(r"no representation", "none").str.replace(r"\b(fd|fire d)\b", "fire dept")\
         .str.replace(r"\b(paperwork|pending)\b", "")
@@ -347,12 +347,12 @@ def clean():
         .pipe(add_missing_year_to_hearing_date)\
         .pipe(split_row_by_hearing_date)\
         .pipe(standardize_hearing_date)\
-        .pipe(extract_representative)\
+        .pipe(extract_counsel)\
         .pipe(extract_appellant_rank)\
         .pipe(split_rows_with_multiple_appellants)\
         .pipe(drop_invalid_rows)\
         .pipe(split_appellant_names)\
-        .pipe(clean_names, ["first_name",  "last_name", "representative"])\
+        .pipe(clean_names, ["first_name",  "last_name", "counsel"])\
         .pipe(clean_resolution)\
         .pipe(clean_action)
     return df

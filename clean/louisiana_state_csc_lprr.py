@@ -107,22 +107,27 @@ def clean_docket_no(df):
     return df
 
 
+def drop_empty_docket_no(df):
+    return df[df.docket_no != ""].reset_index(drop=True)
+
+
 def clean():
     df = pd.read_csv(data_file_path(
         "louisiana_state_csc/louisianastate_csc_lprr_1991-2020.csv"))
     df = clean_column_names(df)
     df.columns = [
-        'docket_no', 'appellant', 'representative', 'filed_date', 'rendered_date', 'resolution', 'delay', 'appealed']
+        'docket_no', 'appellant', 'counsel', 'filed_date', 'rendered_date', 'resolution', 'delay', 'appealed']
     df = df\
         .pipe(standardize_appealed)\
         .pipe(split_appellant_name)\
-        .pipe(clean_names, ["representative"])\
+        .pipe(clean_names, ["counsel"])\
         .pipe(standardize_desc_cols, ["resolution"])\
         .pipe(standardize_delay)\
         .pipe(standardize_rendered_date)\
         .pipe(clean_dates, ["filed_date", "rendered_date"])\
         .pipe(gen_uid, ["first_name", "middle_initial", "last_name"])\
-        .pipe(clean_docket_no)
+        .pipe(clean_docket_no)\
+        .pipe(drop_empty_docket_no)
     return df
 
 

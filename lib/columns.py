@@ -97,9 +97,9 @@ COMPLAINT_COLUMNS = [
 ]
 
 DISCIPLINARY_APPEAL_HEARING_COLUMNS = [
-    "docker_no",
+    "docket_no",
     "uid",
-    "representative",
+    "counsel",
     "filed_year",
     "filed_month",
     "filed_day",
