@@ -124,3 +124,11 @@ class ThresholdMatcher(object):
             samples.to_excel(writer, sheet_name='Sample pairs')
             pairs.to_excel(writer, sheet_name='All pairs')
             dec_sr.to_excel(writer, sheet_name="Decision")
+
+    def print_decision(self, match_threshold):
+        pairs = self.get_index_pairs_within_thresholds(
+            lower_bound=match_threshold)
+        num_pairs = len(pairs)
+        print("for threshold %.3f:" % match_threshold)
+        print("  %d matched pairs (%d%% of A, %d%% of B)" %
+              (num_pairs, num_pairs / self._dfa.shape[0] * 100, num_pairs / self._dfb.shape[0] * 100))

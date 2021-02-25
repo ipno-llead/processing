@@ -1,5 +1,5 @@
 from lib.match import (
-    ThresholdClassifier, NoopIndex, JaroWinklerSimilarity, match_records
+    ThresholdMatcher, NoopIndex, JaroWinklerSimilarity
 )
 from lib.path import data_file_path, ensure_data_dir
 import pandas as pd
@@ -11,15 +11,11 @@ def add_uid_to_complaint(cprr, pprr):
     dfa = cprr[["first_name", "last_name"]]
     dfb = pprr.set_index("uid", drop=True)[["first_name", "last_name"]]
 
-    matches, _, _ = match_records(
-        NoopIndex(),
-        ThresholdClassifier(fields={
-            "first_name": JaroWinklerSimilarity(),
-            "last_name": JaroWinklerSimilarity()
-        }),
-        dfa,
-        dfb
-    )
+    matcher = ThresholdMatcher(dfa, dfb, NoopIndex(), {
+        "first_name": JaroWinklerSimilarity(),
+        "last_name": JaroWinklerSimilarity()
+    })
+    matches = matcher.get_index_pairs_within_thresholds()
 
     matches = dict(matches)
     cprr.loc[:, "uid"] = cprr.index.map(lambda i: matches[i])
@@ -33,18 +29,11 @@ def add_supervisor_uid_to_complaint(cprr, pprr):
     dfa.columns = ["first_name", "last_name"]
     dfb = pprr.set_index("uid", drop=True)[["first_name", "last_name"]]
 
-    matches, _, _ = match_records(
-        NoopIndex(),
-        ThresholdClassifier(
-            fields={
-                "first_name": JaroWinklerSimilarity(),
-                "last_name": JaroWinklerSimilarity()
-            },
-            thresholds=[0.9, 0.5]
-        ),
-        dfa,
-        dfb
-    )
+    matcher = ThresholdMatcher(dfa, dfb, NoopIndex(), {
+        "first_name": JaroWinklerSimilarity(),
+        "last_name": JaroWinklerSimilarity()
+    })
+    matches = matcher.get_index_pairs_within_thresholds(lower_bound=0.9)
 
     matches = dict(matches)
     cprr.loc[:, "supervisor_uid"] = cprr.index.map(lambda i: matches[i])
