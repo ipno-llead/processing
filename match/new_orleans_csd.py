@@ -1,7 +1,6 @@
 from lib.path import data_file_path, ensure_data_dir
 from lib.match import (
-    ThresholdClassifier, ColumnsIndex, JaroWinklerSimilarity, StringSimilarity,
-    DateSimilarity, match_records
+    ThresholdMatcher, ColumnsIndex, JaroWinklerSimilarity, StringSimilarity, DateSimilarity
 )
 from lib.date import combine_date_columns
 import pandas as pd
@@ -23,19 +22,12 @@ def match_officers(df09, df14):
         df14, "hire_year", "hire_month", "hire_day")
     dfb = dfb.drop_duplicates(["mid"]).set_index("mid", drop=True)
 
-    matches, potential_matches, non_matches = match_records(
-        ColumnsIndex(["first_name"]),
-        ThresholdClassifier(
-            fields={
-                "last_name": JaroWinklerSimilarity(),
-                "rank_code": StringSimilarity(),
-                "hire_date": DateSimilarity()
-            },
-            thresholds=[0.8, 0.7]
-        ),
-        dfa,
-        dfb
-    )
+    matcher = ThresholdMatcher(dfa, dfb, ColumnsIndex(["first_name"]), {
+        "last_name": JaroWinklerSimilarity(),
+        "rank_code": StringSimilarity(),
+        "hire_date": DateSimilarity()
+    })
+    matches = matcher.get_index_pairs_within_thresholds(0.8)
 
     mid_09_to_uid_dict = dict()
     for mid_09, mid_14 in matches:
