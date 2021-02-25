@@ -23,6 +23,8 @@ conda install --file requirements.txt
 scripts/download_input.py
 # process all data files, check `data` folder for all generated files.
 make
+# combine all data into personnel, personnel_history and complaint data
+scripts/run.sh fuse/all.py
 ```
 
 ## Workflow

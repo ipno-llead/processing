@@ -106,6 +106,14 @@ repos:
     fileName: fuse/perhist_port_allen_pd.csv
   perhist-madisonville-pd:
     fileName: fuse/perhist_madisonville_pd.csv
+  personnel:
+    fileName: fuse/personnel.csv
+    primaryKey:
+      - uid
+  personnel_history:
+    fileName: fuse/personnel_history.csv
+  complaint:
+    fileName: fuse/complaint.csv
 commit:
   messageTemplate: |-
     {{.GitCommit.Link}}
