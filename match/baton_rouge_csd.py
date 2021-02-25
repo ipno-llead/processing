@@ -1,7 +1,6 @@
 from lib.path import data_file_path, ensure_data_dir
 from lib.match import (
-    match_records, ColumnsIndex, JaroWinklerSimilarity,
-    StringSimilarity, DateSimilarity, ThresholdClassifier
+    ColumnsIndex, JaroWinklerSimilarity, StringSimilarity, DateSimilarity, ThresholdMatcher
 )
 from lib.uid import gen_uid
 from lib.date import combine_date_columns
@@ -30,20 +29,13 @@ def match_officers(df17, df19):
     dfb = dfb.drop_duplicates("uid").set_index(
         "uid", drop=True)
 
-    matches, potential_matches, non_matches = match_records(
-        ColumnsIndex(["first_name", "lnsf"]),
-        ThresholdClassifier(
-            fields={
-                "last_name": JaroWinklerSimilarity(0.25),
-                "middle_initial": StringSimilarity(),
-                "rank_code": StringSimilarity(),
-                "hire_date": DateSimilarity()
-            },
-            thresholds=[0.8, 0.6]
-        ),
-        dfa,
-        dfb
-    )
+    matcher = ThresholdMatcher(dfa, dfb, ColumnsIndex(["first_name", "lnsf"]), {
+        "last_name": JaroWinklerSimilarity(0.25),
+        "middle_initial": StringSimilarity(),
+        "rank_code": StringSimilarity(),
+        "hire_date": DateSimilarity()
+    })
+    matches = matcher.get_index_pairs_within_thresholds(lower_bound=0.8)
 
     emp_id_17_to_uid_dict = dict()
     for emp_id_17, emp_id_19 in matches:
