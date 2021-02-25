@@ -1,7 +1,7 @@
 from lib.path import data_file_path, ensure_data_dir
 from lib.uid import gen_uid
 from lib.match import (
-    ThresholdClassifier, ColumnsIndex, StringSimilarity, DateSimilarity, match_records
+    ThresholdMatcher, ColumnsIndex, StringSimilarity, DateSimilarity
 )
 import pandas as pd
 import sys
@@ -34,22 +34,13 @@ def match_uid_with_cprr(cprr, pprr):
     dfb = pprr[["uid", "first_name", "last_name",
                 "hire_date"]].drop_duplicates()
     dfb = dfb.set_index("uid", drop=True)
-    matches, potential_matches, non_matches = match_records(
-        ColumnsIndex(["first_name"]),
-        ThresholdClassifier(
-            fields={
-                "last_name": StringSimilarity(),
-                "hire_date": DateSimilarity()
-            },
-            thresholds=[1, 0.5]
-        ),
-        dfa,
-        dfb
-    )
+    matcher = ThresholdMatcher(dfa, dfb, ColumnsIndex(["first_name"]), {
+        "last_name": StringSimilarity(),
+        "hire_date": DateSimilarity()
+    })
+    matches = matcher.get_index_pairs_within_thresholds(0.5)
 
-    # potential matches are already reviewed in notebooks and also considered matches
-    # add "uid" column to cprr
-    mid_to_uid_d = dict(matches + potential_matches)
+    mid_to_uid_d = dict(matches)
     cprr.loc[:, "uid"] = cprr["mid"].map(lambda v: mid_to_uid_d[v])
     cprr = cprr.drop(columns=["mid", "hire_date"])
     return cprr
