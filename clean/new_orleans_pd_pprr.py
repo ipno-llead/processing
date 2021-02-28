@@ -115,6 +115,12 @@ def normalize_other_years(df):
     return df
 
 
+def remove_pol_prefix_from_department(df):
+    df.loc[:, "department_desc"] = df.department_desc.fillna(
+        "").str.replace(r"^pol ", "")
+    return df
+
+
 def clean():
     result = dict()
     name_pat = re.compile(r".+_(\d{4})\.csv$")
@@ -131,6 +137,7 @@ def clean():
                 .pipe(normalize_badge_no)\
                 .pipe(gen_uid, ["employee_id"])\
                 .pipe(standardize_desc_cols, ["department_desc"])\
+                .pipe(remove_pol_prefix_from_department)\
                 .pipe(normalize_2018)
         else:
             df = df\
