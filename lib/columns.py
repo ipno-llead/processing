@@ -1,5 +1,5 @@
 import re
-from .clean import float_to_int_str
+from .clean import float_to_int_str, names_to_title_case
 
 
 PERSONNEL_COLUMNS = [
@@ -129,10 +129,11 @@ def clean_column_names(df):
 
 def rearrange_personnel_columns(df):
     existing_cols = set(df.columns)
-    return float_to_int_str(
-        df[[col for col in PERSONNEL_COLUMNS if col in existing_cols]]
-        .drop_duplicates(ignore_index=True),
-        ["birth_year", "birth_month", "birth_day"])
+    df = df[[col for col in PERSONNEL_COLUMNS if col in existing_cols]]\
+        .drop_duplicates(ignore_index=True)
+    return df\
+        .pipe(names_to_title_case, ["first_name", "last_name", "middle_name", "middle_initial"])\
+        .pipe(float_to_int_str, ["birth_year", "birth_month", "birth_day"])
 
 
 def rearrange_personnel_history_columns(df):

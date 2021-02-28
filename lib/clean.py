@@ -129,6 +129,17 @@ def clean_name(series):
         .str.strip("-")
 
 
+def names_to_title_case(df, cols):
+    cols_set = set(df.columns)
+    for col in cols:
+        if col not in cols_set:
+            continue
+        df.loc[:, col] = df[col].str.title()\
+            .str.replace(r" I(i|ii|v|x)$", lambda m: " I"+m.group(1).upper())\
+            .str.replace(r" V(i|ii|iii)$", lambda m: " V"+m.group(1).upper())
+    return df
+
+
 def clean_names(df, cols):
     for col in cols:
         df.loc[:, col] = clean_name(df[col])
