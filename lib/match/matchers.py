@@ -116,7 +116,7 @@ class ThresholdMatcher(object):
         pairs = self.get_all_pairs(lower_bound, upper_bound)
         dec = {
             "match_threshold": match_threshold,
-            "match_pairs": len(self._keys) - bisect_left(self._keys, match_threshold)
+            "number_of_matched_pairs": len(self._keys) - bisect_left(self._keys, match_threshold)
         }
         dec_tups = list(itertools.zip_longest(*dec.items()))
         dec_sr = pd.Series(list(dec_tups[1]), index=list(dec_tups[0]))

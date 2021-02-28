@@ -15,7 +15,10 @@ def match(cprr, pprr):
         "first_name": JaroWinklerSimilarity(),
         "last_name": JaroWinklerSimilarity()
     })
-    matches = matcher.get_index_pairs_within_thresholds(lower_bound=1)
+    decision = 1
+    matcher.save_pairs_to_excel(data_file_path(
+        "match/madisonville_pd_cprr_2010_2020_v_csd_pprr_2019.xlsx"), decision)
+    matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
 
     for idx, uid in matches:
         cprr.loc[idx, "uid"] = uid

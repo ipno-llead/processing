@@ -82,3 +82,13 @@ Each major step above should output CSV files which can then be saved in a versi
 ```bash
 scripts/test.sh
 ```
+
+## Reviewing matching results
+
+Each script in `match` folder produce one or more `.xlsx` files in `data/match` folder showing matched records in an easy-to-review format. The naming convention for those Excel files is `{agency}_{source_a}_v_{source_b}.xlsx`. For example `new_orleans_harbor_pd_cprr_2020_v_pprr_2020.xlsx` shows matched records between `New Orleans Harbor PD CPRR 2020` and `New Orleans Harbor PD PPRR 2020` datasets. Each Excel files has 3 sheets:
+
+- **Sample pairs**: Show a small sample of record pairs for each similarity score range.
+- **All pairs**: Show all pairs of records and their respective similarity score for a more in-depth review. Pairs that score too low (and therefore could never be considered match anyway) are not present.
+- **Decision**: Has 2 values
+  - `match_threshold`: the cut-off similarity score that the matcher has decided on. Everything below this score is considered non-match
+  - `number_of_matched_pairs`: the number of matched pairs using this threshold.

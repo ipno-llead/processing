@@ -15,7 +15,10 @@ def add_uid_to_complaint(cprr, pprr):
         "first_name": JaroWinklerSimilarity(),
         "last_name": JaroWinklerSimilarity()
     })
-    matches = matcher.get_index_pairs_within_thresholds()
+    decision = 0.7
+    matcher.save_pairs_to_excel(data_file_path(
+        "match/brusly_pd_cprr_officer_v_pprr.xlsx"), decision)
+    matches = matcher.get_index_pairs_within_thresholds(decision)
 
     matches = dict(matches)
     cprr.loc[:, "uid"] = cprr.index.map(lambda i: matches[i])
@@ -33,7 +36,10 @@ def add_supervisor_uid_to_complaint(cprr, pprr):
         "first_name": JaroWinklerSimilarity(),
         "last_name": JaroWinklerSimilarity()
     })
-    matches = matcher.get_index_pairs_within_thresholds(lower_bound=0.9)
+    decision = 0.9
+    matcher.save_pairs_to_excel(data_file_path(
+        "match/brusly_pd_cprr_supervisor_v_pprr.xlsx"), decision)
+    matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
 
     matches = dict(matches)
     cprr.loc[:, "supervisor_uid"] = cprr.index.map(lambda i: matches[i])

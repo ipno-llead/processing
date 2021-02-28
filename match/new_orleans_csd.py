@@ -27,7 +27,10 @@ def match_officers(df09, df14):
         "rank_code": StringSimilarity(),
         "hire_date": DateSimilarity()
     })
-    matches = matcher.get_index_pairs_within_thresholds(0.8)
+    decision = 0.8
+    matcher.save_pairs_to_excel(data_file_path(
+        "match/new_orleans_csd_pprr_2009_v_pprr_2014.xlsx"), decision)
+    matches = matcher.get_index_pairs_within_thresholds(decision)
 
     mid_09_to_uid_dict = dict()
     for mid_09, mid_14 in matches:

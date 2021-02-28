@@ -38,7 +38,10 @@ def match_uid_with_cprr(cprr, pprr):
         "last_name": StringSimilarity(),
         "hire_date": DateSimilarity()
     })
-    matches = matcher.get_index_pairs_within_thresholds(0.5)
+    decision = 0.5
+    matcher.save_pairs_to_excel(data_file_path(
+        "match/new_orleans_harbor_pd_cprr_2020_v_pprr_2020.xlsx"), decision)
+    matches = matcher.get_index_pairs_within_thresholds(decision)
 
     mid_to_uid_d = dict(matches)
     cprr.loc[:, "uid"] = cprr["mid"].map(lambda v: mid_to_uid_d[v])
