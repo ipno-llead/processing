@@ -96,7 +96,7 @@ COMPLAINT_COLUMNS = [
     # "Shift of Complainant",  # ?
 ]
 
-DISCIPLINARY_APPEAL_HEARING_COLUMNS = [
+APPEAL_HEARING_COLUMNS = [
     "docket_no",
     "uid",
     "counsel",
@@ -190,3 +190,24 @@ def rearrange_complaint_columns(df):
             "suspension_end_month",
             "suspension_end_day"
         ])
+
+
+def rearrange_appeal_hearing_columns(df):
+    existing_cols = set(df.columns)
+    df = df[[
+            col for col in APPEAL_HEARING_COLUMNS
+            if col in existing_cols
+            ]].drop_duplicates(ignore_index=True)
+    return df\
+        .pipe(float_to_int_str, [
+            "filed_year",
+            "filed_month",
+            "filed_day",
+            "hearing_year",
+            "hearing_month",
+            "hearing_day",
+            "rendered_year",
+            "rendered_month",
+            "rendered_day",
+        ])\
+        .pipe(names_to_title_case, ["counsel"])

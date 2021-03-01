@@ -26,6 +26,8 @@ repos:
     fileName: clean/cprr_port_allen_pd_2019.csv
   clean-pprr-madisonville-csd-2019:
     fileName: clean/pprr_madisonville_csd_2019.csv
+  clean-lprr-baton-rouge-fpcsb-1992-2012:
+    fileName: clean/lprr_baton_rouge_fpcsb_1992_2012.csv
   match-cprr-new-orleans-harbor-pd-2020:
     fileName: match/cprr_new_orleans_harbor_pd_2020.csv
   match-pprr-new-orleans-csd-2009:
@@ -54,6 +56,8 @@ repos:
     fileName: fuse/com_port_allen_pd.csv
   com-madisonville-pd:
     fileName: fuse/com_madisonville_pd.csv
+  app-baton-rouge-fpcsb:
+    fileName: fuse/app_baton_rouge_fpcsb.csv
   per-baton-rouge-pd:
     fileName: fuse/per_baton_rouge_pd.csv
     primaryKey:
@@ -84,6 +88,10 @@ repos:
       - uid
   per-madisonville-pd:
     fileName: fuse/per_madisonville_pd.csv
+    primaryKey:
+      - uid
+  per-baton-rouge-fpcsb:
+    fileName: fuse/per_baton_rouge_fpcsb.csv
     primaryKey:
       - uid
   perhist-baton-rouge-pd:

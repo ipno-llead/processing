@@ -2,6 +2,7 @@ from lib.path import data_file_path, ensure_data_dir
 from lib.rows import duplicate_row
 from lib.clean import clean_names
 from lib.standardize import standardize_from_lookup_table
+from lib.uid import gen_uid
 import pandas as pd
 import io
 import re
@@ -278,6 +279,10 @@ def clean_resolution(df):
     return df
 
 
+def remove_fire_dept_rows(df):
+    return df[df.counsel != "fire dept"].reset_index(drop=True)
+
+
 def clean_action(df):
     lookup_table = [
         ['1/2-day suspension'],
@@ -354,7 +359,9 @@ def clean():
         .pipe(split_appellant_names)\
         .pipe(clean_names, ["first_name",  "last_name", "counsel"])\
         .pipe(clean_resolution)\
-        .pipe(clean_action)
+        .pipe(remove_fire_dept_rows)\
+        .pipe(clean_action)\
+        .pipe(gen_uid, ["first_name", "last_name", "middle_name", "middle_initial"])
     return df
 
 
