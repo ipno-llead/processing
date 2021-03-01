@@ -3,7 +3,7 @@ from lib.columns import (
 )
 from lib.path import data_file_path, ensure_data_dir
 from lib.uid import gen_uid
-from lib.clean import clean_names, parse_dates_with_known_format, standardize_desc_cols
+from lib.clean import clean_names, clean_dates, standardize_desc_cols, parse_dates_with_known_format
 import pandas as pd
 import numpy as np
 import sys
@@ -107,11 +107,10 @@ def assign_cols_2009(df):
 
 def clean_2009():
     df = pd.read_csv(data_file_path(
-        "new_orleans_csd/new_orleans_csd_pprr_2009.csv"))
+        "new_orleans_csd/new_orleans_csd_pprr_2009_realigned.csv"))
     df = df\
         .pipe(match_schema_2009)\
-        .pipe(
-            parse_dates_with_known_format, ['term_date', 'pay_prog_start_date'], "%m/%d/%Y")\
+        .pipe(clean_dates, ['term_date', 'pay_prog_start_date'])\
         .pipe(clean_names, ["first_name", "last_name"])\
         .pipe(parse_salary_2009)\
         .pipe(standardize_rank_2009)\
