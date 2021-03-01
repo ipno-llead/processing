@@ -36,6 +36,8 @@ repos:
     fileName: match/pprr_baton_rouge_csd_2017.csv
   match-pprr-baton-rouge-csd-2019:
     fileName: match/pprr_baton_rouge_csd_2019.csv
+  match-cprr-baton-rouge-pd-2018:
+    fileName: match/cprr_baton_rouge_pd_2018.csv
   match-brusly-pd-2020:
     fileName: match/cprr_brusly_pd_2020.csv
   match-cprr-madisonville-pd-2010-2020:
@@ -72,10 +74,6 @@ repos:
     fileName: fuse/per_new_orleans_csd.csv
     primaryKey:
       - uid
-  per-baton-rouge-csd:
-    fileName: fuse/per_baton_rouge_csd.csv
-    primaryKey:
-      - uid
   per-brusly-pd:
     fileName: fuse/per_brusly_pd.csv
     primaryKey:
@@ -88,8 +86,6 @@ repos:
     fileName: fuse/per_madisonville_pd.csv
     primaryKey:
       - uid
-  perhist-baton-rouge-csd:
-    fileName: fuse/perhist_baton_rouge_csd.csv
   perhist-baton-rouge-pd:
     fileName: fuse/perhist_baton_rouge_pd.csv
   perhist-baton-rouge-so:

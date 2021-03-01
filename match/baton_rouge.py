@@ -67,8 +67,8 @@ def match_pd_cprr_2018_v_csd_pprr_2019(cprr, pprr):
                ].drop_duplicates("uid").set_index("uid", drop=True)
     dfa.loc[:, "fc"] = dfa.first_name.fillna("").map(lambda x: x[:1])
 
-    dfb = pprr[["first_name", "last_name", "middle_initial", "employee_id"]
-               ].drop_duplicates("employee_id").set_index("employee_id", drop=True)
+    dfb = pprr[["first_name", "last_name", "middle_initial", "uid"]
+               ].drop_duplicates("uid").set_index("uid", drop=True)
     dfb.loc[:, "fc"] = dfb.first_name.map(lambda x: x[:1])
 
     matcher = ThresholdMatcher(dfa, dfb, ColumnsIndex(["fc"]), {

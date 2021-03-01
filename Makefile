@@ -8,7 +8,6 @@ all: data/fuse/per_new_orleans_harbor_pd.csv data/fuse/perhist_new_orleans_harbo
 all: data/fuse/per_baton_rouge_pd.csv data/fuse/perhist_baton_rouge_pd.csv data/fuse/com_baton_rouge_pd.csv
 all: data/fuse/per_baton_rouge_so.csv data/fuse/perhist_baton_rouge_so.csv data/fuse/com_baton_rouge_so.csv
 all: data/fuse/per_new_orleans_csd.csv data/fuse/perhist_new_orleans_csd.csv
-all: data/fuse/per_baton_rouge_csd.csv data/fuse/perhist_baton_rouge_csd.csv
 all: data/fuse/per_brusly_pd.csv data/fuse/perhist_brusly_pd.csv data/fuse/com_brusly_pd.csv
 all: data/fuse/per_port_allen_pd.csv data/fuse/perhist_port_allen_pd.csv data/fuse/com_port_allen_pd.csv
 all: data/fuse/per_madisonville_pd.csv data/fuse/perhist_madisonville_pd.csv data/fuse/com_madisonville_pd.csv
@@ -19,14 +18,11 @@ data/fuse/per_new_orleans_pd.csv data/fuse/perhist_new_orleans_pd.csv: fuse/new_
 data/fuse/per_new_orleans_harbor_pd.csv data/fuse/perhist_new_orleans_harbor_pd.csv: fuse/new_orleans_harbor_pd.py data/clean/pprr_new_orleans_harbor_pd_2020.csv data/match/cprr_new_orleans_harbor_pd_2020.csv
 	python fuse/new_orleans_harbor_pd.py
 
-data/fuse/per_baton_rouge_pd.csv data/fuse/perhist_baton_rouge_pd.csv data/fuse/com_baton_rouge_pd.csv: fuse/baton_rouge_pd.py data/clean/cprr_baton_rouge_pd_2018.csv
+data/fuse/per_baton_rouge_pd.csv data/fuse/perhist_baton_rouge_pd.csv data/fuse/com_baton_rouge_pd.csv: fuse/baton_rouge_pd.py data/match/pprr_baton_rouge_csd_2017.csv data/match/pprr_baton_rouge_csd_2019.csv data/match/cprr_baton_rouge_pd_2018.csv
 	python fuse/baton_rouge_pd.py
 
 data/fuse/per_baton_rouge_so.csv data/fuse/perhist_baton_rouge_so.csv data/fuse/com_baton_rouge_so.csv: fuse/baton_rouge_so.py data/clean/cprr_baton_rouge_so_2018.csv
 	python fuse/baton_rouge_so.py
-
-data/fuse/per_new_orleans_csd.csv data/fuse/perhist_new_orleans_csd.csv: fuse/new_orleans_csd.py data/match/pprr_new_orleans_csd_2009.csv data/match/pprr_new_orleans_csd_2014.csv
-	python fuse/new_orleans_csd.py
 
 data/fuse/per_baton_rouge_csd.csv data/fuse/perhist_baton_rouge_csd.csv: fuse/baton_rouge_csd.py data/match/pprr_baton_rouge_csd_2017.csv data/match/pprr_baton_rouge_csd_2019.csv
 	python fuse/baton_rouge_csd.py
