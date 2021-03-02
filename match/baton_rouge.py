@@ -35,7 +35,7 @@ def match_csd_pprr_2017_v_2019(df17, df19):
         "rank_code": StringSimilarity(),
         "hire_date": DateSimilarity()
     })
-    decision = 0.8
+    decision = 0.87
     matcher.save_pairs_to_excel(data_file_path(
         "match/baton_rouge_csd_pprr_2017_v_pprr_2019.xlsx"), decision)
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
