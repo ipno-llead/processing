@@ -42,6 +42,7 @@ PERSONNEL_HISTORY_COLUMNS = [
     "pay_effective_month",
     "pay_effective_day",
     "employment_status",
+    "employee_type",
     "annual_salary",  # annual salary
     "hourly_salary",  # hourly salary
     "data_production_year",  # year of data

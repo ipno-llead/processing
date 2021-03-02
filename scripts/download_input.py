@@ -73,6 +73,13 @@ DATA_FILES = {
     ],
     "baton_rouge_da": [
         "https://www.dropbox.com/sh/vdpyhf3lbi7lxy9/AAB_Qc3S4usW8QMatRXimi_za/Baton_Rouge_DA_CPRR_2021.csv?dl=1"  # noqa
+    ],
+    "ipm": [
+        "https://www.dropbox.com/sh/1zdvf08kjarefyf/AACXnVrPKERs0F5Hs4c9_3GUa/new_orleans_IAPRO_PPRR_1946-2018.csv?dl=1",  # noqa
+        "https://www.dropbox.com/sh/1zdvf08kjarefyf/AAD1_AaJAU5_6Vk8nMMspO0_a/new_orleans_PD_CPRR_actions_taken_1931-2020.csv?dl=1",  # noqa
+        "https://www.dropbox.com/sh/1zdvf08kjarefyf/AAB-HhVpDXo0sUazVJvNd7soa/new_orleans_PD_CPRR_allegations_1931-2020.csv?dl=1",  # noqa
+        "https://www.dropbox.com/sh/1zdvf08kjarefyf/AADcG1KGz9dJ-OovJ2GrFt_za/new_orleans_PD_PPRR_1946-2018.csv?dl=1",  # noqa
+        "https://www.dropbox.com/sh/1zdvf08kjarefyf/AACJmVSIiBlUL5j8cFa8-RuJa/new_orleans_PD_use_of_force_2012-2019.csv?dl=1",  # noqa
     ]
 }
 _current_dir = os.path.dirname(os.path.realpath(__file__))
