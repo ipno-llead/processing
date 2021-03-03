@@ -40,6 +40,9 @@ data/fuse/per_madisonville_pd.csv data/fuse/perhist_madisonville_pd.csv data/fus
 data/fuse/app_baton_rouge_fpcsb.csv data/fuse/per_baton_rouge_fpcsb.csv: fuse/baton_rouge_fpcsb.py data/clean/lprr_baton_rouge_fpcsb_1992_2012.csv
 	python fuse/baton_rouge_fpcsb.py
 
+data/fuse/per_new_orleans_csd.csv data/fuse/perhist_new_orleans_csd.csv: fuse/new_orleans_csd.py data/match/pprr_new_orleans_csd_2009.csv data/match/pprr_new_orleans_csd_2014.csv
+	python fuse/new_orleans_csd.py
+
 
 
 data/match/cprr_new_orleans_harbor_pd_2020.csv: match/new_orleans_harbor_pd.py data/clean/cprr_new_orleans_harbor_pd_2020.csv data/clean/pprr_new_orleans_harbor_pd_2020.csv

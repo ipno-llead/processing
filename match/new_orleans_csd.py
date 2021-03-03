@@ -27,7 +27,7 @@ def match_officers(df09, df14):
         "rank_code": StringSimilarity(),
         "hire_date": DateSimilarity()
     })
-    decision = 0.8
+    decision = 0.886
     matcher.save_pairs_to_excel(data_file_path(
         "match/new_orleans_csd_pprr_2009_v_pprr_2014.xlsx"), decision)
     matches = matcher.get_index_pairs_within_thresholds(decision)
