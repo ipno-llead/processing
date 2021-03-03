@@ -10,6 +10,7 @@ year_pattern = re.compile(r"^(19|20)\d{2}$")
 year_month_pattern = re.compile(r"^(19|20)\d{4}$")
 datetime_pattern_1 = re.compile(r"^\d{1,2}/\d{1,2}/\d{2,4}\s+\d{1,2}:\d{1,2}$")
 month_day_pattern = re.compile(r"^[A-Z][a-z]{2}-\d{1,2}$")
+time_pattern_1 = re.compile(r"\d{2}:\d{2}\.\d$")
 
 
 def clean_date(val):
@@ -56,7 +57,7 @@ def clean_dates(df, cols):
 
 def clean_datetime(val):
     if val == "" or pd.isnull(val):
-        return "", "", "", "", ""
+        return "", "", "", ""
     m = datetime_pattern_1.match(val)
     if m is not None:
         [date, time] = re.split(r"\s+", val)
@@ -79,6 +80,22 @@ def clean_datetimes(df, cols):
     return df
 
 
+def clean_time(val):
+    if val == "" or pd.isnull(val):
+        return ""
+    m = time_pattern_1.match(val)
+    if m is not None:
+        return val[:5]
+    raise ValueError("unknown time format \"%s\"" % val)
+
+
+def clean_times(df, cols):
+    for col in cols:
+        assert col.endswith("_time")
+        df.loc[:, col] = df[col].str.strip().map(clean_time)
+    return df
+
+
 def parse_dates_with_known_format(df, cols, format):
     for col in cols:
         assert col.endswith("_date")
@@ -94,7 +111,8 @@ def parse_dates_with_known_format(df, cols, format):
 def clean_sexes(df, cols):
     for col in cols:
         df.loc[:, col] = df[col].str.strip().str.lower()\
-            .str.replace(r"^m$", "male").str.replace(r"^f$", "female")
+            .str.replace(r"^m$", "male").str.replace(r"^f$", "female")\
+            .str.replace(r"^unknown.*", "unknown")
     return df
 
 
@@ -102,7 +120,7 @@ def clean_races(df, cols):
     for col in cols:
         df.loc[:, col] = df[col].str.strip().str.lower()\
             .str.replace(r"^w$", "white").str.replace(r"^b$", "black")\
-            .str.replace(r"^h$", "hispanic")
+            .str.replace(r"^h$", "hispanic").str.replace(r"^unknown.*", "unknown")
     return df
 
 
