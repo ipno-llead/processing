@@ -10,8 +10,7 @@ sys.path.append("../")
 
 
 def standardize_appealed(df):
-    df.loc[:, "appealed"] = df.appealed.str.replace(r"\W+$", "").str.strip()\
-        .str.lower().str.replace(r" - ", "-", regex=False).fillna("")
+    df.loc[:, "appealed"] = df.appealed.str.strip()
     return df
 
 
@@ -115,20 +114,28 @@ def clean():
     df = pd.read_csv(data_file_path(
         "louisiana_state_csc/louisianastate_csc_lprr_1991-2020.csv"))
     df = clean_column_names(df)
-    df.columns = [
-        'docket_no', 'appellant', 'counsel', 'filed_date', 'rendered_date', 'resolution', 'delay', 'appealed']
-    df = df\
-        .pipe(standardize_appealed)\
-        .pipe(split_appellant_name)\
-        .pipe(clean_names, ["counsel"])\
-        .pipe(standardize_desc_cols, ["resolution"])\
-        .pipe(standardize_delay)\
-        .pipe(standardize_rendered_date)\
-        .pipe(clean_dates, ["filed_date", "rendered_date"])\
-        .pipe(gen_uid, ["first_name", "middle_initial", "last_name"])\
-        .pipe(clean_docket_no)\
-        .pipe(drop_empty_docket_no)
-    return df
+    df = df.rename(columns={
+        'docket': 'docket_no',
+        'apellant': 'appellant',
+        'colonel': 'charging_supervisor',
+        'filed': 'filed_date',
+        'rendered': 'rendered_date'
+    })
+    # df.columns = [
+    #     'docket_no', 'appellant', 'counsel', 'filed_date', 'rendered_date', 'resolution', 'delay', 'appealed']
+    # df = df\
+    #     .pipe(standardize_appealed)\
+    #     .pipe(split_appellant_name)\
+    #     .pipe(clean_names, ["counsel"])\
+    #     .pipe(standardize_desc_cols, ["resolution"])\
+    #     .pipe(standardize_delay)\
+    #     .pipe(standardize_rendered_date)\
+    #     .pipe(clean_dates, ["filed_date", "rendered_date"])\
+    #     .pipe(gen_uid, ["first_name", "middle_initial", "last_name"])\
+    #     .pipe(clean_docket_no)\
+    #     .pipe(drop_empty_docket_no)
+    return df\
+        .pipe(standardize_appealed)
 
 
 if __name__ == "__main__":
