@@ -31,12 +31,27 @@ def split_table(df):
         col for col in df.columns
         if col not in allegation_cols
     ]
-    action_takens = df[action_taken_cols].drop_duplicates().dropna(how="all")\
+    actions_taken = df[action_taken_cols].drop_duplicates().dropna(how="all")\
         .dropna(subset=["action_primary_key"])
-    return allegations, action_takens
+    return allegations, actions_taken
+
+
+def clean_allegations(allegations):
+    return allegations\
+        .pipe(float_to_int_str, [
+            'allegation_incident_officer_id', 'allegation_primary_key', 'allegation_year_created',
+            'allegation_month_created'
+        ])
+
+
+def clean_actions_take(actions_taken):
+    return actions_taken\
+        .pipe(float_to_int_str, ['allegation_primary_key', 'action_primary_key'])
 
 
 def clean():
     df = initial_processing()
-    allegations, action_takens = split_table(df)
-    return allegations, action_takens
+    allegations, actions_taken = split_table(df)
+    return (
+        clean_allegations(allegations), clean_actions_take(actions_taken)
+    )

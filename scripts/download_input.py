@@ -80,6 +80,9 @@ DATA_FILES = {
         "https://www.dropbox.com/sh/1zdvf08kjarefyf/AAB-HhVpDXo0sUazVJvNd7soa/new_orleans_PD_CPRR_allegations_1931-2020.csv?dl=1",  # noqa
         "https://www.dropbox.com/sh/1zdvf08kjarefyf/AADcG1KGz9dJ-OovJ2GrFt_za/new_orleans_PD_PPRR_1946-2018.csv?dl=1",  # noqa
         "https://www.dropbox.com/sh/1zdvf08kjarefyf/AACJmVSIiBlUL5j8cFa8-RuJa/new_orleans_PD_use_of_force_2012-2019.csv?dl=1",  # noqa
+    ],
+    "new_orleans_so": [
+        "https://www.dropbox.com/sh/dsrzc28teybtf4q/AAAq2PQtK_cM5Mt3PpknAoMOa/new_orleans_so_cprr_2019_tabula.csv?dl=1"  # noqa
     ]
 }
 _current_dir = os.path.dirname(os.path.realpath(__file__))
