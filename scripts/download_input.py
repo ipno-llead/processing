@@ -83,6 +83,9 @@ DATA_FILES = {
     ],
     "new_orleans_so": [
         "https://www.dropbox.com/sh/dsrzc28teybtf4q/AAAq2PQtK_cM5Mt3PpknAoMOa/new_orleans_so_cprr_2019_tabula.csv?dl=1"  # noqa
+    ],
+    "greenwood_pd": [
+        "https://www.dropbox.com/sh/9yu4fe2z6xuwnaf/AAALIGMiq95b2ZylzxFcUdqga/greenwood_pd_cprr_2015-2020_byhand.csv?dl=1"  # noqa
     ]
 }
 _current_dir = os.path.dirname(os.path.realpath(__file__))

@@ -3,6 +3,8 @@ import pandas as pd
 import numpy as np
 import datetime
 
+from lib.date import combine_date_columns
+
 
 mdy_date_pattern_1 = re.compile(r"^\d{1,2}/\d{1,2}/\d{2}$")
 mdy_date_pattern_2 = re.compile(r"^\d{1,2}/\d{1,2}/\d{4}$")
@@ -44,14 +46,18 @@ def clean_date(val):
     raise ValueError("unknown date format \"%s\"" % val)
 
 
-def clean_dates(df, cols):
+def clean_dates(df, cols, expand=True):
     for col in cols:
         assert col.endswith("_date")
         dates = pd.DataFrame.from_records(df[col].str.strip().map(clean_date))
-        prefix = col[:-5]
-        dates.columns = [prefix+"_year", prefix+"_month", prefix+"_day"]
-        df = pd.concat([df, dates], axis=1)
-    df = df.drop(columns=cols)
+        if expand:
+            prefix = col[:-5]
+            dates.columns = [prefix+"_year", prefix+"_month", prefix+"_day"]
+            df = pd.concat([df, dates], axis=1)
+        else:
+            df.loc[:, col] = combine_date_columns(dates, 0, 1, 2)
+    if expand:
+        df = df.drop(columns=cols)
     return df
 
 

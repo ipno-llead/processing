@@ -13,6 +13,8 @@ PERSONNEL_COLUMNS = [
     "birth_day",
     "race",
     "sex",
+    "level_1_cert_date",
+    "last_pc_12_qualification_date"
 ]
 
 PERSONNEL_HISTORY_COLUMNS = [
@@ -51,7 +53,8 @@ PERSONNEL_HISTORY_COLUMNS = [
 
 COMPLAINT_COLUMNS = [
     "uid",  # officer unique identifier
-    "tracking_number",  # identifier for complaint
+    "tracking_number",  # unique identifier for complaint
+    "allegation_uid",  # unique identifier for allegation (complaint x officer)
     "occur_year",
     "occur_month",
     "occur_day",
@@ -68,6 +71,7 @@ COMPLAINT_COLUMNS = [
     'suspension_end_year',
     'suspension_end_month',
     'suspension_end_day',
+    "investigation_type",
     "investigation_status",
     "disposition",
     "rule_code",
@@ -76,6 +80,7 @@ COMPLAINT_COLUMNS = [
     "paragraph_violation",
     "unique_officer_allegation_id",
     "officer_years_of_service",
+    "complainant_type",
     "complainant_name",
     "complainant_sex",
     "complainant_race",

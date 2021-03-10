@@ -12,6 +12,7 @@ all: data/fuse/per_brusly_pd.csv data/fuse/perhist_brusly_pd.csv data/fuse/com_b
 all: data/fuse/per_port_allen_pd.csv data/fuse/perhist_port_allen_pd.csv data/fuse/com_port_allen_pd.csv
 all: data/fuse/per_madisonville_pd.csv data/fuse/perhist_madisonville_pd.csv data/fuse/com_madisonville_pd.csv
 all: data/fuse/app_baton_rouge_fpcsb.csv data/fuse/per_baton_rouge_fpcsb.csv
+all: data/fuse/per_greenwood_pd.csv data/fuse/com_greenwood_pd.csv data/fuse/perhist_greenwood_pd.csv
 
 data/fuse/per_new_orleans_pd.csv data/fuse/perhist_new_orleans_pd.csv: fuse/new_orleans_pd.py data/clean/pprr_new_orleans_pd.csv
 	python fuse/new_orleans_pd.py
@@ -43,6 +44,9 @@ data/fuse/app_baton_rouge_fpcsb.csv data/fuse/per_baton_rouge_fpcsb.csv: fuse/ba
 data/fuse/per_new_orleans_csd.csv data/fuse/perhist_new_orleans_csd.csv: fuse/new_orleans_csd.py data/match/pprr_new_orleans_csd_2009.csv data/match/pprr_new_orleans_csd_2014.csv
 	python fuse/new_orleans_csd.py
 
+data/fuse/per_greenwood_pd.csv data/fuse/com_greenwood_pd.csv data/fuse/perhist_greenwood_pd.csv: fuse/greenwood_pd.py data/match/cprr_greenwood_pd_2015_2020.csv data/clean/pprr_post_2020_11_06.csv
+	python fuse/greenwood_pd.py
+
 
 
 data/match/cprr_new_orleans_harbor_pd_2020.csv: match/new_orleans_harbor_pd.py data/clean/cprr_new_orleans_harbor_pd_2020.csv data/clean/pprr_new_orleans_harbor_pd_2020.csv
@@ -59,6 +63,9 @@ data/match/cprr_brusly_pd_2020.csv: match/brusly_pd.py data/clean/pprr_brusly_pd
 
 data/match/cprr_madisonville_pd_2010_2020.csv: match/madisonville_pd.py data/clean/cprr_madisonville_pd_2010_2020.csv data/clean/pprr_madisonville_csd_2019.csv
 	python match/madisonville_pd.py
+
+data/match/cprr_greenwood_pd_2015_2020.csv: match/greenwood_pd.py data/clean/cprr_greenwood_pd_2015_2020.csv data/clean/pprr_post_2020_11_06.csv
+	python match/greenwood_pd.py
 
 
 
@@ -100,3 +107,9 @@ data/clean/cprr_madisonville_pd_2010_2020.csv: clean/madisonville_pd_cprr.py dat
 
 data/clean/pprr_madisonville_csd_2019.csv: clean/madisonville_csd_pprr.py data/madisonville_csd/madisonville_csd_pprr_2019.csv
 	python clean/madisonville_csd_pprr.py
+
+data/clean/pprr_post_2020_11_06.csv: clean/post_pprr.py data/post_council/post_pprr_11-6-2020.csv
+	python clean/post_pprr.py
+
+data/clean/cprr_greenwood_pd_2015_2020.csv: clean/greenwood_pd_cprr.py data/greenwood_pd/greenwood_pd_cprr_2015-2020_byhand.csv
+	python clean/greenwood_pd_cprr.py
