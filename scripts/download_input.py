@@ -86,6 +86,10 @@ DATA_FILES = {
     ],
     "greenwood_pd": [
         "https://www.dropbox.com/sh/9yu4fe2z6xuwnaf/AAALIGMiq95b2ZylzxFcUdqga/greenwood_pd_cprr_2015-2020_byhand.csv?dl=1"  # noqa
+    ],
+    "st_tammany_so": [
+        "https://www.dropbox.com/sh/dtb2hn54ma59q2h/AAB_DLd50KBMkYBODy1PP1sFa/St.%20Tammany_SO_PPRR_2020.csv?dl=1",  # noqa
+        "https://www.dropbox.com/sh/mwabzn85manxzo6/AACR-N1crrGx43ZJ2CYdtqUSa/St.Tammany_SO_CPRR_Lists_2015-2019_tabula.csv?dl=1"  # noqa
     ]
 }
 _current_dir = os.path.dirname(os.path.realpath(__file__))

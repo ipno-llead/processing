@@ -1,4 +1,5 @@
 import re
+import json
 import pandas as pd
 import numpy as np
 import datetime
@@ -168,6 +169,59 @@ def clean_names(df, cols):
     for col in cols:
         df.loc[:, col] = clean_name(df[col])
     return df
+
+
+name_pattern_1 = re.compile(r"^(\w{2,}) (\w\.) (\w{2,}.+)$")
+name_pattern_2 = re.compile(r"^([-\w\']+), (\w{2,})$")
+name_pattern_3 = re.compile(r'^(\w{2,}) ("\w+") ([-\w\']+)$')
+name_pattern_4 = re.compile(
+    r'^(\w{2,}) ([-\w\']+ (?:i|ii|iii|iv|v|jr|sr)\W?)$')
+name_pattern_5 = re.compile(r'^(\w{2,}) (\w+) ([-\w\']+)$')
+name_pattern_6 = re.compile(r"^(\w{2,}) ([-\w\']+)$")
+
+
+def split_names(df, col):
+    def split_name(val):
+        if pd.isnull(val) or not val:
+            return "", "", ""
+        m = name_pattern_1.match(val)
+        if m is not None:
+            first_name = m.group(1)
+            middle_name = m.group(2)
+            last_name = m.group(3)
+            return first_name, middle_name, last_name
+        m = name_pattern_2.match(val)
+        if m is not None:
+            first_name = m.group(2)
+            last_name = m.group(1)
+            return first_name, "", last_name
+        m = name_pattern_3.match(val)
+        if m is not None:
+            first_name = m.group(1)
+            last_name = m.group(3)
+            return first_name, "", last_name
+        m = name_pattern_4.match(val)
+        if m is not None:
+            first_name = m.group(1)
+            last_name = m.group(2)
+            return first_name, "", last_name
+        m = name_pattern_5.match(val)
+        if m is not None:
+            first_name = m.group(1)
+            middle_name = m.group(2)
+            last_name = m.group(3)
+            return first_name, middle_name, last_name
+        m = name_pattern_6.match(val)
+        if m is not None:
+            first_name = m.group(1)
+            last_name = m.group(2)
+            return first_name, "", last_name
+        raise ValueError('unrecognized name format %s' % json.dumps(val))
+
+    names = pd.DataFrame.from_records(
+        df[col].str.strip().str.lower().map(split_name))
+    names.columns = ['first_name', 'middle_name', 'last_name']
+    return pd.concat([df, names], axis=1)
 
 
 def standardize_desc(series):
