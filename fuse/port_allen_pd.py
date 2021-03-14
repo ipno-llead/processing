@@ -8,18 +8,19 @@ import sys
 sys.path.append("../")
 
 
-def fuse():
-    df = pd.read_csv(
-        data_file_path("clean/cprr_port_allen_pd_2019.csv"))
+def fuse(pprr, cprr19):
     return (
-        rearrange_personnel_columns(df),
-        rearrange_personnel_history_columns(df),
-        rearrange_complaint_columns(df)
+        rearrange_personnel_columns(pprr),
+        rearrange_personnel_history_columns(pd.concat([pprr, cprr19])),
+        rearrange_complaint_columns(cprr19)
     )
 
 
 if __name__ == "__main__":
-    personnel_df, history_df, complaint_df = fuse()
+    cprr19 = pd.read_csv(
+        data_file_path("match/cprr_port_allen_pd_2019.csv"))
+    pprr = pd.read_csv(data_file_path('match/pprr_port_allen_csd_2020.csv'))
+    personnel_df, history_df, complaint_df = fuse(pprr, cprr19)
     ensure_data_dir("fuse")
     personnel_df.to_csv(data_file_path(
         "fuse/per_port_allen_pd.csv"), index=False)

@@ -63,7 +63,11 @@ DATA_FILES = {
         "https://www.dropbox.com/sh/9fafm0yxbk4z8zt/AAC22Rm_L4FVRzuIZ-Rc_UL4a/POST_PPRR_11-6-2020.csv?dl=1"  # noqa
     ],
     "port_allen_pd": [
+        "https://www.dropbox.com/sh/8zs58ak2rpah9iu/AABUS6JdCHYyvjXWWk--RtGLa/Port_Allen_CPRR_2017-2018_byhand.csv?dl=1",  # noqa
         "https://www.dropbox.com/sh/8zs58ak2rpah9iu/AAC6iWLPwTHpXGr6NvEBNzgQa/Port_Allen_CPRR_2019.csv?dl=1"  # noqa
+    ],
+    "port_allen_csd": [
+        "https://www.dropbox.com/sh/5znysznypatmig0/AAD4gXEXXJMxnxNcK-TocbPDa/Port_Allen_CSD_PPRR_2020.csv?dl=1"  # noqa
     ],
     "madisonville_pd": [
         "https://www.dropbox.com/sh/bv473hrxugw65qn/AAC-288ely1bv-Wl_o_kF2q2a/Madisonville_PD_CPRR_2010-2020.csv?dl=1"  # noqa

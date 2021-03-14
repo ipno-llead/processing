@@ -85,7 +85,11 @@ def extract_rule_violation(df):
 
 def assign_agency(df):
     df.loc[:, "agency"] = "Port Allen PD"
-    df.loc[:, "data_production_year"] = "2019"
+    return df
+
+
+def assign_prod_year(df, year):
+    df.loc[:, "data_production_year"] = year
     return df
 
 
@@ -107,9 +111,31 @@ def clean19():
         .pipe(split_rows_by_charges)\
         .pipe(clean_badge_no)\
         .pipe(extract_rule_violation)\
-        .pipe(gen_uid, ["first_name", "last_name", "badge_no"])\
-        .pipe(assign_agency)
+        .pipe(assign_agency)\
+        .pipe(assign_prod_year, '2019')\
+        .pipe(gen_uid, ["agency", "first_name", "last_name", "badge_no"])
     return df
+
+
+def clean18():
+    df = pd.read_csv(data_file_path(
+        "port_allen_pd/port_allen_cprr_2017-2018_byhand.csv"))
+    df = clean_column_names(df)
+    df = df.rename(columns={
+        "case_number": "tracking_number",
+        "date_notification": "notification_date",
+        "title": "rank_desc",
+        "f_name": "first_name",
+        "l_name": "last_name",
+        "disposition_investigation": "disposition",
+        "complaintant_type": "complainant_type"
+    })
+    df = df.dropna(how="all")
+    return df\
+        .pipe(clean_dates, ["receive_date", "occur_date"])\
+        .pipe(assign_agency)\
+        .pipe(assign_prod_year, '2018')\
+        .pipe(gen_uid, ["agency", "first_name", "last_name"])
 
 
 if __name__ == "__main__":

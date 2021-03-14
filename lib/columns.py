@@ -58,6 +58,7 @@ COMPLAINT_COLUMNS = [
     "occur_year",
     "occur_month",
     "occur_day",
+    "raw_occur_date",
     "occur_time",
     "receive_year",
     "receive_month",
