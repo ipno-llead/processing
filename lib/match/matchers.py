@@ -42,6 +42,24 @@ class ThresholdMatcher(object):
         return math.sqrt(
             sum(v * v for v in sim_vec.values()) / len(self._fields))
 
+    def _remove_lesser_matches(self):
+        """
+        If someone already have a better match then remove other matches
+        """
+        indices_a = set()
+        indices_b = set()
+        keep = []
+        self._pairs.reverse()
+        for i, tup in enumerate(self._pairs):
+            _, idx_a, idx_b = tup
+            if idx_a in indices_a or idx_b in indices_b:
+                continue
+            indices_a.add(idx_a)
+            indices_b.add(idx_b)
+            keep.append(i)
+        self._pairs = [self._pairs[i] for i in keep]
+        self._pairs.reverse()
+
     def _score_all_pairs(self):
         """
         Calculate similarity value for all pairs of records
@@ -54,6 +72,7 @@ class ThresholdMatcher(object):
                     sim = self._score_pair(ser_a, ser_b)
                     pairs.append((sim, idx_a, idx_b))
         self._pairs = sorted(pairs, key=itemgetter(0))
+        self._remove_lesser_matches()
         self._keys = [t[0] for t in self._pairs]
 
     def get_index_pairs_within_thresholds(self, lower_bound=0.7, upper_bound=1):

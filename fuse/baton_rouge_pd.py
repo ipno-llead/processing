@@ -16,7 +16,7 @@ def fuse_personnel(csd_pprr_17, csd_pprr_19, pd_cprr_18):
             if idx in records:
                 records[idx] = {
                     k: v if not pd.isnull(v) else row[k]
-                    for k, v in records[idx].items()}
+                    for k, v in records[idx].items() if k in row}
             else:
                 records[idx] = row.to_dict()
     return rearrange_personnel_columns(pd.DataFrame.from_records(list(records.values())))

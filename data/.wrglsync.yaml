@@ -54,6 +54,8 @@ repos:
     fileName: match/pprr_port_allen_csd_2020.csv
   match-cprr-greenwood-pd-2015-2020:
     fileName: match/cprr_greenwood_pd_2015_2020.csv
+  match-cprr-baton-rouge-so-2018:
+    fileName: match/cprr_baton_rouge_so_2018.csv
   com-baton-rouge-pd:
     fileName: fuse/com_baton_rouge_pd.csv
   com-baton-rouge-so:

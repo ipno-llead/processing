@@ -19,7 +19,7 @@ def match_csd_pprr_2017_v_2019(df17, df19):
     dfa = dfa.drop_duplicates("employee_id").set_index(
         "employee_id", drop=True)
 
-    df19 = gen_uid(df19, ["employee_id"])
+    df19 = gen_uid(df19, ["agency", "data_production_year", "employee_id"])
     dfb = df19[[
         "last_name", "first_name", "middle_initial", "rank_code", "uid"]]
     dfb.loc[:, "hire_date"] = combine_date_columns(
@@ -55,7 +55,7 @@ def match_csd_pprr_2017_v_2019(df17, df19):
         uid = row_19.name
         emp_id_17_to_uid_dict[emp_id_17] = uid
 
-    df17 = gen_uid(df17, ["employee_id"])
+    df17 = gen_uid(df17, ["agency", "data_production_year", "employee_id"])
     uid_17 = df17.employee_id.map(lambda x: emp_id_17_to_uid_dict.get(x, ""))
     df17.loc[:, "uid"] = uid_17.where(uid_17 != "", df17.uid)
 
@@ -88,6 +88,50 @@ def match_pd_cprr_2018_v_csd_pprr_2019(cprr, pprr):
     return cprr
 
 
+def prepare_post_data():
+    post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
+    post = post[post.agency == 'baton rouge pd']
+    duplicated_uids = set(post.loc[post.uid.duplicated(), 'uid'].to_list())
+    post = post.set_index('uid', drop=False)
+    level_1_cert_dates = post.loc[
+        post.uid.isin(duplicated_uids) & (post.level_1_cert_date.notna()),
+        'level_1_cert_date']
+    for idx, value in level_1_cert_dates.iteritems():
+        post.loc[idx, 'level_1_cert_date'] = value
+    post = post.sort_values('last_pc_12_qualification_date', ascending=False)
+    return post[~post.index.duplicated(keep='first')]
+
+
+def match_csd_pprr_against_post(pprr, post, year, decision):
+    dfa = pprr[['uid', 'first_name', 'last_name']]
+    dfa.loc[:, "hire_date"] = combine_date_columns(
+        pprr, "hire_year", "hire_month", "hire_day")
+    dfa.loc[:, 'fc'] = dfa.first_name.map(lambda x: x[:1])
+    dfa = dfa.drop_duplicates(subset=['uid']).set_index('uid')
+
+    dfb = post[['uid', 'first_name', 'last_name']]
+    dfb.loc[:, "hire_date"] = combine_date_columns(
+        post, "hire_year", "hire_month", "hire_day")
+    dfb.loc[:, 'fc'] = dfb.first_name.map(lambda x: x[:1])
+    dfb = dfb.drop_duplicates(subset=['uid']).set_index('uid')
+
+    matcher = ThresholdMatcher(dfa, dfb, ColumnsIndex(["fc"]), {
+        "last_name": JaroWinklerSimilarity(),
+        "first_name": JaroWinklerSimilarity(),
+        "hire_date": DateSimilarity()
+    })
+    matcher.save_pairs_to_excel(data_file_path(
+        "match/baton_rouge_csd_pprr_%d_v_post_pprr_2020_11_06.xlsx" % year), decision)
+    matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
+    match_dict = dict(matches)
+
+    pprr.loc[:, 'level_1_cert_date'] = pprr.uid.map(
+        lambda x: post.loc[match_dict[x], 'level_1_cert_date'] if x in match_dict else '')
+    pprr.loc[:, 'last_pc_12_qualification_date'] = pprr.uid.map(
+        lambda x: post.loc[match_dict[x], 'last_pc_12_qualification_date'] if x in match_dict else '')
+    return pprr
+
+
 if __name__ == "__main__":
     df17 = pd.read_csv(data_file_path(
         "clean/pprr_baton_rouge_csd_2017.csv"))
@@ -95,6 +139,9 @@ if __name__ == "__main__":
         "clean/pprr_baton_rouge_csd_2019.csv"))
     cprr = pd.read_csv(data_file_path("clean/cprr_baton_rouge_pd_2018.csv"))
     df17, df19 = match_csd_pprr_2017_v_2019(df17, df19)
+    post = prepare_post_data()
+    df17 = match_csd_pprr_against_post(df17, post, 2017, 0.954)
+    df19 = match_csd_pprr_against_post(df19, post, 2019, 0.91)
     cprr = match_pd_cprr_2018_v_csd_pprr_2019(cprr, df19)
     ensure_data_dir("match")
     df17.to_csv(

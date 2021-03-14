@@ -28,11 +28,13 @@ def clean_action(df):
 
 
 def split_infraction(df):
-    rules = df.infraction.str.replace(
-        r"^([A-Za-z ,]+)(\d.+)?$", r"\1@@\2").str.split("@@", expand=True)
-    df.loc[:, "rule_violation"] = rules.iloc[:, 0].str.strip()
-    df.loc[:, "rule_code"] = rules.iloc[:, 1]\
-        .str.strip().fillna("").str.replace(r"-(\d+)$", r".\1")
+    infractions = df.infraction.str.extract(r"^([A-Za-z ,]+)(\d.+)?$")
+    df.loc[:, 'charges'] = infractions.iloc[:, 1].fillna('').str.strip()\
+        .str.replace(r"-(\d+)$", r".\1")\
+        .str.cat(
+            infractions.iloc[:, 0].str.strip(),
+            sep=' - ')\
+        .str.replace(r'^ - ', '')
     df = df.drop(columns=["infraction"])
     return df
 
@@ -57,14 +59,15 @@ def clean18():
         .pipe(split_infraction)\
         .pipe(
             standardize_desc_cols,
-            ["rank_desc", "disposition", "complainant_type", "department_desc", "rule_violation"])\
+            ["rank_desc", "disposition", "complainant_type", "department_desc", "charges"])\
         .pipe(clean_dates, ["rank_date"])\
         .pipe(clean_races, ["race"])\
         .pipe(clean_sexes, ["sex"])\
         .pipe(clean_datetimes, ["occur_datetime"])\
         .pipe(clean_action)\
         .pipe(assign_cols)\
-        .pipe(gen_uid, ["first_name", "last_name", "birth_year", "badge_no"])
+        .pipe(gen_uid, ["agency", "first_name", "last_name", "birth_year", "badge_no"])\
+        .pipe(gen_uid, ['agency', 'uid', 'occur_year', 'occur_month', 'occur_day'], 'complaint_uid')
     return df
 
 

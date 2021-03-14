@@ -1,17 +1,10 @@
 from lib.columns import clean_column_names
 from lib.path import data_file_path, ensure_data_dir
+from lib.clean import clean_names
+from lib.uid import gen_uid
 import pandas as pd
 import sys
 sys.path.append("../")
-
-
-def standardize_agency(df):
-    d = {
-        "East Baton Rouge Sheriff's Office": "Baton Rouge SO",
-        'Baton Rouge Police Department': "Baton Rouge PD"
-    }
-    df.loc[:, "agency"] = df.agency.map(lambda x: d.get(x, x))
-    return df
 
 
 def clean():
@@ -19,4 +12,11 @@ def clean():
         "baton_rouge_da/baton_rouge_da_cprr_2021.csv"))
     df = clean_column_names(df)
     return df\
-        .pipe(standardize_agency)
+        .pipe(clean_names, ['first_name', 'last_name', 'middle_name'])\
+        .pipe(gen_uid, ['agency', 'first_name', 'last_name', 'middle_name'])
+
+
+if __name__ == '__main__':
+    df = clean()
+    ensure_data_dir('clean')
+    df.to_csv(data_file_path('clean/cprr_baton_rouge_da_2021.csv'), index=False)
