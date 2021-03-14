@@ -92,7 +92,6 @@ COMPLAINT_COLUMNS = [
     "complainant_age",
     "recommended_action",
     "action",  # list of actions taken separated by '; '
-    "complainant_type",
     "data_production_year",  # year of data
     "agency",  # name of agency (e.g. "New Orleans CSD")
     "incident_type",

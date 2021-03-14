@@ -38,6 +38,7 @@ if __name__ == '__main__':
         data_file_path('clean/pprr_post_2020_11_06.csv')
     )
     per, com, perhist = fuse(cprr, post_pprr)
+    ensure_data_dir('fuse')
     per.to_csv(
         data_file_path('fuse/per_greenwood_pd.csv'),
         index=False
