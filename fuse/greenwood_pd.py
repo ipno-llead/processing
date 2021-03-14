@@ -10,12 +10,12 @@ sys.path.append('../')
 
 def fuse(cprr, post_pprr):
     post_pprr = post_pprr.loc[
-        (post_pprr.agency == 'greenwood pd') & (post_pprr.hire_year.notna())
+        (post_pprr.agency == 'greenwood pd')
     ]
     post_pprr.loc[:, 'data_production_year'] = '2020'
     post_pprr.loc[:, 'agency'] = 'Greenwood PD'
     cprr = gen_uid(cprr, [
-        'uid', 'occur_year', 'occur_month', 'occur_day', 'rule_violation'
+        'uid', 'complaint_uid'
     ], 'allegation_uid')
     cprr.loc[:, 'rank_year'] = cprr.occur_year
     cprr.loc[:, 'rank_month'] = cprr.occur_month
@@ -25,7 +25,8 @@ def fuse(cprr, post_pprr):
     return (
         rearrange_personnel_columns(post_pprr),
         rearrange_complaint_columns(cprr),
-        rearrange_personnel_history_columns(pd.concat([cprr, post_pprr]))
+        rearrange_personnel_history_columns(
+            pd.concat([cprr, post_pprr[post_pprr.hire_year.notna()]]))
     )
 
 

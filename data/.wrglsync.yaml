@@ -30,6 +30,8 @@ repos:
     fileName: clean/lprr_baton_rouge_fpcsb_1992_2012.csv
   clean-pprr-port-allen-csd-2020:
     fileName: clean/pprr_port_allen_csd_2020.csv
+  clean-cprr-greenwood-pd-2015-2020:
+    fileName: clean/cprr_greenwood_pd_2015_2020.csv
   match-cprr-new-orleans-harbor-pd-2020:
     fileName: match/cprr_new_orleans_harbor_pd_2020.csv
   match-pprr-new-orleans-csd-2009:
@@ -50,6 +52,8 @@ repos:
     fileName: match/cprr_port_allen_pd_2019.csv
   match-pprr-port-allen-csd-2020:
     fileName: match/pprr_port_allen_csd_2020.csv
+  match-cprr-greenwood-pd-2015-2020:
+    fileName: match/cprr_greenwood_pd_2015_2020.csv
   com-baton-rouge-pd:
     fileName: fuse/com_baton_rouge_pd.csv
   com-baton-rouge-so:
@@ -62,6 +66,10 @@ repos:
     fileName: fuse/com_port_allen_pd.csv
   com-madisonville-pd:
     fileName: fuse/com_madisonville_pd.csv
+  com-greenwood-pd:
+    fileName: fuse/com_greenwood_pd.csv
+    primaryKey:
+      - allegation_uid
   app-baton-rouge-fpcsb:
     fileName: fuse/app_baton_rouge_fpcsb.csv
   per-baton-rouge-pd:
@@ -100,6 +108,10 @@ repos:
     fileName: fuse/per_baton_rouge_fpcsb.csv
     primaryKey:
       - uid
+  per-greenwood-pd:
+    fileName: fuse/per_greenwood_pd.csv
+    primaryKey:
+      - uid
   perhist-baton-rouge-pd:
     fileName: fuse/perhist_baton_rouge_pd.csv
   perhist-baton-rouge-so:
@@ -116,6 +128,8 @@ repos:
     fileName: fuse/perhist_port_allen_pd.csv
   perhist-madisonville-pd:
     fileName: fuse/perhist_madisonville_pd.csv
+  perhist-greenwood-pd:
+    fileName: fuse/perhist_greenwood_pd.csv
   personnel:
     fileName: fuse/personnel.csv
     primaryKey:

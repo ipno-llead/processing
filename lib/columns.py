@@ -54,6 +54,7 @@ PERSONNEL_HISTORY_COLUMNS = [
 COMPLAINT_COLUMNS = [
     "uid",  # officer unique identifier
     "tracking_number",  # unique identifier for complaint
+    "complaint_uid",  # unique identifier for complaint but generated for when tracking_number is unavailable
     "allegation_uid",  # unique identifier for allegation (complaint x officer)
     "occur_year",
     "occur_month",
@@ -79,6 +80,9 @@ COMPLAINT_COLUMNS = [
     "rule_violation",
     "paragraph_code",
     "paragraph_violation",
+    # "charges" combine all rule violations (and paragraphs)
+    # and should eventually replace rule_* and paragraph_* columns.
+    "charges",
     "unique_officer_allegation_id",
     "officer_years_of_service",
     "complainant_type",
