@@ -32,6 +32,8 @@ repos:
     fileName: clean/pprr_port_allen_csd_2020.csv
   clean-cprr-greenwood-pd-2015-2020:
     fileName: clean/cprr_greenwood_pd_2015_2020.csv
+  clean-pprr-post-2020-11-06:
+    fileName: clean/pprr_post_2020_11_06.csv
   match-cprr-new-orleans-harbor-pd-2020:
     fileName: match/cprr_new_orleans_harbor_pd_2020.csv
   match-pprr-new-orleans-csd-2009:

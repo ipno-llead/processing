@@ -44,6 +44,7 @@ def match_csd_pprr_against_post(cprr, post):
         lambda x: '' if x not in match_dict else post.loc[match_dict[x], 'level_1_cert_date'])
     cprr.loc[:, 'last_pc_12_qualification_date'] = cprr.uid.map(
         lambda x: '' if x not in match_dict else post.loc[match_dict[x], 'last_pc_12_qualification_date'])
+    cprr.loc[:, 'uid'] = cprr.uid.map(lambda x: match_dict.get(x, x))
     return cprr
 
 
