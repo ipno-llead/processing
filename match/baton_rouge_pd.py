@@ -140,8 +140,8 @@ if __name__ == "__main__":
     cprr = pd.read_csv(data_file_path("clean/cprr_baton_rouge_pd_2018.csv"))
     df17, df19 = match_csd_pprr_2017_v_2019(df17, df19)
     post = prepare_post_data()
-    df17 = match_csd_pprr_against_post(df17, post, 2017, 0.954)
-    df19 = match_csd_pprr_against_post(df19, post, 2019, 0.91)
+    df17 = match_csd_pprr_against_post(df17, post, 2017, 0.798)
+    df19 = match_csd_pprr_against_post(df19, post, 2019, 0.894)
     cprr = match_pd_cprr_2018_v_csd_pprr_2019(cprr, df19)
     ensure_data_dir("match")
     df17.to_csv(

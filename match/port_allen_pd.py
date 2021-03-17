@@ -24,7 +24,7 @@ def match_csd_pprr_against_post_pprr(pprr, post):
         'last_name': JaroWinklerSimilarity(),
         'hire_date': DateSimilarity(),
     })
-    decision = 0.92
+    decision = 0.989
     matcher.save_pairs_to_excel(data_file_path(
         "match/port_allen_csd_pprr_2020_v_post_pprr_2020_11_06.xlsx"), decision)
     matches = matcher.get_index_pairs_within_thresholds(decision)
@@ -67,7 +67,7 @@ def match_cprr_2019_against_csd_pprr_2020(cprr, pprr):
         'first_name': JaroWinklerSimilarity(),
         'last_name': JaroWinklerSimilarity(),
     })
-    decision = 0.96
+    decision = 0.969
     matcher.save_pairs_to_excel(data_file_path(
         "match/port_allen_pd_cprr_2019_v_csd_pprr_2020.xlsx"), decision)
     matches = matcher.get_index_pairs_within_thresholds(decision)

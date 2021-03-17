@@ -46,7 +46,7 @@ def match_against_baton_rouge_so_personnel(df, per):
         'first_name': JaroWinklerSimilarity(),
         'last_name': JaroWinklerSimilarity(),
     })
-    decision = 0.9
+    decision = 1
     matcher.save_pairs_to_excel(data_file_path(
         "match/baton_rouge_da_cprr_2018_v_baton_rouge_so_personnel.xlsx"), decision)
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
@@ -62,7 +62,7 @@ if __name__ == '__main__':
     so_per = pd.read_csv(data_file_path(
         "fuse/per_baton_rouge_so.csv"))
     df = pd.read_csv(data_file_path('clean/cprr_baton_rouge_da_2021.csv'))
-    df = match_against_baton_rouge_csd_pprr(df, pprr17, 2017, 0.94)
-    df = match_against_baton_rouge_csd_pprr(df, pprr19, 2019, 0.97)
+    df = match_against_baton_rouge_csd_pprr(df, pprr17, 2017, 0.98)
+    df = match_against_baton_rouge_csd_pprr(df, pprr19, 2019, 0.98)
     df = match_against_baton_rouge_so_personnel(df, so_per)
     df.to_csv(data_file_path('match/cprr_baton_rouge_da_2021.csv'), index=False)

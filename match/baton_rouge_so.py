@@ -34,7 +34,7 @@ def match_csd_pprr_against_post(cprr, post):
         "last_name": JaroWinklerSimilarity(),
         "first_name": JaroWinklerSimilarity(),
     })
-    decision = 0.969
+    decision = 1
     matcher.save_pairs_to_excel(data_file_path(
         "match/baton_rouge_so_cprr_2018_v_post_pprr_2020_11_06.xlsx"), decision)
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
