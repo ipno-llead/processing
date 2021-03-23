@@ -22,7 +22,7 @@ def split_name(df):
 
 def clean_action(df):
     df.loc[:, "action"] = df.action.str.lower().str.strip()\
-        .str.replace(r"(\. |, | and )", "; ").str.replace(r"\.$", "")\
+        .str.replace(r"(\. |, | and )", " | ").str.replace(r"\.$", "")\
         .str.replace("privliges", "privileges", regex=False)
     return df
 

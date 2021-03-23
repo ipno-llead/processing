@@ -1,9 +1,6 @@
 from lib.path import data_file_path, ensure_data_dir
 from lib.columns import clean_column_names
-from lib.clean import (
-    float_to_int_str, clean_sexes, clean_races, standardize_desc_cols, clean_datetimes,
-    clean_dates, clean_times
-)
+from lib.clean import float_to_int_str
 import pandas as pd
 import sys
 sys.path.append("../")
@@ -13,45 +10,78 @@ def initial_processing():
     df = pd.read_csv(data_file_path(
         "ipm/new_orleans_pd_cprr_actions_taken_1931-2020.csv"), escapechar="\\")
     df = df.dropna(axis=1, how="all")
-    df = df.drop_duplicates()
-    return clean_column_names(df)
+    df = clean_column_names(df)
+    df = df[[
+        'allegation_primary_key', 'action_primary_key', 'action_taken_date', 'action_taken_year', 'action_taken_month',
+        'action_taken_completed', 'action_taken_category', 'action_taken', 'action_taken_oipm'
+    ]]
+    return df[df.allegation_primary_key.notna() & df.action_primary_key.notna()]\
+        .drop_duplicates().reset_index(drop=True)
 
 
-def split_table(df):
-    allegation_cols = [
-        'allegation_incident_officer_id', 'allegation_primary_key', 'allegation',
-        'allegation_finding', 'allegation_final_disposition', 'allegation_created_date',
-        'allegation_year_created', 'allegation_month_created', 'allegation_finding_date',
-        'allegation_created_on', 'allegation_final_disposition_date', 'allegation_directive'
-    ]
-    allegations = df[allegation_cols].drop_duplicates().dropna(how="all")\
-        .dropna(subset=["allegation_primary_key"])
-
-    action_taken_cols = ['allegation_primary_key']+[
-        col for col in df.columns
-        if col not in allegation_cols
-    ]
-    actions_taken = df[action_taken_cols].drop_duplicates().dropna(how="all")\
-        .dropna(subset=["action_primary_key"])
-    return allegations, actions_taken
+def clean_category(df):
+    df.loc[:, 'action_taken_category'] = df.action_taken_category.str.replace(
+        r'Adminstrative', 'Administrative')
+    return df
 
 
-def clean_allegations(allegations):
-    return allegations\
-        .pipe(float_to_int_str, [
-            'allegation_incident_officer_id', 'allegation_primary_key', 'allegation_year_created',
-            'allegation_month_created'
-        ])
+def combine_date_columns(df):
+    df.loc[:, 'action_taken_date'] = df.action_taken_year.str.cat(
+        [
+            df.action_taken_month.str.zfill(2),
+            df.action_taken_date.fillna('').str.replace(
+                r'^\d+\/(\d+)\/\d+$', r'\1').str.zfill(2),
+        ],
+        sep='-'
+    ).str.replace(r'^-.+', '')
+    return df.drop(columns=['action_taken_year', 'action_taken_month'])
 
 
-def clean_actions_take(actions_taken):
-    return actions_taken\
-        .pipe(float_to_int_str, ['allegation_primary_key', 'action_primary_key'])
+def combine_columns(df):
+    def combine(row):
+        txts = []
+        if pd.notnull(row.action_taken_category):
+            txts.append('Category: %s' % row.action_taken_category)
+        if pd.notnull(row.action_taken_date):
+            txts.append('Date: %s' % row.action_taken_date)
+        if pd.notnull(row.action_taken):
+            txts.append(row.action_taken)
+        if pd.notnull(row.action_taken_oipm):
+            txts.append('OIPM: %s' % row.action_taken_oipm)
+        if row.action_taken_completed == 'Yes':
+            txts.append('Completed')
+        elif row.action_taken_completed == 'No':
+            txts.append('Not completed')
+        return '; '.join(txts)
+    df.loc[:, 'action'] = df.apply(combine, axis=1, result_type='reduce')
+    df = df.drop(columns=[
+        'action_taken_date', 'action_taken_completed', 'action_taken_category',
+        'action_taken', 'action_taken_oipm', 'action_primary_key'
+    ])
+    return df
+
+
+def combine_rows(df):
+    records = []
+    for idx, frame in df.groupby('allegation_primary_key'):
+        records.append((idx, ' | '.join(frame.action.to_list())))
+    return pd.DataFrame.from_records(records, columns=['allegation_primary_key', 'action'])
 
 
 def clean():
     df = initial_processing()
-    allegations, actions_taken = split_table(df)
-    return (
-        clean_allegations(allegations), clean_actions_take(actions_taken)
-    )
+    return df\
+        .pipe(float_to_int_str, [
+            'allegation_primary_key', 'action_primary_key', 'action_taken_year', 'action_taken_month'
+        ])\
+        .pipe(clean_category)\
+        .pipe(combine_date_columns)\
+        .pipe(combine_columns)\
+        .pipe(combine_rows)
+
+
+if __name__ == '__main__':
+    df = clean()
+    ensure_data_dir('clean')
+    df.to_csv(data_file_path(
+        'clean/ipm_new_orleans_pd_cprr_actions.csv'), index=False)

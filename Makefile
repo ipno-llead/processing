@@ -125,3 +125,6 @@ data/clean/pprr_port_allen_csd_2020.csv: clean/port_allen_csd_pprr.py data/port_
 
 data/clean/cprr_baton_rouge_da_2021.csv: clean/baton_rouge_da_cprr_2021.py data/baton_rouge_da/baton_rouge_da_cprr_2021.csv
 	python clean/baton_rouge_da_cprr_2021.py
+
+data/clean/ipm_new_orleans_pd_cprr.csv: clean/ipm_new_orleans_pd_cprr_allegation.py data/ipm/new_orleans_pd_cprr_allegations_1931-2020.csv
+	python clean/ipm_new_orleans_pd_cprr_allegation.py

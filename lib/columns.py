@@ -64,6 +64,9 @@ COMPLAINT_COLUMNS = [
     "receive_year",
     "receive_month",
     "receive_day",
+    "allegation_create_year",
+    "allegation_create_month",
+    "allegation_create_day",
     "investigation_complete_year",
     "investigation_complete_month",
     "investigation_complete_day",
@@ -75,23 +78,34 @@ COMPLAINT_COLUMNS = [
     'suspension_end_day',
     "investigation_type",
     "investigation_status",
+    "assigned_unit",
+    "assigned_department",
+    "assigned_division",
+    "assigned_sub_division_a",
+    "assigned_sub_division_b"
+    "traffic_stop",
+    "body_worn_camera_available",
+    "app_used",
+    "citizen_arrested",
+    "allegation_finding",
+    "allegation",
+    "allegation_class",
+    "citizen",
     "disposition",
-    "rule_code",
-    "rule_violation",
-    "paragraph_code",
-    "paragraph_violation",
+    "rule_code",  # deprecated, use "charges" field instead
+    "rule_violation",  # deprecated, use "charges" field instead
+    "paragraph_code",  # deprecated, use "charges" field instead
+    "paragraph_violation",  # deprecated, use "charges" field instead
     # "charges" combine all rule violations (and paragraphs)
     # and should eventually replace rule_* and paragraph_* columns.
     "charges",
-    "unique_officer_allegation_id",
     "officer_years_of_service",
     "complainant_type",
-    "complainant_name",
     "complainant_sex",
     "complainant_race",
     "complainant_age",
     "recommended_action",
-    "action",  # list of actions taken separated by '; '
+    "action",  # list of actions taken separated by ' | '
     "data_production_year",  # year of data
     "agency",  # name of agency (e.g. "New Orleans CSD")
     "incident_type",

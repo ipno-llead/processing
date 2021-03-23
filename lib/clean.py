@@ -126,7 +126,7 @@ def clean_sexes(df, cols):
 def clean_races(df, cols):
     for col in cols:
         df.loc[:, col] = df[col].str.strip().str.lower()\
-            .str.replace(r"^w$", "white").str.replace(r"^b$", "black")\
+            .str.replace(r"^w$", "white").str.replace(r"^b(lack.+)?$", "black")\
             .str.replace(r"^h$", "hispanic").str.replace(r"^unknown.*", "unknown")
     return df
 

@@ -1,8 +1,7 @@
 from lib.path import data_file_path, ensure_data_dir
 from lib.columns import clean_column_names
 from lib.clean import (
-    float_to_int_str, clean_sexes, clean_races, standardize_desc_cols, clean_datetimes,
-    clean_dates, clean_times
+    float_to_int_str, clean_sexes, clean_races, standardize_desc_cols, clean_dates
 )
 import pandas as pd
 import sys
@@ -17,92 +16,106 @@ def initial_processing():
     return clean_column_names(df)
 
 
-def split_table(df):
-    officer_cols = [
-        'officer_primary_key', 'officer_unknown_id', 'officer_sex', 'officer_race',
-    ]
-    officers = df[officer_cols].drop_duplicates().dropna(how="all")\
-        .dropna(subset=["officer_primary_key"])
-
+def combine_citizen_columns(df):
     citizen_cols = [
+        'allegation_primary_key', 'citizen_primary_key', 'citizen_sex', 'citizen_race'
+    ]
+    citizens = df[citizen_cols].dropna(how="all").drop_duplicates(subset=[
+        'allegation_primary_key', 'citizen_primary_key'
+    ]).set_index(['allegation_primary_key', 'citizen_primary_key'])
+    citizen_dict = dict()
+    for idx, frame in citizens.groupby(level=0):
+        citizen_list = []
+        for _, row in frame.iterrows():
+            citizen = [
+                x for x in [row.citizen_race, row.citizen_sex]
+                if x != '' and not x.startswith('unknown')
+            ]
+            if len(citizen) > 0:
+                citizen_list.append(' '.join(citizen))
+        sexrace = ', '.join(citizen_list)
+        citizen_dict[idx] = sexrace
+    df.loc[:, 'citizen'] = df.allegation_primary_key\
+        .map(lambda x: citizen_dict.get(x, ''))
+    df = df.drop(columns=['citizen_primary_key', 'citizen_sex', 'citizen_race'])\
+        .drop_duplicates().reset_index(drop=True)
+    return df
+
+
+def rename_columns(df):
+    cols = [
+        'pib_control_number', 'incident_type', 'occurred_date', 'year_occurred', 'month_occurred',
+        'disposition_nopd', 'ocurred_time', 'received_date', 'assigned_unit',
+        'assigned_department', 'assigned_division', 'assigned_sub_division_a', 'assigned_sub_division_b',
+        'source', 'rule_violation', 'paragraph_violation', 'traffic_stop', 'body_worn_camera_available',
+        'app_used', 'citizen_arrested', 'officer_primary_key', 'allegation_primary_key',
+        'allegation_finding_oipm', 'allegation', 'allegation_class', 'allegation_created_on',
         'citizen_primary_key', 'citizen_sex', 'citizen_race'
     ]
-    citizens = df[citizen_cols].drop_duplicates().dropna(how="all")\
-        .dropna(subset=["citizen_primary_key"])
+    df = df[cols].drop_duplicates().dropna(how="all").rename(columns={
+        'pib_control_number': 'tracking_number',
+        'occurred_date': 'raw_occur_date',
+        'year_occurred': 'occur_year',
+        'month_occurred': 'occur_month',
+        'disposition_nopd': 'disposition',
+        'ocurred_time': 'occur_time',
+        'received_date': 'receive_date',
+        'source': 'complainant_type',
+        'allegation_finding_oipm': 'allegation_finding',
+        'allegation_created_on': 'allegation_create_date'
+    })
 
-    complaint_cols = [
-        'pib_control_number', 'incident_type', 'occurred_date', 'year_occurred', 'month_occurred',
-        'status', 'disposition_nopd', 'day_of_week', 'hour_of_day', 'ocurred_time', 'received_date',
-        'open_date', 'due_date', 'assigned_date', 'completed_date', 'created_date', 'assigned_unit',
-        'assigned_department', 'assigned_division', 'assigned_sub_division_a', 'assigned_sub_division_b',
-        'working_status', 'shift_details', 'priority', 'source', 'service_type', 'rule_violation',
-        'paragraph_violation', 'cit_complaint', 'unidentified_officer', 'why_forwarded', 'county',
-        'traffic_stop', 'field_unit_level', 'length_of_job', 'sustained', 'body_worn_camera_available',
-        'app_used', 'citizen_arrested', 'citizen_involvement'
-    ]
-    complaints = df[complaint_cols].drop_duplicates().dropna(how="all")\
-        .dropna(subset=["pib_control_number"])
-
-    allegation_cols = ['pib_control_number', 'officer_primary_key']+[
-        col for col in df.columns
-        if col not in officer_cols + citizen_cols + complaint_cols
-    ]
-    allegations = df[allegation_cols].drop_duplicates().dropna(how="all")\
-        .dropna(subset=["allegation_primary_key"])
-
-    allegation_citizens = df[
-        ["allegation_primary_key", "citizen_primary_key"]
-    ].drop_duplicates().dropna(how="all")
-
-    return officers, citizens, complaints, allegations, allegation_citizens
+    return df
 
 
-def clean_officers(officers):
-    officers.columns = [
-        'officer_primary_key', 'officer_unknown_id', 'sex', 'race']
-    return officers\
-        .pipe(float_to_int_str, ["officer_primary_key", "officer_unknown_id"])\
-        .pipe(clean_sexes, ["sex"])\
-        .pipe(clean_races, ["race"])
+def clean_occur_time(df):
+    df.loc[:, 'occur_time'] = df.occur_time.str.replace(r'\.0$', '')
+    return df
 
 
-def clean_citizens(citizens):
-    return citizens\
-        .pipe(float_to_int_str, ["citizen_primary_key"])\
-        .pipe(clean_sexes, ["citizen_sex"])\
-        .pipe(clean_races, ["citizen_race"])
+def clean_trailing_empty_time(df, cols):
+    for col in cols:
+        df.loc[:, col] = df[col].str.replace(r' 0:00$', '')
+    return df
 
 
-def clean_complaints(complaints):
-    return complaints\
-        .pipe(float_to_int_str, [
-            "pib_control_number", 'year_occurred', 'month_occurred', 'hour_of_day'
-        ])\
-        .pipe(standardize_desc_cols, ['incident_type', 'status', 'disposition_nopd', 'day_of_week'])
+def clean_complainant_type(df):
+    df.loc[:, 'complainant_type'] = df.complainant_type.str.lower().str.strip()\
+        .str.replace(r' \# \d+$', '').str.replace(r' complain(t|ant)$', '')\
+        .str.replace(r'civilian', 'citizen').str.replace(r' offi$', ' office')
+    return df
 
 
-def clean_allegations(allegations):
-    return allegations\
-        .pipe(float_to_int_str, [
-            'pib_control_number', 'officer_primary_key', 'allegation_primary_key'
-        ])\
-        .pipe(standardize_desc_cols, [
-            'allegation', 'allegation_finding', 'allegation_final_disposition', 'all_findings',
-            'disposition_oipm_by_officer', 'allegation_finding_oipm', 'allegation_1', 'allegation_class',
-            'allegation_class_1', 'allegation_directive', 'allegation_alert_processed'
-        ])
-    # .pipe(clean_dates, ["occur_date", 'allegation_final_disposition_date', 'allegation_alert_processed_date'])\
-    # .pipe(clean_datetimes, ['allegation_finding_datetime', 'allegation_created_on_datetime'])\
-    # .pipe(clean_times, ["occur_time"])
+def combine_rule_and_paragraph(df):
+    df.loc[:, "charges"] = df.rule_violation.str.cat(df.paragraph_violation, sep='; ')\
+        .str.replace(r'^; ', '').str.replace(r'; $', '')
+    df = df.drop(columns=['rule_violation', 'paragraph_violation'])
+    return df
 
 
 def clean():
     df = initial_processing()
-    officers, citizens, complaints, allegations, allegation_citizens = split_table(
-        df
-    )
-    officers = clean_officers(officers)
-    citizens = clean_citizens(citizens)
-    complaints = clean_complaints(complaints)
-    allegations = clean_allegations(allegations)
-    return officers, citizens, complaints, allegations, allegation_citizens
+    return df\
+        .pipe(rename_columns)\
+        .pipe(clean_sexes, ['citizen_sex'])\
+        .pipe(clean_races, ['citizen_race'])\
+        .pipe(combine_citizen_columns)\
+        .pipe(standardize_desc_cols, [
+            'incident_type', 'disposition', 'rule_violation', 'paragraph_violation',
+            'traffic_stop', 'body_worn_camera_available', 'citizen_arrested', 'allegation_finding',
+            'allegation', 'allegation_class'
+        ])\
+        .pipe(float_to_int_str, [
+            'occur_year', 'occur_month', 'officer_primary_key', 'allegation_primary_key'
+        ])\
+        .pipe(clean_occur_time)\
+        .pipe(clean_trailing_empty_time, ['receive_date', 'allegation_create_date'])\
+        .pipe(clean_dates, ['receive_date', 'allegation_create_date'])\
+        .pipe(clean_complainant_type)\
+        .pipe(combine_rule_and_paragraph)
+
+
+if __name__ == '__main__':
+    df = clean()
+    ensure_data_dir('clean')
+    df.to_csv(data_file_path('clean/ipm_new_orleans_pd_cprr.csv'), index=False)
