@@ -4,14 +4,13 @@ import pandas as pd
 import numpy as np
 import datetime
 
-from lib.date import combine_date_columns
+from lib.date import combine_date_columns, combine_datetime_columns
 
 
 mdy_date_pattern_1 = re.compile(r"^\d{1,2}/\d{1,2}/\d{2}$")
 mdy_date_pattern_2 = re.compile(r"^\d{1,2}/\d{1,2}/\d{4}$")
 year_pattern = re.compile(r"^(19|20)\d{2}$")
 year_month_pattern = re.compile(r"^(19|20)\d{4}$")
-datetime_pattern_1 = re.compile(r"^\d{1,2}/\d{1,2}/\d{2,4}\s+\d{1,2}:\d{1,2}$")
 month_day_pattern = re.compile(r"^[A-Z][a-z]{2}-\d{1,2}$")
 time_pattern_1 = re.compile(r"\d{2}:\d{2}\.\d$")
 
@@ -62,6 +61,9 @@ def clean_dates(df, cols, expand=True):
     return df
 
 
+datetime_pattern_1 = re.compile(r"^\d{1,2}/\d{1,2}/\d{2,4}\s+\d{1,2}:\d{1,2}$")
+
+
 def clean_datetime(val):
     if val == "" or pd.isnull(val):
         return "", "", "", ""
@@ -74,16 +76,28 @@ def clean_datetime(val):
     raise ValueError("unknown datetime format \"%s\"" % val)
 
 
-def clean_datetimes(df, cols):
+def clean_datetimes(df, cols, expand=True):
     for col in cols:
         assert col.endswith("_datetime")
         dates = pd.DataFrame.from_records(
             df[col].str.strip().map(clean_datetime))
-        prefix = col[:-9]
-        dates.columns = [prefix+"_year", prefix +
-                         "_month", prefix+"_day", prefix+"_time"]
-        df = pd.concat([df, dates], axis=1)
-    df = df.drop(columns=cols)
+        if expand:
+            prefix = col[:-9]
+            dates.columns = [prefix+"_year", prefix +
+                             "_month", prefix+"_day", prefix+"_time"]
+            df = pd.concat([df, dates], axis=1)
+        else:
+            df.loc[:, col] = combine_datetime_columns(dates, 0, 1, 2, 3)
+    if expand:
+        df = df.drop(columns=cols)
+    return df
+
+
+def parse_datetimes(df, cols):
+    for col in cols:
+        dates = pd.DataFrame.from_records(
+            df[col].str.strip().map(clean_datetime))
+        df.loc[:, col] = combine_datetime_columns(dates, 0, 1, 2, 3)
     return df
 
 

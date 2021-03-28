@@ -1,13 +1,7 @@
 username: ipno
 repos:
-  clean-pprr-new-orleans-csd-2009:
-    fileName: clean/pprr_new_orleans_csd_2009.csv
-  clean-pprr-new-orleans-csd-2014:
-    fileName: clean/pprr_new_orleans_csd_2014.csv
   clean-pprr-new-orleans-harbor-pd-2020:
     fileName: clean/pprr_new_orleans_harbor_pd_2020.csv
-  clean-pprr-new-orlenas-pd:
-    fileName: clean/pprr_new_orleans_pd.csv
   clean-cprr-baton-rouge-pd-2018:
     fileName: clean/cprr_baton_rouge_pd_2018.csv
   clean-cprr-baton-rouge-so-2018:
@@ -34,12 +28,16 @@ repos:
     fileName: clean/cprr_greenwood_pd_2015_2020.csv
   clean-pprr-post-2020-11-06:
     fileName: clean/pprr_post_2020_11_06.csv
+  clean-pprr-new-orleans-pd-1946-2018:
+    fileName: clean/pprr_new_orleans_pd_1946_2018.csv
+  clean-cprr-new-orleans-pd-1931-2020:
+    fileName: clean/cprr_new_orleans_pd_1931_2020.csv
+  clean-cprr-actions-new-orleans-pd-1931-2020:
+    fileName: clean/cprr_actions_new_orleans_pd_1931_2020.csv
+  clean-uof-new-orleans-pd-2012-2019:
+    fileName: clean/uof_new_orleans_pd_2012_2019.csv
   match-cprr-new-orleans-harbor-pd-2020:
     fileName: match/cprr_new_orleans_harbor_pd_2020.csv
-  match-pprr-new-orleans-csd-2009:
-    fileName: match/pprr_new_orleans_csd_2009.csv
-  match-pprr-new-orleans-csd-2014:
-    fileName: match/pprr_new_orleans_csd_2014.csv
   match-pprr-baton-rouge-csd-2017:
     fileName: match/pprr_baton_rouge_csd_2017.csv
   match-pprr-baton-rouge-csd-2019:
@@ -74,6 +72,14 @@ repos:
     fileName: fuse/com_greenwood_pd.csv
     primaryKey:
       - allegation_uid
+  com-new-orleans-pd:
+    fileName: fuse/com_new_orleans_pd.csv
+    primaryKey:
+      - allegation_uid
+  uof-new-orleans-pd:
+    fileName: fuse/uof_new_orleans_pd.csv
+    primaryKey:
+      - use_of_force_uid
   app-baton-rouge-fpcsb:
     fileName: fuse/app_baton_rouge_fpcsb.csv
   per-baton-rouge-pd:
@@ -90,10 +96,6 @@ repos:
       - uid
   per-new-orleans-pd:
     fileName: fuse/per_new_orleans_pd.csv
-    primaryKey:
-      - uid
-  per-new-orleans-csd:
-    fileName: fuse/per_new_orleans_csd.csv
     primaryKey:
       - uid
   per-brusly-pd:
@@ -124,8 +126,6 @@ repos:
     fileName: fuse/perhist_new_orleans_harbor_pd.csv
   perhist-new-orleans-pd:
     fileName: fuse/perhist_new_orleans_pd.csv
-  perhist-new-orleans-csd:
-    fileName: fuse/perhist_new_orleans_csd.csv
   perhist-brusly-pd:
     fileName: fuse/perhist_brusly_pd.csv
   perhist-port-allen-pd:

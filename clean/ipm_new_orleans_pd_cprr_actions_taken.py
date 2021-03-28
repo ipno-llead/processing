@@ -84,4 +84,4 @@ if __name__ == '__main__':
     df = clean()
     ensure_data_dir('clean')
     df.to_csv(data_file_path(
-        'clean/ipm_new_orleans_pd_cprr_actions.csv'), index=False)
+        'clean/cprr_actions_new_orleans_pd_1931_2020.csv'), index=False)

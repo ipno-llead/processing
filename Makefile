@@ -3,19 +3,15 @@ export PYTHONPATH := $(current_dir):$(PYTHONPATH)
 
 .PHONY: all
 
-all: data/fuse/per_new_orleans_pd.csv data/fuse/perhist_new_orleans_pd.csv
 all: data/fuse/per_new_orleans_harbor_pd.csv data/fuse/perhist_new_orleans_harbor_pd.csv
 all: data/fuse/per_baton_rouge_pd.csv data/fuse/perhist_baton_rouge_pd.csv data/fuse/com_baton_rouge_pd.csv
 all: data/fuse/per_baton_rouge_so.csv data/fuse/perhist_baton_rouge_so.csv data/fuse/com_baton_rouge_so.csv
-all: data/fuse/per_new_orleans_csd.csv data/fuse/perhist_new_orleans_csd.csv
 all: data/fuse/per_brusly_pd.csv data/fuse/perhist_brusly_pd.csv data/fuse/com_brusly_pd.csv
 all: data/fuse/per_port_allen_pd.csv data/fuse/perhist_port_allen_pd.csv data/fuse/com_port_allen_pd.csv
 all: data/fuse/per_madisonville_pd.csv data/fuse/perhist_madisonville_pd.csv data/fuse/com_madisonville_pd.csv
 all: data/fuse/app_baton_rouge_fpcsb.csv data/fuse/per_baton_rouge_fpcsb.csv
 all: data/fuse/per_greenwood_pd.csv data/fuse/com_greenwood_pd.csv data/fuse/perhist_greenwood_pd.csv
-
-data/fuse/per_new_orleans_pd.csv data/fuse/perhist_new_orleans_pd.csv: fuse/new_orleans_pd.py data/clean/pprr_new_orleans_pd.csv
-	python fuse/new_orleans_pd.py
+all: data/fuse/com_new_orleans_pd.csv data/fuse/uof_new_orleans_pd.csv data/fuse/per_new_orleans_pd.csv data/fuse/perhist_new_orleans_pd.csv
 
 data/fuse/per_new_orleans_harbor_pd.csv data/fuse/perhist_new_orleans_harbor_pd.csv: fuse/new_orleans_harbor_pd.py data/clean/pprr_new_orleans_harbor_pd_2020.csv data/match/cprr_new_orleans_harbor_pd_2020.csv
 	python fuse/new_orleans_harbor_pd.py
@@ -38,19 +34,16 @@ data/fuse/per_madisonville_pd.csv data/fuse/perhist_madisonville_pd.csv data/fus
 data/fuse/app_baton_rouge_fpcsb.csv data/fuse/per_baton_rouge_fpcsb.csv: fuse/baton_rouge_fpcsb.py data/clean/lprr_baton_rouge_fpcsb_1992_2012.csv
 	python fuse/baton_rouge_fpcsb.py
 
-data/fuse/per_new_orleans_csd.csv data/fuse/perhist_new_orleans_csd.csv: fuse/new_orleans_csd.py data/match/pprr_new_orleans_csd_2009.csv data/match/pprr_new_orleans_csd_2014.csv
-	python fuse/new_orleans_csd.py
-
 data/fuse/per_greenwood_pd.csv data/fuse/com_greenwood_pd.csv data/fuse/perhist_greenwood_pd.csv: fuse/greenwood_pd.py data/match/cprr_greenwood_pd_2015_2020.csv data/clean/pprr_post_2020_11_06.csv
 	python fuse/greenwood_pd.py
+
+data/fuse/com_new_orleans_pd.csv data/fuse/uof_new_orleans_pd.csv data/fuse/per_new_orleans_pd.csv data/fuse/perhist_new_orleans_pd.csv: fuse/new_orleans_pd.py data/clean/pprr_new_orleans_pd_1946_2018.csv data/clean/cprr_new_orleans_pd_1931_2020.csv data/clean/cprr_actions_new_orleans_pd_1931_2020.csv data/clean/uof_new_orleans_pd_2012_2019.csv
+	python fuse/new_orleans_pd.py
 
 
 
 data/match/cprr_new_orleans_harbor_pd_2020.csv: match/new_orleans_harbor_pd.py data/clean/cprr_new_orleans_harbor_pd_2020.csv data/clean/pprr_new_orleans_harbor_pd_2020.csv
 	python match/new_orleans_harbor_pd.py
-
-data/match/pprr_new_orleans_csd_2009.csv data/match/pprr_new_orleans_csd_2014.csv: match/new_orleans_csd.py data/clean/pprr_new_orleans_csd_2009.csv data/clean/pprr_new_orleans_csd_2014.csv
-	python match/new_orleans_csd.py
 
 data/match/pprr_baton_rouge_csd_2017.csv data/match/pprr_baton_rouge_csd_2019.csv data/match/cprr_baton_rouge_pd_2018.csv: match/baton_rouge_pd.py data/clean/pprr_baton_rouge_csd_2017.csv data/clean/pprr_baton_rouge_csd_2019.csv data/clean/cprr_baton_rouge_pd_2018.csv data/clean/pprr_post_2020_11_06.csv
 	python match/baton_rouge_pd.py
@@ -77,12 +70,6 @@ data/match/cprr_baton_rouge_da_2021.csv: match/baton_rouge_da.py data/clean/cprr
 
 data/clean/pprr_new_orleans_harbor_pd_2020.csv: clean/new_orleans_harbor_pd_pprr.py data/new_orleans_harbor_pd/new_orleans_harbor_pd_pprr_2020.csv
 	python clean/new_orleans_harbor_pd_pprr.py
-
-data/clean/pprr_new_orleans_pd.csv: clean/new_orleans_pd_pprr.py data/new_orleans_pd/*.csv
-	python clean/new_orleans_pd_pprr.py
-
-data/clean/pprr_new_orleans_csd_2009.csv data/clean/pprr_new_orleans_csd_2014.csv: clean/new_orleans_csd_pprr.py data/new_orleans_csd/*.csv
-	python clean/new_orleans_csd_pprr.py
 
 data/clean/pprr_baton_rouge_csd_2017.csv data/clean/pprr_baton_rouge_csd_2019.csv: clean/baton_rouge_csd_pprr.py data/baton_rouge_csd/*.csv
 	python clean/baton_rouge_csd_pprr.py
@@ -126,5 +113,14 @@ data/clean/pprr_port_allen_csd_2020.csv: clean/port_allen_csd_pprr.py data/port_
 data/clean/cprr_baton_rouge_da_2021.csv: clean/baton_rouge_da_cprr_2021.py data/baton_rouge_da/baton_rouge_da_cprr_2021.csv
 	python clean/baton_rouge_da_cprr_2021.py
 
-data/clean/ipm_new_orleans_pd_cprr.csv: clean/ipm_new_orleans_pd_cprr_allegation.py data/ipm/new_orleans_pd_cprr_allegations_1931-2020.csv
-	python clean/ipm_new_orleans_pd_cprr_allegation.py
+data/clean/cprr_new_orleans_pd_1931_2020.csv: clean/ipm_new_orleans_pd_cprr_allegations.py data/ipm/new_orleans_pd_cprr_allegations_1931-2020.csv
+	python clean/ipm_new_orleans_pd_cprr_allegations.py
+
+data/clean/pprr_new_orleans_pd_1946_2018.csv: clean/ipm_new_orleans_iapro_pprr.py data/ipm/new_orleans_pd_pprr_1946-2018.csv
+	python clean/ipm_new_orleans_iapro_pprr.py
+
+data/clean/cprr_actions_new_orleans_pd_1931_2020.csv: clean/ipm_new_orleans_pd_cprr_actions_taken.py data/ipm/new_orleans_pd_cprr_actions_taken_1931-2020.csv
+	python clean/ipm_new_orleans_pd_cprr_actions_taken.py
+
+data/clean/uof_new_orleans_pd_2012_2019.csv: clean/ipm_new_orleans_pd_use_of_force.py data/ipm/new_orleans_pd_use_of_force_2012-2019.csv
+	python clean/ipm_new_orleans_pd_use_of_force.py

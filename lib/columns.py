@@ -23,6 +23,10 @@ PERSONNEL_HISTORY_COLUMNS = [
     "employee_id",  # employee ID given to the person by the agency.
     "department_code",  # department code or id
     "department_desc",  # department title or description
+    "division_desc",
+    "sub_division_a_desc",
+    "sub_division_b_desc",
+    "current_supervisor",
     "rank_code",  # rank code
     "rank_desc",  # rank title or description
     "rank_year",
@@ -44,7 +48,9 @@ PERSONNEL_HISTORY_COLUMNS = [
     "pay_effective_month",
     "pay_effective_day",
     "employment_status",
+    "officer_inactive",
     "employee_type",
+    "years_employed",
     "annual_salary",  # annual salary
     "hourly_salary",  # hourly salary
     "data_production_year",  # year of data
@@ -137,6 +143,62 @@ APPEAL_HEARING_COLUMNS = [
     "action",
     "delay",
     "appealed"
+]
+
+USE_OF_FORCE_COLUMNS = [
+    'use_of_force_uid',
+    'uof_tracking_number',
+    'report_year',
+    'occur_year',
+    'occur_month',
+    'occur_day',
+    'occur_time',
+    'uid',
+    'force_description',
+    'force_type',
+    'force_level',
+    'effective_uof',
+    'accidental_discharge',
+    'less_than_lethal',
+    'receive_date',
+    'due_datetime',
+    'assigned_date',
+    'completed_date',
+    'created_date',
+    'status',
+    'source',
+    'service_type',
+    'county',
+    'traffic_stop',
+    'sustained',
+    'force_reason',
+    'weather_description',
+    'distance_from_officer',
+    'body_worn_camera_available',
+    'app_used',
+    'citizen_arrested',
+    'citizen_hospitalized',
+    'citizen_injured',
+    'citizen_body_type',
+    'citizen_height',
+    'citizen_age',
+    'citizen_involvement',
+    'disposition',
+    'citizen_sex',
+    'citizen_race',
+    'citizen_age_1',
+    'officer_current_supervisor',
+    'officer_title',
+    'officer_injured',
+    'officer_age',
+    'officer_years_exp',
+    'officer_years_with_unit',
+    'officer_type',
+    'officer_employment_status',
+    'officer_department',
+    'officer_division',
+    'officer_sub_division_a',
+    'officer_sub_division_b',
 ]
 
 
@@ -235,3 +297,12 @@ def rearrange_appeal_hearing_columns(df):
             "rendered_day",
         ])\
         .pipe(names_to_title_case, ["counsel"])
+
+
+def rearrange_use_of_force(df):
+    existing_cols = set(df.columns)
+    df = df[[
+            col for col in USE_OF_FORCE_COLUMNS
+            if col in existing_cols
+            ]].drop_duplicates(ignore_index=True)
+    return df

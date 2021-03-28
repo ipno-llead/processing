@@ -3,6 +3,7 @@ from lib.columns import clean_column_names
 from lib.clean import (
     float_to_int_str, clean_sexes, clean_races, standardize_desc_cols, clean_dates
 )
+from lib.uid import gen_uid
 import pandas as pd
 import sys
 sys.path.append("../")
@@ -68,6 +69,10 @@ def rename_columns(df):
     return df
 
 
+def drop_rows_without_tracking_number(df):
+    return df.dropna(subset=['tracking_number'])
+
+
 def clean_occur_time(df):
     df.loc[:, 'occur_time'] = df.occur_time.str.replace(r'\.0$', '')
     return df
@@ -93,10 +98,17 @@ def combine_rule_and_paragraph(df):
     return df
 
 
+def assign_agency(df):
+    df.loc[:, 'data_production_year'] = '2020'
+    df.loc[:, 'agency'] = 'New Orleans PD'
+    return df
+
+
 def clean():
     df = initial_processing()
     return df\
         .pipe(rename_columns)\
+        .pipe(drop_rows_without_tracking_number)\
         .pipe(clean_sexes, ['citizen_sex'])\
         .pipe(clean_races, ['citizen_race'])\
         .pipe(combine_citizen_columns)\
@@ -112,10 +124,13 @@ def clean():
         .pipe(clean_trailing_empty_time, ['receive_date', 'allegation_create_date'])\
         .pipe(clean_dates, ['receive_date', 'allegation_create_date'])\
         .pipe(clean_complainant_type)\
-        .pipe(combine_rule_and_paragraph)
+        .pipe(combine_rule_and_paragraph)\
+        .pipe(assign_agency)\
+        .pipe(gen_uid, ['agency', 'tracking_number', 'officer_primary_key', 'allegation_primary_key'], 'allegation_uid')
 
 
 if __name__ == '__main__':
     df = clean()
     ensure_data_dir('clean')
-    df.to_csv(data_file_path('clean/ipm_new_orleans_pd_cprr.csv'), index=False)
+    df.to_csv(data_file_path(
+        'clean/cprr_new_orleans_pd_1931_2020.csv'), index=False)

@@ -18,3 +18,13 @@ def combine_date_columns(df, year_col, month_col, day_col):
     dates = df[[year_col, month_col, day_col]]
     dates.columns = ["year", "month", "day"]
     return pd.to_datetime(dates)
+
+
+def combine_datetime_columns(df, year_col, month_col, day_col, time_col):
+    time_frame = df[time_col].str.split(':', expand=True)
+    dates = pd.concat([
+        df[[year_col, month_col, day_col]],
+        time_frame
+    ], axis=1)
+    dates.columns = ["year", "month", "day", "hour", "minute"]
+    return pd.to_datetime(dates)
