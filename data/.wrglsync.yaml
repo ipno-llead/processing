@@ -44,6 +44,8 @@ repos:
     fileName: match/pprr_baton_rouge_csd_2019.csv
   match-cprr-baton-rouge-pd-2018:
     fileName: match/cprr_baton_rouge_pd_2018.csv
+  match-lprr-baton-rouge-fpcsb-1992-2012:
+    fileName: match/lprr_baton_rouge_fpcsb_1992_2012.csv
   match-brusly-pd-2020:
     fileName: match/cprr_brusly_pd_2020.csv
   match-pprr-brusly-pd-2020:
@@ -90,8 +92,8 @@ repos:
     fileName: fuse/uof_new_orleans_pd.csv
     primaryKey:
       - use_of_force_uid
-  app-baton-rouge-fpcsb:
-    fileName: fuse/app_baton_rouge_fpcsb.csv
+  app-baton-rouge-pd:
+    fileName: fuse/app_baton_rouge_pd.csv
   per-baton-rouge-pd:
     fileName: fuse/per_baton_rouge_pd.csv
     primaryKey:
@@ -118,10 +120,6 @@ repos:
       - uid
   per-madisonville-pd:
     fileName: fuse/per_madisonville_pd.csv
-    primaryKey:
-      - uid
-  per-baton-rouge-fpcsb:
-    fileName: fuse/per_baton_rouge_fpcsb.csv
     primaryKey:
       - uid
   per-greenwood-pd:

@@ -362,7 +362,7 @@ def clean():
         .pipe(remove_fire_dept_rows)\
         .pipe(clean_action)\
         .pipe(gen_uid, ["first_name", "last_name", "middle_name", "middle_initial"])
-    return df
+    return df.drop_duplicates().reset_index(drop=True)
 
 
 if __name__ == "__main__":

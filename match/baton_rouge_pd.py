@@ -132,18 +132,75 @@ def match_csd_pprr_against_post(pprr, post, year, decision):
     return pprr
 
 
+def match_lprr_against_pprr(lprr, pprr, year, decision):
+    dfa = lprr[['uid', 'first_name', 'last_name', 'middle_initial']]
+    dfa.loc[:, 'fc'] = dfa.first_name.fillna('').map(lambda x: x[:1])
+    dfa = dfa.drop_duplicates(subset=['uid']).set_index('uid')
+
+    dfb = pprr[['uid', 'first_name', 'last_name', 'middle_initial']]
+    dfb.loc[:, 'fc'] = dfb.first_name.fillna('').map(lambda x: x[:1])
+    dfb = dfb.drop_duplicates(subset=['uid']).set_index('uid')
+
+    matcher = ThresholdMatcher(dfa, dfb, ColumnsIndex(["fc"]), {
+        "first_name": JaroWinklerSimilarity(),
+        "last_name": JaroWinklerSimilarity(),
+        "middle_initial": StringSimilarity(),
+    })
+    matcher.save_pairs_to_excel(data_file_path(
+        "match/baton_rouge_fpcsb_lprr_1992_2012_v_pprr_%d.xlsx" % year), decision)
+    matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
+    match_dict = dict(matches)
+
+    lprr.loc[:, 'uid'] = lprr.uid.map(lambda x: match_dict.get(x, x))
+    return lprr
+
+
+def match_lprr_against_post(lprr, post):
+    dfa = lprr[['uid', 'first_name', 'last_name']]
+    dfa.loc[:, 'fc'] = dfa.first_name.fillna('').map(lambda x: x[:1])
+    dfa = dfa.drop_duplicates(subset=['uid']).set_index('uid')
+
+    dfb = post[['uid', 'first_name', 'last_name']]
+    dfb.loc[:, 'fc'] = dfb.first_name.fillna('').map(lambda x: x[:1])
+    dfb = dfb.drop_duplicates(subset=['uid']).set_index('uid')
+
+    matcher = ThresholdMatcher(dfa, dfb, ColumnsIndex(["fc"]), {
+        "first_name": JaroWinklerSimilarity(),
+        "last_name": JaroWinklerSimilarity(),
+    })
+    decision = 0.93
+    matcher.save_pairs_to_excel(data_file_path(
+        "match/baton_rouge_fpcsb_lprr_1992_2012_v_post_pprr_2020_11_06.xlsx"), decision)
+    matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
+    match_dict = dict(matches)
+
+    lprr.loc[:, 'level_1_cert_date'] = lprr.uid.map(
+        lambda x: post.loc[match_dict[x], 'level_1_cert_date'] if x in match_dict else '')
+    lprr.loc[:, 'last_pc_12_qualification_date'] = lprr.uid.map(
+        lambda x: post.loc[match_dict[x], 'last_pc_12_qualification_date'] if x in match_dict else '')
+    return lprr
+
+
 if __name__ == "__main__":
     df17 = pd.read_csv(data_file_path(
         "clean/pprr_baton_rouge_csd_2017.csv"))
     df19 = pd.read_csv(data_file_path(
         "clean/pprr_baton_rouge_csd_2019.csv"))
+    lprr = pd.read_csv(data_file_path(
+        "clean/lprr_baton_rouge_fpcsb_1992_2012.csv"))
     cprr = pd.read_csv(data_file_path("clean/cprr_baton_rouge_pd_2018.csv"))
     df17, df19 = match_csd_pprr_2017_v_2019(df17, df19)
+    lprr = match_lprr_against_pprr(lprr, df17, 2017, 0.97)
+    lprr = match_lprr_against_pprr(lprr, df19, 2019, 0.97)
     post = prepare_post_data()
+    lprr = match_lprr_against_post(lprr, post)
     df17 = match_csd_pprr_against_post(df17, post, 2017, 0.798)
     df19 = match_csd_pprr_against_post(df19, post, 2019, 0.894)
     cprr = match_pd_cprr_2018_v_csd_pprr_2019(cprr, df19)
     ensure_data_dir("match")
+    lprr.to_csv(
+        data_file_path("match/lprr_baton_rouge_fpcsb_1992_2012.csv"),
+        index=False)
     df17.to_csv(
         data_file_path("match/pprr_baton_rouge_csd_2017.csv"),
         index=False)

@@ -1,17 +1,18 @@
 import pandas as pd
 from lib.path import data_file_path, ensure_data_dir
 from lib.columns import (
-    rearrange_personnel_columns, rearrange_personnel_history_columns, rearrange_complaint_columns
+    rearrange_personnel_columns, rearrange_personnel_history_columns, rearrange_complaint_columns,
+    rearrange_appeal_hearing_columns
 )
 
 import sys
 sys.path.append("../")
 
 
-def fuse_personnel(csd_pprr_17, csd_pprr_19, pd_cprr_18):
+def fuse_personnel(csd_pprr_17, csd_pprr_19, pd_cprr_18, lprr):
     records = rearrange_personnel_columns(
         csd_pprr_17.set_index("uid", drop=False)).to_dict('index')
-    for df in [csd_pprr_19, pd_cprr_18]:
+    for df in [csd_pprr_19, pd_cprr_18, lprr]:
         for idx, row in rearrange_personnel_columns(df.set_index("uid", drop=False)).iterrows():
             if idx in records:
                 records[idx] = {
@@ -37,9 +38,12 @@ if __name__ == "__main__":
     )
     pd_cprr_18 = pd.read_csv(
         data_file_path("match/cprr_baton_rouge_pd_2018.csv"))
-    personnel_df = fuse_personnel(csd_pprr_17, csd_pprr_19, pd_cprr_18)
+    lprr = pd.read_csv(data_file_path(
+        "match/lprr_baton_rouge_fpcsb_1992_2012.csv"))
+    personnel_df = fuse_personnel(csd_pprr_17, csd_pprr_19, pd_cprr_18, lprr)
     history_df = fuse_personnel_history(csd_pprr_17, csd_pprr_19)
     complaint_df = rearrange_complaint_columns(pd_cprr_18)
+    lprr_df = rearrange_appeal_hearing_columns(lprr)
 
     ensure_data_dir("fuse")
     personnel_df.to_csv(data_file_path(
@@ -48,3 +52,4 @@ if __name__ == "__main__":
         "fuse/perhist_baton_rouge_pd.csv"), index=False)
     complaint_df.to_csv(data_file_path(
         "fuse/com_baton_rouge_pd.csv"), index=False)
+    lprr_df.to_csv(data_file_path("fuse/app_baton_rouge_pd.csv"), index=False)
