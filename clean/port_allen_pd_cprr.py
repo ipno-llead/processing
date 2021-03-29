@@ -129,6 +129,23 @@ def combine_rule_columns(df):
     return df
 
 
+def combine_appeal_and_action_columns(df):
+    def combine(row):
+        buf = list()
+        if pd.notnull(row.action):
+            buf.append(row.action)
+        if pd.notnull(row.appeal):
+            buf.append('appeal: %s' % row.appeal)
+        if pd.notnull(row.hearing_date):
+            buf.append('hearing date: %s' % row.hearing_date)
+        if pd.notnull(row.disposition_appeal):
+            buf.append('appeal disposition: %s' % row.disposition_appeal)
+        return '; '.join(buf)
+    df.loc[:, 'action'] = df.apply(combine, axis=1, result_type='reduce')
+    df = df.drop(columns=['appeal', 'hearing_date', 'disposition_appeal'])
+    return df
+
+
 def clean18():
     df = pd.read_csv(data_file_path(
         "port_allen_pd/port_allen_cprr_2017-2018_byhand.csv"))
@@ -146,6 +163,7 @@ def clean18():
     return df\
         .pipe(clean_dates, ["receive_date", "occur_date"])\
         .pipe(combine_rule_columns)\
+        .pipe(combine_appeal_and_action_columns)\
         .pipe(assign_agency)\
         .pipe(assign_prod_year, '2018')\
         .pipe(gen_uid, ["agency", "first_name", "last_name"])
