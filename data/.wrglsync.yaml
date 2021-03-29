@@ -60,14 +60,22 @@ repos:
     fileName: fuse/com_baton_rouge_pd.csv
   com-baton-rouge-so:
     fileName: fuse/com_baton_rouge_so.csv
+    primaryKey:
+      - complaint_uid
   com-new-orleans-harbor-pd:
     fileName: fuse/com_new_orleans_harbor_pd.csv
+    primaryKey:
+      - tracking_number
   com-brusly-pd:
     fileName: fuse/com_brusly_pd.csv
+    primaryKey:
+      - complaint_uid
   com-port-allen-pd:
     fileName: fuse/com_port_allen_pd.csv
   com-madisonville-pd:
     fileName: fuse/com_madisonville_pd.csv
+    primaryKey:
+      - tracking_number
   com-greenwood-pd:
     fileName: fuse/com_greenwood_pd.csv
     primaryKey:
