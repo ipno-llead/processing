@@ -111,9 +111,21 @@ def clean19():
         .pipe(split_rows_by_charges)\
         .pipe(clean_badge_no)\
         .pipe(extract_rule_violation)\
+        .pipe(combine_rule_columns)\
         .pipe(assign_agency)\
         .pipe(assign_prod_year, '2019')\
         .pipe(gen_uid, ["agency", "first_name", "last_name", "badge_no"])
+    return df
+
+
+def combine_rule_columns(df):
+    df.loc[:, 'rule_code'] = df.rule_code.fillna('')
+    df.loc[:, 'rule_violation'] = df.rule_violation.fillna('')
+
+    def combine(row):
+        return ' '.join(filter(None, [row.rule_code, row.rule_violation]))
+    df.loc[:, 'charges'] = df.apply(combine, axis=1, result_type='reduce')
+    df = df.drop(columns=['rule_code', 'rule_violation'])
     return df
 
 
@@ -133,6 +145,7 @@ def clean18():
     df = df.dropna(how="all")
     return df\
         .pipe(clean_dates, ["receive_date", "occur_date"])\
+        .pipe(combine_rule_columns)\
         .pipe(assign_agency)\
         .pipe(assign_prod_year, '2018')\
         .pipe(gen_uid, ["agency", "first_name", "last_name"])

@@ -37,13 +37,13 @@ def clean_cprr():
     df = pd.read_csv(data_file_path("brusly_pd/brusly_pd_cprr_2020.csv"))
     df = clean_column_names(df)
     df.columns = ['receive_date', 'occur_date', 'officer_name', 'supervisor',
-                  'rule_violation', 'action', 'suspension_start_date', 'suspension_end_date']
+                  'charges', 'action', 'suspension_start_date', 'suspension_end_date']
     df = df\
         .pipe(split_cprr_name)\
         .pipe(clean_names, ["last_name", "first_name"])\
         .pipe(split_supervisor)\
         .pipe(clean_dates, ['receive_date', 'occur_date', 'suspension_start_date', 'suspension_end_date'])\
-        .pipe(standardize_desc_cols, ['rule_violation', 'action'])\
+        .pipe(standardize_desc_cols, ['charges', 'action'])\
         .pipe(assign_agency)
     return df
 
