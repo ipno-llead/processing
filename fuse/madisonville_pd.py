@@ -10,7 +10,7 @@ sys.path.append("../")
 def fuse():
     cprr = pd.read_csv(data_file_path(
         "match/cprr_madisonville_pd_2010_2020.csv"))
-    pprr = pd.read_csv(data_file_path("clean/pprr_madisonville_csd_2019.csv"))
+    pprr = pd.read_csv(data_file_path("match/pprr_madisonville_csd_2019.csv"))
     return (
         rearrange_personnel_columns(pprr),
         rearrange_personnel_history_columns(pprr),
