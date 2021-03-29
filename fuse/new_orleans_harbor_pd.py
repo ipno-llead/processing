@@ -11,7 +11,7 @@ sys.path.append("../")
 
 def fuse():
     pprr = pd.read_csv(
-        data_file_path("clean/pprr_new_orleans_harbor_pd_2020.csv")
+        data_file_path("match/pprr_new_orleans_harbor_pd_2020.csv")
     )
     cprr = pd.read_csv(
         data_file_path("match/cprr_new_orleans_harbor_pd_2020.csv")
