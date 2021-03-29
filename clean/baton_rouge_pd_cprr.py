@@ -185,6 +185,18 @@ def standardize_action_18(df):
     return standardize_from_lookup_table(df, "action", actions_lookup)
 
 
+def combine_rule_and_paragraph(df):
+    def combine(row):
+        rule = ' '.join(filter(None, [row.rule_code, row.rule_violation]))
+        paragraph = ' '.join(
+            filter(None, [row.paragraph_code, row.paragraph_violation]))
+        return ' - '.join(filter(None, [rule, paragraph]))
+    df.loc[:, 'charges'] = df.apply(combine, axis=1, result_type='reduce')
+    df = df.drop(columns=['rule_code', 'rule_violation',
+                          'paragraph_code', 'paragraph_violation'])
+    return df
+
+
 def assign_data_production_year_18(df):
     df.loc[:, "data_production_year"] = df.occur_year.where(
         df.occur_year != "", df.receive_year)
@@ -194,6 +206,10 @@ def assign_data_production_year_18(df):
 def assign_agency_18(df):
     df.loc[:, "agency"] = "Baton Rouge PD"
     return df
+
+
+def drop_office_investigation_rows(df):
+    return df[~(df.action == 'office investigation')].reset_index(drop=True)
 
 
 def clean_18():
@@ -210,10 +226,12 @@ def clean_18():
             standardize_desc_cols,
             ["department_desc", "action", "disposition", "rule_violation",
              "paragraph_violation", "investigation_status"])\
+        .pipe(drop_office_investigation_rows)\
         .pipe(clean_dates, ["receive_date", "occur_date"])\
         .pipe(assign_tracking_num_18)\
         .pipe(standardize_action_18)\
         .pipe(gen_uid, ["first_name", "middle_initial", "last_name"])\
+        .pipe(combine_rule_and_paragraph)\
         .pipe(assign_agency_18)\
         .pipe(assign_data_production_year_18)
 
