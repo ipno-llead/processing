@@ -190,7 +190,7 @@ if __name__ == "__main__":
         "clean/lprr_baton_rouge_fpcsb_1992_2012.csv"))
     cprr = pd.read_csv(data_file_path("clean/cprr_baton_rouge_pd_2018.csv"))
     df17, df19 = match_csd_pprr_2017_v_2019(df17, df19)
-    lprr = match_lprr_against_pprr(lprr, df17, 2017, 0.97)
+    lprr = match_lprr_against_pprr(lprr, df17, 2017, 0.98)
     lprr = match_lprr_against_pprr(lprr, df19, 2019, 0.97)
     post = prepare_post_data()
     lprr = match_lprr_against_post(lprr, post)

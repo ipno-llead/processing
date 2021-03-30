@@ -23,3 +23,9 @@ def clean():
         .pipe(standardize_desc_cols, ['rank_desc'])\
         .pipe(clean_dates, ['hire_date', 'term_date'])\
         .pipe(gen_uid, ['employee_id', 'first_name', 'last_name', 'birth_year'])
+
+
+if __name__ == '__main__':
+    df = clean()
+    ensure_data_dir('clean')
+    df.to_csv(data_file_path('clean/pprr_st_tammany_so_2020.csv'), index=False)

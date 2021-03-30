@@ -36,6 +36,10 @@ repos:
     fileName: clean/cprr_actions_new_orleans_pd_1931_2020.csv
   clean-uof-new-orleans-pd-2012-2019:
     fileName: clean/uof_new_orleans_pd_2012_2019.csv
+  clean-cprr-st-tammany-so-2015-2019:
+    fileName: clean/cprr_st_tammany_so_2015_2019.csv
+  clean-pprr-st-tammany-so-2020:
+    fileName: clean/pprr_st_tammany_so_2020.csv
   match-cprr-new-orleans-harbor-pd-2020:
     fileName: match/cprr_new_orleans_harbor_pd_2020.csv
   match-pprr-baton-rouge-csd-2017:
@@ -60,6 +64,10 @@ repos:
     fileName: match/cprr_greenwood_pd_2015_2020.csv
   match-cprr-baton-rouge-so-2018:
     fileName: match/cprr_baton_rouge_so_2018.csv
+  match-cprr-st-tammany-so-2015-2019:
+    fileName: data/match/cprr_st_tammany_so_2015_2019.csv
+  match-pprr-st-tammany-so-2020:
+    fileName: data/match/pprr_st_tammany_so_2020.csv
   com-baton-rouge-pd:
     fileName: fuse/com_baton_rouge_pd.csv
   com-baton-rouge-so:
@@ -88,6 +96,8 @@ repos:
     fileName: fuse/com_new_orleans_pd.csv
     primaryKey:
       - allegation_uid
+  com-st-tammany-so:
+    fileName: fuse/com_st_tammany_so.csv
   uof-new-orleans-pd:
     fileName: fuse/uof_new_orleans_pd.csv
     primaryKey:
@@ -126,6 +136,10 @@ repos:
     fileName: fuse/per_greenwood_pd.csv
     primaryKey:
       - uid
+  per-st-tammany-so:
+    fileName: fuse/per_st_tammany_so.csv
+    primaryKey:
+      - uid
   perhist-baton-rouge-pd:
     fileName: fuse/perhist_baton_rouge_pd.csv
   perhist-baton-rouge-so:
@@ -142,6 +156,8 @@ repos:
     fileName: fuse/perhist_madisonville_pd.csv
   perhist-greenwood-pd:
     fileName: fuse/perhist_greenwood_pd.csv
+  perhist-st-tammany-so:
+    fileName: fuse/perhist_st_tammany_so.csv
   personnel:
     fileName: fuse/personnel.csv
     primaryKey:
