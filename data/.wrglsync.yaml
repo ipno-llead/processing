@@ -40,6 +40,8 @@ repos:
     fileName: clean/cprr_st_tammany_so_2015_2019.csv
   clean-pprr-st-tammany-so-2020:
     fileName: clean/pprr_st_tammany_so_2020.csv
+  clean-cprr-plaquemines-so-2019:
+    fileName: clean/cprr_plaquemines_so_2019.csv
   match-cprr-new-orleans-harbor-pd-2020:
     fileName: match/cprr_new_orleans_harbor_pd_2020.csv
   match-pprr-baton-rouge-csd-2017:
@@ -65,9 +67,11 @@ repos:
   match-cprr-baton-rouge-so-2018:
     fileName: match/cprr_baton_rouge_so_2018.csv
   match-cprr-st-tammany-so-2015-2019:
-    fileName: data/match/cprr_st_tammany_so_2015_2019.csv
+    fileName: match/cprr_st_tammany_so_2015_2019.csv
   match-pprr-st-tammany-so-2020:
-    fileName: data/match/pprr_st_tammany_so_2020.csv
+    fileName: match/pprr_st_tammany_so_2020.csv
+  match-cprr-plaquemines-so-2019:
+    fileName: match/cprr_plaquemines_so_2019.csv
   com-baton-rouge-pd:
     fileName: fuse/com_baton_rouge_pd.csv
     primaryKey:
@@ -104,6 +108,10 @@ repos:
     fileName: fuse/com_st_tammany_so.csv
     primaryKey:
       - charge_uid
+  com-plaquemines-pd:
+    fileName: fuse/com_plaquemines_so.csv
+    primaryKey:
+      - complaint_uid
   uof-new-orleans-pd:
     fileName: fuse/uof_new_orleans_pd.csv
     primaryKey:
@@ -146,6 +154,10 @@ repos:
     fileName: fuse/per_st_tammany_so.csv
     primaryKey:
       - uid
+  per-plaquemines-so:
+    fileName: fuse/per_plaquemines_so.csv
+    primaryKey:
+      - uid
   perhist-baton-rouge-pd:
     fileName: fuse/perhist_baton_rouge_pd.csv
   perhist-baton-rouge-so:
@@ -164,6 +176,8 @@ repos:
     fileName: fuse/perhist_greenwood_pd.csv
   perhist-st-tammany-so:
     fileName: fuse/perhist_st_tammany_so.csv
+  perhist-plaquemines-so:
+    fileName: fuse/perhist_plaquemines_so.csv
   personnel:
     fileName: fuse/personnel.csv
     primaryKey:

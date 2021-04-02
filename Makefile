@@ -12,6 +12,7 @@ all: data/fuse/per_madisonville_pd.csv data/fuse/perhist_madisonville_pd.csv dat
 all: data/fuse/per_greenwood_pd.csv data/fuse/com_greenwood_pd.csv data/fuse/perhist_greenwood_pd.csv
 all: data/fuse/com_new_orleans_pd.csv data/fuse/uof_new_orleans_pd.csv data/fuse/per_new_orleans_pd.csv data/fuse/perhist_new_orleans_pd.csv
 all: data/fuse/per_st_tammany_so.csv data/fuse/perhist_st_tammany_so.csv data/fuse/com_st_tammany_so.csv
+all: data/fuse/com_plaquemines_so.csv data/fuse/per_plaquemines_so.csv data/fuse/perhist_plaquemines_so.csv
 
 data/fuse/per_new_orleans_harbor_pd.csv data/fuse/perhist_new_orleans_harbor_pd.csv data/fuse/com_new_orleans_harbor_pd.csv: fuse/new_orleans_harbor_pd.py data/match/pprr_new_orleans_harbor_pd_2020.csv data/match/cprr_new_orleans_harbor_pd_2020.csv
 	python fuse/new_orleans_harbor_pd.py
@@ -39,6 +40,9 @@ data/fuse/com_new_orleans_pd.csv data/fuse/uof_new_orleans_pd.csv data/fuse/per_
 
 data/fuse/per_st_tammany_so.csv data/fuse/perhist_st_tammany_so.csv data/fuse/com_st_tammany_so.csv: fuse/st_tammany_so.py data/match/cprr_st_tammany_so_2015_2019.csv data/match/pprr_st_tammany_so_2020.csv
 	python fuse/st_tammany_so.py
+
+data/fuse/com_plaquemines_so.csv data/fuse/per_plaquemines_so.csv data/fuse/perhist_plaquemines_so.csv: fuse/plaquemines_so.py data/match/cprr_plaquemines_so_2019.csv data/clean/pprr_post_2020_11_06.csv
+	python fuse/plaquemines_so.py
 
 
 
@@ -68,6 +72,9 @@ data/match/cprr_baton_rouge_da_2021.csv: match/baton_rouge_da.py data/clean/cprr
 
 data/match/cprr_st_tammany_so_2015_2019.csv data/match/pprr_st_tammany_so_2020.csv: match/st_tammany_so.py data/clean/cprr_st_tammany_so_2015_2019.csv data/clean/pprr_st_tammany_so_2020.csv data/clean/pprr_post_2020_11_06.csv
 	python match/st_tammany_so.py
+
+data/match/cprr_plaquemines_so_2019.csv: match/plaquemines_so.py data/clean/cprr_plaquemines_so_2019.csv
+	python match/plaquemines_so.py
 
 
 
@@ -133,3 +140,6 @@ data/clean/cprr_st_tammany_so_2015_2019.csv: clean/st_tammany_so_cprr.py data/st
 
 data/clean/pprr_st_tammany_so_2020.csv: clean/st_tammany_so_pprr.py data/st_tammany_so/st._tammany_so_pprr_2020.csv
 	python clean/st_tammany_so_pprr.py
+
+data/clean/cprr_plaquemines_so_2019.csv: clean/plaquemines_so_cprr.py data/plaquemines_so/plaquemines_so_cprr_2019.csv
+	python clean/plaquemines_so_cprr.py
