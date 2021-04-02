@@ -230,10 +230,11 @@ def clean_18():
         .pipe(clean_dates, ["receive_date", "occur_date"])\
         .pipe(assign_tracking_num_18)\
         .pipe(standardize_action_18)\
-        .pipe(gen_uid, ["first_name", "middle_initial", "last_name"])\
         .pipe(combine_rule_and_paragraph)\
         .pipe(assign_agency_18)\
-        .pipe(assign_data_production_year_18)
+        .pipe(assign_data_production_year_18)\
+        .pipe(gen_uid, ["agency", "first_name", "middle_initial", "last_name"])\
+        .pipe(gen_uid, ['tracking_number', 'uid', 'action', 'charges'], 'charge_uid')
 
     return df
 

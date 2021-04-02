@@ -62,6 +62,7 @@ COMPLAINT_COLUMNS = [
     "tracking_number",  # unique identifier for complaint
     "complaint_uid",  # unique identifier for complaint but generated for when tracking_number is unavailable
     "allegation_uid",  # unique identifier for allegation (complaint x officer)
+    "charge_uid",  # unique identifier for individual charges
     "occur_year",
     "occur_month",
     "occur_day",

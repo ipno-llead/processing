@@ -71,7 +71,8 @@ def clean():
         .pipe(extract_occur_date)\
         .pipe(assign_agency)\
         .pipe(gen_uid, ['first_name', 'last_name', 'agency'])\
-        .pipe(gen_uid, ['agency', 'raw_occur_date', 'uid'], 'complaint_uid')
+        .pipe(gen_uid, ['agency', 'raw_occur_date', 'uid'], 'complaint_uid')\
+        .pipe(gen_uid, ['complaint_uid', 'charges'], 'charge_uid')
     df = df.drop(columns=['full_name'])
     return df
 

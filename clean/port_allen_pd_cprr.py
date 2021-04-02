@@ -114,7 +114,9 @@ def clean19():
         .pipe(combine_rule_columns)\
         .pipe(assign_agency)\
         .pipe(assign_prod_year, '2019')\
-        .pipe(gen_uid, ["agency", "first_name", "last_name", "badge_no"])
+        .pipe(gen_uid, ["agency", "first_name", "last_name", "badge_no"])\
+        .pipe(gen_uid, ["agency", "tracking_number"], "complaint_uid")\
+        .pipe(gen_uid, ["complaint_uid", "uid", "charges"], "charge_uid")
     return df
 
 
@@ -166,7 +168,9 @@ def clean18():
         .pipe(combine_appeal_and_action_columns)\
         .pipe(assign_agency)\
         .pipe(assign_prod_year, '2018')\
-        .pipe(gen_uid, ["agency", "first_name", "last_name"])
+        .pipe(gen_uid, ["agency", "first_name", "last_name"])\
+        .pipe(gen_uid, ["agency", "tracking_number"], "complaint_uid")\
+        .pipe(gen_uid, ["complaint_uid", "uid", "charges"], "charge_uid")
 
 
 if __name__ == "__main__":

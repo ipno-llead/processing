@@ -3,6 +3,7 @@ from lib.path import data_file_path, ensure_data_dir
 from lib.clean import (
     clean_dates, clean_names, standardize_desc_cols, clean_sexes, clean_races
 )
+from lib.uid import gen_uid
 import pandas as pd
 import sys
 sys.path.append("../")
@@ -68,7 +69,8 @@ def clean():
         .pipe(clean_sexes, ["complainant_sex"])\
         .pipe(clean_races, ["complainant_race"])\
         .pipe(clean_dates, ["appoint_date", "occur_date", "receive_date", "investigation_complete_date"])\
-        .pipe(assign_agency)
+        .pipe(assign_agency)\
+        .pipe(gen_uid, ['agency', 'tracking_number'], 'complaint_uid')
     return df
 
 

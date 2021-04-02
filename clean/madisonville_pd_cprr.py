@@ -1,6 +1,7 @@
 from lib.path import data_file_path, ensure_data_dir
 from lib.columns import clean_column_names
 from lib.clean import clean_names, clean_dates, standardize_desc_cols
+from lib.uid import gen_uid
 import pandas as pd
 import sys
 sys.path.append("../")
@@ -41,7 +42,8 @@ def clean():
         .pipe(clean_names, ["first_name", "last_name", "complainant_name"])\
         .pipe(clean_dates, ["occur_date"])\
         .pipe(standardize_desc_cols, ["rank_desc"])\
-        .pipe(assign_agency)
+        .pipe(assign_agency)\
+        .pipe(gen_uid, ['agency', 'tracking_number'], 'complaint_uid')
     return df
 
 
