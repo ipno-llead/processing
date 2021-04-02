@@ -192,6 +192,7 @@ name_pattern_4 = re.compile(
     r'^(\w{2,}) ([-\w\']+ (?:i|ii|iii|iv|v|jr|sr)\W?)$')
 name_pattern_5 = re.compile(r'^(\w{2,}) (\w+) ([-\w\']+)$')
 name_pattern_6 = re.compile(r"^(\w{2,}) ([-\w\']+)$")
+name_pattern_7 = re.compile(r"^\w+$")
 
 
 def split_names(df, col):
@@ -230,6 +231,9 @@ def split_names(df, col):
             first_name = m.group(1)
             last_name = m.group(2)
             return first_name, "", last_name
+        m = name_pattern_7.match(val)
+        if m is not None:
+            return "", "", val
         raise ValueError('unrecognized name format %s' % json.dumps(val))
 
     names = pd.DataFrame.from_records(
