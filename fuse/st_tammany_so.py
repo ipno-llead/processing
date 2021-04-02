@@ -22,7 +22,7 @@ def fuse_personnel(pprr, cprr):
 
 if __name__ == '__main__':
     cprr = pd.read_csv(data_file_path(
-        'match/cprr_st_tammany_so_2015_2019.csv'
+        'match/cprr_st_tammany_so_2011_2021.csv'
     ))
     pprr = pd.read_csv(data_file_path(
         'match/pprr_st_tammany_so_2020.csv'

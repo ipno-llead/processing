@@ -46,25 +46,33 @@ def extract_occur_date(df):
 
 def assign_agency(df):
     df.loc[:, 'agency'] = 'St. Tammany SO'
-    df.loc[:, 'data_production_year'] = 2019
+    df.loc[:, 'data_production_year'] = 2021
+    return df
+
+
+def gen_middle_initial(df):
+    df.loc[:, 'middle_initial'] = df.middle_name.fillna(
+        '').map(lambda x: x[:1])
     return df
 
 
 def clean():
-    df = pd.read_csv(
-        data_file_path(
-            'st_tammany_so/st.tammany_so_cprr_lists_2015-2019_tabula.csv')
-    )
+    df = pd.concat([
+        pd.read_csv(data_file_path(
+            'st_tammany_so/st_tammany_so_cprr_2011-2020_tabula.csv')),
+        pd.read_csv(data_file_path(
+            'st_tammany_so/st_tammany_so_cprr_2020-2021_tabula.csv'))
+    ])
     df = clean_column_names(df)
     df = df.rename(columns={
-        'dept_code': 'department_code',
-        'incident_date': 'raw_occur_date',
-        'infraction': 'charges'
+        'dept': 'department_code',
+        'date_of_incident': 'raw_occur_date',
+        'discipline_action_outcome': 'charges'
     })
     df = df\
-        .pipe(remove_newlines)\
-        .pipe(split_names, "full_name")\
+        .pipe(split_names, "name")\
         .pipe(clean_names, ['first_name', 'last_name', 'middle_name'])\
+        .pipe(gen_middle_initial)\
         .pipe(float_to_int_str, ["department_code"])\
         .pipe(pad_dept_code)\
         .pipe(assign_department_desc)\
@@ -73,7 +81,7 @@ def clean():
         .pipe(gen_uid, ['first_name', 'last_name', 'agency'])\
         .pipe(gen_uid, ['agency', 'raw_occur_date', 'uid'], 'complaint_uid')\
         .pipe(gen_uid, ['complaint_uid', 'charges'], 'charge_uid')
-    df = df.drop(columns=['full_name'])
+    df = df.drop(columns=['name'])
     return df
 
 
@@ -81,4 +89,4 @@ if __name__ == '__main__':
     df = clean()
     ensure_data_dir('clean')
     df.to_csv(data_file_path(
-        'clean/cprr_st_tammany_so_2015_2019.csv'), index=False)
+        'clean/cprr_st_tammany_so_2011_2021.csv'), index=False)

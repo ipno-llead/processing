@@ -190,8 +190,8 @@ name_pattern_2 = re.compile(r"^([-\w\']+), (\w{2,})$")
 name_pattern_3 = re.compile(r'^(\w{2,}) ("\w+") ([-\w\']+)$')
 name_pattern_4 = re.compile(
     r'^(\w{2,}) ([-\w\']+ (?:i|ii|iii|iv|v|jr|sr)\W?)$')
-name_pattern_5 = re.compile(r'^(\w{2,}) (\w+) ([-\w\']+)$')
-name_pattern_6 = re.compile(r"^(\w{2,}) ([-\w\']+)$")
+name_pattern_5 = re.compile(r'^([\w-]{2,}) (\w+) ([-\w\']+)$')
+name_pattern_6 = re.compile(r"^([\w-]{2,}) ([-\w\']+)$")
 name_pattern_7 = re.compile(r"^\w+$")
 
 
@@ -236,8 +236,10 @@ def split_names(df, col):
             return "", "", val
         raise ValueError('unrecognized name format %s' % json.dumps(val))
 
+    df = df.reset_index(drop=True)
     names = pd.DataFrame.from_records(
-        df[col].str.strip().str.lower().map(split_name))
+        df[col].fillna('').str.strip().str.replace(r' +', ' ')
+        .str.lower().map(split_name).to_list())
     names.columns = ['first_name', 'middle_name', 'last_name']
     return pd.concat([df, names], axis=1)
 

@@ -34,7 +34,7 @@ def match_cprr(cprr, pprr):
     })
     decision = 0.94
     matcher.save_pairs_to_excel(data_file_path(
-        "match/st_tammany_so_cprr_2015_2019_v_pprr_2020.xlsx"), decision)
+        "match/st_tammany_so_cprr_2011_2021_v_pprr_2020.xlsx"), decision)
     matches = matcher.get_index_pairs_within_thresholds(decision)
 
     match_dict = dict(matches)
@@ -81,9 +81,9 @@ def match_cprr_and_post(cprr, post):
         "last_name": JaroWinklerSimilarity(),
         "first_name": JaroWinklerSimilarity(),
     })
-    decision = 0.9
+    decision = 0.929
     matcher.save_pairs_to_excel(data_file_path(
-        "match/st_tammany_so_cprr_2015_2019_v_post_pprr_2020_11_06.xlsx"), decision)
+        "match/st_tammany_so_cprr_2011_2021_v_post_pprr_2020_11_06.xlsx"), decision)
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
     match_dict = dict(matches)
 
@@ -96,7 +96,7 @@ def match_cprr_and_post(cprr, post):
 
 if __name__ == '__main__':
     cprr = pd.read_csv(data_file_path(
-        'clean/cprr_st_tammany_so_2015_2019.csv'))
+        'clean/cprr_st_tammany_so_2011_2021.csv'))
     pprr = pd.read_csv(data_file_path('clean/pprr_st_tammany_so_2020.csv'))
     post = prepare_post_data()
     cprr = match_cprr(cprr, pprr)
@@ -104,6 +104,6 @@ if __name__ == '__main__':
     cprr = match_cprr_and_post(cprr, post)
     ensure_data_dir('match')
     cprr.to_csv(data_file_path(
-        'match/cprr_st_tammany_so_2015_2019.csv'), index=False)
+        'match/cprr_st_tammany_so_2011_2021.csv'), index=False)
     pprr.to_csv(data_file_path(
         'match/pprr_st_tammany_so_2020.csv'), index=False)

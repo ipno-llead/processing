@@ -31,12 +31,12 @@ def remove_carriage_return(df, cols):
 
 
 def split_name(df):
-    names = df.name_of_accused\
-        .str.replace(r"^(.+) ([-\w']+(?: Jr\.)?)$", r"\1@@\2").str.split("@@", expand=True)
-    df.loc[:, "last_name"] = names[1]
+    names = df.name_of_accused.str.strip()\
+        .str.replace(r"^([\w'-]+) ([-\w']+(?: Jr\.)?)$", r"\1@@\2").str.split("@@", expand=True)
+    df.loc[:, "last_name"] = names[1].fillna('')
     names = names[0].str.split(" ", expand=True)
-    df.loc[:, "first_name"] = names[0]
-    df.loc[:, "middle_initial"] = names[1]
+    df.loc[:, "first_name"] = names[0].fillna('')
+    df.loc[:, "middle_initial"] = names[1].fillna('')
     return df
 
 
@@ -47,9 +47,8 @@ def clean():
     return df\
         .pipe(remove_header_rows)\
         .pipe(rename_columns)\
-        .pipe(split_name)\
         .pipe(remove_carriage_return, [
             'name_of_accused', 'disposition', 'charges', 'summary', 'assigned_agent',
             'terminated_resigned'
         ])\
-        .pipe(clean_names, ['first_name', 'middle_initial', 'last_name'])
+        .pipe(split_name)

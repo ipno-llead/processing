@@ -94,7 +94,9 @@ DATA_FILES = {
     "st_tammany_so": [
         "https://www.dropbox.com/sh/dtb2hn54ma59q2h/AAB_DLd50KBMkYBODy1PP1sFa/St.%20Tammany_SO_PPRR_2020.csv?dl=1",  # noqa
         "https://www.dropbox.com/sh/mwabzn85manxzo6/AACR-N1crrGx43ZJ2CYdtqUSa/St.Tammany_SO_CPRR_Lists_2015-2019_tabula.csv?dl=1",  # noqa
-        "https://www.dropbox.com/sh/mwabzn85manxzo6/AACgbqjIwVL3XetaFcQHo-e5a/st_tammany_department_codes_tabula.csv?dl=1"  # noqa
+        "https://www.dropbox.com/sh/mwabzn85manxzo6/AACgbqjIwVL3XetaFcQHo-e5a/st_tammany_department_codes_tabula.csv?dl=1",  # noqa
+        "https://www.dropbox.com/sh/lx21aphi3lxw09y/AAB1AX8m9X4jFCITWgXqupSoa/st_tammany_so_cprr_2011-2020_tabula.csv?dl=1",  # noqa
+        "https://www.dropbox.com/sh/lx21aphi3lxw09y/AADn_CNJdKQfYUVaMR116l8aa/st_tammany_so_cprr_2020-2021_tabula.csv?dl=1",  # noqa
     ],
     "plaquemines_so": [
         "https://www.dropbox.com/s/g1b98kn4e4k1dtr/plaquemines_so_cprr_2019.csv?dl=1",  # noqa
