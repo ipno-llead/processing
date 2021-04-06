@@ -36,8 +36,6 @@ repos:
     fileName: clean/cprr_actions_new_orleans_pd_1931_2020.csv
   clean-uof-new-orleans-pd-2012-2019:
     fileName: clean/uof_new_orleans_pd_2012_2019.csv
-  clean-cprr-st-tammany-so-2015-2019:
-    fileName: clean/cprr_st_tammany_so_2015_2019.csv
   clean-pprr-st-tammany-so-2020:
     fileName: clean/pprr_st_tammany_so_2020.csv
   clean-cprr-plaquemines-so-2019:
@@ -66,8 +64,6 @@ repos:
     fileName: match/cprr_greenwood_pd_2015_2020.csv
   match-cprr-baton-rouge-so-2018:
     fileName: match/cprr_baton_rouge_so_2018.csv
-  match-cprr-st-tammany-so-2015-2019:
-    fileName: match/cprr_st_tammany_so_2015_2019.csv
   match-pprr-st-tammany-so-2020:
     fileName: match/pprr_st_tammany_so_2020.csv
   match-cprr-plaquemines-so-2019:
