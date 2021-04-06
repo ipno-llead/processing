@@ -1,8 +1,9 @@
 import pandas as pd
 from lib.path import data_file_path, ensure_data_dir
 from lib.columns import (
-    rearrange_personnel_columns, rearrange_personnel_history_columns, rearrange_complaint_columns
+    rearrange_personnel_history_columns, rearrange_complaint_columns
 )
+from lib.personnel import fuse_personnel
 
 import sys
 sys.path.append("../")
@@ -13,19 +14,6 @@ def prepare_post_data():
     post = post[post.agency == 'e. baton rouge so']
     post.loc[:, 'agency'] = 'Baton Rouge SO'
     return post
-
-
-def fuse_personnel(cprr, post):
-    records = rearrange_personnel_columns(
-        cprr.set_index("uid", drop=False)).to_dict('index')
-    for idx, row in rearrange_personnel_columns(post.set_index("uid", drop=False)).iterrows():
-        if idx in records:
-            records[idx] = {
-                k: v if not pd.isnull(v) else row[k]
-                for k, v in records[idx].items() if k in row}
-        else:
-            records[idx] = row.to_dict()
-    return rearrange_personnel_columns(pd.DataFrame.from_records(list(records.values())))
 
 
 def fuse_personnel_history(cprr, post):

@@ -131,6 +131,7 @@ APPEAL_HEARING_COLUMNS = [
     "docket_no",
     "uid",
     "counsel",
+    "charging_supervisor",
     "filed_year",
     "filed_month",
     "filed_day",
@@ -143,7 +144,9 @@ APPEAL_HEARING_COLUMNS = [
     "resolution",
     "action",
     "delay",
-    "appealed"
+    "appealed",
+    "agency",
+    "data_production_year"
 ]
 
 USE_OF_FORCE_COLUMNS = [

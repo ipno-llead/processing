@@ -1,26 +1,13 @@
 import pandas as pd
 from lib.path import data_file_path, ensure_data_dir
+from lib.personnel import fuse_personnel
 from lib.columns import (
-    rearrange_personnel_columns, rearrange_personnel_history_columns, rearrange_complaint_columns,
+    rearrange_personnel_history_columns, rearrange_complaint_columns,
     rearrange_appeal_hearing_columns
 )
 
 import sys
 sys.path.append("../")
-
-
-def fuse_personnel(csd_pprr_17, csd_pprr_19, pd_cprr_18, lprr):
-    records = rearrange_personnel_columns(
-        csd_pprr_17.set_index("uid", drop=False)).to_dict('index')
-    for df in [csd_pprr_19, pd_cprr_18, lprr]:
-        for idx, row in rearrange_personnel_columns(df.set_index("uid", drop=False)).iterrows():
-            if idx in records:
-                records[idx] = {
-                    k: v if not pd.isnull(v) else row[k]
-                    for k, v in records[idx].items() if k in row}
-            else:
-                records[idx] = row.to_dict()
-    return rearrange_personnel_columns(pd.DataFrame.from_records(list(records.values())))
 
 
 def fuse_personnel_history(csd_pprr_17, csd_pprr_19):

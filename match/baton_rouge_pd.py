@@ -55,7 +55,8 @@ def match_csd_pprr_2017_v_2019(df17, df19):
         uid = row_19.name
         emp_id_17_to_uid_dict[emp_id_17] = uid
 
-    df17 = gen_uid(df17, ["agency", "data_production_year", "employee_id"])
+    df17 = gen_uid(df17, ["agency", "data_production_year",
+                          "first_name", "last_name", "middle_initial"])
     uid_17 = df17.employee_id.map(lambda x: emp_id_17_to_uid_dict.get(x, ""))
     df17.loc[:, "uid"] = uid_17.where(uid_17 != "", df17.uid)
 

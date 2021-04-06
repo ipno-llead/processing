@@ -1,25 +1,11 @@
 from lib.path import data_file_path, ensure_data_dir
 from lib.columns import (
-    rearrange_complaint_columns, rearrange_personnel_columns, rearrange_personnel_history_columns
+    rearrange_complaint_columns, rearrange_personnel_history_columns
 )
+from lib.personnel import fuse_personnel
 import pandas as pd
-import numpy as np
 import sys
 sys.path.append('../')
-
-
-def fuse_personnel(pprr, cprr):
-    records = rearrange_personnel_columns(pprr)\
-        .set_index("uid", drop=False).to_dict('index')
-    for idx, row in rearrange_personnel_columns(cprr).set_index("uid", drop=False).iterrows():
-        if idx in records:
-            records[idx] = {
-                k: v if not pd.isnull(
-                    v) else np.NaN if k not in row else row[k]
-                for k, v in records[idx].items()}
-        else:
-            records[idx] = row.to_dict()
-    return rearrange_personnel_columns(pd.DataFrame.from_records(list(records.values())))
 
 
 if __name__ == '__main__':

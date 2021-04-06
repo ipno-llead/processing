@@ -1,4 +1,4 @@
-from lib.clean import clean_dates, standardize_desc_cols, clean_names
+from lib.clean import clean_dates, clean_names
 from lib.columns import clean_column_names
 from lib.path import data_file_path, ensure_data_dir
 from lib.uid import gen_uid
@@ -13,7 +13,7 @@ def standardize_appealed(df):
     return df
 
 
-def split_appellant(df):
+def split_row_with_multiple_appellant(df):
     indices_to_remove = list()
     for idx, row in df.loc[
             df.appellant.str.contains('/') |
@@ -34,7 +34,7 @@ def split_appellant(df):
     return df.reset_index(drop=True)
 
 
-def clean_appellant(df):
+def split_appellant_column(df):
     df.loc[:, 'appellant'] = df.appellant.str.replace(r', ', ' ')\
         .str.strip().str.replace(r"D'Berry Jr\. Reuben", 'Berry Jr. Reuben O.')
 
@@ -57,14 +57,27 @@ def clean_appellant(df):
         df.appellant.map(split_name)
     )
     df.loc[:, 'last_name'] = names.iloc[:, 1]
-
     names = names.iloc[:, 0].str.split(' ', expand=True)
     df.loc[:, 'first_name'] = names.iloc[:, 0]
     df.loc[:, 'middle_initial'] = names.iloc[:, 1]
+
     return df
 
 
-def clean_docket_no(df):
+def assign_additional_appellant_names(df):
+    names = pd.read_csv(data_file_path(
+        'louisiana_state_csc/la_lprr_appellants.csv'))
+    for _, row in names.iterrows():
+        for col in ['first_name', 'last_name', 'middle_initial']:
+            df.loc[df.docket_no == row.docket_no,
+                   col] = row['appellant_%s' % col]
+    df.loc[df.docket_no == '93-36-O', 'first_name'] = 'Edward'
+    df.loc[df.docket_no == '93-36-O', 'middle_initial'] = 'A'
+    df.loc[df.docket_no == '93-36-O', 'last_name'] = 'Kuhnest'
+    return df
+
+
+def split_rows_with_multiple_docket_no(df):
     df.loc[:, 'docket_no'] = df.docket_no.str.strip()\
         .str.replace(r'- ', '-')
 
@@ -83,8 +96,20 @@ def clean_docket_no(df):
     return df.reset_index(drop=True)
 
 
-def clean_decision(df):
-    df.loc[:, 'decision'] = df.decision.str.strip().str.lower()\
+def correct_docket_no(df):
+    def process(row):
+        if row.filed_year == '':
+            return row.docket_no
+        if row.docket_no[:2] != row.filed_year[2:]:
+            return row.filed_year[2:] + row.docket_no[2:]
+        return row.docket_no
+
+    df.loc[:, 'docket_no'] = df.agg(process, axis=1)
+    return df
+
+
+def clean_resolution(df):
+    df.loc[:, 'resolution'] = df.resolution.str.strip().str.lower()\
         .str.replace(r'dnied', 'denied')\
         .str.replace(r'denited', 'denied')\
         .str.replace(r'ganted', 'granted')\
@@ -99,6 +124,30 @@ def assign_agency(df):
     return df
 
 
+def assign_charging_supervisor(df):
+    docket_year = df.docket_no.str.replace(r'^(\d+)-.+$', r'\1')
+    df.loc[:, 'charging_supervisor'] = df.charging_supervisor.str.strip()\
+        .str.replace(r'Flores', 'Marlin A. Flores')\
+        .str.replace(r'Fonten.+', 'Paul Fontenot')
+    for years, first_letter, full_name in [
+        (['95'], 'F', 'Paul Fontenot'),
+        (['96', '97', '98', '99', '00'], 'W', 'William R. Whittington'),
+        (['00', '01', '02', '03'], 'L', 'Terry C. Landry'),
+        (['04', '05', '06', '07'], 'W', 'Henry Whitehorn'),
+        (['07', '08'], 'G', 'Stanley Griffin'),
+        (['08', '09', '10', '11', '12', '13', '14',
+          '15', '16'], 'E', 'Michael D. Edmonson'),
+        (['12'], 'F', 'Michael D. Edmonson'),
+        (['17', '18', '19', '20'], 'R', 'Kevin W. Reeves')
+    ]:
+        df.loc[
+            (docket_year.isin(years)) & (
+                df.charging_supervisor == first_letter),
+            'charging_supervisor'
+        ] = full_name
+    return df
+
+
 def clean():
     df = pd.read_csv(data_file_path(
         "louisiana_state_csc/louisianastate_csc_lprr_1991-2020.csv"))
@@ -108,19 +157,23 @@ def clean():
         'apellant': 'appellant',
         'colonel': 'charging_supervisor',
         'filed': 'filed_date',
-        'rendered': 'rendered_date'
+        'rendered': 'rendered_date',
+        'decision': 'resolution'
     })
     df = df.drop(columns=['delay'])
     return df\
         .pipe(standardize_appealed)\
-        .pipe(split_appellant)\
-        .pipe(clean_appellant)\
+        .pipe(split_row_with_multiple_appellant)\
+        .pipe(split_appellant_column)\
+        .pipe(split_rows_with_multiple_docket_no)\
+        .pipe(assign_additional_appellant_names)\
         .pipe(clean_names, ['first_name', 'middle_initial', 'last_name'])\
-        .pipe(clean_docket_no)\
         .pipe(clean_dates, ['filed_date', 'rendered_date'])\
-        .pipe(clean_decision)\
+        .pipe(correct_docket_no)\
+        .pipe(clean_resolution)\
         .pipe(assign_agency)\
-        .pipe(gen_uid, ['agency', 'first_name', 'middle_initial', 'last_name'])
+        .pipe(gen_uid, ['agency', 'first_name', 'middle_initial', 'last_name'])\
+        .pipe(assign_charging_supervisor)
 
 
 if __name__ == "__main__":

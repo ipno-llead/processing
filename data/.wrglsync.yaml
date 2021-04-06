@@ -40,6 +40,8 @@ repos:
     fileName: clean/pprr_st_tammany_so_2020.csv
   clean-cprr-plaquemines-so-2019:
     fileName: clean/cprr_plaquemines_so_2019.csv
+  clean-lprr-louisiana-state-csc-1991-2020:
+    fileName: clean/lprr_louisiana_state_csc_1991_2020.csv
   match-cprr-new-orleans-harbor-pd-2020:
     fileName: match/cprr_new_orleans_harbor_pd_2020.csv
   match-pprr-baton-rouge-csd-2017:
@@ -68,6 +70,8 @@ repos:
     fileName: match/pprr_st_tammany_so_2020.csv
   match-cprr-plaquemines-so-2019:
     fileName: match/cprr_plaquemines_so_2019.csv
+  match-lprr-louisiana-state-csc-1991-2020:
+    fileName: match/lprr_louisiana_state_csc_1991_2020.csv
   com-baton-rouge-pd:
     fileName: fuse/com_baton_rouge_pd.csv
     primaryKey:
@@ -114,6 +118,8 @@ repos:
       - use_of_force_uid
   app-baton-rouge-pd:
     fileName: fuse/app_baton_rouge_pd.csv
+  app-louisiana-state-police:
+    fileName: fuse/app_louisiana_state_police.csv
   per-baton-rouge-pd:
     fileName: fuse/per_baton_rouge_pd.csv
     primaryKey:
@@ -154,6 +160,10 @@ repos:
     fileName: fuse/per_plaquemines_so.csv
     primaryKey:
       - uid
+  per-louisiana-state-police:
+    fileName: fuse/per_louisiana_state_police.csv
+    primaryKey:
+      - uid
   perhist-baton-rouge-pd:
     fileName: fuse/perhist_baton_rouge_pd.csv
   perhist-baton-rouge-so:
@@ -174,6 +184,8 @@ repos:
     fileName: fuse/perhist_st_tammany_so.csv
   perhist-plaquemines-so:
     fileName: fuse/perhist_plaquemines_so.csv
+  perhist-louisiana-state-police:
+    fileName: fuse/perhist_louisiana_state_police.csv
   personnel:
     fileName: fuse/personnel.csv
     primaryKey:
