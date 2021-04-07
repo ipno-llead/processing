@@ -27,7 +27,9 @@ if __name__ == "__main__":
         data_file_path("match/cprr_baton_rouge_pd_2018.csv"))
     lprr = pd.read_csv(data_file_path(
         "match/lprr_baton_rouge_fpcsb_1992_2012.csv"))
-    personnel_df = fuse_personnel(csd_pprr_17, csd_pprr_19, pd_cprr_18, lprr)
+    personnel_df = fuse_personnel(
+        csd_pprr_17.drop_duplicates(subset='uid', keep='last'),
+        csd_pprr_19, pd_cprr_18, lprr)
     history_df = fuse_personnel_history(csd_pprr_17, csd_pprr_19)
     complaint_df = rearrange_complaint_columns(pd_cprr_18)
     lprr_df = rearrange_appeal_hearing_columns(lprr)

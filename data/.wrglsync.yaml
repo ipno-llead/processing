@@ -118,8 +118,12 @@ repos:
       - use_of_force_uid
   app-baton-rouge-pd:
     fileName: fuse/app_baton_rouge_pd.csv
+    primaryKey:
+      - resolution_uid
   app-louisiana-state-police:
     fileName: fuse/app_louisiana_state_police.csv
+    primaryKey:
+      - appeal_uid
   per-baton-rouge-pd:
     fileName: fuse/per_baton_rouge_pd.csv
     primaryKey:

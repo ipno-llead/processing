@@ -128,6 +128,8 @@ COMPLAINT_COLUMNS = [
 ]
 
 APPEAL_HEARING_COLUMNS = [
+    "appeal_uid",  # unique per docket_no and uid
+    "resolution_uid",  # unique per appeal_uid, hearing_date and resolution
     "docket_no",
     "uid",
     "counsel",

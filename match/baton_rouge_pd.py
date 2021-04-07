@@ -35,7 +35,7 @@ def match_csd_pprr_2017_v_2019(df17, df19):
         "rank_code": StringSimilarity(),
         "hire_date": DateSimilarity()
     })
-    decision = 0.87
+    decision = 0.7
     matcher.save_pairs_to_excel(data_file_path(
         "match/baton_rouge_csd_pprr_2017_v_pprr_2019.xlsx"), decision)
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
@@ -191,11 +191,11 @@ if __name__ == "__main__":
         "clean/lprr_baton_rouge_fpcsb_1992_2012.csv"))
     cprr = pd.read_csv(data_file_path("clean/cprr_baton_rouge_pd_2018.csv"))
     df17, df19 = match_csd_pprr_2017_v_2019(df17, df19)
-    lprr = match_lprr_against_pprr(lprr, df17, 2017, 0.98)
+    lprr = match_lprr_against_pprr(lprr, df17, 2017, 0.816)
     lprr = match_lprr_against_pprr(lprr, df19, 2019, 0.97)
     post = prepare_post_data()
     lprr = match_lprr_against_post(lprr, post)
-    df17 = match_csd_pprr_against_post(df17, post, 2017, 0.798)
+    df17 = match_csd_pprr_against_post(df17, post, 2017, 0.809)
     df19 = match_csd_pprr_against_post(df19, post, 2019, 0.894)
     cprr = match_pd_cprr_2018_v_csd_pprr_2019(cprr, df19)
     ensure_data_dir("match")

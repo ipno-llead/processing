@@ -61,7 +61,7 @@ def split_appellant_column(df):
     df.loc[:, 'first_name'] = names.iloc[:, 0]
     df.loc[:, 'middle_initial'] = names.iloc[:, 1]
 
-    return df
+    return df.drop(columns=['appellant'])
 
 
 def assign_additional_appellant_names(df):
@@ -161,7 +161,7 @@ def clean():
         'decision': 'resolution'
     })
     df = df.drop(columns=['delay'])
-    return df\
+    df = df\
         .pipe(standardize_appealed)\
         .pipe(split_row_with_multiple_appellant)\
         .pipe(split_appellant_column)\
@@ -173,7 +173,9 @@ def clean():
         .pipe(clean_resolution)\
         .pipe(assign_agency)\
         .pipe(gen_uid, ['agency', 'first_name', 'middle_initial', 'last_name'])\
+        .pipe(gen_uid, ['agency', 'docket_no', 'uid'], 'appeal_uid')\
         .pipe(assign_charging_supervisor)
+    return df.drop_duplicates(subset=['docket_no', 'uid']).reset_index(drop=True)
 
 
 if __name__ == "__main__":

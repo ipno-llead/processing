@@ -275,12 +275,25 @@ def split_appellant_names(df):
 
 
 def clean_resolution(df):
-    df.loc[:, "resolution"] = df.resolution.str.replace(r"[ \/]+$", "")
+    df.loc[:, "resolution"] = df.resolution.str.replace(r"[ \/]+$", "")\
+        .str.lower().str.strip()
     return df
 
 
-def remove_fire_dept_rows(df):
-    return df[df.counsel != "fire dept"].reset_index(drop=True)
+def remove_invalid_rows(df):
+    df = df[df.counsel != "fire dept"]
+    df = df[df.last_name != '']
+    return df.reset_index(drop=True)
+
+
+def assign_counsel_for_empty_rows(df):
+    counsel_dict = df.loc[
+        df.counsel != '', ['docket_no', 'counsel']
+    ].drop_duplicates(subset=['docket_no'])\
+        .set_index('docket_no').counsel.to_dict()
+    df.loc[df.counsel == '', 'counsel'] = df.loc[df.counsel == '', 'docket_no']\
+        .map(lambda x: counsel_dict.get(x, ''))
+    return df
 
 
 def clean_action(df):
@@ -345,6 +358,36 @@ def clean_action(df):
     return df
 
 
+def condense_rows_with_same_docket_no(df):
+    for idx1, row1 in df[df.resolution.isna()].iterrows():
+        for idx2, row2 in df[df.docket_no == row1.docket_no].iterrows():
+            if (
+                idx1 == idx2 or
+                row1.action != row2.action or
+                row1.counsel != row2.counsel or
+                row1.last_name != row2.last_name or
+                row1.middle_name != row2.middle_name or
+                row1.middle_initial != row2.middle_initial or
+                row1.first_name != row2.first_name or
+                row1.rank_desc != row2.rank_desc or
+                (row1.hearing_year != '' and row2.hearing_year != row1.hearing_year)
+            ):
+                continue
+            if pd.notnull(row2.resolution):
+                df.loc[idx1, 'resolution'] = row2.resolution
+            if row2.hearing_year != '':
+                df.loc[idx1, 'hearing_year'] = row2.hearing_year
+                df.loc[idx1, 'hearing_month'] = row2.hearing_month
+                df.loc[idx1, 'hearing_day'] = row2.hearing_day
+    return df
+
+
+def assign_agency(df):
+    df.loc[:, 'agency'] = 'Baton Rouge PD'
+    df.loc[:, 'data_production_year'] = 2012
+    return df
+
+
 def clean():
     df = realign()
     df = df\
@@ -359,9 +402,14 @@ def clean():
         .pipe(split_appellant_names)\
         .pipe(clean_names, ["first_name",  "last_name", "counsel"])\
         .pipe(clean_resolution)\
-        .pipe(remove_fire_dept_rows)\
+        .pipe(remove_invalid_rows)\
+        .pipe(assign_counsel_for_empty_rows)\
         .pipe(clean_action)\
-        .pipe(gen_uid, ["first_name", "last_name", "middle_name", "middle_initial"])
+        .pipe(condense_rows_with_same_docket_no)\
+        .pipe(assign_agency)\
+        .pipe(gen_uid, ["agency", "first_name", "last_name", "middle_name", "middle_initial"])\
+        .pipe(gen_uid, ['uid', 'docket_no'], 'appeal_uid')\
+        .pipe(gen_uid, ['appeal_uid', 'hearing_year', 'hearing_month', 'hearing_day', 'resolution'], 'resolution_uid')
     return df.drop_duplicates().reset_index(drop=True)
 
 
