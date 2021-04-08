@@ -10,20 +10,22 @@ sys.path.append("../")
 
 
 def fuse():
-    pprr = pd.read_csv(
+    pprr20 = pd.read_csv(
         data_file_path("match/pprr_new_orleans_harbor_pd_2020.csv")
+    )
+    pprr08 = pd.read_csv(
+        data_file_path("clean/pprr_new_orleans_harbor_pd_1991_2008.csv")
     )
     cprr = pd.read_csv(
         data_file_path("match/cprr_new_orleans_harbor_pd_2020.csv")
     )
-    personnel = rearrange_personnel_columns(pprr)
-    personnel_history_1 = rearrange_personnel_history_columns(pprr)
-    personnel_history_2 = rearrange_personnel_history_columns(cprr)
+    personnel = rearrange_personnel_columns(pd.concat([pprr08, pprr20]))
+    personnel_history = rearrange_personnel_history_columns(pd.concat(
+        [pprr08, pprr20, cprr]))
     complaint = rearrange_complaint_columns(cprr)
     return (
         personnel,
-        rearrange_personnel_history_columns(
-            pd.concat([personnel_history_1, personnel_history_2])),
+        personnel_history,
         complaint
     )
 

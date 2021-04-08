@@ -3,6 +3,7 @@ from lib.uid import gen_uid
 from lib.match import (
     ThresholdMatcher, ColumnsIndex, JaroWinklerSimilarity
 )
+from lib.post import keep_latest_row_for_each_post_officer
 import pandas as pd
 import sys
 sys.path.append("../")
@@ -11,15 +12,7 @@ sys.path.append("../")
 def prepare_post_data():
     post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
     post = post[post.agency == 'new orleans harbor pd']
-    duplicated_uids = set(post.loc[post.uid.duplicated(), 'uid'].to_list())
-    post = post.set_index('uid', drop=False)
-    level_1_cert_dates = post.loc[
-        post.uid.isin(duplicated_uids) & (post.level_1_cert_date.notna()),
-        'level_1_cert_date']
-    for idx, value in level_1_cert_dates.iteritems():
-        post.loc[idx, 'level_1_cert_date'] = value
-    post = post.sort_values('last_pc_12_qualification_date', ascending=False)
-    return post[~post.index.duplicated(keep='first')]
+    return keep_latest_row_for_each_post_officer(post)
 
 
 def match_uid_with_cprr(cprr, pprr):
@@ -32,13 +25,16 @@ def match_uid_with_cprr(cprr, pprr):
 
     # limit number of columns before matching
     dfa = cprr[["mid", "first_name", "last_name"]].drop_duplicates()
+    dfa.loc[:, 'fc'] = dfa.first_name.map(lambda x: x[:1])
     dfa = dfa.set_index("mid", drop=True)
     dfb = pprr[["uid", "first_name", "last_name"]].drop_duplicates()
+    dfb.loc[:, 'fc'] = dfb.first_name.map(lambda x: x[:1])
     dfb = dfb.set_index("uid", drop=True)
-    matcher = ThresholdMatcher(dfa, dfb, ColumnsIndex(["first_name"]), {
+    matcher = ThresholdMatcher(dfa, dfb, ColumnsIndex(["fc"]), {
+        "first_name": JaroWinklerSimilarity(),
         "last_name": JaroWinklerSimilarity(),
     })
-    decision = 0.93
+    decision = 0.96
     matcher.save_pairs_to_excel(data_file_path(
         "match/new_orleans_harbor_pd_cprr_2020_v_pprr_2020.xlsx"), decision)
     matches = matcher.get_index_pairs_within_thresholds(decision)
@@ -78,15 +74,15 @@ def match_pprr_and_post(pprr, post):
 if __name__ == "__main__":
     cprr = pd.read_csv(data_file_path(
         "clean/cprr_new_orleans_harbor_pd_2020.csv"))
-    pprr = pd.read_csv(data_file_path(
+    pprr20 = pd.read_csv(data_file_path(
         "clean/pprr_new_orleans_harbor_pd_2020.csv"))
     post = prepare_post_data()
-    cprr = match_uid_with_cprr(cprr, pprr)
-    pprr = match_pprr_and_post(pprr, post)
+    cprr = match_uid_with_cprr(cprr, pprr20)
+    pprr20 = match_pprr_and_post(pprr20, post)
     ensure_data_dir("match")
     cprr.to_csv(
         data_file_path("match/cprr_new_orleans_harbor_pd_2020.csv"),
         index=False)
-    pprr.to_csv(
+    pprr20.to_csv(
         data_file_path("match/pprr_new_orleans_harbor_pd_2020.csv"),
         index=False)
