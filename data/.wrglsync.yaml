@@ -190,6 +190,8 @@ repos:
     fileName: fuse/perhist_port_allen_pd.csv
   perhist-madisonville-pd:
     fileName: fuse/perhist_madisonville_pd.csv
+    primaryKey:
+      - perhist_uid
   perhist-greenwood-pd:
     fileName: fuse/perhist_greenwood_pd.csv
   perhist-st-tammany-so:

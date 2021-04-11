@@ -37,7 +37,7 @@ def split_rows_by_salary(df):
         j = 0
         for k, v in salaries.items():
             df.loc[idx+j, "annual_salary"] = v
-            df.loc[idx+j, "data_production_year"] = k
+            df.loc[idx+j, "pay_effective_year"] = k
             j += 1
         idx += salaries_count
     df = df.drop(columns=salary_cols)
@@ -47,6 +47,7 @@ def split_rows_by_salary(df):
 
 def assign_agency(df):
     df.loc[:, "agency"] = "Madisonville CSD"
+    df.loc[:, "data_production_year"] = 2019
     return df
 
 
@@ -62,9 +63,10 @@ def clean():
         .pipe(split_names)\
         .pipe(clean_names, ["first_name", "last_name"])\
         .pipe(clean_dates, ["hire_date"])\
-        .pipe(gen_uid, ["first_name", "last_name", "badge_no"])\
         .pipe(split_rows_by_salary)\
-        .pipe(assign_agency)
+        .pipe(assign_agency)\
+        .pipe(gen_uid, ["agency", "first_name", "last_name", "badge_no"])\
+        .pipe(gen_uid, ['uid', 'pay_effective_year'], 'perhist_uid')
     return df
 
 
