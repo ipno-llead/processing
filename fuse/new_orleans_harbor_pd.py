@@ -21,7 +21,7 @@ def fuse():
     )
     personnel = rearrange_personnel_columns(pd.concat([pprr08, pprr20]))
     personnel_history = rearrange_personnel_history_columns(pd.concat(
-        [pprr08, pprr20, cprr]))
+        [pprr08, pprr20]))
     complaint = rearrange_complaint_columns(cprr)
     return (
         personnel,

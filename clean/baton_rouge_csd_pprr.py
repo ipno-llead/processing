@@ -24,6 +24,9 @@ def assign_rank_year_and_pay_year(df):
     for idx, row in df.iterrows():
         if row.uid != uid:
             uid = row.uid
+            df.loc[idx, 'pay_effective_year'] = row.year
+            df.loc[idx, 'rank_year'] = row.year
+            df.loc[idx, 'dept_year'] = row.year
         else:
             if row.annual_salary != salary:
                 df.loc[idx, 'pay_effective_year'] = row.year

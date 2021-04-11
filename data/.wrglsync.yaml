@@ -178,6 +178,8 @@ repos:
       - perhist_uid
   perhist-new-orleans-harbor-pd:
     fileName: fuse/perhist_new_orleans_harbor_pd.csv
+    primaryKey:
+      - perhist_uid
   perhist-new-orleans-pd:
     fileName: fuse/perhist_new_orleans_pd.csv
   perhist-brusly-pd:
