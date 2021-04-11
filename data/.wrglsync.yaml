@@ -170,6 +170,8 @@ repos:
       - uid
   perhist-baton-rouge-pd:
     fileName: fuse/perhist_baton_rouge_pd.csv
+    primaryKey:
+      - perhist_uid
   perhist-baton-rouge-so:
     fileName: fuse/perhist_baton_rouge_so.csv
   perhist-new-orleans-harbor-pd:

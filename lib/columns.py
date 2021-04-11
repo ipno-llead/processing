@@ -18,6 +18,7 @@ PERSONNEL_COLUMNS = [
 ]
 
 PERSONNEL_HISTORY_COLUMNS = [
+    "perhist_uid",  # unique for each row in this table
     "uid",  # officer unique identifier
     "badge_no",  # badge number
     "employee_id",  # employee ID given to the person by the agency.

@@ -66,7 +66,8 @@ def clean_17():
         .pipe(assign_agency)\
         .pipe(gen_uid, [
             "agency", "data_production_year", "first_name", "last_name", "middle_initial"])\
-        .pipe(assign_rank_year_and_pay_year)
+        .pipe(assign_rank_year_and_pay_year)\
+        .pipe(gen_uid, ['uid', 'year', 'pay_effective_year', 'rank_year', 'dept_year'], 'perhist_uid')
     return df
 
 
@@ -91,6 +92,7 @@ def clean_19():
         "uniqueid": "employee_id"
     })
     df.loc[:, "data_production_year"] = "2019"
+    df = df.drop_duplicates()
     df = df\
         .pipe(clean_names, ["first_name", "last_name", "middle_initial"])\
         .pipe(clean_salaries, ["annual_salary"])\
@@ -99,7 +101,8 @@ def clean_19():
         .pipe(clean_employment_status, ["employment_status"])\
         .pipe(assign_agency)\
         .pipe(gen_uid, ["agency", "data_production_year", "employee_id"])\
-        .pipe(assign_rank_year_and_pay_year)
+        .pipe(assign_rank_year_and_pay_year)\
+        .pipe(gen_uid, ['uid', 'year', 'pay_effective_year', 'rank_year', 'dept_year'], 'perhist_uid')
     return df
 
 
