@@ -72,7 +72,7 @@ def clean():
     df = df.rename(columns={
         'badge_number': 'badge_no',
         'title': 'rank_desc',
-        'employment_ended_on': 'term_date',
+        'employment_ended_on': 'resign_date',
         'officer_department': 'department_desc',
         'officer_division': 'division_desc',
         'officer_sub_division_a': 'sub_division_a_desc',
@@ -92,12 +92,13 @@ def clean():
         ])\
         .pipe(clean_employee_type)\
         .pipe(clean_sexes, ['sex', 'race'])\
-        .pipe(split_dates, ['hire_date', 'term_date', 'dept_date'])\
+        .pipe(assign_agency)\
+        .pipe(gen_uid, ['agency', 'employee_id'])\
+        .pipe(gen_uid, ['uid', 'dept_date'], 'perhist_uid')\
+        .pipe(split_dates, ['hire_date', 'resign_date', 'dept_date'])\
         .pipe(clean_names, ['first_name', 'middle_name', 'last_name'])\
         .pipe(remove_unnamed_officers)\
         .pipe(generate_middle_initial)\
-        .pipe(assign_agency)\
-        .pipe(gen_uid, ['agency', 'employee_id'])\
         .pipe(clean_current_supervisor)
 
 
