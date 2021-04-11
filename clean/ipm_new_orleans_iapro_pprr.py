@@ -77,7 +77,7 @@ def clean():
         'officer_division': 'division_desc',
         'officer_sub_division_a': 'sub_division_a_desc',
         'officer_sub_division_b': 'sub_division_b_desc',
-        'assigned_to_unit_on': 'appoint_date',
+        'assigned_to_unit_on': 'dept_date',
         'hired_on': 'hire_date',
         'officer_sex': 'sex',
         'officer_race': 'race',
@@ -92,7 +92,7 @@ def clean():
         ])\
         .pipe(clean_employee_type)\
         .pipe(clean_sexes, ['sex', 'race'])\
-        .pipe(split_dates, ['hire_date', 'term_date', 'appoint_date'])\
+        .pipe(split_dates, ['hire_date', 'term_date', 'dept_date'])\
         .pipe(clean_names, ['first_name', 'middle_name', 'last_name'])\
         .pipe(remove_unnamed_officers)\
         .pipe(generate_middle_initial)\

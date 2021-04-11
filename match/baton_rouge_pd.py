@@ -2,7 +2,6 @@ from lib.path import data_file_path, ensure_data_dir
 from lib.match import (
     ColumnsIndex, JaroWinklerSimilarity, StringSimilarity, DateSimilarity, ThresholdMatcher
 )
-from lib.uid import gen_uid
 from lib.date import combine_date_columns
 import pandas as pd
 import sys
@@ -19,7 +18,6 @@ def match_csd_pprr_2017_v_2019(df17, df19):
     dfa = dfa.drop_duplicates("employee_id").set_index(
         "employee_id", drop=True)
 
-    df19 = gen_uid(df19, ["agency", "data_production_year", "employee_id"])
     dfb = df19[[
         "last_name", "first_name", "middle_initial", "rank_code", "uid"]]
     dfb.loc[:, "hire_date"] = combine_date_columns(
@@ -54,9 +52,6 @@ def match_csd_pprr_2017_v_2019(df17, df19):
 
         uid = row_19.name
         emp_id_17_to_uid_dict[emp_id_17] = uid
-
-    df17 = gen_uid(df17, ["agency", "data_production_year",
-                          "first_name", "last_name", "middle_initial"])
     uid_17 = df17.employee_id.map(lambda x: emp_id_17_to_uid_dict.get(x, ""))
     df17.loc[:, "uid"] = uid_17.where(uid_17 != "", df17.uid)
 
@@ -77,7 +72,7 @@ def match_pd_cprr_2018_v_csd_pprr_2019(cprr, pprr):
         "first_name": JaroWinklerSimilarity(),
         "middle_initial": JaroWinklerSimilarity(),
     })
-    decision = 0.96
+    decision = 0.8
     matcher.save_pairs_to_excel(data_file_path(
         "match/baton_rouge_pd_cprr_2018_v_csd_pprr_2019.xlsx"), decision)
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)

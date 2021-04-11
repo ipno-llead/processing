@@ -54,7 +54,7 @@ def clean():
         "e_the_date_on_which_the_complaint_investigation_was_completed", "f_the_classification_of_the_complaint",
         "g_the_status_of_the_investigation", "1_gender", "2_race"]]
     df.columns = [
-        "full_name", "badge_no", "sex", "department_desc", "rank_desc", "appoint_date", "rule_code", "paragraph_code",
+        "full_name", "badge_no", "sex", "department_desc", "rank_desc", "hire_date", "rule_code", "paragraph_code",
         "recommended_action", "action", "incident_type", "tracking_number", "occur_date", "receive_date",
         "investigation_complete_date", "disposition", "investigation_status", "complainant_sex", "complainant_race"]
     df = df\
@@ -68,7 +68,7 @@ def clean():
         ])\
         .pipe(clean_sexes, ["complainant_sex"])\
         .pipe(clean_races, ["complainant_race"])\
-        .pipe(clean_dates, ["appoint_date", "occur_date", "receive_date", "investigation_complete_date"])\
+        .pipe(clean_dates, ["hire_date", "occur_date", "receive_date", "investigation_complete_date"])\
         .pipe(assign_agency)\
         .pipe(gen_uid, ['agency', 'tracking_number'], 'complaint_uid')
     return df
