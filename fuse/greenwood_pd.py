@@ -17,16 +17,13 @@ def fuse(cprr, post_pprr):
     cprr = gen_uid(cprr, [
         'uid', 'complaint_uid'
     ], 'allegation_uid')
-    cprr.loc[:, 'rank_year'] = cprr.occur_year
-    cprr.loc[:, 'rank_month'] = cprr.occur_month
-    cprr.loc[:, 'rank_day'] = cprr.occur_day
     cprr.loc[:, 'data_production_year'] = '2020'
     cprr.loc[:, 'agency'] = 'Greenwood PD'
     return (
         rearrange_personnel_columns(post_pprr),
         rearrange_complaint_columns(cprr),
         rearrange_personnel_history_columns(
-            pd.concat([cprr, post_pprr[post_pprr.hire_year.notna()]]))
+            post_pprr[post_pprr.hire_year.notna()])
     )
 
 
