@@ -4,6 +4,7 @@ from lib.columns import (
     rearrange_personnel_history_columns, rearrange_complaint_columns
 )
 from lib.personnel import fuse_personnel
+from lib.uid import gen_uid
 
 import sys
 sys.path.append("../")
@@ -17,7 +18,12 @@ def prepare_post_data():
 
 
 def fuse_personnel_history(cprr, post):
-    return rearrange_personnel_history_columns(pd.concat([cprr, post]))
+    df = pd.concat([cprr, post])
+    df = gen_uid(df, [
+        'uid', 'rank_year', 'rank_month', 'rank_day', 'hire_year', 'hire_month', 'hire_day'
+    ], 'perhist_uid')
+    df = rearrange_personnel_history_columns(df)
+    return df
 
 
 if __name__ == "__main__":
