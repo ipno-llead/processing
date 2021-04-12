@@ -157,6 +157,7 @@ def clean18():
         .pipe(assign_prod_year, '2018')\
         .pipe(gen_uid, ["agency", "first_name", "last_name"])\
         .pipe(gen_uid, ["agency", "tracking_number"], "complaint_uid")\
+        .pipe(gen_uid, ["complaint_uid", "uid", "rule_code", "rule_violation"], "charge_uid")\
         .dropna(subset=['tracking_number'])
 
 
@@ -183,7 +184,8 @@ def clean16():
         .pipe(gen_uid, ["agency", "tracking_number"], "complaint_uid")\
         .pipe(standardize_desc_cols, [
             "rank_desc", "department_desc", "complainant_type", "paragraph_violation", "rule_violation", "disposition"
-        ])
+        ])\
+        .pipe(gen_uid, ["complaint_uid", "uid", "rule_code", "rule_violation"], "charge_uid")
 
 
 if __name__ == "__main__":
