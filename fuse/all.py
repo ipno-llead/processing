@@ -20,7 +20,7 @@ def fuse_personnel():
         pd.read_csv(data_file_path("fuse/per_st_tammany_so.csv")),
         pd.read_csv(data_file_path("fuse/per_plaquemines_so.csv")),
         pd.read_csv(data_file_path("fuse/per_louisiana_state_police.csv")),
-    ]))
+    ])).sort_values('uid', ignore_index=True)
 
 
 def fuse_personnel_history():
@@ -36,7 +36,7 @@ def fuse_personnel_history():
         pd.read_csv(data_file_path("fuse/perhist_st_tammany_so.csv")),
         pd.read_csv(data_file_path("fuse/perhist_plaquemines_so.csv")),
         pd.read_csv(data_file_path("fuse/perhist_louisiana_state_police.csv")),
-    ]))
+    ])).sort_values(['agency', 'data_production_year', 'perhist_uid'], ignore_index=True)
 
 
 def fuse_complaint():
@@ -52,7 +52,7 @@ def fuse_complaint():
         pd.read_csv(data_file_path("fuse/com_st_tammany_so.csv")),
         pd.read_csv(data_file_path("fuse/com_plaquemines_so.csv")),
         pd.read_csv(data_file_path("fuse/complaint.csv")),
-    ]))
+    ])).sort_values(['agency', 'data_production_year', 'tracking_number'], ignore_index=True)
 
 
 if __name__ == "__main__":
