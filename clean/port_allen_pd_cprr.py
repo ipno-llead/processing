@@ -172,12 +172,13 @@ def clean16():
             "l_name": "last_name",
             "title": "rank_desc",
             "division": "department_desc",
-            "complaint_type": "complainant_type"
+            "complaint_type": "complainant_type",
+            "disposition_date": "investigation_complete_date"
         })\
         .drop(columns=["department", "shift"])\
         .pipe(clean_names, ["first_name", "last_name"])\
         .pipe(float_to_int_str, ['paragraph_code'])\
-        .pipe(clean_dates, ["receive_date", "occur_date"])\
+        .pipe(clean_dates, ["receive_date", "occur_date", "investigation_complete_date"])\
         .pipe(assign_agency)\
         .pipe(assign_prod_year, '2016')\
         .pipe(gen_uid, ["agency", "first_name", "last_name"])\
