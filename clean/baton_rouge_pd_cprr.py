@@ -234,6 +234,7 @@ def clean_18():
         .pipe(assign_agency_18)\
         .pipe(assign_data_production_year_18)\
         .pipe(gen_uid, ["agency", "first_name", "middle_initial", "last_name"])\
+        .pipe(gen_uid, ["agency", "tracking_number"], "complaint_uid")\
         .pipe(gen_uid, ['tracking_number', 'uid', 'action', 'charges'], 'charge_uid')
 
     return df

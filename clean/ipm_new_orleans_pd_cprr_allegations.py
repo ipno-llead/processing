@@ -126,6 +126,7 @@ def clean():
         .pipe(clean_complainant_type)\
         .pipe(combine_rule_and_paragraph)\
         .pipe(assign_agency)\
+        .pipe(gen_uid, ['agency', 'tracking_number'], 'complaint_uid')\
         .pipe(gen_uid, ['agency', 'tracking_number', 'officer_primary_key', 'allegation_primary_key'], 'allegation_uid')
 
 

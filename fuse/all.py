@@ -51,7 +51,6 @@ def fuse_complaint():
         pd.read_csv(data_file_path("fuse/com_new_orleans_pd.csv")),
         pd.read_csv(data_file_path("fuse/com_st_tammany_so.csv")),
         pd.read_csv(data_file_path("fuse/com_plaquemines_so.csv")),
-        pd.read_csv(data_file_path("fuse/complaint.csv")),
     ])).sort_values(['agency', 'data_production_year', 'tracking_number'], ignore_index=True)
 
 

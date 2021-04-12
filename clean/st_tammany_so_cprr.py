@@ -56,6 +56,11 @@ def gen_middle_initial(df):
     return df
 
 
+def remove_new_lines_from_charges(df):
+    df.loc[:, 'charges'] = df.charges.str.replace(r'(\n|\r)\s*', ' ')
+    return df
+
+
 def clean():
     df = pd.concat([
         pd.read_csv(data_file_path(
@@ -80,7 +85,8 @@ def clean():
         .pipe(assign_agency)\
         .pipe(gen_uid, ['first_name', 'last_name', 'agency'])\
         .pipe(gen_uid, ['agency', 'raw_occur_date', 'uid'], 'complaint_uid')\
-        .pipe(gen_uid, ['complaint_uid', 'charges'], 'charge_uid')
+        .pipe(gen_uid, ['complaint_uid', 'charges'], 'charge_uid')\
+        .pipe(remove_new_lines_from_charges)
     df = df.drop(columns=['name'])
     return df
 
