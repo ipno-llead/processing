@@ -37,7 +37,7 @@ def match_csd_pprr_against_post_pprr(pprr, post):
     return pprr
 
 
-def match_cprr_2018_against_csd_pprr_2020(cprr, pprr):
+def match_cprr_against_csd_pprr_2020(cprr, pprr, year, decision):
     dfa = cprr[['first_name', 'last_name', 'uid']].drop_duplicates()\
         .set_index('uid')
 
@@ -47,29 +47,8 @@ def match_cprr_2018_against_csd_pprr_2020(cprr, pprr):
         'first_name': JaroWinklerSimilarity(),
         'last_name': JaroWinklerSimilarity(),
     })
-    decision = 0.96
     matcher.save_pairs_to_excel(data_file_path(
-        "match/port_allen_pd_cprr_2018_v_csd_pprr_2020.xlsx"), decision)
-    matches = matcher.get_index_pairs_within_thresholds(decision)
-    match_dict = dict(matches)
-
-    cprr.loc[:, 'uid'] = cprr.uid.map(lambda x: match_dict.get(x, x))
-    return cprr
-
-
-def match_cprr_2019_against_csd_pprr_2020(cprr, pprr):
-    dfa = cprr[['first_name', 'last_name', 'uid']].drop_duplicates()\
-        .set_index('uid')
-
-    dfb = pprr[['first_name', 'last_name', 'uid']].set_index('uid')
-
-    matcher = ThresholdMatcher(dfa, dfb, NoopIndex(), {
-        'first_name': JaroWinklerSimilarity(),
-        'last_name': JaroWinklerSimilarity(),
-    })
-    decision = 0.969
-    matcher.save_pairs_to_excel(data_file_path(
-        "match/port_allen_pd_cprr_2019_v_csd_pprr_2020.xlsx"), decision)
+        "match/port_allen_pd_cprr_%d_v_csd_pprr_2020.xlsx" % year), decision)
     matches = matcher.get_index_pairs_within_thresholds(decision)
     match_dict = dict(matches)
 
@@ -81,10 +60,20 @@ if __name__ == '__main__':
     pprr = pd.read_csv(data_file_path('clean/pprr_port_allen_csd_2020.csv'))
     post = pd.read_csv(data_file_path('clean/pprr_post_2020_11_06.csv'))
     cprr19 = pd.read_csv(data_file_path('clean/cprr_port_allen_pd_2019.csv'))
+    cprr18 = pd.read_csv(data_file_path(
+        'clean/cprr_port_allen_pd_2017_2018.csv'))
+    cprr16 = pd.read_csv(data_file_path(
+        'clean/cprr_port_allen_pd_2015_2016.csv'))
     pprr = match_csd_pprr_against_post_pprr(pprr, post)
-    cprr19 = match_cprr_2019_against_csd_pprr_2020(cprr19, pprr)
+    cprr19 = match_cprr_against_csd_pprr_2020(cprr19, pprr, 2019, 0.96)
+    cprr18 = match_cprr_against_csd_pprr_2020(cprr18, pprr, 2018, 1)
+    cprr16 = match_cprr_against_csd_pprr_2020(cprr16, pprr, 2016, 1)
     ensure_data_dir('match')
     pprr.to_csv(data_file_path(
         'match/pprr_port_allen_csd_2020.csv'), index=False)
     cprr19.to_csv(data_file_path(
         'match/cprr_port_allen_pd_2019.csv'), index=False)
+    cprr18.to_csv(data_file_path(
+        'match/cprr_port_allen_pd_2017_2018.csv'), index=False)
+    cprr16.to_csv(data_file_path(
+        'match/cprr_port_allen_pd_2015_2016.csv'), index=False)

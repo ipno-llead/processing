@@ -2,7 +2,7 @@ from lib.columns import clean_column_names
 from lib.path import data_file_path, ensure_data_dir
 from lib.uid import gen_uid
 from lib.clean import (
-    clean_names, clean_dates, standardize_desc_cols
+    clean_names, clean_dates, standardize_desc_cols, float_to_int_str
 )
 from lib.standardize import standardize_from_lookup_table
 from lib.rows import duplicate_row
@@ -111,23 +111,11 @@ def clean19():
         .pipe(split_rows_by_charges)\
         .pipe(clean_badge_no)\
         .pipe(extract_rule_violation)\
-        .pipe(combine_rule_columns)\
         .pipe(assign_agency)\
         .pipe(assign_prod_year, '2019')\
         .pipe(gen_uid, ["agency", "first_name", "last_name", "badge_no"])\
         .pipe(gen_uid, ["agency", "tracking_number"], "complaint_uid")\
-        .pipe(gen_uid, ["complaint_uid", "uid", "charges"], "charge_uid")
-    return df
-
-
-def combine_rule_columns(df):
-    df.loc[:, 'rule_code'] = df.rule_code.fillna('')
-    df.loc[:, 'rule_violation'] = df.rule_violation.fillna('')
-
-    def combine(row):
-        return ' '.join(filter(None, [row.rule_code, row.rule_violation]))
-    df.loc[:, 'charges'] = df.apply(combine, axis=1, result_type='reduce')
-    df = df.drop(columns=['rule_code', 'rule_violation'])
+        .pipe(gen_uid, ["complaint_uid", "uid", "rule_code", "rule_violation"], "charge_uid")
     return df
 
 
@@ -149,33 +137,66 @@ def combine_appeal_and_action_columns(df):
 
 
 def clean18():
-    df = pd.read_csv(data_file_path(
-        "port_allen_pd/port_allen_cprr_2017-2018_byhand.csv"))
-    df = clean_column_names(df)
-    df = df.rename(columns={
-        "case_number": "tracking_number",
-        "date_notification": "notification_date",
-        "title": "rank_desc",
-        "f_name": "first_name",
-        "l_name": "last_name",
-        "disposition_investigation": "disposition",
-        "complaintant_type": "complainant_type"
-    })
-    df = df.dropna(how="all")
-    return df\
+    return pd.read_csv(data_file_path(
+        "port_allen_pd/port_allen_cprr_2017-2018_byhand.csv"))\
+        .pipe(clean_column_names)\
+        .rename(columns={
+            "case_number": "tracking_number",
+            "date_notification": "notification_date",
+            "title": "rank_desc",
+            "f_name": "first_name",
+            "l_name": "last_name",
+            "disposition_investigation": "disposition",
+            "complaintant_type": "complainant_type"
+        })\
+        .dropna(how="all")\
+        .pipe(clean_names, ["first_name", "last_name"])\
         .pipe(clean_dates, ["receive_date", "occur_date"])\
-        .pipe(combine_rule_columns)\
         .pipe(combine_appeal_and_action_columns)\
         .pipe(assign_agency)\
         .pipe(assign_prod_year, '2018')\
         .pipe(gen_uid, ["agency", "first_name", "last_name"])\
         .pipe(gen_uid, ["agency", "tracking_number"], "complaint_uid")\
-        .pipe(gen_uid, ["complaint_uid", "uid", "charges"], "charge_uid")
+        .dropna(subset=['tracking_number'])
+
+
+def clean16():
+    return pd.read_csv(data_file_path(
+        "port_allen_pd/port_allen_cprr_2015-2016_byhand.csv"))\
+        .pipe(clean_column_names)\
+        .dropna(how="all")\
+        .dropna(subset=['tracking_number'])\
+        .rename(columns={
+            "f_name": "first_name",
+            "l_name": "last_name",
+            "title": "rank_desc",
+            "division": "department_desc",
+            "complaint_type": "complainant_type"
+        })\
+        .drop(columns=["department", "shift"])\
+        .pipe(clean_names, ["first_name", "last_name"])\
+        .pipe(float_to_int_str, ['paragraph_code'])\
+        .pipe(clean_dates, ["receive_date", "occur_date"])\
+        .pipe(assign_agency)\
+        .pipe(assign_prod_year, '2016')\
+        .pipe(gen_uid, ["agency", "first_name", "last_name"])\
+        .pipe(gen_uid, ["agency", "tracking_number"], "complaint_uid")\
+        .pipe(standardize_desc_cols, [
+            "rank_desc", "department_desc", "complainant_type", "paragraph_violation", "rule_violation", "disposition"
+        ])
 
 
 if __name__ == "__main__":
-    df = clean19()
+    df19 = clean19()
+    df18 = clean18()
+    df16 = clean16()
     ensure_data_dir("clean")
-    df.to_csv(
+    df19.to_csv(
         data_file_path("clean/cprr_port_allen_pd_2019.csv"),
+        index=False)
+    df18.to_csv(
+        data_file_path("clean/cprr_port_allen_pd_2017_2018.csv"),
+        index=False)
+    df16.to_csv(
+        data_file_path("clean/cprr_port_allen_pd_2015_2016.csv"),
         index=False)
