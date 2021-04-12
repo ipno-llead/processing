@@ -208,6 +208,8 @@ repos:
     fileName: fuse/personnel_history.csv
   complaint:
     fileName: fuse/complaint.csv
+  baton-rouge-da-brady-list:
+    fileName: match/cprr_baton_rouge_da_2021.csv
 commit:
   messageTemplate: |-
     {{.GitCommit.Link}}
