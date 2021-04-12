@@ -16,7 +16,7 @@ if __name__ == '__main__':
         'match/pprr_st_tammany_so_2020.csv'
     ))
     personnels = fuse_personnel(pprr, cprr)
-    perhist = rearrange_personnel_history_columns(pd.concat([pprr, cprr]))
+    perhist = rearrange_personnel_history_columns(pprr)
     complaints = rearrange_complaint_columns(cprr)
     ensure_data_dir('fuse')
     personnels.to_csv(data_file_path(

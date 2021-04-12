@@ -16,6 +16,7 @@ if __name__ == "__main__":
     cprr16 = pd.read_csv(
         data_file_path("match/cprr_port_allen_pd_2015_2016.csv"))
     pprr = pd.read_csv(data_file_path('match/pprr_port_allen_csd_2020.csv'))
+    pprr.loc[:, 'agency'] = 'Port Allen PD'
     personnel_df = rearrange_personnel_columns(pprr)
     history_df = rearrange_personnel_history_columns(pprr)
     complaint_df = rearrange_complaint_columns(

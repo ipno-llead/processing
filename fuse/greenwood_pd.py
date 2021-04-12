@@ -14,6 +14,9 @@ def fuse(cprr, post_pprr):
     ]
     post_pprr.loc[:, 'data_production_year'] = '2020'
     post_pprr.loc[:, 'agency'] = 'Greenwood PD'
+    post_pprr = gen_uid(post_pprr, [
+        'agency', 'uid', 'hire_year', 'hire_month', 'hire_day'
+    ], 'perhist_uid')
     cprr = gen_uid(cprr, [
         'uid', 'complaint_uid'
     ], 'allegation_uid')

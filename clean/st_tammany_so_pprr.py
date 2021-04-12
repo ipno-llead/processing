@@ -7,6 +7,12 @@ import sys
 sys.path.append('../')
 
 
+def assign_agency(df):
+    df.loc[:, 'agency'] = 'St. Tammany SO'
+    df.loc[:, 'data_production_year'] = 2020
+    return df
+
+
 def clean():
     df = pd.read_csv(
         data_file_path('st_tammany_so/st._tammany_so_pprr_2020.csv')
@@ -22,7 +28,9 @@ def clean():
         .pipe(float_to_int_str, ['birth_year'])\
         .pipe(standardize_desc_cols, ['rank_desc'])\
         .pipe(clean_dates, ['hire_date', 'term_date'])\
-        .pipe(gen_uid, ['employee_id', 'first_name', 'last_name', 'birth_year'])
+        .pipe(assign_agency)\
+        .pipe(gen_uid, ['agency', 'employee_id', 'first_name', 'last_name', 'birth_year'])\
+        .pipe(gen_uid, ['uid', 'hire_year', 'hire_month', 'hire_day'], 'perhist_uid')
 
 
 if __name__ == '__main__':

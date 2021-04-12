@@ -72,8 +72,11 @@ def clean_pprr():
         .pipe(clean_dates, ['birth_date', 'hire_date', 'term_date'])\
         .pipe(standardize_desc_cols, ["rank_desc"])\
         .pipe(clean_salaries, ["annual_salary"])\
-        .pipe(gen_uid, ["last_name", "first_name", "middle_initial", "birth_year", "birth_month", "birth_day"])\
-        .pipe(assign_agency)
+        .pipe(assign_agency)\
+        .pipe(gen_uid, [
+            "agency", "last_name", "first_name", "middle_initial", "birth_year", "birth_month", "birth_day"
+        ])\
+        .pipe(gen_uid, ["uid", "hire_year", "hire_month", "hire_day"], "perhist_uid")
     return df
 
 
