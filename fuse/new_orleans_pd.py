@@ -2,7 +2,7 @@ import pandas as pd
 from lib.path import data_file_path, ensure_data_dir
 from lib.columns import (
     rearrange_personnel_columns, rearrange_complaint_columns,
-    rearrange_use_of_force
+    rearrange_use_of_force, rearrange_event_columns
 )
 from lib.clean import float_to_int_str
 from lib import events
@@ -75,10 +75,16 @@ if __name__ == "__main__":
     uof = pd.read_csv(data_file_path(
         'clean/uof_new_orleans_pd_2012_2019.csv'
     ))
+    post_event = pd.read_csv(data_file_path(
+        'match/post_event_new_orleans_pd.csv'))
     complaints = fuse_cprr(cprr, actions, officer_number_dict)
     use_of_force = fuse_use_of_force(uof, officer_number_dict)
     personnel = rearrange_personnel_columns(pprr)
     events_df = fuse_events(pprr, cprr, uof)
+    events_df = rearrange_event_columns(pd.concat([
+        post_event,
+        events_df
+    ]))
     ensure_data_dir("fuse")
     complaints.to_csv(data_file_path(
         'fuse/com_new_orleans_pd.csv'), index=False)

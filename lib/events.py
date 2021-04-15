@@ -83,7 +83,7 @@ class Builder(object):
 
     def _extract_date(self, fields, raw_date, strptime_format=None):
         if strptime_format is not None:
-            dt = datetime.strptime(raw_date)
+            dt = datetime.strptime(raw_date, strptime_format)
             fields["year"] = dt.year
             fields["month"] = dt.month
             fields["day"] = dt.day
@@ -94,7 +94,7 @@ class Builder(object):
 
     def _extract_datetime(self, fields, raw_datetime, strptime_format=None):
         if strptime_format is not None:
-            dt = datetime.strptime(raw_datetime)
+            dt = datetime.strptime(raw_datetime, strptime_format)
             fields["year"] = dt.year
             fields["month"] = dt.month
             fields["day"] = dt.day
