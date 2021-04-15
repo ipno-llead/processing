@@ -168,6 +168,10 @@ repos:
     fileName: fuse/per_louisiana_state_police.csv
     primaryKey:
       - uid
+  event-new-orleans-pd:
+    fileName: fuse/event_new_orleans_pd.csv
+    primaryKey:
+      - event_uid
   perhist-baton-rouge-pd:
     fileName: fuse/perhist_baton_rouge_pd.csv
     primaryKey:
@@ -178,10 +182,6 @@ repos:
       - perhist_uid
   perhist-new-orleans-harbor-pd:
     fileName: fuse/perhist_new_orleans_harbor_pd.csv
-    primaryKey:
-      - perhist_uid
-  perhist-new-orleans-pd:
-    fileName: fuse/perhist_new_orleans_pd.csv
     primaryKey:
       - perhist_uid
   perhist-brusly-pd:

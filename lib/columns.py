@@ -13,52 +13,6 @@ PERSONNEL_COLUMNS = [
     "birth_day",
     "race",
     "sex",
-    "level_1_cert_date",
-    "last_pc_12_qualification_date"
-]
-
-PERSONNEL_HISTORY_COLUMNS = [
-    "perhist_uid",  # unique for each row in this table
-    "uid",  # officer unique identifier
-    "badge_no",  # badge number
-    "employee_id",  # employee ID given to the person by the agency.
-    "department_code",  # department code or id
-    "department_desc",  # department title or description
-    "division_desc",
-    "sub_division_a_desc",
-    "sub_division_b_desc",
-    "current_supervisor",
-    "rank_code",  # rank code
-    "rank_desc",  # rank title or description
-    "rank_year",
-    "rank_month",
-    "rank_day",
-    "dept_year",  # join unit date
-    "dept_month",
-    "dept_day",
-    "hire_year",
-    "hire_month",
-    "hire_day",
-    "term_year",  # termination year
-    "term_month",
-    "term_day",
-    "resign_year",
-    "resign_month",
-    "resign_day",
-    "pay_prog_start_year",
-    "pay_prog_start_month",
-    "pay_prog_start_day",
-    "pay_effective_year",
-    "pay_effective_month",
-    "pay_effective_day",
-    "employment_status",
-    "officer_inactive",
-    "employee_type",
-    "years_employed",
-    "annual_salary",  # annual salary
-    "hourly_salary",  # hourly salary
-    "data_production_year",  # year of data
-    "agency",  # name of agency (e.g. "New Orleans CSD")
 ]
 
 COMPLAINT_COLUMNS = [
@@ -67,26 +21,6 @@ COMPLAINT_COLUMNS = [
     "complaint_uid",  # unique identifier for complaint but generated for when tracking_number is unavailable
     "allegation_uid",  # unique identifier for allegation (complaint x officer)
     "charge_uid",  # unique identifier for individual charges
-    "occur_year",
-    "occur_month",
-    "occur_day",
-    "raw_occur_date",
-    "occur_time",
-    "receive_year",
-    "receive_month",
-    "receive_day",
-    "allegation_create_year",
-    "allegation_create_month",
-    "allegation_create_day",
-    "investigation_complete_year",
-    "investigation_complete_month",
-    "investigation_complete_day",
-    'suspension_start_year',
-    'suspension_start_month',
-    'suspension_start_day',
-    'suspension_end_year',
-    'suspension_end_month',
-    'suspension_end_day',
     "investigation_type",
     "investigation_status",
     "assigned_unit",
@@ -138,15 +72,6 @@ APPEAL_HEARING_COLUMNS = [
     "uid",
     "counsel",
     "charging_supervisor",
-    "filed_year",
-    "filed_month",
-    "filed_day",
-    "hearing_year",
-    "hearing_month",
-    "hearing_day",
-    "rendered_year",
-    "rendered_month",
-    "rendered_day",
     "resolution",
     "action",
     "delay",
@@ -159,10 +84,6 @@ USE_OF_FORCE_COLUMNS = [
     'use_of_force_uid',
     'uof_tracking_number',
     'report_year',
-    'occur_year',
-    'occur_month',
-    'occur_day',
-    'occur_time',
     'uid',
     'force_description',
     'force_type',
@@ -170,11 +91,6 @@ USE_OF_FORCE_COLUMNS = [
     'effective_uof',
     'accidental_discharge',
     'less_than_lethal',
-    'receive_date',
-    'due_datetime',
-    'assigned_date',
-    'completed_date',
-    'created_date',
     'status',
     'source',
     'service_type',
@@ -211,6 +127,42 @@ USE_OF_FORCE_COLUMNS = [
     'officer_sub_division_b',
 ]
 
+EVENT_COLUMNS = [
+    # common columns
+    "event_uid",
+    "kind",
+    "year",
+    "month",
+    "day",
+    "time",
+    "raw_date",
+
+    # situational
+    "uid",  # officer unique identifier
+    "complaint_uid",
+    "allegation_uid",
+    "appeal_uid",
+    "resolution_uid",
+    'use_of_force_uid',
+    "agency",  # name of agency (e.g. "New Orleans CSD")
+    "badge_no",  # badge number
+    "employee_id",  # employee ID given to the person by the agency.
+    "department_code",  # department code or id
+    "department_desc",  # department title or description
+    "division_desc",
+    "sub_division_a_desc",
+    "sub_division_b_desc",
+    "current_supervisor",
+    "rank_code",  # rank code
+    "rank_desc",  # rank title or description
+    "employment_status",
+    "officer_inactive",
+    "employee_type",
+    "years_employed",
+    "annual_salary",  # annual salary
+    "hourly_salary",  # hourly salary
+]
+
 
 def clean_column_names(df):
     """
@@ -232,37 +184,19 @@ def rearrange_personnel_columns(df):
         .pipe(float_to_int_str, ["birth_year", "birth_month", "birth_day"])
 
 
-def rearrange_personnel_history_columns(df):
+def rearrange_event_columns(df):
     existing_cols = set(df.columns)
     return float_to_int_str(
         df[[
-            col for col in PERSONNEL_HISTORY_COLUMNS if col in existing_cols
+            col for col in EVENT_COLUMNS if col in existing_cols
         ]].drop_duplicates(ignore_index=True),
         [
             "badge_no",
             "employee_id",
-            "dept_year",
-            "dept_month",
-            "dept_day",
-            "resign_year",
-            "resign_month",
-            "resign_day",
-            "rank_year",
-            "rank_month",
-            "rank_day",
-            "hire_year",
-            "hire_month",
-            "hire_day",
-            "term_year",
-            "term_month",
-            "term_day",
-            "pay_prog_start_year",
-            "pay_prog_start_month",
-            "pay_prog_start_day",
-            "pay_effective_year",
-            "pay_effective_month",
-            "pay_effective_day",
-            "data_production_year"
+            "year",
+            "month",
+            "day",
+            "years_employed",
         ])
 
 
@@ -272,22 +206,7 @@ def rearrange_complaint_columns(df):
         df[[col for col in COMPLAINT_COLUMNS if col in existing_cols]]
         .drop_duplicates(ignore_index=True),
         [
-            "occur_year",
-            "occur_month",
-            "occur_day",
-            "receive_year",
-            "receive_month",
-            "receive_day",
-            "investigation_complete_year",
-            "investigation_complete_month",
-            "investigation_complete_day",
             "paragraph_code",
-            "suspension_start_year",
-            "suspension_start_month",
-            "suspension_start_day",
-            "suspension_end_year",
-            "suspension_end_month",
-            "suspension_end_day"
         ])
 
 
@@ -297,19 +216,7 @@ def rearrange_appeal_hearing_columns(df):
             col for col in APPEAL_HEARING_COLUMNS
             if col in existing_cols
             ]].drop_duplicates(ignore_index=True)
-    return df\
-        .pipe(float_to_int_str, [
-            "filed_year",
-            "filed_month",
-            "filed_day",
-            "hearing_year",
-            "hearing_month",
-            "hearing_day",
-            "rendered_year",
-            "rendered_month",
-            "rendered_day",
-        ])\
-        .pipe(names_to_title_case, ["counsel"])
+    return df.pipe(names_to_title_case, ["counsel"])
 
 
 def rearrange_use_of_force(df):

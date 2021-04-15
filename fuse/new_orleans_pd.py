@@ -1,10 +1,11 @@
 import pandas as pd
 from lib.path import data_file_path, ensure_data_dir
 from lib.columns import (
-    rearrange_personnel_columns, rearrange_personnel_history_columns, rearrange_complaint_columns,
+    rearrange_personnel_columns, rearrange_complaint_columns,
     rearrange_use_of_force
 )
 from lib.clean import float_to_int_str
+from lib import events
 
 import sys
 sys.path.append("../")
@@ -36,6 +37,30 @@ def fuse_use_of_force(uof, officer_number_dict):
     return rearrange_use_of_force(uof)
 
 
+def fuse_events(pprr, cprr, uof):
+    builder = events.Builder()
+    builder.extract_events(pprr, {
+        events.OFFICER_HIRE: {'prefix': 'hire'},
+        events.OFFICER_LEFT: {'prefix': 'left'},
+        events.OFFICER_DEPT: {'prefix': 'dept'},
+    })
+    builder.extract_events(cprr, {
+        events.COMPLAINT_RECEIVE: {'prefix': 'receive'},
+        events.ALLEGATION_CREATE: {'prefix': 'allegation_create'},
+        events.COMPLAINT_INCIDENT: {'prefix': 'occur'},
+    })
+    builder.extract_events(uof, {
+        events.UOF_INCIDENT: {'prefix': 'occur'},
+        events.UOF_RECEIVE: {'prefix': 'receive', 'parse_date': True},
+        events.UOF_ASSIGNED: {'prefix': 'assigned', 'parse_date': True},
+        events.UOF_COMPLETED: {'prefix': 'completed', 'parse_date': True},
+        events.UOF_CREATED: {'prefix': 'created', 'parse_date': True},
+        events.UOF_DUE: {'prefix': 'due', 'parse_datetime': True},
+    })
+    return builder.to_frame(
+        ["kind", "year", "month", "day", "uid", "complaint_uid", "use_of_force_uid", "allegation_uid"])
+
+
 if __name__ == "__main__":
     pprr = pd.read_csv(data_file_path(
         'clean/pprr_new_orleans_pd_1946_2018.csv'
@@ -53,7 +78,7 @@ if __name__ == "__main__":
     complaints = fuse_cprr(cprr, actions, officer_number_dict)
     use_of_force = fuse_use_of_force(uof, officer_number_dict)
     personnel = rearrange_personnel_columns(pprr)
-    perhist = rearrange_personnel_history_columns(pprr)
+    events_df = fuse_events(pprr, cprr, uof)
     ensure_data_dir("fuse")
     complaints.to_csv(data_file_path(
         'fuse/com_new_orleans_pd.csv'), index=False)
@@ -61,5 +86,5 @@ if __name__ == "__main__":
         'fuse/uof_new_orleans_pd.csv'), index=False)
     personnel.to_csv(data_file_path(
         'fuse/per_new_orleans_pd.csv'), index=False)
-    perhist.to_csv(data_file_path(
-        'fuse/perhist_new_orleans_pd.csv'), index=False)
+    events_df.to_csv(data_file_path(
+        'fuse/event_new_orleans_pd.csv'), index=False)

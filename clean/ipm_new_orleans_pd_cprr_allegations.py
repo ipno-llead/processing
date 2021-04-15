@@ -45,7 +45,7 @@ def combine_citizen_columns(df):
 
 def rename_columns(df):
     cols = [
-        'pib_control_number', 'incident_type', 'occurred_date', 'year_occurred', 'month_occurred',
+        'pib_control_number', 'incident_type', 'occurred_date',
         'disposition_nopd', 'ocurred_time', 'received_date', 'assigned_unit',
         'assigned_department', 'assigned_division', 'assigned_sub_division_a', 'assigned_sub_division_b',
         'source', 'rule_violation', 'paragraph_violation', 'traffic_stop', 'body_worn_camera_available',
@@ -55,9 +55,7 @@ def rename_columns(df):
     ]
     df = df[cols].drop_duplicates().dropna(how="all").rename(columns={
         'pib_control_number': 'tracking_number',
-        'occurred_date': 'raw_occur_date',
-        'year_occurred': 'occur_year',
-        'month_occurred': 'occur_month',
+        'occurred_date': 'occur_date',
         'disposition_nopd': 'disposition',
         'ocurred_time': 'occur_time',
         'received_date': 'receive_date',
@@ -118,11 +116,11 @@ def clean():
             'allegation', 'allegation_class'
         ])\
         .pipe(float_to_int_str, [
-            'occur_year', 'occur_month', 'officer_primary_key', 'allegation_primary_key'
+            'officer_primary_key', 'allegation_primary_key'
         ])\
         .pipe(clean_occur_time)\
         .pipe(clean_trailing_empty_time, ['receive_date', 'allegation_create_date'])\
-        .pipe(clean_dates, ['receive_date', 'allegation_create_date'])\
+        .pipe(clean_dates, ['receive_date', 'allegation_create_date', 'occur_date'])\
         .pipe(clean_complainant_type)\
         .pipe(combine_rule_and_paragraph)\
         .pipe(assign_agency)\

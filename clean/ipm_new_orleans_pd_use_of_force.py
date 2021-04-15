@@ -1,8 +1,7 @@
 from lib.columns import clean_column_names
 from lib.path import data_file_path, ensure_data_dir
 from lib.clean import (
-    float_to_int_str, standardize_desc_cols, clean_sexes, clean_races, clean_dates,
-    clean_datetimes
+    float_to_int_str, standardize_desc_cols, clean_sexes, clean_races
 )
 from lib.uid import gen_uid
 import pandas as pd
@@ -86,10 +85,6 @@ def clean():
         ])\
         .pipe(add_occur_day)\
         .pipe(add_occur_time)\
-        .pipe(clean_dates, [
-            'receive_date', 'assigned_date', 'completed_date', 'created_date'
-        ], expand=False)\
-        .pipe(clean_datetimes, ['due_datetime'], expand=False)\
         .pipe(clean_sexes, ['citizen_sex'])\
         .pipe(clean_races, ['citizen_race'])\
         .pipe(drop_duplicates)\
