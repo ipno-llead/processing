@@ -3,7 +3,7 @@ from lib.path import data_file_path, ensure_data_dir
 from lib.match import (
     ThresholdMatcher, JaroWinklerSimilarity, DateSimilarity, ColumnsIndex
 )
-from lib import events
+from lib.post import extract_events_from_post
 import pandas as pd
 import sys
 sys.path.append('../')
@@ -32,22 +32,7 @@ def match_pprr_against_post(pprr, post):
         "match/new_orleans_pd_pprr_1946_2018_v_post_pprr_2020_11_06.xlsx"), decision)
 
     matches = matcher.get_index_pairs_within_thresholds(decision)
-    builder = events.Builder()
-    for pprr_uid, post_uid in matches:
-        for _, row in post[post.uid == post_uid].iterrows():
-            if pd.notnull(row.level_1_cert_date):
-                builder.append(
-                    events.OFFICER_LEVEL_1_CERT,
-                    raw_date_str=row.level_1_cert_date,
-                    strptime_format='%Y-%m-%d',
-                    uid=pprr_uid)
-            if pd.notnull(row.last_pc_12_qualification_date):
-                builder.append(
-                    events.OFFICER_PC_12_QUALIFICATION,
-                    raw_date_str=row.last_pc_12_qualification_date,
-                    strptime_format='%Y-%m-%d',
-                    uid=pprr_uid)
-    return builder.to_frame(['kind', 'uid', 'year', 'month', 'day'])
+    return extract_events_from_post(post, matches)
 
 
 if __name__ == '__main__':

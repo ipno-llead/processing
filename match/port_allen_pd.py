@@ -1,6 +1,7 @@
 from lib.date import combine_date_columns
 from lib.match import ThresholdMatcher, JaroWinklerSimilarity, NoopIndex, DateSimilarity
 from lib.path import data_file_path, ensure_data_dir
+from lib.post import extract_events_from_post
 import pandas as pd
 import sys
 sys.path.append('../')
@@ -28,13 +29,7 @@ def match_csd_pprr_against_post_pprr(pprr, post):
     matcher.save_pairs_to_excel(data_file_path(
         "match/port_allen_csd_pprr_2020_v_post_pprr_2020_11_06.xlsx"), decision)
     matches = matcher.get_index_pairs_within_thresholds(decision)
-    match_dict = dict(matches)
-
-    pprr.loc[:, 'level_1_cert_date'] = pprr.uid.map(
-        lambda x: post.loc[match_dict[x], 'level_1_cert_date'] if x in match_dict else '')
-    pprr.loc[:, 'last_pc_12_qualification_date'] = pprr.uid.map(
-        lambda x: post.loc[match_dict[x], 'last_pc_12_qualification_date'] if x in match_dict else '')
-    return pprr
+    return extract_events_from_post(post, matches)
 
 
 def match_cprr_against_csd_pprr_2020(cprr, pprr, year, decision):
@@ -64,7 +59,7 @@ if __name__ == '__main__':
         'clean/cprr_port_allen_pd_2017_2018.csv'))
     cprr16 = pd.read_csv(data_file_path(
         'clean/cprr_port_allen_pd_2015_2016.csv'))
-    pprr = match_csd_pprr_against_post_pprr(pprr, post)
+    post_event = match_csd_pprr_against_post_pprr(pprr, post)
     cprr19 = match_cprr_against_csd_pprr_2020(cprr19, pprr, 2019, 0.96)
     cprr18 = match_cprr_against_csd_pprr_2020(cprr18, pprr, 2018, 1)
     cprr16 = match_cprr_against_csd_pprr_2020(cprr16, pprr, 2016, 1)
@@ -77,3 +72,5 @@ if __name__ == '__main__':
         'match/cprr_port_allen_pd_2017_2018.csv'), index=False)
     cprr16.to_csv(data_file_path(
         'match/cprr_port_allen_pd_2015_2016.csv'), index=False)
+    post_event.to_csv(data_file_path(
+        'match/post_event_port_allen_pd.csv'), index=False)

@@ -172,6 +172,10 @@ repos:
     fileName: fuse/event_new_orleans_pd.csv
     primaryKey:
       - event_uid
+  event-port-allen-pd:
+    fileName: fuse/event_port_allen_pd.csv
+    primaryKey:
+      - event_uid
   perhist-baton-rouge-pd:
     fileName: fuse/perhist_baton_rouge_pd.csv
     primaryKey:
@@ -186,8 +190,6 @@ repos:
       - perhist_uid
   perhist-brusly-pd:
     fileName: fuse/perhist_brusly_pd.csv
-  perhist-port-allen-pd:
-    fileName: fuse/perhist_port_allen_pd.csv
   perhist-madisonville-pd:
     fileName: fuse/perhist_madisonville_pd.csv
     primaryKey:
