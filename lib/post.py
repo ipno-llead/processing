@@ -1,4 +1,3 @@
-from lib.path import data_file_path
 from lib import events
 import pandas as pd
 import sys

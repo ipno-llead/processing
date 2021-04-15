@@ -132,28 +132,28 @@ def parse_dates_with_known_format(df, cols, format):
 def clean_sexes(df, cols):
     for col in cols:
         df.loc[:, col] = df[col].str.strip().str.lower()\
-            .str.replace(r"^m$", "male").str.replace(r"^f$", "female")\
-            .str.replace(r"^unknown.*", "unknown")
+            .str.replace(r"^m$", "male", regex=True).str.replace(r"^f$", "female", regex=True)\
+            .str.replace(r"^unknown.*", "unknown", regex=True)
     return df
 
 
 def clean_races(df, cols):
     for col in cols:
         df.loc[:, col] = df[col].str.strip().str.lower()\
-            .str.replace(r"^w$", "white").str.replace(r"^b(lack.+)?$", "black")\
-            .str.replace(r"^h$", "hispanic").str.replace(r"^unknown.*", "unknown")
+            .str.replace(r"^w$", "white", regex=True).str.replace(r"^b(lack.+)?$", "black", regex=True)\
+            .str.replace(r"^h$", "hispanic", regex=True).str.replace(r"^unknown.*", "unknown", regex=True)
     return df
 
 
 def clean_employment_status(df, cols):
     for col in cols:
         df.loc[:, col] = df[col].str.strip().str.lower()\
-            .str.replace(r"^i$", "inactive").str.replace(r"^a$", "active")
+            .str.replace(r"^i$", "inactive", regex=True).str.replace(r"^a$", "active", regex=True)
     return df
 
 
 def clean_salary(series):
-    return series.str.strip().str.replace(r"[^\d\.]", "").astype("float64")
+    return series.str.strip().str.replace(r"[^\d\.]", "", regex=True).astype("float64")
 
 
 def clean_salaries(df, cols):
@@ -163,8 +163,8 @@ def clean_salaries(df, cols):
 
 
 def clean_name(series):
-    return series.str.strip().str.replace(r"[^\w-]+", " ").str.replace(r"\s+", " ")\
-        .str.replace(r"\s*-\s*", "-").str.lower().str.strip().fillna("")\
+    return series.str.strip().str.replace(r"[^\w-]+", " ", regex=True).str.replace(r"\s+", " ", regex=True)\
+        .str.replace(r"\s*-\s*", "-", regex=True).str.lower().str.strip().fillna("")\
         .str.strip("-")
 
 
@@ -174,8 +174,8 @@ def names_to_title_case(df, cols):
         if col not in cols_set:
             continue
         df.loc[:, col] = df[col].str.title()\
-            .str.replace(r" I(i|ii|v|x)$", lambda m: " I"+m.group(1).upper())\
-            .str.replace(r" V(i|ii|iii)$", lambda m: " V"+m.group(1).upper())
+            .str.replace(r" I(i|ii|v|x)$", lambda m: " I"+m.group(1).upper(), regex=True)\
+            .str.replace(r" V(i|ii|iii)$", lambda m: " V"+m.group(1).upper(), regex=True)
     return df
 
 
@@ -238,7 +238,7 @@ def split_names(df, col):
 
     df = df.reset_index(drop=True)
     names = pd.DataFrame.from_records(
-        df[col].fillna('').str.strip().str.replace(r' +', ' ')
+        df[col].fillna('').str.strip().str.replace(r' +', ' ', regex=True)
         .str.lower().map(split_name).to_list())
     names.columns = ['first_name', 'middle_name', 'last_name']
     return pd.concat([df, names], axis=1)

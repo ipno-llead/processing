@@ -176,10 +176,10 @@ repos:
     fileName: fuse/event_port_allen_pd.csv
     primaryKey:
       - event_uid
-  perhist-baton-rouge-pd:
-    fileName: fuse/perhist_baton_rouge_pd.csv
+  event-baton-rouge-pd:
+    fileName: fuse/event_baton_rouge_pd.csv
     primaryKey:
-      - perhist_uid
+      - event_uid
   perhist-baton-rouge-so:
     fileName: fuse/perhist_baton_rouge_so.csv
     primaryKey:

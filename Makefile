@@ -4,7 +4,7 @@ export PYTHONPATH := $(current_dir):$(PYTHONPATH)
 .PHONY: all
 
 all: data/fuse/per_new_orleans_harbor_pd.csv data/fuse/perhist_new_orleans_harbor_pd.csv data/fuse/com_new_orleans_harbor_pd.csv
-all: data/fuse/per_baton_rouge_pd.csv data/fuse/perhist_baton_rouge_pd.csv data/fuse/com_baton_rouge_pd.csv data/fuse/app_baton_rouge_pd.csv
+all: data/fuse/per_baton_rouge_pd.csv data/fuse/event_baton_rouge_pd.csv data/fuse/com_baton_rouge_pd.csv data/fuse/app_baton_rouge_pd.csv
 all: data/fuse/per_baton_rouge_so.csv data/fuse/perhist_baton_rouge_so.csv data/fuse/com_baton_rouge_so.csv
 all: data/fuse/per_brusly_pd.csv data/fuse/perhist_brusly_pd.csv data/fuse/com_brusly_pd.csv
 all: data/fuse/per_port_allen_pd.csv data/fuse/event_port_allen_pd.csv data/fuse/com_port_allen_pd.csv
@@ -19,7 +19,7 @@ all: data/match/cprr_baton_rouge_da_2021.csv
 data/fuse/per_new_orleans_harbor_pd.csv data/fuse/perhist_new_orleans_harbor_pd.csv data/fuse/com_new_orleans_harbor_pd.csv: fuse/new_orleans_harbor_pd.py data/match/pprr_new_orleans_harbor_pd_2020.csv data/match/cprr_new_orleans_harbor_pd_2020.csv data/clean/pprr_new_orleans_harbor_pd_1991_2008.csv
 	python fuse/new_orleans_harbor_pd.py
 
-data/fuse/per_baton_rouge_pd.csv data/fuse/perhist_baton_rouge_pd.csv data/fuse/com_baton_rouge_pd.csv data/fuse/app_baton_rouge_pd.csv: fuse/baton_rouge_pd.py data/match/pprr_baton_rouge_csd_2017.csv data/match/pprr_baton_rouge_csd_2019.csv data/match/cprr_baton_rouge_pd_2018.csv data/match/lprr_baton_rouge_fpcsb_1992_2012.csv
+data/fuse/per_baton_rouge_pd.csv data/fuse/event_baton_rouge_pd.csv data/fuse/com_baton_rouge_pd.csv data/fuse/app_baton_rouge_pd.csv: fuse/baton_rouge_pd.py data/match/pprr_baton_rouge_csd_2017.csv data/match/pprr_baton_rouge_csd_2019.csv data/match/cprr_baton_rouge_pd_2018.csv data/match/lprr_baton_rouge_fpcsb_1992_2012.csv data/match/event_post_baton_rouge_pd.csv
 	python fuse/baton_rouge_pd.py
 
 data/fuse/per_baton_rouge_so.csv data/fuse/perhist_baton_rouge_so.csv data/fuse/com_baton_rouge_so.csv: fuse/baton_rouge_so.py data/match/cprr_baton_rouge_so_2018.csv data/clean/pprr_post_2020_11_06.csv
@@ -57,7 +57,7 @@ data/match/post_event_new_orleans_pd.csv: match/new_orleans_pd.py data/clean/ppr
 data/match/cprr_new_orleans_harbor_pd_2020.csv data/match/pprr_new_orleans_harbor_pd_2020.csv: match/new_orleans_harbor_pd.py data/clean/cprr_new_orleans_harbor_pd_2020.csv data/clean/pprr_new_orleans_harbor_pd_2020.csv
 	python match/new_orleans_harbor_pd.py
 
-data/match/pprr_baton_rouge_csd_2017.csv data/match/pprr_baton_rouge_csd_2019.csv data/match/cprr_baton_rouge_pd_2018.csv data/match/lprr_baton_rouge_fpcsb_1992_2012.csv: match/baton_rouge_pd.py data/clean/pprr_baton_rouge_csd_2017.csv data/clean/pprr_baton_rouge_csd_2019.csv data/clean/cprr_baton_rouge_pd_2018.csv data/clean/pprr_post_2020_11_06.csv data/clean/lprr_baton_rouge_fpcsb_1992_2012.csv
+data/match/pprr_baton_rouge_csd_2017.csv data/match/pprr_baton_rouge_csd_2019.csv data/match/cprr_baton_rouge_pd_2018.csv data/match/lprr_baton_rouge_fpcsb_1992_2012.csv data/match/event_post_baton_rouge_pd.csv: match/baton_rouge_pd.py data/clean/pprr_baton_rouge_csd_2017.csv data/clean/pprr_baton_rouge_csd_2019.csv data/clean/cprr_baton_rouge_pd_2018.csv data/clean/pprr_post_2020_11_06.csv data/clean/lprr_baton_rouge_fpcsb_1992_2012.csv
 	python match/baton_rouge_pd.py
 
 data/match/cprr_brusly_pd_2020.csv data/match/pprr_brusly_pd_2020.csv: match/brusly_pd.py data/clean/pprr_brusly_pd_2020.csv data/clean/cprr_brusly_pd_2020.csv

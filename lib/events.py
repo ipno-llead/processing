@@ -4,9 +4,8 @@ import pandas as pd
 from pandas.api.types import CategoricalDtype
 
 from lib.clean import clean_date, clean_datetime, float_to_int_str
-from lib.path import data_file_path
-from lib.uid import gen_uid
-from lib.exceptions import InvalidEventKindException, InvalidEventDateException, NonUniqueEventIDException
+from lib.uid import gen_uid, ensure_uid_unique
+from lib.exceptions import InvalidEventKindException, InvalidEventDateException
 from lib.columns import rearrange_event_columns
 
 OFFICER_LEVEL_1_CERT = "officer_level_1_cert"
@@ -215,8 +214,16 @@ class Builder(object):
                     anchor_col = '%s_year' % obj['prefix']
                 if row[anchor_col] == '' or pd.isnull(row[anchor_col]):
                     continue
+                if 'keep' in obj:
+                    fields = dict(
+                        [(k, v) for k, v in common_fields.items() if k in obj['keep']])
+                elif 'drop' in obj:
+                    fields = dict(
+                        [(k, v) for k, v in common_fields.items() if k not in obj['drop']])
+                else:
+                    fields = dict(list(common_fields.items()))
                 fields = dict(
-                    list(common_fields.items()) + kwargs_funcs[kind](row))
+                    list(fields.items()) + kwargs_funcs[kind](row))
                 self.append(kind, **fields)
 
     def to_frame(self, id_cols, output_duplicated_events=False):
@@ -239,11 +246,5 @@ class Builder(object):
             .pipe(gen_uid, id_cols, "event_uid")
         df.loc[:, 'kind'] = df.kind.astype(cat_type)
         df = rearrange_event_columns(df)
-        if df[df.event_uid.duplicated()].shape[0] > 0:
-            if output_duplicated_events:
-                df[df.event_uid.duplicated(keep=False)].dropna(
-                    axis=1, how='all').to_csv(data_file_path('dup_events.csv'), index=False)
-            raise NonUniqueEventIDException(
-                'generated event_id is not unique. Make sure id_cols are unique per row:\n%s'
-                % df[df.event_uid.duplicated()].dropna(axis=1, how='all'))
+        ensure_uid_unique(df, 'event_uid', output_duplicated_events)
         return df

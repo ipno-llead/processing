@@ -3,6 +3,7 @@ from lib.match import (
     ColumnsIndex, JaroWinklerSimilarity, StringSimilarity, DateSimilarity, ThresholdMatcher
 )
 from lib.date import combine_date_columns
+from lib.post import extract_events_from_post
 import pandas as pd
 import sys
 sys.path.append("../")
@@ -86,16 +87,7 @@ def match_pd_cprr_2018_v_csd_pprr_2019(cprr, pprr):
 
 def prepare_post_data():
     post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
-    post = post[post.agency == 'baton rouge pd']
-    duplicated_uids = set(post.loc[post.uid.duplicated(), 'uid'].to_list())
-    post = post.set_index('uid', drop=False)
-    level_1_cert_dates = post.loc[
-        post.uid.isin(duplicated_uids) & (post.level_1_cert_date.notna()),
-        'level_1_cert_date']
-    for idx, value in level_1_cert_dates.iteritems():
-        post.loc[idx, 'level_1_cert_date'] = value
-    post = post.sort_values('last_pc_12_qualification_date', ascending=False)
-    return post[~post.index.duplicated(keep='first')]
+    return post[post.agency == 'baton rouge pd'].reset_index(drop=True)
 
 
 def match_csd_pprr_against_post(pprr, post, year, decision):
@@ -119,13 +111,7 @@ def match_csd_pprr_against_post(pprr, post, year, decision):
     matcher.save_pairs_to_excel(data_file_path(
         "match/baton_rouge_csd_pprr_%d_v_post_pprr_2020_11_06.xlsx" % year), decision)
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
-    match_dict = dict(matches)
-
-    pprr.loc[:, 'level_1_cert_date'] = pprr.uid.map(
-        lambda x: post.loc[match_dict[x], 'level_1_cert_date'] if x in match_dict else '')
-    pprr.loc[:, 'last_pc_12_qualification_date'] = pprr.uid.map(
-        lambda x: post.loc[match_dict[x], 'last_pc_12_qualification_date'] if x in match_dict else '')
-    return pprr
+    return extract_events_from_post(post, matches)
 
 
 def match_lprr_against_pprr(lprr, pprr, year, decision):
@@ -168,13 +154,7 @@ def match_lprr_against_post(lprr, post):
     matcher.save_pairs_to_excel(data_file_path(
         "match/baton_rouge_fpcsb_lprr_1992_2012_v_post_pprr_2020_11_06.xlsx"), decision)
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
-    match_dict = dict(matches)
-
-    lprr.loc[:, 'level_1_cert_date'] = lprr.uid.map(
-        lambda x: post.loc[match_dict[x], 'level_1_cert_date'] if x in match_dict else '')
-    lprr.loc[:, 'last_pc_12_qualification_date'] = lprr.uid.map(
-        lambda x: post.loc[match_dict[x], 'last_pc_12_qualification_date'] if x in match_dict else '')
-    return lprr
+    return extract_events_from_post(post, matches)
 
 
 if __name__ == "__main__":
@@ -188,11 +168,15 @@ if __name__ == "__main__":
     df17, df19 = match_csd_pprr_2017_v_2019(df17, df19)
     lprr = match_lprr_against_pprr(lprr, df17, 2017, 0.816)
     lprr = match_lprr_against_pprr(lprr, df19, 2019, 0.97)
-    post = prepare_post_data()
-    lprr = match_lprr_against_post(lprr, post)
-    df17 = match_csd_pprr_against_post(df17, post, 2017, 0.809)
-    df19 = match_csd_pprr_against_post(df19, post, 2019, 0.894)
     cprr = match_pd_cprr_2018_v_csd_pprr_2019(cprr, df19)
+    post = prepare_post_data()
+    post_event = pd.concat([
+        match_lprr_against_post(lprr, post),
+        match_csd_pprr_against_post(df17, post, 2017, 0.809),
+        match_csd_pprr_against_post(df19, post, 2019, 0.894),
+    ]).drop_duplicates(ignore_index=True)
+    assert post_event[post_event.duplicated(
+        subset=['event_uid'])].shape[0] == 0
     ensure_data_dir("match")
     lprr.to_csv(
         data_file_path("match/lprr_baton_rouge_fpcsb_1992_2012.csv"),
@@ -205,4 +189,7 @@ if __name__ == "__main__":
         index=False)
     cprr.to_csv(
         data_file_path("match/cprr_baton_rouge_pd_2018.csv"),
+        index=False)
+    post_event.to_csv(
+        data_file_path("match/event_post_baton_rouge_pd.csv"),
         index=False)

@@ -1,4 +1,6 @@
 import hashlib
+from lib.path import data_file_path
+from lib.exceptions import NonUniqueUIDException
 
 
 def gen_uid_from_row(series, id_cols):
@@ -17,3 +19,15 @@ def gen_uid(df, id_cols, uid_name="uid"):
                     keep=False)].to_string()
             ))
     return df
+
+
+def ensure_uid_unique(df, uid_col, output_csv=False):
+    if df[df[uid_col].duplicated()].shape[0] == 0:
+        return
+    dup_df = df[df[uid_col].duplicated(keep=False)]\
+        .dropna(axis=1, how='all').sort_values(uid_col)
+    if output_csv:
+        dup_df.to_csv(data_file_path('duplicates.csv'), index=False)
+    raise NonUniqueUIDException(
+        'DataFrame is not unique:\n%s'
+        % dup_df)

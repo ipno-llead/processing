@@ -6,5 +6,5 @@ class InvalidEventDateException(Exception):
     pass
 
 
-class NonUniqueEventIDException(Exception):
+class NonUniqueUIDException(Exception):
     pass
