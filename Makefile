@@ -15,6 +15,7 @@ all: data/fuse/per_st_tammany_so.csv data/fuse/event_st_tammany_so.csv data/fuse
 all: data/fuse/com_plaquemines_so.csv data/fuse/per_plaquemines_so.csv data/fuse/event_plaquemines_so.csv
 all: data/fuse/per_louisiana_state_police.csv data/fuse/event_louisiana_state_police.csv data/fuse/app_louisiana_state_police.csv
 all: data/match/cprr_baton_rouge_da_2021.csv
+all: data/fuse/per_caddo_parish_so.csv data/fuse/event_caddo_parish_so.csv
 
 data/fuse/per_new_orleans_harbor_pd.csv data/fuse/event_new_orleans_harbor_pd.csv data/fuse/com_new_orleans_harbor_pd.csv: fuse/new_orleans_harbor_pd.py data/match/post_event_new_orleans_harbor_pd_2020.csv data/match/cprr_new_orleans_harbor_pd_2020.csv data/clean/pprr_new_orleans_harbor_pd_1991_2008.csv data/clean/pprr_new_orleans_harbor_pd_2020.csv
 	python fuse/new_orleans_harbor_pd.py
@@ -51,6 +52,9 @@ data/fuse/per_louisiana_state_police.csv data/fuse/event_louisiana_state_police.
 
 data/match/post_event_new_orleans_pd.csv: match/new_orleans_pd.py data/clean/pprr_post_2020_11_06.csv data/clean/pprr_new_orleans_pd_1946_2018.csv
 	python match/new_orleans_pd.py
+
+data/fuse/per_caddo_parish_so.csv data/fuse/event_caddo_parish_so.csv: fuse/caddo_parish_so.py data/clean/pprr_caddo_parish_so_2020.csv data/match/post_event_caddo_parish_so.csv
+	python fuse/caddo_parish_so.py
 
 
 
@@ -89,6 +93,9 @@ data/match/lprr_louisiana_state_csc_1991_2020.csv: match/louisiana_state_csc.py 
 
 data/match/mandeville_csd_pprr_2020.csv: match/mandeville_pd.py data/clean/mandeville_csd_pprr_2020.csv data/clean/pprr_post_2020_11_06.csv
 	python match/mandeville_pd.py
+
+data/match/post_event_caddo_parish_so.csv: match/caddo_parish_so.py data/clean/pprr_post_2020_11_06.csv data/clean/pprr_caddo_parish_so_2020.csv
+	python match/caddo_parish_so.py
 
 
 
@@ -160,3 +167,6 @@ data/clean/cprr_plaquemines_so_2019.csv: clean/plaquemines_so_cprr.py data/plaqu
 
 data/clean/mandeville_csd_pprr_2020.csv data/clean/mandeville_pd_cprr_2019_byhand.csv: clean/mandeville_pd.py data/mandeville_pd/mandeville_csd_pprr_2020.csv data/mandeville_pd/mandeville_pd_cprr_2019_byhand.csv
 	python clean/mandeville_pd.py
+
+data/clean/pprr_caddo_parish_so_2020.csv: clean/caddo_parish_so_pprr.py data/caddo_parish_so/caddo_parish_so_pprr_2020.csv
+	python clean/caddo_parish_so_pprr.py

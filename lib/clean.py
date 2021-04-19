@@ -163,9 +163,9 @@ def clean_salaries(df, cols):
 
 
 def clean_name(series):
-    return series.str.strip().str.replace(r"[^\w-]+", " ", regex=True).str.replace(r"\s+", " ", regex=True)\
-        .str.replace(r"\s*-\s*", "-", regex=True).str.lower().str.strip().fillna("")\
-        .str.strip("-")
+    return series.str.strip().str.replace(r"'", '', regex=True).str.replace(r"[^\w-]+", " ", regex=True)\
+        .str.replace(r"\s+", " ", regex=True).str.replace(r"\s*-\s*", "-", regex=True)\
+        .str.lower().str.strip().fillna("").str.strip("-")
 
 
 def names_to_title_case(df, cols):

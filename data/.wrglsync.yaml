@@ -168,6 +168,10 @@ repos:
     fileName: fuse/per_louisiana_state_police.csv
     primaryKey:
       - uid
+  per-caddo-parish-so:
+    fileName: fuse/per_caddo_parish_so.csv
+    primaryKey:
+      - uid
   event-new-orleans-pd:
     fileName: fuse/event_new_orleans_pd.csv
     primaryKey:
@@ -210,6 +214,10 @@ repos:
       - event_uid
   event-louisiana-state-police:
     fileName: fuse/event_louisiana_state_police.csv
+    primaryKey:
+      - event_uid
+  event-caddo-parish-so:
+    fileName: fuse/event_caddo_parish_so.csv
     primaryKey:
       - event_uid
   personnel:
