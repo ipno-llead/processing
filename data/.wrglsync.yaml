@@ -204,8 +204,10 @@ repos:
     fileName: fuse/event_st_tammany_so.csv
     primaryKey:
       - event_uid
-  perhist-plaquemines-so:
-    fileName: fuse/perhist_plaquemines_so.csv
+  event-plaquemines-so:
+    fileName: fuse/event_plaquemines_so.csv
+    primaryKey:
+      - event_uid
   perhist-louisiana-state-police:
     fileName: fuse/perhist_louisiana_state_police.csv
   personnel:

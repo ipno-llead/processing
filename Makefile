@@ -12,7 +12,7 @@ all: data/fuse/per_madisonville_pd.csv data/fuse/event_madisonville_pd.csv data/
 all: data/fuse/per_greenwood_pd.csv data/fuse/com_greenwood_pd.csv data/fuse/event_greenwood_pd.csv
 all: data/fuse/com_new_orleans_pd.csv data/fuse/uof_new_orleans_pd.csv data/fuse/per_new_orleans_pd.csv data/fuse/event_new_orleans_pd.csv
 all: data/fuse/per_st_tammany_so.csv data/fuse/event_st_tammany_so.csv data/fuse/com_st_tammany_so.csv
-all: data/fuse/com_plaquemines_so.csv data/fuse/per_plaquemines_so.csv data/fuse/perhist_plaquemines_so.csv
+all: data/fuse/com_plaquemines_so.csv data/fuse/per_plaquemines_so.csv data/fuse/event_plaquemines_so.csv
 all: data/fuse/per_louisiana_state_police.csv data/fuse/perhist_louisiana_state_police.csv data/fuse/app_louisiana_state_police.csv
 all: data/match/cprr_baton_rouge_da_2021.csv
 
@@ -43,7 +43,7 @@ data/fuse/com_new_orleans_pd.csv data/fuse/uof_new_orleans_pd.csv data/fuse/per_
 data/fuse/per_st_tammany_so.csv data/fuse/event_st_tammany_so.csv data/fuse/com_st_tammany_so.csv: fuse/st_tammany_so.py data/match/cprr_st_tammany_so_2011_2021.csv data/match/post_event_st_tammany_so_2020.csv data/clean/pprr_st_tammany_so_2020.csv
 	python fuse/st_tammany_so.py
 
-data/fuse/com_plaquemines_so.csv data/fuse/per_plaquemines_so.csv data/fuse/perhist_plaquemines_so.csv: fuse/plaquemines_so.py data/match/cprr_plaquemines_so_2019.csv data/clean/pprr_post_2020_11_06.csv
+data/fuse/com_plaquemines_so.csv data/fuse/per_plaquemines_so.csv data/fuse/event_plaquemines_so.csv: fuse/plaquemines_so.py data/match/cprr_plaquemines_so_2019.csv data/clean/pprr_post_2020_11_06.csv
 	python fuse/plaquemines_so.py
 
 data/fuse/per_louisiana_state_police.csv data/fuse/perhist_louisiana_state_police.csv data/fuse/app_louisiana_state_police.csv: fuse/louisiana_state_csc.py data/match/lprr_louisiana_state_csc_1991_2020.csv data/clean/pprr_post_2020_11_06.csv
