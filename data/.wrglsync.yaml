@@ -188,8 +188,10 @@ repos:
     fileName: fuse/perhist_new_orleans_harbor_pd.csv
     primaryKey:
       - perhist_uid
-  perhist-brusly-pd:
-    fileName: fuse/perhist_brusly_pd.csv
+  event-brusly-pd:
+    fileName: fuse/event_brusly_pd.csv
+    primaryKey:
+      - event_uid
   perhist-madisonville-pd:
     fileName: fuse/perhist_madisonville_pd.csv
     primaryKey:
