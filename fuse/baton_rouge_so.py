@@ -1,10 +1,8 @@
 import pandas as pd
 from lib.path import data_file_path, ensure_data_dir
-from lib.columns import (
-    rearrange_personnel_history_columns, rearrange_complaint_columns
-)
+from lib.columns import rearrange_complaint_columns
 from lib.personnel import fuse_personnel
-from lib.uid import gen_uid
+from lib import events
 
 import sys
 sys.path.append("../")
@@ -17,13 +15,22 @@ def prepare_post_data():
     return post
 
 
-def fuse_personnel_history(cprr, post):
-    df = pd.concat([cprr, post])
-    df = gen_uid(df, [
-        'uid', 'rank_year', 'rank_month', 'rank_day', 'hire_year', 'hire_month', 'hire_day'
-    ], 'perhist_uid')
-    df = rearrange_personnel_history_columns(df)
-    return df
+def fuse_events(cprr, post):
+    builder = events.Builder()
+    builder.extract_events(cprr, {
+        events.OFFICER_RANK: {'prefix': 'rank', 'keep': ['uid', 'agency']},
+        events.COMPLAINT_INCIDENT: {'prefix': 'occur', 'keep': ['uid', 'agency', 'complaint_uid']},
+    })
+    builder.extract_events(post, {
+        events.OFFICER_LEVEL_1_CERT: {'prefix': 'level_1_cert', 'parse_date': '%Y-%m-%d', 'keep': [
+            'uid', 'agency'
+        ]},
+        events.OFFICER_PC_12_QUALIFICATION: {'prefix': 'last_pc_12_qualification', 'parse_date': '%Y-%m-%d', 'keep': [
+            'uid', 'agency'
+        ]},
+        events.OFFICER_HIRE: {'prefix': 'hire', 'keep': ['uid', 'agency']},
+    })
+    return builder.to_frame(["kind", "year", "month", "day", "uid", "complaint_uid"])
 
 
 if __name__ == "__main__":
@@ -31,12 +38,12 @@ if __name__ == "__main__":
         data_file_path("match/cprr_baton_rouge_so_2018.csv"))
     post = prepare_post_data()
     personnel_df = fuse_personnel(cprr, post)
-    history_df = fuse_personnel_history(cprr, post)
+    event_df = fuse_events(cprr, post)
     complaint_df = rearrange_complaint_columns(cprr)
     ensure_data_dir("fuse")
     personnel_df.to_csv(data_file_path(
         "fuse/per_baton_rouge_so.csv"), index=False)
-    history_df.to_csv(data_file_path(
-        "fuse/perhist_baton_rouge_so.csv"), index=False)
+    event_df.to_csv(data_file_path(
+        "fuse/event_baton_rouge_so.csv"), index=False)
     complaint_df.to_csv(data_file_path(
         "fuse/com_baton_rouge_so.csv"), index=False)

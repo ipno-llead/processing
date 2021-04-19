@@ -5,7 +5,7 @@ export PYTHONPATH := $(current_dir):$(PYTHONPATH)
 
 all: data/fuse/per_new_orleans_harbor_pd.csv data/fuse/perhist_new_orleans_harbor_pd.csv data/fuse/com_new_orleans_harbor_pd.csv
 all: data/fuse/per_baton_rouge_pd.csv data/fuse/event_baton_rouge_pd.csv data/fuse/com_baton_rouge_pd.csv data/fuse/app_baton_rouge_pd.csv
-all: data/fuse/per_baton_rouge_so.csv data/fuse/perhist_baton_rouge_so.csv data/fuse/com_baton_rouge_so.csv
+all: data/fuse/per_baton_rouge_so.csv data/fuse/event_baton_rouge_so.csv data/fuse/com_baton_rouge_so.csv
 all: data/fuse/per_brusly_pd.csv data/fuse/perhist_brusly_pd.csv data/fuse/com_brusly_pd.csv
 all: data/fuse/per_port_allen_pd.csv data/fuse/event_port_allen_pd.csv data/fuse/com_port_allen_pd.csv
 all: data/fuse/per_madisonville_pd.csv data/fuse/perhist_madisonville_pd.csv data/fuse/com_madisonville_pd.csv
@@ -22,7 +22,7 @@ data/fuse/per_new_orleans_harbor_pd.csv data/fuse/perhist_new_orleans_harbor_pd.
 data/fuse/per_baton_rouge_pd.csv data/fuse/event_baton_rouge_pd.csv data/fuse/com_baton_rouge_pd.csv data/fuse/app_baton_rouge_pd.csv: fuse/baton_rouge_pd.py data/match/pprr_baton_rouge_csd_2017.csv data/match/pprr_baton_rouge_csd_2019.csv data/match/cprr_baton_rouge_pd_2018.csv data/match/lprr_baton_rouge_fpcsb_1992_2012.csv data/match/event_post_baton_rouge_pd.csv
 	python fuse/baton_rouge_pd.py
 
-data/fuse/per_baton_rouge_so.csv data/fuse/perhist_baton_rouge_so.csv data/fuse/com_baton_rouge_so.csv: fuse/baton_rouge_so.py data/match/cprr_baton_rouge_so_2018.csv data/clean/pprr_post_2020_11_06.csv
+data/fuse/per_baton_rouge_so.csv data/fuse/event_baton_rouge_so.csv data/fuse/com_baton_rouge_so.csv: fuse/baton_rouge_so.py data/match/cprr_baton_rouge_so_2018.csv data/clean/pprr_post_2020_11_06.csv
 	python fuse/baton_rouge_so.py
 
 data/fuse/per_brusly_pd.csv data/fuse/perhist_brusly_pd.csv data/fuse/com_brusly_pd.csv: fuse/brusly_pd.py data/match/pprr_brusly_pd_2020.csv data/match/cprr_brusly_pd_2020.csv

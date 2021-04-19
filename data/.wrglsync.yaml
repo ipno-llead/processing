@@ -180,10 +180,10 @@ repos:
     fileName: fuse/event_baton_rouge_pd.csv
     primaryKey:
       - event_uid
-  perhist-baton-rouge-so:
-    fileName: fuse/perhist_baton_rouge_so.csv
+  event-baton-rouge-so:
+    fileName: fuse/event_baton_rouge_so.csv
     primaryKey:
-      - perhist_uid
+      - event_uid
   perhist-new-orleans-harbor-pd:
     fileName: fuse/perhist_new_orleans_harbor_pd.csv
     primaryKey:
