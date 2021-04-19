@@ -208,8 +208,10 @@ repos:
     fileName: fuse/event_plaquemines_so.csv
     primaryKey:
       - event_uid
-  perhist-louisiana-state-police:
-    fileName: fuse/perhist_louisiana_state_police.csv
+  event-louisiana-state-police:
+    fileName: fuse/event_louisiana_state_police.csv
+    primaryKey:
+      - event_uid
   personnel:
     fileName: fuse/personnel.csv
     primaryKey:

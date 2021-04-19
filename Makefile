@@ -13,7 +13,7 @@ all: data/fuse/per_greenwood_pd.csv data/fuse/com_greenwood_pd.csv data/fuse/eve
 all: data/fuse/com_new_orleans_pd.csv data/fuse/uof_new_orleans_pd.csv data/fuse/per_new_orleans_pd.csv data/fuse/event_new_orleans_pd.csv
 all: data/fuse/per_st_tammany_so.csv data/fuse/event_st_tammany_so.csv data/fuse/com_st_tammany_so.csv
 all: data/fuse/com_plaquemines_so.csv data/fuse/per_plaquemines_so.csv data/fuse/event_plaquemines_so.csv
-all: data/fuse/per_louisiana_state_police.csv data/fuse/perhist_louisiana_state_police.csv data/fuse/app_louisiana_state_police.csv
+all: data/fuse/per_louisiana_state_police.csv data/fuse/event_louisiana_state_police.csv data/fuse/app_louisiana_state_police.csv
 all: data/match/cprr_baton_rouge_da_2021.csv
 
 data/fuse/per_new_orleans_harbor_pd.csv data/fuse/event_new_orleans_harbor_pd.csv data/fuse/com_new_orleans_harbor_pd.csv: fuse/new_orleans_harbor_pd.py data/match/post_event_new_orleans_harbor_pd_2020.csv data/match/cprr_new_orleans_harbor_pd_2020.csv data/clean/pprr_new_orleans_harbor_pd_1991_2008.csv data/clean/pprr_new_orleans_harbor_pd_2020.csv
@@ -46,7 +46,7 @@ data/fuse/per_st_tammany_so.csv data/fuse/event_st_tammany_so.csv data/fuse/com_
 data/fuse/com_plaquemines_so.csv data/fuse/per_plaquemines_so.csv data/fuse/event_plaquemines_so.csv: fuse/plaquemines_so.py data/match/cprr_plaquemines_so_2019.csv data/clean/pprr_post_2020_11_06.csv
 	python fuse/plaquemines_so.py
 
-data/fuse/per_louisiana_state_police.csv data/fuse/perhist_louisiana_state_police.csv data/fuse/app_louisiana_state_police.csv: fuse/louisiana_state_csc.py data/match/lprr_louisiana_state_csc_1991_2020.csv data/clean/pprr_post_2020_11_06.csv
+data/fuse/per_louisiana_state_police.csv data/fuse/event_louisiana_state_police.csv data/fuse/app_louisiana_state_police.csv: fuse/louisiana_state_csc.py data/match/lprr_louisiana_state_csc_1991_2020.csv data/clean/pprr_post_2020_11_06.csv
 	python fuse/louisiana_state_csc.py
 
 data/match/post_event_new_orleans_pd.csv: match/new_orleans_pd.py data/clean/pprr_post_2020_11_06.csv data/clean/pprr_new_orleans_pd_1946_2018.csv
