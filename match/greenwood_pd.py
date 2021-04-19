@@ -21,10 +21,6 @@ def match(gw_cprr, post_pprr):
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
     uid_dict = dict(matches)
     gw_cprr.loc[:, 'uid'] = gw_cprr.mid.map(lambda x: uid_dict[x])
-    gw_cprr.loc[:, 'level_1_cert_date'] = gw_cprr.uid.map(
-        lambda x: post_pprr.loc[x, 'level_1_cert_date'])
-    gw_cprr.loc[:, 'last_pc_12_qualification_date'] = gw_cprr.uid.map(
-        lambda x: post_pprr.loc[x, 'last_pc_12_qualification_date'])
     return gw_cprr.drop(columns='mid')
 
 

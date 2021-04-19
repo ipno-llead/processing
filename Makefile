@@ -9,7 +9,7 @@ all: data/fuse/per_baton_rouge_so.csv data/fuse/event_baton_rouge_so.csv data/fu
 all: data/fuse/per_brusly_pd.csv data/fuse/event_brusly_pd.csv data/fuse/com_brusly_pd.csv
 all: data/fuse/per_port_allen_pd.csv data/fuse/event_port_allen_pd.csv data/fuse/com_port_allen_pd.csv
 all: data/fuse/per_madisonville_pd.csv data/fuse/event_madisonville_pd.csv data/fuse/com_madisonville_pd.csv
-all: data/fuse/per_greenwood_pd.csv data/fuse/com_greenwood_pd.csv data/fuse/perhist_greenwood_pd.csv
+all: data/fuse/per_greenwood_pd.csv data/fuse/com_greenwood_pd.csv data/fuse/event_greenwood_pd.csv
 all: data/fuse/com_new_orleans_pd.csv data/fuse/uof_new_orleans_pd.csv data/fuse/per_new_orleans_pd.csv data/fuse/event_new_orleans_pd.csv
 all: data/fuse/per_st_tammany_so.csv data/fuse/perhist_st_tammany_so.csv data/fuse/com_st_tammany_so.csv
 all: data/fuse/com_plaquemines_so.csv data/fuse/per_plaquemines_so.csv data/fuse/perhist_plaquemines_so.csv
@@ -34,7 +34,7 @@ data/fuse/per_port_allen_pd.csv data/fuse/event_port_allen_pd.csv data/fuse/com_
 data/fuse/per_madisonville_pd.csv data/fuse/event_madisonville_pd.csv data/fuse/com_madisonville_pd.csv: fuse/madisonville_pd.py data/match/cprr_madisonville_pd_2010_2020.csv data/match/post_event_madisonville_csd_2019.csv data/clean/pprr_madisonville_csd_2019.csv
 	python fuse/madisonville_pd.py
 
-data/fuse/per_greenwood_pd.csv data/fuse/com_greenwood_pd.csv data/fuse/perhist_greenwood_pd.csv: fuse/greenwood_pd.py data/match/cprr_greenwood_pd_2015_2020.csv data/clean/pprr_post_2020_11_06.csv
+data/fuse/per_greenwood_pd.csv data/fuse/com_greenwood_pd.csv data/fuse/event_greenwood_pd.csv: fuse/greenwood_pd.py data/match/cprr_greenwood_pd_2015_2020.csv data/clean/pprr_post_2020_11_06.csv
 	python fuse/greenwood_pd.py
 
 data/fuse/com_new_orleans_pd.csv data/fuse/uof_new_orleans_pd.csv data/fuse/per_new_orleans_pd.csv data/fuse/event_new_orleans_pd.csv: fuse/new_orleans_pd.py data/clean/pprr_new_orleans_pd_1946_2018.csv data/clean/cprr_new_orleans_pd_1931_2020.csv data/clean/cprr_actions_new_orleans_pd_1931_2020.csv data/clean/uof_new_orleans_pd_2012_2019.csv data/match/post_event_new_orleans_pd.csv
