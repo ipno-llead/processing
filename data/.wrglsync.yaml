@@ -200,8 +200,10 @@ repos:
     fileName: fuse/event_greenwood_pd.csv
     primaryKey:
       - event_uid
-  perhist-st-tammany-so:
-    fileName: fuse/perhist_st_tammany_so.csv
+  event-st-tammany-so:
+    fileName: fuse/event_st_tammany_so.csv
+    primaryKey:
+      - event_uid
   perhist-plaquemines-so:
     fileName: fuse/perhist_plaquemines_so.csv
   perhist-louisiana-state-police:

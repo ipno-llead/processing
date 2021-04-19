@@ -8,7 +8,7 @@ sys.path.append('../')
 
 
 def remove_newlines(df):
-    for col in ['full_name', 'raw_occur_date', 'charges']:
+    for col in ['full_name', 'occur_raw_date', 'charges']:
         df.loc[:, col] = df[col].str.replace(r'(\d)\r\n(\d)', r'\1\2')\
             .str.replace(r'\r\n', ' ')
     return df
@@ -36,9 +36,9 @@ def assign_department_desc(df):
 
 
 def extract_occur_date(df):
-    df.loc[:, 'occur_year'] = df.raw_occur_date.fillna(
+    df.loc[:, 'occur_year'] = df.occur_raw_date.fillna(
         '').str.replace(r'.+(\d{4})$', r'\1')
-    dates = df.raw_occur_date.str.extract(r'^(\d+)\/(\d+)\/\d{4}$')
+    dates = df.occur_raw_date.str.extract(r'^(\d+)\/(\d+)\/\d{4}$')
     df.loc[:, 'occur_month'] = dates[0]
     df.loc[:, 'occur_day'] = dates[1]
     return df
@@ -71,7 +71,7 @@ def clean():
     df = clean_column_names(df)
     df = df.rename(columns={
         'dept': 'department_code',
-        'date_of_incident': 'raw_occur_date',
+        'date_of_incident': 'occur_raw_date',
         'discipline_action_outcome': 'charges'
     })
     df = df\
@@ -84,7 +84,7 @@ def clean():
         .pipe(extract_occur_date)\
         .pipe(assign_agency)\
         .pipe(gen_uid, ['first_name', 'last_name', 'agency'])\
-        .pipe(gen_uid, ['agency', 'raw_occur_date', 'uid'], 'complaint_uid')\
+        .pipe(gen_uid, ['agency', 'occur_raw_date', 'uid'], 'complaint_uid')\
         .pipe(gen_uid, ['complaint_uid', 'charges'], 'charge_uid')\
         .pipe(remove_new_lines_from_charges)
     df = df.drop(columns=['name'])

@@ -2,6 +2,7 @@ from lib.match import (
     ThresholdMatcher, JaroWinklerSimilarity, ColumnsIndex
 )
 from lib.path import data_file_path, ensure_data_dir
+from lib.post import extract_events_from_post
 import pandas as pd
 import sys
 sys.path.append('../')
@@ -9,16 +10,7 @@ sys.path.append('../')
 
 def prepare_post_data():
     post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
-    post = post[post.agency == 'st tammany parish so']
-    duplicated_uids = set(post.loc[post.uid.duplicated(), 'uid'].to_list())
-    post = post.set_index('uid', drop=False)
-    level_1_cert_dates = post.loc[
-        post.uid.isin(duplicated_uids) & (post.level_1_cert_date.notna()),
-        'level_1_cert_date']
-    for idx, value in level_1_cert_dates.iteritems():
-        post.loc[idx, 'level_1_cert_date'] = value
-    post = post.sort_values('last_pc_12_qualification_date', ascending=False)
-    return post[~post.index.duplicated(keep='first')]
+    return post[post.agency == 'st tammany parish so']
 
 
 def match_cprr(cprr, pprr):
@@ -59,13 +51,7 @@ def match_pprr_and_post(pprr, post):
     matcher.save_pairs_to_excel(data_file_path(
         "match/st_tammany_so_pprr_2020_v_post_pprr_2020_11_06.xlsx"), decision)
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
-    match_dict = dict(matches)
-
-    pprr.loc[:, 'level_1_cert_date'] = pprr.uid.map(
-        lambda x: post.loc[match_dict[x], 'level_1_cert_date'] if x in match_dict else '')
-    pprr.loc[:, 'last_pc_12_qualification_date'] = pprr.uid.map(
-        lambda x: post.loc[match_dict[x], 'last_pc_12_qualification_date'] if x in match_dict else '')
-    return pprr
+    return extract_events_from_post(post, matches)
 
 
 def match_cprr_and_post(cprr, post):
@@ -85,13 +71,7 @@ def match_cprr_and_post(cprr, post):
     matcher.save_pairs_to_excel(data_file_path(
         "match/st_tammany_so_cprr_2011_2021_v_post_pprr_2020_11_06.xlsx"), decision)
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
-    match_dict = dict(matches)
-
-    cprr.loc[:, 'level_1_cert_date'] = cprr.uid.map(
-        lambda x: post.loc[match_dict[x], 'level_1_cert_date'] if x in match_dict else '')
-    cprr.loc[:, 'last_pc_12_qualification_date'] = cprr.uid.map(
-        lambda x: post.loc[match_dict[x], 'last_pc_12_qualification_date'] if x in match_dict else '')
-    return cprr
+    return extract_events_from_post(post, matches)
 
 
 if __name__ == '__main__':
@@ -100,10 +80,12 @@ if __name__ == '__main__':
     pprr = pd.read_csv(data_file_path('clean/pprr_st_tammany_so_2020.csv'))
     post = prepare_post_data()
     cprr = match_cprr(cprr, pprr)
-    pprr = match_pprr_and_post(pprr, post)
-    cprr = match_cprr_and_post(cprr, post)
+    post_event = pd.concat([
+        match_pprr_and_post(pprr, post),
+        match_cprr_and_post(cprr, post)
+    ]).drop_duplicates(ignore_index=True)
     ensure_data_dir('match')
     cprr.to_csv(data_file_path(
         'match/cprr_st_tammany_so_2011_2021.csv'), index=False)
-    pprr.to_csv(data_file_path(
-        'match/pprr_st_tammany_so_2020.csv'), index=False)
+    post_event.to_csv(data_file_path(
+        'match/post_event_st_tammany_so_2020.csv'), index=False)
