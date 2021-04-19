@@ -182,7 +182,15 @@ class Builder(object):
         """Extract event records from a DataFrame.
 
         Multiple kinds of event can be extracted. Each defined as a single key in `event_dict`.
-        Each value in `event_dict` is prefix of columns to extract.
+        Each value in `event_dict` is a dictionary with following keys:
+        - prefix: Prefix of columns to extract date from .E.g. if prefix = "hire" then hire_year, hire_month
+          hire_day, hire_time, hire_date, hire_datetime, hire_raw_date are looked up depending on other keys.
+        - keep: List of columns to keep in each event.
+        - drop: Alternatively use "drop" to specify which columns to drop from each event.
+        - parse_date: If set to True then extract date from column "{prefix}_date". If set to a string then
+          it is used as strptime format string.
+        - parse_datetime: Same as "parse_date" but extract from column "{prefix}_datetime" instead. And time
+          is also extracted.
 
         Parameters
         ----------
@@ -191,8 +199,8 @@ class Builder(object):
         event_dict
             Dictionary of event kinds to extract. E.g.:
             {
-                events.COMPLAINT_INCIDENT: "occur",
-                events.COMPLAINT_RECEIVE: "receive",
+                events.COMPLAINT_INCIDENT: {"prefix": "occur", "keep": ["uid", "complaint_uid", "agency"]},
+                events.COMPLAINT_RECEIVE: {"prefix": "receive", "keep": ["uid", "complaint_uid", "agency"]},
                 ...
             }
         """
@@ -235,6 +243,8 @@ class Builder(object):
         ----------
         id_cols
             List of columns to generate `event_uid` with.
+        output_duplicated_events
+            Output duplicated events to file data/duplicates.csv
 
         Raises
         ------
