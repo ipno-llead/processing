@@ -216,8 +216,10 @@ repos:
     fileName: fuse/personnel.csv
     primaryKey:
       - uid
-  personnel_history:
-    fileName: fuse/personnel_history.csv
+  event:
+    fileName: fuse/event.csv
+    primaryKey:
+      - event_uid
   complaint:
     fileName: fuse/complaint.csv
   baton-rouge-da-brady-list:

@@ -1,8 +1,9 @@
 import pandas as pd
 from lib.path import data_file_path
 from lib.columns import (
-    rearrange_personnel_columns, rearrange_personnel_history_columns, rearrange_complaint_columns
+    rearrange_personnel_columns, rearrange_event_columns, rearrange_complaint_columns
 )
+from lib.uid import ensure_uid_unique
 import sys
 sys.path.append("../")
 
@@ -23,20 +24,20 @@ def fuse_personnel():
     ])).sort_values('uid', ignore_index=True)
 
 
-def fuse_personnel_history():
-    return rearrange_personnel_history_columns(pd.concat([
-        pd.read_csv(data_file_path("fuse/perhist_baton_rouge_pd.csv")),
-        pd.read_csv(data_file_path("fuse/perhist_baton_rouge_so.csv")),
-        pd.read_csv(data_file_path("fuse/perhist_new_orleans_harbor_pd.csv")),
-        pd.read_csv(data_file_path("fuse/perhist_new_orleans_pd.csv")),
-        pd.read_csv(data_file_path("fuse/perhist_brusly_pd.csv")),
-        pd.read_csv(data_file_path("fuse/perhist_port_allen_pd.csv")),
-        pd.read_csv(data_file_path("fuse/perhist_madisonville_pd.csv")),
-        pd.read_csv(data_file_path("fuse/perhist_greenwood_pd.csv")),
-        pd.read_csv(data_file_path("fuse/perhist_st_tammany_so.csv")),
-        pd.read_csv(data_file_path("fuse/perhist_plaquemines_so.csv")),
-        pd.read_csv(data_file_path("fuse/perhist_louisiana_state_police.csv")),
-    ])).sort_values(['agency', 'data_production_year', 'perhist_uid'], ignore_index=True)
+def fuse_event():
+    return rearrange_event_columns(pd.concat([
+        pd.read_csv(data_file_path("fuse/event_baton_rouge_pd.csv")),
+        pd.read_csv(data_file_path("fuse/event_baton_rouge_so.csv")),
+        pd.read_csv(data_file_path("fuse/event_new_orleans_harbor_pd.csv")),
+        pd.read_csv(data_file_path("fuse/event_new_orleans_pd.csv")),
+        pd.read_csv(data_file_path("fuse/event_brusly_pd.csv")),
+        pd.read_csv(data_file_path("fuse/event_port_allen_pd.csv")),
+        pd.read_csv(data_file_path("fuse/event_madisonville_pd.csv")),
+        pd.read_csv(data_file_path("fuse/event_greenwood_pd.csv")),
+        pd.read_csv(data_file_path("fuse/event_st_tammany_so.csv")),
+        pd.read_csv(data_file_path("fuse/event_plaquemines_so.csv")),
+        pd.read_csv(data_file_path("fuse/event_louisiana_state_police.csv")),
+    ])).sort_values(['agency', 'event_uid'], ignore_index=True)
 
 
 def fuse_complaint():
@@ -56,9 +57,11 @@ def fuse_complaint():
 
 if __name__ == "__main__":
     per_df = fuse_personnel()
-    perhist_df = fuse_personnel_history()
+    ensure_uid_unique(per_df, 'uid')
+    event_df = fuse_event()
+    ensure_uid_unique(event_df, 'event_uid')
     com_df = fuse_complaint()
     per_df.to_csv(data_file_path("fuse/personnel.csv"), index=False)
-    perhist_df.to_csv(data_file_path(
-        "fuse/personnel_history.csv"), index=False)
+    event_df.to_csv(data_file_path(
+        "fuse/event.csv"), index=False)
     com_df.to_csv(data_file_path("fuse/complaint.csv"), index=False)
