@@ -61,6 +61,8 @@ if __name__ == "__main__":
     event_df = fuse_event()
     ensure_uid_unique(event_df, 'event_uid')
     com_df = fuse_complaint()
+    ensure_uid_unique(
+        com_df, ['complaint_uid', 'allegation_uid', 'charge_uid'])
     per_df.to_csv(data_file_path("fuse/personnel.csv"), index=False)
     event_df.to_csv(data_file_path(
         "fuse/event.csv"), index=False)

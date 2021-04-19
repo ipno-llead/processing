@@ -21,11 +21,13 @@ def gen_uid(df, id_cols, uid_name="uid"):
     return df
 
 
-def ensure_uid_unique(df, uid_col, output_csv=False):
-    if df[df[uid_col].duplicated()].shape[0] == 0:
+def ensure_uid_unique(df, uid_cols, output_csv=False):
+    if type(uid_cols) == str:
+        uid_cols = [uid_cols]
+    if df[df[uid_cols].duplicated()].shape[0] == 0:
         return
-    dup_df = df[df[uid_col].duplicated(keep=False)]\
-        .dropna(axis=1, how='all').sort_values(uid_col)
+    dup_df = df[df[uid_cols].duplicated(keep=False)]\
+        .dropna(axis=1, how='all').sort_values(uid_cols)
     if output_csv:
         dup_df.to_csv(data_file_path('duplicates.csv'), index=False)
     raise NonUniqueUIDException(

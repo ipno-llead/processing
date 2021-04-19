@@ -222,6 +222,10 @@ repos:
       - event_uid
   complaint:
     fileName: fuse/complaint.csv
+    primaryKey:
+      - complaint_uid
+      - allegation_uid
+      - charge_uid
   baton-rouge-da-brady-list:
     fileName: match/cprr_baton_rouge_da_2021.csv
 commit:

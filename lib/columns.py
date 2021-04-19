@@ -202,6 +202,8 @@ def rearrange_event_columns(df):
             "month",
             "day",
             "years_employed",
+            "department_code",
+            "rank_code"
         ])
 
 
