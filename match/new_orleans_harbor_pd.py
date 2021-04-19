@@ -3,7 +3,7 @@ from lib.uid import gen_uid
 from lib.match import (
     ThresholdMatcher, ColumnsIndex, JaroWinklerSimilarity
 )
-from lib.post import keep_latest_row_for_each_post_officer
+from lib.post import extract_events_from_post
 import pandas as pd
 import sys
 sys.path.append("../")
@@ -11,8 +11,7 @@ sys.path.append("../")
 
 def prepare_post_data():
     post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
-    post = post[post.agency == 'new orleans harbor pd']
-    return keep_latest_row_for_each_post_officer(post)
+    return post[post.agency == 'new orleans harbor pd']
 
 
 def match_uid_with_cprr(cprr, pprr):
@@ -62,13 +61,7 @@ def match_pprr_and_post(pprr, post):
     matcher.save_pairs_to_excel(data_file_path(
         "match/new_orleans_harbor_pd_pprr_2020_v_post_pprr_2020_11_06.xlsx"), decision)
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
-    match_dict = dict(matches)
-
-    pprr.loc[:, 'level_1_cert_date'] = pprr.uid.map(
-        lambda x: post.loc[match_dict[x], 'level_1_cert_date'] if x in match_dict else '')
-    pprr.loc[:, 'last_pc_12_qualification_date'] = pprr.uid.map(
-        lambda x: post.loc[match_dict[x], 'last_pc_12_qualification_date'] if x in match_dict else '')
-    return pprr
+    return extract_events_from_post(post, matches)
 
 
 if __name__ == "__main__":
@@ -78,11 +71,11 @@ if __name__ == "__main__":
         "clean/pprr_new_orleans_harbor_pd_2020.csv"))
     post = prepare_post_data()
     cprr = match_uid_with_cprr(cprr, pprr20)
-    pprr20 = match_pprr_and_post(pprr20, post)
+    post_event = match_pprr_and_post(pprr20, post)
     ensure_data_dir("match")
     cprr.to_csv(
         data_file_path("match/cprr_new_orleans_harbor_pd_2020.csv"),
         index=False)
-    pprr20.to_csv(
-        data_file_path("match/pprr_new_orleans_harbor_pd_2020.csv"),
+    post_event.to_csv(
+        data_file_path("match/post_event_new_orleans_harbor_pd_2020.csv"),
         index=False)

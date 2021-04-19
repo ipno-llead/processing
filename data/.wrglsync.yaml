@@ -184,10 +184,10 @@ repos:
     fileName: fuse/event_baton_rouge_so.csv
     primaryKey:
       - event_uid
-  perhist-new-orleans-harbor-pd:
-    fileName: fuse/perhist_new_orleans_harbor_pd.csv
+  event-new-orleans-harbor-pd:
+    fileName: fuse/event_new_orleans_harbor_pd.csv
     primaryKey:
-      - perhist_uid
+      - event_uid
   event-brusly-pd:
     fileName: fuse/event_brusly_pd.csv
     primaryKey:
