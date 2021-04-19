@@ -18,7 +18,7 @@ def prepare_post_data():
 def fuse_events(cprr, post):
     builder = events.Builder()
     builder.extract_events(cprr, {
-        events.OFFICER_RANK: {'prefix': 'rank', 'keep': ['uid', 'agency']},
+        events.OFFICER_RANK: {'prefix': 'rank', 'keep': ['uid', 'agency', 'badge_no', 'rank_desc']},
         events.COMPLAINT_INCIDENT: {'prefix': 'occur', 'keep': ['uid', 'agency', 'complaint_uid']},
     })
     builder.extract_events(post, {
