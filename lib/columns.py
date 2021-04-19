@@ -55,7 +55,12 @@ COMPLAINT_COLUMNS = [
     "agency",  # name of agency (e.g. "New Orleans CSD")
     "incident_type",
     "supervisor_uid",
-    "supervisor_rank"
+    "supervisor_rank",
+    "badge_no",  # badge number
+    "department_code",  # department code or id
+    "department_desc",  # department title or description
+    "rank_code",  # rank code
+    "rank_desc",  # rank title or description
     # "Complaint Classification",  # ?
     # "Bureau of Complainant",  # ?
     # "Division of Complainant",  # ?
