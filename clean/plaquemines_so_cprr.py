@@ -31,8 +31,8 @@ def clean():
     })
     return df\
         .pipe(gen_middle_initial)\
-        .pipe(clean_names, ['first_name', 'last_name', 'middle_name', 'middle_initial'])\
         .pipe(assign_agency)\
+        .pipe(clean_names, ['first_name', 'last_name', 'middle_name', 'middle_initial'])\
         .pipe(gen_uid, ['agency', 'first_name', 'last_name', 'middle_name', 'middle_initial'])\
         .pipe(gen_uid, ['agency', 'tracking_number'], 'complaint_uid')
 

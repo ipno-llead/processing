@@ -17,10 +17,10 @@ def clean_pprr_20():
     return pd.read_csv(data_file_path('mandeville_pd/mandeville_csd_pprr_2020.csv'))\
         .pipe(clean_column_names)\
         .pipe(float_to_int_str, ['term_year', 'term_day', 'term_month', 'hire_year', 'hire_day', 'hire_month'])\
-        .pipe(clean_names, ['first_name', 'last_name'])\
         .pipe(standardize_desc_cols, ['rank_desc'])\
         .pipe(clean_salaries, ['annual_salary'])\
         .pipe(assign_agency, 2020)\
+        .pipe(clean_names, ['first_name', 'last_name'])\
         .pipe(gen_uid, ['agency', 'badge_no', 'first_name', 'last_name'])
 
 
@@ -35,6 +35,7 @@ def clean_cprr_19():
         .pipe(float_to_int_str, ['occur_year', 'occur_month', 'occur_day'])\
         .pipe(standardize_desc_cols, ['rank_desc', 'charges', 'disposition'])\
         .pipe(assign_agency, 2020)\
+        .pipe(clean_names, ['last_name'])\
         .pipe(gen_uid, ['agency', 'rank_desc', 'last_name'])\
         .pipe(gen_uid, ['agency', 'tracking_number'], 'complaint_uid')
 

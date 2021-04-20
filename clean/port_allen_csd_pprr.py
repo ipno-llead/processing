@@ -58,8 +58,7 @@ def clean():
         .pipe(standardize_desc_cols, ['rank_desc'])\
         .pipe(fix_typo)\
         .pipe(assign_agency)\
-        .pipe(gen_uid, ['agency', 'employee_id'])\
-        .pipe(gen_uid, ['uid', 'hire_year', 'hire_month', 'hire_day'], 'perhist_uid')
+        .pipe(gen_uid, ['agency', 'employee_id'])
 
 
 if __name__ == '__main__':

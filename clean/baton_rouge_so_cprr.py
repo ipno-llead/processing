@@ -2,7 +2,7 @@ from lib.columns import clean_column_names
 from lib.uid import gen_uid
 from lib.path import data_file_path, ensure_data_dir
 from lib.clean import (
-    clean_name, standardize_desc_cols, clean_dates, clean_sexes, clean_races, clean_datetimes
+    clean_names, standardize_desc_cols, clean_dates, clean_sexes, clean_races, clean_datetimes
 )
 import pandas as pd
 import sys
@@ -13,9 +13,9 @@ def split_name(df):
     names1 = df.name.str.strip().str.replace(
         r"^(\w+(?: \w\.)?) (\w+(?:, \w{2}\.)?)$", r"\1@@\2").str.split("@@", expand=True)
     names2 = names1.iloc[:, 0].str.split(" ", expand=True)
-    df.loc[:, "first_name"] = clean_name(names2.iloc[:, 0])
-    df.loc[:, "middle_initial"] = clean_name(names2.iloc[:, 1])
-    df.loc[:, "last_name"] = clean_name(names1.iloc[:, 1])
+    df.loc[:, "first_name"] = names2.iloc[:, 0]
+    df.loc[:, "middle_initial"] = names2.iloc[:, 1]
+    df.loc[:, "last_name"] = names1.iloc[:, 1]
     df = df.drop(columns=["name"])
     return df
 
@@ -66,6 +66,7 @@ def clean18():
         .pipe(clean_datetimes, ["occur_datetime"])\
         .pipe(clean_action)\
         .pipe(assign_cols)\
+        .pipe(clean_names, ['first_name', 'last_name', 'middle_initial'])\
         .pipe(gen_uid, ["agency", "first_name", "last_name", "birth_year", "badge_no"])\
         .pipe(gen_uid, ['agency', 'uid', 'occur_year', 'occur_month', 'occur_day'], 'complaint_uid')
     return df

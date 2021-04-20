@@ -30,12 +30,12 @@ def clean():
     df.loc[:, 'data_production_year'] = '2020'
     df = df.dropna(0, "all", subset=["first_name"])
     df = df\
-        .pipe(clean_names, ["first_name", "last_name"])\
         .pipe(standardize_agency)\
         .pipe(standardize_desc_cols, ["employment_status"])\
         .pipe(clean_dates, ["hire_date"])\
         .pipe(replace_impossible_dates)\
         .pipe(clean_dates, ['level_1_cert_date', 'last_pc_12_qualification_date'], expand=False)\
+        .pipe(clean_names, ["first_name", "last_name"])\
         .pipe(gen_uid, ['agency', 'last_name', 'first_name', 'hire_year', 'hire_month', 'hire_day'])
     return df
 

@@ -39,10 +39,10 @@ def clean():
     df = df\
         .pipe(swap_names)\
         .pipe(extract_complainant_gender)\
-        .pipe(clean_names, ["first_name", "last_name", "complainant_name"])\
         .pipe(clean_dates, ["occur_date"])\
         .pipe(standardize_desc_cols, ["rank_desc"])\
         .pipe(assign_agency)\
+        .pipe(clean_names, ["first_name", "last_name", "complainant_name"])\
         .pipe(gen_uid, ['agency', 'tracking_number'], 'complaint_uid')
     return df
 

@@ -50,11 +50,11 @@ def clean():
         })\
         .drop(columns=['commission_number'])\
         .pipe(extract_name)\
-        .pipe(clean_names, ['first_name', 'last_name', 'middle_name'])\
         .pipe(clean_salaries, ['annual_salary'])\
         .pipe(standardize_desc_cols, ['rank_desc'])\
         .pipe(assign_agency)\
         .pipe(clean_dates, ['hire_date'])\
+        .pipe(clean_names, ['first_name', 'last_name', 'middle_name'])\
         .pipe(gen_uid, ['agency', 'first_name', 'last_name', 'middle_name', 'employee_id'])
 
 

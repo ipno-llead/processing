@@ -400,13 +400,13 @@ def clean():
         .pipe(split_rows_with_multiple_appellants)\
         .pipe(drop_invalid_rows)\
         .pipe(split_appellant_names)\
+        .pipe(assign_agency)\
         .pipe(clean_names, ["first_name",  "last_name", "counsel"])\
         .pipe(clean_resolution)\
         .pipe(remove_invalid_rows)\
         .pipe(assign_counsel_for_empty_rows)\
         .pipe(clean_action)\
         .pipe(condense_rows_with_same_docket_no)\
-        .pipe(assign_agency)\
         .pipe(gen_uid, ["agency", "first_name", "last_name", "middle_name", "middle_initial"])\
         .pipe(gen_uid, ['uid', 'docket_no'], 'appeal_uid')\
         .pipe(gen_uid, ['appeal_uid', 'hearing_year', 'hearing_month', 'hearing_day', 'resolution'], 'resolution_uid')

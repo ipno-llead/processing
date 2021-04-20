@@ -61,10 +61,10 @@ def clean():
     df = df\
         .pipe(float_to_int_str, ["badge_no"])\
         .pipe(split_names)\
-        .pipe(clean_names, ["first_name", "last_name"])\
         .pipe(clean_dates, ["hire_date"])\
         .pipe(split_rows_by_salary)\
         .pipe(assign_agency)\
+        .pipe(clean_names, ["first_name", "last_name"])\
         .pipe(gen_uid, ["agency", "first_name", "last_name", "badge_no"])\
         .pipe(gen_uid, ['uid', 'pay_effective_year'], 'perhist_uid')
     return df

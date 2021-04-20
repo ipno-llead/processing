@@ -24,11 +24,11 @@ def clean():
         'year_of_birth': 'birth_year'
     })
     return df\
-        .pipe(clean_names, ['first_name', 'last_name'])\
         .pipe(float_to_int_str, ['birth_year'])\
         .pipe(standardize_desc_cols, ['rank_desc'])\
         .pipe(clean_dates, ['hire_date', 'term_date'])\
         .pipe(assign_agency)\
+        .pipe(clean_names, ['first_name', 'last_name'])\
         .pipe(gen_uid, ['agency', 'employee_id', 'first_name', 'last_name', 'birth_year'])\
         .pipe(gen_uid, ['uid', 'hire_year', 'hire_month', 'hire_day'], 'perhist_uid')
 

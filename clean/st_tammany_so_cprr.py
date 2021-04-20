@@ -76,13 +76,13 @@ def clean():
     })
     df = df\
         .pipe(split_names, "name")\
-        .pipe(clean_names, ['first_name', 'last_name', 'middle_name'])\
-        .pipe(gen_middle_initial)\
         .pipe(float_to_int_str, ["department_code"])\
         .pipe(pad_dept_code)\
         .pipe(assign_department_desc)\
         .pipe(extract_occur_date)\
         .pipe(assign_agency)\
+        .pipe(clean_names, ['first_name', 'last_name', 'middle_name'])\
+        .pipe(gen_middle_initial)\
         .pipe(gen_uid, ['first_name', 'last_name', 'agency'])\
         .pipe(gen_uid, ['agency', 'occur_raw_date', 'uid'], 'complaint_uid')\
         .pipe(gen_uid, ['complaint_uid', 'charges'], 'charge_uid')\

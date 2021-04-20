@@ -62,15 +62,14 @@ def clean_17():
     })
     df.loc[:, "data_production_year"] = "2017"
     df = df\
-        .pipe(clean_names, ["first_name", "last_name", "middle_initial"])\
         .pipe(clean_salaries, ["annual_salary"])\
         .pipe(standardize_desc_cols, ["department_desc", "rank_desc"])\
         .pipe(parse_dates_with_known_format, ["hire_date", "resign_date"], "%m/%d/%Y")\
         .pipe(assign_agency)\
+        .pipe(clean_names, ["first_name", "last_name", "middle_initial"])\
         .pipe(gen_uid, [
             "agency", "data_production_year", "first_name", "last_name", "middle_initial"])\
-        .pipe(assign_rank_year_and_pay_year)\
-        .pipe(gen_uid, ['uid', 'year', 'pay_effective_year', 'rank_year', 'dept_year'], 'perhist_uid')
+        .pipe(assign_rank_year_and_pay_year)
     return df
 
 
@@ -97,15 +96,14 @@ def clean_19():
     df.loc[:, "data_production_year"] = "2019"
     df = df.drop_duplicates()
     df = df\
-        .pipe(clean_names, ["first_name", "last_name", "middle_initial"])\
         .pipe(clean_salaries, ["annual_salary"])\
         .pipe(standardize_desc_cols, ["department_desc", "rank_desc"])\
         .pipe(parse_dates_with_known_format, ["hire_date", "resign_date"], "%m/%d/%Y")\
         .pipe(clean_employment_status, ["employment_status"])\
         .pipe(assign_agency)\
+        .pipe(clean_names, ["first_name", "last_name", "middle_initial"])\
         .pipe(gen_uid, ["agency", "data_production_year", "employee_id"])\
-        .pipe(assign_rank_year_and_pay_year)\
-        .pipe(gen_uid, ['uid', 'year', 'pay_effective_year', 'rank_year', 'dept_year'], 'perhist_uid')
+        .pipe(assign_rank_year_and_pay_year)
     return df
 
 

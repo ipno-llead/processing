@@ -68,11 +68,11 @@ def clean_pprr():
     df = df.drop(columns=['company_name', 'department_name'])
     df = df\
         .pipe(split_pprr_name)\
-        .pipe(clean_names, ['first_name', 'last_name', 'middle_initial'])\
         .pipe(clean_dates, ['birth_date', 'hire_date', 'term_date'])\
         .pipe(standardize_desc_cols, ["rank_desc"])\
         .pipe(clean_salaries, ["annual_salary"])\
         .pipe(assign_agency)\
+        .pipe(clean_names, ['first_name', 'last_name', 'middle_initial'])\
         .pipe(gen_uid, [
             "agency", "last_name", "first_name", "middle_initial", "birth_year", "birth_month", "birth_day"
         ])\

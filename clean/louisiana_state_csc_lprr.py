@@ -167,11 +167,11 @@ def clean():
         .pipe(split_appellant_column)\
         .pipe(split_rows_with_multiple_docket_no)\
         .pipe(assign_additional_appellant_names)\
-        .pipe(clean_names, ['first_name', 'middle_initial', 'last_name'])\
         .pipe(clean_dates, ['filed_date', 'rendered_date'])\
         .pipe(correct_docket_no)\
         .pipe(clean_resolution)\
         .pipe(assign_agency)\
+        .pipe(clean_names, ['first_name', 'middle_initial', 'last_name'])\
         .pipe(gen_uid, ['agency', 'first_name', 'middle_initial', 'last_name'])\
         .pipe(gen_uid, ['agency', 'docket_no', 'uid'], 'appeal_uid')\
         .pipe(assign_charging_supervisor)

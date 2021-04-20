@@ -50,13 +50,12 @@ def clean_personnel_2008():
         "term_date": "resign_date",
     })
     return df\
-        .pipe(clean_names, ["first_name", "last_name", "middle_initial"])\
         .pipe(standardize_desc_cols, ["rank_desc"])\
         .pipe(clean_salaries, ["hourly_salary"])\
         .pipe(assign_agency, 2008)\
+        .pipe(clean_names, ["first_name", "last_name", "middle_initial"])\
         .pipe(gen_uid, ['agency', 'first_name', 'last_name', 'middle_initial'])\
         .pipe(assign_pay_date_and_rank_date)\
-        .pipe(gen_uid, ['uid', 'pay_effective_date', 'rank_date'], 'perhist_uid')\
         .pipe(clean_dates, ["hire_date", "resign_date", "pay_effective_date", "rank_date"])
 
 
@@ -77,10 +76,10 @@ def clean_personnel_2020():
     }, inplace=True)
     df = df.drop_duplicates(ignore_index=True)
     return df\
-        .pipe(clean_names, ["last_name", "middle_initial", "first_name"])\
         .pipe(clean_salaries, ['hourly_salary'])\
         .pipe(standardize_desc_cols, ['rank_desc'])\
         .pipe(assign_agency, 2020)\
+        .pipe(clean_names, ["last_name", "middle_initial", "first_name"])\
         .pipe(gen_uid, [
             "agency", "first_name", "last_name", "middle_initial", "hire_date"
         ])\
