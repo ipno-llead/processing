@@ -20,16 +20,16 @@ def fuse_events(csd_pprr_17, csd_pprr_19, pd_cprr_18, lprr):
         events.OFFICER_PAY_EFFECTIVE: {'prefix': 'pay_effective', 'keep': [
             'uid', 'agency', 'hourly_salary', 'yearly_salary']},
         events.OFFICER_RANK: {'prefix': 'rank', 'keep': [
-            'uid', 'agency', 'rank_code', 'rank_description']},
+            'uid', 'agency', 'rank_code', 'rank_desc']},
         events.OFFICER_DEPT: {'prefix': 'dept', 'keep': [
-            'uid', 'agency', 'department_code', 'department_description']},
+            'uid', 'agency', 'department_code', 'department_desc']},
     })
     builder.extract_events(csd_pprr_19, {
         events.OFFICER_HIRE: {'prefix': 'hire', 'keep': ['uid', 'agency']},
         events.OFFICER_LEFT: {'prefix': 'resign', 'keep': ['uid', 'agency']},
         events.OFFICER_PAY_EFFECTIVE: {'prefix': 'pay_effective', 'keep': ['uid', 'agency', 'yearly_salary']},
-        events.OFFICER_RANK: {'prefix': 'rank', 'keep': ['uid', 'agency', 'rank_code', 'rank_description']},
-        events.OFFICER_DEPT: {'prefix': 'dept', 'keep': ['uid', 'agency', 'department_code', 'department_description']},
+        events.OFFICER_RANK: {'prefix': 'rank', 'keep': ['uid', 'agency', 'rank_code', 'rank_desc']},
+        events.OFFICER_DEPT: {'prefix': 'dept', 'keep': ['uid', 'agency', 'department_code', 'department_desc']},
     })
     builder.extract_events(pd_cprr_18, {
         events.COMPLAINT_RECEIVE: {'prefix': 'receive', 'keep': ['uid', 'agency', 'complaint_uid']},
