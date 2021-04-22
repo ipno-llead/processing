@@ -112,6 +112,10 @@ repos:
     fileName: fuse/com_plaquemines_so.csv
     primaryKey:
       - complaint_uid
+  com-mandeville-pd:
+    fileName: fuse/com_mandeville_pd.csv
+    primaryKey:
+      - complaint_uid
   uof-new-orleans-pd:
     fileName: fuse/uof_new_orleans_pd.csv
     primaryKey:
@@ -172,6 +176,10 @@ repos:
     fileName: fuse/per_caddo_parish_so.csv
     primaryKey:
       - uid
+  per-mandeville-pd:
+    fileName: fuse/per_mandeville_pd.csv
+    primaryKey:
+      - uid
   event-new-orleans-pd:
     fileName: fuse/event_new_orleans_pd.csv
     primaryKey:
@@ -218,6 +226,10 @@ repos:
       - event_uid
   event-caddo-parish-so:
     fileName: fuse/event_caddo_parish_so.csv
+    primaryKey:
+      - event_uid
+  event-mandeville-pd:
+    fileName: fuse/event_mandeville_pd.csv
     primaryKey:
       - event_uid
   personnel:

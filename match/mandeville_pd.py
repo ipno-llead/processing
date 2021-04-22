@@ -3,26 +3,34 @@ from lib.match import (
 )
 from lib.date import combine_date_columns
 from lib.path import data_file_path, ensure_data_dir
-from lib.post import prepare_post
+from lib.post import extract_events_from_post
 import pandas as pd
 import sys
 sys.path.append('../')
 
 
 def match_cprr_with_pprr(cprr, pprr):
-    dfa = cprr[['uid', 'last_name', 'rank_desc']].drop_duplicates()\
+    dfa = cprr[['uid', 'first_name', 'last_name', 'rank_desc']].drop_duplicates()\
         .set_index('uid', drop=True)
-    dfa.loc[:, 'fc'] = dfa.last_name.fillna('').map(lambda x: x[:1])
+    dfa.loc[:, 'fc'] = dfa.first_name.fillna('').map(lambda x: x[:1])
 
-    dfb = pprr[['uid', 'last_name', 'rank_desc']].drop_duplicates()\
+    dfb = pprr[['uid', 'first_name', 'last_name', 'rank_desc']].drop_duplicates()\
         .set_index('uid', drop=True)
-    dfb.loc[:, 'fc'] = dfb.last_name.fillna('').map(lambda x: x[:1])
+    dfb.loc[:, 'fc'] = dfb.first_name.fillna('').map(lambda x: x[:1])
 
     matcher = ThresholdMatcher(dfa, dfb, ColumnsIndex(['fc']), {
+        'first_name': JaroWinklerSimilarity(),
         'last_name': JaroWinklerSimilarity(),
         'rank_desc': StringSimilarity(),
     })
-    return matcher
+    decision = 0.9
+    matcher.save_pairs_to_excel(data_file_path(
+        "match/mandeville_csd_pprr_2020_v_post_pprr_2020_11_06.xlsx"), decision)
+    matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
+    match_dict = dict(matches)
+
+    cprr.loc[:, 'uid'] = cprr.uid.map(lambda x: match_dict.get(x, x))
+    return cprr
 
 
 def match_pprr_against_post(pprr, post):
@@ -47,19 +55,19 @@ def match_pprr_against_post(pprr, post):
     matcher.save_pairs_to_excel(data_file_path(
         "match/mandeville_csd_pprr_2020_v_post_pprr_2020_11_06.xlsx"), decision)
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
-    match_dict = dict(matches)
-
-    pprr.loc[:, 'level_1_cert_date'] = pprr.uid.map(
-        lambda x: post.loc[match_dict[x], 'level_1_cert_date'] if x in match_dict else '')
-    pprr.loc[:, 'last_pc_12_qualification_date'] = pprr.uid.map(
-        lambda x: post.loc[match_dict[x], 'last_pc_12_qualification_date'] if x in match_dict else '')
-    return pprr
+    return extract_events_from_post(post, matches)
 
 
 if __name__ == '__main__':
-    post = prepare_post('mandeville pd')
-    pprr = pd.read_csv(data_file_path('clean/mandeville_csd_pprr_2020.csv'))
-    pprr = match_pprr_against_post(pprr, post)
+    post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
+    post = post[post.agency == 'mandeville pd']
+    cprr = pd.read_csv(data_file_path(
+        "clean/cprr_mandeville_pd_2019.csv"))
+    pprr = pd.read_csv(data_file_path('clean/pprr_mandeville_csd_2020.csv'))
+    post_event = match_pprr_against_post(pprr, post)
+    cprr = match_cprr_with_pprr(cprr, pprr)
     ensure_data_dir('match')
-    pprr.to_csv(data_file_path(
-        'match/mandeville_csd_pprr_2020.csv'), index=False)
+    post_event.to_csv(data_file_path(
+        'match/post_event_mandeville_pd_2019.csv'), index=False)
+    cprr.to_csv(data_file_path(
+        'match/cprr_mandeville_pd_2019.csv'), index=False)

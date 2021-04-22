@@ -45,6 +45,6 @@ if __name__ == '__main__':
     cprr = clean_cprr_19()
     ensure_data_dir("clean")
     pprr.to_csv(data_file_path(
-        "clean/mandeville_csd_pprr_2020.csv"), index=False)
+        "clean/pprr_mandeville_csd_2020.csv"), index=False)
     cprr.to_csv(data_file_path(
-        "clean/mandeville_pd_cprr_2019_byhand.csv"), index=False)
+        "clean/cprr_mandeville_pd_2019.csv"), index=False)
