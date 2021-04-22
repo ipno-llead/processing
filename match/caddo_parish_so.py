@@ -27,7 +27,7 @@ def match_pprr_against_post(pprr, post):
         'last_name': JaroWinklerSimilarity(),
         'hire_date': DateSimilarity()
     })
-    decision = 0.88
+    decision = 0.793
     matcher.save_pairs_to_excel(data_file_path(
         "match/caddo_parish_so_pprr_2020_v_post.xlsx"), decision)
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
