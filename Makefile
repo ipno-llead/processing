@@ -173,3 +173,6 @@ data/clean/pprr_mandeville_csd_2020.csv data/clean/cprr_mandeville_pd_2019.csv: 
 
 data/clean/pprr_caddo_parish_so_2020.csv: clean/caddo_parish_so_pprr.py data/caddo_parish_so/caddo_parish_so_pprr_2020.csv
 	python clean/caddo_parish_so_pprr.py
+
+data/clean/pprr_louisiana_csd_2021.csv: clean/louisiana_csd_pprr_2021.py data/louisiana_csd/louisiana_csd_pprr_2021.csv
+	python clean/louisiana_csd_pprr_2021.py

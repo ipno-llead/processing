@@ -58,6 +58,9 @@ DATA_FILES = {
         "https://www.dropbox.com/s/h0ordt45fsaq4p5/colonel_full_names.csv?dl=1",  # noqa
         "https://www.dropbox.com/s/5n72txx1us8k07r/la_lprr_appellants.csv?dl=1",  # noqa
     ],
+    "louisiana_csd": [
+        "https://www.dropbox.com/sh/tca7uxdcm2fqbgq/AAACRDPB2CJJoAcmR2Ws6KAsa/Louisiana_CSD_PPRR_2021.csv?dl=1",  # noqa
+    ],
     "brusly_pd": [
         "https://www.dropbox.com/sh/s3qchv84i0j5tsd/AAAx1lt_f2iqEERkEjK7wj2_a/Complaints%20Data/Brusly_PD_CPRR_2020.csv?dl=1",  # noqa
         "https://www.dropbox.com/sh/0t6dvicvhztbtya/AAACRW8-Smg0C7TdfMHtHUxua/Brusly_PD_PPRR_2020.csv?dl=1"  # noqa
