@@ -61,6 +61,7 @@ COMPLAINT_COLUMNS = [
     "department_desc",  # department title or description
     "rank_code",  # rank code
     "rank_desc",  # rank title or description
+    "employment_status",
     # "Complaint Classification",  # ?
     # "Bureau of Complainant",  # ?
     # "Division of Complainant",  # ?
@@ -182,6 +183,7 @@ def clean_column_names(df):
 
 def rearrange_personnel_columns(df):
     existing_cols = set(df.columns)
+    df = df[df.uid.notna() & (df.uid != '')]
     df = df[[col for col in PERSONNEL_COLUMNS if col in existing_cols]]\
         .drop_duplicates(ignore_index=True)
     return df\

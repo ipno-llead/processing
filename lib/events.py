@@ -20,6 +20,7 @@ OFFICER_PAY_EFFECTIVE = "officer_pay_effective"
 COMPLAINT_INCIDENT = "complaint_incident"
 COMPLAINT_RECEIVE = "complaint_receive"
 ALLEGATION_CREATE = "allegation_create"
+INVESTIGATION_START = "investigation_start"
 INVESTIGATION_COMPLETE = "investigation_complete"
 SUSPENSION_START = "suspension_start"
 SUSPENSION_END = "suspension_end"
@@ -48,6 +49,7 @@ cat_type = CategoricalDtype(categories=[
     COMPLAINT_INCIDENT,
     COMPLAINT_RECEIVE,
     ALLEGATION_CREATE,
+    INVESTIGATION_START,
     INVESTIGATION_COMPLETE,
     SUSPENSION_START,
     SUSPENSION_END,

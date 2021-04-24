@@ -21,6 +21,9 @@ def fuse_personnel():
         pd.read_csv(data_file_path("fuse/per_st_tammany_so.csv")),
         pd.read_csv(data_file_path("fuse/per_plaquemines_so.csv")),
         pd.read_csv(data_file_path("fuse/per_louisiana_state_police.csv")),
+        pd.read_csv(data_file_path("fuse/per_caddo_parish_so.csv")),
+        pd.read_csv(data_file_path("fuse/per_mandeville_pd.csv")),
+        pd.read_csv(data_file_path("fuse/per_levee_pd.csv")),
     ])).sort_values('uid', ignore_index=True)
 
 
@@ -36,7 +39,9 @@ def fuse_event():
         pd.read_csv(data_file_path("fuse/event_greenwood_pd.csv")),
         pd.read_csv(data_file_path("fuse/event_st_tammany_so.csv")),
         pd.read_csv(data_file_path("fuse/event_plaquemines_so.csv")),
-        pd.read_csv(data_file_path("fuse/event_louisiana_state_police.csv")),
+        pd.read_csv(data_file_path("fuse/event_caddo_parish_so.csv")),
+        pd.read_csv(data_file_path("fuse/event_mandeville_pd.csv")),
+        pd.read_csv(data_file_path("fuse/event_levee_pd.csv")),
     ])).sort_values(['agency', 'event_uid'], ignore_index=True)
 
 
@@ -52,6 +57,8 @@ def fuse_complaint():
         pd.read_csv(data_file_path("fuse/com_new_orleans_pd.csv")),
         pd.read_csv(data_file_path("fuse/com_st_tammany_so.csv")),
         pd.read_csv(data_file_path("fuse/com_plaquemines_so.csv")),
+        pd.read_csv(data_file_path("fuse/com_mandeville_pd.csv")),
+        pd.read_csv(data_file_path("fuse/com_levee_pd.csv")),
     ])).sort_values(['agency', 'data_production_year', 'tracking_number'], ignore_index=True)
 
 

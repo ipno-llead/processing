@@ -114,6 +114,9 @@ DATA_FILES = {
     ],
     "caddo_parish_so": [
         "https://www.dropbox.com/sh/8w4uff2emzbhcvr/AAC4YdwWdPudXeH4pdDvl-Fpa/Caddo%20Parish_SO_PPRR_2020.csv?dl=1",  # noqa
+    ],
+    "levee_pd": [
+        "https://www.dropbox.com/sh/d1j6djl9jb7jvx3/AAB5DDSmd4Uo247gktnG3A9Za/Log%20Records/levee_pd_cprr_2020.csv?dl=1",  # noqa
     ]
 }
 _current_dir = os.path.dirname(os.path.realpath(__file__))
