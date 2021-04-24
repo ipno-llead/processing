@@ -13,12 +13,15 @@ def remove_header_rows(df):
 
 
 def rename_columns(df):
-    df = df.drop(columns=['month', 'quarter', 'numb_er_of_cases'])
+    df = df.drop(columns=[
+        'month', 'quarter', 'numb_er_of_cases', 'related_item_number'])
     df = df.rename(columns={
         'date_received': 'receive_date',
         'case_number': 'tracking_number',
         'job_title': 'rank_desc',
-        'charge_disposition': 'disposition'
+        'charge_disposition': 'disposition',
+        'location_or_facility': 'department_desc',
+        'assigned_agent': 'investigating_supervisor'
     })
     return df
 
@@ -31,13 +34,13 @@ def remove_carriage_return(df, cols):
 
 
 def split_name(df):
-    names = df.name_of_accused.str.strip()\
-        .str.replace(r"^([\w'-]+) ([-\w']+(?: Jr\.)?)$", r"\1@@\2").str.split("@@", expand=True)
-    df.loc[:, "last_name"] = names[1].fillna('')
-    names = names[0].str.split(" ", expand=True)
-    df.loc[:, "first_name"] = names[0].fillna('')
-    df.loc[:, "middle_initial"] = names[1].fillna('')
-    return df
+    series = df.name_of_accused.fillna('').str.strip()
+    for col, pat in [('first_name', r"^([\w'-]+)(.*)$"), ('middle_initial', r'^(\w\.) (.*)$')]:
+        names = series[series.str.match(pat)].str.extract(pat)
+        df.loc[series.str.match(pat), col] = names[0]
+        series = series.str.replace(pat, r'\2').str.strip()
+    df.loc[:, 'last_name'] = series
+    return df.drop(columns=['name_of_accused'])
 
 
 def clean():
@@ -48,7 +51,8 @@ def clean():
         .pipe(remove_header_rows)\
         .pipe(rename_columns)\
         .pipe(remove_carriage_return, [
-            'name_of_accused', 'disposition', 'charges', 'summary', 'assigned_agent',
+            'name_of_accused', 'disposition', 'charges', 'summary', 'investigating_supervisor',
             'terminated_resigned'
         ])\
-        .pipe(split_name)
+        .pipe(split_name)\
+        .pipe(clean_names, ['first_name', 'last_name', 'middle_initial'])
