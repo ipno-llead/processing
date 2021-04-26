@@ -19,13 +19,13 @@ def fuse_events(pprr, cprr):
         events.OFFICER_LEFT: {
             'prefix': 'term', 'keep': ['uid', 'agency', 'rank_code', 'rank_desc', 'pay_group']
         }
-    })
+    }, ['uid'])
     builder.extract_events(cprr, {
         events.COMPLAINT_INCIDENT: {
             'prefix': 'occur', 'keep': ['uid', 'agency', 'complaint_uid']
         }
-    })
-    return builder.to_frame(['kind', 'year', 'month', 'day', 'uid', 'complaint_uid'])
+    }, ['uid', 'complaint_uid'])
+    return builder.to_frame()
 
 
 if __name__ == '__main__':

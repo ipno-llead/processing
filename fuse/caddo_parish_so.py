@@ -13,8 +13,8 @@ def fuse_events(pprr):
         events.OFFICER_HIRE: {
             'prefix': 'hire', 'keep': ['uid', 'agency', 'employee_id', 'rank_desc', 'annual_salary']
         }
-    })
-    return builder.to_frame(['kind', 'year', 'month', 'day', 'uid'])
+    }, ['uid'])
+    return builder.to_frame()
 
 
 if __name__ == '__main__':

@@ -17,15 +17,17 @@ def fuse_events(pprr08, pprr20, cprr):
         events.OFFICER_LEFT: {'prefix': 'resign', 'keep': ['uid', 'agency']},
         events.OFFICER_PAY_EFFECTIVE: {'prefix': 'pay_effective', 'keep': ['uid', 'agency', 'hourly_salary']},
         events.OFFICER_RANK: {'prefix': 'rank', 'keep': ['uid', 'agency', 'rank_desc']},
-    })
+    }, ['uid'])
     builder.extract_events(pprr20, {
         events.OFFICER_HIRE: {'prefix': 'hire', 'keep': ['uid', 'agency']},
         events.OFFICER_LEFT: {'prefix': 'resign', 'keep': ['uid', 'agency']},
         events.OFFICER_PAY_EFFECTIVE: {'prefix': 'pay_effective', 'keep': ['uid', 'agency', 'hourly_salary']},
         events.OFFICER_RANK: {'prefix': 'rank', 'keep': ['uid', 'agency', 'rank_desc']},
-    })
+    }, ['uid'])
     builder.extract_events(cprr, {
-        events.OFFICER_HIRE: {'prefix': 'hire', 'keep': ['uid', 'agency']},
+        events.OFFICER_HIRE: {
+            'prefix': 'hire', 'keep': ['uid', 'agency'], 'id_cols': ['uid']
+        },
         events.COMPLAINT_INCIDENT: {
             'prefix': 'occur', 'keep': ['uid', 'agency', 'complaint_uid']
         },
@@ -35,8 +37,8 @@ def fuse_events(pprr08, pprr20, cprr):
         events.INVESTIGATION_COMPLETE: {
             'prefix': 'investigation_complete', 'keep': ['uid', 'agency', 'complaint_uid']
         }
-    })
-    return builder.to_frame(['kind', 'year', 'month', 'day', 'uid', 'complaint_uid'])
+    }, ['uid', 'complaint_uid'])
+    return builder.to_frame()
 
 
 if __name__ == "__main__":

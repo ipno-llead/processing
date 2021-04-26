@@ -43,12 +43,12 @@ def fuse_events(pprr, cprr, uof):
         events.OFFICER_HIRE: {'prefix': 'hire'},
         events.OFFICER_LEFT: {'prefix': 'left'},
         events.OFFICER_DEPT: {'prefix': 'dept'},
-    })
+    }, ['uid'])
     builder.extract_events(cprr, {
         events.COMPLAINT_RECEIVE: {'prefix': 'receive'},
         events.ALLEGATION_CREATE: {'prefix': 'allegation_create'},
         events.COMPLAINT_INCIDENT: {'prefix': 'occur'},
-    })
+    }, ['uid', 'complaint_uid', 'allegation_uid'])
     builder.extract_events(uof, {
         events.UOF_INCIDENT: {'prefix': 'occur'},
         events.UOF_RECEIVE: {'prefix': 'receive', 'parse_date': True},
@@ -56,9 +56,8 @@ def fuse_events(pprr, cprr, uof):
         events.UOF_COMPLETED: {'prefix': 'completed', 'parse_date': True},
         events.UOF_CREATED: {'prefix': 'created', 'parse_date': True},
         events.UOF_DUE: {'prefix': 'due', 'parse_datetime': True},
-    })
-    return builder.to_frame(
-        ["kind", "year", "month", "day", "uid", "complaint_uid", "use_of_force_uid", "allegation_uid"])
+    }, ['uid', 'use_of_force_uid'])
+    return builder.to_frame()
 
 
 if __name__ == "__main__":

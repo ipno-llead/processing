@@ -4,7 +4,7 @@ import pandas as pd
 from pandas.api.types import CategoricalDtype
 
 from lib.clean import clean_date, clean_datetime, float_to_int_str
-from lib.uid import gen_uid, ensure_uid_unique
+from lib.uid import ensure_uid_unique, gen_uid_from_dict
 from lib.exceptions import InvalidEventKindException, InvalidEventDateException
 from lib.columns import rearrange_event_columns
 
@@ -36,6 +36,8 @@ UOF_COMPLETED = "uof_completed"
 UOF_CREATED = "uof_created"
 UOF_DUE = "uof_due"
 
+AWARD_RECEIVE = "award_receive"
+
 
 cat_type = CategoricalDtype(categories=[
     OFFICER_LEVEL_1_CERT,
@@ -62,6 +64,7 @@ cat_type = CategoricalDtype(categories=[
     UOF_COMPLETED,
     UOF_CREATED,
     UOF_DUE,
+    AWARD_RECEIVE,
 ], ordered=True)
 
 
@@ -105,8 +108,8 @@ class Builder(object):
                 raw_datetime)
         fields["raw_date"] = raw_datetime
 
-    def append(
-            self, event_kind, raw_date_str=None, raw_datetime_str=None,
+    def append_record(
+            self, event_kind, id_cols, raw_date_str=None, raw_datetime_str=None,
             strptime_format=None, ignore_bad_date=False, **kwargs):
         """Append an event and optionally parse datetime of the event.
 
@@ -121,6 +124,8 @@ class Builder(object):
         ----------
         event_kind : str
             Kind of event
+        id_cols: list
+            List of columns to generate event_uid from (in addition to ['kind', 'year', 'month', 'day', 'time'])
         raw_date_str : str, optional
             Raw date string to extract `year`, `month` and `day` from
         raw_datetime_str : str, optional
@@ -144,11 +149,13 @@ class Builder(object):
             self._extract_date(kwargs, raw_date_str, strptime_format)
         elif raw_datetime_str is not None:
             self._extract_datetime(kwargs, raw_datetime_str, strptime_format)
-        if pd.isnull(kwargs["year"]) or kwargs["year"] == "":
+        if 'year' not in kwargs or pd.isnull(kwargs["year"]) or kwargs["year"] == "":
             if ignore_bad_date:
                 return
             raise InvalidEventDateException(
                 "year column cannot be empty:\n\t%s" % kwargs)
+        kwargs["event_uid"] = gen_uid_from_dict(
+            kwargs, ['kind', 'year', 'month', 'day', 'time'] + id_cols)
         self._records.append(kwargs)
 
     def _assign_kwargs_func(self, cols, kwargs_funcs, flatten_date_cols, kind, obj):
@@ -180,7 +187,7 @@ class Builder(object):
                 (event_col, row[col]) for col, event_col in col_pairs
             ]
 
-    def extract_events(self, df, event_dict):
+    def extract_events(self, df, event_dict, id_cols):
         """Extract event records from a DataFrame.
 
         Multiple kinds of event can be extracted. Each defined as a single key in `event_dict`.
@@ -193,6 +200,7 @@ class Builder(object):
           it is used as strptime format string.
         - parse_datetime: Same as "parse_date" but extract from column "{prefix}_datetime" instead. And time
           is also extracted.
+        - id_cols: Overwrite `id_cols` for this event kind.
 
         Parameters
         ----------
@@ -205,6 +213,8 @@ class Builder(object):
                 events.COMPLAINT_RECEIVE: {"prefix": "receive", "keep": ["uid", "complaint_uid", "agency"]},
                 ...
             }
+        id_cols
+            List of columns to generate event_uid from (in addition to ['kind', 'year', 'month', 'day', 'time'])
         """
         cols = set(df.columns)
         kwargs_funcs = dict()
@@ -234,17 +244,16 @@ class Builder(object):
                     fields = dict(list(common_fields.items()))
                 fields = dict(
                     list(fields.items()) + kwargs_funcs[kind](row))
-                self.append(kind, **fields)
+                self.append_record(
+                    kind, id_cols if 'id_cols' not in obj else obj['id_cols'], **fields)
 
-    def to_frame(self, id_cols, output_duplicated_events=False):
+    def to_frame(self, output_duplicated_events=False):
         """Create a DataFrame out of collected events.
 
         This also ensure all event kinds are valid and generate `event_uid` column from `id_cols`
 
         Parameters
         ----------
-        id_cols
-            List of columns to generate `event_uid` with.
         output_duplicated_events
             Output duplicated events to file data/duplicates.csv
 
@@ -254,8 +263,7 @@ class Builder(object):
             If event_uid is not unique.
         """
         df = pd.DataFrame.from_records(self._records)\
-            .pipe(float_to_int_str, ["year", "month", "day"])\
-            .pipe(gen_uid, id_cols, "event_uid")
+            .pipe(float_to_int_str, ["year", "month", "day"], True)
         df.loc[:, 'kind'] = df.kind.astype(cat_type)
         df = rearrange_event_columns(df)
         ensure_uid_unique(df, 'event_uid', output_duplicated_events)

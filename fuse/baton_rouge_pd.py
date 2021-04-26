@@ -23,23 +23,24 @@ def fuse_events(csd_pprr_17, csd_pprr_19, pd_cprr_18, lprr):
             'uid', 'agency', 'rank_code', 'rank_desc']},
         events.OFFICER_DEPT: {'prefix': 'dept', 'keep': [
             'uid', 'agency', 'department_code', 'department_desc']},
-    })
+    }, ['uid'])
     builder.extract_events(csd_pprr_19, {
         events.OFFICER_HIRE: {'prefix': 'hire', 'keep': ['uid', 'agency']},
         events.OFFICER_LEFT: {'prefix': 'resign', 'keep': ['uid', 'agency']},
         events.OFFICER_PAY_EFFECTIVE: {'prefix': 'pay_effective', 'keep': ['uid', 'agency', 'annual_salary']},
         events.OFFICER_RANK: {'prefix': 'rank', 'keep': ['uid', 'agency', 'rank_code', 'rank_desc']},
-        events.OFFICER_DEPT: {'prefix': 'dept', 'keep': ['uid', 'agency', 'department_code', 'department_desc']},
-    })
+        events.OFFICER_DEPT: {
+            'prefix': 'dept', 'keep': ['uid', 'agency', 'department_code', 'department_desc'],
+            'id_cols': ['uid', 'department_code']},
+    }, ['uid'])
     builder.extract_events(pd_cprr_18, {
         events.COMPLAINT_RECEIVE: {'prefix': 'receive', 'keep': ['uid', 'agency', 'complaint_uid']},
         events.COMPLAINT_INCIDENT: {'prefix': 'occur', 'keep': ['uid', 'agency', 'complaint_uid']},
-    })
+    }, ['uid', 'complaint_uid'])
     builder.extract_events(lprr, {
         events.APPEAL_HEARING: {'prefix': 'hearing', 'keep': ['uid', 'agency', 'appeal_uid']},
-    })
-    return builder.to_frame(
-        ["kind", "year", "month", "day", "uid", "complaint_uid", "appeal_uid", "department_code"], True)
+    }, ['uid', 'appeal_uid'])
+    return builder.to_frame()
 
 
 if __name__ == "__main__":

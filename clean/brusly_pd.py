@@ -27,9 +27,9 @@ def split_supervisor(df):
     return df
 
 
-def assign_agency(df):
+def assign_agency(df, year):
     df.loc[:, "agency"] = "Brusly PD"
-    df.loc[:, "data_production_year"] = "2020"
+    df.loc[:, "data_production_year"] = year
     return df
 
 
@@ -44,7 +44,7 @@ def clean_cprr():
         .pipe(split_supervisor)\
         .pipe(clean_dates, ['receive_date', 'occur_date', 'suspension_start_date', 'suspension_end_date'])\
         .pipe(standardize_desc_cols, ['charges', 'action'])\
-        .pipe(assign_agency)
+        .pipe(assign_agency, 2020)
     return df
 
 
@@ -71,18 +71,31 @@ def clean_pprr():
         .pipe(clean_dates, ['birth_date', 'hire_date', 'term_date'])\
         .pipe(standardize_desc_cols, ["rank_desc"])\
         .pipe(clean_salaries, ["annual_salary"])\
-        .pipe(assign_agency)\
+        .pipe(assign_agency, 2020)\
         .pipe(clean_names, ['first_name', 'last_name', 'middle_initial'])\
         .pipe(gen_uid, [
             "agency", "last_name", "first_name", "middle_initial", "birth_year", "birth_month", "birth_day"
-        ])\
-        .pipe(gen_uid, ["uid", "hire_year", "hire_month", "hire_day"], "perhist_uid")
+        ])
     return df
+
+
+def clean_award():
+    return pd.read_csv(data_file_path('brusly_pd/brusly_pd_awards_2015-2020_byhand.csv'))\
+        .pipe(clean_column_names)\
+        .rename(columns={
+            'l_name': "last_name",
+            'f_name': 'first_name',
+            'comments': 'award_comments'
+        })\
+        .pipe(assign_agency, 2021)\
+        .pipe(gen_uid, ['agency', 'last_name', 'first_name'])
 
 
 if __name__ == "__main__":
     cprr = clean_cprr()
     pprr = clean_pprr()
+    award = clean_award()
     ensure_data_dir("clean")
     cprr.to_csv(data_file_path("clean/cprr_brusly_pd_2020.csv"), index=False)
     pprr.to_csv(data_file_path("clean/pprr_brusly_pd_2020.csv"), index=False)
+    award.to_csv(data_file_path("clean/award_brusly_pd_2021.csv"), index=False)

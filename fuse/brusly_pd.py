@@ -10,19 +10,23 @@ import sys
 sys.path.append("../")
 
 
-def fuse_events(pprr, cprr):
+def fuse_events(pprr, cprr, award):
     builder = events.Builder()
     builder.extract_events(pprr, {
         events.OFFICER_HIRE: {'prefix': 'hire', 'keep': ['uid', 'agency', 'rank_desc', 'annual_salary']},
         events.OFFICER_LEFT: {'prefix': 'term', 'keep': ['uid', 'agency', 'rank_desc', 'annual_salary']},
-    })
+    }, ['uid'])
     builder.extract_events(cprr, {
         events.COMPLAINT_RECEIVE: {'prefix': 'receive', 'keep': ['uid', 'agency', 'complaint_uid']},
         events.COMPLAINT_INCIDENT: {'prefix': 'occur', 'keep': ['uid', 'agency', 'complaint_uid']},
         events.SUSPENSION_START: {'prefix': 'suspension_start', 'keep': ['uid', 'agency', 'complaint_uid']},
         events.SUSPENSION_END: {'prefix': 'suspension_end', 'keep': ['uid', 'agency', 'complaint_uid']},
-    })
-    return builder.to_frame(['kind', 'year', 'month', 'day', 'uid', 'complaint_uid'])
+    }, ['uid', 'complaint_uid'])
+    builder.extract_events(award, {
+        events.AWARD_RECEIVE: {'prefix': 'receive', 'keep': [
+            'uid', 'agency', 'award', 'award_comments']}
+    }, ['uid', 'award'])
+    return builder.to_frame()
 
 
 if __name__ == "__main__":
@@ -31,9 +35,10 @@ if __name__ == "__main__":
     post_event = pd.read_csv(data_file_path(
         "match/post_event_brusly_pd_2020.csv"))
     cprr = pd.read_csv(data_file_path("match/cprr_brusly_pd_2020.csv"))
+    award = pd.read_csv(data_file_path('match/award_brusly_pd_2021.csv'))
     cprr = gen_uid(cprr, [
         'uid', 'occur_year', 'occur_month', 'occur_day'], 'complaint_uid')
-    events_df = fuse_events(pprr, cprr)
+    events_df = fuse_events(pprr, cprr, award)
     events_df = rearrange_event_columns(pd.concat([
         post_event,
         events_df

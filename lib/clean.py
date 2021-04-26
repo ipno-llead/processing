@@ -260,7 +260,7 @@ def standardize_desc_cols(df, cols):
     return df
 
 
-def float_to_int_str(df, cols):
+def float_to_int_str(df, cols, cast_as_str=False):
     """
     Turn float values in column into strings without trailing ".0"
     e.g. [1973.0, np.nan, "abc"] => ["1973", "", "abc"]
@@ -276,4 +276,8 @@ def float_to_int_str(df, cols):
             idx = df[col].map(lambda v: type(v) == float)
             df.loc[idx, col] = df.loc[idx, col].fillna(0).astype(
                 "int64").astype(str).str.replace(r"^0$", "", regex=True)
+            if cast_as_str:
+                df.loc[~idx, col] = df.loc[~idx, col].astype(str)
+        elif cast_as_str:
+            df.loc[:, col] = df[col].astype(str)
     return df

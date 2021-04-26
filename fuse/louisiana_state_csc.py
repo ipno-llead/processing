@@ -19,7 +19,7 @@ def fuse_events(lprr, post):
         events.APPEAL_RENDER: {
             'prefix': 'rendered', 'keep': ['uid', 'agency', 'appeal_uid']
         }
-    })
+    }, ['uid', 'appeal_uid'])
     builder.extract_events(post, {
         events.OFFICER_LEVEL_1_CERT: {'prefix': 'level_1_cert', 'parse_date': '%Y-%m-%d', 'keep': [
             'uid', 'agency'
@@ -28,8 +28,8 @@ def fuse_events(lprr, post):
             'uid', 'agency'
         ]},
         events.OFFICER_HIRE: {'prefix': 'hire', 'keep': ['uid', 'agency']},
-    })
-    return builder.to_frame(["kind", "year", "month", "day", "uid", "appeal_uid"])
+    }, ['uid'])
+    return builder.to_frame()
 
 
 if __name__ == '__main__':

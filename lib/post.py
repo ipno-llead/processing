@@ -16,20 +16,24 @@ def keep_latest_row_for_each_post_officer(post):
     return post[~post.index.duplicated(keep='first')]
 
 
-def extract_events_from_post(post, uid_matches):
+def extract_events_from_post(post, uid_matches, agency):
     builder = events.Builder()
     for pprr_uid, post_uid in uid_matches:
         for _, row in post[post.uid == post_uid].iterrows():
             if pd.notnull(row.level_1_cert_date):
-                builder.append(
+                builder.append_record(
                     events.OFFICER_LEVEL_1_CERT,
+                    ['uid'],
                     raw_date_str=row.level_1_cert_date,
                     strptime_format='%Y-%m-%d',
+                    agency=agency,
                     uid=pprr_uid)
             if pd.notnull(row.last_pc_12_qualification_date):
-                builder.append(
+                builder.append_record(
                     events.OFFICER_PC_12_QUALIFICATION,
+                    ['uid'],
                     raw_date_str=row.last_pc_12_qualification_date,
                     strptime_format='%Y-%m-%d',
+                    agency=agency,
                     uid=pprr_uid)
-    return builder.to_frame(['kind', 'uid', 'year', 'month', 'day'])
+    return builder.to_frame()

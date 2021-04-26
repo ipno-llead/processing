@@ -27,8 +27,7 @@ class TestThresholdMatcher(unittest.TestCase):
         matcher = ThresholdMatcher(
             dfa, dfb, NoopIndex(), {"a": StringSimilarity()})
 
-        self.assertEqual(matcher._pairs, [
-            (0.0, 0, 2), (0.5, 0, 1), (1.0, 0, 0)])
+        self.assertEqual(matcher._pairs, [(1.0, 0, 0)])
 
         self.assertEqual(matcher.get_index_pairs_within_thresholds(), [(0, 0)])
 

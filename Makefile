@@ -28,7 +28,7 @@ data/fuse/per_baton_rouge_pd.csv data/fuse/event_baton_rouge_pd.csv data/fuse/co
 data/fuse/per_baton_rouge_so.csv data/fuse/event_baton_rouge_so.csv data/fuse/com_baton_rouge_so.csv: fuse/baton_rouge_so.py data/match/cprr_baton_rouge_so_2018.csv data/clean/pprr_post_2020_11_06.csv
 	python fuse/baton_rouge_so.py
 
-data/fuse/per_brusly_pd.csv data/fuse/event_brusly_pd.csv data/fuse/com_brusly_pd.csv: fuse/brusly_pd.py data/match/post_event_brusly_pd_2020.csv data/match/cprr_brusly_pd_2020.csv data/clean/pprr_brusly_pd_2020.csv
+data/fuse/per_brusly_pd.csv data/fuse/event_brusly_pd.csv data/fuse/com_brusly_pd.csv: fuse/brusly_pd.py data/match/post_event_brusly_pd_2020.csv data/match/cprr_brusly_pd_2020.csv data/clean/pprr_brusly_pd_2020.csv data/match/award_brusly_pd_2021.csv
 	python fuse/brusly_pd.py
 
 data/fuse/per_port_allen_pd.csv data/fuse/event_port_allen_pd.csv data/fuse/com_port_allen_pd.csv: fuse/port_allen_pd.py data/match/cprr_port_allen_pd_2019.csv data/match/pprr_port_allen_csd_2020.csv data/match/cprr_port_allen_pd_2017_2018.csv data/match/cprr_port_allen_pd_2015_2016.csv data/match/post_event_port_allen_pd.csv
@@ -71,7 +71,7 @@ data/match/cprr_new_orleans_harbor_pd_2020.csv data/match/post_event_new_orleans
 data/match/pprr_baton_rouge_csd_2017.csv data/match/pprr_baton_rouge_csd_2019.csv data/match/cprr_baton_rouge_pd_2018.csv data/match/lprr_baton_rouge_fpcsb_1992_2012.csv data/match/event_post_baton_rouge_pd.csv: match/baton_rouge_pd.py data/clean/pprr_baton_rouge_csd_2017.csv data/clean/pprr_baton_rouge_csd_2019.csv data/clean/cprr_baton_rouge_pd_2018.csv data/clean/pprr_post_2020_11_06.csv data/clean/lprr_baton_rouge_fpcsb_1992_2012.csv
 	python match/baton_rouge_pd.py
 
-data/match/cprr_brusly_pd_2020.csv data/match/post_event_brusly_pd_2020.csv: match/brusly_pd.py data/clean/pprr_brusly_pd_2020.csv data/clean/cprr_brusly_pd_2020.csv
+data/match/cprr_brusly_pd_2020.csv data/match/post_event_brusly_pd_2020.csv data/match/award_brusly_pd_2021.csv: match/brusly_pd.py data/clean/pprr_brusly_pd_2020.csv data/clean/cprr_brusly_pd_2020.csv data/clean/award_brusly_pd_2021.csv
 	python match/brusly_pd.py
 
 data/match/cprr_madisonville_pd_2010_2020.csv data/match/post_event_madisonville_csd_2019.csv: match/madisonville_pd.py data/clean/cprr_madisonville_pd_2010_2020.csv data/clean/pprr_madisonville_csd_2019.csv data/clean/pprr_post_2020_11_06.csv
@@ -130,7 +130,7 @@ data/clean/lprr_louisiana_state_csc_1991_2020.csv: clean/louisiana_state_csc_lpr
 data/clean/lprr_baton_rouge_fpcsb_1992_2012.csv: clean/baton_rouge_fpcsb_lprr.py data/baton_rouge_fpcsb/baton_rouge_fpcsb_logs_1992-2012.csv
 	python clean/baton_rouge_fpcsb_lprr.py
 
-data/clean/pprr_brusly_pd_2020.csv data/clean/cprr_brusly_pd_2020.csv: clean/brusly_pd.py data/brusly_pd/brusly_pd_pprr_2020.csv data/brusly_pd/brusly_pd_cprr_2020.csv
+data/clean/pprr_brusly_pd_2020.csv data/clean/cprr_brusly_pd_2020.csv data/clean/award_brusly_pd_2021.csv: clean/brusly_pd.py data/brusly_pd/brusly_pd_pprr_2020.csv data/brusly_pd/brusly_pd_cprr_2020.csv
 	python clean/brusly_pd.py
 
 data/clean/cprr_port_allen_pd_2019.csv data/clean/cprr_port_allen_pd_2017_2018.csv data/clean/cprr_port_allen_pd_2015_2016.csv: clean/port_allen_pd_cprr.py data/port_allen_pd/port_allen_cprr_2019.csv data/port_allen_pd/port_allen_cprr_2017-2018_byhand.csv data/port_allen_pd/port_allen_cprr_2015-2016_byhand.csv

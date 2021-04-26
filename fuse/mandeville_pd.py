@@ -17,14 +17,14 @@ def fuse_events(cprr, pprr):
             'prefix': 'occur', 'keep': ['uid', 'complaint_uid', 'agency']},
         events.INVESTIGATION_COMPLETE: {
             'prefix': 'investigation_complete', 'keep': ['uid', 'complaint_uid', 'agency']}
-    })
+    }, ['uid', 'complaint_uid'])
     builder.extract_events(pprr, {
         events.OFFICER_HIRE: {
             'prefix': 'hire', 'keep': ['uid', 'badge_no', 'rank_desc', 'annual_salary', 'agency']},
         events.OFFICER_LEFT: {
             'prefix': 'term', 'keep': ['uid', 'badge_no', 'rank_desc', 'annual_salary', 'agency']}
-    })
-    return builder.to_frame(['kind', 'year', 'month', 'day', 'uid', 'complaint_uid'])
+    }, ['uid'])
+    return builder.to_frame()
 
 
 if __name__ == '__main__':

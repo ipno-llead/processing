@@ -111,7 +111,7 @@ def match_csd_pprr_against_post(pprr, post, year, decision):
     matcher.save_pairs_to_excel(data_file_path(
         "match/baton_rouge_csd_pprr_%d_v_post_pprr_2020_11_06.xlsx" % year), decision)
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
-    return extract_events_from_post(post, matches)
+    return extract_events_from_post(post, matches, 'Baton Rouge PD')
 
 
 def match_lprr_against_pprr(lprr, pprr, year, decision):
@@ -154,7 +154,7 @@ def match_lprr_against_post(lprr, post):
     matcher.save_pairs_to_excel(data_file_path(
         "match/baton_rouge_fpcsb_lprr_1992_2012_v_post_pprr_2020_11_06.xlsx"), decision)
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
-    return extract_events_from_post(post, matches)
+    return extract_events_from_post(post, matches, 'Baton Rouge PD')
 
 
 if __name__ == "__main__":

@@ -32,7 +32,7 @@ def match_pprr_against_post(pprr, post):
         "match/new_orleans_pd_pprr_1946_2018_v_post_pprr_2020_11_06.xlsx"), decision)
 
     matches = matcher.get_index_pairs_within_thresholds(decision)
-    return extract_events_from_post(post, matches)
+    return extract_events_from_post(post, matches, 'New Orleans PD')
 
 
 if __name__ == '__main__':

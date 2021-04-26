@@ -167,6 +167,8 @@ EVENT_COLUMNS = [
     "years_employed",
     "annual_salary",  # annual salary
     "hourly_salary",  # hourly salary
+    "award",
+    "award_comments"
 ]
 
 

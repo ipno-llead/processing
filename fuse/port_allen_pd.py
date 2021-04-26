@@ -12,22 +12,21 @@ def fuse_events(pprr, cprr16, cprr18, cprr19):
     builder = events.Builder()
     builder.extract_events(pprr, {
         events.OFFICER_HIRE: {'prefix': 'hire'},
-    })
+    }, ['uid'])
     builder.extract_events(cprr16, {
         events.COMPLAINT_RECEIVE: {'prefix': 'receive'},
         events.INVESTIGATION_COMPLETE: {'prefix': 'investigation_complete'},
         events.COMPLAINT_INCIDENT: {'prefix': 'occur'},
-    })
+    }, ['uid', 'complaint_uid'])
     builder.extract_events(cprr18, {
         events.COMPLAINT_RECEIVE: {'prefix': 'receive'},
         events.COMPLAINT_INCIDENT: {'prefix': 'occur'},
-    })
+    }, ['uid', 'complaint_uid'])
     builder.extract_events(cprr19, {
         events.COMPLAINT_RECEIVE: {'prefix': 'receive'},
         events.COMPLAINT_INCIDENT: {'prefix': 'occur'},
-    })
-    return builder.to_frame(
-        ["kind", "year", "month", "day", "uid", "complaint_uid"])
+    }, ['uid', 'complaint_uid'])
+    return builder.to_frame()
 
 
 if __name__ == "__main__":

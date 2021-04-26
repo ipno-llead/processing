@@ -31,7 +31,7 @@ def match_pprr_against_post(pprr, post):
     matcher.save_pairs_to_excel(data_file_path(
         "match/caddo_parish_so_pprr_2020_v_post.xlsx"), decision)
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
-    return extract_events_from_post(post, matches)
+    return extract_events_from_post(post, matches, 'Caddo Parish SO')
 
 
 if __name__ == '__main__':

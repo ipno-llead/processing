@@ -22,7 +22,7 @@ def fuse_events(cprr, post):
         events.INVESTIGATION_START: {
             'prefix': 'investigation_start', 'parse_date': True, 'keep': ['agency', 'uid', 'complaint_uid']
         },
-    })
+    }, ['uid', 'complaint_uid'])
     builder.extract_events(post, {
         events.OFFICER_HIRE: {
             'prefix': 'hire', 'keep': ['agency', 'uid', 'employment_status'],
@@ -33,8 +33,8 @@ def fuse_events(cprr, post):
         events.OFFICER_PC_12_QUALIFICATION: {
             'prefix': 'last_pc_12_qualification', 'parse_date': '%Y-%m-%d', 'keep': ['agency', 'uid'],
         },
-    })
-    return builder.to_frame(['kind', 'year', 'month', 'day', 'uid', 'complaint_uid'])
+    }, ['uid'])
+    return builder.to_frame()
 
 
 if __name__ == '__main__':

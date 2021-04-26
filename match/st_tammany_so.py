@@ -51,7 +51,7 @@ def match_pprr_and_post(pprr, post):
     matcher.save_pairs_to_excel(data_file_path(
         "match/st_tammany_so_pprr_2020_v_post_pprr_2020_11_06.xlsx"), decision)
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
-    return extract_events_from_post(post, matches)
+    return extract_events_from_post(post, matches, 'St. Tammany SO')
 
 
 def match_cprr_and_post(cprr, post):
@@ -71,7 +71,7 @@ def match_cprr_and_post(cprr, post):
     matcher.save_pairs_to_excel(data_file_path(
         "match/st_tammany_so_cprr_2011_2021_v_post_pprr_2020_11_06.xlsx"), decision)
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
-    return extract_events_from_post(post, matches)
+    return extract_events_from_post(post, matches, 'St. Tammany SO')
 
 
 if __name__ == '__main__':

@@ -49,7 +49,7 @@ def match_pprr_and_post(pprr, post):
     matcher.save_pairs_to_excel(data_file_path(
         "match/madisonville_csd_pprr_2019_v_post_pprr_2020_11_06.xlsx"), decision)
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
-    return extract_events_from_post(post, matches)
+    return extract_events_from_post(post, matches, 'Madisonville PD')
 
 
 if __name__ == "__main__":
