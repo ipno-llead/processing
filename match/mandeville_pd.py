@@ -1,5 +1,5 @@
 from lib.match import (
-    ThresholdMatcher, ColumnsIndex, JaroWinklerSimilarity, StringSimilarity, DateSimilarity
+    ThresholdMatcher, ColumnsIndex, JaroWinklerSimilarity, DateSimilarity
 )
 from lib.date import combine_date_columns
 from lib.path import data_file_path, ensure_data_dir
@@ -10,26 +10,25 @@ sys.path.append('../')
 
 
 def match_cprr_with_pprr(cprr, pprr):
-    dfa = cprr[['uid', 'first_name', 'last_name', 'rank_desc']].drop_duplicates()\
+    dfa = cprr[['uid', 'first_name', 'last_name']].drop_duplicates()\
         .set_index('uid', drop=True)
     dfa.loc[:, 'fc'] = dfa.first_name.fillna('').map(lambda x: x[:1])
 
-    dfb = pprr[['uid', 'first_name', 'last_name', 'rank_desc']].drop_duplicates()\
+    dfb = pprr[['uid', 'first_name', 'last_name']].drop_duplicates()\
         .set_index('uid', drop=True)
     dfb.loc[:, 'fc'] = dfb.first_name.fillna('').map(lambda x: x[:1])
 
     matcher = ThresholdMatcher(dfa, dfb, ColumnsIndex(['fc']), {
         'first_name': JaroWinklerSimilarity(),
         'last_name': JaroWinklerSimilarity(),
-        'rank_desc': StringSimilarity(),
     })
-    decision = 0.9
+    decision = 0.89
     matcher.save_pairs_to_excel(data_file_path(
-        "match/mandeville_csd_pprr_2020_v_post_pprr_2020_11_06.xlsx"), decision)
+        "match/mandeville_pd_cprr_2019_v_csd_pprr_2020.xlsx"), decision)
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
     match_dict = dict(matches)
 
-    cprr.loc[:, 'uid'] = cprr.uid.map(lambda x: match_dict.get(x, x))
+    cprr.loc[:, 'uid'] = cprr.uid.map(lambda x: match_dict[x])
     return cprr
 
 
