@@ -188,6 +188,10 @@ repos:
     fileName: fuse/per_levee_pd.csv
     primaryKey:
       - uid
+  per-grand-isle-pd:
+    fileName: fuse/per_grand_isle_pd.csv
+    primaryKey:
+      - uid
   event-new-orleans-pd:
     fileName: fuse/event_new_orleans_pd.csv
     primaryKey:
@@ -242,6 +246,10 @@ repos:
       - event_uid
   event-levee-pd:
     fileName: fuse/event_levee_pd.csv
+    primaryKey:
+      - event_uid
+  event-grand-isle-pd:
+    fileName: fuse/event_grand_isle_pd.csv
     primaryKey:
       - event_uid
   personnel:

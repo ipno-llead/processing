@@ -18,6 +18,7 @@ all: data/match/cprr_baton_rouge_da_2021.csv
 all: data/fuse/per_caddo_parish_so.csv data/fuse/event_caddo_parish_so.csv
 all: data/fuse/event_mandeville_pd.csv data/fuse/com_mandeville_pd.csv data/fuse/per_mandeville_pd.csv
 all: data/fuse/event_levee_pd.csv data/fuse/com_levee_pd.csv data/fuse/per_levee_pd.csv
+all: data/fuse/per_grand_isle_pd.csv data/fuse/event_grand_isle_pd.csv
 
 data/fuse/per_new_orleans_harbor_pd.csv data/fuse/event_new_orleans_harbor_pd.csv data/fuse/com_new_orleans_harbor_pd.csv: fuse/new_orleans_harbor_pd.py data/match/post_event_new_orleans_harbor_pd_2020.csv data/match/cprr_new_orleans_harbor_pd_2020.csv data/clean/pprr_new_orleans_harbor_pd_1991_2008.csv data/clean/pprr_new_orleans_harbor_pd_2020.csv
 	python fuse/new_orleans_harbor_pd.py
@@ -64,6 +65,10 @@ data/fuse/event_mandeville_pd.csv data/fuse/com_mandeville_pd.csv data/fuse/per_
 data/fuse/event_levee_pd.csv data/fuse/com_levee_pd.csv data/fuse/per_levee_pd.csv: fuse/levee_pd.py data/match/cprr_levee_pd.csv data/clean/pprr_post_2020_11_06.csv
 	python fuse/levee_pd.py
 
+data/fuse/per_grand_isle_pd.csv data/fuse/event_grand_isle_pd.csv: fuse/grand_isle_pd.py data/clean/pprr_grand_isle_pd_2021.csv data/match/post_event_grand_isle_pd.csv
+	python fuse/grand_isle_pd.py
+
+
 
 data/match/cprr_new_orleans_harbor_pd_2020.csv data/match/post_event_new_orleans_harbor_pd_2020.csv: match/new_orleans_harbor_pd.py data/clean/cprr_new_orleans_harbor_pd_2020.csv data/clean/pprr_new_orleans_harbor_pd_2020.csv
 	python match/new_orleans_harbor_pd.py
@@ -104,8 +109,11 @@ data/match/post_event_mandeville_pd_2019.csv data/match/cprr_mandeville_pd_2019.
 data/match/post_event_caddo_parish_so.csv: match/caddo_parish_so.py data/clean/pprr_post_2020_11_06.csv data/clean/pprr_caddo_parish_so_2020.csv
 	python match/caddo_parish_so.py
 
-data/match/cprr_levee_pd.csv: match/levee_pd.py data/clean/cprr_levee_pd.csv
+data/match/cprr_levee_pd.csv: match/levee_pd.py data/clean/cprr_levee_pd.csv data/clean/pprr_post_2020_11_06.csv
 	python match/levee_pd.py
+
+data/match/post_event_grand_isle_pd.csv: match/grand_isle_pd.py data/clean/pprr_grand_isle_pd_2021.csv data/clean/pprr_post_2020_11_06.csv
+	python match/grand_isle_pd.py
 
 
 
@@ -186,3 +194,6 @@ data/clean/pprr_louisiana_csd_2021.csv: clean/louisiana_csd_pprr_2021.py data/lo
 
 data/clean/cprr_levee_pd.csv: clean/levee_pd.py data/levee_pd/levee_pd_cprr_2020.csv
 	python clean/levee_pd.py
+
+data/clean/pprr_grand_isle_pd_2021.csv: clean/grand_isle_pd.py data/grand_isle/grand_isle_pd_pprr_2021_byhand.csv
+	python clean/grand_isle_pd.py

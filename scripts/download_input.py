@@ -118,6 +118,9 @@ DATA_FILES = {
     ],
     "levee_pd": [
         "https://www.dropbox.com/sh/d1j6djl9jb7jvx3/AAB5DDSmd4Uo247gktnG3A9Za/Log%20Records/levee_pd_cprr_2020.csv?dl=1",  # noqa
+    ],
+    "grand_isle": [
+        "https://www.dropbox.com/sh/x8t0gh2dtw4wsp7/AABS1d3AD-F_1dreLV3_bFXUa/grand_isle_pd_pprr_2021_byhand.csv?dl=1"  # noqa
     ]
 }
 _current_dir = os.path.dirname(os.path.realpath(__file__))

@@ -9,6 +9,7 @@ from lib.date import combine_date_columns, combine_datetime_columns
 
 mdy_date_pattern_1 = re.compile(r"^\d{1,2}/\d{1,2}/\d{2}$")
 mdy_date_pattern_2 = re.compile(r"^\d{1,2}/\d{1,2}/\d{4}$")
+dmy_date_pattern = re.compile(r'^\d{1,2}-\w{3}-\d{2}$')
 year_pattern = re.compile(r"^(19|20)\d{2}$")
 year_month_pattern = re.compile(r"^(19|20)\d{4}$")
 month_day_pattern = re.compile(r"^[A-Z][a-z]{2}-\d{1,2}$")
@@ -28,6 +29,15 @@ def clean_date(val):
     m = mdy_date_pattern_1.match(val)
     if m is not None:
         [month, day, year] = val.split("/")
+        if year[0] in ["1", "2", "0"]:
+            year = "20" + year
+        else:
+            year = "19" + year
+        return year, month, day
+    m = dmy_date_pattern.match(val)
+    if m is not None:
+        [day, month, year] = val.split("-")
+        month = str(datetime.datetime.strptime(month, '%b').month)
         if year[0] in ["1", "2", "0"]:
             year = "20" + year
         else:

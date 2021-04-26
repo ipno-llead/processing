@@ -15,6 +15,11 @@
   // 	],
   // 	"description": "Log output to console"
   // }
+  "Read CSV from data folder": {
+    "scope": "python",
+    "prefix": "read_csv",
+    "body": "$1 = pd.read_csv(data_file_path('$2'))"
+  },
   "Clean script": {
     "scope": "python",
     "prefix": "clean",
@@ -54,23 +59,29 @@
     ],
     "description": "Data match script"
   },
-  "Prepare POST data": {
+  "Fuse script": {
     "scope": "python",
-    "prefix": "prepare_post",
+    "prefix": "fuse",
     "body": [
-      "def prepare_post_data():",
-      "    post = pd.read_csv(data_file_path('clean/pprr_post_2020_11_06.csv'))",
-      "    post = post[post.agency == '$1']",
-      "    duplicated_uids = set(post.loc[post.uid.duplicated(), 'uid'].to_list())",
-      "    post = post.set_index('uid', drop=False)",
-      "    level_1_cert_dates = post.loc[",
-      "        post.uid.isin(duplicated_uids) & (post.level_1_cert_date.notna()),",
-      "        'level_1_cert_date']",
-      "    for idx, value in level_1_cert_dates.iteritems():",
-      "        post.loc[idx, 'level_1_cert_date'] = value",
-      "    post = post.sort_values('last_pc_12_qualification_date', ascending=False)",
-      "    return post[~post.index.duplicated(keep='first')]"
-    ],
-    "description": "Prepare POST data for matching"
+      "import pandas as pd",
+      "from lib.path import data_file_path, ensure_data_dir",
+      "from lib.columns import (",
+      "    rearrange_personnel_columns, rearrange_complaint_columns, rearrange_event_columns",
+      ")",
+      "from lib.uid import ensure_uid_unique",
+      "from lib import events",
+      "",
+      "import sys",
+      "sys.path.append('../')",
+      "",
+      "",
+      "def fuse_events():",
+      "    builder = events.Builder()",
+      "    return builder.to_frame()",
+      "",
+      "",
+      "if __name__ == '__main__':",
+      "    ensure_data_dir('fuse')"
+    ]
   }
 }
