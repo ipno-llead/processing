@@ -43,13 +43,14 @@ def split_rows(df):
 def extract_employment_status(df):
     df.loc[:, 'employment_status'] = ''
     df.loc[df.hire_date_raw.str.match(
-        r'full time'), 'employment_status'] = 'full time'
+        r'full time'), 'employment_status'] = 'full-time'
     df.loc[df.hire_date_raw.str.match(
         r'reserve'), 'employment_status'] = 'reserve'
     df.loc[df.hire_date_raw.str.match(
-        r'^(part time|pt)'), 'employment_status'] = 'part time'
-    df.loc[df.rank_desc.fillna('').str.lower().str.match(r'part-time'),
-           'employment_status'] = 'part time'
+        r'^(part time|pt)'), 'employment_status'] = 'part-time'
+    df.loc[
+        df.rank_desc.fillna('').str.lower().str.match(r'part-time'),
+        'employment_status'] = 'part-time'
     df.loc[:, 'rank_desc'] = df.rank_desc.fillna('').str.lower()\
         .str.replace(r'part-time ', '', regex=False)
     return df

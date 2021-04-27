@@ -121,6 +121,11 @@ DATA_FILES = {
     ],
     "grand_isle": [
         "https://www.dropbox.com/sh/x8t0gh2dtw4wsp7/AABS1d3AD-F_1dreLV3_bFXUa/grand_isle_pd_pprr_2021_byhand.csv?dl=1"  # noqa
+    ],
+    "kenner_pd": [
+        "https://www.dropbox.com/sh/x1b2ve5ei3mod94/AACL1pMApTujHaUfooMPKoBEa/Kenner_PD_PPRR_2020.csv?dl=1",  # noqa
+        "https://www.dropbox.com/sh/x1b2ve5ei3mod94/AADd22L9dZyWKXnxzCHxT-Oqa/Kenner_PD_PPRR_FormerEmployees_Long.csv?dl=1",  # noqa
+        "https://www.dropbox.com/sh/x1b2ve5ei3mod94/AAA6YD5qjTmc8iL8ccq5mQZSa/Kenner_PD_PPRR_FormerEmployees_Short.csv?dl=1",  # noqa
     ]
 }
 _current_dir = os.path.dirname(os.path.realpath(__file__))
