@@ -27,7 +27,7 @@ def match_pprr_against_post(pprr, post):
         'last_name': JaroWinklerSimilarity(),
         'hire_date': DateSimilarity()
     })
-    decision = 0.886
+    decision = 0.803
     matcher.save_pairs_to_excel(data_file_path(
         "match/new_orleans_pd_pprr_1946_2018_v_post_pprr_2020_11_06.xlsx"), decision)
 
