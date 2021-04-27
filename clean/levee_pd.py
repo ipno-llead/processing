@@ -44,6 +44,13 @@ def assign_uid(df):
     return df
 
 
+def remove_NA_dates(df, cols):
+    for col in cols:
+        df.loc[:, col] = df[col].str.strip().str.replace(
+            r'^(Unk|N\/A)$', '', regex=True)
+    return df
+
+
 def clean19():
     return pd.read_csv(data_file_path(
         'levee_pd/levee_pd_cprr_2019.csv'
@@ -52,13 +59,26 @@ def clean19():
         .rename(columns={
             'case_no': 'tracking_number',
             'reserve_full_time': 'employment_status',
-            'type_of_complaint_or_allegation': 'rule_violation'
+            'type_of_complaint_or_allegation': 'rule_violation',
+            'assigned_investigator': 'investigator',
+            'name_of_shift_supervisor_if_handeled_by_shift': 'shift_supervisor',
+            'internal_external': 'complainant_type',
+            'complainant': 'complainant_name',
+            'date_occurred': 'occur_date',
+            'date_received_by_iad': 'receive_date',
+            'date_investigation_started': 'investigation_start_date',
+            'date_investigation_complete': 'investigation_complete_date',
+            'action_taken': 'action'
         })\
         .dropna(subset=['ejld_oldp'])\
+        .reset_index(drop=True)\
         .pipe(assign_agency, 2019)\
         .pipe(split_name_19)\
         .pipe(clean_names, ['first_name', 'last_name'])\
-        .pipe(standardize_desc_cols, ['employment_status'])
+        .pipe(standardize_desc_cols, ['employment_status', 'disposition', 'action', 'complainant_type'])\
+        .pipe(assign_uid)\
+        .pipe(gen_uid, ['agency', 'tracking_number'], 'complaint_uid')\
+        .pipe(remove_NA_dates, ['occur_date', 'receive_date'])
 
 
 def clean20():
@@ -92,7 +112,8 @@ def clean20():
 
 if __name__ == '__main__':
     df20 = clean20()
+    df19 = clean19()
     ensure_data_dir('clean')
-    df20.to_csv(data_file_path(
+    pd.concat([df19, df20]).to_csv(data_file_path(
         'clean/cprr_levee_pd.csv'
     ), index=False)

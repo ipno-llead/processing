@@ -117,6 +117,7 @@ DATA_FILES = {
         "https://www.dropbox.com/sh/8w4uff2emzbhcvr/AAC4YdwWdPudXeH4pdDvl-Fpa/Caddo%20Parish_SO_PPRR_2020.csv?dl=1",  # noqa
     ],
     "levee_pd": [
+        "https://www.dropbox.com/sh/d1j6djl9jb7jvx3/AADgCrm6xbUHZJ0ATwfwZp2Ga/Log%20Records/levee_pd_cprr_2019.csv?dl=1",  # noqa
         "https://www.dropbox.com/sh/d1j6djl9jb7jvx3/AAB5DDSmd4Uo247gktnG3A9Za/Log%20Records/levee_pd_cprr_2020.csv?dl=1",  # noqa
     ],
     "grand_isle": [

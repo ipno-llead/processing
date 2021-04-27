@@ -45,6 +45,7 @@ COMPLAINT_COLUMNS = [
     # and should eventually replace rule_* and paragraph_* columns.
     "charges",
     "officer_years_of_service",
+    "complainant_name",
     "complainant_type",
     "complainant_sex",
     "complainant_race",

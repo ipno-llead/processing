@@ -192,7 +192,7 @@ data/clean/pprr_caddo_parish_so_2020.csv: clean/caddo_parish_so_pprr.py data/cad
 data/clean/pprr_louisiana_csd_2021.csv: clean/louisiana_csd_pprr_2021.py data/louisiana_csd/louisiana_csd_pprr_2021.csv
 	python clean/louisiana_csd_pprr_2021.py
 
-data/clean/cprr_levee_pd.csv: clean/levee_pd.py data/levee_pd/levee_pd_cprr_2020.csv
+data/clean/cprr_levee_pd.csv: clean/levee_pd.py data/levee_pd/levee_pd_cprr_2020.csv data/levee_pd/levee_pd_cprr_2019.csv
 	python clean/levee_pd.py
 
 data/clean/pprr_grand_isle_pd_2021.csv: clean/grand_isle_pd.py data/grand_isle/grand_isle_pd_pprr_2021_byhand.csv
