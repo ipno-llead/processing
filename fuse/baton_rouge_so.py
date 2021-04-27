@@ -2,6 +2,7 @@ import pandas as pd
 from lib.path import data_file_path, ensure_data_dir
 from lib.columns import rearrange_complaint_columns
 from lib.personnel import fuse_personnel
+from lib.uid import ensure_uid_unique
 from lib import events
 
 import sys
@@ -41,6 +42,7 @@ if __name__ == "__main__":
     personnel_df = fuse_personnel(cprr, post)
     event_df = fuse_events(cprr, post)
     complaint_df = rearrange_complaint_columns(cprr)
+    ensure_uid_unique(complaint_df, 'complaint_uid')
     ensure_data_dir("fuse")
     personnel_df.to_csv(data_file_path(
         "fuse/per_baton_rouge_so.csv"), index=False)

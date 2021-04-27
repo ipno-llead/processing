@@ -41,7 +41,7 @@ if __name__ == '__main__':
     per_df = fuse_personnel(pprr, cprr)
     ensure_uid_unique(per_df, 'uid', True)
     com_df = rearrange_complaint_columns(cprr)
-    ensure_uid_unique(com_df, 'complaint_uid', True)
+    ensure_uid_unique(com_df, 'complaint_uid')
     ensure_data_dir('fuse')
     events_df.to_csv(data_file_path(
         'fuse/event_mandeville_pd.csv'), index=False)

@@ -3,6 +3,7 @@ from lib.path import data_file_path, ensure_data_dir
 from lib.columns import (
     rearrange_personnel_columns, rearrange_event_columns, rearrange_complaint_columns
 )
+from lib.uid import ensure_uid_unique
 from lib import events
 import sys
 sys.path.append("../")
@@ -43,6 +44,7 @@ if __name__ == "__main__":
     personnel_df = rearrange_personnel_columns(pprr)
     complaint_df = rearrange_complaint_columns(
         pd.concat([cprr16, cprr18, cprr19]))
+    ensure_uid_unique(complaint_df, 'complaint_uid', True)
     events_df = fuse_events(pprr, cprr16, cprr18, cprr19)
     events_df = rearrange_event_columns(pd.concat([
         post_event,

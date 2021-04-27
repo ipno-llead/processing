@@ -69,6 +69,7 @@ if __name__ == "__main__":
     ensure_uid_unique(events_df, 'event_uid', True)
 
     complaint_df = rearrange_complaint_columns(pd_cprr_18)
+    ensure_uid_unique(complaint_df, 'complaint_uid')
     lprr_df = rearrange_appeal_hearing_columns(lprr)
 
     ensure_data_dir("fuse")

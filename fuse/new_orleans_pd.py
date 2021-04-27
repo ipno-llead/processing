@@ -5,6 +5,7 @@ from lib.columns import (
     rearrange_use_of_force, rearrange_event_columns
 )
 from lib.clean import float_to_int_str
+from lib.uid import ensure_uid_unique
 from lib import events
 
 import sys
@@ -77,6 +78,7 @@ if __name__ == "__main__":
     post_event = pd.read_csv(data_file_path(
         'match/post_event_new_orleans_pd.csv'))
     complaints = fuse_cprr(cprr, actions, officer_number_dict)
+    ensure_uid_unique(complaints, 'complaint_uid')
     use_of_force = fuse_use_of_force(uof, officer_number_dict)
     personnel = rearrange_personnel_columns(pprr)
     events_df = fuse_events(pprr, cprr, uof)

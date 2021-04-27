@@ -45,6 +45,7 @@ if __name__ == "__main__":
     ]))
     ensure_uid_unique(events_df, 'event_uid', True)
     com_df = rearrange_complaint_columns(cprr)
+    ensure_uid_unique(com_df, 'complaint_uid')
     ensure_data_dir("fuse")
     rearrange_personnel_columns(pprr).to_csv(data_file_path(
         "fuse/per_brusly_pd.csv"), index=False)

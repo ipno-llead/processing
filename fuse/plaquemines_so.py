@@ -2,6 +2,7 @@ from lib.path import data_file_path, ensure_data_dir
 from lib.columns import (
     rearrange_complaint_columns, rearrange_personnel_columns
 )
+from lib.uid import ensure_uid_unique
 from lib import events
 import pandas as pd
 import sys
@@ -34,7 +35,9 @@ if __name__ == '__main__':
     post.loc[:, 'agency'] = 'Plaquemines SO'
     event = fuse_events(cprr, post)
     ensure_data_dir('fuse')
-    rearrange_complaint_columns(cprr).to_csv(
+    complaints = rearrange_complaint_columns(cprr)
+    ensure_uid_unique(complaints, 'complaint_uid')
+    complaints.to_csv(
         data_file_path('fuse/com_plaquemines_so.csv'),
         index=False
     )

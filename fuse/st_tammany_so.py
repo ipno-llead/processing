@@ -39,6 +39,7 @@ if __name__ == '__main__':
         'match/post_event_st_tammany_so_2020.csv'))
     personnels = fuse_personnel(pprr, cprr)
     complaints = rearrange_complaint_columns(cprr)
+    ensure_uid_unique(complaints, 'complaint_uid', True)
     events_df = fuse_events(pprr, cprr)
     events_df = rearrange_event_columns(pd.concat([
         post_event,

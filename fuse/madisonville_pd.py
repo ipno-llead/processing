@@ -35,6 +35,7 @@ if __name__ == "__main__":
         "match/post_event_madisonville_csd_2019.csv"))
     per = rearrange_personnel_columns(pprr)
     com = rearrange_complaint_columns(cprr)
+    ensure_uid_unique(com, 'complaint_uid')
     event = fuse_events(pprr, cprr)
     event = rearrange_event_columns(pd.concat([
         post_event,

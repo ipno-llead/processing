@@ -3,7 +3,7 @@ from lib.columns import (
 )
 from lib.path import data_file_path, ensure_data_dir
 from lib import events
-from lib.uid import gen_uid
+from lib.uid import gen_uid, ensure_uid_unique
 import pandas as pd
 import sys
 sys.path.append('../')
@@ -60,6 +60,7 @@ if __name__ == '__main__':
     post = prepare_post()
     per = rearrange_personnel_columns(post)
     com = rearrange_complaint_columns(cprr)
+    ensure_uid_unique(com, 'complaint_uid')
     event = fuse_events(cprr, post)
     ensure_data_dir('fuse')
     per.to_csv(

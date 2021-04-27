@@ -55,6 +55,7 @@ if __name__ == "__main__":
         'match/post_event_new_orleans_harbor_pd_2020.csv'))
     personnel_df = rearrange_personnel_columns(pd.concat([pprr08, pprr20]))
     complaint_df = rearrange_complaint_columns(cprr)
+    ensure_uid_unique(complaint_df, 'complaint_uid')
     event_df = fuse_events(pprr08, pprr20, cprr)
     event_df = rearrange_event_columns(pd.concat([
         post_event,

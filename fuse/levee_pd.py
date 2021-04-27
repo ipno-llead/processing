@@ -1,6 +1,7 @@
 from lib.columns import rearrange_complaint_columns
 from lib.personnel import fuse_personnel
 from lib.path import data_file_path, ensure_data_dir
+from lib.uid import ensure_uid_unique
 from lib import events
 import pandas as pd
 import sys
@@ -53,7 +54,9 @@ if __name__ == '__main__':
         lambda x: agency_dict.get(x, x))
     ensure_data_dir('fuse')
     event_df.to_csv(data_file_path('fuse/event_levee_pd.csv'), index=False)
-    rearrange_complaint_columns(cprr).to_csv(
+    complaint_df = rearrange_complaint_columns(cprr)
+    ensure_uid_unique(complaint_df, 'complaint_uid')
+    complaint_df.to_csv(
         data_file_path('fuse/com_levee_pd.csv'), index=False)
     fuse_personnel(post, cprr).to_csv(
         data_file_path('fuse/per_levee_pd.csv'), index=False)

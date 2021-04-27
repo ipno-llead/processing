@@ -91,7 +91,7 @@ repos:
   com-port-allen-pd:
     fileName: fuse/com_port_allen_pd.csv
     primaryKey:
-      - charge_uid
+      - complaint_uid
   com-madisonville-pd:
     fileName: fuse/com_madisonville_pd.csv
     primaryKey:
@@ -99,15 +99,15 @@ repos:
   com-greenwood-pd:
     fileName: fuse/com_greenwood_pd.csv
     primaryKey:
-      - allegation_uid
+      - complaint_uid
   com-new-orleans-pd:
     fileName: fuse/com_new_orleans_pd.csv
     primaryKey:
-      - allegation_uid
+      - complaint_uid
   com-st-tammany-so:
     fileName: fuse/com_st_tammany_so.csv
     primaryKey:
-      - charge_uid
+      - complaint_uid
   com-plaquemines-pd:
     fileName: fuse/com_plaquemines_so.csv
     primaryKey:
@@ -264,8 +264,6 @@ repos:
     fileName: fuse/complaint.csv
     primaryKey:
       - complaint_uid
-      - allegation_uid
-      - charge_uid
   baton-rouge-da-brady-list:
     fileName: match/cprr_baton_rouge_da_2021.csv
 commit:
