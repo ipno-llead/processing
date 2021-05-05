@@ -123,7 +123,7 @@ repos:
   uof-new-orleans-pd:
     fileName: fuse/uof_new_orleans_pd.csv
     primaryKey:
-      - use_of_force_uid
+      - uof_uid
   app-baton-rouge-pd:
     fileName: fuse/app_baton_rouge_pd.csv
     primaryKey:
@@ -264,6 +264,10 @@ repos:
     fileName: fuse/complaint.csv
     primaryKey:
       - complaint_uid
+  use-of-force:
+    fileName: fuse/use_of_force.csv
+    primaryKey:
+      - uof_uid
   baton-rouge-da-brady-list:
     fileName: match/cprr_baton_rouge_da_2021.csv
 commit:

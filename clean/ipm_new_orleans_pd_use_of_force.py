@@ -28,8 +28,10 @@ def add_occur_time(df):
     return df.drop(columns=['occur_hour', 'occur_minute'])
 
 
-def drop_duplicates(df):
-    return df.drop_duplicates()
+def assign_agency(df):
+    df.loc[:, 'data_production_year'] = 2019
+    df.loc[:, 'agency'] = 'New Orleans PD'
+    return df
 
 
 def clean():
@@ -87,12 +89,13 @@ def clean():
         .pipe(add_occur_time)\
         .pipe(clean_sexes, ['citizen_sex'])\
         .pipe(clean_races, ['citizen_race'])\
-        .pipe(drop_duplicates)\
+        .drop_duplicates()\
+        .pipe(assign_agency)\
         .pipe(gen_uid, [
-            'uof_tracking_number', 'officer_primary_key', 'citizen_primary_key',
+            'agency', 'uof_tracking_number', 'officer_primary_key', 'citizen_primary_key',
             'force_description', 'force_type', 'force_level', 'effective_uof',
             'accidental_discharge', 'less_than_lethal'
-        ], 'use_of_force_uid')
+        ], 'uof_uid')
 
 
 if __name__ == '__main__':

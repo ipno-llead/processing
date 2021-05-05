@@ -88,7 +88,7 @@ APPEAL_HEARING_COLUMNS = [
 ]
 
 USE_OF_FORCE_COLUMNS = [
-    'use_of_force_uid',
+    'uof_uid',
     'uof_tracking_number',
     'report_year',
     'uid',
@@ -132,6 +132,8 @@ USE_OF_FORCE_COLUMNS = [
     'officer_division',
     'officer_sub_division_a',
     'officer_sub_division_b',
+    "agency",
+    "data_production_year"
 ]
 
 EVENT_COLUMNS = [
@@ -150,7 +152,7 @@ EVENT_COLUMNS = [
     "allegation_uid",
     "appeal_uid",
     "resolution_uid",
-    'use_of_force_uid',
+    'uof_uid',
     "agency",  # name of agency (e.g. "New Orleans CSD")
     "badge_no",  # badge number
     "employee_id",  # employee ID given to the person by the agency.

@@ -57,7 +57,7 @@ def fuse_events(pprr, cprr, uof):
         events.UOF_COMPLETED: {'prefix': 'completed', 'parse_date': True},
         events.UOF_CREATED: {'prefix': 'created', 'parse_date': True},
         events.UOF_DUE: {'prefix': 'due', 'parse_datetime': True},
-    }, ['uid', 'use_of_force_uid'])
+    }, ['uid', 'uof_uid'])
     return builder.to_frame()
 
 
