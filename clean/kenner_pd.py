@@ -82,8 +82,6 @@ def clean_former_long():
         })\
         .pipe(clean_names, ['first_name', 'last_name'])\
         .pipe(standardize_desc_cols, ['rank_desc', 'employee_class'])\
-        .pipe(drop_volunteers)\
-        .pipe(remove_mr_and_ms_as_rank)\
         .pipe(clean_employee_id)\
         .pipe(clean_dates, ['hire_date'])
 

@@ -127,6 +127,13 @@ DATA_FILES = {
         "https://www.dropbox.com/sh/x1b2ve5ei3mod94/AACL1pMApTujHaUfooMPKoBEa/Kenner_PD_PPRR_2020.csv?dl=1",  # noqa
         "https://www.dropbox.com/sh/x1b2ve5ei3mod94/AADd22L9dZyWKXnxzCHxT-Oqa/Kenner_PD_PPRR_FormerEmployees_Long.csv?dl=1",  # noqa
         "https://www.dropbox.com/sh/x1b2ve5ei3mod94/AAA6YD5qjTmc8iL8ccq5mQZSa/Kenner_PD_PPRR_FormerEmployees_Short.csv?dl=1",  # noqa
+    ],
+    "harahan_csd": [
+        "https://www.dropbox.com/s/kgiidkew18odd7m/Harahan_CSD_PPRR_Roster%20by%20Employment%20Status_2020.csv?dl=1",  # noqa
+        "https://www.dropbox.com/s/r60o45dmuqpbnke/Harahan_CSD_PRRR_Roster%20by%20Employment%20Date_2020.csv?dl=1",  # noqa
+    ],
+    "harahan_pd": [
+        "https://www.dropbox.com/s/e95kg68746ndcg9/Harahan_PD_PPRR_2020.csv?dl=1",  # noqa
     ]
 }
 _current_dir = os.path.dirname(os.path.realpath(__file__))
