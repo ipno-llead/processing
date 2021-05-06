@@ -197,3 +197,9 @@ data/clean/cprr_levee_pd.csv: clean/levee_pd.py data/levee_pd/levee_pd_cprr_2020
 
 data/clean/pprr_grand_isle_pd_2021.csv: clean/grand_isle_pd.py data/grand_isle/grand_isle_pd_pprr_2021_byhand.csv
 	python clean/grand_isle_pd.py
+
+data/clean/pprr_harahan_pd_2020.csv: clean/harahan_pd.py data/harahan_pd/harahan_pd_pprr_2020.csv
+	python clean/harahan_pd.py
+
+data/clean/pprr_harahan_csd_2020.csv: clean/harahan_csd.py data/harahan_csd/harahan_csd_pprr_roster_by_employment_status_2020.csv data/harahan_csd/harahan_csd_prrr_roster_by_employment_date_2020.csv
+	python clean/harahan_csd.py

@@ -1,3 +1,4 @@
+from lib.uid import gen_uid
 import re
 import sys
 
@@ -101,7 +102,8 @@ def clean():
         .pipe(clean_salaries, ['annual_salary'])\
         .pipe(clean_names, ['first_name', 'middle_name', 'middle_initial', 'last_name'])\
         .pipe(join_employment_date)\
-        .pipe(assign_agency)
+        .pipe(assign_agency)\
+        .pipe(gen_uid, ['agency', 'employee_id'])
 
 
 def join_employment_date(df):
@@ -122,5 +124,5 @@ if __name__ == '__main__':
     df = clean()
     ensure_data_dir('clean')
     df.to_csv(data_file_path(
-        'clean/pprr_harahan_csd.csv'
+        'clean/pprr_harahan_csd_2020.csv'
     ), index=False)

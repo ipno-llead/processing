@@ -2,3 +2,4 @@ numpy==1.18.5
 pandas==1.2.0
 python-Levenshtein==0.12.0
 Unidecode==1.1.2
+datamatch==0.0.1
