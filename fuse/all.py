@@ -25,6 +25,7 @@ def fuse_personnel():
         pd.read_csv(data_file_path("fuse/per_mandeville_pd.csv")),
         pd.read_csv(data_file_path("fuse/per_levee_pd.csv")),
         pd.read_csv(data_file_path("fuse/per_grand_isle_pd.csv")),
+        pd.read_csv(data_file_path("fuse/per_gretna_pd.csv")),
     ])).sort_values('uid', ignore_index=True)
 
 
@@ -44,6 +45,7 @@ def fuse_event():
         pd.read_csv(data_file_path("fuse/event_mandeville_pd.csv")),
         pd.read_csv(data_file_path("fuse/event_levee_pd.csv")),
         pd.read_csv(data_file_path("fuse/event_grand_isle_pd.csv")),
+        pd.read_csv(data_file_path("fuse/event_gretna_pd.csv")),
     ])).sort_values(['agency', 'event_uid'], ignore_index=True)
 
 

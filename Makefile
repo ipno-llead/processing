@@ -19,6 +19,7 @@ all: data/fuse/per_caddo_parish_so.csv data/fuse/event_caddo_parish_so.csv
 all: data/fuse/event_mandeville_pd.csv data/fuse/com_mandeville_pd.csv data/fuse/per_mandeville_pd.csv
 all: data/fuse/event_levee_pd.csv data/fuse/com_levee_pd.csv data/fuse/per_levee_pd.csv
 all: data/fuse/per_grand_isle_pd.csv data/fuse/event_grand_isle_pd.csv
+all: data/fuse/per_gretna_pd.csv data/fuse/event_gretna_pd.csv
 
 data/fuse/per_new_orleans_harbor_pd.csv data/fuse/event_new_orleans_harbor_pd.csv data/fuse/com_new_orleans_harbor_pd.csv: fuse/new_orleans_harbor_pd.py data/match/post_event_new_orleans_harbor_pd_2020.csv data/match/cprr_new_orleans_harbor_pd_2020.csv data/clean/pprr_new_orleans_harbor_pd_1991_2008.csv data/clean/pprr_new_orleans_harbor_pd_2020.csv
 	python fuse/new_orleans_harbor_pd.py
@@ -68,6 +69,9 @@ data/fuse/event_levee_pd.csv data/fuse/com_levee_pd.csv data/fuse/per_levee_pd.c
 data/fuse/per_grand_isle_pd.csv data/fuse/event_grand_isle_pd.csv: fuse/grand_isle_pd.py data/clean/pprr_grand_isle_pd_2021.csv data/match/post_event_grand_isle_pd.csv
 	python fuse/grand_isle_pd.py
 
+data/fuse/per_gretna_pd.csv data/fuse/event_gretna_pd.csv: fuse/gretna_pd.py data/match/post_event_gretna_pd_2020.csv data/clean/pprr_gretna_pd_2018.csv
+	python fuse/gretna_pd.py
+
 
 
 data/match/cprr_new_orleans_harbor_pd_2020.csv data/match/post_event_new_orleans_harbor_pd_2020.csv: match/new_orleans_harbor_pd.py data/clean/cprr_new_orleans_harbor_pd_2020.csv data/clean/pprr_new_orleans_harbor_pd_2020.csv
@@ -114,6 +118,9 @@ data/match/cprr_levee_pd.csv: match/levee_pd.py data/clean/cprr_levee_pd.csv dat
 
 data/match/post_event_grand_isle_pd.csv: match/grand_isle_pd.py data/clean/pprr_grand_isle_pd_2021.csv data/clean/pprr_post_2020_11_06.csv
 	python match/grand_isle_pd.py
+
+data/match/post_event_gretna_pd_2020.csv: match/gretna_pd.py data/clean/pprr_gretna_pd_2018.csv data/clean/pprr_post_2020_11_06.csv
+	python match/gretna_pd.py
 
 
 
@@ -203,3 +210,6 @@ data/clean/pprr_harahan_pd_2020.csv: clean/harahan_pd.py data/harahan_pd/harahan
 
 data/clean/pprr_harahan_csd_2020.csv: clean/harahan_csd.py data/harahan_csd/harahan_csd_pprr_roster_by_employment_status_2020.csv data/harahan_csd/harahan_csd_prrr_roster_by_employment_date_2020.csv
 	python clean/harahan_csd.py
+
+data/clean/pprr_gretna_pd_2018.csv: clean/gretna_pd.py data/gretna_pd/gretna_pd_pprr_2018.csv
+	python clean/gretna_pd.py

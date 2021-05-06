@@ -134,6 +134,9 @@ DATA_FILES = {
     ],
     "harahan_pd": [
         "https://www.dropbox.com/s/e95kg68746ndcg9/Harahan_PD_PPRR_2020.csv?dl=1",  # noqa
+    ],
+    "gretna_pd": [
+        "https://www.dropbox.com/s/qr92icxpgtcdcb4/Gretna_PD_PPRR_2018.csv?dl=1",  # noqa
     ]
 }
 _current_dir = os.path.dirname(os.path.realpath(__file__))
