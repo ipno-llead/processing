@@ -140,6 +140,21 @@ DATA_FILES = {
     ],
     "vivian_csd": [
         "https://www.dropbox.com/sh/9wlhj0groq8eg84/AADaXj3Lr0WgxA4Vu8jelRjja/vivian_csd_pprr_2021.csv?dl=1",  # noqa
+    ],
+    "covington_pd": [
+        "https://www.dropbox.com/sh/ngj8aygmmgqy2dg/AABXzZ0uFMy60AGfao0eDkfGa/covington_pd_actions_history.csv?dl=1",  # noqa
+        "https://www.dropbox.com/sh/ngj8aygmmgqy2dg/AADa8X7eSd72sbsglvwO0DlWa/covington_pd_pprr_2010.csv?dl=1",
+        "https://www.dropbox.com/sh/ngj8aygmmgqy2dg/AADYcp9Z9-X_09E9PhYApvLfa/covington_pd_pprr_2011.csv?dl=1",
+        "https://www.dropbox.com/sh/ngj8aygmmgqy2dg/AADoPfUKgD386icBjXbW_weca/covington_pd_pprr_2012.csv?dl=1",
+        "https://www.dropbox.com/sh/ngj8aygmmgqy2dg/AAA61eg4XA8B6XGsJmzmr8v9a/covington_pd_pprr_2013.csv?dl=1",
+        "https://www.dropbox.com/sh/ngj8aygmmgqy2dg/AAC_1x7oC4Ps85x2070f0jXQa/covington_pd_pprr_2014.csv?dl=1",
+        "https://www.dropbox.com/sh/ngj8aygmmgqy2dg/AADpsk9XZBFJMLXDnofR_Wdla/covington_pd_pprr_2015.csv?dl=1",
+        "https://www.dropbox.com/sh/ngj8aygmmgqy2dg/AADhl3wSmQdV50QMpfn6aFcha/covington_pd_pprr_2016.csv?dl=1",
+        "https://www.dropbox.com/sh/ngj8aygmmgqy2dg/AADhEHTt8tHg2XCWzKUhssDMa/covington_pd_pprr_2017.csv?dl=1",
+        "https://www.dropbox.com/sh/ngj8aygmmgqy2dg/AAAz131JwVZwh74pq8U1nSFza/covington_pd_pprr_2018.csv?dl=1",
+        "https://www.dropbox.com/sh/ngj8aygmmgqy2dg/AACQhE7V_m8g9-q-UKEq8B8Ka/covington_pd_pprr_2019.csv?dl=1",
+        "https://www.dropbox.com/sh/ngj8aygmmgqy2dg/AAAfzXvjWo2j3W-Ke9OjomZia/covington_pd_pprr_2020.csv?dl=1",
+        "https://www.dropbox.com/sh/ngj8aygmmgqy2dg/AAAPr3m_zEV1FTeoK2EbfBu3a/covington_pd_pprr_2021.csv?dl=1",
     ]
 }
 _current_dir = os.path.dirname(os.path.realpath(__file__))

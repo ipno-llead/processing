@@ -1,4 +1,7 @@
 import re
+
+import pandas as pd
+
 from .clean import float_to_int_str, names_to_title_case
 
 

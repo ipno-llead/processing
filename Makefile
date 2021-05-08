@@ -22,6 +22,7 @@ all: data/fuse/per_grand_isle_pd.csv data/fuse/event_grand_isle_pd.csv
 all: data/fuse/per_gretna_pd.csv data/fuse/event_gretna_pd.csv
 all: data/fuse/per_kenner_pd.csv data/fuse/event_kenner_pd.csv
 all: data/fuse/per_vivian_pd.csv data/fuse/event_vivian_pd.csv
+all: data/fuse/per_covington_pd.csv data/fuse/event_covington_pd.csv
 
 data/fuse/per_new_orleans_harbor_pd.csv data/fuse/event_new_orleans_harbor_pd.csv data/fuse/com_new_orleans_harbor_pd.csv: fuse/new_orleans_harbor_pd.py data/match/post_event_new_orleans_harbor_pd_2020.csv data/match/cprr_new_orleans_harbor_pd_2020.csv data/clean/pprr_new_orleans_harbor_pd_1991_2008.csv data/clean/pprr_new_orleans_harbor_pd_2020.csv
 	python fuse/new_orleans_harbor_pd.py
@@ -80,6 +81,9 @@ data/fuse/per_kenner_pd.csv data/fuse/event_kenner_pd.csv: fuse/kenner_pd.py dat
 data/fuse/per_vivian_pd.csv data/fuse/event_vivian_pd.csv: fuse/vivian_pd.py data/match/post_event_vivian_pd_2020.csv data/clean/pprr_vivian_pd_2021.csv
 	python fuse/vivian_pd.py
 
+data/fuse/per_covington_pd.csv data/fuse/event_covington_pd.csv: fuse/covington_pd.py data/match/post_event_covington_pd_2020.csv data/clean/actions_history_covington_pd_2021.csv data/clean/pprr_covington_pd_2021.csv
+	python fuse/covington_pd.py
+
 
 
 data/match/cprr_new_orleans_harbor_pd_2020.csv data/match/post_event_new_orleans_harbor_pd_2020.csv: match/new_orleans_harbor_pd.py data/clean/cprr_new_orleans_harbor_pd_2020.csv data/clean/pprr_new_orleans_harbor_pd_2020.csv
@@ -135,6 +139,9 @@ data/match/post_event_kenner_pd_2020.csv: match/kenner_pd.py data/clean/pprr_ken
 
 data/match/post_event_vivian_pd_2020.csv: match/vivian_pd.py data/clean/pprr_vivian_pd_2021.csv data/clean/pprr_post_2020_11_06.csv
 	python match/vivian_pd.py
+
+data/match/post_event_covington_pd_2020.csv: match/covington_pd.py data/clean/actions_history_covington_pd_2021.csv data/clean/pprr_post_2020_11_06.csv
+	python match/covington_pd.py
 
 
 
@@ -233,3 +240,6 @@ data/clean/pprr_kenner_pd_2020.csv: clean/kenner_pd.py data/kenner_pd/kenner_pd_
 
 data/clean/pprr_vivian_pd_2021.csv: clean/vivian_csd.py data/vivian_csd/vivian_csd_pprr_2021.csv
 	python clean/vivian_csd.py
+
+data/clean/actions_history_covington_pd_2021.csv data/clean/pprr_covington_pd_2021.csv: clean/covington_pd.py data/covington_pd/covington_pd_actions_history.csv data/covington_pd/covington_pd_pprr_2010.csv data/covington_pd/covington_pd_pprr_2011.csv data/covington_pd/covington_pd_pprr_2012.csv data/covington_pd/covington_pd_pprr_2013.csv data/covington_pd/covington_pd_pprr_2014.csv data/covington_pd/covington_pd_pprr_2015.csv data/covington_pd/covington_pd_pprr_2016.csv data/covington_pd/covington_pd_pprr_2017.csv data/covington_pd/covington_pd_pprr_2018.csv data/covington_pd/covington_pd_pprr_2019.csv data/covington_pd/covington_pd_pprr_2020.csv
+	python clean/covington_pd.py
