@@ -1,6 +1,7 @@
 from lib.columns import clean_column_names
 from lib.path import data_file_path, ensure_data_dir
 from lib.clean import clean_names, standardize_desc_cols, clean_dates
+from lib.uid import gen_uid
 import pandas as pd
 import sys
 sys.path.append('../')
@@ -39,15 +40,16 @@ def clean():
             'date_hired': 'hire_date',
             'work_classification': 'employment_status',
             'status': 'officer_inactive',
+            'gender': 'sex',
         })\
         .drop(columns=['years_with_dept'])\
         .pipe(clean_employee_id)\
-        .pipe(assign_agency)\
         .pipe(split_names)\
         .drop(columns=['name'])\
         .pipe(clean_names, ['first_name', 'last_name', 'middle_name', 'middle_initial'])\
         .pipe(standardize_desc_cols, [
-            'gender', 'department_desc', 'rank_desc', 'employment_status', 'officer_inactive', 'sworn'])\
+            'sex', 'department_desc', 'rank_desc', 'employment_status', 'officer_inactive', 'sworn'])\
+        .pipe(remove_non_officers)\
         .pipe(clean_dates, ['hire_date'])
 
 
@@ -61,9 +63,23 @@ def clean_employee_id(df):
     return df
 
 
-def remove_mr_and_ms_as_rank(df):
-    df.loc[:, 'rank_desc'] = df.rank_desc.str.replace(
-        r'^(mr|ms|mrs)\.?$', '', regex=True)
+def remove_non_officers(df):
+    return df[~df.rank_desc.str.match(
+        r'^(mr|ms|mrs|call taker|father|chaplain|custodian|explorer|not stated)\.?$'
+    )].reset_index(drop=True)
+
+
+def clean_rank(df):
+    df.loc[:, 'rank_desc'] = df.rank_desc\
+        .str.replace(r' off(er|c)?$', ' officer', regex=True)\
+        .str.replace(r' tech$', ' technician', regex=True)\
+        .str.replace(r'admin\.', 'administrative', regex=True)\
+        .str.replace(r'dir\. of', 'director of', regex=True)\
+        .str.replace(r'coll\.', 'collector', regex=True)\
+        .str.replace(r'invest.', 'investigator', regex=True)\
+        .str.replace(r' prop\.', ' property', regex=True)\
+        .str.replace(r' il$', ' ii', regex=True)\
+        .str.replace(r' maint$', ' maintainer', regex=True)
     return df
 
 
@@ -82,6 +98,7 @@ def clean_former_long():
         })\
         .pipe(clean_names, ['first_name', 'last_name'])\
         .pipe(standardize_desc_cols, ['rank_desc', 'employee_class'])\
+        .pipe(remove_non_officers)\
         .pipe(clean_employee_id)\
         .pipe(clean_dates, ['hire_date'])
 
@@ -95,7 +112,8 @@ def clean_former_short():
             'date_left': 'left_date',
             'division': 'department_desc',
             'rank': 'rank_desc',
-            'id_no': 'employee_id'
+            'id_no': 'employee_id',
+            'gender': 'sex',
         })\
         .pipe(clean_employee_id)\
         .drop(columns=['gone', 'reason_left'])\
@@ -103,7 +121,8 @@ def clean_former_short():
         .pipe(split_names)\
         .drop(columns=['name'])\
         .pipe(clean_names, ['first_name', 'last_name', 'middle_name', 'middle_initial'])\
-        .pipe(standardize_desc_cols, ['department_desc', 'rank_desc', 'gender'])\
+        .pipe(standardize_desc_cols, ['department_desc', 'rank_desc', 'sex'])\
+        .pipe(remove_non_officers)\
         .pipe(clean_dates, ['hire_date', 'left_date'])
 
 
@@ -121,12 +140,18 @@ def combine_pprrs(pprr, former_long, former_short):
                     record[k] = v
             else:
                 records[idx] = row.to_dict()
-    return pd.DataFrame.from_records(list(records.values()))
+    return pd.DataFrame.from_records(list(records.values()))\
+        .pipe(assign_agency)\
+        .pipe(clean_rank)\
+        .pipe(gen_uid, ['agency', 'employee_id'])
 
 
 if __name__ == '__main__':
-    df = clean()
+    pprr = clean()
+    former_long = clean_former_long()
+    former_short = clean_former_short()
+    combined = combine_pprrs(pprr, former_long, former_short)
     ensure_data_dir('clean')
-    df.to_csv(data_file_path(
+    combined.to_csv(data_file_path(
         'clean/pprr_kenner_pd_2020.csv'
     ), index=False)

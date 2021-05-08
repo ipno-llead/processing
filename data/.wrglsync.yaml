@@ -196,6 +196,10 @@ repos:
     fileName: fuse/per_gretna_pd.csv
     primaryKey:
       - uid
+  per-kenner-pd:
+    fileName: fuse/per_kenner_pd.csv
+    primaryKey:
+      - uid
   event-new-orleans-pd:
     fileName: fuse/event_new_orleans_pd.csv
     primaryKey:
@@ -258,6 +262,10 @@ repos:
       - event_uid
   event-gretna-pd:
     fileName: fuse/event_gretna_pd.csv
+    primaryKey:
+      - event_uid
+  event-kenner-pd:
+    fileName: fuse/event_kenner_pd.csv
     primaryKey:
       - event_uid
   personnel:
