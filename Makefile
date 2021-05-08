@@ -21,6 +21,7 @@ all: data/fuse/event_levee_pd.csv data/fuse/com_levee_pd.csv data/fuse/per_levee
 all: data/fuse/per_grand_isle_pd.csv data/fuse/event_grand_isle_pd.csv
 all: data/fuse/per_gretna_pd.csv data/fuse/event_gretna_pd.csv
 all: data/fuse/per_kenner_pd.csv data/fuse/event_kenner_pd.csv
+all: data/fuse/per_vivian_pd.csv data/fuse/event_vivian_pd.csv
 
 data/fuse/per_new_orleans_harbor_pd.csv data/fuse/event_new_orleans_harbor_pd.csv data/fuse/com_new_orleans_harbor_pd.csv: fuse/new_orleans_harbor_pd.py data/match/post_event_new_orleans_harbor_pd_2020.csv data/match/cprr_new_orleans_harbor_pd_2020.csv data/clean/pprr_new_orleans_harbor_pd_1991_2008.csv data/clean/pprr_new_orleans_harbor_pd_2020.csv
 	python fuse/new_orleans_harbor_pd.py
@@ -76,6 +77,9 @@ data/fuse/per_gretna_pd.csv data/fuse/event_gretna_pd.csv: fuse/gretna_pd.py dat
 data/fuse/per_kenner_pd.csv data/fuse/event_kenner_pd.csv: fuse/kenner_pd.py data/match/post_event_kenner_pd_2020.csv data/clean/pprr_kenner_pd_2020.csv
 	python fuse/kenner_pd.py
 
+data/fuse/per_vivian_pd.csv data/fuse/event_vivian_pd.csv: fuse/vivian_pd.py data/match/post_event_vivian_pd_2020.csv data/clean/pprr_vivian_pd_2021.csv
+	python fuse/vivian_pd.py
+
 
 
 data/match/cprr_new_orleans_harbor_pd_2020.csv data/match/post_event_new_orleans_harbor_pd_2020.csv: match/new_orleans_harbor_pd.py data/clean/cprr_new_orleans_harbor_pd_2020.csv data/clean/pprr_new_orleans_harbor_pd_2020.csv
@@ -128,6 +132,9 @@ data/match/post_event_gretna_pd_2020.csv: match/gretna_pd.py data/clean/pprr_gre
 
 data/match/post_event_kenner_pd_2020.csv: match/kenner_pd.py data/clean/pprr_kenner_pd_2020.csv data/clean/pprr_post_2020_11_06.csv
 	python match/kenner_pd.py
+
+data/match/post_event_vivian_pd_2020.csv: match/vivian_pd.py data/clean/pprr_vivian_pd_2021.csv data/clean/pprr_post_2020_11_06.csv
+	python match/vivian_pd.py
 
 
 
@@ -223,3 +230,6 @@ data/clean/pprr_gretna_pd_2018.csv: clean/gretna_pd.py data/gretna_pd/gretna_pd_
 
 data/clean/pprr_kenner_pd_2020.csv: clean/kenner_pd.py data/kenner_pd/kenner_pd_pprr_2020.csv data/kenner_pd/kenner_pd_pprr_formeremployees_long.csv data/kenner_pd/kenner_pd_pprr_formeremployees_short.csv
 	python clean/kenner_pd.py
+
+data/clean/pprr_vivian_pd_2021.csv: clean/vivian_csd.py data/vivian_csd/vivian_csd_pprr_2021.csv
+	python clean/vivian_csd.py

@@ -137,6 +137,9 @@ DATA_FILES = {
     ],
     "gretna_pd": [
         "https://www.dropbox.com/s/qr92icxpgtcdcb4/Gretna_PD_PPRR_2018.csv?dl=1",  # noqa
+    ],
+    "vivian_csd": [
+        "https://www.dropbox.com/sh/9wlhj0groq8eg84/AADaXj3Lr0WgxA4Vu8jelRjja/vivian_csd_pprr_2021.csv?dl=1",  # noqa
     ]
 }
 _current_dir = os.path.dirname(os.path.realpath(__file__))
