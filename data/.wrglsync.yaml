@@ -208,6 +208,10 @@ repos:
     fileName: fuse/per_covington_pd.csv
     primaryKey:
       - uid
+  per-slidell-pd:
+    fileName: fuse/per_slidell_pd.csv
+    primaryKey:
+      - uid
   event-new-orleans-pd:
     fileName: fuse/event_new_orleans_pd.csv
     primaryKey:
@@ -282,6 +286,10 @@ repos:
       - event_uid
   event-covington-pd:
     fileName: fuse/event_covington_pd.csv
+    primaryKey:
+      - event_uid
+  event-slidell-pd:
+    fileName: fuse/event_slidell_pd.csv
     primaryKey:
       - event_uid
   personnel:
