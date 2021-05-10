@@ -147,8 +147,11 @@ class Builder(object):
         """
         if event_kind not in cat_type.categories:
             raise InvalidEventKindException(event_kind)
-        if 'salary_freq' in kwargs and kwargs['salary_freq'] not in salary.cat_type.categories:
-            raise InvalidSalaryFreqException(kwargs['salary_freq'])
+        if 'salary_freq' in kwargs:
+            if 'salary' not in kwargs or pd.isnull(kwargs['salary']) or kwargs['salary'] == '':
+                del kwargs['salary_freq']
+            elif kwargs['salary_freq'] not in salary.cat_type.categories:
+                raise InvalidSalaryFreqException(kwargs['salary_freq'])
         kwargs["kind"] = event_kind
         if raw_date_str is not None:
             self._extract_date(kwargs, raw_date_str, strptime_format)
