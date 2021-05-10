@@ -1,8 +1,7 @@
 import sys
-from datamatch.similarities import DateSimilarity
 
 import pandas as pd
-from datamatch import ThresholdMatcher, JaroWinklerSimilarity, ColumnsIndex
+from datamatch import ThresholdMatcher, JaroWinklerSimilarity, ColumnsIndex, DateSimilarity
 
 from lib.path import data_file_path, ensure_data_dir
 from lib.date import combine_date_columns

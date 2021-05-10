@@ -173,9 +173,8 @@ EVENT_COLUMNS = [
     "officer_inactive",
     "employee_type",
     "years_employed",
-    "annual_salary",  # annual salary
-    "hourly_salary",  # hourly salary
-    "weekly_salary",
+    "salary",
+    "salary_freq",
     "award",
     "award_comments"
 ]
@@ -189,6 +188,15 @@ def clean_column_names(df):
     df.columns = [
         re.sub(r"[\s\W]+", "_", col.strip()).lower().strip("_")
         for col in df.columns]
+    return df
+
+
+def set_values(df, value_dict):
+    """
+    Set entire column to a value. Multiple columns can be specified each as a single key in value_dict
+    """
+    for col, val in value_dict.items():
+        df.loc[:, col] = val
     return df
 
 

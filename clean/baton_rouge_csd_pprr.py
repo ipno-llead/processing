@@ -1,10 +1,11 @@
-from lib.columns import clean_column_names
+from lib.columns import clean_column_names, set_values
 from lib.clean import (
     clean_names, parse_dates_with_known_format, clean_salaries, standardize_desc_cols,
     clean_employment_status
 )
 from lib.path import data_file_path, ensure_data_dir
 from lib.uid import gen_uid
+from lib import salary
 import pandas as pd
 import sys
 sys.path.append("../")
@@ -18,7 +19,7 @@ def assign_agency(df):
 def assign_rank_year_and_pay_year(df):
     df = df.sort_values(['uid', 'year'])
     uid = None
-    salary = None
+    sal = None
     rank = None
     dept = None
     for idx, row in df.iterrows():
@@ -28,13 +29,13 @@ def assign_rank_year_and_pay_year(df):
             df.loc[idx, 'rank_year'] = row.year
             df.loc[idx, 'dept_year'] = row.year
         else:
-            if row.annual_salary != salary:
+            if row.salary != sal:
                 df.loc[idx, 'pay_effective_year'] = row.year
             if row.rank_desc != rank:
                 df.loc[idx, 'rank_year'] = row.year
             if row.department_desc != dept:
                 df.loc[idx, 'dept_year'] = row.year
-        salary = row.annual_salary
+        sal = row.salary
         rank = row.rank_desc
         dept = row.department_desc
     return df
@@ -42,13 +43,12 @@ def assign_rank_year_and_pay_year(df):
 
 def clean_17():
     df = pd.read_csv(data_file_path(
-        "baton_rouge_csd/baton_rouge_csd_pprr_2017.csv"))
-    df = clean_column_names(df)
+        "baton_rouge_csd/baton_rouge_csd_pprr_2017.csv"
+    )).pipe(clean_column_names)
     df = df[[
         'year', 'employee_num', 'last_name', 'first_name', 'middle_init', 'division_num', 'division_name', 'job_code',
         'job_title', 'current_hire_date', 'employment_end_date', 'employment_status', 'gross_pay', 'total_hourly_rate'
-    ]]
-    df = df.rename(columns={
+    ]].rename(columns={
         "employee_num": "employee_id",
         "middle_init": "middle_initial",
         "division_num": "department_code",
@@ -57,12 +57,11 @@ def clean_17():
         "job_title": "rank_desc",
         "current_hire_date": "hire_date",
         "employment_end_date": "resign_date",
-        "gross_pay": "annual_salary",
-        "total_hourly_rate": "hourly_salary"
-    })
-    df.loc[:, "data_production_year"] = "2017"
-    df = df\
-        .pipe(clean_salaries, ["annual_salary"])\
+        "gross_pay": "salary",
+    }).pipe(set_values, {
+        'data_production_year': '2017',
+        'salary_freq': salary.YEARLY
+    }).pipe(clean_salaries, ["salary"])\
         .pipe(standardize_desc_cols, ["department_desc", "rank_desc"])\
         .pipe(parse_dates_with_known_format, ["hire_date", "resign_date"], "%m/%d/%Y")\
         .pipe(assign_agency)\
@@ -75,14 +74,15 @@ def clean_17():
 
 def clean_19():
     df = pd.read_csv(data_file_path(
-        "baton_rouge_csd/baton_rouge_csd_pprr_2019.csv"))
-    df = clean_column_names(df)
-    df = df[['year', 'last_name', 'first_name', 'middle_init',
-             'pay_location_code', 'pay_location_description',
-             'job_code', 'job_title', 'current_hire_date', 'employment_end_date',
-             'employment_status', 'gross_pay', 'uniqueid']]
-    df = df.rename(columns={
-        # "year": "data_production_year",
+        "baton_rouge_csd/baton_rouge_csd_pprr_2019.csv"
+    )).pipe(clean_column_names)
+
+    df = df[[
+        'year', 'last_name', 'first_name', 'middle_init',
+        'pay_location_code', 'pay_location_description',
+        'job_code', 'job_title', 'current_hire_date', 'employment_end_date',
+        'employment_status', 'gross_pay', 'uniqueid'
+    ]].rename(columns={
         "middle_init": "middle_initial",
         "pay_location_code": "department_code",
         "pay_location_description": "department_desc",
@@ -90,13 +90,13 @@ def clean_19():
         "job_title": "rank_desc",
         "current_hire_date": "hire_date",
         "employment_end_date": "resign_date",
-        "gross_pay": "annual_salary",
+        "gross_pay": "salary",
         "uniqueid": "employee_id"
-    })
-    df.loc[:, "data_production_year"] = "2019"
-    df = df.drop_duplicates()
-    df = df\
-        .pipe(clean_salaries, ["annual_salary"])\
+    }).pipe(set_values, {
+        'data_production_year': '2019',
+        'salary_freq': salary.YEARLY
+    }).drop_duplicates()\
+        .pipe(clean_salaries, ["salary"])\
         .pipe(standardize_desc_cols, ["department_desc", "rank_desc"])\
         .pipe(parse_dates_with_known_format, ["hire_date", "resign_date"], "%m/%d/%Y")\
         .pipe(clean_employment_status, ["employment_status"])\

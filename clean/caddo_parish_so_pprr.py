@@ -1,7 +1,8 @@
-from lib.columns import clean_column_names
+from lib.columns import clean_column_names, set_values
 from lib.path import data_file_path, ensure_data_dir
 from lib.clean import clean_names, clean_salaries, standardize_desc_cols, clean_dates
 from lib.uid import gen_uid, ensure_uid_unique
+from lib import salary
 import pandas as pd
 import sys
 sys.path.append('../')
@@ -44,13 +45,14 @@ def clean():
         .drop_duplicates(ignore_index=True)\
         .pipe(clean_column_names)\
         .rename(columns={
-            'yearly_salary': 'annual_salary',
+            'yearly_salary': 'salary',
             'rank': 'rank_desc',
             'ee_number': 'employee_id'
         })\
+        .pipe(set_values, {'salary_freq': salary.YEARLY})\
         .drop(columns=['commission_number'])\
         .pipe(extract_name)\
-        .pipe(clean_salaries, ['annual_salary'])\
+        .pipe(clean_salaries, ['salary'])\
         .pipe(standardize_desc_cols, ['rank_desc'])\
         .pipe(assign_agency)\
         .pipe(clean_dates, ['hire_date'])\

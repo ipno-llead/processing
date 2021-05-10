@@ -1,9 +1,10 @@
-from lib.columns import clean_column_names
+from lib.columns import clean_column_names, set_values
 from lib.path import data_file_path, ensure_data_dir
 from lib.clean import (
     parse_dates_with_known_format, clean_salaries, standardize_desc_cols, clean_names
 )
 from lib.uid import gen_uid
+from lib import salary
 import pandas as pd
 import numpy as np
 import sys
@@ -41,12 +42,13 @@ def clean():
         .rename(columns={
             'organizational_unit': 'department_desc',
             'job_title': 'rank_desc',
-            'annual_rate_of_pay': 'annual_salary',
+            'annual_rate_of_pay': 'salary',
             'state_of_la_begin_date': 'hire_date'
         })\
         .pipe(convert_hire_date)\
         .pipe(parse_dates_with_known_format, ['hire_date'], '%Y%m%d')\
-        .pipe(clean_salaries, ['annual_salary'])\
+        .pipe(set_values, {'salary_freq': salary.YEARLY})\
+        .pipe(clean_salaries, ['salary'])\
         .pipe(standardize_desc_cols, ['rank_desc', 'department_desc'])\
         .pipe(split_names)\
         .pipe(clean_names, ['first_name', 'last_name', 'middle_initial'])\

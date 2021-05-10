@@ -2,9 +2,10 @@ import sys
 
 import pandas as pd
 
-from lib.columns import clean_column_names
+from lib.columns import clean_column_names, set_values
 from lib.path import data_file_path, ensure_data_dir
 from lib.uid import gen_uid
+from lib import salary
 from lib.clean import clean_names, standardize_desc_cols, clean_salaries
 
 sys.path.append('../')
@@ -52,9 +53,9 @@ def sum_salaries(df):
             if record is not None:
                 records.append(record)
         else:
-            record['annual_salary'] += row['annual_salary']
+            record['salary'] += row['salary']
     df = pd.DataFrame.from_records(records)
-    df.loc[:, 'annual_salary'] = df.annual_salary.map(lambda x: '%.2f' % x)
+    df.loc[:, 'salary'] = df.salary.map(lambda x: '%.2f' % x)
     return df
 
 
@@ -67,11 +68,12 @@ def clean_pprr():
             .rename(columns={
                 'emp': 'employee_id',
                 'year': 'salary_year',
-                'employee_gross': 'annual_salary',
+                'employee_gross': 'salary',
             })\
             .drop(columns=['code'])\
+            .pipe(set_values, {'salary_freq': salary.YEARLY})\
             .pipe(clean_names, ['first_name', 'last_name'])\
-            .pipe(clean_salaries, ['annual_salary'])\
+            .pipe(clean_salaries, ['salary'])\
             .pipe(sum_salaries)\
             .pipe(assign_agency)\
             .pipe(gen_uid, ['agency', 'employee_id'])

@@ -1,11 +1,14 @@
-from lib.path import data_file_path, ensure_data_dir
-from lib.uid import gen_uid
-from lib.match import (
+import sys
+
+from datamatch import (
     ThresholdMatcher, ColumnsIndex, JaroWinklerSimilarity
 )
-from lib.post import extract_events_from_post
 import pandas as pd
-import sys
+
+from lib.path import data_file_path, ensure_data_dir
+from lib.uid import gen_uid
+from lib.post import extract_events_from_post
+
 sys.path.append("../")
 
 

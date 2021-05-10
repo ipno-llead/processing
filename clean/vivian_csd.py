@@ -6,21 +6,19 @@ from lib.columns import clean_column_names
 from lib.path import data_file_path, ensure_data_dir
 from lib.clean import clean_dates, clean_names, float_to_int_str, standardize_desc_cols
 from lib.uid import gen_uid
+from lib import salary
 
 sys.path.append('../')
 
 
 def split_salary_col(df):
     df.loc[:, 'salary'] = df.salary.fillna('').str.lower().str.strip()
-    df.loc[:, 'weekly_salary'] = df.loc[
-        df.salary.str.match(r'.+\/week$'),
-        'salary'
-    ].str.replace(r'\/week$', '', regex=True)
-    df.loc[:, 'hourly_salary'] = df.loc[
-        df.salary.str.match(r'.+\/hr$'),
-        'salary'
-    ].str.replace(r'\/hr$', '', regex=True)
-    return df.drop(columns=['salary'])
+    df.loc[df.salary.str.match(r'.+\/week$'), 'salary_freq'] = salary.WEEKLY
+    df.loc[df.salary.str.match(r'.+\/hr$'), 'salary_freq'] = salary.HOURLY
+    df.loc[:, 'salary'] = df.salary\
+        .str.replace(r'\/week$', '', regex=True)\
+        .str.replace(r'\/hr$', '', regex=True)
+    return df
 
 
 def assign_agency(df):

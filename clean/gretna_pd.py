@@ -2,10 +2,11 @@ import sys
 
 import pandas as pd
 
-from lib.columns import clean_column_names
+from lib.columns import clean_column_names, set_values
 from lib.path import data_file_path, ensure_data_dir
 from lib.clean import clean_names, clean_salaries, clean_dates, standardize_desc_cols
 from lib.uid import gen_uid
+from lib import salary
 
 sys.path.append('../')
 
@@ -35,11 +36,12 @@ def clean():
     )).pipe(clean_column_names)\
         .rename(columns={
             'rank': 'rank_desc',
-            '2018_salary': 'annual_salary',
+            '2018_salary': 'salary',
         })\
+        .pipe(set_values, {'salary_freq': salary.YEARLY})\
         .pipe(split_names)\
         .pipe(clean_names, ['first_name', 'middle_name', 'last_name'])\
-        .pipe(clean_salaries, ['annual_salary'])\
+        .pipe(clean_salaries, ['salary'])\
         .pipe(clean_dates, ['hire_date'])\
         .pipe(standardize_desc_cols, ['rank_desc'])\
         .pipe(assign_agency)\

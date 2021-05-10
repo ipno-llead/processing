@@ -1,11 +1,14 @@
-from lib.match import (
+import sys
+
+from datamatch import (
     ThresholdMatcher, ColumnsIndex, JaroWinklerSimilarity, DateSimilarity
 )
+import pandas as pd
+
 from lib.date import combine_date_columns
 from lib.path import data_file_path, ensure_data_dir
 from lib.post import extract_events_from_post
-import pandas as pd
-import sys
+
 sys.path.append('../')
 
 

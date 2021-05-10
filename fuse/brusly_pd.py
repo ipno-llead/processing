@@ -13,8 +13,8 @@ sys.path.append("../")
 def fuse_events(pprr, cprr, award):
     builder = events.Builder()
     builder.extract_events(pprr, {
-        events.OFFICER_HIRE: {'prefix': 'hire', 'keep': ['uid', 'agency', 'rank_desc', 'annual_salary']},
-        events.OFFICER_LEFT: {'prefix': 'term', 'keep': ['uid', 'agency', 'rank_desc', 'annual_salary']},
+        events.OFFICER_HIRE: {'prefix': 'hire', 'keep': ['uid', 'agency', 'rank_desc', 'salary', 'salary_freq']},
+        events.OFFICER_LEFT: {'prefix': 'term', 'keep': ['uid', 'agency', 'rank_desc', 'salary', 'salary_freq']},
     }, ['uid'])
     builder.extract_events(cprr, {
         events.COMPLAINT_RECEIVE: {'prefix': 'receive', 'keep': ['uid', 'agency', 'complaint_uid']},

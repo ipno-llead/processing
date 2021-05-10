@@ -3,6 +3,7 @@ from lib.columns import clean_column_names
 from lib.path import data_file_path, ensure_data_dir
 from lib.clean import clean_names, clean_dates, clean_salary, standardize_desc_cols
 from lib.uid import gen_uid
+from lib import salary
 import pandas as pd
 import sys
 sys.path.append('../')
@@ -87,10 +88,11 @@ def extract_pay_effective_date(df):
 
 
 def extract_salary(df):
-    df.loc[:, 'hourly_salary'] = clean_salary(
+    df.loc[:, 'salary'] = clean_salary(
         df.salary_raw
         .str.replace('$1 raise', '$10.50', regex=False)
         .str.extract(r'(\$\d{1,2}(?:\.\d{2})?)')[0])
+    df.loc[:, 'salary_freq'] = salary.HOURLY
     return df.drop(columns=['salary_raw'])
 
 

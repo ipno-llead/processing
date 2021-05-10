@@ -1,8 +1,9 @@
-from lib.columns import clean_column_names
+from lib.columns import clean_column_names, set_values
 from lib.path import data_file_path, ensure_data_dir
 from lib.clean import float_to_int_str, clean_dates, clean_names
 from lib.uid import gen_uid
 from lib.rows import duplicate_row
+from lib import salary
 import pandas as pd
 import numpy as np
 import sys
@@ -20,7 +21,7 @@ def split_names(df):
 def split_rows_by_salary(df):
     salary_cols = [
         '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019']
-    df.loc[:, "annual_salary"] = np.nan
+    df.loc[:, "salary"] = np.nan
     idx = 0
     while idx < df.shape[0]:
         row = df.loc[idx]
@@ -36,12 +37,12 @@ def split_rows_by_salary(df):
             df = duplicate_row(df, idx, salaries_count)
         j = 0
         for k, v in salaries.items():
-            df.loc[idx+j, "annual_salary"] = v
+            df.loc[idx+j, "salary"] = v
             df.loc[idx+j, "pay_effective_year"] = k
             j += 1
         idx += salaries_count
     df = df.drop(columns=salary_cols)
-    df.loc[:, "annual_salary"] = df.annual_salary.astype("float64")
+    df.loc[:, "salary"] = df.salary.astype("float64")
     return df
 
 
@@ -63,6 +64,7 @@ def clean():
         .pipe(split_names)\
         .pipe(clean_dates, ["hire_date"])\
         .pipe(split_rows_by_salary)\
+        .pipe(set_values, {'salary_freq': salary.YEARLY})\
         .pipe(assign_agency)\
         .pipe(clean_names, ["first_name", "last_name"])\
         .pipe(gen_uid, ["agency", "first_name", "last_name", "badge_no"])\

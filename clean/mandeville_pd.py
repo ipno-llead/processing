@@ -1,7 +1,8 @@
 from lib.path import data_file_path, ensure_data_dir
-from lib.columns import clean_column_names
+from lib.columns import clean_column_names, set_values
 from lib.clean import float_to_int_str, clean_names, standardize_desc_cols, clean_salaries
 from lib.uid import gen_uid
+from lib import salary
 import pandas as pd
 import sys
 sys.path.append('../')
@@ -15,10 +16,12 @@ def assign_agency(df, year):
 
 def clean_pprr_20():
     return pd.read_csv(data_file_path('mandeville_pd/mandeville_csd_pprr_2020.csv'))\
+        .rename(columns={'annual_salary': 'salary'})\
         .pipe(clean_column_names)\
         .pipe(float_to_int_str, ['term_year', 'term_day', 'term_month', 'hire_year', 'hire_day', 'hire_month'])\
         .pipe(standardize_desc_cols, ['rank_desc'])\
-        .pipe(clean_salaries, ['annual_salary'])\
+        .pipe(set_values, {'salary_freq': salary.YEARLY})\
+        .pipe(clean_salaries, ['salary'])\
         .pipe(assign_agency, 2020)\
         .pipe(clean_names, ['first_name', 'last_name'])\
         .pipe(gen_uid, ['agency', 'badge_no', 'first_name', 'last_name'])

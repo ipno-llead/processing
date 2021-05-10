@@ -26,7 +26,9 @@ def clean_date(val):
     m = mdy_date_pattern_2.match(val)
     if m is not None:
         [month, day, year] = val.split("/")
-        return year, month, day
+        if int(month) > 12 and int(day) <= 12:
+            month, day = day, month
+        return year, month.lstrip("0"), day.lstrip("0")
     m = mdy_date_pattern_1.match(val)
     if m is not None:
         [month, day, year] = val.split("/")
@@ -34,7 +36,9 @@ def clean_date(val):
             year = "20" + year
         else:
             year = "19" + year
-        return year, month, day
+        if int(month) > 12 and int(day) <= 12:
+            month, day = day, month
+        return year, month.lstrip("0"), day.lstrip("0")
     m = mdy_date_pattern_3.match(val)
     if m is not None:
         [month, day, year] = val.split("-")
@@ -42,6 +46,8 @@ def clean_date(val):
             year = "20" + year
         else:
             year = "19" + year
+        if int(month) > 12 and int(day) <= 12:
+            month, day = day, month
         return year, month.lstrip("0"), day.lstrip("0")
     m = dmy_date_pattern.match(val)
     if m is not None:

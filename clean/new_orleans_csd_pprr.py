@@ -1,9 +1,10 @@
 from lib.columns import (
-    clean_column_names
+    clean_column_names, set_values
 )
 from lib.path import data_file_path, ensure_data_dir
 from lib.uid import gen_uid
 from lib.clean import clean_names, clean_dates, standardize_desc_cols, parse_dates_with_known_format
+from lib import salary
 import pandas as pd
 import numpy as np
 import sys
@@ -12,20 +13,21 @@ sys.path.insert(0, "../")
 
 def match_schema_2014(df):
     df = clean_column_names(df)
-    df = df[['orgn_desc', 'last_name', 'first_name', 'birth_date',
-             'hire_date', 'title_code', 'title_desc', 'termination_date',
-             'pay_prog_start_date', 'annual_salary']]
-    df = df.rename(columns={
+    return df[[
+        'orgn_desc', 'last_name', 'first_name', 'birth_date',
+        'hire_date', 'title_code', 'title_desc', 'termination_date',
+        'pay_prog_start_date', 'annual_salary'
+    ]].rename(columns={
         "orgn_desc": "department_desc",
         "title_code": "rank_code",
         "title_desc": "rank_desc",
-        "termination_date": "term_date"
-    })
-    return df
+        "termination_date": "term_date",
+        'annual_salary': 'salary'
+    }).pipe(set_values, {'salary_freq': salary.YEARLY})
 
 
 def parse_salary_2014(df):
-    df.loc[:, "annual_salary"] = df.annual_salary.str.replace(
+    df.loc[:, "salary"] = df.salary.str.replace(
         ",", "").astype("float64")
     return df
 
@@ -71,18 +73,19 @@ def clean_2014():
 
 def match_schema_2009(df):
     df = clean_column_names(df)
-    df = df[['orgn_desc', 'last_name', 'first_name', 'titl_e_code', 'title_desc',
-             'term_date', 'pay_prog_start_date', 'annual_salary']]
-    df = df.rename(columns={
+    return df[[
+        'orgn_desc', 'last_name', 'first_name', 'titl_e_code', 'title_desc',
+        'term_date', 'pay_prog_start_date', 'annual_salary'
+    ]].rename(columns={
         "orgn_desc": "department_desc",
         "titl_e_code": "rank_code",
-        "title_desc": "rank_desc"
-    })
-    return df
+        "title_desc": "rank_desc",
+        'annual_salary': 'salary',
+    }).pipe(set_values, {'salary_freq': salary.YEARLY})
 
 
 def parse_salary_2009(df):
-    df.loc[:, "annual_salary"] = df.annual_salary.str.replace(
+    df.loc[:, "salary"] = df.salary.str.replace(
         r",|\$", "").astype("float64")
     return df
 

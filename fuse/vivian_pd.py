@@ -16,10 +16,10 @@ def fuse_events(pprr):
     builder = events.Builder()
     builder.extract_events(pprr, {
         events.OFFICER_HIRE: {
-            'prefix': 'hire', 'keep': ['uid', 'agency', 'rank_desc', 'employment_status', 'weekly_salary', 'hourly_salary']
+            'prefix': 'hire', 'keep': ['uid', 'agency', 'rank_desc', 'employment_status', 'salary', 'salary_freq', 'salary', 'salary_freq']
         },
         events.OFFICER_RANK: {
-            'prefix': 'rank', 'keep': ['uid', 'agency', 'rank_desc', 'weekly_salary', 'hourly_salary']
+            'prefix': 'rank', 'keep': ['uid', 'agency', 'rank_desc', 'salary', 'salary_freq', 'salary', 'salary_freq']
         }
     }, ['uid'])
     return builder.to_frame()

@@ -5,8 +5,9 @@ from pandas.api.types import CategoricalDtype
 
 from lib.clean import clean_date, clean_datetime, float_to_int_str
 from lib.uid import ensure_uid_unique, gen_uid_from_dict
-from lib.exceptions import InvalidEventKindException, InvalidEventDateException
+from lib.exceptions import InvalidEventKindException, InvalidEventDateException, InvalidSalaryFreqException
 from lib.columns import rearrange_event_columns
+from lib import salary
 
 OFFICER_LEVEL_1_CERT = "officer_level_1_cert"
 OFFICER_PC_12_QUALIFICATION = "officer_pc_12_qualification"
@@ -139,11 +140,15 @@ class Builder(object):
         ------
         InvalidEventKindException
             If `event_kind` is invalid
+        InvalidSalaryFreqException
+            If `salary_freq` is passed in and it's not one of the categories defined in lib.salary
         InvalidEventDateException
             If `year` isn't passed in or can't be extracted from raw date string.
         """
         if event_kind not in cat_type.categories:
             raise InvalidEventKindException(event_kind)
+        if 'salary_freq' in kwargs and kwargs['salary_freq'] not in salary.cat_type.categories:
+            raise InvalidSalaryFreqException(kwargs['salary_freq'])
         kwargs["kind"] = event_kind
         if raw_date_str is not None:
             self._extract_date(kwargs, raw_date_str, strptime_format)
@@ -223,7 +228,7 @@ class Builder(object):
             self._assign_kwargs_func(
                 cols, kwargs_funcs, flatten_date_cols, kind, obj)
 
-        for idx, row in df.iterrows():
+        for _, row in df.iterrows():
             common_fields = row.drop(flatten_date_cols).to_dict()
             for kind, obj in event_dict.items():
                 if "parse_date" in obj:
@@ -265,6 +270,8 @@ class Builder(object):
         df = pd.DataFrame.from_records(self._records)\
             .pipe(float_to_int_str, ["year", "month", "day"], True)
         df.loc[:, 'kind'] = df.kind.astype(cat_type)
+        if 'salary_freq' in df.columns:
+            df.loc[:, 'salary_freq'] = df.salary_freq.astype(salary.cat_type)
         df = rearrange_event_columns(df)
         ensure_uid_unique(df, 'event_uid', output_duplicated_events)
         return df

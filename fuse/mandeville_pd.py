@@ -20,9 +20,9 @@ def fuse_events(cprr, pprr):
     }, ['uid', 'complaint_uid'])
     builder.extract_events(pprr, {
         events.OFFICER_HIRE: {
-            'prefix': 'hire', 'keep': ['uid', 'badge_no', 'rank_desc', 'annual_salary', 'agency']},
+            'prefix': 'hire', 'keep': ['uid', 'badge_no', 'rank_desc', 'salary', 'salary_freq', 'agency']},
         events.OFFICER_LEFT: {
-            'prefix': 'term', 'keep': ['uid', 'badge_no', 'rank_desc', 'annual_salary', 'agency']}
+            'prefix': 'term', 'keep': ['uid', 'badge_no', 'rank_desc', 'salary', 'salary_freq', 'agency']}
     }, ['uid'])
     return builder.to_frame()
 

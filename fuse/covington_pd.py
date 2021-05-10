@@ -42,7 +42,7 @@ def fuse_events(ah, pprr):
 
     builder.extract_events(pprr, {
         events.OFFICER_PAY_EFFECTIVE: {
-            'prefix': 'salary', 'keep': ['employee_id', 'uid', 'agency', 'annual_salary']
+            'prefix': 'salary', 'keep': ['employee_id', 'uid', 'agency', 'salary', 'salary_freq']
         }
     }, ['uid'])
     return builder.to_frame()

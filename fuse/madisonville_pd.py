@@ -15,7 +15,7 @@ def fuse_events(pprr, cprr):
         events.OFFICER_HIRE: {
             'prefix': 'hire', 'keep': ['uid', 'agency', 'badge_no']},
         events.OFFICER_PAY_EFFECTIVE: {
-            'prefix': 'pay_effective', 'keep': ['uid', 'agency', 'badge_no', 'annual_salary']
+            'prefix': 'pay_effective', 'keep': ['uid', 'agency', 'badge_no', 'salary', 'salary_freq']
         }
     }, ['uid'])
     builder.extract_events(cprr, {

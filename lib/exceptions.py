@@ -8,3 +8,7 @@ class InvalidEventDateException(Exception):
 
 class NonUniqueUIDException(Exception):
     pass
+
+
+class InvalidSalaryFreqException(Exception):
+    pass

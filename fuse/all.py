@@ -44,6 +44,7 @@ def fuse_event():
         pd.read_csv(data_file_path("fuse/event_greenwood_pd.csv")),
         pd.read_csv(data_file_path("fuse/event_st_tammany_so.csv")),
         pd.read_csv(data_file_path("fuse/event_plaquemines_so.csv")),
+        pd.read_csv(data_file_path("fuse/event_louisiana_state_police.csv")),
         pd.read_csv(data_file_path("fuse/event_caddo_parish_so.csv")),
         pd.read_csv(data_file_path("fuse/event_mandeville_pd.csv")),
         pd.read_csv(data_file_path("fuse/event_levee_pd.csv")),

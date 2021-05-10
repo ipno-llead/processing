@@ -4,9 +4,10 @@ import sys
 
 import pandas as pd
 
-from lib.columns import clean_column_names
+from lib.columns import clean_column_names, set_values
 from lib.path import data_file_path, ensure_data_dir
 from lib.clean import clean_dates, clean_salaries, clean_names
+from lib import salary
 
 sys.path.append('../')
 
@@ -92,14 +93,15 @@ def clean():
         .fillna("")\
         .pipe(realign)\
         .rename(columns={
-            'annual': 'annual_salary',
+            'annual': 'salary',
             'emp_no': 'employee_id',
             'status': 'employment_status'
         })\
+        .pipe(set_values, {'salary_freq': salary.YEARLY})\
         .drop(columns=['dept_no'])\
         .pipe(split_names)\
         .pipe(clean_employment_status)\
-        .pipe(clean_salaries, ['annual_salary'])\
+        .pipe(clean_salaries, ['salary'])\
         .pipe(clean_names, ['first_name', 'middle_name', 'middle_initial', 'last_name'])\
         .pipe(join_employment_date)\
         .pipe(assign_agency)\

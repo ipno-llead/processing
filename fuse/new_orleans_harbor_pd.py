@@ -15,13 +15,13 @@ def fuse_events(pprr08, pprr20, cprr):
     builder.extract_events(pprr08, {
         events.OFFICER_HIRE: {'prefix': 'hire', 'keep': ['uid', 'agency']},
         events.OFFICER_LEFT: {'prefix': 'resign', 'keep': ['uid', 'agency']},
-        events.OFFICER_PAY_EFFECTIVE: {'prefix': 'pay_effective', 'keep': ['uid', 'agency', 'hourly_salary']},
+        events.OFFICER_PAY_EFFECTIVE: {'prefix': 'pay_effective', 'keep': ['uid', 'agency', 'salary', 'salary_freq']},
         events.OFFICER_RANK: {'prefix': 'rank', 'keep': ['uid', 'agency', 'rank_desc']},
     }, ['uid'])
     builder.extract_events(pprr20, {
         events.OFFICER_HIRE: {'prefix': 'hire', 'keep': ['uid', 'agency']},
         events.OFFICER_LEFT: {'prefix': 'resign', 'keep': ['uid', 'agency']},
-        events.OFFICER_PAY_EFFECTIVE: {'prefix': 'pay_effective', 'keep': ['uid', 'agency', 'hourly_salary']},
+        events.OFFICER_PAY_EFFECTIVE: {'prefix': 'pay_effective', 'keep': ['uid', 'agency', 'salary', 'salary_freq']},
         events.OFFICER_RANK: {'prefix': 'rank', 'keep': ['uid', 'agency', 'rank_desc']},
     }, ['uid'])
     builder.extract_events(cprr, {

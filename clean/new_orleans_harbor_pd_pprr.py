@@ -3,8 +3,9 @@ from lib.clean import (
     clean_dates, clean_names, standardize_desc_cols, clean_salaries
 )
 from lib.path import data_file_path, ensure_data_dir
-from lib.columns import clean_column_names
+from lib.columns import clean_column_names, set_values
 from lib.uid import gen_uid
+from lib import salary
 import sys
 sys.path.append("../")
 
@@ -20,7 +21,7 @@ def assign_pay_date_and_rank_date(df):
         .drop_duplicates(ignore_index=True)
     uid = None
     rank = None
-    salary = None
+    sal = None
     for idx, row in df.iterrows():
         if row.uid != uid:
             uid = row.uid
@@ -29,10 +30,10 @@ def assign_pay_date_and_rank_date(df):
         else:
             if row.rank_desc != rank:
                 df.loc[idx, 'rank_date'] = row.effective_date
-            if row.hourly_salary != salary:
+            if row.salary != sal:
                 df.loc[idx, 'pay_effective_date'] = row.effective_date
         rank = row.rank_desc
-        salary = row.hourly_salary
+        sal = row.salary
     return df
 
 
@@ -46,12 +47,13 @@ def clean_personnel_2008():
         "mi": "middle_initial",
         "date_hired": "hire_date",
         "position_rank": "rank_desc",
-        "hourly_pay_rate": "hourly_salary",
+        "hourly_pay_rate": "salary",
         "term_date": "resign_date",
     })
     return df\
         .pipe(standardize_desc_cols, ["rank_desc"])\
-        .pipe(clean_salaries, ["hourly_salary"])\
+        .pipe(set_values, {'salary_freq': salary.HOURLY})\
+        .pipe(clean_salaries, ["salary"])\
         .pipe(assign_agency, 2008)\
         .pipe(clean_names, ["first_name", "last_name", "middle_initial"])\
         .pipe(gen_uid, ['agency', 'first_name', 'last_name', 'middle_initial'])\
@@ -69,14 +71,15 @@ def clean_personnel_2020():
     df.rename(columns={
         "date_hired": "hire_date",
         "position_rank": "rank_desc",
-        "hourly_pay": "hourly_salary",
+        "hourly_pay": "salary",
         "mi": "middle_initial",
         "term_date": "resign_date",
         "pay_effective_date": "effective_date"
     }, inplace=True)
     df = df.drop_duplicates(ignore_index=True)
     return df\
-        .pipe(clean_salaries, ['hourly_salary'])\
+        .pipe(set_values, {'salary_freq': salary.HOURLY})\
+        .pipe(clean_salaries, ['salary'])\
         .pipe(standardize_desc_cols, ['rank_desc'])\
         .pipe(assign_agency, 2020)\
         .pipe(clean_names, ["last_name", "middle_initial", "first_name"])\

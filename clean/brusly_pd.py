@@ -1,7 +1,8 @@
 from lib.path import data_file_path, ensure_data_dir
-from lib.columns import clean_column_names
+from lib.columns import clean_column_names, set_values
 from lib.clean import clean_names, clean_dates, standardize_desc_cols, clean_salaries
 from lib.uid import gen_uid
+from lib import salary
 import pandas as pd
 import sys
 sys.path.append("../")
@@ -27,12 +28,6 @@ def split_supervisor(df):
     return df
 
 
-def assign_agency(df, year):
-    df.loc[:, "agency"] = "Brusly PD"
-    df.loc[:, "data_production_year"] = year
-    return df
-
-
 def clean_cprr():
     df = pd.read_csv(data_file_path("brusly_pd/brusly_pd_cprr_2020.csv"))
     df = clean_column_names(df)
@@ -44,7 +39,10 @@ def clean_cprr():
         .pipe(split_supervisor)\
         .pipe(clean_dates, ['receive_date', 'occur_date', 'suspension_start_date', 'suspension_end_date'])\
         .pipe(standardize_desc_cols, ['charges', 'action'])\
-        .pipe(assign_agency, 2020)
+        .pipe(set_values, {
+            'data_production_year': 2020,
+            'agency': 'Brusly PD'
+        })
     return df
 
 
@@ -63,15 +61,18 @@ def clean_pprr():
     df = clean_column_names(df)
     df.columns = [
         'employee_name', 'birth_date', 'hire_date', 'term_date',
-        'company_name', 'department_name', 'rank_desc', 'annual_salary']
-    df = df.drop(df[df.employee_name.isna()].index).reset_index(drop=True)
-    df = df.drop(columns=['company_name', 'department_name'])
-    df = df\
+        'company_name', 'department_name', 'rank_desc', 'salary']
+    df = df.drop(df[df.employee_name.isna()].index).reset_index(drop=True)\
+        .pipe(set_values, {'salary_freq': salary.YEARLY})\
+        .drop(columns=['company_name', 'department_name'])\
         .pipe(split_pprr_name)\
         .pipe(clean_dates, ['birth_date', 'hire_date', 'term_date'])\
         .pipe(standardize_desc_cols, ["rank_desc"])\
-        .pipe(clean_salaries, ["annual_salary"])\
-        .pipe(assign_agency, 2020)\
+        .pipe(clean_salaries, ["salary"])\
+        .pipe(set_values, {
+            'data_production_year': 2020,
+            'agency': 'Brusly PD'
+        })\
         .pipe(clean_names, ['first_name', 'last_name', 'middle_initial'])\
         .pipe(gen_uid, [
             "agency", "last_name", "first_name", "middle_initial", "birth_year", "birth_month", "birth_day"
@@ -87,7 +88,10 @@ def clean_award():
             'f_name': 'first_name',
             'comments': 'award_comments'
         })\
-        .pipe(assign_agency, 2021)\
+        .pipe(set_values, {
+            'data_production_year': 2021,
+            'agency': 'Brusly PD'
+        })\
         .pipe(gen_uid, ['agency', 'last_name', 'first_name'])
 
 

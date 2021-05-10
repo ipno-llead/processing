@@ -1,8 +1,11 @@
-from lib.match import ThresholdMatcher, JaroWinklerSimilarity, ColumnsIndex
+import sys
+
+from datamatch import ThresholdMatcher, JaroWinklerSimilarity, ColumnsIndex
+import pandas as pd
+
 from lib.path import data_file_path, ensure_data_dir
 from lib.post import extract_events_from_post
-import pandas as pd
-import sys
+
 sys.path.append('../')
 
 
