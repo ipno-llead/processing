@@ -1,0 +1,26 @@
+files:
+  data/fuse/complaint.csv:
+    - name: `complaint_uid` should be unique per `allegation` x `uid`
+      unique:
+        - complaint_uid
+        - uid
+        - allegation
+    - name: if `allegation_finding` is "sustained" then `disposition` should also be "sustained"
+      empty:
+        and:
+          - column: allegation_finding
+            op: equal
+            value: sustained
+          - column: disposition
+            op: not_equal
+            value: sustained
+  data/fuse/event.csv:
+    - name: no officer with consecutive left date
+      where:
+        kind: officer_left
+      where_same: uid
+      combine_date:
+        - year
+        - month
+        - day
+      no_consecutive_date: yes
