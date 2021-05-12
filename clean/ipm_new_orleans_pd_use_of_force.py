@@ -11,20 +11,20 @@ sys.path.append('../')
 
 def clean_trailing_empty_time(df, cols):
     for col in cols:
-        df.loc[:, col] = df[col].str.replace(r' \d:\d\d$', '')
+        df.loc[:, col] = df[col].str.replace(r' \d:\d\d$', '', regex=True)
     return df
 
 
 def add_occur_day(df):
     df.loc[:, 'occur_day'] = df.occur_date.str.replace(
-        r'^\d+\/(\d+)\/\d+.+', r'\1')
+        r'^\d+\/(\d+)\/\d+.+', r'\1', regex=True)
     df = df.drop(columns=['occur_date', 'day_of_week'])
     return df
 
 
 def add_occur_time(df):
     df.loc[:, 'occur_time'] = df.occur_hour.str.zfill(2).str.cat(
-        df.occur_minute.str.replace(r'\:.+', ''), sep=':')
+        df.occur_minute.str.replace(r'\:.+', '', regex=True), sep=':')
     return df.drop(columns=['occur_hour', 'occur_minute'])
 
 

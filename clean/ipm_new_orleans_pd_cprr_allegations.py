@@ -72,26 +72,27 @@ def drop_rows_without_tracking_number(df):
 
 
 def clean_occur_time(df):
-    df.loc[:, 'occur_time'] = df.occur_time.str.replace(r'\.0$', '')
+    df.loc[:, 'occur_time'] = df.occur_time.str.replace(
+        r'\.0$', '', regex=True)
     return df
 
 
 def clean_trailing_empty_time(df, cols):
     for col in cols:
-        df.loc[:, col] = df[col].str.replace(r' 0:00$', '')
+        df.loc[:, col] = df[col].str.replace(r' 0:00$', '', regex=True)
     return df
 
 
 def clean_complainant_type(df):
     df.loc[:, 'complainant_type'] = df.complainant_type.str.lower().str.strip()\
-        .str.replace(r' \# \d+$', '').str.replace(r' complain(t|ant)$', '')\
-        .str.replace(r'civilian', 'citizen').str.replace(r' offi$', ' office')
+        .str.replace(r' \# \d+$', '', regex=True).str.replace(r' complain(t|ant)$', '', regex=True)\
+        .str.replace(r'civilian', 'citizen', regex=True).str.replace(r' offi$', ' office', regex=True)
     return df
 
 
 def combine_rule_and_paragraph(df):
     df.loc[:, "charges"] = df.rule_violation.str.cat(df.paragraph_violation, sep='; ')\
-        .str.replace(r'^; ', '').str.replace(r'; $', '')
+        .str.replace(r'^; ', '', regex=True).str.replace(r'; $', '', regex=True)
     df = df.drop(columns=['rule_violation', 'paragraph_violation'])
     return df
 
