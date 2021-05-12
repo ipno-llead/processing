@@ -19,15 +19,15 @@ def create_officer_number_dict(pprr):
 
 
 def fuse_cprr(cprr, actions, officer_number_dict):
-    actions.loc[:, 'allegation_primary_key'] = actions.allegation_primary_key.astype(
-        str)
-    actions_dict = actions.set_index('allegation_primary_key').action.to_dict()
+    # actions.loc[:, 'allegation_primary_key'] = actions.allegation_primary_key\
+    #     .astype(str)
+    # actions_dict = actions.set_index('allegation_primary_key').action.to_dict()
     cprr = float_to_int_str(
         cprr, ['officer_primary_key', 'allegation_primary_key'])
     cprr.loc[:, 'uid'] = cprr.officer_primary_key.map(
         lambda x: officer_number_dict.get(x, ''))
-    cprr.loc[:, 'action'] = cprr.allegation_primary_key.map(
-        lambda x: actions_dict.get(x, ''))
+    # cprr.loc[:, 'action'] = cprr.allegation_primary_key.map(
+    #     lambda x: actions_dict.get(x, ''))
     return rearrange_complaint_columns(cprr)
 
 

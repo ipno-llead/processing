@@ -102,6 +102,32 @@ def assign_agency(df):
     return df
 
 
+def discard_allegations_with_same_description(df):
+    finding_cat = pd.CategoricalDtype(categories=[
+        'sustained',
+        'exonerated',
+        'illegitimate outcome',
+        'counseling',
+        'mediation',
+        'not sustained',
+        'unfounded',
+        'no investigation',
+        'pending'
+    ], ordered=True)
+    df.loc[:, 'allegation_finding'] = df.allegation_finding.replace({
+        'di-2': 'counseling',
+        'nfim': 'no investigation'
+    }).astype(finding_cat)
+    return df.sort_values(['tracking_number', 'complaint_uid', 'allegation_finding'])\
+        .drop_duplicates(subset=['complaint_uid'], keep='first')\
+        .reset_index(drop=True)
+
+
+def remove_rows_with_conflicting_disposition(df):
+    df.loc[df.allegation_finding == 'sustained', 'disposition'] = 'sustained'
+    return df
+
+
 def clean():
     df = initial_processing()
     return df\
@@ -125,9 +151,10 @@ def clean():
         .pipe(combine_rule_and_paragraph)\
         .pipe(assign_agency)\
         .pipe(gen_uid, [
-            'agency', 'tracking_number', 'officer_primary_key', 'allegation_primary_key'
-        ], 'allegation_uid')\
-        .pipe(gen_uid, ['allegation_uid'], 'complaint_uid')
+            'agency', 'tracking_number', 'officer_primary_key', 'allegation', 'allegation_class'
+        ], 'complaint_uid')\
+        .pipe(discard_allegations_with_same_description)\
+        .pipe(remove_rows_with_conflicting_disposition)
 
 
 if __name__ == '__main__':
