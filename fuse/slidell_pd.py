@@ -19,7 +19,7 @@ def fuse_events(pprr):
             'prefix': 'hire', 'keep': ['uid', 'agency', 'department_desc', 'badge_no', 'employment_status']
         },
         events.OFFICER_PAY_EFFECTIVE: {
-            'prefix': 'salary', 'parse_date': True, 'keep': ['uid', 'agency', 'rank_desc', 'salary', 'salary_freq']
+            'prefix': 'salary', 'keep': ['uid', 'agency', 'rank_desc', 'salary', 'salary_freq']
         }
     }, ['uid'])
     return builder.to_frame()

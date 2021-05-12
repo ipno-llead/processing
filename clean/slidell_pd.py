@@ -28,6 +28,21 @@ def split_names(df):
     return df.drop(columns=['name'])
 
 
+def clean_rank(df):
+    df.loc[:, 'rank_desc'] = df.rank_desc\
+        .str.replace('temp.', 'temporary', regex=False)\
+        .str.replace('asst.', 'assistant', regex=False)\
+        .str.replace(r'(sergeamt|sgt.)', 'sergeant', regex=True)\
+        .str.replace(r'\/tech ', ' technology ', regex=True)\
+        .str.replace(r'support s$', 'support special', regex=True)\
+        .str.replace(r' (c of|chief of( p)?)$', ' chief of police', regex=True)\
+        .str.replace(r'-$', '', regex=True)\
+        .str.replace(r' 3rd$', ' 3rd class', regex=True)\
+        .str.replace(' 2 nd ', ' 2nd ', regex=False)\
+        .str.replace('policesergeant', 'police sergeant', regex=False)
+    return df
+
+
 def clean09():
     return pd.read_csv(data_file_path(
         'slidell_pd/slidell_pd_pprr_2009.csv'
@@ -52,6 +67,7 @@ def clean09():
         .reset_index(drop=True)\
         .pipe(clean_dates, ['hire_date', 'salary_date'])\
         .pipe(standardize_desc_cols, ['rank_desc'])\
+        .pipe(clean_rank)\
         .pipe(set_values, {
             'data_production_year': 2009,
             'agency': 'Slidell PD'
@@ -94,6 +110,7 @@ def clean19():
         .pipe(clean_names, ['first_name', 'last_name'])\
         .pipe(clean_dates, ['hire_date', 'salary_date'])\
         .pipe(standardize_desc_cols, ['rank_desc', 'department_desc', 'employment_status'])\
+        .pipe(clean_rank)\
         .pipe(set_values, {
             'data_production_year': 2019,
             'agency': 'Slidell PD'
@@ -108,14 +125,57 @@ def fill_empty_columns_for_pprr_2009(df09, df19):
     return df09
 
 
-if __name__ == '__main__':
+def deduplicate(df):
+    rank_cat = pd.CategoricalDtype(categories=[
+        'acting chief of police',
+        'chief of police',
+        'chief of police elect',
+        'captain, assistant chief of police',
+        'captain',
+        'police captain',
+        'police corporal',
+        'lieutenant',
+        'police lieutenant',
+        'sergeant',
+        'police sergeant',
+        'temporary police sergeant',
+        'police officer 1st class',
+        'police officer 2nd class',
+        'police officer 3rd class',
+        'police officer iii',
+        'police officer',
+        'police',
+        'reserve police officer',
+        'temporary police officer - sr',
+        'temporary police officer 3rd class',
+        'temporary police officer',
+        'sergeant technology support special',
+        'corrections lieutenant',
+        'corrections officer ii',
+        'corrections peace officer',
+        'special assistant to chief of police',
+        'temporary appointment',
+        'school resource officer'
+        'special detail - wal-mart',
+    ], ordered=True)
+    df.loc[:, 'rank_desc'] = df.rank_desc.astype(rank_cat)
+    return df.sort_values(['uid', 'salary_year', 'salary_month', 'salary_day', 'rank_desc'])\
+        .drop_duplicates(subset=['uid', 'salary_year', 'salary_month', 'salary_day'], keep='first')\
+        .reset_index(drop=True)
+
+
+def clean():
     df09 = clean09()
     df19 = clean19()
     df09 = fill_empty_columns_for_pprr_2009(df09, df19)
-    df = pd.concat([
+    return pd.concat([
         df09,
         df19
-    ])
+    ]).pipe(deduplicate)
+
+
+if __name__ == '__main__':
+    df = clean()
     ensure_data_dir('clean')
     df.to_csv(data_file_path(
         'clean/pprr_slidell_pd_2019.csv'
