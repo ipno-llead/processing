@@ -1,0 +1,29 @@
+files:
+  fuse/complaint.csv:
+    - name: "`complaint_uid` should be unique per `allegation` x `uid`"
+      unique:
+        - complaint_uid
+        - uid
+        - allegation
+    - name: if `allegation_finding` is "sustained" then `disposition` should also be "sustained"
+      empty:
+        and:
+          - column: allegation_finding
+            op: equal
+            value: sustained
+          - column: disposition
+            op: not_equal
+            value: sustained
+  fuse/event.csv:
+    - name: no officer with more than 1 left date in a calendar month
+      where:
+        column: kind
+        op: equal
+        value: officer_left
+      group_by: uid
+      no_more_than_once_a_month:
+        date_from:
+          year_column: year
+          month_column: month
+          day_column: day
+save_bad_rows_to: invalid_rows.csv
