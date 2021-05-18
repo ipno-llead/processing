@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import pandas as pd
 from pandas.api.types import CategoricalDtype
@@ -7,6 +7,7 @@ from lib.clean import clean_date, clean_datetime, float_to_int_str
 from lib.uid import ensure_uid_unique, gen_uid_from_dict
 from lib.exceptions import InvalidEventKindException, InvalidEventDateException, InvalidSalaryFreqException
 from lib.columns import rearrange_event_columns
+from lib.date import combine_date_columns
 from lib import salary
 
 OFFICER_LEVEL_1_CERT = "officer_level_1_cert"
@@ -278,3 +279,32 @@ class Builder(object):
         df = rearrange_event_columns(df)
         ensure_uid_unique(df, 'event_uid', output_duplicated_events)
         return df
+
+
+def discard_events_occur_more_than_once_every_30_days(df, kind, groupby):
+    """Discard events that occur more than once every 30 days.
+
+    Parameters
+    ----------
+    kind
+        event kind to filter
+    groupby
+        list of columns to group by
+    """
+    df.loc[:, 'date'] = combine_date_columns(df, 'year', 'month', 'day')
+    event_uids = []
+    for _, frame in df[df.kind == kind].groupby(groupby):
+        if frame.shape[0] == 1:
+            continue
+        frame = frame.sort_values(['date'])
+        prev_date = None
+        prev_event_uid = None
+        for _, row in frame.iterrows():
+            if pd.isnull(row.date):
+                continue
+            if prev_date is not None and (prev_date == row.date or prev_date + timedelta(days=30) >= row.date):
+                event_uids.append(prev_event_uid)
+            prev_date = row.date
+            prev_event_uid = row.event_uid
+    df = df.loc[~df.event_uid.isin(event_uids)]
+    return df.drop(columns=['date']).reset_index(drop=True)

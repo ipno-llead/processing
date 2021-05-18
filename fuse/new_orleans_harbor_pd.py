@@ -38,7 +38,7 @@ def fuse_events(pprr08, pprr20, cprr):
             'prefix': 'investigation_complete', 'keep': ['uid', 'agency', 'complaint_uid']
         }
     }, ['uid', 'complaint_uid'])
-    return builder.to_frame()
+    return events.discard_events_occur_more_than_once_every_30_days(builder.to_frame(), events.OFFICER_LEFT, ['uid'])
 
 
 if __name__ == "__main__":

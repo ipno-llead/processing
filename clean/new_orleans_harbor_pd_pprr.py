@@ -88,8 +88,7 @@ def clean_personnel_2020():
         ])\
         .pipe(assign_pay_date_and_rank_date)\
         .pipe(gen_uid, ['uid', 'pay_effective_date', 'rank_date'], 'perhist_uid')\
-        .pipe(clean_dates, ["resign_date", "hire_date", "pay_effective_date", "rank_date"])\
-
+        .pipe(clean_dates, ["resign_date", "hire_date", "pay_effective_date", "rank_date"])
 
 
 if __name__ == "__main__":
