@@ -1,7 +1,5 @@
 import re
 
-import pandas as pd
-
 from .clean import float_to_int_str, names_to_title_case
 
 
@@ -249,8 +247,12 @@ def rearrange_appeal_hearing_columns(df):
 
 def rearrange_use_of_force(df):
     existing_cols = set(df.columns)
-    df = df[[
+    return float_to_int_str(
+        df[[
             col for col in USE_OF_FORCE_COLUMNS
             if col in existing_cols
-            ]].drop_duplicates(ignore_index=True)
-    return df
+        ]].drop_duplicates(ignore_index=True),
+        [
+            'citizen_age', 'citizen_age_1', 'officer_current_supervisor', 'officer_age',
+            'officer_years_exp', 'officer_years_with_unit'
+        ])
