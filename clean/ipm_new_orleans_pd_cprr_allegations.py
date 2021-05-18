@@ -89,7 +89,7 @@ def discard_allegations_with_same_description(df):
         'mediation',
         'not sustained',
         'unfounded',
-        'no investigation',
+        'no investigation merited',
         'pending'
     ], ordered=True)
     df.loc[:, 'allegation_finding'] = df.allegation_finding.replace({
@@ -109,6 +109,14 @@ def remove_rows_with_conflicting_disposition(df):
 def clean_tracking_number(df):
     df.loc[:, 'tracking_number'] = df.tracking_number.str\
         .replace(r'^Rule9-', '', regex=True)
+    return df
+
+
+def replace_disposition(df):
+    df.loc[:, 'disposition'] = df.disposition.replace({
+        'di-2': 'counseling',
+        'nfim': 'no investigation merited'
+    })
     return df
 
 
@@ -163,7 +171,8 @@ def clean():
         .pipe(gen_uid, [
             'agency', 'tracking_number', 'officer_primary_key', 'allegation', 'allegation_class'
         ], 'complaint_uid')\
-        .pipe(discard_allegations_with_same_description)
+        .pipe(discard_allegations_with_same_description)\
+        .pipe(replace_disposition)
 
 
 if __name__ == '__main__':
