@@ -94,7 +94,7 @@ def discard_allegations_with_same_description(df):
     ], ordered=True)
     df.loc[:, 'allegation_finding'] = df.allegation_finding.replace({
         'di-2': 'counseling',
-        'nfim': 'no investigation'
+        'nfim': 'no investigation merited'
     }).astype(finding_cat)
     return df.sort_values(['tracking_number', 'complaint_uid', 'allegation_finding'])\
         .drop_duplicates(subset=['complaint_uid'], keep='first')\
