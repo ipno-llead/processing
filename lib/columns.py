@@ -110,6 +110,7 @@ USE_OF_FORCE_COLUMNS = [
     'distance_from_officer',
     'body_worn_camera_available',
     'app_used',
+    'citizen_uid',
     'citizen_arrested',
     'citizen_hospitalized',
     'citizen_injured',

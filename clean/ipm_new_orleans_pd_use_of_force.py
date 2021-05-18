@@ -95,7 +95,8 @@ def clean():
             'agency', 'uof_tracking_number', 'officer_primary_key', 'citizen_primary_key',
             'force_description', 'force_type', 'force_level', 'effective_uof',
             'accidental_discharge', 'less_than_lethal'
-        ], 'uof_uid')
+        ], 'uof_uid')\
+        .pipe(gen_uid, ['agency', 'citizen_primary_key'], 'citizen_uid')
 
 
 if __name__ == '__main__':
