@@ -51,7 +51,8 @@ DATA_FILES = {
         "https://www.dropbox.com/sh/qihmr1a6wiswr6f/AAAwyYt429HSaOO6ZlNeNQsca/Baton_Rouge_FPCSB_Logs_1992-2012.csv?dl=1",  # noqa
     ],
     "baton_rouge_so": [
-        "https://www.dropbox.com/sh/7s3ernm7fea479k/AAAXbtXwRx59xb0zPe6ExzMFa/Baton_Rouge_SO_CPRR_2018.csv?dl=1",  # noqa
+        "https://www.dropbox.com/sh/7s3ernm7fea479k/AAAXbtXwRx59xb0zPe6ExzMFa/Baton_Rouge_SO_Cprr_2018.csv?dl=1",  # noqa
+        "https://www.dropbox.com/s/ntxarlgwzlqoms9/baton_rouge_so_cprr_2016-2020.csv?dl=1", # noqa
     ],
     "louisiana_state_csc": [
         "https://www.dropbox.com/sh/9zndy2dz3w60etq/AAAqcTxDk8GVj3uvQbUto3XBa/Log%20Records/LouisianaState_CSC_LPRR_1991-2020.csv?dl=1",  # noqa
