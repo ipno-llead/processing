@@ -1,16 +1,10 @@
-# noinspection PyUnresolvedReferences
 from lib.columns import clean_column_names
-# noinspection PyUnresolvedReferences
 from lib.uid import gen_uid
-# noinspection PyUnresolvedReferences
 from lib.path import data_file_path, ensure_data_dir
-# noinspection PyUnresolvedReferences
 from lib.clean import (
     clean_names, standardize_desc_cols, clean_dates, clean_sexes, clean_races, clean_datetimes
 )
-# noinspection PyUnresolvedReferences
 import pandas as pd
-# noinspection PyUnresolvedReferences
 import sys
 sys.path.append("../")
 
