@@ -8,7 +8,6 @@ import pandas as pd
 import sys
 sys.path.append("../")
 
-
 def split_name(df):
     names1 = df.name.str.strip().str.replace(
         r"^(\w+(?: \w\.)?) (\w+(?:, \w{2}\.)?)$", r"\1@@\2", regex=False).str.split("@@", expand=True)
@@ -19,13 +18,11 @@ def split_name(df):
     df = df.drop(columns=["name"])
     return df
 
-
 def clean_action(df):
     df.loc[:, "action"] = df.action.str.lower().str.strip()\
         .str.replace(r"(\. |, | and )", " | ", regex=False).str.replace(r"\.$", "", regex=False)\
         .str.replace("privliges", "privileges", regex=False)
     return df
-
 
 def split_infraction(df):
     infractions = df.infraction.str.extract(r"^([A-Za-z ,]+)(\d.+)?$")
@@ -57,11 +54,9 @@ def clean_charges(df):
         .str.replace("1-01.1 - unsatisfactory performance", "01-01.14 - unsatisfactory performance", regex=False)
     return df
 
-
 def assign_agency(df):
     df.loc[:, "agency"] = "Baton Rouge SO"
     return df
-
 
 def assign_prod_year(df, year):
     df.loc[:, "data_production_year"] = year
