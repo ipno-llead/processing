@@ -1,4 +1,4 @@
-from lib.match import (
+from datamatch import (
     ThresholdMatcher, JaroWinklerSimilarity, ColumnsIndex
 )
 from lib.path import data_file_path, ensure_data_dir
@@ -20,10 +20,10 @@ def match_cprr(cprr, pprr):
     dfb = pprr[['first_name', 'last_name', 'uid']]\
         .drop_duplicates(subset=['uid']).set_index('uid', drop=True)
     dfb.loc[:, 'fc'] = dfb.first_name.fillna('').map(lambda x: x[:1])
-    matcher = ThresholdMatcher(dfa, dfb, ColumnsIndex(["fc"]), {
+    matcher = ThresholdMatcher(ColumnsIndex(["fc"]), {
         "first_name": JaroWinklerSimilarity(),
         "last_name": JaroWinklerSimilarity(),
-    })
+    }, dfa, dfb)
     decision = 0.94
     matcher.save_pairs_to_excel(data_file_path(
         "match/st_tammany_so_cprr_2011_2021_v_pprr_2020.xlsx"), decision)
@@ -43,10 +43,10 @@ def match_pprr_and_post(pprr, post):
     dfb.loc[:, 'fc'] = dfb.first_name.map(lambda x: x[:1])
     dfb = dfb.drop_duplicates(subset=['uid']).set_index('uid')
 
-    matcher = ThresholdMatcher(dfa, dfb, ColumnsIndex(["fc"]), {
+    matcher = ThresholdMatcher(ColumnsIndex(["fc"]), {
         "last_name": JaroWinklerSimilarity(),
         "first_name": JaroWinklerSimilarity(),
-    })
+    }, dfa, dfb)
     decision = 0.955
     matcher.save_pairs_to_excel(data_file_path(
         "match/st_tammany_so_pprr_2020_v_post_pprr_2020_11_06.xlsx"), decision)
@@ -63,10 +63,10 @@ def match_cprr_and_post(cprr, post):
     dfb.loc[:, 'fc'] = dfb.first_name.fillna('').map(lambda x: x[:1])
     dfb = dfb.drop_duplicates(subset=['uid']).set_index('uid')
 
-    matcher = ThresholdMatcher(dfa, dfb, ColumnsIndex(["fc"]), {
+    matcher = ThresholdMatcher(ColumnsIndex(["fc"]), {
         "last_name": JaroWinklerSimilarity(),
         "first_name": JaroWinklerSimilarity(),
-    })
+    }, dfa, dfb)
     decision = 0.929
     matcher.save_pairs_to_excel(data_file_path(
         "match/st_tammany_so_cprr_2011_2021_v_post_pprr_2020_11_06.xlsx"), decision)

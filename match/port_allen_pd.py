@@ -1,5 +1,5 @@
 from lib.date import combine_date_columns
-from lib.match import ThresholdMatcher, JaroWinklerSimilarity, NoopIndex, DateSimilarity
+from datamatch import ThresholdMatcher, JaroWinklerSimilarity, NoopIndex, DateSimilarity
 from lib.path import data_file_path, ensure_data_dir
 from lib.post import extract_events_from_post
 import pandas as pd
@@ -20,11 +20,11 @@ def match_csd_pprr_against_post_pprr(pprr, post):
         post, 'hire_year', 'hire_month', 'hire_day')
     dfb = dfb.set_index('uid')
 
-    matcher = ThresholdMatcher(dfa, dfb, NoopIndex(), {
+    matcher = ThresholdMatcher(NoopIndex(), {
         'first_name': JaroWinklerSimilarity(),
         'last_name': JaroWinklerSimilarity(),
         'hire_date': DateSimilarity(),
-    })
+    }, dfa, dfb)
     decision = 0.989
     matcher.save_pairs_to_excel(data_file_path(
         "match/port_allen_csd_pprr_2020_v_post_pprr_2020_11_06.xlsx"), decision)
@@ -38,10 +38,10 @@ def match_cprr_against_csd_pprr_2020(cprr, pprr, year, decision):
 
     dfb = pprr[['first_name', 'last_name', 'uid']].set_index('uid')
 
-    matcher = ThresholdMatcher(dfa, dfb, NoopIndex(), {
+    matcher = ThresholdMatcher(NoopIndex(), {
         'first_name': JaroWinklerSimilarity(),
         'last_name': JaroWinklerSimilarity(),
-    })
+    }, dfa, dfb)
     matcher.save_pairs_to_excel(data_file_path(
         "match/port_allen_pd_cprr_%d_v_csd_pprr_2020.xlsx" % year), decision)
     matches = matcher.get_index_pairs_within_thresholds(decision)

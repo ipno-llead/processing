@@ -1,4 +1,4 @@
-from lib.match import ThresholdMatcher, JaroWinklerSimilarity, ColumnsIndex
+from datamatch import ThresholdMatcher, JaroWinklerSimilarity, ColumnsIndex
 from lib.path import data_file_path, ensure_data_dir
 import pandas as pd
 import sys
@@ -14,10 +14,10 @@ def match_cprr_post(cprr, post, agency, year, decision):
     dfb.loc[:, 'fc'] = dfb.first_name.fillna('').map(lambda x: x[:1])
     dfb = dfb.set_index('uid', drop=True)
 
-    matcher = ThresholdMatcher(dfa, dfb, ColumnsIndex(['fc']), {
+    matcher = ThresholdMatcher(ColumnsIndex(['fc']), {
         'first_name': JaroWinklerSimilarity(),
         'last_name': JaroWinklerSimilarity(),
-    })
+    }, dfa, dfb)
     matcher.save_pairs_to_excel(data_file_path(
         "match/%s_levee_pd_cprr_%d_v_post_pprr_2020_11_06.xlsx" % (agency, year)), decision)
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)

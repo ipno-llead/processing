@@ -20,10 +20,10 @@ def add_uid_to_complaint(cprr, pprr):
     dfa = cprr[["first_name", "last_name"]]
     dfb = pprr.set_index("uid", drop=True)[["first_name", "last_name"]]
 
-    matcher = ThresholdMatcher(dfa, dfb, NoopIndex(), {
+    matcher = ThresholdMatcher(NoopIndex(), {
         "first_name": JaroWinklerSimilarity(),
         "last_name": JaroWinklerSimilarity()
-    })
+    }, dfa, dfb)
     decision = 0.7
     matcher.save_pairs_to_excel(data_file_path(
         "match/brusly_pd_cprr_officer_v_pprr.xlsx"), decision)
@@ -41,10 +41,10 @@ def add_supervisor_uid_to_complaint(cprr, pprr):
     dfa.columns = ["first_name", "last_name"]
     dfb = pprr.set_index("uid", drop=True)[["first_name", "last_name"]]
 
-    matcher = ThresholdMatcher(dfa, dfb, NoopIndex(), {
+    matcher = ThresholdMatcher(NoopIndex(), {
         "first_name": JaroWinklerSimilarity(),
         "last_name": JaroWinklerSimilarity()
-    })
+    }, dfa, dfb)
     decision = 0.9
     matcher.save_pairs_to_excel(data_file_path(
         "match/brusly_pd_cprr_supervisor_v_pprr.xlsx"), decision)
@@ -64,10 +64,10 @@ def add_uid_to_award(award, pprr):
     dfb = pprr[['uid', 'first_name', 'last_name']].drop_duplicates()\
         .set_index('uid', drop=True)
 
-    matcher = ThresholdMatcher(dfa, dfb, NoopIndex(), {
+    matcher = ThresholdMatcher(NoopIndex(), {
         "first_name": JaroWinklerSimilarity(),
         "last_name": JaroWinklerSimilarity()
-    })
+    }, dfa, dfb)
     decision = 0.9
     matcher.save_pairs_to_excel(data_file_path(
         "match/brusly_pd_award_v_pprr.xlsx"), decision)
@@ -82,10 +82,10 @@ def extract_post_events(pprr, post):
     dfa = pprr[["uid", "first_name", "last_name"]].set_index("uid", drop=True)
     dfb = post[["uid", "first_name", "last_name"]].set_index("uid", drop=True)
 
-    matcher = ThresholdMatcher(dfa, dfb, NoopIndex(), {
+    matcher = ThresholdMatcher(NoopIndex(), {
         "first_name": JaroWinklerSimilarity(),
         "last_name": JaroWinklerSimilarity()
-    })
+    }, dfa, dfb)
     decision = 0.9
     matcher.save_pairs_to_excel(data_file_path(
         "match/brusly_pd_pprr_v_post.xlsx"), decision)

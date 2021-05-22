@@ -1,6 +1,6 @@
 from lib.date import combine_date_columns
 from lib.path import data_file_path, ensure_data_dir
-from lib.match import (
+from datamatch import (
     ThresholdMatcher, JaroWinklerSimilarity, DateSimilarity, ColumnsIndex
 )
 from lib.post import extract_events_from_post
@@ -22,11 +22,11 @@ def match_pprr_against_post(pprr, post):
     dfb.loc[:, 'fc'] = dfb.first_name.fillna('').map(lambda x: x[:1])
     dfb = dfb.drop_duplicates(subset=['uid']).set_index('uid')
 
-    matcher = ThresholdMatcher(dfa, dfb, ColumnsIndex(['fc']), {
+    matcher = ThresholdMatcher(ColumnsIndex(['fc']), {
         'first_name': JaroWinklerSimilarity(),
         'last_name': JaroWinklerSimilarity(),
         'hire_date': DateSimilarity()
-    })
+    }, dfa, dfb)
     decision = 0.803
     matcher.save_pairs_to_excel(data_file_path(
         "match/new_orleans_pd_pprr_1946_2018_v_post_pprr_2020_11_06.xlsx"), decision)

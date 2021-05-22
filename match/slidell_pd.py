@@ -20,10 +20,10 @@ def extract_post_events(pprr, post):
     dfb.loc[:, 'fc'] = dfb.first_name.fillna('').map(lambda x: x[:1])
     dfb = dfb.drop_duplicates(subset=['uid']).set_index('uid', drop=True)
 
-    matcher = ThresholdMatcher(dfa, dfb, ColumnsIndex(['fc']), {
+    matcher = ThresholdMatcher(ColumnsIndex(['fc']), {
         'first_name': JaroWinklerSimilarity(),
         'last_name': JaroWinklerSimilarity(),
-    })
+    }, dfa, dfb)
     decision = 0.95
     matcher.save_pairs_to_excel(data_file_path(
         "match/slidell_pd_pprr_2019_v_post_pprr_2020_11_06.xlsx"), decision)

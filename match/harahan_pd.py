@@ -17,10 +17,10 @@ def match_pd_pprr_with_csd_pprr(pdpprr, csdpprr):
         .set_index('uid', drop=True)
     dfb.loc[:, 'fc'] = dfb.first_name.map(lambda x: x[:1])
 
-    matcher = ThresholdMatcher(dfa, dfb, ColumnsIndex(['fc']), {
+    matcher = ThresholdMatcher(ColumnsIndex(['fc']), {
         'first_name': JaroWinklerSimilarity(),
         'last_name': JaroWinklerSimilarity(),
-    })
+    }, dfa, dfb)
     decision = 0.97
     matcher.save_pairs_to_excel(data_file_path(
         "match/harahan_pd_pprr_2020_v_csd_pprr_2020.xlsx"), decision)

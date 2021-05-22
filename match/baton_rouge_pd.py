@@ -31,12 +31,12 @@ def match_csd_pprr_2017_v_2019(df17, df19):
     dfb = dfb.drop_duplicates("uid").set_index(
         "uid", drop=True)
 
-    matcher = ThresholdMatcher(dfa, dfb, ColumnsIndex(["first_name", "lnsf"]), {
+    matcher = ThresholdMatcher(ColumnsIndex(["first_name", "lnsf"]), {
         "last_name": JaroWinklerSimilarity(0.25),
         "middle_initial": StringSimilarity(),
         "rank_code": StringSimilarity(),
         "hire_date": DateSimilarity()
-    })
+    }, dfa, dfb)
     decision = 0.7
     matcher.save_pairs_to_excel(data_file_path(
         "match/baton_rouge_csd_pprr_2017_v_pprr_2019.xlsx"), decision)
@@ -71,11 +71,11 @@ def match_pd_cprr_2018_v_csd_pprr_2019(cprr, pprr):
                ].drop_duplicates("uid").set_index("uid", drop=True)
     dfb.loc[:, "fc"] = dfb.first_name.map(lambda x: x[:1])
 
-    matcher = ThresholdMatcher(dfa, dfb, ColumnsIndex(["fc"]), {
+    matcher = ThresholdMatcher(ColumnsIndex(["fc"]), {
         "last_name": JaroWinklerSimilarity(),
         "first_name": JaroWinklerSimilarity(),
         "middle_initial": JaroWinklerSimilarity(),
-    })
+    }, dfa, dfb)
     decision = 0.8
     matcher.save_pairs_to_excel(data_file_path(
         "match/baton_rouge_pd_cprr_2018_v_csd_pprr_2019.xlsx"), decision)
@@ -106,11 +106,11 @@ def match_csd_pprr_against_post(pprr, post, year, decision):
     dfb.loc[:, 'fc'] = dfb.first_name.map(lambda x: x[:1])
     dfb = dfb.drop_duplicates(subset=['uid']).set_index('uid')
 
-    matcher = ThresholdMatcher(dfa, dfb, ColumnsIndex(["fc"]), {
+    matcher = ThresholdMatcher(ColumnsIndex(["fc"]), {
         "last_name": JaroWinklerSimilarity(),
         "first_name": JaroWinklerSimilarity(),
         "hire_date": DateSimilarity()
-    })
+    }, dfa, dfb)
     matcher.save_pairs_to_excel(data_file_path(
         "match/baton_rouge_csd_pprr_%d_v_post_pprr_2020_11_06.xlsx" % year), decision)
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
@@ -126,11 +126,11 @@ def match_lprr_against_pprr(lprr, pprr, year, decision):
     dfb.loc[:, 'fc'] = dfb.first_name.fillna('').map(lambda x: x[:1])
     dfb = dfb.drop_duplicates(subset=['uid']).set_index('uid')
 
-    matcher = ThresholdMatcher(dfa, dfb, ColumnsIndex(["fc"]), {
+    matcher = ThresholdMatcher(ColumnsIndex(["fc"]), {
         "first_name": JaroWinklerSimilarity(),
         "last_name": JaroWinklerSimilarity(),
         "middle_initial": StringSimilarity(),
-    })
+    }, dfa, dfb)
     matcher.save_pairs_to_excel(data_file_path(
         "match/baton_rouge_fpcsb_lprr_1992_2012_v_pprr_%d.xlsx" % year), decision)
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
@@ -149,10 +149,10 @@ def match_lprr_against_post(lprr, post):
     dfb.loc[:, 'fc'] = dfb.first_name.fillna('').map(lambda x: x[:1])
     dfb = dfb.drop_duplicates(subset=['uid']).set_index('uid')
 
-    matcher = ThresholdMatcher(dfa, dfb, ColumnsIndex(["fc"]), {
+    matcher = ThresholdMatcher(ColumnsIndex(["fc"]), {
         "first_name": JaroWinklerSimilarity(),
         "last_name": JaroWinklerSimilarity(),
-    })
+    }, dfa, dfb)
     decision = 0.93
     matcher.save_pairs_to_excel(data_file_path(
         "match/baton_rouge_fpcsb_lprr_1992_2012_v_post_pprr_2020_11_06.xlsx"), decision)

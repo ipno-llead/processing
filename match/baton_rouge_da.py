@@ -1,5 +1,5 @@
 from lib.path import data_file_path
-from lib.match import (
+from datamatch import (
     ColumnsIndex, JaroWinklerSimilarity, ThresholdMatcher
 )
 import pandas as pd
@@ -17,10 +17,10 @@ def match_against_baton_rouge_csd_pprr(df, pprr, year, decision):
         .drop_duplicates(subset=['uid']).set_index('uid')
     dfb.loc[:, 'fc'] = dfb.first_name.map(lambda x: x[: 1])
 
-    matcher = ThresholdMatcher(dfa, dfb, ColumnsIndex(['fc']), {
+    matcher = ThresholdMatcher(ColumnsIndex(['fc']), {
         'first_name': JaroWinklerSimilarity(),
         'last_name': JaroWinklerSimilarity(),
-    })
+    }, dfa, dfb)
     matcher.save_pairs_to_excel(data_file_path(
         "match/baton_rouge_da_cprr_2018_v_csd_pprr_%d.xlsx" % year), decision)
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
@@ -42,10 +42,10 @@ def match_against_baton_rouge_so_personnel(df, per):
     dfb.loc[:, 'last_name'] = dfb.last_name.str.lower()
     dfb.loc[:, 'fc'] = dfb.first_name.map(lambda x: x[: 1])
 
-    matcher = ThresholdMatcher(dfa, dfb, ColumnsIndex(['fc']), {
+    matcher = ThresholdMatcher(ColumnsIndex(['fc']), {
         'first_name': JaroWinklerSimilarity(),
         'last_name': JaroWinklerSimilarity(),
-    })
+    }, dfa, dfb)
     decision = 1
     matcher.save_pairs_to_excel(data_file_path(
         "match/baton_rouge_da_cprr_2018_v_baton_rouge_so_personnel.xlsx"), decision)
