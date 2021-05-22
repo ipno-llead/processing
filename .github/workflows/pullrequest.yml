@@ -14,6 +14,5 @@ jobs:
         with:
           github-token: "${{ secrets.GITHUB_TOKEN }}"
           valid-labels: "bug, documentation, enhancement"
-          invalid-labels: "WIP"
           pull-request-number: "${{ github.event.pull_request.number }}"
           disable-reviews: true
