@@ -150,6 +150,9 @@ data/match/post_event_covington_pd_2020.csv: match/covington_pd.py data/clean/ac
 data/match/post_event_slidell_pd_2020.csv: match/slidell_pd.py data/clean/pprr_slidell_pd_2019.csv
 	python match/slidell_pd.py
 
+data/match/cprr_new_orleans_so_2019.csv: match/new_orleans_so.py data/clean/cprr_new_orleans_so_2019.csv
+	python match/new_orleans_so.py
+
 
 
 data/clean/pprr_new_orleans_harbor_pd_2020.csv data/clean/pprr_new_orleans_harbor_pd_1991_2008.csv: clean/new_orleans_harbor_pd_pprr.py data/new_orleans_harbor_pd/new_orleans_harbor_pd_pprr_2020.csv
@@ -253,3 +256,6 @@ data/clean/actions_history_covington_pd_2021.csv data/clean/pprr_covington_pd_20
 
 data/clean/pprr_slidell_pd_2019.csv: clean/slidell_pd.py data/slidell_pd/slidell_pd_pprr_2009.csv data/slidell_pd/slidell_pd_pprr_2019.csv
 	python clean/slidell_pd.py
+
+data/clean/cprr_new_orleans_so_2019.csv: clean/new_orleans_so_cprr.py data/new_orleans_so/new_orleans_so_cprr_2019_tabula.csv
+	python clean/new_orleans_so_cprr.py

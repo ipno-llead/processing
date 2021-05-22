@@ -4,7 +4,7 @@ import pandas as pd
 
 from lib.columns import clean_column_names, set_values
 from lib.path import data_file_path, ensure_data_dir
-from lib.clean import clean_names
+from lib.clean import clean_names, standardize_desc_cols
 from lib.uid import gen_uid
 
 sys.path.append("../")
@@ -64,6 +64,17 @@ def clean_receive_date(df):
     return df
 
 
+def clean_department_desc(df):
+    df.loc[:, 'department_desc'] = df.department_desc.str.lower()\
+        .str.strip().str.replace('mechani c', 'mechanic', regex=False)\
+        .str.replace('plannin g', 'planning', regex=False)\
+        .str.replace('complai nce', 'complaince', regex=False)\
+        .str.replace(r'mainten( ance)?$', 'maintenance', regex=True)\
+        .str.replace('grievnce', 'grievance', regex=False)\
+        .str.replace('h.r.', 'hr', regex=False)
+    return df
+
+
 def clean():
     df = pd.read_csv(data_file_path(
         "new_orleans_so/new_orleans_so_cprr_2019_tabula.csv"))
@@ -88,8 +99,10 @@ def clean():
         })\
         .pipe(remove_carriage_return, [
             'name_of_accused', 'disposition', 'charges', 'summary', 'investigating_supervisor',
-            'action'
+            'action', 'department_desc', 'rank_desc'
         ])\
+        .pipe(clean_department_desc)\
+        .pipe(standardize_desc_cols, ['rank_desc'])\
         .pipe(split_name)\
         .pipe(clean_names, ['first_name', 'last_name', 'middle_initial'])\
         .pipe(clean_action)\
