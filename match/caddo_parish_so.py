@@ -25,11 +25,11 @@ def match_pprr_against_post(pprr, post):
     dfb = dfb.drop_duplicates(subset=['uid'], ignore_index=True)\
         .set_index('uid', drop=True)
 
-    matcher = ThresholdMatcher(dfa, dfb, ColumnsIndex(['fc']), {
+    matcher = ThresholdMatcher(ColumnsIndex(['fc']), {
         'first_name': JaroWinklerSimilarity(),
         'last_name': JaroWinklerSimilarity(),
         'hire_date': DateSimilarity()
-    })
+    }, dfa, dfb)
     decision = 0.793
     matcher.save_pairs_to_excel(data_file_path(
         "match/caddo_parish_so_pprr_2020_v_post.xlsx"), decision)

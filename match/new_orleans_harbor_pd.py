@@ -32,10 +32,10 @@ def match_uid_with_cprr(cprr, pprr):
     dfb = pprr[["uid", "first_name", "last_name"]].drop_duplicates()
     dfb.loc[:, 'fc'] = dfb.first_name.map(lambda x: x[:1])
     dfb = dfb.set_index("uid", drop=True)
-    matcher = ThresholdMatcher(dfa, dfb, ColumnsIndex(["fc"]), {
+    matcher = ThresholdMatcher(ColumnsIndex(["fc"]), {
         "first_name": JaroWinklerSimilarity(),
         "last_name": JaroWinklerSimilarity(),
-    })
+    }, dfa, dfb)
     decision = 0.96
     matcher.save_pairs_to_excel(data_file_path(
         "match/new_orleans_harbor_pd_cprr_2020_v_pprr_2020.xlsx"), decision)
@@ -56,10 +56,10 @@ def match_pprr_and_post(pprr, post):
     dfb.loc[:, 'fc'] = dfb.first_name.map(lambda x: x[:1])
     dfb = dfb.drop_duplicates(subset=['uid']).set_index('uid')
 
-    matcher = ThresholdMatcher(dfa, dfb, ColumnsIndex(["fc"]), {
+    matcher = ThresholdMatcher(ColumnsIndex(["fc"]), {
         "last_name": JaroWinklerSimilarity(),
         "first_name": JaroWinklerSimilarity(),
-    })
+    }, dfa, dfb)
     decision = 0.96
     matcher.save_pairs_to_excel(data_file_path(
         "match/new_orleans_harbor_pd_pprr_2020_v_post_pprr_2020_11_06.xlsx"), decision)

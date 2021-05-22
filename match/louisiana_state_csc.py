@@ -29,10 +29,10 @@ def match_post(lprr, post):
         .set_index('uid', drop=True)
     dfb.loc[:, 'fc'] = dfb.first_name.fillna('').map(lambda x: x[:1])
 
-    matcher = ThresholdMatcher(dfa, dfb, ColumnsIndex(['fc']), {
+    matcher = ThresholdMatcher(ColumnsIndex(['fc']), {
         'first_name': JaroWinklerSimilarity(),
         'last_name': JaroWinklerSimilarity(),
-    })
+    }, dfa, dfb)
     decision = 0.924
     matcher.save_pairs_to_excel(data_file_path(
         "match/louisiana_state_csc_1991_2020_v_post_pprr_2020_11_06.xlsx"), decision)
