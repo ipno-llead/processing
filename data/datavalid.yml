@@ -21,7 +21,7 @@ files:
         op: equal
         value: officer_left
       group_by: uid
-      no_more_than_once_a_month:
+      no_more_than_once_per_30_days:
         date_from:
           year_column: year
           month_column: month
