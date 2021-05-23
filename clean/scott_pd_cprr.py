@@ -9,13 +9,11 @@ import sys
 sys.path.append("../")
 
 def split_name(df):
-    names1 = df.full_name.str.strip().str.replace(
-        r"^(\w+(?: \w\.)?) (\w+(?:, \w{2}\.)?)$", r"\1@@\2", regex=False).str.split("@@", expand=True)
-    names2 = names1.iloc[:, 0].str.split(" ", expand=True)
-    df.loc[:, "rank_desc"] = names2.iloc[:, 0]
-    df.loc[:, "first_name"] = names2.iloc[:, 1]
-    df.loc[:, "last_name"] = names1.iloc[:, 0]
-    df = df.drop(columns=["full_name"])
+    names = df.full_name.str.split(" ", expand=True)
+    df.loc[:, "rank_desc"] = names.loc[:, 0].fillna("")
+    df.loc[:, "first_name"] = names.loc[:, 1].fillna("")
+    df.loc[:, "last_name"] = names.loc[:, 2].fillna("")
+    df = df.drop(columns="full_name")
     return df
 
 def assign_agency(df):
@@ -27,11 +25,22 @@ def assign_prod_year(df, year):
     return df
 
 
+def clean_charges(df):
+    df.loc[:, "charges"] = df.charges.str.lower().str.strip() \
+        .str.replace("conduct unbecoming/ rude behavior", "conduct unbecoming (rude behavior)", regex=False)\
+        .str.replace("conduct unbecoming/lying", "conduct unbecoming (lying)", regex=False)\
+        .str.replace("conduct unbecoming/rudeness", "conduct unbecoming (rudeness)", regex=False)
+    return df
+
+
 def clean():
     df = pd.read_csv(data_file_path(
         "scott_pd/scott_pd_cprr_2020.csv"))
-    df = clean_column_names(df)
-    df.columns = ['notification_date', 'full_name', 'rule_violation', 'appeal', 'disposition/action']
+    df = clean_column_names(df) \
+        .rename(columns={
+        'rule_violation': 'charges'})
+    df.columns = ['notification_date', 'full_name', 'charges', 'appeal', 'disposition/action']
+    df = df.drop(columns=["appeal"])
     df = df\
         .pipe(split_name)\
         .pipe(
@@ -39,6 +48,7 @@ def clean():
             ["rank_desc", "disposition/action"])\
         .pipe(assign_prod_year, '2020')\
         .pipe(assign_agency)\
+        .pipe(clean_charges)\
         .pipe(clean_names, ['first_name', 'last_name'])\
         .pipe(gen_uid, ["agency", "first_name", "last_name"])\
         .pipe(gen_uid, ['agency', 'uid'], 'complaint_uid')
