@@ -38,6 +38,7 @@ def clean_charges(df):
         .str.replace("conduct unbecoming/ rude behavior", "conduct unbecoming (rude behavior)", regex=False)\
         .str.replace("conduct unbecoming/lying", "conduct unbecoming (lying)", regex=False)\
         .str.replace("conduct unbecoming/rudeness", "conduct unbecoming (rudeness)", regex=False)
+    df = df.drop(columns='rule_violation')
     return df
 
 
@@ -46,7 +47,7 @@ def clean():
         "scott_pd/scott_pd_cprr_2020.csv"))
     df = clean_column_names(df)
     df.columns = ['notification_date', 'full_name', 'rule_violation', 'appeal', 'disposition/action']
-    df = df.drop(columns=["appeal"])
+    df = df.drop(columns="appeal")
     df = df\
         .pipe(split_name)\
         .pipe(
