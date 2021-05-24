@@ -76,3 +76,4 @@ if __name__ == "__main__":
     df.to_csv(
         data_file_path("clean/cprr_scott_pd_2020.csv"),
         index=False)
+
