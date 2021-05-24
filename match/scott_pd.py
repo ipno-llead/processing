@@ -32,6 +32,7 @@ def match_cprr_against_post(cprr, post):
     cprr.loc[:, 'uid'] = cprr.uid.map(lambda x: match_dict.get(x, x))
     return cprr
 
+
 if __name__ == '__main__':
     cprr = pd.read_csv(data_file_path('clean/cprr_scott_pd_2020.csv'))
     post = prepare_post_data()
