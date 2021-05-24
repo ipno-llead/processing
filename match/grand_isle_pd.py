@@ -18,10 +18,10 @@ def match_pprr_post(pprr, post):
     dfb.loc[:, 'fc'] = dfb.first_name.map(lambda x: x[:1])
     dfb = dfb.drop_duplicates().set_index('uid', drop=True)
 
-    matcher = ThresholdMatcher(dfa, dfb, ColumnsIndex(['fc']), {
+    matcher = ThresholdMatcher(ColumnsIndex(['fc']), {
         'first_name': JaroWinklerSimilarity(),
         'last_name': JaroWinklerSimilarity(),
-    })
+    }, dfa, dfb)
     decision = 0.9
     matcher.save_pairs_to_excel(data_file_path(
         "match/grand_isle_pd_pprr_2021_v_post.xlsx"), decision)

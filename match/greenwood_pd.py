@@ -1,4 +1,4 @@
-from lib.match import ThresholdMatcher, JaroWinklerSimilarity, NoopIndex
+from datamatch import ThresholdMatcher, JaroWinklerSimilarity, NoopIndex
 from lib.path import data_file_path, ensure_data_dir
 import pandas as pd
 import sys
@@ -11,10 +11,10 @@ def match(gw_cprr, post_pprr):
     dfa = gw_cprr[['first_name', 'last_name', 'mid']]\
         .drop_duplicates().set_index('mid')
     dfb = post_pprr[['last_name', 'first_name']].drop_duplicates()
-    matcher = ThresholdMatcher(dfa, dfb, NoopIndex(), {
+    matcher = ThresholdMatcher(NoopIndex(), {
         'first_name': JaroWinklerSimilarity(),
         'last_name': JaroWinklerSimilarity()
-    })
+    }, dfa, dfb)
     decision = 0.9
     matcher.save_pairs_to_excel(data_file_path(
         "match/greenwood_pd_cprr_2015_2020_v_post_pprr_2020_11_06.xlsx"), decision)
