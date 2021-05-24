@@ -97,3 +97,4 @@ if __name__ == "__main__":
     event_df.to_csv(data_file_path("fuse/event.csv"), index=False)
     com_df.to_csv(data_file_path("fuse/complaint.csv"), index=False)
     uof_df.to_csv(data_file_path('fuse/use_of_force.csv'), index=False)
+
