@@ -16,7 +16,6 @@ def split_name(df):
     df = df.drop(columns="full_name")
     return df
 
-
 def split_disposition_action(df):
     outcomes = df["disposition/action"].str.split("/", expand=True)
     df.loc[:, "disposition"] = outcomes.loc[:, 0].fillna("")
@@ -29,7 +28,6 @@ def clean_rank(df):
         .str.replace("pofc", "officer", regex=False)\
         .str.replace("lt.", "lieutenant ", regex=False)
     return df
-
 
 def assign_agency(df):
     df.loc[:, "agency"] = "Scott PD"
@@ -68,9 +66,6 @@ def clean():
         .pipe(clean_names, ["first_name", "last_name"])\
         .pipe(gen_uid, ["agency", "first_name", "last_name"])\
         .pipe(gen_uid, ["agency", "uid", "notification_year", "notification_month", "notification_day"], "complaint_uid")
-    df = df[["first_name", "last_name", "rank_desc", "charges", "disposition",
-             "action", "notification_year","notification_month", "notification_day",
-             "agency", "data_production_year", "uid", "complaint_uid"]]
     return df
 
 if __name__ == "__main__":
