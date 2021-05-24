@@ -59,10 +59,14 @@ def clean():
             'data_production_year': 2020,
             'agency': 'Scott PD'})\
         .pipe(split_disposition_action)\
-        .pipe(clean_dates, ["notification_date"])\
+        .pipe(clean_dates, ["notification_date"]) \
+        .rename(columns={
+            'notification_year': 'receive_year',
+            'notification_month': 'receive_month',
+            'notification_day': 'receive_day'})\
         .pipe(clean_names, ["first_name", "last_name"])\
         .pipe(gen_uid, ["agency", "first_name", "last_name"])\
-        .pipe(gen_uid, ["agency", "uid", "notification_year", "notification_month", "notification_day"], "complaint_uid")
+        .pipe(gen_uid, ["agency", "uid", "receive_year", "receive_month", "receive_day"], "complaint_uid")
     return df
 
 
