@@ -31,6 +31,7 @@ def fuse_personnel():
         pd.read_csv(data_file_path("fuse/per_covington_pd.csv")),
         pd.read_csv(data_file_path("fuse/per_slidell_pd.csv")),
         pd.read_csv(data_file_path("fuse/per_new_orleans_so.csv")),
+        pd.read_csv(data_file_path("fuse/per_scott_pd.csv")),
     ])).sort_values('uid', ignore_index=True)
 
 
@@ -57,6 +58,7 @@ def fuse_event():
         pd.read_csv(data_file_path("fuse/event_covington_pd.csv")),
         pd.read_csv(data_file_path("fuse/event_slidell_pd.csv")),
         pd.read_csv(data_file_path("fuse/event_new_orleans_so.csv")),
+        pd.read_csv(data_file_path("fuse/event_scott_pd.csv")),
     ])).sort_values(['agency', 'event_uid'], ignore_index=True)
 
 
@@ -75,6 +77,7 @@ def fuse_complaint():
         pd.read_csv(data_file_path("fuse/com_mandeville_pd.csv")),
         pd.read_csv(data_file_path("fuse/com_levee_pd.csv")),
         pd.read_csv(data_file_path("fuse/com_new_orleans_so.csv")),
+        pd.read_csv(data_file_path("fuse/com_scott_pd.csv")),
     ])).sort_values(['agency', 'data_production_year', 'tracking_number'], ignore_index=True)
 
 

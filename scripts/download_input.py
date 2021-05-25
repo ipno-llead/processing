@@ -157,6 +157,9 @@ DATA_FILES = {
         "https://www.dropbox.com/sh/ngj8aygmmgqy2dg/AAAfzXvjWo2j3W-Ke9OjomZia/covington_pd_pprr_2020.csv?dl=1",  # noqa
         "https://www.dropbox.com/sh/ngj8aygmmgqy2dg/AAAPr3m_zEV1FTeoK2EbfBu3a/covington_pd_pprr_2021.csv?dl=1",  # noqa
     ],
+    "scott_pd": [
+        "https://www.dropbox.com/s/a0fw6b3a6505eoi/scott_pd_cprr_2020.csv?dl=0", # noqa
+    ],
     "slidell_pd": [
         "https://www.dropbox.com/s/1z09ujt4ja3b4wx/Slidell_PD_PPRR_2009.csv?dl=1",  # noqa
         "https://www.dropbox.com/s/ejgypovnab90z0p/Slidell_PD_PPRR_2019.csv?dl=1",  # noqa
