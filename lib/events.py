@@ -95,7 +95,8 @@ class Builder(object):
             fields["day"] = dt.day
         else:
             fields["year"], fields["month"], fields["day"] = clean_date(
-                raw_date)
+                raw_date
+            )
         fields["raw_date"] = raw_date
 
     def _extract_datetime(self, fields, raw_datetime, strptime_format=None):

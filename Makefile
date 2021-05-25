@@ -24,6 +24,7 @@ all: data/fuse/per_kenner_pd.csv data/fuse/event_kenner_pd.csv
 all: data/fuse/per_vivian_pd.csv data/fuse/event_vivian_pd.csv
 all: data/fuse/per_covington_pd.csv data/fuse/event_covington_pd.csv
 all: data/fuse/per_slidell_pd.csv data/fuse/event_slidell_pd.csv
+all: data/fuse/per_new_orleans_so.csv data/fuse/event_new_orleans_so.csv data/fuse/com_new_orleans_so.csv
 
 data/fuse/per_new_orleans_harbor_pd.csv data/fuse/event_new_orleans_harbor_pd.csv data/fuse/com_new_orleans_harbor_pd.csv: fuse/new_orleans_harbor_pd.py data/match/post_event_new_orleans_harbor_pd_2020.csv data/match/cprr_new_orleans_harbor_pd_2020.csv data/clean/pprr_new_orleans_harbor_pd_1991_2008.csv data/clean/pprr_new_orleans_harbor_pd_2020.csv
 	python fuse/new_orleans_harbor_pd.py
@@ -88,6 +89,9 @@ data/fuse/per_covington_pd.csv data/fuse/event_covington_pd.csv: fuse/covington_
 data/fuse/per_slidell_pd.csv data/fuse/event_slidell_pd.csv: fuse/slidell_pd.py data/match/post_event_slidell_pd_2020.csv data/clean/pprr_slidell_pd_2019.csv
 	python fuse/slidell_pd.py
 
+data/fuse/per_new_orleans_so.csv data/fuse/event_new_orleans_so.csv data/fuse/com_new_orleans_so.csv: fuse/new_orleans_so.py data/clean/pprr_post_2020_11_06.csv data/match/cprr_new_orleans_so_2019.csv
+	python fuse/new_orleans_so.py
+
 
 
 data/match/cprr_new_orleans_harbor_pd_2020.csv data/match/post_event_new_orleans_harbor_pd_2020.csv: match/new_orleans_harbor_pd.py data/clean/cprr_new_orleans_harbor_pd_2020.csv data/clean/pprr_new_orleans_harbor_pd_2020.csv
@@ -150,7 +154,7 @@ data/match/post_event_covington_pd_2020.csv: match/covington_pd.py data/clean/ac
 data/match/post_event_slidell_pd_2020.csv: match/slidell_pd.py data/clean/pprr_slidell_pd_2019.csv
 	python match/slidell_pd.py
 
-data/match/cprr_new_orleans_so_2019.csv: match/new_orleans_so.py data/clean/cprr_new_orleans_so_2019.csv
+data/match/cprr_new_orleans_so_2019.csv: match/new_orleans_so.py data/clean/cprr_new_orleans_so_2019.csv data/clean/pprr_post_2020_11_06.csv
 	python match/new_orleans_so.py
 
 

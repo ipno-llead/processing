@@ -58,12 +58,6 @@ def process_disposition(df):
     return df
 
 
-def clean_receive_date(df):
-    df.loc[:, 'receive_date'] = df.receive_date.str.strip()\
-        .str.replace(r'2011(\d)$', r'201\1', regex=True)
-    return df
-
-
 def clean_department_desc(df):
     df.loc[:, 'department_desc'] = df.department_desc.str.lower()\
         .str.strip().str.replace('mechani c', 'mechanic', regex=False)\
@@ -73,6 +67,53 @@ def clean_department_desc(df):
         .str.replace('grievnce', 'grievance', regex=False)\
         .str.replace('h.r.', 'hr', regex=False)
     return df
+
+
+def set_empty_uid_for_anonymous_officers(df):
+    df.loc[df.employee_id.isna() & (df.first_name == ''), "uid"] = ""
+    return df
+
+
+def fix_date_typos(df, cols):
+    for col in cols:
+        df.loc[:, col] = df[col].str.strip()\
+            .str.replace('//', '/', regex=False)\
+            .str.replace(r'^(\d{2})(\d{2})', r'\1/\2', regex=True)\
+            .str.replace(r'2011(\d)$', r'201\1', regex=True)
+    return df
+
+
+def split_investigating_supervisor(df):
+    df.loc[:, 'investigating_supervisor'] = df.investigating_supervisor\
+        .fillna('').str.strip().str.lower()\
+        .str.replace('serrgeant', 'sergeant', regex=False)\
+        .str.replace('sergeat', 'sergeant', regex=False)\
+        .str.replace('lt.', 'lieutenant', regex=False)\
+        .str.replace('lieutenatn', 'lieutenant', regex=False)\
+        .str.replace('lieuttenant', 'lieutenant', regex=False)\
+        .str.replace('lieuteant', 'lieutenant', regex=False)\
+        .str.replace('unassigned', '', regex=False)
+    ranks = set([
+        'major', 'agent', 'sergeant', 'captain', 'lieutenant',
+        'colonel', 'chief', 'director', 'admin', 'mrs.'
+    ])
+    for idx, s in df.investigating_supervisor.items():
+        if ' ' not in s:
+            continue
+        first_word = s[:s.index(' ')]
+        if first_word in ranks:
+            df.loc[idx, 'supervisor_rank'] = first_word
+            df.loc[idx, 'supervisor_name'] = s[s.index(' ')+1:]
+        else:
+            df.loc[idx, 'supervisor_name'] = s
+    df.loc[:, 'supervisor_name'] = df.supervisor_name.str.replace(
+        ' -', '-', regex=False
+    )
+    names = df.supervisor_name.fillna('')\
+        .str.extract(r'^([^ ]+) (.+)')
+    df.loc[:, 'supervisor_first_name'] = names[0]
+    df.loc[:, 'supervisor_last_name'] = names[1]
+    return df.drop(columns=['investigating_supervisor'])
 
 
 def clean():
@@ -111,12 +152,14 @@ def clean():
             'data_production_year': '2019'
         })\
         .pipe(process_disposition)\
-        .pipe(clean_receive_date)\
+        .pipe(fix_date_typos, ['receive_date', 'investigation_start_date', 'investigation_complete_date'])\
         .pipe(gen_uid, ['agency', 'employee_id', 'first_name', 'last_name', 'middle_initial'])\
+        .pipe(set_empty_uid_for_anonymous_officers)\
         .pipe(gen_uid, ['agency', 'tracking_number'], 'complaint_uid')\
         .pipe(gen_uid, ['complaint_uid', 'uid'], 'allegation_uid')\
         .sort_values(['tracking_number', 'investigation_complete_date'])\
-        .drop_duplicates(subset=['allegation_uid'], keep='last', ignore_index=True)
+        .drop_duplicates(subset=['allegation_uid'], keep='last', ignore_index=True)\
+        .pipe(split_investigating_supervisor)
 
 
 if __name__ == '__main__':

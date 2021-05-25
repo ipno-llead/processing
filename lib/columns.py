@@ -58,6 +58,7 @@ COMPLAINT_COLUMNS = [
     "incident_type",
     "supervisor_uid",
     "supervisor_rank",
+    "supervisor_name",
     "badge_no",  # badge number
     "department_code",  # department code or id
     "department_desc",  # department title or description
