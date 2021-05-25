@@ -30,6 +30,7 @@ def fuse_personnel():
         pd.read_csv(data_file_path("fuse/per_vivian_pd.csv")),
         pd.read_csv(data_file_path("fuse/per_covington_pd.csv")),
         pd.read_csv(data_file_path("fuse/per_slidell_pd.csv")),
+        pd.read_csv(data_file_path("fuse/per_scott_pd.csv")),
     ])).sort_values('uid', ignore_index=True)
 
 
@@ -55,6 +56,7 @@ def fuse_event():
         pd.read_csv(data_file_path("fuse/event_vivian_pd.csv")),
         pd.read_csv(data_file_path("fuse/event_covington_pd.csv")),
         pd.read_csv(data_file_path("fuse/event_slidell_pd.csv")),
+        pd.read_csv(data_file_path("fuse/event_scott_pd.csv")),
     ])).sort_values(['agency', 'event_uid'], ignore_index=True)
 
 
@@ -72,6 +74,7 @@ def fuse_complaint():
         pd.read_csv(data_file_path("fuse/com_plaquemines_so.csv")),
         pd.read_csv(data_file_path("fuse/com_mandeville_pd.csv")),
         pd.read_csv(data_file_path("fuse/com_levee_pd.csv")),
+        pd.read_csv(data_file_path("fuse/com_scott_pd.csv")),
     ])).sort_values(['agency', 'data_production_year', 'tracking_number'], ignore_index=True)
 
 
@@ -94,3 +97,4 @@ if __name__ == "__main__":
     event_df.to_csv(data_file_path("fuse/event.csv"), index=False)
     com_df.to_csv(data_file_path("fuse/complaint.csv"), index=False)
     uof_df.to_csv(data_file_path('fuse/use_of_force.csv'), index=False)
+
