@@ -1,6 +1,7 @@
 import pandas as pd
 from lib.path import data_file_path, ensure_data_dir
-from lib.columns import rearrange_complaint_columns, rearrange_personnel_columns
+from lib.columns import rearrange_complaint_columns
+from lib.personnel import fuse_personnel
 from lib.uid import ensure_uid_unique
 from lib import events
 import sys
@@ -42,20 +43,21 @@ if __name__ == '__main__':
     cprr = pd.read_csv(
         data_file_path("match/cprr_scott_pd_2020.csv"))
     post = prepare_post()
-    per = rearrange_personnel_columns(post)
-    com = rearrange_complaint_columns(cprr)
-    ensure_uid_unique(com, 'complaint_uid')
-    event = fuse_events(cprr, post)
+    personnel_df = fuse_personnel(cprr, post)
+    event_df = fuse_events(cprr, post)
+    complaint_df = rearrange_complaint_columns(cprr)
+    ensure_uid_unique(complaint_df, 'complaint_uid')
     ensure_data_dir('fuse')
-    per.to_csv(
+    personnel_df.to_csv(
         data_file_path('fuse/per_scott_pd.csv'),
         index=False
     )
-    com.to_csv(
+    complaint_df.to_csv(
         data_file_path('fuse/com_scott_pd.csv'),
         index=False
     )
-    event.to_csv(
+    event_df.to_csv(
         data_file_path('fuse/event_scott_pd.csv'),
         index=False
     )
+
