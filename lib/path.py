@@ -4,9 +4,13 @@ import pathlib
 _current_dir = os.path.dirname(os.path.realpath(__file__))
 
 
-def data_file_path(filepath):
+def data_file_path(filepath: str) -> str:
+    """Gets full file path of file in data folder
+    """
     return os.path.join(_current_dir, "../data", filepath)
 
 
-def ensure_data_dir(name):
+def ensure_data_dir(name: str) -> None:
+    """Ensure directory is created under data folder
+    """
     pathlib.Path(data_file_path(name)).mkdir(parents=True, exist_ok=True)

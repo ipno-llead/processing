@@ -1,8 +1,7 @@
 from lib.path import data_file_path, ensure_data_dir
 from lib.columns import clean_column_names
 from lib.clean import (
-    parse_datetimes, float_to_int_str, standardize_desc_cols,
-    clean_sexes, clean_names
+    float_to_int_str, standardize_desc_cols, clean_sexes, clean_names
 )
 from lib.uid import gen_uid
 import pandas as pd
@@ -99,15 +98,6 @@ def clean():
         .pipe(remove_unnamed_officers)\
         .pipe(generate_middle_initial)\
         .pipe(clean_current_supervisor)
-
-
-def clean_pprr():
-    df = pd.read_csv(data_file_path('ipm/new_orleans_pd_pprr_1946-2018.csv'))
-    df = df.dropna(axis=1, how="all")
-    df = clean_column_names(df)
-    return df\
-        .pipe(parse_datetimes, ["employment_ended_on", "hired_on", "assigned_to_unit_on"])\
-        .pipe(float_to_int_str, ["years_employed", "current_supervisor"])
 
 
 if __name__ == '__main__':
