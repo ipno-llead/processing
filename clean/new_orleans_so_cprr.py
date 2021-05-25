@@ -18,8 +18,8 @@ def remove_header_rows(df):
 
 def remove_carriage_return(df, cols):
     for col in cols:
-        df.loc[:, col] = df[col].str.replace(r"-\r", r"-")\
-            .str.replace(r"\r", r" ")
+        df.loc[:, col] = df[col].str.replace(r"-\r", r"-", regex=True)\
+            .str.replace(r"\r", r" ", regex=True)
     return df
 
 
@@ -28,7 +28,7 @@ def split_name(df):
     for col, pat in [('first_name', r"^([\w'-]+)(.*)$"), ('middle_initial', r'^(\w\.) (.*)$')]:
         names = series[series.str.match(pat)].str.extract(pat)
         df.loc[series.str.match(pat), col] = names[0]
-        series = series.str.replace(pat, r'\2').str.strip()
+        series = series.str.replace(pat, r'\2', regex=True).str.strip()
     df.loc[:, 'last_name'] = series
     return df.drop(columns=['name_of_accused'])
 
@@ -155,10 +155,9 @@ def clean():
         .pipe(fix_date_typos, ['receive_date', 'investigation_start_date', 'investigation_complete_date'])\
         .pipe(gen_uid, ['agency', 'employee_id', 'first_name', 'last_name', 'middle_initial'])\
         .pipe(set_empty_uid_for_anonymous_officers)\
-        .pipe(gen_uid, ['agency', 'tracking_number'], 'complaint_uid')\
-        .pipe(gen_uid, ['complaint_uid', 'uid'], 'allegation_uid')\
+        .pipe(gen_uid, ['agency', 'tracking_number', 'uid'], 'complaint_uid')\
         .sort_values(['tracking_number', 'investigation_complete_date'])\
-        .drop_duplicates(subset=['allegation_uid'], keep='last', ignore_index=True)\
+        .drop_duplicates(subset=['complaint_uid'], keep='last', ignore_index=True)\
         .pipe(split_investigating_supervisor)
 
 
