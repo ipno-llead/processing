@@ -261,5 +261,5 @@ data/clean/actions_history_covington_pd_2021.csv data/clean/pprr_covington_pd_20
 data/clean/pprr_slidell_pd_2019.csv: clean/slidell_pd.py data/slidell_pd/slidell_pd_pprr_2009.csv data/slidell_pd/slidell_pd_pprr_2019.csv
 	python clean/slidell_pd.py
 
-data/clean/cprr_scott_pd_cprr_2020.csv: clean/scott_pd_cprr.py data/baton_rouge_so/scott_pd_cprr_2020.csv
+data/clean/cprr_scott_pd_2020.csv: clean/scott_pd_cprr.py data/scott_pd/scott_pd_cprr_2020.csv
 	python clean/scott_pd_cprr.py
