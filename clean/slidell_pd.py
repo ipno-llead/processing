@@ -58,7 +58,7 @@ def clean09():
                 'Hourly': salary.HOURLY,
                 'Daily': salary.DAILY,
                 'Monthly': salary.MONTHLY,
-                'Bi-Weekly': salary.BIWEEKLY
+                'Bi-Weekly': salary.HOURLY
             }
         }).pipe(realign09)\
         .pipe(clean_salaries, ['salary'])\
