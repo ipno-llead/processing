@@ -19,10 +19,10 @@ def split_name(df):
 
 
 def split_disposition_action(df):
-    outcomes = df["disposition/action"].str.split("/", expand=True)
+    outcomes = df["disposition_action"].str.split("/", expand=True)
     df.loc[:, "disposition"] = outcomes.loc[:, 0].fillna("")
     df.loc[:, "action"] = outcomes.loc[:, 1].fillna("")
-    df = df.drop(columns="disposition/action")
+    df = df.drop(columns="disposition_action")
     return df
 
 
@@ -44,15 +44,14 @@ def clean_charges(df):
 
 def clean():
     df = pd.read_csv(data_file_path(
-        "scott_pd/scott_pd_cprr_2020.csv"))
-    df = clean_column_names(df)
-    df.columns = ['notification_date', 'full_name', 'rule_violation', 'appeal', 'disposition/action']
-    df = df.drop(columns="appeal")
-    df = df\
+        "scott_pd/scott_pd_cprr_2020.csv")
+    ).pipe(clean_column_names)\
+        .drop(columns="appeal")\
+        .dropna()\
         .pipe(split_name)\
         .pipe(
             standardize_desc_cols,
-            ["rank_desc", "disposition/action"])\
+            ["rank_desc", "disposition_action"])\
         .pipe(clean_charges)\
         .pipe(clean_rank)\
         .pipe(set_values, {
@@ -76,4 +75,3 @@ if __name__ == "__main__":
     df.to_csv(
         data_file_path("clean/cprr_scott_pd_2020.csv"),
         index=False)
-

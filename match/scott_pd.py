@@ -1,10 +1,11 @@
 from lib.path import data_file_path, ensure_data_dir
-from lib.match import (
+from datamatch import (
     ColumnsIndex, JaroWinklerSimilarity, ThresholdMatcher
 )
 import pandas as pd
 import sys
 sys.path.append("../")
+
 
 def prepare_post_data():
     post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
@@ -13,17 +14,17 @@ def prepare_post_data():
 
 def match_cprr_against_post(cprr, post):
     dfa = cprr[['uid', 'first_name', 'last_name']]
-    dfa.loc[:, 'fc'] = dfa.first_name.map(lambda x: x[:1])
+    dfa.loc[:, 'fc'] = dfa.first_name.fillna('').map(lambda x: x[:1])
     dfa = dfa.drop_duplicates(subset=['uid']).set_index('uid')
 
     dfb = post[['uid', 'first_name', 'last_name']]
-    dfb.loc[:, 'fc'] = dfb.first_name.map(lambda x: x[:1])
+    dfb.loc[:, 'fc'] = dfb.first_name.fillna('').map(lambda x: x[:1])
     dfb = dfb.drop_duplicates(subset=['uid']).set_index('uid')
 
-    matcher = ThresholdMatcher(dfa, dfb, ColumnsIndex(["fc"]), {
+    matcher = ThresholdMatcher(ColumnsIndex(["fc"]), {
         "last_name": JaroWinklerSimilarity(),
         "first_name": JaroWinklerSimilarity(),
-    })
+    }, dfa, dfb)
     decision = 1
     matcher.save_pairs_to_excel(data_file_path(
         "match/scott_pd_cprr_2020_v_post_pprr_2020_11_06.xlsx"), decision)

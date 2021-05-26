@@ -8,6 +8,7 @@ import pandas as pd
 import sys
 sys.path.append("../")
 
+
 def split_name(df):
     names1 = df.name.str.strip().str.replace(
         r"^(\w+(?: \w\.)?) (\w+(?:, \w{2}\.)?)$", r"\1@@\2", regex=False).str.split("@@", expand=True)
@@ -15,17 +16,22 @@ def split_name(df):
     df.loc[:, "first_name"] = names2.iloc[:, 0]
     df.loc[:, "middle_initial"] = names2.iloc[:, 1]
     df.loc[:, "last_name"] = names1.iloc[:, 0]
-    df = df.drop(columns=["full_name"])
+    df = df.drop(columns=["name"])
     return df
+
 
 def clean_action(df):
     df.loc[:, "action"] = df.action.str.lower().str.strip()\
         .str.replace(r"(\. |, | and )", " | ", regex=False).str.replace(r"\.$", "", regex=False)\
         .str.replace("privliges", "privileges", regex=False)\
         .str.replace("priviledges", "privileges", regex=False)\
-        .str.replace("demotion to cpl to deputy and suspended for 7 days", "7-day suspension | demotion - cpl. to dep.", regex=False)\
+        .str.replace(
+            "demotion to cpl to deputy and suspended for 7 days",
+            "7-day suspension | demotion - cpl. to dep.", regex=False)\
         .str.replace("capt.", "captain", regex=False)\
-        .str.replace("suspended five days and the loss of take home vehicle privileges for 60 days.", "5-day suspension | loss of take home vehicle privileges for 60 days", regex=False)\
+        .str.replace(
+            "suspended five days and the loss of take home vehicle privileges for 60 days.",
+            "5-day suspension | loss of take home vehicle privileges for 60 days", regex=False)\
         .str.replace("admin.", "administration", regex=False)\
         .str.replace("none.", "none", regex=False)\
         .str.replace("resignation", "resigned", regex=False)\
@@ -43,11 +49,20 @@ def clean_action(df):
         .str.replace("7 day suspension", "7-day suspension", regex=False)\
         .str.replace("5 day suspension", "5-day suspension", regex=False)\
         .str.replace("2 week suspension", "2-week suspension", regex=False)\
-        .str.replace("suspended one day and loss of take home vehicle privileges for 30 days", "1-day suspension | loss of take home vehicle privileges for 30 days", regex=False)\
-        .str.replace("10 day suspension 30 day loss of extra duty detail privelages", "10-day suspension | 30-day loss of extra duty detail privileges", regex=False)\
-        .str.replace("loss of take home vehicle privileges for 60 days", "60-day loss of take home vehicle privileges", regex=False)\
-        .str.replace("loss of take of home vehicle privileges for 20 days", "20-day loss of take of home vehicle privileges", regex=False)
+        .str.replace(
+            "suspended one day and loss of take home vehicle privileges for 30 days",
+            "1-day suspension | loss of take home vehicle privileges for 30 days", regex=False)\
+        .str.replace(
+            "10 day suspension 30 day loss of extra duty detail privelages",
+            "10-day suspension | 30-day loss of extra duty detail privileges", regex=False)\
+        .str.replace(
+            "loss of take home vehicle privileges for 60 days", "60-day loss of take home vehicle privileges",
+            regex=False)\
+        .str.replace(
+            "loss of take of home vehicle privileges for 20 days",
+            "20-day loss of take of home vehicle privileges", regex=False)
     return df
+
 
 def clean_complainant(df):
     df.loc[:, "complainant_type"] = df.complainant_type.str.lower().str.strip()\
@@ -56,6 +71,7 @@ def clean_complainant(df):
         .str.replace("ebrso administration and brpd", "administration and baton rouge police department")\
         .str.replace("administration (see also 17-19)", "administration")
     return df
+
 
 def split_infraction(df):
     infractions = df.infraction.str.extract(r"^([A-Za-z ,]+)(\d.+)?$")
@@ -67,6 +83,7 @@ def split_infraction(df):
         .str.replace(r'^ - ', '', regex=False)
     df = df.drop(columns=["infraction"])
     return df
+
 
 def clean_charges(df):
     df.loc[:, "charges"] = df.charges.str.lower().str.strip() \
@@ -88,13 +105,16 @@ def clean_charges(df):
         .str.replace("1-01.1 - unsatisfactory performance", "01-01.14 - unsatisfactory performance", regex=False)
     return df
 
+
 def assign_agency(df):
     df.loc[:, "agency"] = "Baton Rouge SO"
     return df
 
+
 def assign_prod_year(df, year):
     df.loc[:, "data_production_year"] = year
     return df
+
 
 def clean18():
     df = pd.read_csv(data_file_path(
@@ -122,6 +142,7 @@ def clean18():
         .pipe(gen_uid, ["agency", "first_name", "last_name", "birth_year", "badge_no"])\
         .pipe(gen_uid, ['agency', 'uid', 'occur_year', 'occur_month', 'occur_day'], 'complaint_uid')
     return df
+
 
 def clean20():
     df = pd.read_csv(data_file_path(
@@ -151,6 +172,7 @@ def clean20():
         .pipe(gen_uid, ["agency", "first_name", "last_name", "birth_year", "badge_no"])\
         .pipe(gen_uid, ['agency', 'uid', 'occur_year', 'occur_month', 'occur_day'], 'complaint_uid')
     return df
+
 
 if __name__ == "__main__":
     df18 = clean18()
