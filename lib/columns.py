@@ -1,5 +1,7 @@
 import re
 
+import pandas as pd
+
 from .clean import float_to_int_str, names_to_title_case
 
 
@@ -180,9 +182,15 @@ EVENT_COLUMNS = [
 ]
 
 
-def clean_column_names(df):
-    """
-    Remove unnamed columns and convert to snake case
+def clean_column_names(df: pd.DataFrame) -> pd.DataFrame:
+    """Removes unnamed columns and convert column names to snake case
+
+    Args:
+        df (pd.DataFrame):
+            the frame to process
+
+    Returns:
+        the updated frame
     """
     df = df[[col for col in df.columns if not col.startswith("Unnamed:")]]
     df.columns = [
@@ -191,16 +199,49 @@ def clean_column_names(df):
     return df
 
 
-def set_values(df, value_dict):
-    """
-    Set entire column to a value. Multiple columns can be specified each as a single key in value_dict
+def set_values(df: pd.DataFrame, value_dict: dict) -> pd.DataFrame:
+    """Set entire column to a value.
+
+    Multiple columns can be specified each as a single key in value_dict
+
+    Examples:
+        >>> df = set_values(df, {
+        ...     "agency": "Brusly PD",
+        ...     "data_production_year": 2020
+        ... })
+
+    Args:
+        df (pd.DataFrame):
+            the frame to process
+        value_dict (dict):
+            the mapping between column name and what value should be set
+            for that column.
+
+    Returns:
+        the updated frame
     """
     for col, val in value_dict.items():
         df.loc[:, col] = val
     return df
 
 
-def rearrange_personnel_columns(df):
+def rearrange_personnel_columns(df: pd.DataFrame) -> pd.DataFrame:
+    """Performs final processing step for a personnel table
+
+    This performs the following tasks:
+    - discard rows with empty uid
+    - discard columns not present in PERSONNEL_COLUMNS
+    - drop row duplicates
+    - convert name columns to title case
+    - convert numeric columns to int or str
+
+    Args:
+        df (pd.DataFrame):
+            the frame to process
+
+    Returns:
+        the updated frame
+    """
     existing_cols = set(df.columns)
     df = df[df.uid.notna() & (df.uid != '')]
     df = df[[col for col in PERSONNEL_COLUMNS if col in existing_cols]]\
@@ -211,6 +252,20 @@ def rearrange_personnel_columns(df):
 
 
 def rearrange_event_columns(df):
+    """Performs final processing step for an event table
+
+    This performs the following tasks:
+    - discard columns not present in EVENT_COLUMNS
+    - drop row duplicates
+    - convert numeric columns to int or str
+
+    Args:
+        df (pd.DataFrame):
+            the frame to process
+
+    Returns:
+        the updated frame
+    """
     existing_cols = set(df.columns)
     return float_to_int_str(
         df[[
@@ -229,6 +284,20 @@ def rearrange_event_columns(df):
 
 
 def rearrange_complaint_columns(df):
+    """Performs final processing step for a complaint table
+
+    This performs the following tasks:
+    - discard columns not present in COMPLAINT_COLUMNS
+    - drop row duplicates
+    - convert numeric columns to int or str
+
+    Args:
+        df (pd.DataFrame):
+            the frame to process
+
+    Returns:
+        the updated frame
+    """
     existing_cols = set(df.columns)
     return float_to_int_str(
         df[[col for col in COMPLAINT_COLUMNS if col in existing_cols]]
@@ -239,6 +308,20 @@ def rearrange_complaint_columns(df):
 
 
 def rearrange_appeal_hearing_columns(df):
+    """Performs final processing step for an appeal hearing table
+
+    This performs the following tasks:
+    - discard columns not present in APPEAL_HEARING_COLUMNS
+    - drop row duplicates
+    - convert counsel name to title case
+
+    Args:
+        df (pd.DataFrame):
+            the frame to process
+
+    Returns:
+        the updated frame
+    """
     existing_cols = set(df.columns)
     df = df[[
             col for col in APPEAL_HEARING_COLUMNS
@@ -248,6 +331,20 @@ def rearrange_appeal_hearing_columns(df):
 
 
 def rearrange_use_of_force(df):
+    """Performs final processing step for a uof table
+
+    This performs the following tasks:
+    - discard columns not present in USE_OF_FORCE_COLUMNS
+    - drop row duplicates
+    - convert numeric columns to int or str
+
+    Args:
+        df (pd.DataFrame):
+            the frame to process
+
+    Returns:
+        the updated frame
+    """
     existing_cols = set(df.columns)
     return float_to_int_str(
         df[[

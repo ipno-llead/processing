@@ -51,8 +51,8 @@ DATA_FILES = {
         "https://www.dropbox.com/sh/qihmr1a6wiswr6f/AAAwyYt429HSaOO6ZlNeNQsca/Baton_Rouge_FPCSB_Logs_1992-2012.csv?dl=1",  # noqa
     ],
     "baton_rouge_so": [
-        "https://www.dropbox.com/sh/7s3ernm7fea479k/AAAXbtXwRx59xb0zPe6ExzMFa/Baton_Rouge_SO_Cprr_2018.csv?dl=1",  # noqa
-        "https://www.dropbox.com/s/ntxarlgwzlqoms9/baton_rouge_so_cprr_2016-2020.csv?dl=1", # noqa
+        "https://www.dropbox.com/s/aa8gwwebqfcmbp9/Baton_Rouge_SO_CPRR_2018.csv?dl=1",  # noqa
+        "https://www.dropbox.com/s/ntxarlgwzlqoms9/baton_rouge_so_cprr_2016-2020.csv?dl=1",  # noqa
     ],
     "louisiana_state_csc": [
         "https://www.dropbox.com/sh/9zndy2dz3w60etq/AAAqcTxDk8GVj3uvQbUto3XBa/Log%20Records/LouisianaState_CSC_LPRR_1991-2020.csv?dl=1",  # noqa
@@ -158,7 +158,7 @@ DATA_FILES = {
         "https://www.dropbox.com/sh/ngj8aygmmgqy2dg/AAAPr3m_zEV1FTeoK2EbfBu3a/covington_pd_pprr_2021.csv?dl=1",  # noqa
     ],
     "scott_pd": [
-        "https://www.dropbox.com/s/a0fw6b3a6505eoi/scott_pd_cprr_2020.csv?dl=0", # noqa
+        "https://www.dropbox.com/s/a0fw6b3a6505eoi/scott_pd_cprr_2020.csv?dl=1",  # noqa
     ],
     "slidell_pd": [
         "https://www.dropbox.com/s/1z09ujt4ja3b4wx/Slidell_PD_PPRR_2009.csv?dl=1",  # noqa

@@ -270,6 +270,6 @@ data/clean/pprr_slidell_pd_2019.csv: clean/slidell_pd.py data/slidell_pd/slidell
 
 data/clean/cprr_new_orleans_so_2019.csv: clean/new_orleans_so_cprr.py data/new_orleans_so/new_orleans_so_cprr_2019_tabula.csv
 	python clean/new_orleans_so_cprr.py
-	
-data/clean/cprr_scott_pd_cprr_2020.csv: clean/scott_pd_cprr.py data/baton_rouge_so/scott_pd_cprr_2020.csv
+
+data/clean/cprr_scott_pd_2020.csv: clean/scott_pd_cprr.py data/scott_pd/scott_pd_cprr_2020.csv
 	python clean/scott_pd_cprr.py

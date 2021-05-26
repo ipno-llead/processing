@@ -1,26 +1,47 @@
-import re
 import pandas as pd
 
-m_d_y_date_pattern = re.compile(r'^\d{2}/\d{2}/\d{4}$')
 
+def combine_date_columns(df: pd.DataFrame, year_col: str, month_col: str, day_col: str) -> pd.Series:
+    """Combines date columns into a single column
 
-def to_datetime_series(series):
-    if series.dtype.name == "datetime64[ns]":
-        return series
-    elif series.dtype.name == "object" and type(series[0]) == str:
-        if m_d_y_date_pattern.match(series[0]) is not None:
-            return pd.to_datetime(series, format='%m/%d/%Y', errors='raise')
-        raise Exception("unknown format: %s" % series[0])
-    raise Exception("to_datetime can't deal with series: %s", series)
+    Args:
+        df (pd.DataFrame):
+            the frame to process
+        year_col (str):
+            year column
+        month_col (str):
+            month column
+        day_col (str):
+            day column
 
-
-def combine_date_columns(df, year_col, month_col, day_col):
+    Returns:
+        the combined datetime series
+    """
     dates = df[[year_col, month_col, day_col]]
     dates.columns = ["year", "month", "day"]
     return pd.to_datetime(dates)
 
 
-def combine_datetime_columns(df, year_col, month_col, day_col, time_col):
+def combine_datetime_columns(
+    df: pd.DataFrame, year_col: str, month_col: str, day_col: str, time_col: str
+) -> pd.Series:
+    """Combines datetime columns into a single column
+
+    Args:
+        df (pd.DataFrame):
+            the frame to process
+        year_col (str):
+            year column
+        month_col (str):
+            month column
+        day_col (str):
+            day column
+        time_col (str):
+            time column
+
+    Returns:
+        the combined datetime series
+    """
     time_frame = df[time_col].str.split(':', expand=True)
     dates = pd.concat([
         df[[year_col, month_col, day_col]],
