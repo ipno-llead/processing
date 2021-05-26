@@ -1,9 +1,11 @@
-def standardize_from_lookup_table(df, col, lookup_table):
-    """
-    Standardize a column with a lookup table.
+import pandas as pd
 
-    Each entry in lookup table contain all variations of a sequence that need to be standardize.
-    The first sequence in an entry is considered canonical and all variations will be replaced
+
+def standardize_from_lookup_table(df: pd.DataFrame, col: str, lookup_table: list[list[str]]) -> pd.DataFrame:
+    """Standardize a column with a lookup table.
+
+    Each entry in lookup table contain all variations of a string that need to be standardize.
+    The first string in an entry is considered canonical and all variations will be replaced
     with it.
 
     For example with lookup table:
@@ -12,9 +14,22 @@ def standardize_from_lookup_table(df, col, lookup_table):
         ["the university of sydney", "sydney uni", "university sydney"],
         ...
     ]
-    The sequences "sydney uni", "university sydney" will be replaced with "the university of sydney"
+    The strings "sydney uni", "university sydney" will be replaced with "the university of sydney"
 
-    This function also print unmatched sequences after a successful run
+    This function also print unmatched strings after a successful run
+
+    Args:
+        df (pd.DataFrame):
+            the frame to process
+        col (str):
+            the column to standardize
+        lookup_table (list of list of str):
+            list of entries that need to be standardized. The first string in an entry
+            is considered canonical and all subsequent strings are variations that need
+            to be replaced with the canonical string.
+
+    Returns:
+        the processed frame
     """
     # create list of sequences sorted by length
     table = []

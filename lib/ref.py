@@ -12,9 +12,13 @@ with open(os.path.join(os.path.dirname(__file__), "../references/us_surname.txt"
     LAST_NAMES = s.strip().split("\n")
 
 
-def is_firstname(s):
+def is_firstname(s: str) -> bool:
+    """Checks if first name can be found in reference
+    """
     return s in FIRST_NAMES
 
 
-def is_lastname(s):
+def is_lastname(s: str) -> bool:
+    """Checks if last name can be found in reference
+    """
     return s in LAST_NAMES

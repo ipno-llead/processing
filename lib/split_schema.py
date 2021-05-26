@@ -2,8 +2,7 @@ import pandas as pd
 
 
 def detect_unique_columns_subset(df):
-    """
-    Detect the subset of columns which is unique for each index label
+    """Detect the subset of columns which is unique for each index label
     """
     unique_cols = df.columns
     rows = dict()

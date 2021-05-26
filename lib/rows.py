@@ -1,7 +1,20 @@
 import pandas as pd
 
 
-def duplicate_row(df, idx, n=2):
+def duplicate_row(df: pd.DataFrame, idx: any, n: int = 2) -> pd.DataFrame:
+    """Duplicates row at specified index
+
+    Args:
+        df (pd.DataFrame):
+            the frame to process
+        idx (any):
+            the index at which to duplicate record
+        n (int):
+            how many duplicates to produce. Defaults to 2
+
+    Returns:
+        the processed frame
+    """
     if n == 1:
         return df
     assert isinstance(df.index, pd.RangeIndex)

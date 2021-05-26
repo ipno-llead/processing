@@ -4,7 +4,9 @@ import sys
 sys.path.append("../")
 
 
-def keep_latest_row_for_each_post_officer(post):
+def keep_latest_row_for_each_post_officer(post: pd.DataFrame) -> pd.DataFrame:
+    """Sort and discard all but the latest rows for each officer in POST data
+    """
     duplicated_uids = set(post.loc[post.uid.duplicated(), 'uid'].to_list())
     post = post.set_index('uid', drop=False)
     level_1_cert_dates = post.loc[
@@ -16,7 +18,24 @@ def keep_latest_row_for_each_post_officer(post):
     return post[~post.index.duplicated(keep='first')]
 
 
-def extract_events_from_post(post, uid_matches, agency):
+def extract_events_from_post(post: pd.DataFrame, uid_matches: list[tuple[str, str]], agency: str) -> pd.DataFrame:
+    """Extract events from POST data.
+
+    Only extract events.OFFICER_LEVEL_1_CERT and events.OFFICER_PC_12_QUALIFICATION
+
+    Args:
+        post (pd.DataFrame):
+            the subset of POST data already filtered for a specific agency
+        uid_matches (list of tuple of str):
+            list of (pprr_uid, post_uid) tuples. Only rows with uid==post_uid
+            would be consider for event extraction. uid will be set to pprr_uid
+            in event records.
+        agency (str):
+            agency name as it should appear in event records.
+
+    Returns:
+        the events frame
+    """
     builder = events.Builder()
     for pprr_uid, post_uid in uid_matches:
         for _, row in post[post.uid == post_uid].iterrows():

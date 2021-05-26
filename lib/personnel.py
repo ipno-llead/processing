@@ -4,7 +4,21 @@ import sys
 sys.path.append("../")
 
 
-def fuse_personnel(df, *other_dfs):
+def fuse_personnel(df: pd.DataFrame, *other_dfs: list[pd.DataFrame]) -> pd.DataFrame:
+    """Fuses personnel columns from multiple frames.
+
+    If an uid appear across multiple frames then all columns belong to that
+    uid will be collected and be present in the final output.
+
+    Args:
+        df (pd.DataFrame):
+            the first frame
+        other_dfs (list of pd.DataFrame):
+            the rest of the frames
+
+    Returns:
+        the fused frame
+    """
     df = rearrange_personnel_columns(df).set_index("uid", drop=False)
     try:
         records = df.set_index("uid", drop=False).to_dict('index')

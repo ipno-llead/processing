@@ -71,17 +71,7 @@ cat_type = CategoricalDtype(categories=[
 
 
 class Builder(object):
-    """
-    Builder build a DataFrame out of event records.
-
-    Methods
-    -------
-    append(parse_date=None, parse_datetime=None,
-           strptime_format=None, ignore_bad_date=False, **kwargs)
-        Append an event and optionally parse datetime of the event
-
-    to_frame()
-        Create a DataFrame out of collected events
+    """Builder build an event DataFrame by collecting event records.
     """
 
     def __init__(self):
@@ -111,8 +101,15 @@ class Builder(object):
         fields["raw_date"] = raw_datetime
 
     def append_record(
-            self, event_kind, id_cols, raw_date_str=None, raw_datetime_str=None,
-            strptime_format=None, ignore_bad_date=False, **kwargs):
+        self,
+        event_kind: str,
+        id_cols: list[str],
+        raw_date_str: str or None = None,
+        raw_datetime_str: str or None = None,
+        strptime_format: str or None = None,
+        ignore_bad_date: bool = False,
+        **kwargs
+    ) -> None:
         """Append an event and optionally parse datetime of the event.
 
         If `raw_date_str` is passed then Builder try to extract `year`, `month`, `day` from it. If `raw_datetime_str`
@@ -122,29 +119,30 @@ class Builder(object):
         raised. If `ignore_bad_date` is True then an error isn't raised and the event is simply ignored. Any other
         keyword arguments passed to this method will become a column in the final DataFrame.
 
-        Parameters
-        ----------
-        event_kind : str
-            Kind of event
-        id_cols: list
-            List of columns to generate event_uid from (in addition to ['kind', 'year', 'month', 'day', 'time'])
-        raw_date_str : str, optional
-            Raw date string to extract `year`, `month` and `day` from
-        raw_datetime_str : str, optional
-            Raw datetime string to extract `year`, `month`, `day` and `time` from
-        strptime_format : str, optional
-            Format string to extract datetime with.
-        ignore_bad_date : bool, optional
-            If True then ignore events with bad date instead of raising error
+        Args
+            event_kind (str):
+                kind of event
+            id_cols (list of str):
+                list of columns to generate event_uid from (in addition to ['kind', 'year', 'month', 'day', 'time'])
+            raw_date_str (str):
+                raw date string to extract `year`, `month` and `day` from
+            raw_datetime_str (str):
+                raw datetime string to extract `year`, `month`, `day` and `time` from
+            strptime_format (str):
+                format string to extract datetime with.
+            ignore_bad_date (bool):
+                if True then ignore events with bad date instead of raising error
 
-        Raises
-        ------
-        InvalidEventKindException
-            If `event_kind` is invalid
-        InvalidSalaryFreqException
-            If `salary_freq` is passed in and it's not one of the categories defined in lib.salary
-        InvalidEventDateException
-            If `year` isn't passed in or can't be extracted from raw date string.
+        Returns:
+            no value
+
+        Raises:
+            InvalidEventKindException:
+                `event_kind` is invalid
+            InvalidSalaryFreqException:
+                `salary_freq` is passed in and it's not one of the categories defined in lib.salary
+            InvalidEventDateException:
+                `year` isn't passed in or can't be extracted from raw date string.
         """
         if event_kind not in cat_type.categories:
             raise InvalidEventKindException(event_kind)
@@ -196,7 +194,7 @@ class Builder(object):
                 (event_col, row[col]) for col, event_col in col_pairs
             ]
 
-    def extract_events(self, df, event_dict, id_cols):
+    def extract_events(self, df: pd.DataFrame, event_dict: dict, id_cols: list[str]) -> None:
         """Extract event records from a DataFrame.
 
         Multiple kinds of event can be extracted. Each defined as a single key in `event_dict`.
@@ -211,19 +209,21 @@ class Builder(object):
           is also extracted.
         - id_cols: Overwrite `id_cols` for this event kind.
 
-        Parameters
-        ----------
-        df
-            DataFrame to extract events from
-        event_dict
-            Dictionary of event kinds to extract. E.g.:
-            {
-                events.COMPLAINT_INCIDENT: {"prefix": "occur", "keep": ["uid", "complaint_uid", "agency"]},
-                events.COMPLAINT_RECEIVE: {"prefix": "receive", "keep": ["uid", "complaint_uid", "agency"]},
-                ...
-            }
-        id_cols
-            List of columns to generate event_uid from (in addition to ['kind', 'year', 'month', 'day', 'time'])
+        Args:
+            df (pd.DataFrame):
+                the frame to extract events from
+            event_dict (dict):
+                event kinds to extract. E.g.:
+                {
+                    events.COMPLAINT_INCIDENT: {"prefix": "occur", "keep": ["uid", "complaint_uid", "agency"]},
+                    events.COMPLAINT_RECEIVE: {"prefix": "receive", "keep": ["uid", "complaint_uid", "agency"]},
+                    ...
+                }
+            id_cols (list of str):
+                list of columns to generate event_uid from (in addition to ['kind', 'year', 'month', 'day', 'time'])
+
+        Returns:
+            no value
         """
         cols = set(df.columns)
         kwargs_funcs = dict()
@@ -256,20 +256,22 @@ class Builder(object):
                 self.append_record(
                     kind, id_cols if 'id_cols' not in obj else obj['id_cols'], **fields)
 
-    def to_frame(self, output_duplicated_events=False):
+    def to_frame(self, output_duplicated_events: bool = False) -> pd.DataFrame:
         """Create a DataFrame out of collected events.
 
         This also ensure all event kinds are valid and generate `event_uid` column from `id_cols`
 
-        Parameters
-        ----------
-        output_duplicated_events
-            Output duplicated events to file data/duplicates.csv
+        Args:
+            output_duplicated_events (bool):
+                if True then output duplicated events to file data/duplicates.csv.
+                Defaults to False
 
-        Raises
-        ------
-        NonUniqueEventIDException
-            If event_uid is not unique.
+        Returns:
+            collected events as a data frame
+
+        Raises:
+            NonUniqueEventIDException:
+                event_uid is not unique.
         """
         df = pd.DataFrame.from_records(self._records)\
             .pipe(float_to_int_str, ["year", "month", "day"], True)
@@ -281,15 +283,19 @@ class Builder(object):
         return df
 
 
-def discard_events_occur_more_than_once_every_30_days(df, kind, groupby):
-    """Discard events that occur more than once every 30 days.
+def discard_events_occur_more_than_once_every_30_days(df: pd.DataFrame, kind: str, groupby: list[str]) -> pd.DataFrame:
+    """Discards events that occur more frequent than once every 30 days.
 
-    Parameters
-    ----------
-    kind
-        event kind to filter
-    groupby
-        list of columns to group by
+    Args:
+        df (pd.DataFrame):
+            the frame to process
+        kind (str):
+            event kind to filter
+        groupby (list of str):
+            list of columns to group by
+
+    Returns:
+        the processed frame
     """
     df.loc[:, 'date'] = combine_date_columns(df, 'year', 'month', 'day')
     event_uids = []

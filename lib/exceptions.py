@@ -12,3 +12,7 @@ class NonUniqueUIDException(Exception):
 
 class InvalidSalaryFreqException(Exception):
     pass
+
+
+class HashCollisionException(Exception):
+    pass
