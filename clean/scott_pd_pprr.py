@@ -38,16 +38,19 @@ def clean():
     df.columns = ["full_name", "sex", "race", "birth_date", "salary", "hire_date", "termination_date",
                   "badge_no", "rank_desc", "assigned_zone"]
     df = df\
-        .drop(columns=["assigned_zone"]) \
-        .pipe(set_values, {"salary_freq": salary.YEARLY}) \
+        .drop(columns=["assigned_zone"])\
+        .rename(columns={
+            "termination_date": "term_date"
+        })\
+        .pipe(set_values, {"salary_freq": salary.YEARLY})\
         .pipe(clean_salaries, ["salary"])\
         .pipe(split_name)\
         .pipe(clean_rank)\
         .pipe(clean_names, ["rank_desc"])\
-        .pipe(clean_dates, ["birth_date", "hire_date", "termination_date"])\
+        .pipe(clean_dates, ["birth_date", "hire_date", "term_date"])\
         .pipe(clean_races, ["race"])\
         .pipe(clean_sexes, ["sex"])\
-        .pipe(clean_names, ["first_name", "last_name", "middle_initial"]) \
+        .pipe(clean_names, ["first_name", "last_name", "middle_initial"])\
         .pipe(set_values, {
             "data_production_year": 2021,
             "agency": "Scott PD"

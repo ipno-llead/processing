@@ -24,7 +24,7 @@ def match_cprr(cprr, pprr):
         'first_name': JaroWinklerSimilarity(),
         'last_name': JaroWinklerSimilarity(),
     })
-    decision = 0.94
+    decision = 0.90
     matcher.save_pairs_to_excel(data_file_path(
         'match/scott_pd_cprr_2021_v_scott_pd_pprr_2021.xlsx'), decision)
     matches = matcher.get_index_pairs_within_thresholds(decision)
@@ -47,7 +47,7 @@ def match_pprr_and_post(pprr, post):
         'last_name': JaroWinklerSimilarity(),
         'first_name': JaroWinklerSimilarity(),
     })
-    decision = 1
+    decision = .90
     matcher.save_pairs_to_excel(data_file_path(
         'match/scott_pd_pprr_2021_v_post_pprr_2020_11_06.xlsx'), decision)
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
@@ -67,7 +67,7 @@ def match_cprr_and_post(cprr, post):
         'last_name': JaroWinklerSimilarity(),
         'first_name': JaroWinklerSimilarity(),
     })
-    decision = 1
+    decision = .90
     matcher.save_pairs_to_excel(data_file_path(
         'match/scott_pd_cprr_2021_v_post_pprr_2020_11_06.xlsx'), decision)
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
@@ -89,4 +89,3 @@ if __name__ == '__main__':
         'match/cprr_scott_pd_2021.csv'), index=False)
     post_event.to_csv(data_file_path(
         'match/post_event_scott_pd_2021.csv'), index=False)
-
