@@ -49,7 +49,7 @@ def fuse_events(pprr, cprr, uof):
         events.COMPLAINT_RECEIVE: {'prefix': 'receive'},
         events.ALLEGATION_CREATE: {'prefix': 'allegation_create'},
         events.COMPLAINT_INCIDENT: {'prefix': 'occur'},
-    }, ['uid', 'complaint_uid', 'allegation_uid'])
+    }, ['uid', 'complaint_uid'])
     builder.extract_events(uof, {
         events.UOF_INCIDENT: {'prefix': 'occur'},
         events.UOF_RECEIVE: {'prefix': 'receive', 'parse_date': True},

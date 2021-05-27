@@ -3,7 +3,7 @@ from lib.columns import (
 )
 from lib.path import data_file_path, ensure_data_dir
 from lib import events
-from lib.uid import gen_uid, ensure_uid_unique
+from lib.uid import ensure_uid_unique
 import pandas as pd
 import sys
 sys.path.append('../')
@@ -25,9 +25,6 @@ def prepare_cprr():
     cprr = pd.read_csv(
         data_file_path('match/cprr_greenwood_pd_2015_2020.csv')
     )
-    cprr = gen_uid(cprr, [
-        'uid', 'complaint_uid'
-    ], 'allegation_uid')
     cprr.loc[:, 'data_production_year'] = '2020'
     cprr.loc[:, 'agency'] = 'Greenwood PD'
     return cprr

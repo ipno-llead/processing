@@ -212,7 +212,7 @@ def clean_sexes(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
     for col in cols:
         df.loc[:, col] = df[col].str.strip().str.lower()\
             .str.replace(r"^m$", "male", regex=True).str.replace(r"^f$", "female", regex=True)\
-            .str.replace(r"^unknown.*", "unknown", regex=True)
+            .str.replace(r"^unknown.*", "", regex=True)
     return df
 
 
@@ -231,7 +231,7 @@ def clean_races(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
     for col in cols:
         df.loc[:, col] = df[col].str.strip().str.lower()\
             .str.replace(r"^w$", "white", regex=True).str.replace(r"^b(lack.+)?$", "black", regex=True)\
-            .str.replace(r"^h$", "hispanic", regex=True).str.replace(r"^unknown.*", "unknown", regex=True)
+            .str.replace(r"^h$", "hispanic", regex=True).str.replace(r"^unknown.*", "", regex=True)
     return df
 
 

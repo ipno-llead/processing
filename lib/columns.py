@@ -22,9 +22,7 @@ COMPLAINT_COLUMNS = [
     "uid",  # officer unique identifier
     "tracking_number",  # unique identifier for complaint
     "complaint_uid",  # unique identifier for complaint but generated for when tracking_number is unavailable
-    "allegation_uid",  # unique identifier for allegation (complaint x officer)
     "charge_uid",  # unique identifier for individual charges
-    "investigation_type",
     "investigation_status",
     "assigned_unit",
     "assigned_department",
@@ -53,7 +51,6 @@ COMPLAINT_COLUMNS = [
     "complainant_sex",
     "complainant_race",
     "complainant_age",
-    "recommended_action",
     "action",  # list of actions taken separated by ' | '
     "data_production_year",  # year of data
     "agency",  # name of agency (e.g. "New Orleans CSD")
@@ -138,7 +135,7 @@ USE_OF_FORCE_COLUMNS = [
     'officer_sub_division_a',
     'officer_sub_division_b',
     "agency",
-    "data_production_year"
+    "data_production_year",
 ]
 
 EVENT_COLUMNS = [
@@ -154,7 +151,6 @@ EVENT_COLUMNS = [
     # situational
     "uid",  # officer unique identifier
     "complaint_uid",
-    "allegation_uid",
     "appeal_uid",
     "resolution_uid",
     'uof_uid',
@@ -178,7 +174,7 @@ EVENT_COLUMNS = [
     "salary",
     "salary_freq",
     "award",
-    "award_comments"
+    "award_comments",
 ]
 
 
