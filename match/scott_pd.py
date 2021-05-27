@@ -26,7 +26,7 @@ def match_cprr(cprr, pprr):
     })
     decision = 0.90
     matcher.save_pairs_to_excel(data_file_path(
-        'match/scott_pd_cprr_2021_v_scott_pd_pprr_2021.xlsx'), decision)
+        'match/scott_pd_cprr_2020_v_scott_pd_pprr_2021.xlsx'), decision)
     matches = matcher.get_index_pairs_within_thresholds(decision)
 
     match_dict = dict(matches)
@@ -69,14 +69,14 @@ def match_cprr_and_post(cprr, post):
     })
     decision = .90
     matcher.save_pairs_to_excel(data_file_path(
-        'match/scott_pd_cprr_2021_v_post_pprr_2020_11_06.xlsx'), decision)
+        'match/scott_pd_cprr_2020_v_post_pprr_2020_11_06.xlsx'), decision)
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
     return extract_events_from_post(post, matches, 'Scott PD')
 
 
 if __name__ == '__main__':
     cprr = pd.read_csv(data_file_path(
-        'clean/cprr_scott_pd_2021.csv'))
+        'clean/cprr_scott_pd_2020.csv'))
     pprr = pd.read_csv(data_file_path('clean/pprr_scott_pd_2021.csv'))
     post = prepare_post_data()
     cprr = match_cprr(cprr, pprr)
@@ -86,6 +86,6 @@ if __name__ == '__main__':
     ]).drop_duplicates(ignore_index=True)
     ensure_data_dir('match')
     cprr.to_csv(data_file_path(
-        'match/cprr_scott_pd_2021.csv'), index=False)
+        'match/cprr_scott_pd_2020.csv'), index=False)
     post_event.to_csv(data_file_path(
         'match/post_event_scott_pd_2021.csv'), index=False)

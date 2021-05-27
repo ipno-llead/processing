@@ -30,7 +30,7 @@ def fuse_events(pprr, cprr):
 
 if __name__ == '__main__':
     cprr = pd.read_csv(data_file_path(
-        'match/cprr_scott_pd_2021.csv'
+        'match/cprr_scott_pd_2020.csv'
     ))
     pprr = pd.read_csv(data_file_path(
         'clean/pprr_scott_pd_2021.csv'
