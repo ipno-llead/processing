@@ -3,9 +3,7 @@ import sys
 import pandas as pd
 
 from lib.path import data_file_path, ensure_data_dir
-from lib.columns import (
-    rearrange_personnel_columns, rearrange_event_columns
-)
+from lib.columns import rearrange_event_columns
 from lib.personnel import fuse_personnel
 from lib.uid import ensure_uid_unique
 from lib import events

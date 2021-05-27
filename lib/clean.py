@@ -97,7 +97,11 @@ def clean_dates(df: pd.DataFrame, cols: list[str], expand: bool = True) -> pd.Da
     """
     for col in cols:
         assert col.endswith("_date")
-        dates = pd.DataFrame.from_records(df[col].str.strip().map(clean_date))
+        dates = pd.DataFrame.from_records(
+            df[col].str.strip().str.replace(
+                r'//', r'/', regex=False
+            ).map(clean_date)
+        )
         if expand:
             prefix = col[:-5]
             dates.columns = [prefix+"_year", prefix+"_month", prefix+"_day"]

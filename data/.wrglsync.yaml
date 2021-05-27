@@ -124,6 +124,10 @@ repos:
     fileName: fuse/com_levee_pd.csv
     primaryKey:
       - complaint_uid
+  com-new-orleans-so:
+    fileName: fuse/com_new_orleans_so.csv
+    primaryKey:
+      - complaint_uid
   com-scott-pd:
     fileName: fuse/com_scott_pd.csv
     primaryKey:
@@ -220,6 +224,10 @@ repos:
     fileName: fuse/per_slidell_pd.csv
     primaryKey:
       - uid
+  per-new-orleans-so:
+    fileName: fuse/per_new_orleans_so.csv
+    primaryKey:
+      - uid
   per-scott-pd:
     fileName: fuse/per_scott_pd.csv
     primaryKey:
@@ -302,6 +310,10 @@ repos:
       - event_uid
   event-slidell-pd:
     fileName: fuse/event_slidell_pd.csv
+    primaryKey:
+      - event_uid
+  event-new-orleans-so:
+    fileName: fuse/event_new_orleans_so.csv
     primaryKey:
       - event_uid
   event-scott-pd:
