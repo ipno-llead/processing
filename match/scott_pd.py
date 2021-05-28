@@ -1,4 +1,4 @@
-from lib.match import (
+from datamatch import (
     ThresholdMatcher, JaroWinklerSimilarity, ColumnsIndex
 )
 from lib.path import data_file_path, ensure_data_dir
