@@ -153,7 +153,7 @@ data/match/post_event_covington_pd_2020.csv: match/covington_pd.py data/clean/ac
 data/match/post_event_slidell_pd_2020.csv: match/slidell_pd.py data/clean/pprr_slidell_pd_2019.csv
 	python match/slidell_pd.py
 
-data/match/post_event_scott_pd_2021.csv: match/scott_pd.py data/clean/cprr_scott_pd_2021.csv data/clean/pprr_scott_pd_2020.csv data/clean/pprr_post_2020_11_06.csv
+data/match/post_event_scott_pd_2021.csv: match/scott_pd.py data/clean/cprr_scott_pd_2020.csv data/clean/pprr_scott_pd_2021.csv data/clean/pprr_post_2020_11_06.csv
 	python match/scott_pd.py
 
 
