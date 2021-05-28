@@ -1,8 +1,5 @@
-from datamatch import (
-    ThresholdMatcher, JaroWinklerSimilarity, ColumnsIndex
-)
+from datamatch import ColumnsIndex, JaroWinklerSimilarity, ThresholdMatcher
 from lib.path import data_file_path, ensure_data_dir
-from lib.post import extract_events_from_post
 import pandas as pd
 import sys
 sys.path.append('../')
@@ -14,24 +11,26 @@ def prepare_post_data():
 
 
 def match_cprr(cprr, pprr):
-    dfa = cprr[['first_name', 'last_name', 'uid']]\
-        .drop_duplicates(subset=['uid']).set_index('uid', drop=True)
-    dfa.loc[:, 'fc'] = dfa.first_name.fillna('').map(lambda x: x[:1])
-    dfb = pprr[['first_name', 'last_name', 'uid']]\
-        .drop_duplicates(subset=['uid']).set_index('uid', drop=True)
-    dfb.loc[:, 'fc'] = dfb.first_name.fillna('').map(lambda x: x[:1])
-    matcher = ThresholdMatcher(dfa, dfb, ColumnsIndex(['fc']), {
-        'first_name': JaroWinklerSimilarity(),
-        'last_name': JaroWinklerSimilarity(),
-    })
-    decision = 0.90
+    dfa = cprr[['first_name', 'last_name', 'uid']]
+    dfa.loc[:, 'fc'] = dfa.first_name.map(lambda x: x[:1])
+    dfa = dfa.drop_duplicates(subset=['uid']).set_index('uid')
+
+    dfb = pprr[['first_name', 'last_name', 'uid']]
+    dfb.loc[:, 'fc'] = dfb.first_name.map(lambda x: x[:1])
+    dfb = dfb.drop_duplicates(subset=['uid']).set_index('uid', drop=True)
+
+    matcher = ThresholdMatcher(ColumnsIndex(["fc"]), {
+        "last_name": JaroWinklerSimilarity(),
+        "first_name": JaroWinklerSimilarity(),
+    }, dfa, dfb)
+    decision = 1
     matcher.save_pairs_to_excel(data_file_path(
         'match/scott_pd_cprr_2020_v_scott_pd_pprr_2021.xlsx'), decision)
     matches = matcher.get_index_pairs_within_thresholds(decision)
-
     match_dict = dict(matches)
+
     cprr.loc[:, 'uid'] = cprr['uid'].map(lambda v: match_dict.get(v, v))
-    return cprr
+    return cprr;pprr
 
 
 def match_pprr_and_post(pprr, post):
@@ -43,35 +42,41 @@ def match_pprr_and_post(pprr, post):
     dfb.loc[:, 'fc'] = dfb.first_name.map(lambda x: x[:1])
     dfb = dfb.drop_duplicates(subset=['uid']).set_index('uid')
 
-    matcher = ThresholdMatcher(dfa, dfb, ColumnsIndex(['fc']), {
-        'last_name': JaroWinklerSimilarity(),
-        'first_name': JaroWinklerSimilarity(),
-    })
-    decision = .90
+    matcher = ThresholdMatcher(ColumnsIndex(["fc"]), {
+        "last_name": JaroWinklerSimilarity(),
+        "first_name": JaroWinklerSimilarity(),
+    }, dfa, dfb)
+    decision = 1
     matcher.save_pairs_to_excel(data_file_path(
         'match/scott_pd_pprr_2021_v_post_pprr_2020_11_06.xlsx'), decision)
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
-    return extract_events_from_post(post, matches, 'Scott PD')
+    match_dict = dict(matches)
+
+    pprr.loc[:, 'uid'] = pprr.uid.map(lambda x: match_dict.get(x, x))
+    return pprr
 
 
 def match_cprr_and_post(cprr, post):
     dfa = cprr[['uid', 'first_name', 'last_name']]
-    dfa.loc[:, 'fc'] = dfa.first_name.fillna('').map(lambda x: x[:1])
+    dfa.loc[:, 'fc'] = dfa.first_name.map(lambda x: x[:1])
     dfa = dfa.drop_duplicates(subset=['uid']).set_index('uid')
 
     dfb = post[['uid', 'first_name', 'last_name']]
-    dfb.loc[:, 'fc'] = dfb.first_name.fillna('').map(lambda x: x[:1])
+    dfb.loc[:, 'fc'] = dfb.first_name.map(lambda x: x[:1])
     dfb = dfb.drop_duplicates(subset=['uid']).set_index('uid')
 
-    matcher = ThresholdMatcher(dfa, dfb, ColumnsIndex(['fc']), {
-        'last_name': JaroWinklerSimilarity(),
-        'first_name': JaroWinklerSimilarity(),
-    })
-    decision = .90
+    matcher = ThresholdMatcher(ColumnsIndex(["fc"]), {
+        "last_name": JaroWinklerSimilarity(),
+        "first_name": JaroWinklerSimilarity(),
+    }, dfa, dfb)
+    decision = 1
     matcher.save_pairs_to_excel(data_file_path(
         'match/scott_pd_cprr_2020_v_post_pprr_2020_11_06.xlsx'), decision)
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
-    return extract_events_from_post(post, matches, 'Scott PD')
+    match_dict = dict(matches)
+
+    cprr.loc[:, 'uid'] = cprr.uid.map(lambda x: match_dict.get(x, x))
+    return cprr
 
 
 if __name__ == '__main__':
