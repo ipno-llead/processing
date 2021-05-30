@@ -19,9 +19,9 @@ def match_cprr(cprr, pprr):
     dfb.loc[:, 'fc'] = dfb.first_name.map(lambda x: x[:1])
     dfb = dfb.drop_duplicates(subset=['uid']).set_index('uid', drop=True)
 
-    matcher = ThresholdMatcher(ColumnsIndex(["fc"]), {
-        "last_name": JaroWinklerSimilarity(),
-        "first_name": JaroWinklerSimilarity(),
+    matcher = ThresholdMatcher(ColumnsIndex(['fc']), {
+        'last_name': JaroWinklerSimilarity(),
+        'first_name': JaroWinklerSimilarity(),
     }, dfa, dfb)
     decision = 1
     matcher.save_pairs_to_excel(data_file_path(
@@ -43,8 +43,8 @@ def match_pprr_and_post(pprr, post):
     dfb = dfb.drop_duplicates(subset=['uid']).set_index('uid')
 
     matcher = ThresholdMatcher(ColumnsIndex(["fc"]), {
-        "last_name": JaroWinklerSimilarity(),
-        "first_name": JaroWinklerSimilarity(),
+        'last_name': JaroWinklerSimilarity(),
+        'first_name': JaroWinklerSimilarity(),
     }, dfa, dfb)
     decision = 1
     matcher.save_pairs_to_excel(data_file_path(
@@ -66,8 +66,8 @@ def match_cprr_and_post(cprr, post):
     dfb = dfb.drop_duplicates(subset=['uid']).set_index('uid')
 
     matcher = ThresholdMatcher(ColumnsIndex(["fc"]), {
-        "last_name": JaroWinklerSimilarity(),
-        "first_name": JaroWinklerSimilarity(),
+        'last_name': JaroWinklerSimilarity(),
+        'first_name': JaroWinklerSimilarity(),
     }, dfa, dfb)
     decision = 1
     matcher.save_pairs_to_excel(data_file_path(
