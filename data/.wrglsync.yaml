@@ -44,6 +44,8 @@ repos:
     fileName: clean/lprr_louisiana_state_csc_1991_2020.csv
   clean-cprr-scott-pd-2020:
     fileName: clean/cprr_scott_pd_2020.csv
+  clean-pprr-scott-pd-2021:
+    fileName: clean/pprr_scott_pd_2021.csv
   match-cprr-new-orleans-harbor-pd-2020:
     fileName: match/cprr_new_orleans_harbor_pd_2020.csv
   match-pprr-baton-rouge-csd-2017:
@@ -76,6 +78,8 @@ repos:
     fileName: match/lprr_louisiana_state_csc_1991_2020.csv
   match-cprr-scott-pd-2020:
     fileName: match/cprr_scott_pd_2020.csv
+  match-pprr-scott-pd-2021:
+    fileName: match/pprr_scott_pd_2021.csv
   com-baton-rouge-pd:
     fileName: fuse/com_baton_rouge_pd.csv
     primaryKey:
@@ -122,10 +126,6 @@ repos:
       - complaint_uid
   com-levee-pd:
     fileName: fuse/com_levee_pd.csv
-    primaryKey:
-      - complaint_uid
-  com-new-orleans-so:
-    fileName: fuse/com_new_orleans_so.csv
     primaryKey:
       - complaint_uid
   com-scott-pd:
@@ -224,10 +224,6 @@ repos:
     fileName: fuse/per_slidell_pd.csv
     primaryKey:
       - uid
-  per-new-orleans-so:
-    fileName: fuse/per_new_orleans_so.csv
-    primaryKey:
-      - uid
   per-scott-pd:
     fileName: fuse/per_scott_pd.csv
     primaryKey:
@@ -310,10 +306,6 @@ repos:
       - event_uid
   event-slidell-pd:
     fileName: fuse/event_slidell_pd.csv
-    primaryKey:
-      - event_uid
-  event-new-orleans-so:
-    fileName: fuse/event_new_orleans_so.csv
     primaryKey:
       - event_uid
   event-scott-pd:
