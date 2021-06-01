@@ -42,7 +42,7 @@ def match_pprr_and_post(pprr, post):
     dfb.loc[:, 'fc'] = dfb.first_name.map(lambda x: x[:1])
     dfb = dfb.drop_duplicates(subset=['uid']).set_index('uid')
 
-    matcher = ThresholdMatcher(ColumnsIndex([fc'']), {
+    matcher = ThresholdMatcher(ColumnsIndex(['fc']), {
         'last_name': JaroWinklerSimilarity(),
         'first_name': JaroWinklerSimilarity(),
     }, dfa, dfb)
