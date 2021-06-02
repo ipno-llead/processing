@@ -159,6 +159,7 @@ DATA_FILES = {
     ],
     "scott_pd": [
         "https://www.dropbox.com/s/a0fw6b3a6505eoi/scott_pd_cprr_2020.csv?dl=1",  # noqa
+        "https://www.dropbox.com/sh/65xjaciojdchrhz/AACKNo0rWVfAqLBYejmj0J4Ta?dl=1" # noqa
     ],
     "slidell_pd": [
         "https://www.dropbox.com/s/1z09ujt4ja3b4wx/Slidell_PD_PPRR_2009.csv?dl=1",  # noqa
