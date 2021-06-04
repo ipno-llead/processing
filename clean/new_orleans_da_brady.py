@@ -26,7 +26,13 @@ def combine_rule_and_paragraph(df):
 
 def clean_charges(df):
     df.loc[:, 'charges'] = df.charges.str.lower().str.strip()\
-        .str.rplace('rule : 2:', 'rule 2:')
+        .str.replace('rule : moral conduc', 'rule 2: moral conduct', regex=False)\
+        .str.replace('rule 2:moral conduct', 'rule 2: moral conduct', regex=False)\
+        .str.replace('rule moral conduct', 'rule 2: moral conduct', regex=False)\
+        .str.replace('rule: 2: moral conduc', 'rule 2: moral conduct', regex=False)\
+        .str.replace('rule: moral conduct', 'rule 2: moral conduct', regex=False)\
+        .str.replace('rule2: moralconduct', 'rule 2: moral conduct', regex=False)
+    return df
 
 def clean_disposition(df):
     df.loc[:, 'disposition'] = df.disposition.str.lower().str.strip() \
@@ -133,7 +139,8 @@ def clean():
         .pipe(extract_date_from_pib)\
         .pipe(combine_rule_and_paragraph)\
         .pipe(clean_disposition)\
-        .pipe(clean_directive) \
+        .pipe(clean_directive)\
+        .pipe(clean_charges)\
         .pipe(standardize_desc_cols, ['directive', 'disposition', 'charges'])\
         .pipe(clean_names, ['first_name', 'last_name'])\
         .pipe(set_values, {
