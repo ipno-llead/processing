@@ -24,6 +24,9 @@ def combine_rule_and_paragraph(df):
     df = df.drop(columns=['allegation classification', 'allegation'])
     return df
 
+def clean_charges(df):
+    df.loc[:, 'charges'] = df.charges.str.lower().str.strip()\
+        .str.rplace('rule : 2:', 'rule 2:')
 
 def clean_disposition(df):
     df.loc[:, 'disposition'] = df.disposition.str.lower().str.strip() \
@@ -40,6 +43,7 @@ def clean_disposition(df):
 
 def clean_directive(df):
     df.loc[:, 'directive'] = df.directive.str.lower().str.strip()\
+        .str.replace('\\', '', regex=False)\
         .str.replace('reltive ', 'relative', regex=False)\
         .str.replace('licene', 'license', regex=False)\
         .str.replace('r.s./', 'r.s. ', regex=False)\
@@ -126,11 +130,11 @@ def clean():
             'first name': 'first_name',
             'last name': 'last_name'
         })\
-        .pipe(standardize_desc_cols, ['allegation classification', 'allegation']) \
         .pipe(extract_date_from_pib)\
         .pipe(combine_rule_and_paragraph)\
         .pipe(clean_disposition)\
-        .pipe(clean_directive)\
+        .pipe(clean_directive) \
+        .pipe(standardize_desc_cols, ['directive', 'disposition', 'charges'])\
         .pipe(clean_names, ['first_name', 'last_name'])\
         .pipe(set_values, {
             'data_production_year': 2021,
