@@ -40,7 +40,6 @@ def clean_disposition(df):
 
 def clean_directive(df):
     df.loc[:, 'directive'] = df.directive.str.lower().str.strip()\
-        .str.replace('\\', '/', regex=False)\
         .str.replace('reltive ', 'relative', regex=False)\
         .str.replace('licene', 'license', regex=False)\
         .str.replace('r.s./', 'r.s. ', regex=False)\
@@ -60,10 +59,15 @@ def clean_directive(df):
                      '4:108.1 relative to resisting an officer/obstruction', regex=False)\
         .str.replace('to wit 14:98', 'to wit: r.s. 14:98 relative to operating a vehicle while intoxicated ', regex=False)\
         .str.replace('reckles', 'reckless', regex=False)\
+        .str.replace(r'r.s. 14:35$', 'r.s. 14:35 relative to simple battery')\
         .str.replace('r.s 32:81 following vehicles', 'r.s. 32:81 relative to following vehicles', regex=False)\
         .str.replace('r.s. 32:58 careless operation',
                      'r.s. 32:58 relative to careless operation of a moveable', regex=False)\
+        .str.replace('r.s 47-507', 'r.s. 47-507 relative to display of plate', regex=False)\
+        .str.replace('r.s. 14.35.3', 'r.s. 14:35.3 relative to domestic abuse battery', regex=False)\
         .str.replace('to wit: hit ad run', 'to wit: r.s. 14:100 hit and run driving', regex=False)\
+        .str.replace('32:863.1 no proof of liability insurance',
+                     'r.s. 32:863.1 relative to no proof of liability insurance', regex=False)\
         .str.replace('to wit: simple battery', 'to wit: la. r.s. 14:35 relative to simple battery', regex=False)\
         .str.replace('to wit:14:98', 'to wit: r.s. 14:98 relative to operating a vehicle while intoxicated', regex=False)\
         .str.replace('to wit r.s. la 32:865', 'to wit: r.s. la 32:865')\
@@ -88,7 +92,26 @@ def clean_directive(df):
                      '32:50 relative to careless operation of a motor vehicle', regex=False)\
         .str.replace('14:138 public payroll fraud', '14:138 relative to public payroll fraud', regex=False)\
         .str.replace('14:38 simple assault and r.s. 14:63 criminal trespassing',
-                     '14:38 relative to simple assault | r.s. 14:63 criminal trespassing', regex=False)
+                     '14:38 relative to simple assault | r.s. 14:63 criminal trespassing', regex=False)\
+        .str.replace('relative sexual battery', 'r.s. 14:43.1 relative to sexual battery')\
+        .str.replace("to la. r.s. 32:52 relative to driver's license expired",
+                     "to wit: la. r.s. 32:52 relative to driver's license expired", regex=False)\
+        .str.replace(r'^relative to theft$', 'r.s. 14:67 relative to theft')\
+        .str.replace('relative to aggravated incest', 'r.s. 14:78.1 relative to aggravated incest', regex=False)\
+        .str.replace('relative to attempt and conspiracy to commit offense',
+                     '14:26 relative to attempt and conspiracy to commit offense', regex=False)\
+        .str.replace('relative to conspiracy to commit offense',
+                     '14:26 relative to attempt and conspiracy to commit offense', regex=False)\
+        .str.replace('relative to forcible rape', '14:42.1 relative to forcible rape', regex=False)\
+        .str.replace('relative to no proof of insurance',
+                     'r.s. 32:863.1 relative to no proof of liability insurance', regex=False)\
+        .str.replace(r'^relative to simple battery$', 'r.s. 14:35 relative to simple battery')\
+        .str.replace(r'^relative to simple assault$', 'r.s. 14:38 relative to simple assault')\
+        .str.replace(r'^simple assault$', 'r.s. 14:38 relative to simple assault')\
+        .str.replace('r.s. 14:99 relative to reckless operation of a vehicle',
+                     'r.s. 14:99 relative to reckless operation of a motor vehicle', regex=False)\
+        .str.replace('recklesss', 'reckless', regex=False)\
+        .str.replace("r.s. 32:412 driver's must be licensed", "r.s. 32:412 drivers must be licensed", regex=False)
     return df
 
 
