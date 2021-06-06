@@ -55,9 +55,38 @@ def clean_charges(df):
         .str.replace('rule 2: moral conduct ; paragraph ( adherence to law',
                      'rule 2: moral conduct ; paragraph 01 adherence to law', regex=False)\
         .str.replace('rule 2: moral conduct ; paragraph 0: adherence to law',
-                     'rule 2: moral conduct ; paragraph 01 adherence to law', regex=False)
+                     'rule 2: moral conduct ; paragraph 01 adherence to law', regex=False)\
+        .str.replace('rule 2: moral conduct ; paragraph o adherence to law',
+                     'rule 2: moral conduct ; paragraph 01 adherence to law', regex=False)\
+        .str.replace('rule 2: moral conduct ; paragraph o honesty and truthfulness',
+                     'rule 2: moral conduct ; paragraph 03 honesty and truthfulness', regex=False)\
+        .str.replace('rule 2: moral conduct ; paragrapr 01 adherence to law',
+                     'rule 2: moral conduct ; paragraph 01 adherence to law', regex=False)\
+        .str.replace('rule 2: moralconduct ; paragraph 01 adherence to law',
+                     'rule 2: moral conduct ; paragraph 01 adherence to law', regex=False)\
+        .str.replace('rule 2: moral-conduct ; paragraph 01 adherence to law',
+                     'rule 2: moral conduct ; paragraph 01 adherence to law', regex=False)\
+        .str.replace('rule moral conduct ; aragraph o adherence to law'
+                     'rule 2: moral conduct ; paragraph 01 adherence to law', regex=False)\
+        .str.replace('rule: 2: moral conduc ; paragraph 01 adherence to law',
+                     'rule 2: moral conduct ; paragraph 01 adherence to law', regex=False)\
+        .str.replace('rule: 2: moral conduct ; paragraph 01 adherence to law',
+                     'rule 2: moral conduct ; paragraph 01 adherence to law', regex=False)\
+        .str.replace('rule 2L moral conduct ; paragraph 01 adherence to law', regex=False)\
+        .str.replace('rule: moral conduct ; paragraph ( adherence to law',
+                     'rule 2: moral conduct ; paragraph 01 adherence to law', regex=False)\
+        .str.replace('rule: moral conduct ; paragraph 01 adherence to law',
+                     'rule 2: moral conduct ; paragraph 01 adherence to law', regex=False)\
+        .str.replace('rule: moral conduct ; paragraph 01 adherence to law',
+                     'rule 2: moral conduct ; paragraph 01 adherence to law', regex=False)\
+        .str.replace('rule: moral conduct ; paragraph o adherence to law',
+                     'rule 2: moral conduct ; paragraph 01 adherence to law', regex=False)\
+        .str.replace('rule2: moralconduct ; paragraph 0: adherence to law',
+                     'rule 2: moral conduct ; paragraph 01 adherence to law', regex=False)\
+        .str.replace('rule 2: moral conduct ; paragraph 01 adherence to law', regex=False)\
+        .str.replace('rule2:moral conduct ; paragraph 03 - honesty and truthfulness')
     return df
-
+`
 def clean_disposition(df):
     df.loc[:, 'disposition'] = df.disposition.str.lower().str.strip() \
         .str.replace('-', ' | ', regex=False)\
