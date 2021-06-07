@@ -212,8 +212,8 @@ def clean_finding(df):
     return df
 
 
-def clean_directive(df):
-    df.loc[:, 'directive'] = df.directive.str.lower().str.strip()\
+def clean_allegation_class(df):
+    df.loc[:, 'allegation_class'] = df.directive.str.lower().str.strip()\
         .str.replace('\\', '', regex=False)\
         .str.replace('reltive ', 'relative', regex=False)\
         .str.replace('licene', 'license', regex=False)\
@@ -287,7 +287,7 @@ def clean_directive(df):
                      'r.s. 14:99 relative to reckless operation of a motor vehicle', regex=False)\
         .str.replace('recklesss', 'reckless', regex=False)\
         .str.replace("r.s. 32:412 driver's must be licensed", "r.s. 32:412 drivers must be licensed", regex=False)
-    return df
+    return df.drop(columns=['directive'])
 
 
 def clean():
@@ -304,10 +304,10 @@ def clean():
         .pipe(extract_date_from_pib)\
         .pipe(combine_rule_and_paragraph)\
         .pipe(clean_disposition)\
-        .pipe(clean_directive)\
+        .pipe(clean_allegation_class)\
         .pipe(clean_charges)\
         .pipe(clean_finding)\
-        .pipe(standardize_desc_cols, ['directive', 'disposition', 'charges'])\
+        .pipe(standardize_desc_cols, ['allegation_class', 'disposition', 'charges'])\
         .pipe(clean_names, ['first_name', 'last_name'])\
         .pipe(set_values, {
             'data_production_year': 2021,
