@@ -138,19 +138,77 @@ def clean_charges(df):
         .str.replace('rule: 2: moral conduct;paragraph 01 adherence to law',
                      'rule 2: moral conduct;paragraph 01 adherence to law', regex=False)\
         .str.replace('rule 6: official info ; paragraph 02 false or inaccurate reports',
-                     'rule 6: official info;paragraph 02 false or inaccurate reports', regex=False)
+                     'rule 6: official info;paragraph 02 false or inaccurate reports', regex=False)\
+        .str.replace(r'^rule 2: moral conduct ; paragraph 01 adhÃ©rence to law$',
+                     'rule 2: moral conduct ; paragraph 01 adherence to law')
     return df
 
 def clean_disposition(df):
     df.loc[:, 'disposition'] = df.disposition.str.lower().str.strip() \
         .str.replace('-', ' | ', regex=False)\
         .str.replace('/', ' | ', regex=False)\
-        .str.replace('rui', '', regex=False)\
-        .str.replace('dismissal', 'dismissed', regex=False)\
-        .str.replace('dui', 'driving under the influence', regex=False)\
+        .str.replace('rui awaiting hearing', 'rui | awaiting hearing', regex=False)\
+        .str.replace('rui awaiting hearing (2 po rui)',
+                     'rui | awaiting hearing (2 po rui)', regex=False)\
+        .str.replace('rui resigned under investigation',
+                     'rui | resigned under investigation', regex=False)\
+        .str.replace('sustained |  dismissed',
+                     'sustained | dismissed', regex=False)\
+        .str.replace('sustained | dismissa',
+                     'sustained | dismissed', regex=False)\
+        .str.replace('sustained | dismissal',
+                     'sustained | dismissed', regex=False)\
+        .str.replace('sustained awaiting panel hearing',
+                     'sustained | awaiting panel hearing', regex=False)\
         .str.replace('sustained dismissal overturned by 4th circuit',
-                     'sustained dismissal overturned by the 4th circuit court', regex=False)\
-        .str.replace('sustÃ¤ined', 'sustained', regex=False)
+                     'sustained | dismissed | overturned by 4th circuit', regex=False)\
+        .str.replace(r'^sustained dismissed$',
+                     'sustained | dismissed', regex=False)\
+        .str.replace('sustained dismissed under another investigation',
+                     'sustained | dismissed under another investigation', regex=False)\
+        .str.replace('sustained pending superintendent approval',
+                     'sustained | pending superintendent approval', regex=False)\
+        .str.replace('sustained pending suspension served',
+                     'sustained | pending suspension served', regex=False)\
+        .str.replace('sustained | dismissedl',
+                     'sustained | dismissed', regex=False)\
+        .str.replace('sustained | dismissedl (1 po dismissed)',
+                     'sustained | dismissed (1 po dismissed)', regex=False)\
+        .str.replace('sustained dismissed',
+                     'sustained | dismissed', regex=False)\
+        .str.replace('sustalned', 'sustained', regex=False)\
+        .str.replace('sustalned | dismissal', 'sustained | dismissed', regex=False)\
+        .str.replace('rui  | resigned under investigation',
+                     'rui | resigned under investigation', regex=False)\
+        .str.replace('sustained | dismissal',
+                     'sustained | dismissed', regex=False)
+    return df
+
+def clean_finding(df):
+    df.loc[:, 'finding'] = df.finding.str.lower().str.strip() \
+        .str.replace('-', ' | ', regex=False)\
+        .str.replace('/', ' | ', regex=False)\
+        .str.replace('rui | resigned under inves',
+                     'resigned under investigation', regex=False)\
+        .str.replace('sustained  | dismissed', 'sustained | dismissed', regex=False)\
+        .str.replace('sustained | rui | resign',
+                     'sustained | resigned under investigation', regex=False)\
+        .str.replace('sustained | rui | retire',
+                     'sustained | retired under investigation', regex=False)\
+        .str.replace('sustained | rui resign',
+                     'sustained | resigned under investigation', regex=False)\
+        .str.replace('sustained dismissed',
+                     'sustained | dismissed', regex=False)\
+        .str.replace('sustained rui resign',
+                     'sustained | resigned under investigation', regex=False)\
+        .str.replace("ustained | rui | resign'", 'sustained | resigned under investigation', regex=False)\
+        .str.replace('sustained rui', 'sustained | rui', regex=False)\
+        .str.replace('sustained rui retire',
+                     'sustained | retired under investigation', regex=False)\
+        .str.replace('sustained | rui retire',
+                     'sustained | retired under investigation', regex=False)\
+        .str.replace('sustained | rui retire', 'sustained | retired under investigation', regex=False)\
+        .str.replace('sustained |  rui', 'sustained | rui', regex=False)
     return df
 
 
@@ -248,6 +306,7 @@ def clean():
         .pipe(clean_disposition)\
         .pipe(clean_directive)\
         .pipe(clean_charges)\
+        .pipe(clean_finding)\
         .pipe(standardize_desc_cols, ['directive', 'disposition', 'charges'])\
         .pipe(clean_names, ['first_name', 'last_name'])\
         .pipe(set_values, {
