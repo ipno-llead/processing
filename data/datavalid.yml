@@ -5,11 +5,10 @@ files:
         description: >
           unique identifier for officer
         unique: true
-        not_empty: true
+        no_na: true
       last_name:
         description: >
           person last name plus suffix if any
-        not_empty: true
         title_case: true
       middle_name:
         description: >
@@ -23,7 +22,6 @@ files:
         description: >
           person first name
         title_case: true
-        not_empty: true
       birth_year:
         integer: true
         range: [1900, 2010]
@@ -56,7 +54,7 @@ files:
         description: >
           complaint unique identifier
         unique: true
-        not_empty: true
+        no_na: true
       charge_uid:
       investigation_status:
       assigned_unit:
@@ -112,10 +110,8 @@ files:
           the text of the violated paragraph.
       charges:
         description: >
-          rule_ and paragraph_ columns combined. Inputs that are too hard to parse and
+          `rule_*` and `paragraph_*` columns combined. Inputs that are too hard to parse and
           split into rule and paragraph will end up here.
-      officer_years_of_service:
-        integer: true
       complainant_name:
         description: >
           redacted if the complainant isn't a police officer.
@@ -133,8 +129,6 @@ files:
           - hispanic
           - native american
           - asian / pacific islander
-      complainant_age:
-        integer: true
       action:
         description: >
           what (disciplinary) actions were taken regarding this complaint
@@ -162,7 +156,6 @@ files:
       supervisor_name:
       badge_no:
         description: accused's badge number during incident
-        integer: true
       department_code:
         description: >
           internal code of the department the accused belonged to during the incident.
@@ -170,10 +163,6 @@ files:
       department_desc:
         description: >
           text description of the department the accused belonged to during the incident.
-      rank_code:
-        description: >
-          internal rank code of the accused during the incident. Due to how widely
-          unavailable this field is, it is not very useful.
       rank_desc:
         description: >
           text description of the accused's rank during the incident.
@@ -181,11 +170,6 @@ files:
         description: >
           whether the accused was fulltime or reserve during incident.
     validation_tasks:
-      - name: "`complaint_uid` should be unique per `allegation` x `uid`"
-        unique:
-          - complaint_uid
-          - uid
-          - allegation
       - name: if `allegation_finding` is "sustained" then `disposition` should also be "sustained"
         warn_only: true
         empty:
@@ -202,7 +186,7 @@ files:
         description: >
           unique identifier for each event
         unique: true
-        not_empty: true
+        no_na: true
       kind:
         options:
           - officer_level_1_cert
@@ -230,10 +214,10 @@ files:
           - uof_created
           - uof_due
           - award_receive
-        not_empty: true
+        no_na: true
       year:
         integer: true
-        not_empty: true
+        no_na: true
         range: [1900, 2021]
       month:
         integer: true
@@ -256,10 +240,6 @@ files:
         description: >
           appeal hearing unique identifier, references the `appeal_uid` column in
           app_*.csv files.
-      resolution_uid:
-        description: >
-          unique identifier for individual resolution in an appeal hearing, references
-          the `resolution_uid` column in app_*.csv files.
       uof_uid:
         description: >
           unique identifier for a use of force report, references the `uof_uid` column
@@ -271,7 +251,6 @@ files:
       badge_no:
         description: >
           officer's badge number
-        integer: true
       employee_id:
         description: >
           referred officer's internal employee number.
@@ -345,7 +324,7 @@ files:
         description: >
           unique identifier of use of force report.
         unique: true
-        not_empty: true
+        no_na: true
       uof_tracking_number:
         description: >
           tracking number of use of force report from the originating agency.

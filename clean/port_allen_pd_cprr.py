@@ -151,6 +151,7 @@ def clean18():
         })\
         .dropna(how="all")\
         .pipe(clean_dates, ["receive_date", "occur_date"])\
+        .pipe(clean_occur_time)\
         .pipe(combine_appeal_and_action_columns)\
         .pipe(assign_agency)\
         .pipe(assign_prod_year, '2018')\
@@ -178,6 +179,7 @@ def clean16():
         .drop(columns=["department", "shift"])\
         .pipe(float_to_int_str, ['paragraph_code'])\
         .pipe(clean_dates, ["receive_date", "occur_date", "investigation_complete_date"])\
+        .pipe(clean_occur_time)\
         .pipe(assign_agency)\
         .pipe(assign_prod_year, '2016')\
         .pipe(clean_names, ["first_name", "last_name"])\

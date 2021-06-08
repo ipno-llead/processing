@@ -92,3 +92,16 @@ Each script in `match` folder produce one or more `.xlsx` files in `data/match` 
 - **Decision**: Has 2 values
   - `match_threshold`: the cut-off similarity score that the matcher has decided on. Everything below this score is considered non-match
   - `number_of_matched_pairs`: the number of matched pairs using this threshold.
+
+## Validate output
+
+```bash
+pip install datavalid
+python -m datavalid --dir data
+```
+
+## Regenerate schema.md from datavalid.yml file
+
+```bash
+python -m datavalid --dir data --doc schema.md
+```
