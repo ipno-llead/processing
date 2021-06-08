@@ -125,4 +125,4 @@ if __name__ == '__main__':
     ]).drop_duplicates(ignore_index=True)
     ensure_data_dir('match')
     df.to_csv(data_file_path('match/cprr_new_orleans_da_2021.csv'), index=False)
-    post_event.to_csv(data_file_path('match/post_event_new_orleans_pd_2021.csv'), index=False)
+    post_event.to_csv(data_file_path('match/post_event_new_orleans_da_2021.csv'), index=False)
