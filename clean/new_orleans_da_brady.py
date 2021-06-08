@@ -2,7 +2,7 @@ from lib.columns import clean_column_names, set_values
 from lib.uid import gen_uid
 from lib.path import data_file_path, ensure_data_dir
 from lib.clean import (
-    clean_names, standardize_desc_cols
+    clean_names, standardize_desc_cols, clean_dates
 )
 import pandas as pd
 import sys
@@ -307,7 +307,7 @@ def clean():
         .pipe(clean_allegation_class)\
         .pipe(clean_charges)\
         .pipe(clean_finding)\
-        .pipe(clean_date, ['receive_year'])\
+        .pipe(clean_dates, ['receive_date'])\
         .pipe(standardize_desc_cols, ['allegation_class', 'disposition', 'charges'])\
         .pipe(clean_names, ['first_name', 'last_name'])\
         .pipe(set_values, {
