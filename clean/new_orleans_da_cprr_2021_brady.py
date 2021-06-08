@@ -143,6 +143,7 @@ def clean_charges(df):
                      'rule 2: moral conduct ; paragraph 01 adherence to law')
     return df
 
+
 def clean_disposition(df):
     df.loc[:, 'disposition'] = df.disposition.str.lower().str.strip() \
         .str.replace('-', ' | ', regex=False)\
@@ -181,7 +182,15 @@ def clean_disposition(df):
         .str.replace('rui  | resigned under investigation',
                      'rui | resigned under investigation', regex=False)\
         .str.replace('sustained | dismissal',
-                     'sustained | dismissed', regex=False)
+                     'sustained | dismissed', regex=False) \
+        .str.replace('sustained rui | resigned under investigation',
+                     'sustained | resigned under investigation', regex=False) \
+        .str.replace('sustained rui | retired under investigation',
+                     'sustained | retired under investigation', regex=False) \
+        .str.replace('rui | resigned under investigation',
+                     'resigned under investigation', regex=False)\
+        .str.replace('sustained resign | retired (2 po rui)',
+                     'sustained | resigned | retired (2 po rui)', regex=False)
     return df
 
 def clean_finding(df):
@@ -286,14 +295,17 @@ def clean_allegation_class(df):
         .str.replace('r.s. 14:99 relative to reckless operation of a vehicle',
                      'r.s. 14:99 relative to reckless operation of a motor vehicle', regex=False)\
         .str.replace('recklesss', 'reckless', regex=False)\
-        .str.replace("r.s. 32:412 driver's must be licensed", "r.s. 32:412 drivers must be licensed", regex=False)
+        .str.replace("r.s. 32:412 driver's must be licensed", "r.s. 32:412 drivers must be licensed", regex=False)\
+        .str.replace('(see attached criminal charges)', '', regex=False)
     return df.drop(columns=['directive'])
 
+def drop
 
 def clean():
     df = pd.read_csv(data_file_path(
         'new_orleans_da/new_orleans_da_cprr_2021.csv'))
     df = clean_column_names(df)
+    df =
     df.columns = ['pib control#', 'first name', 'last name', 'allegation classification', 'allegation',
                   'directive', 'finding', 'disposition']
     df = df\
@@ -301,6 +313,8 @@ def clean():
             'first name': 'first_name',
             'last name': 'last_name'
         })\
+        .drop_duplicates()\
+        .dropna(axis=1, how='all')\
         .pipe(extract_date_from_pib)\
         .pipe(combine_rule_and_paragraph)\
         .pipe(clean_disposition)\
@@ -315,7 +329,9 @@ def clean():
             'agency': 'New Orleans DA'
         })\
         .pipe(gen_uid, ['agency', 'first_name', 'last_name'])\
-        .pipe(gen_uid, ['agency', 'uid', 'receive_year', 'receive_day'], "complaint_uid")
+        .pipe(gen_uid, [
+            'agency', 'uid', 'receive_year', 'allegation_class', 'tracking_number', 'finding', 'disposition', 'charges'
+        ], "complaint_uid")
     return df
 
 
