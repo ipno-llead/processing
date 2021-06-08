@@ -11,9 +11,9 @@ sys.path.append('../')
 
 def extract_date_from_pib(df):
     tracking = df['pib control#'].str.split("-", 1, expand=True)
-    df.loc[:, 'receive_year'] = tracking.loc[:, 0].fillna('')
+    df.loc[:, 'receive_date'] = tracking.loc[:, 0].fillna('')
     df.loc[:, 'partial_tracking_number'] = tracking.loc[:, 1].fillna('')
-    df.loc[:, 'tracking_number'] = df.receive_year.str.cat(df.partial_tracking_number, sep='-')
+    df.loc[:, 'tracking_number'] = df.receive_date.str.cat(df.partial_tracking_number, sep='-')
     df = df.drop(columns=['pib control#', 'partial_tracking_number'])
     return df
 
@@ -307,6 +307,7 @@ def clean():
         .pipe(clean_allegation_class)\
         .pipe(clean_charges)\
         .pipe(clean_finding)\
+        .pipe(clean_date, ['receive_year'])\
         .pipe(standardize_desc_cols, ['allegation_class', 'disposition', 'charges'])\
         .pipe(clean_names, ['first_name', 'last_name'])\
         .pipe(set_values, {
