@@ -193,6 +193,7 @@ def clean_disposition(df):
                      'sustained | resigned | retired (2 po rui)', regex=False)
     return df
 
+
 def clean_finding(df):
     df.loc[:, 'finding'] = df.finding.str.lower().str.strip() \
         .str.replace('-', ' | ', regex=False)\
@@ -299,22 +300,18 @@ def clean_allegation_class(df):
         .str.replace('(see attached criminal charges)', '', regex=False)
     return df.drop(columns=['directive'])
 
-def drop
 
 def clean():
     df = pd.read_csv(data_file_path(
         'new_orleans_da/new_orleans_da_cprr_2021.csv'))
     df = clean_column_names(df)
-    df =
     df.columns = ['pib control#', 'first name', 'last name', 'allegation classification', 'allegation',
                   'directive', 'finding', 'disposition']
     df = df\
         .rename(columns={
             'first name': 'first_name',
             'last name': 'last_name'
-        })\
-        .drop_duplicates()\
-        .dropna(axis=1, how='all')\
+        }) \
         .pipe(extract_date_from_pib)\
         .pipe(combine_rule_and_paragraph)\
         .pipe(clean_disposition)\
@@ -331,7 +328,10 @@ def clean():
         .pipe(gen_uid, ['agency', 'first_name', 'last_name'])\
         .pipe(gen_uid, [
             'agency', 'uid', 'receive_year', 'allegation_class', 'tracking_number', 'finding', 'disposition', 'charges'
-        ], "complaint_uid")
+        ], "complaint_uid")\
+    .drop_duplicates(subset=[
+        'complaint_uid'])\
+    .dropna(axis=1, how='all')
     return df
 
 
