@@ -5,6 +5,7 @@ from lib.clean import (
     clean_names, standardize_desc_cols, clean_dates
 )
 import pandas as pd
+import regex as re
 import sys
 sys.path.append('../')
 
@@ -26,121 +27,12 @@ def combine_rule_and_paragraph(df):
 
 
 def clean_charges(df):
-    df.loc[:, 'charges'] = df.charges.str.lower().str.strip()\
-        .str.replace('rule : 2: moral conduct ; paragraph 01 adherence to law',
-                     'rule 2: moral conduct;paragraph 01 adherence to law', regex=False)\
-        .str.replace('rule : 2: moral conduct ; paragraph 03 honesty and truthfulness',
-                     'rule 2: moral conduct;paragraph 03 honesty and truthfulness', regex=False)\
-        .str.replace('rule : 2: moralconduct ; paragraph 01 adherence to law',
-                     'rule 2: moral conduct;paragraph 01 adherence to law', regex=False)\
-        .str.replace('rule : moral conduc ; paragraph 01 adherenceto law',
-                     'rule 2: moral conduct;paragraph 01 adherence to law', regex=False)\
-        .str.replace('rule 2 2: moral conduct ; paragraph 01 adherence to law',
-                     'rule 2: moral conduct;paragraph 01 adherence to law', regex=False)\
-        .str.replace('rule 2 2: moral conduct ; paragraph 03 honesty and truthfulness',
-                     'rule 2: moral conduct;paragraph 03 honesty and truthfulness', regex=False)\
-        .str.replace('rule 2 2:moralconduct ; paragraph 01 adherence to law',
-                     'rule 2: moral conduct;paragraph 01 adherence to law', regex=False)\
-        .str.replace('rule 2 moral conduct;paragraph 0 honesty and truthfulness',
-                     'rule 2: moral conduct;paragraph 01 honesty and truthfulness', regex=False)\
-        .str.replace('rule 2 moral conduct ; paragraph 01 adhÃ©rence to law',
-                     'rule 2: moral conduct;paragraph 01 adherence to law', regex=False)\
-        .str.replace('rule 2 moral conduct ; paragraph 01 adherence to law',
-                     'rule 2: moral conduct;paragraph 01 adherence to law', regex=False)\
-        .str.replace('rule 2: 1oral conduct ; paragraph 01 adherence to law',
-                     'rule 2: moral conduct;paragraph 01 adherence to law', regex=False)\
-        .str.replace('rule 2: moral conduc ; paragraph 01 adherence to law',
-                     'rule 2: moral conduct;paragraph 01 adherence to law', regex=False)\
-        .str.replace('rule 2: moral conduct ; paragraph ( 01 adherence to law',
-                     'rule 2: moral conduct;paragraph 01 adherence to law', regex=False)\
-        .str.replace('rule 2: moral conduct ; paragraph ( adherence to law',
-                     'rule 2: moral conduct;paragraph 01 adherence to law', regex=False)\
-        .str.replace('rule 2: moral conduct ; paragraph 0: adherence to law',
-                     'rule 2: moral conduct;paragraph 01 adherence to law', regex=False)\
-        .str.replace('rule 2: moral conduct ; paragraph o adherence to law',
-                     'rule 2: moral conduct;paragraph 01 adherence to law', regex=False)\
-        .str.replace('rule 2: moral conduct ; paragraph o honesty and truthfulness',
-                     'rule 2: moral conduct;paragraph 03 honesty and truthfulness', regex=False)\
-        .str.replace('rule 2: moral conduct ; paragrapr 01 adherence to law',
-                     'rule 2: moral conduct;paragraph 01 adherence to law', regex=False)\
-        .str.replace('rule 2: moralconduct ; paragraph 01 adherence to law',
-                     'rule 2: moral conduct;paragraph 01 adherence to law', regex=False)\
-        .str.replace('rule 2: moral-conduct ; paragraph 01 adherence to law',
-                     'rule 2: moral conduct;paragraph 01 adherence to law', regex=False)\
-        .str.replace('rule moral conduct ; aragraph o adherence to law',
-                     'rule 2: moral conduct;paragraph 01 adherence to law', regex=False)\
-        .str.replace('rule: 2: moral conduc ; paragraph 01 adherence to law',
-                     'rule 2: moral conduct;paragraph 01 adherence to law', regex=False)\
-        .str.replace('rule: 2: moral conduct ; paragraph 01 adherence to law',
-                     'rule 2: moral conduct;paragraph 01 adherence to law', regex=False)\
-        .str.replace('rule 2L moral conduct ; paragraph 01 adherence to law',
-                     'rule 2: moral conduct;paragraph 01 adherence to law', regex=False)\
-        .str.replace('rule: moral conduct ; paragraph ( adherence to law',
-                     'rule 2: moral conduct;paragraph 01 adherence to law', regex=False)\
-        .str.replace('rule: moral conduct ; paragraph 01 adherence to law',
-                     'rule 2: moral conduct;paragraph 01 adherence to law', regex=False)\
-        .str.replace('rule: moral conduct ; paragraph 01 adherence to law',
-                     'rule 2: moral conduct;paragraph 01 adherence to law', regex=False)\
-        .str.replace('rule: moral conduct ; paragraph o adherence to law',
-                     'rule 2: moral conduct;paragraph 01 adherence to law', regex=False)\
-        .str.replace('rule2: moralconduct ; paragraph 0: adherence to law',
-                     'rule 2: moral conduct;paragraph 01 adherence to law', regex=False)\
-        .str.replace('rule2:moral conduct ; paragraph 03 - honesty and truthfulness',
-                     'rule 2: moral conduct;paragraph 03 honesty and truthfulness', regex=False)\
-        .str.replace('rule2:moralconduct ; paragraph ( adherence to law',
-                     'rule 2: moral conduct;paragraph 01 adherence to law', regex=False)\
-        .str.replace('rule2:moralconduct ; paragraph 01 adherence to law',
-                     'rule 2: moral conduct;paragraph 01 adherence to law', regex=False)\
-        .str.replace('rule2:moralconduct ; paragraph 03 honesty and truthfulness',
-                     'rule 2: moral conduct;paragraph 03 honesty and truthfulness', regex=False)\
-        .str.replace('rule 2:moralconduct ; paragraph 01 adherence to law',
-                     'rule 2: moral conduct;paragraph 01 adherence to law', regex=False)\
-        .str.replace('rule 2:moralconduct ; paragraph 03 honesty and truthfulness',
-                     'rule 2: moral conduct;paragraph 03 honesty and truthfulness', regex=False)\
-        .str.replace('rule 6: official infi ; paragraph 02 false or inaccurate reports',
-                     'rule 6: official info;paragraph 02 false or inaccurate reports', regex=False)\
-        .str.replace('rule moral conduct ; paragraph 01 adherence to law',
-                     'rule 2: moral conduct;paragraph 01 adherence to law', regex=False)\
-        .str.replace('rule: 2: moral:conduct ; paragraph 01 adherence to law',
-                     'rule: 2: moral conduct;paragraph 01 adherence to law', regex=False)\
-        .str.replace('rule: 2: moralconduct ; paragraph 01 adherence to law',
-                     'rule 2: moral conduct;paragraph 01 adherence to law', regex=False)\
-        .str.replace('rule: moral conduc ; paragraph 01 adherence to law',
-                     'rule 2: moral conduct;paragraph 01 adherence to law', regex=False)\
-        .str.replace('rule2:moral conduct ; paragraph 01 adherence to law',
-                     'rule 2: moral conduct;paragraph 01 adherence to law', regex=False)\
-        .str.replace('rule 2: oral conduci ; paragraph 01 adherence to law',
-                     'rule 2: moral conduci;paragraph 01 adherence to law', regex=False)\
-        .str.replace('rule 2: ralconduci ; paragraph 01 adherence to law',
-                     'rule 2: moral conduct;paragraph 01 adherence to law', regex=False)\
-        .str.replace('rule 2:moral conduct ; paragraph 01 adherence to law',
-                     'rule 2: moral conduct;paragraph 01 adherence to law', regex=False)\
-        .str.replace('rule 2:moral conduct ; paragraph 03 honesty and truthfulness',
-                     'rule 2: moral conduct;paragraph 03 honesty and truthfulness', regex=False)\
-        .str.replace('rule 2:moral conduct ; paragraph adherence to law',
-                     'rule 2: moral conduct;paragraph 01 adherence to law', regex=False)\
-        .str.replace('rule: 2: moral conduct ; paragraph 01 adherence to law',
-                     'rule 2: moral conduct;paragraph 01 adherence to law', regex=False)\
-        .str.replace('rule 2: oral conduct ; paragraph 01 adherence to law',
-                     'rule 2: moral conduct;paragraph 01 adherence to law', regex=False)\
-        .str.replace('rule 2: oralconduct ; paragraph 01 adherence to law',
-                     'rule 2: moral conduct;paragraph 01 adherence to law', regex=False)\
-        .str.replace('rule 2: moral conduct ; paragraph 01 adherence to law',
-                     'rule 2: moral conduct;paragraph 01 adherence to law', regex=False)\
-        .str.replace('rule 2: moral conduct ; paragraph 03 honesty and truthfulness',
-                     'rule 2: moral conduct;paragraph 03 honesty and truthfulness', regex=False)\
-        .str.replace('rule 2: moral conduct ; paragraph 01 adherenceto law',
-                     'rule 2: moral conduct;paragraph 01 adherence to law', regex=False)\
-        .str.replace('rule 2: moral conduci;paragraph 01 adherence to law',
-                     'rule 2: moral conduct;paragraph 01 adherence to law', regex=False)\
-        .str.replace('rule 2 moral conduct ; paragraph 0 honesty and truthfulness',
-                     'rule 2: moral conduct;paragraph 03 honesty and truthfulness', regex=False)\
-        .str.replace('rule: 2: moral conduct;paragraph 01 adherence to law',
-                     'rule 2: moral conduct;paragraph 01 adherence to law', regex=False)\
-        .str.replace('rule 6: official info ; paragraph 02 false or inaccurate reports',
-                     'rule 6: official info;paragraph 02 false or inaccurate reports', regex=False)\
-        .str.replace(r'^rule 2: moral conduct ; paragraph 01 adhÃ©rence to law$',
-                     'rule 2: moral conduct ; paragraph 01 adherence to law')
+    df.loc[:, 'charges'] = df.charges.str.lower().str.strip() \
+        .str.replace("[,.]", ";")\
+        .str.replace(r'([ew])(\d{1,2})', r'\1 \2')\
+        .str.replace(r'?<=[.,])(?=[^\s])', r' ')\
+        .str.replace('rule: 2: ', 'rule 2:')\
+        .str.replace('moralconduct', 'moral conduct')
     return df
 
 
