@@ -10,7 +10,7 @@ import sys
 sys.path.append('../')
 
 
-def fuse_events(pprr, cprr):
+def fuse_events(pprr, cprr, post):
     builder = events.Builder()
     builder.extract_events(pprr, {
         events.OFFICER_HIRE: {
@@ -18,7 +18,10 @@ def fuse_events(pprr, cprr):
         },
         events.OFFICER_LEFT: {
             'prefix': 'term', 'keep': ['uid', 'badge_no', 'agency', 'rank_desc']
-        }
+        },
+        events.OFFICER_RANK: {'prefix': 'rank', 'keep': [ 'uid', 'agency', 'rank_code', 'rank_desc']},
+        events.OFFICER_DEPT: {'prefix': 'dept', 'keep': [
+            'uid', 'agency', 'department_code', 'department_desc']},
     }, ['uid'])
     builder.extract_events(cprr, {
         events.COMPLAINT_INCIDENT: {
@@ -41,7 +44,7 @@ if __name__ == '__main__':
     personnels = fuse_personnel(pprr, cprr, so_per)
     complaints = rearrange_complaint_columns(cprr)
     ensure_uid_unique(complaints, 'complaint_uid', True)
-    events_df = fuse_events(pprr, cprr)
+    events_df = fuse_events(pprr, cprr, post)
     events_df = rearrange_event_columns(pd.concat([
         post_event,
         events_df

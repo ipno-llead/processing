@@ -300,6 +300,9 @@ def clean_allegation_class(df):
         .str.replace('(see attached criminal charges)', '', regex=False)
     return df.drop(columns=['directive'])
 
+def drop_rows_without_last_name(df):
+    df = df[df.last_name != 'test']
+    return df.dropna(subset=['last_name']).reset_index(drop=True)
 
 def clean():
     df = pd.read_csv(data_file_path(
@@ -311,13 +314,14 @@ def clean():
         .rename(columns={
             'first name': 'first_name',
             'last name': 'last_name'
-        }) \
+        })\
         .pipe(extract_date_from_pib)\
         .pipe(combine_rule_and_paragraph)\
         .pipe(clean_disposition)\
         .pipe(clean_allegation_class)\
         .pipe(clean_charges)\
         .pipe(clean_finding)\
+        .pipe(drop_rows_without_last_name)\
         .pipe(clean_dates, ['receive_date'])\
         .pipe(standardize_desc_cols, ['allegation_class', 'disposition', 'charges'])\
         .pipe(clean_names, ['first_name', 'last_name'])\
@@ -329,9 +333,7 @@ def clean():
         .pipe(gen_uid, [
             'agency', 'uid', 'receive_year', 'allegation_class', 'tracking_number', 'finding', 'disposition', 'charges'
         ], "complaint_uid")\
-    .drop_duplicates(subset=[
-        'complaint_uid'])\
-    .dropna(axis=1, how='all')
+    .drop_duplicates(subset=['complaint_uid'])
     return df
 
 
