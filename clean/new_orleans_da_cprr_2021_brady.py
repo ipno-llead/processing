@@ -5,7 +5,6 @@ from lib.clean import (
     clean_names, standardize_desc_cols, clean_dates
 )
 import pandas as pd
-import regex as re
 import sys
 sys.path.append('../')
 
@@ -28,13 +27,12 @@ def combine_rule_and_paragraph(df):
 
 def clean_charges(df):
     df.loc[:, 'charges'] = df.charges.str.lower().str.strip() \
-        .str.replace("[,.]", ";")\
-        .str.replace(r'([ew])(\d{1,2})', r'\1 \2')\
-        .str.replace(r'?<=[.,])(?=[^\s])', r' ')\
-        .str.replace('rule: 2: ', 'rule 2:')\
-        .str.replace('moralconduct', 'moral conduct')
-    return df
+        .str.replace('rule 2 2:moralconduct', 'rule 2: moral conduct', regex=False)
+        # .str.replace(r"^(\d+)(?:\.|,)(\d+)", r"\1:\2")\
+        # .str.replace(r" 2:$", "").str.replace("rule moral conduct", "rule 2: moral conduct", regex=False)
+        # .str.replace("[,.]", ";")\
 
+    return df
 
 def clean_disposition(df):
     df.loc[:, 'disposition'] = df.disposition.str.lower().str.strip()\
