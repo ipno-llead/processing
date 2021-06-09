@@ -308,7 +308,7 @@ def drop_rows_without_last_name(df):
 
 def clean():
     df = pd.read_csv(data_file_path(
-        'new_orleans_da/new_orleans_da_cprr_2021.csv'))
+        'new_orleans_da/new_orleans_da_cprr_2021_brady.csv'))
     df = clean_column_names(df)
     df.columns = ['pib control#', 'first name', 'last name', 'allegation classification', 'allegation',
                   'directive', 'finding', 'disposition']

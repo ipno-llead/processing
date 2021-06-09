@@ -11,7 +11,7 @@ all: data/fuse/per_port_allen_pd.csv data/fuse/event_port_allen_pd.csv data/fuse
 all: data/fuse/per_madisonville_pd.csv data/fuse/event_madisonville_pd.csv data/fuse/com_madisonville_pd.csv
 all: data/fuse/per_greenwood_pd.csv data/fuse/com_greenwood_pd.csv data/fuse/event_greenwood_pd.csv
 all: data/fuse/com_new_orleans_pd.csv data/fuse/uof_new_orleans_pd.csv data/fuse/per_new_orleans_pd.csv data/fuse/event_new_orleans_pd.csv
-all: data/match/per_new_orleans_da.csv data/fuse/event_new_orleans_da.csv data/fuse/com_new_orleans_da.csv
+all: data/match/cprr_new_orleans_da.csv
 all: data/fuse/per_st_tammany_so.csv data/fuse/event_st_tammany_so.csv data/fuse/com_st_tammany_so.csv
 all: data/fuse/com_plaquemines_so.csv data/fuse/per_plaquemines_so.csv data/fuse/event_plaquemines_so.csv
 all: data/fuse/per_louisiana_state_police.csv data/fuse/event_louisiana_state_police.csv data/fuse/app_louisiana_state_police.csv
