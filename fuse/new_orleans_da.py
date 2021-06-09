@@ -10,18 +10,15 @@ import sys
 sys.path.append('../')
 
 
-def fuse_events(pprr, cprr, post):
+def fuse_events(pprr, cprr):
     builder = events.Builder()
     builder.extract_events(pprr, {
         events.OFFICER_HIRE: {
-            'prefix': 'hire', 'keep': ['uid', 'badge_no' 'agency', 'rank_desc']
+            'prefix': 'hire', 'keep': ['uid', 'agency', 'rank_desc']
         },
         events.OFFICER_LEFT: {
-            'prefix': 'term', 'keep': ['uid', 'badge_no', 'agency', 'rank_desc']
-        },
-        events.OFFICER_RANK: {'prefix': 'rank', 'keep': [ 'uid', 'agency', 'rank_code', 'rank_desc']},
-        events.OFFICER_DEPT: {'prefix': 'dept', 'keep': [
-            'uid', 'agency', 'department_code', 'department_desc']},
+            'prefix': 'term', 'keep': ['uid', 'agency', 'rank_desc']
+        }
     }, ['uid'])
     builder.extract_events(cprr, {
         events.COMPLAINT_INCIDENT: {
@@ -40,11 +37,10 @@ if __name__ == '__main__':
     ))
     post_event = pd.read_csv(data_file_path(
         'match/post_event_new_orleans_da_2021.csv'))
-    so_per = pd.read_csv(data_file_path('match/per_new_orleans_so.csv'))
-    personnels = fuse_personnel(pprr, cprr, so_per)
+    personnels = fuse_personnel(pprr, cprr)
     complaints = rearrange_complaint_columns(cprr)
     ensure_uid_unique(complaints, 'complaint_uid', True)
-    events_df = fuse_events(pprr, cprr, post)
+    events_df = fuse_events(pprr, cprr)
     events_df = rearrange_event_columns(pd.concat([
         post_event,
         events_df

@@ -330,6 +330,8 @@ repos:
       - uof_uid
   baton-rouge-da-brady-list:
     fileName: match/cprr_baton_rouge_da_2021.csv
+  new-orleans-da-brady-list:
+    fileName: match/cprr_new_orleans_da_2021.csv
 commit:
   messageTemplate: |-
     {{.GitCommit.Link}}

@@ -145,7 +145,7 @@ def clean_charges(df):
 
 
 def clean_disposition(df):
-    df.loc[:, 'disposition'] = df.disposition.str.lower().str.strip() \
+    df.loc[:, 'disposition'] = df.disposition.str.lower().str.strip()\
         .str.replace('-', ' | ', regex=False)\
         .str.replace('/', ' | ', regex=False)\
         .str.replace('rui awaiting hearing', 'rui | awaiting hearing', regex=False)\
@@ -182,11 +182,11 @@ def clean_disposition(df):
         .str.replace('rui  | resigned under investigation',
                      'rui | resigned under investigation', regex=False)\
         .str.replace('sustained | dismissal',
-                     'sustained | dismissed', regex=False) \
+                     'sustained | dismissed', regex=False)\
         .str.replace('sustained rui | resigned under investigation',
-                     'sustained | resigned under investigation', regex=False) \
+                     'sustained | resigned under investigation', regex=False)\
         .str.replace('sustained rui | retired under investigation',
-                     'sustained | retired under investigation', regex=False) \
+                     'sustained | retired under investigation', regex=False)\
         .str.replace('rui | resigned under investigation',
                      'resigned under investigation', regex=False)\
         .str.replace('sustained resign | retired (2 po rui)',
@@ -195,7 +195,7 @@ def clean_disposition(df):
 
 
 def clean_finding(df):
-    df.loc[:, 'finding'] = df.finding.str.lower().str.strip() \
+    df.loc[:, 'finding'] = df.finding.str.lower().str.strip()\
         .str.replace('-', ' | ', regex=False)\
         .str.replace('/', ' | ', regex=False)\
         .str.replace('rui | resigned under inves',
@@ -300,9 +300,11 @@ def clean_allegation_class(df):
         .str.replace('(see attached criminal charges)', '', regex=False)
     return df.drop(columns=['directive'])
 
+
 def drop_rows_without_last_name(df):
     df = df[df.last_name != 'test']
     return df.dropna(subset=['last_name']).reset_index(drop=True)
+
 
 def clean():
     df = pd.read_csv(data_file_path(
