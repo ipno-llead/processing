@@ -28,11 +28,17 @@ def combine_rule_and_paragraph(df):
 def clean_charges(df):
     df.loc[:, 'charges'] = df.charges.str.lower().str.strip()\
         .str.replace('paragraph ( 01 adherence to law', 'paragraph 01 adherence to law', regex=False)\
-        .str.replace(r"^:", "").str.replace("rule: 2:", "rule 2:")\
-        .str.replace(r'^moralconduct', '').str.replace('moralconduct', 'moral conduct')
+        .str.replace(r'^:', '').str.replace('rule: 2:', 'rule 2:')\
+        .str.replace(r'^', ' ').str.replace('rule:','rule 2:')\
+        .str.replace(r'^moralconduct', '').str.replace('moralconduct', 'moral conduct')\
+        .str.replace('^:$', ' ').str.replace('rule2:moral', 'rule 2: moral')\
+        .str.replace('^:$', ' ').str.replace('rule 2:moral', 'rule 2: moral')\
+        .str.replace(r'^2:', '').str.replace('rule2:', 'rule 2:')\
+        .str.replace('moral-conduct', 'moral conduct', regex=False)\
+        .str.replace('moral:conduct', 'moral conduct', regex=False)
+
         # .str.repalce('rule2:moralconduct', 'rule 2: moral conduct', regex=False)
         # .str.replace(r"^(\d+)(?:\.|,)(\d+)", r"\1:\2")\
-
     return df
 
 def clean_disposition(df):
