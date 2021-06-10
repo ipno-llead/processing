@@ -26,11 +26,12 @@ def combine_rule_and_paragraph(df):
 
 
 def clean_charges(df):
-    df.loc[:, 'charges'] = df.charges.str.lower().str.strip() \
-        .str.replace('rule 2 2:moralconduct', 'rule 2: moral conduct', regex=False)
+    df.loc[:, 'charges'] = df.charges.str.lower().str.strip()\
+        .str.replace('paragraph ( 01 adherence to law', 'paragraph 01 adherence to law', regex=False)\
+        .str.replace(r"^:", "").str.replace("rule: 2:", "rule 2:")\
+        .str.replace(r'^moralconduct', '').str.replace('moralconduct', 'moral conduct')
+        # .str.repalce('rule2:moralconduct', 'rule 2: moral conduct', regex=False)
         # .str.replace(r"^(\d+)(?:\.|,)(\d+)", r"\1:\2")\
-        # .str.replace(r" 2:$", "").str.replace("rule moral conduct", "rule 2: moral conduct", regex=False)
-        # .str.replace("[,.]", ";")\
 
     return df
 
