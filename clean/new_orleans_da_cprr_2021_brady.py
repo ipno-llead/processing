@@ -36,8 +36,8 @@ def clean_charges(df):
         .str.replace(r'^2:', '').str.replace('rule2:', 'rule 2:')\
         .str.replace('moral-conduct', 'moral conduct', regex=False)\
         .str.replace('moral:conduct', 'moral conduct', regex=False)\
-        .str.replace(r'rule 2: | (oral conduci) | (oral conduct) | (oralconduct) | (ralconduci)',
-                     'rule 2: moral conduct', regex=False)
+        .str.replace(r'^([rule 2:]+(ralconduci | oralconduct | oral conduct | oral conduci | 1oral conduct))',
+                     'rule 2: moral conduct')
 
         # .str.repalce('rule2:moralconduct', 'rule 2: moral conduct', regex=False)
         # .str.replace(r"^(\d+)(?:\.|,)(\d+)", r"\1:\2")\
