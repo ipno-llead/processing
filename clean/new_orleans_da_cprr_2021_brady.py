@@ -28,19 +28,19 @@ def combine_rule_and_paragraph(df):
 def clean_charges(df):
     df.loc[:, 'charges'] = df.charges.str.lower().str.strip()\
         .str.replace('paragraph ( 01 adherence to law', 'paragraph 01 adherence to law', regex=False)\
-        .str.replace(r'^:', '').str.replace('rule: 2:', 'rule 2:')\
-        .str.replace(r'^', ' ').str.replace('rule:','rule 2:')\
-        .str.replace(r'^moralconduct', '').str.replace('moralconduct', 'moral conduct')\
-        .str.replace('^:$', ' ').str.replace('rule2:moral', 'rule 2: moral')\
-        .str.replace('^:$', ' ').str.replace('rule 2:moral', 'rule 2: moral')\
-        .str.replace(r'^2:', '').str.replace('rule2:', 'rule 2:')\
-        .str.replace('moral-conduct', 'moral conduct', regex=False)\
-        .str.replace('moral:conduct', 'moral conduct', regex=False)\
         .str.replace(r'^([rule 2:]+(ralconduci | oralconduct | oral conduct | oral conduci | 1oral conduct))',
-                     'rule 2: moral conduct')
-
-        # .str.repalce('rule2:moralconduct', 'rule 2: moral conduct', regex=False)
-        # .str.replace(r"^(\d+)(?:\.|,)(\d+)", r"\1:\2")\
+                     'rule 2: moral conduct ')\
+        .str.replace(r'^([rule 2:]+(moralconduct | moral-conduct | moral:conduct | :moral conduct))',
+                     'rule 2: moral conduct ')\
+        .str.replace(r'([rule]+(2: 2 2 | 2 2: | :2: | :2 | : 2: | 2: 2:))', 'rule 2:')\
+        .str.replace(r"[rule:]+( 2: )", 'rule 2: ') \
+        .str.replace('^:$', '').str.replace('rule2:moral', 'rule 2: moral')\
+        .str.replace(r'^', '').str.replace('rule:','rule 2:')\
+        .str.replace('^:$', '').str.replace('rule 2:moral', 'rule 2: moral')\
+        .str.replace('infi', 'info', regex=False)\
+        .str.replace('; aragraph', '; paragraph', regex=False)\
+        .str.replace('adherenceto', 'adherence to', regex=False)\
+        .str.replace(r'([paragraph]+(o | 0: | ())', 'paragrahph 01')
     return df
 
 def clean_disposition(df):
