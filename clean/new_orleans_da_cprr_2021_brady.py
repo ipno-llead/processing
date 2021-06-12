@@ -28,20 +28,26 @@ def combine_rule_and_paragraph(df):
 def clean_charges(df):
     df.loc[:, 'charges'] = df.charges.str.lower().str.strip()\
         .str.replace('paragraph ( 01 adherence to law', 'paragraph 01 adherence to law', regex=False)\
-        .str.replace(r'^([rule 2:]+(ralconduci | oralconduct | oral conduct | oral conduci | 1oral conduct))',
+        .str.replace(r'^([rule 2:]+(moralconduct | moral-conduct | moral:conduct | :moral conduct |'
+                     r'ralconduci | oralconduct | oral conduct | oral conduci | 1oral conduct | moral conduc ))',
                      'rule 2: moral conduct ')\
-        .str.replace(r'^([rule 2:]+(moralconduct | moral-conduct | moral:conduct | :moral conduct))',
-                     'rule 2: moral conduct ')\
-        .str.replace(r'([rule]+(2: 2 2 | 2 2: | :2: | :2 | : 2: | 2: 2:))', 'rule 2:')\
+        .str.replace(r'([rule]+( 2: | 2 2 | 2 2: | :2: | :2 | : 2: | 2: 2: ))', 'rule 2:')\
         .str.replace(r"[rule:]+( 2: )", 'rule 2: ') \
         .str.replace('^:$', '').str.replace('rule2:moral', 'rule 2: moral')\
         .str.replace(r'^', '').str.replace('rule:','rule 2:')\
-        .str.replace('^:$', '').str.replace('rule 2:moral', 'rule 2: moral')\
+        .str.replace('^:$', '').str.replace('rule 2:moral', 'rule 2: moral') \
+        .str.replace(r'([paragraph]+( o | 0: | \( | 0 ))', 'paragraph  01 ')\
         .str.replace('infi', 'info', regex=False)\
         .str.replace('; aragraph', '; paragraph', regex=False)\
         .str.replace('adherenceto', 'adherence to', regex=False)\
-        .str.replace(r'([paragraph]+(o | 0: | ())', 'paragrahph 01')
+        .str.replace('paragrapr', 'paragraph', regex=False) \
+        .str.replace(r'( 2 | 2: | :2 )', ' : ').str.replace(' : ', ' 2: ')\
+        .str.replace('paragraph adherence to law', 'paragraph 01 adherence to law', regex=False)\
+        .str.replace('rule moral conduct', 'rule 2: moral conduct', regex=False)\
+        .str.replace('rule : moral conduc', 'rule 2: moral conduct', regex=False)\
+        .str.replace('-', '', regex=False)
     return df
+
 
 def clean_disposition(df):
     df.loc[:, 'disposition'] = df.disposition.str.lower().str.strip()\
