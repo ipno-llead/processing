@@ -19,7 +19,7 @@ def extract_date_from_pib(df):
 
 
 def combine_rule_and_paragraph(df):
-    df.loc[:, 'charges'] = df['allegation classification'].str.cat(df.allegation, sep='; ')\
+    df.loc[:, 'charges'] = df['allegation classification'].str.cat(df.allegation, sep=';')\
         .str.replace(r'^;', '', regex=True).str.replace(r';$', '', regex=True)
     df = df.drop(columns=['allegation classification', 'allegation'])
     return df
@@ -27,16 +27,15 @@ def combine_rule_and_paragraph(df):
 
 def clean_charges(df):
     df.loc[:, 'charges'] = df.charges.str.lower().str.strip()\
-        .str.replace('paragraph ( 01 adherence to law', 'paragraph 01 adherence to law', regex=False)\
         .str.replace(r'^([rule 2:]+(moralconduct | moral-conduct | moral:conduct | :moral conduct |'
                      r'ralconduci | oralconduct | oral conduct | oral conduci | 1oral conduct | moral conduc ))',
-                     'rule 2: moral conduct ')\
+                     'rule 2: moral conduct')\
         .str.replace(r'([rule]+( 2: | 2 2 | 2 2: | :2: | :2 | : 2: | 2: 2: ))', 'rule 2:')\
         .str.replace(r"[rule:]+( 2: )", 'rule 2: ') \
         .str.replace('^:$', '').str.replace('rule2:moral', 'rule 2: moral')\
         .str.replace(r'^', '').str.replace('rule:','rule 2:')\
         .str.replace('^:$', '').str.replace('rule 2:moral', 'rule 2: moral') \
-        .str.replace(r'([paragraph]+( o | 0: | \( | 0 ))', 'paragraph  01 ')\
+        .str.replace(r'([paragraph]+( o | 0: | \( | 0 | \( 01 ))', 'paragraph  01 ')\
         .str.replace('infi', 'info', regex=False)\
         .str.replace('; aragraph', '; paragraph', regex=False)\
         .str.replace('adherenceto', 'adherence to', regex=False)\
@@ -45,12 +44,14 @@ def clean_charges(df):
         .str.replace('paragraph adherence to law', 'paragraph 01 adherence to law', regex=False)\
         .str.replace('rule moral conduct', 'rule 2: moral conduct', regex=False)\
         .str.replace('rule : moral conduc', 'rule 2: moral conduct', regex=False)\
+        .str.replace('rule 2: moral conduct ; paragraph  01 01 adherence to law',
+                     'rule 2: moral conduct;paragraph 01 adherence to law', regex=False)\
         .str.replace('-', '', regex=False)
     return df
 
 
 def clean_disposition(df):
-    df.loc[:, 'disposition'] = df.disposition.str.lower().str.strip()\
+    df.loc[:, 'disposition'] = df.disposition.str.lower().str.strip() \
         .str.replace('-', ' | ', regex=False)\
         .str.replace('/', ' | ', regex=False)\
         .str.replace('rui awaiting hearing', 'rui | awaiting hearing', regex=False)\
@@ -58,16 +59,10 @@ def clean_disposition(df):
                      'rui | awaiting hearing (2 po rui)', regex=False)\
         .str.replace('rui resigned under investigation',
                      'rui | resigned under investigation', regex=False)\
-        .str.replace('sustained |  dismissed',
-                     'sustained | dismissed', regex=False)\
-        .str.replace('sustained | dismissa',
-                     'sustained | dismissed', regex=False)\
-        .str.replace('sustained | dismissal',
-                     'sustained | dismissed', regex=False)\
         .str.replace('sustained awaiting panel hearing',
                      'sustained | awaiting panel hearing', regex=False)\
         .str.replace('sustained dismissal overturned by 4th circuit',
-                     'sustained | dismissed | overturned by 4th circuit', regex=False)\
+                     'sustained | dismissed | dismissal overturned by 4th circuit', regex=False)\
         .str.replace(r'^sustained dismissed$',
                      'sustained | dismissed', regex=False)\
         .str.replace('sustained dismissed under another investigation',
@@ -76,18 +71,11 @@ def clean_disposition(df):
                      'sustained | pending superintendent approval', regex=False)\
         .str.replace('sustained pending suspension served',
                      'sustained | pending suspension served', regex=False)\
-        .str.replace('sustained | dismissedl',
-                     'sustained | dismissed', regex=False)\
         .str.replace('sustained | dismissedl (1 po dismissed)',
                      'sustained | dismissed (1 po dismissed)', regex=False)\
-        .str.replace('sustained dismissed',
-                     'sustained | dismissed', regex=False)\
         .str.replace('sustalned', 'sustained', regex=False)\
-        .str.replace('sustalned | dismissal', 'sustained | dismissed', regex=False)\
         .str.replace('rui  | resigned under investigation',
                      'rui | resigned under investigation', regex=False)\
-        .str.replace('sustained | dismissal',
-                     'sustained | dismissed', regex=False)\
         .str.replace('sustained rui | resigned under investigation',
                      'sustained | resigned under investigation', regex=False)\
         .str.replace('sustained rui | retired under investigation',
@@ -95,7 +83,8 @@ def clean_disposition(df):
         .str.replace('rui | resigned under investigation',
                      'resigned under investigation', regex=False)\
         .str.replace('sustained resign | retired (2 po rui)',
-                     'sustained | resigned | retired (2 po rui)', regex=False)
+                     'sustained | resigned | retired (2 po rui)', regex=False)\
+        .str.replace('r(^[sustained]+((\s+)(\w+)))$', 'sustained | ')
     return df
 
 
