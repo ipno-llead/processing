@@ -84,7 +84,8 @@ def clean_disposition(df):
                      'resigned under investigation', regex=False)\
         .str.replace('sustained resign | retired (2 po rui)',
                      'sustained | resigned | retired (2 po rui)', regex=False)\
-        .str.replace('r(^[sustained]+((\s+)(\w+)))$', 'sustained | ')
+        .str.replace('dismissal', 'dismissed', regex=False)\
+        .str.replace('r([sustained]+((\s*\w*)))$', 'sustained | ')
     return df
 
 
