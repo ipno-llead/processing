@@ -37,7 +37,7 @@ def clean_charges(df):
         .str.replace('^:$', '').str.replace('rule 2:moral', 'rule 2: moral') \
         .str.replace(r'([paragraph]+( o | 0: | \( | 0 | \( 01 ))', 'paragraph  01 ')\
         .str.replace('infi', 'info', regex=False)\
-        .str.replace('; aragraph', '; paragraph', regex=False)\
+        .str.replace('; aragraph', ';paragraph', regex=False)\
         .str.replace('adherenceto', 'adherence to', regex=False)\
         .str.replace('paragrapr', 'paragraph', regex=False) \
         .str.replace(r'( 2 | 2: | :2 )', ' : ').str.replace(' : ', ' 2: ')\
@@ -46,16 +46,25 @@ def clean_charges(df):
         .str.replace('rule : moral conduc', 'rule 2: moral conduct', regex=False)\
         .str.replace('rule 2: moral conduct ; paragraph  01 01 adherence to law',
                      'rule 2: moral conduct;paragraph 01 adherence to law', regex=False)\
-        .str.replace('-', '', regex=False)
+        .str.replace('rule 2: moral conduct ;paragraph  01 01 adherence to law',
+                     'rule 2: moral conduct;paragraph 01 adherence to law', regex=False)\
+        .str.replace('rule 2: moral conduct ;paragraph  01 honesty and truthfulness',
+                     'rule 2: moral conduct;paragraph 03 honesty and truthfulness', regex=False)\
+        .str.replace('[^\u0000-\u007F]+', '')\
+        .str.replace('-', '', regex=False)\
+        .str.replace('conduct ;', 'conduct;', regex=False)
     return df
 
 
 def clean_disposition(df):
     df.loc[:, 'disposition'] = df.disposition.str.lower().str.strip()\
-        .str.replace(r'([^\w])', '|', 1)\
-        .str.replace(r'(rui-resigned under investigation$)',
+        .str.replace(r'([^\w])', '|', 1) \
+        .str.replace('.', '', regex=False) \
+        .str.replace('/', '|', regex=False) \
+        .str.replace('-', '', regex=False)\
+        .str.replace(r'(ruiresigned under investigation$)',
                      'resigned under investigation')\
-        .str.replace(r'rui-retired under investigation$',
+        .str.replace(r'ruiretired under investigation$',
                      'retired under investigation')\
         .str.replace('dismissed|under investigation', 'dismissed under investigation', regex=False)\
         .str.replace('dui|from another case', 'dui (driving under the influence) from another case', regex=False)\
@@ -65,60 +74,50 @@ def clean_disposition(df):
         .str.replace(r'(sustained\|$)', 'sustained')\
         .str.replace(r'(dismissal$)', 'dismissed')\
         .str.replace(r'(dismissa$)', 'dismissed')\
-        .str.replace('.', '', regex=False)\
-        .str.replace('/', '|', regex=False)\
-        .str.replace('-', '', regex=False)
+        .str.replace('susta|ined dismissed', 'sustained|dismissed', regex=False)
     return df
 
 
 def clean_finding(df):
     df.loc[:, 'finding'] = df.finding.str.lower().str.strip()\
-        .str.replace(r'([^\w])', '|', 1)
-        # .str.replace('rui | resigned under inves',
-        #              'resigned under investigation', regex=False)\
-        # .str.replace('sustained | rui | resign',
-        #              'sustained|resigned under investigation', regex=False)\
-        # .str.replace('sustained | rui | retire',
-        #              'sustained|retired under investigation', regex=False)\
-        # .str.replace('sustained | rui resign',
-        #              'sustained|resigned under investigation', regex=False)\
-        # .str.replace('sustained dismissed',
-        #              'sustained|dismissed', regex=False)\
-        # .str.replace('sustained rui resign',
-        #              'sustained|resigned under investigation', regex=False)\
-        # .str.replace("ustained | rui | resign'", 'sustained|resigned under investigation', regex=False)\
-        # .str.replace('sustained rui', 'sustained|rui', regex=False)\
-        # .str.replace('sustained rui retire',
-        #              'sustained|retired under investigation', regex=False)\
-        # .str.replace('sustained | rui retire',
-        #              'sustained|retired under investigation', regex=False)\
-        # .str.replace('sustained | rui retire', 'sustained|retired under investigation', regex=False)\
-        # .str.replace('sustained |  rui', 'sustained|rui', regex=False)
+        .str.replace(r'([^\w])', '|', 1)\
+        .str.replace('-', ' ', regex=False)\
+        .str.replace("'", ' ', regex=False)\
+        .str.replace('ustained|rui resign ', 'sustained|resigned under investigation', regex=False)\
+        .str.replace('sustained|rui retire',
+                     'sustained|retired under investigation', regex=False)\
+        .str.replace('rui|resigned under inves',
+                     'resigned under investigation', regex=False)\
+        .str.replace('duplicate|allegation', 'duplicate allegation', regex=False)\
+        .str.replace('duplicate|investigation', 'duplicate investigation', regex=False)\
+        .str.replace('sustained|rui resign',
+                     'sustained|resigned under investigation', regex=False)
     return df
 
 
 def clean_allegation_class(df):
     df.loc[:, 'allegation_class'] = df.directive.str.lower().str.strip()\
-        .str.replace('\\', '', regex=False)\
+        .str.replace('\\', '', regex=False) \
+        .str.replace('r.s./', 'r.s. ', regex=False) \
+        .str.replace('r.s.1', 'r.s. ', regex=False) \
+        .str.replace("r.s.'", 'r.s. ', regex=False) \
+        .str.replace('r.s:', 'r.s. ', regex=False) \
+        .str.replace('la r.s.', 'la. r.s.') \
+        .str.replace('la s.', 'la. r.s. ') \
         .str.replace('reltive ', 'relative', regex=False)\
         .str.replace('licene', 'license', regex=False)\
-        .str.replace('r.s./', 'r.s. ', regex=False)\
-        .str.replace('r.s.1', 'r.s. ', regex=False)\
-        .str.replace("r.s.'", 'r.s. ', regex=False)\
-        .str.replace('r.s:', 'r.s. ', regex=False)\
-        .str.replace('la r.s.', 'la. r.s.')\
-        .str.replace('la s.', 'la. r.s. ')\
         .str.replace('8attery', 'battery', regex=False)\
         .str.replace('vehivle', 'vehicle', regex=False)\
-        .str.replace('drivers', "driver's", regex=False)\
+        .str.replace('drivers', "driver's", regex=False) \
+        .str.replace('to la r.s.', 'to wit: la r.s.', regex=False) \
         .str.replace('32:79-driving', '32:79 driving', regex=False)\
         .str.replace('relative public payroll fraud', 'relative to public payroll fraud', regex=False)\
-        .str.replace('to la r.s.', 'to wit: la r.s.', regex=False)\
-        .str.replace('relativeto', 'relative to', regex=False)\
+        .str.replace('relativeto', 'relative to', regex=False) \
+        .str.replace('reckles', 'reckless', regex=False) \
         .str.replace('4.108.1 resisting an officer/obstruction',
                      '4:108.1 relative to resisting an officer/obstruction', regex=False)\
-        .str.replace('to wit 14:98', 'to wit: r.s. 14:98 relative to operating a vehicle while intoxicated ', regex=False)\
-        .str.replace('reckles', 'reckless', regex=False)\
+        .str.replace('to wit 14:98',
+                     'to wit: r.s. 14:98 relative to operating a vehicle while intoxicated ', regex=False)\
         .str.replace(r'r.s. 14:35$', 'r.s. 14:35 relative to simple battery')\
         .str.replace('r.s 32:81 following vehicles', 'r.s. 32:81 relative to following vehicles', regex=False)\
         .str.replace('r.s. 32:58 careless operation',
@@ -128,17 +127,10 @@ def clean_allegation_class(df):
         .str.replace('to wit: hit ad run', 'to wit: r.s. 14:100 hit and run driving', regex=False)\
         .str.replace('32:863.1 no proof of liability insurance',
                      'r.s. 32:863.1 relative to no proof of liability insurance', regex=False)\
-        .str.replace('to wit: simple battery', 'to wit: la. r.s. 14:35 relative to simple battery', regex=False)\
+        .str.replace('to wit: simple battery', 'to wit: r.s. 14:35 relative to simple battery', regex=False) \
+        .str.replace('to wit r.s. la 32:865', 'to wit: la. r.s. 32:865') \
         .str.replace('to wit:14:98', 'to wit: r.s. 14:98 relative to operating a vehicle while intoxicated', regex=False)\
-        .str.replace('to wit r.s. la 32:865', 'to wit: r.s. la 32:865')\
         .str.replace('to wit 32.863.1', 'to wit: r.s. 32:863.1')\
-        .str.replace('to wit r.s. 4:80 relative to felony carnel knowledge of a juvenile',
-                     'to wit: r.s. 4:80 relative to felony carnel knowledge of a juvenile', regex=False)\
-        .str.replace('to wit r.s. 32:81 relative to following vehicles',
-                    'to wit: r.s. 32:81 relative to following vehicles', regex=False)\
-        .str.replace('to wit r.s. 32:58 relative to careless operation of a moveable',
-                     'to wit: r.s. 32:58 relative to careless operation of a moveable', regex=False)\
-        .str.replace('to wit 32.863.1', 'to wit 32.863.1', regex=False)\
         .str.replace('14:98 driving while intoxicated',
                      '14:98 relative to operating a vehicle while intoxicated', regex=False)\
         .str.replace('14:98.3 d.w.i 3rd offense',
@@ -172,7 +164,13 @@ def clean_allegation_class(df):
                      'r.s. 14:99 relative to reckless operation of a motor vehicle', regex=False)\
         .str.replace('recklesss', 'reckless', regex=False)\
         .str.replace("r.s. 32:412 driver's must be licensed", "r.s. 32:412 drivers must be licensed", regex=False)\
-        .str.replace('(see attached criminal charges)', '', regex=False)
+        .str.replace('(see attached criminal charges)', '', regex=False)\
+        .str.replace('to wit r.s. 32:58 relative to careless operation of a moveable',
+                 'to wit: r.s. 32:58 relative to careless operation of a moveable vehicle', regex=False)\
+        .str.replace('to wit r.s. 4:80 relative to felony carnel knowledge of a juvenile',
+                 'to wit: r.s. 4:80 relative to felony carnel knowledge of a juvenile', regex=False)\
+        .str.replace('to wit r.s. 32:81 relative to following vehicles',
+                'to wit: r.s. 32:81 relative to following vehicles', regex=False)
     return df.drop(columns=['directive'])
 
 
@@ -200,7 +198,7 @@ def clean():
         .pipe(clean_finding)\
         .pipe(drop_rows_without_last_name)\
         .pipe(clean_dates, ['receive_date'])\
-        .pipe(standardize_desc_cols, ['allegation_class', 'disposition', 'charges'])\
+        .pipe(standardize_desc_cols, ['finding', 'disposition', 'charges', 'allegation_class'])\
         .pipe(clean_names, ['first_name', 'last_name'])\
         .pipe(set_values, {
             'data_production_year': 2021,
