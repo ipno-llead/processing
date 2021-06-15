@@ -52,9 +52,14 @@ def clean_charges(df):
 
 def clean_disposition(df):
     df.loc[:, 'disposition'] = df.disposition.str.lower().str.strip()\
-        .str.replace('-', ' | ', regex=False)\
-        .str.replace('/', ' | ', regex=False) \
-        .str.replace(r'(^[sustained]+(\s\w))', '').str.replace('\s', ' | ')
+        .str.replace(r'([^\w])', ' | ', 1)\
+        .str.replace('sustalned', 'sustained', regex=False)\
+        .str.replace('sustained | dismissal', 'sustained | dismissed', regex=False)
+        # .str.replace('sustained | dismissal', 'sustained | dismissed', regex=False)
+        # .str.replace('dismissa', 'dismissed', regex=False)\
+        # .str.replace('dismissal', 'dismissed', regex=False)
+        # .str.replace('-', ' | ', regex=False)\
+        # .str.replace('/', ' | ', regex=False) \
         # .str.replace('rui awaiting hearing', 'rui | awaiting hearing', regex=False)\
         # .str.replace('rui awaiting hearing (2 po rui)',
         #              'rui | awaiting hearing (2 po rui)', regex=False)\
