@@ -12,9 +12,10 @@ sys.path.append('../')
 
 def fuse_events(pprr, cprr):
     builder = events.Builder()
+    pprr.loc[:, 'agency'] = 'Scott PD'
     builder.extract_events(pprr, {
         events.OFFICER_HIRE: {
-            'prefix': 'hire', 'keep': ['uid', 'badge_no' 'agency', 'rank_desc', 'salary', 'salary_freq']
+            'prefix': 'hire', 'keep': ['uid', 'badge_no', 'agency', 'rank_desc', 'salary', 'salary_freq']
         },
         events.OFFICER_LEFT: {
             'prefix': 'term', 'keep': ['uid', 'badge_no', 'agency', 'rank_desc', 'salary', 'salary_freq']

@@ -11,6 +11,7 @@ all: data/fuse/per_port_allen_pd.csv data/fuse/event_port_allen_pd.csv data/fuse
 all: data/fuse/per_madisonville_pd.csv data/fuse/event_madisonville_pd.csv data/fuse/com_madisonville_pd.csv
 all: data/fuse/per_greenwood_pd.csv data/fuse/com_greenwood_pd.csv data/fuse/event_greenwood_pd.csv
 all: data/fuse/com_new_orleans_pd.csv data/fuse/uof_new_orleans_pd.csv data/fuse/per_new_orleans_pd.csv data/fuse/event_new_orleans_pd.csv
+all: data/match/cprr_new_orleans_da_2021.csv
 all: data/fuse/per_st_tammany_so.csv data/fuse/event_st_tammany_so.csv data/fuse/com_st_tammany_so.csv
 all: data/fuse/com_plaquemines_so.csv data/fuse/per_plaquemines_so.csv data/fuse/event_plaquemines_so.csv
 all: data/fuse/per_louisiana_state_police.csv data/fuse/event_louisiana_state_police.csv data/fuse/app_louisiana_state_police.csv
@@ -96,6 +97,9 @@ data/fuse/per_scott_pd.csv data/fuse/com_scott_pd.csv data/fuse/event_scott_pd.c
 
 data/match/cprr_new_orleans_harbor_pd_2020.csv data/match/post_event_new_orleans_harbor_pd_2020.csv: match/new_orleans_harbor_pd.py data/clean/cprr_new_orleans_harbor_pd_2020.csv data/clean/pprr_new_orleans_harbor_pd_2020.csv
 	python match/new_orleans_harbor_pd.py
+
+data/match/cprr_new_orleans_da_2021.csv: match/new_orleans_da.py data/clean/cprr_new_orleans_da_2021.csv data/clean/pprr_new_orleans_pd_1946_2018.csv data/clean/pprr_post_2020_11_06.csv
+	python match/new_orleans_da.py
 
 data/match/pprr_baton_rouge_csd_2017.csv data/match/pprr_baton_rouge_csd_2019.csv data/match/cprr_baton_rouge_pd_2018.csv data/match/lprr_baton_rouge_fpcsb_1992_2012.csv data/match/event_post_baton_rouge_pd.csv: match/baton_rouge_pd.py data/clean/pprr_baton_rouge_csd_2017.csv data/clean/pprr_baton_rouge_csd_2019.csv data/clean/cprr_baton_rouge_pd_2018.csv data/clean/pprr_post_2020_11_06.csv data/clean/lprr_baton_rouge_fpcsb_1992_2012.csv
 	python match/baton_rouge_pd.py
@@ -215,6 +219,9 @@ data/clean/cprr_actions_new_orleans_pd_1931_2020.csv: clean/ipm_new_orleans_pd_c
 
 data/clean/uof_new_orleans_pd_2012_2019.csv: clean/ipm_new_orleans_pd_use_of_force.py data/ipm/new_orleans_pd_use_of_force_2012-2019.csv
 	python clean/ipm_new_orleans_pd_use_of_force.py
+
+data/clean/cprr_new_orleans_da_2021.csv: clean/new_orleans_da_cprr_2021_brady.py data/new_orleans_da/new_orleans_da_cprr_2021_brady.csv
+	python clean/new_orleans_da_cprr_2021_brady.py
 
 data/clean/cprr_st_tammany_so_2011_2021.csv: clean/st_tammany_so_cprr.py data/st_tammany_so/st_tammany_so_cprr_2011-2020_tabula.csv data/st_tammany_so/st_tammany_so_cprr_2020-2021_tabula.csv data/st_tammany_so/st_tammany_department_codes_tabula.csv
 	python clean/st_tammany_so_cprr.py

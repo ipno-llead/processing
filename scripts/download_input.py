@@ -40,6 +40,9 @@ DATA_FILES = {
         "https://www.dropbox.com/sh/ymvc81kjfqqv9m6/AADoEpTWUNef0AMH5GaZxMPea/New%20Orleans_CSD_PPRR_2009_realigned.csv?dl=1",  # noqa
         "https://www.dropbox.com/sh/nv366qnl1vmhgny/AABVFv9T2bwTOI0XuHULfbD-a/Data%20Collected/New%20Orleans%20Civil%20Service%20Department/Administrative%20Data/New%20Orleans_CSD_PPRR_2014.csv?dl=1",  # noqa
     ],
+    "new_orleans_da": [
+        "https://www.dropbox.com/s/gyalu2tgut5ya2w/new_orleans_da_cprr_2021_brady.csv?dl=1",  # noqa
+    ],
     "baton_rouge_pd": [
         "https://www.dropbox.com/sh/rc4a4961qqxu0co/AADmtLqCxY_k5ZlbPKtOmcKHa/Data%20Collected/Baton%20Rouge%20Police%20Department/Baton%20Rouge_PD_CPRR_2018.csv?dl=1",  # noqa
     ],
@@ -159,7 +162,7 @@ DATA_FILES = {
     ],
     "scott_pd": [
         "https://www.dropbox.com/s/a0fw6b3a6505eoi/scott_pd_cprr_2020.csv?dl=1",  # noqa
-        "https://www.dropbox.com/sh/65xjaciojdchrhz/AACKNo0rWVfAqLBYejmj0J4Ta?dl=1" # noqa
+        "https://www.dropbox.com/s/9xstfdrq7h39cqy/scott_pd_pprr_2021.csv?dl=1"  # noqa
     ],
     "slidell_pd": [
         "https://www.dropbox.com/s/1z09ujt4ja3b4wx/Slidell_PD_PPRR_2009.csv?dl=1",  # noqa
