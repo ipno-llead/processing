@@ -78,8 +78,6 @@ repos:
     fileName: match/lprr_louisiana_state_csc_1991_2020.csv
   match-cprr-scott-pd-2020:
     fileName: match/cprr_scott_pd_2020.csv
-  match-pprr-scott-pd-2021:
-    fileName: match/pprr_scott_pd_2021.csv
   com-baton-rouge-pd:
     fileName: fuse/com_baton_rouge_pd.csv
     primaryKey:
