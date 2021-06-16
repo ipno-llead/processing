@@ -9,7 +9,7 @@ import sys
 sys.path.append("../")
 
 
-def realign():
+def realign() -> pd.DataFrame:
     df = pd.read_csv(data_file_path(
         "new_orleans_harbor_pd/new_orleans_harbor_pd_cprr_2014-2020.csv"))
     df = df.set_index("Unnamed: 0").transpose().dropna(
@@ -44,27 +44,34 @@ def assign_agency(df):
 
 
 def clean():
-    df = realign()
-    df = df[[
-        "1_name", "2_badge_number", "3_gender",
-        "6_unit_assignment_on_the_date_of_the_complaint_incident", "7_rank_on_the_date_of_the_complaint_incident",
-        "8_date_of_appointment", "b_rule_violation", "c_paragraph_violation", "e_the_recommended_discipline",
-        "e_the_final_discipline_imposed", "a_the_incident_type", "b_the_complaint_tracking_number",
-        "c_the_date_on_which_the_complaint_incident_took_place", "d_the_date_on_which_the_complaint_was_received",
-        "e_the_date_on_which_the_complaint_investigation_was_completed", "f_the_classification_of_the_complaint",
-        "g_the_status_of_the_investigation", "1_gender", "2_race"]]
-    df.columns = [
-        "full_name", "badge_no", "sex", "department_desc", "rank_desc", "hire_date", "rule_code", "paragraph_code",
-        "recommended_action", "action", "incident_type", "tracking_number", "occur_date", "receive_date",
-        "investigation_complete_date", "disposition", "investigation_status", "complainant_sex", "complainant_race"]
-    df = df\
+    df = realign()\
+        .drop(columns=["e_the_recommended_discipline"])\
+        .rename(columns={
+            "1_name": "full_name",
+            "2_badge_number": "badge_no",
+            "3_gender": "sex",
+            "6_unit_assignment_on_the_date_of_the_complaint_incident": "department_desc",
+            "7_rank_on_the_date_of_the_complaint_incident": "rank_desc",
+            "8_date_of_appointment": "hire_date",
+            "b_rule_violation": "rule_code",
+            "c_paragraph_violation": "paragraph_code",
+            "e_the_final_discipline_imposed": "action",
+            "a_the_incident_type": "incident_type",
+            "b_the_complaint_tracking_number": "tracking_number",
+            "c_the_date_on_which_the_complaint_incident_took_place": "occur_date",
+            "d_the_date_on_which_the_complaint_was_received": "receive_date",
+            "e_the_date_on_which_the_complaint_investigation_was_completed": "investigation_complete_date",
+            "f_the_classification_of_the_complaint": "disposition",
+            "g_the_status_of_the_investigation": "investigation_status",
+            "1_gender": "complainant_sex",
+            "2_race": "complainant_race",
+        })\
         .pipe(split_name)\
         .pipe(clean_names, ["first_name", "last_name"])\
         .pipe(strip_badge)\
         .pipe(clean_officer_sex)\
         .pipe(standardize_desc_cols, [
-            "department_desc", "rank_desc", "recommended_action", "action", "incident_type", "disposition",
-            "investigation_status"
+            "department_desc", "rank_desc", "action", "incident_type", "disposition", "investigation_status"
         ])\
         .pipe(clean_sexes, ["complainant_sex"])\
         .pipe(clean_races, ["complainant_race"])\

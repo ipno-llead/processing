@@ -20,7 +20,8 @@ def fuse_events(pprr):
                 'month': row.hire_month,
                 'day': row.hire_day,
                 'uid': row.uid,
-                'agency': row.agency
+                'agency': row.agency,
+                'employment_status': row.employment_status,
             }
             if pd.isnull(row.pay_effective_year):
                 kwargs['salary'] = row.salary
@@ -34,7 +35,7 @@ def fuse_events(pprr):
                 'uid': row.uid,
                 'agency': row.agency,
                 'salary': row.salary,
-                'salary_freq': row.salary_freq,
+                'salary_freq': row.salary_freq
             }
             builder.append_record(
                 events.OFFICER_PAY_EFFECTIVE, ['uid'], **kwargs)

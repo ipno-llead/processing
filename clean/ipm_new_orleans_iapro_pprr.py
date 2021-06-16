@@ -1,7 +1,7 @@
 from lib.path import data_file_path, ensure_data_dir
 from lib.columns import clean_column_names
 from lib.clean import (
-    float_to_int_str, standardize_desc_cols, clean_sexes, clean_names
+    clean_races, float_to_int_str, standardize_desc_cols, clean_sexes, clean_names
 )
 from lib.uid import gen_uid
 import pandas as pd
@@ -90,7 +90,8 @@ def clean():
             "rank_desc", "employment_status", "officer_inactive", "department_desc"
         ])\
         .pipe(clean_employee_type)\
-        .pipe(clean_sexes, ['sex', 'race'])\
+        .pipe(clean_sexes, ['sex'])\
+        .pipe(clean_races, ['race'])\
         .pipe(assign_agency)\
         .pipe(gen_uid, ['agency', 'employee_id'])\
         .pipe(split_dates, ['hire_date', 'left_date', 'dept_date'])\

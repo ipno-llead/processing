@@ -1,11 +1,13 @@
 import re
+import sys
+
+import pandas as pd
+
 from lib.columns import clean_column_names
 from lib.path import data_file_path, ensure_data_dir
 from lib.clean import clean_names, clean_dates, clean_salary, standardize_desc_cols
 from lib.uid import gen_uid
 from lib import salary
-import pandas as pd
-import sys
 sys.path.append('../')
 
 
