@@ -38,7 +38,7 @@ def realign(df):
         emp_no = match.group(2) or ""
         name = (match.group(3) or "").lower().strip()
         if rank != "":
-            record["rank"] = rank
+            record["rank_desc"] = rank
             rank = ""
         if emp_no != "":
             if len(record) > 0:
@@ -50,7 +50,7 @@ def realign(df):
             match2 = pat2.match(name)
             if match2 is not None and match2.group(2).lower() in rank_whitelist:
                 record["name"] = match2.group(1)
-                record["rank"] = match2.group(2)
+                record["rank_desc"] = match2.group(2)
         if row[1] != "":
             record["dept_no"] = row[1].strip()
             record["annual"] = row[2]
