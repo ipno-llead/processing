@@ -63,18 +63,29 @@ def clean_rule_violation(df):
         .str.replace('.', '', regex=False)\
         .str.replace('$', '', regex=False)\
         .str.replace('-', '', regex=False)\
-        .str.replace('coutersy', 'courtesty', regex=False)\
+        .str.replace(r'cou[r]?te[r]?s[e]?y', 'courtesy', regex=True)\
         .str.replace('authoruty', 'authority', regex=False)\
         .str.replace(r'unsa[r]?tasfactory', r'unsatisfactory', regex=True)\
-        .str.replace('peformance', 'performance', regex=False)\
+        .str.replace(r'pef[r]?ormance', 'performance', regex=True)\
+        .str.replace('accidnet', 'accident', regex=False)\
+        .str.replace('rudness', 'rudeness', regex=False)\
         .str.replace('policy violation', '', regex=False)\
+        .str.replace('mishandeling', 'mishandling', regex=False)\
+        .str.replace('handeling', 'handling', regex=False)\
         .str.replace('uof', 'use of force', regex=False)\
         .str.replace('trafic', 'traffic', regex=False)\
         .str.replace('mistratment', 'mistreatment', regex=False)\
         .str.replace('misued', 'misuse', regex=False)\
-        .str.replace(' pursuit', 'pursuit', regex=False)
+        .str.replace(' pursuit', 'pursuit', regex=False)\
+        .str.replace('delayed responsetime', 'delayed response time', regex=False)\
+        .str.replace('social mediathreat', 'social media threat', regex=False)
     return df
-     
+
+def clean_investigating_supervisor(df):
+    df.investigating_supervisor = df.investigating_supervisor.str.lower().str.strip()\
+        .str.replace('.', '', regex=False)\
+        .str.replace('/', '', regex=False)\
+        .str.replace(r'lt|it|')
 
 def clean():
     df = pd.read_csv(data_file_path(
@@ -94,5 +105,5 @@ if __name__ == '__main__':
         data_file_path('clean/cprr_tangipahoa_so_2015_2021.csv'),
         index=False)
 
-print(df['rule_violation'].unique())
+print(df['investigating_supervisor'].unique())
 print(df.columns.to_list())
