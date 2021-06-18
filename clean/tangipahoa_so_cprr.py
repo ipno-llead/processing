@@ -85,8 +85,14 @@ def clean_investigating_supervisor(df):
     df.investigating_supervisor = df.investigating_supervisor.str.lower().str.strip()\
         .str.replace('.', '', regex=False)\
         .str.replace('/', '', regex=False)\
-        .str.replace(r'lt|it|')
-
+        .str.replace('fecrand', 'ferrand', regex=False)\
+        .str.replace('suanne', 'susanne', regex=False)\
+        .str.replace(r'^(?:miller)$', 'susanne miller', regex=True)\
+        .str.replace('dawn p', 'dawn panepinto', regex=False)\
+        .str.replace(r'^(\w{2}\s+\[sanders]$)', 'blane sanders', regex=True)
+        # .str.replace(r'(?:moore)', 'mike moore', regex=True)
+    return df
+00
 def clean():
     df = pd.read_csv(data_file_path(
         'tangipahoa_so/tangipahoa_so_cprr_2015-2021.csv')
@@ -94,7 +100,8 @@ def clean():
         .pipe(split_name)\
         .pipe(clean_dept_desc)\
         .pipe(clean_complaint_type)\
-        .pipe(clean_rule_violation)
+        .pipe(clean_rule_violation)\
+        .pipe(clean_investigating_supervisor)
     return df
 
 
