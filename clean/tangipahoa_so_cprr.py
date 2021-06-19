@@ -19,8 +19,7 @@ def split_rows_with_name(df):
     return df
 
 
-
-def split_name(df):
+def split_full_name(df):
     df.loc[:, 'full_name'] = df.full_name.str.lower().str.strip()\
         .str.replace(r'^(unknown|unk|tpso|tp715|facebook comments)$', '', regex=True)\
         .str.replace('.', '', regex=False)\
@@ -35,7 +34,8 @@ def split_name(df):
     df.loc[:, 'first_name'] = parts[1].str.strip().str.replace('jessical', 'jessica', regex=False)
     df.loc[:, 'last_name'] = parts[2]
     df.loc[df.full_name == 'deputy', 'rank_desc'] = 'deputy'
-    return df
+    return df.drop(columns='full_name')
+
 
 
 def clean_dept_desc(df):
@@ -82,18 +82,23 @@ def clean_rule_violation(df):
         .str.replace('behaivor', 'behavior', regex=False)
     return df
 
+
+
 def clean_investigating_supervisor(df):
-    df.loc[:, 'investigating_supervisor'] = df.investigating_supervisor.str.lower().str.strip()\
+    df.loc[:, 'investigating_supervisor'] = df.investigating_supervisor.str.lower().str.strip().fillna('')\
         .str.replace('.', '', regex=False)\
-        .str.replace('/', '', regex=False)\
-        .str.replace('fecrand', 'ferrand', regex=False)\
-        .str.replace('suanne', 'susanne', regex=False)\
-        .str.replace('dawn p', 'dawn panepinto', regex=False)\
-        .str.replace(r'lt|lt.', 'lieutenant', regex=True)\
-        .str.replace(r'^(cpt|cpt.|capt|capt.)$', 'captain', regex=True)\
-        .str.replace(r'sgt|sgt.', 'sargeant', regex=True)
-        # .str.replace(r'(?:moore)', 'mike moore', regex=True)
+        .str.replace(r'\bca?pt\b', 'captain', regex=True)\
+        .str.replace('det', 'detective', regex=False)\
+        .str.replace('sgt', 'sargeant', regex=False)\
+        .str.replace('km', 'kim', regex=False)\
+        .str.replace('mke', 'mike', regex=False)\
+        .str.replace(r'\b(lt|ltj|it)\b', 'lieutenant', regex=True)
+    parts = df.investigating_supervisor.str.extract(r'(?:(lieutenant|captain|detective|chief|major|sargeant))?( [^ ]*) (.+)')
+    df.loc[:, 'supervisors_rank_desc'] = parts[0]
+    df.loc[:, 'supervisors_first_name'] = parts[1]
+    df.loc[:, 'supervisors_last_name'] = parts[2]
     return df
+
 
 def clean_disposition(df):
     df.disposition = df.disposition.str.lower().str.strip()\
@@ -113,7 +118,7 @@ def clean():
         'tangipahoa_so/tangipahoa_so_cprr_2015_2021.csv')
         )\
         .pipe(split_rows_with_name)\
-        .pipe(split_name)\
+        .pipe(split_full_name)\
         .pipe(clean_dept_desc)\
         .pipe(clean_complaint_type)\
         .pipe(clean_rule_violation)\
@@ -128,5 +133,3 @@ if __name__ == '__main__':
     df.to_csv(
         data_file_path('clean/cprr_tangipahoa_so_2015_2021.csv'),
         index=False)
-    print(df['action'].unique())
-    print(df.columns.to_list())
