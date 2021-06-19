@@ -132,7 +132,7 @@ data/match/cprr_st_tammany_so_2011_2021.csv data/match/post_event_st_tammany_so_
 data/match/cprr_plaquemines_so_2019.csv: match/plaquemines_so.py data/clean/cprr_plaquemines_so_2019.csv
 	python match/plaquemines_so.py
 
-data/match/lprr_louisiana_state_csc_1991_2020.csv: match/louisiana_state_csc.py data/clean/lprr_louisiana_state_csc_1991_2020.csv data/clean/pprr_post_2020_11_06.csv
+data/match/lprr_louisiana_state_csc_1991_2020.csv: match/louisiana_state_csc.py data/clean/lprr_louisiana_state_csc_1991_2020.csv data/clean/pprr_post_2020_11_06.csv data/clean/pprr_louisiana_csd_2021.csv
 	python match/louisiana_state_csc.py
 
 data/match/post_event_mandeville_pd_2019.csv data/match/cprr_mandeville_pd_2019.csv: match/mandeville_pd.py data/clean/pprr_mandeville_csd_2020.csv data/clean/pprr_post_2020_11_06.csv data/clean/cprr_mandeville_pd_2019.csv
