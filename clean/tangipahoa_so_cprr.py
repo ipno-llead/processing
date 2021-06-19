@@ -9,33 +9,33 @@ from lib.clean import (
 import pandas as pd
 
 
-
-#  for col, pat in [('rank_desc', r'^((\w{2}\.|\w{2}\s)?)'), ('first_name', r"^([\w'-]+)(.*)$")]:
-#         names = series[series.str.match(pat)].str.extract(pat)
-#         df.loc[series.str.match(pat), col] = names[0]
-#         series = series.str.replace(pat, r'\2').str.strip()
-#     df.loc[:, 'last_name'] = series
-#     return df.drop(columns=['full_name'])
+def split_rows_with_name(df):
+    for idx, row in df[df.full_name.fillna('').str.contains(' & ')].iterrows():
+        names = row.full_name.split(' & ')
+        df.loc[idx, 'full_name'] = names[0]
+        row = row.copy()
+        row.loc['full_name'] = names[1]
+        df = df.append(row)
+    return df
 
 
 
 def split_name(df):
-    df.full_name = df.full_name.str.lower().str.strip()\
+    df.loc[:, 'full_name'] = df.full_name.str.lower().str.strip()\
+        .str.replace(r'^(unknown|unk|tpso|tp715|facebook comments)$', '', regex=True)\
         .str.replace('.', '', regex=False)\
-        .str.replace('jessical', 'jessica', regex=False)\
-        .str.replace('dy', 'deputy', regex=False)\
-        .str.replace('capt', 'captain', regex=False)\
-        .str.replace('sgt', 'sargeant', regex=False)\
-        .str.replace('lt', 'lieutenant', regex=False)\
-        .str.replace(r'unk|unknown', '', regex=True)
-    series = df.full_name.fillna('').str.strip()
-    for col, pat in [('rank_desc', r'^((lieutenant|deputy|captain|sargeant)?)'), ('first_name', r'((\s?[A-Za-z]+))')]:
-        names = series[series.str.match(pat)].str.extract(pat)
-        df.loc[series.str.match(pat), col] = names[0]
-        series = series.str.replace(pat, r'\2').str.strip()
-    df.loc[:, 'last_name'] = series
-    df.first_name = df.first_name.str.replace(r'deputy|lieutenant|sargeant|captain', '', regex=True)
-    return df.drop(columns=['full_name'])
+        .str.replace(r'(\w+), (\w+)', r'\2 \1', regex=True)
+    parts = df.full_name.str.extract(r'(?:(dy|sgt|lt|capt) )?([^ ]+) (.+)')
+    df.loc[:, 'rank_desc'] = parts[0].replace({
+        'dy': 'deputy',
+        'sgt': 'sargeant',
+        'lt': 'lieutenant',
+        'capt': 'captain'
+    })
+    df.loc[:, 'first_name'] = parts[1].str.strip().str.replace('jessical', 'jessica', regex=False)
+    df.loc[:, 'last_name'] = parts[2]
+    df.loc[df.full_name == 'deputy', 'rank_desc'] = 'deputy'
+    return df
 
 
 def clean_dept_desc(df):
@@ -63,10 +63,10 @@ def clean_rule_violation(df):
         .str.replace('.', '', regex=False)\
         .str.replace('$', '', regex=False)\
         .str.replace('-', '', regex=False)\
-        .str.replace(r'cou[r]?te[r]?s[e]?y', 'courtesy', regex=True)\
+        .str.replace(r'cour?ter?se?y', 'courtesy', regex=True)\
         .str.replace('authoruty', 'authority', regex=False)\
-        .str.replace(r'unsa[r]?tasfactory', r'unsatisfactory', regex=True)\
-        .str.replace(r'pef[r]?ormance', 'performance', regex=True)\
+        .str.replace(r'unsar?tasfactory', 'unsatisfactory', regex=True)\
+        .str.replace(r'pefr?ormance', 'performance', regex=True)\
         .str.replace('accidnet', 'accident', regex=False)\
         .str.replace('rudness', 'rudeness', regex=False)\
         .str.replace('policy violation', '', regex=False)\
@@ -78,11 +78,12 @@ def clean_rule_violation(df):
         .str.replace('misued', 'misuse', regex=False)\
         .str.replace(' pursuit', 'pursuit', regex=False)\
         .str.replace('delayed responsetime', 'delayed response time', regex=False)\
-        .str.replace('social mediathreat', 'social media threat', regex=False)
+        .str.replace('social mediathreat', 'social media threat', regex=False)\
+        .str.replace('behaivor', 'behavior', regex=False)
     return df
 
 def clean_investigating_supervisor(df):
-    df.investigating_supervisor = df.investigating_supervisor.str.lower().str.strip()\
+    df.loc[:, 'investigating_supervisor'] = df.investigating_supervisor.str.lower().str.strip()\
         .str.replace('.', '', regex=False)\
         .str.replace('/', '', regex=False)\
         .str.replace('fecrand', 'ferrand', regex=False)\
@@ -109,8 +110,9 @@ def clean_action(df):
 
 def clean():
     df = pd.read_csv(data_file_path(
-        'tangipahoa_so/tangipahoa_so_cprr_2015-2021.csv')
+        'tangipahoa_so/tangipahoa_so_cprr_2015_2021.csv')
         )\
+        .pipe(split_rows_with_name)\
         .pipe(split_name)\
         .pipe(clean_dept_desc)\
         .pipe(clean_complaint_type)\
@@ -126,6 +128,5 @@ if __name__ == '__main__':
     df.to_csv(
         data_file_path('clean/cprr_tangipahoa_so_2015_2021.csv'),
         index=False)
-
-print(df['action'].unique())
-print(df.columns.to_list())
+    print(df['action'].unique())
+    print(df.columns.to_list())

@@ -167,6 +167,9 @@ DATA_FILES = {
     "slidell_pd": [
         "https://www.dropbox.com/s/1z09ujt4ja3b4wx/Slidell_PD_PPRR_2009.csv?dl=1",  # noqa
         "https://www.dropbox.com/s/ejgypovnab90z0p/Slidell_PD_PPRR_2019.csv?dl=1",  # noqa
+    ],
+    "tangipahoa_so": [
+        "https://www.dropbox.com/s/x034pjdzxamt3zk/tangipahoa_so_cprr_2015_2021.csv?dl=1",  # noqa
     ]
 }
 _current_dir = os.path.dirname(os.path.realpath(__file__))
