@@ -87,12 +87,26 @@ def clean_investigating_supervisor(df):
         .str.replace('/', '', regex=False)\
         .str.replace('fecrand', 'ferrand', regex=False)\
         .str.replace('suanne', 'susanne', regex=False)\
-        .str.replace(r'^(?:miller)$', 'susanne miller', regex=True)\
         .str.replace('dawn p', 'dawn panepinto', regex=False)\
-        .str.replace(r'^(\w{2}\s+\[sanders]$)', 'blane sanders', regex=True)
+        .str.replace(r'lt|lt.', 'lieutenant', regex=True)\
+        .str.replace(r'^(cpt|cpt.|capt|capt.)$', 'captain', regex=True)\
+        .str.replace(r'sgt|sgt.', 'sargeant', regex=True)
         # .str.replace(r'(?:moore)', 'mike moore', regex=True)
     return df
-00
+
+def clean_disposition(df):
+    df.disposition = df.disposition.str.lower().str.strip()\
+        .str.replace('not sustained', 'unsustained', regex=False)\
+        .str.replace('exonerted', 'exonerated', regex=False)\
+        .str.replace(r'(?:admin[\.]?[closed]?)', 'administrative', regex=True)
+    return df
+
+
+def clean_action(df):
+    df.action = df.action.str.lower().str.strip()\
+        .str.replace('')
+
+
 def clean():
     df = pd.read_csv(data_file_path(
         'tangipahoa_so/tangipahoa_so_cprr_2015-2021.csv')
@@ -101,7 +115,8 @@ def clean():
         .pipe(clean_dept_desc)\
         .pipe(clean_complaint_type)\
         .pipe(clean_rule_violation)\
-        .pipe(clean_investigating_supervisor)
+        .pipe(clean_investigating_supervisor)\
+        .pipe(clean_disposition)
     return df
 
 
@@ -112,5 +127,5 @@ if __name__ == '__main__':
         data_file_path('clean/cprr_tangipahoa_so_2015_2021.csv'),
         index=False)
 
-print(df['investigating_supervisor'].unique())
+print(df['action'].unique())
 print(df.columns.to_list())
