@@ -107,10 +107,21 @@ def clean_disposition(df):
         .str.replace(r'(?:admin[\.]?[closed]?)', 'administrative', regex=True)
     return df
 
+def clean_appeal(df):
+    df.appeal = df.appeal.str.lower().str.strip()\
+        .str.replace(r'^$', 'yes', regex=True)
+    return df
 
-def clean_action(df):
-    df.action = df.action.str.lower().str.strip()\
-        .str.replace('')
+def clean_policy_failure(df):
+    df.policy_failure = df.policy_failure.str.lower().str.strip()\
+        .str.replace(r'^$', 'yes', regex=True)
+    return df
+
+def clean_submission_type(df):
+    df.submission_type = df.submission_type.str.lower().str.strip()\
+        .str.replace('ph', 'telephone', regex=False)\
+        .str.replace(r'\bin? ?[per]?son\b', 'person', regex=True)
+    return df
 
 
 def clean():
@@ -123,7 +134,10 @@ def clean():
         .pipe(clean_complaint_type)\
         .pipe(clean_rule_violation)\
         .pipe(clean_investigating_supervisor)\
-        .pipe(clean_disposition)
+        .pipe(clean_disposition)\
+        .pipe(clean_appeal)\
+        .pipe(clean_policy_failure)\
+        .pipe(clean_submission_type)
     return df
 
 
