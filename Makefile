@@ -273,3 +273,6 @@ data/clean/cprr_scott_pd_cprr_2020.csv: clean/scott_pd_cprr.py data/scott_pd/sco
 
 data/clean/pprr_scott_pd_2021.csv: clean/scott_pd_pprr.py data/scott_pd/scott_pd_pprr_2021.csv
 	python clean/scott_pd_pprr.py
+
+data/clean/cprr_tangipahoa_so_2015_2021.csv: clean/tangipahoa_so_cprr.py data/tangipahoa_so/tangipahoa_so_cprr_2015_2021.csv
+	python clean/tangipahoa_so_cprr.py

@@ -1,10 +1,11 @@
+from clean.st_tammany_so_cprr import assign_agency
 import sys
 sys.path.append('../')
 from lib.path import data_file_path, ensure_data_dir
 from lib.columns import clean_column_names, set_values
 from lib.uid import gen_uid
 from lib.clean import (
-    clean_names, standardize_desc_cols, clean_dates
+    clean_names, standardize_desc_cols, clean_dates, float_to_int_str, clean_dates
 )
 import pandas as pd
 
@@ -23,8 +24,10 @@ def split_full_name(df):
     df.loc[:, 'full_name'] = df.full_name.str.lower().str.strip()\
         .str.replace(r'^(unknown|unk|tpso|tp715|facebook comments)$', '', regex=True)\
         .str.replace('.', '', regex=False)\
-        .str.replace(r'(\w+), (\w+)', r'\2 \1', regex=True)
-    parts = df.full_name.str.extract(r'(?:(dy|sgt|lt|capt) )?([^ ]+) (.+)')
+        .str.replace(r'(\w+), (\w+)', r'\2 \1', regex=True)\
+        .str.replace("d'amatto", "d'amato", regex=False)\
+        .str.replace('francoois', 'francois', regex=False)
+    parts = df.full_name.str.extract(r'(?:(dy|sgt|lt|capt) )?(?:([^ ]+) )?(.+)')
     df.loc[:, 'rank_desc'] = parts[0].replace({
         'dy': 'deputy',
         'sgt': 'sargeant',
@@ -32,10 +35,9 @@ def split_full_name(df):
         'capt': 'captain'
     })
     df.loc[:, 'first_name'] = parts[1].str.strip().str.replace('jessical', 'jessica', regex=False)
-    df.loc[:, 'last_name'] = parts[2]
+    df.loc[:, 'last_name'] = parts[2].str.strip().str.replace('deputy', '', regex=False)
     df.loc[df.full_name == 'deputy', 'rank_desc'] = 'deputy'
     return df.drop(columns='full_name')
-
 
 
 def clean_dept_desc(df):
@@ -48,6 +50,7 @@ def clean_dept_desc(df):
         .str.replace('admin', 'administration', regex=False)
     return df.fillna('')
 
+
 def clean_complaint_type(df):
     df.complaint_type = df.complaint_type.str.lower().str.strip().fillna('')\
         .str.replace('citizen complaint', 'citizen', regex=False)\
@@ -56,8 +59,9 @@ def clean_complaint_type(df):
         .str.replace(r'ex[rt](?:\.?)?', r'external', regex=True)
     return df
 
+
 def clean_rule_violation(df):
-    df.rule_violation = df.rule_violation.str.lower().str.strip()\
+    df.loc[:, 'allegation'] = df.rule_violation.str.lower().str.strip()\
         .str.replace(r' ?/ ?', '/', regex=True)\
         .str.replace('w/', 'with ', regex=False)\
         .str.replace('.', '', regex=False)\
@@ -83,7 +87,6 @@ def clean_rule_violation(df):
     return df
 
 
-
 def clean_investigating_supervisor(df):
     df.loc[:, 'investigating_supervisor'] = df.investigating_supervisor.str.lower().str.strip().fillna('')\
         .str.replace('.', '', regex=False)\
@@ -92,12 +95,16 @@ def clean_investigating_supervisor(df):
         .str.replace('sgt', 'sargeant', regex=False)\
         .str.replace('km', 'kim', regex=False)\
         .str.replace('mke', 'mike', regex=False)\
-        .str.replace(r'\b(lt|ltj|it)\b', 'lieutenant', regex=True)
-    parts = df.investigating_supervisor.str.extract(r'(?:(lieutenant|captain|detective|chief|major|sargeant))?( [^ ]*) (.+)')
-    df.loc[:, 'supervisors_rank_desc'] = parts[0]
-    df.loc[:, 'supervisors_first_name'] = parts[1]
-    df.loc[:, 'supervisors_last_name'] = parts[2]
-    return df
+        .str.replace(r'^p$', 'panepinto', regex=True)\
+        .str.replace(r'\b(lt|ltj|it)\b', 'lieutenant', regex=True)\
+        .str.replace('/', '', regex=False)\
+        .str.replace(r'^captain$', '', regex=True)\
+        .str.replace(r'fe[cr]ra[nm]d', 'ferrand', regex=True)
+    parts = df.investigating_supervisor.str.extract(r'(?:(lieutenant|captain|detective|chief|major|sargeant) )?(?:([^ ]+) )?(.+)')
+    df.loc[:, 'supervisor_rank'] = parts[0]
+    df.loc[:, 'supervisor_first_name'] = parts[1]
+    df.loc[:, 'supervisor_last_name'] = parts[2]
+    return df.drop(columns='investigating_supervisor')
 
 
 def clean_disposition(df):
@@ -107,22 +114,59 @@ def clean_disposition(df):
         .str.replace(r'(?:admin[\.]?[closed]?)', 'administrative', regex=True)
     return df
 
+
 def clean_appeal(df):
     df.appeal = df.appeal.str.lower().str.strip()\
         .str.replace(r'^$', 'yes', regex=True)
     return df
+
 
 def clean_policy_failure(df):
     df.policy_failure = df.policy_failure.str.lower().str.strip()\
         .str.replace(r'^$', 'yes', regex=True)
     return df
 
+
 def clean_submission_type(df):
-    df.submission_type = df.submission_type.str.lower().str.strip()\
-        .str.replace('ph', 'telephone', regex=False)\
-        .str.replace(r'\bin? ?[per]?son\b', 'person', regex=True)
+    df.loc[:, 'complainant_type'] = df.submission_type.str.lower().str.strip()\
+        .str.replace(r'ph(one)?', 'complaint by telephone', regex=True)\
+        .str.replace(r'(in )?per(son)?', 'complainant appeared in person', regex=True)\
+        .str.replace(r'^l$', 'complaint by letter', regex=True)\
+        .str.replace(r'(l/)?email', 'complaint by email', regex=True)
+    return df.drop(columns='submission_type')
+
+
+def clean_action(df):
+    df.action = df.action.str.lower().str.strip()\
+        .str.replace('ocal', 'oral', regex=False)\
+        .str.replace(r'susp(ens?ion|ended)?', 'suspended', regex=True)\
+        .str.replace('dem', 'demoted', regex=False)\
+        .str.replace(r'terminat(e|ion)', 'terminated', regex=True)\
+        .str.replace(r'disciplin(e|ary)', 'disciplined', regex=True)\
+        .str.replace(r'counseling', 'counseled', regex=True)\
+        .str.replace('oral', 'verbal', regex=False)
+    return df
+        
+
+def clean_received_by(df):
+    df.loc[:, 'receiver'] = df.receive_by.str.lower().str.strip()\
+        .str.replace('/', '', regex=False)\
+        .str.replace('.', '', regex=False)\
+        .str.replace('d.', 'dawn', regex=False)\
+        .str.replace(r'^in', 'lt', regex=True)\
+        .str.replace(r'^facebook comments$', '', regex=True)\
+        .str.replace(r'^lt', 'lieutenant', regex=True)\
+        .str.replace(r'^dy', 'deputy', regex=True)\
+        .str.replace(r'^cpl', 'corporal', regex=True)\
+        .str.replace(r'^sgt', 'sargeant', regex=True)\
+        .str.replace(r'^capt', 'captain', regex=True)\
+        .str.replace(r'shuma(haker|cher)', 'schumacher', regex=True)\
+        .str.replace(r'^ry\b', 'ryan', regex=True)\
+        .str.replace('dennise', 'denise', regex=False)
     return df
 
+def drop_rows_with_allegation_disposition_action_all_empty(df):
+    return df[~((df.allegation == '') & (df.disposition == '') & (df.action == ''))]
 
 def clean():
     df = pd.read_csv(data_file_path(
@@ -137,7 +181,18 @@ def clean():
         .pipe(clean_disposition)\
         .pipe(clean_appeal)\
         .pipe(clean_policy_failure)\
-        .pipe(clean_submission_type)
+        .pipe(clean_submission_type)\
+        .pipe(clean_received_by)\
+        .pipe(clean_action)\
+        .pipe(float_to_int_str, ['level'])\
+        .pipe(drop_rows_with_allegation_disposition_action_all_empty)\
+        .pipe(clean_dates, ['receive_date'], expand=False)\
+        .pipe(set_values, {'agency':'Tangipahoa SO', 'data_production_year': '2021'})\
+        .pipe(gen_uid, ['first_name', 'last_name', 'agency'])\
+        .drop_duplicates(subset=['receive_date', 'uid', 'allegation'], keep='first')\
+        .pipe(gen_uid, ['receive_date', 'uid', 'allegation'], 'complaint_uid')\
+        .pipe(gen_uid,
+              ['supervisor_rank', 'supervisor_first_name', 'supervisor_last_name', 'agency'], 'supervisor_uid')
     return df
 
 
