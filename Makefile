@@ -26,6 +26,7 @@ all: data/fuse/per_vivian_pd.csv data/fuse/event_vivian_pd.csv
 all: data/fuse/per_covington_pd.csv data/fuse/event_covington_pd.csv
 all: data/fuse/per_slidell_pd.csv data/fuse/event_slidell_pd.csv
 all: data/fuse/per_scott_pd.csv data/fuse/event_scott_pd.csv data/fuse/com_scott_pd.csv
+all: data/fuse/per_new_orleans_so.csv data/fuse/event_new_orleans_so.csv data/fuse/com_new_orleans_so.csv
 
 data/fuse/per_new_orleans_harbor_pd.csv data/fuse/event_new_orleans_harbor_pd.csv data/fuse/com_new_orleans_harbor_pd.csv: fuse/new_orleans_harbor_pd.py data/match/post_event_new_orleans_harbor_pd_2020.csv data/match/cprr_new_orleans_harbor_pd_2020.csv data/clean/pprr_new_orleans_harbor_pd_1991_2008.csv data/clean/pprr_new_orleans_harbor_pd_2020.csv
 	python fuse/new_orleans_harbor_pd.py
@@ -93,6 +94,9 @@ data/fuse/per_slidell_pd.csv data/fuse/event_slidell_pd.csv: fuse/slidell_pd.py 
 data/fuse/per_scott_pd.csv data/fuse/com_scott_pd.csv data/fuse/event_scott_pd.csv: fuse/scott_pd.py data/match/post_event_scott_pd_2021.csv data/clean/pprr_scott_pd_2021.csv
 	python fuse/scott_pd.py
 
+data/fuse/per_new_orleans_so.csv data/fuse/event_new_orleans_so.csv data/fuse/com_new_orleans_so.csv: fuse/new_orleans_so.py data/clean/pprr_post_2020_11_06.csv data/match/cprr_new_orleans_so_2019.csv
+	python fuse/new_orleans_so.py
+
 
 
 data/match/cprr_new_orleans_harbor_pd_2020.csv data/match/post_event_new_orleans_harbor_pd_2020.csv: match/new_orleans_harbor_pd.py data/clean/cprr_new_orleans_harbor_pd_2020.csv data/clean/pprr_new_orleans_harbor_pd_2020.csv
@@ -128,7 +132,7 @@ data/match/cprr_st_tammany_so_2011_2021.csv data/match/post_event_st_tammany_so_
 data/match/cprr_plaquemines_so_2019.csv: match/plaquemines_so.py data/clean/cprr_plaquemines_so_2019.csv
 	python match/plaquemines_so.py
 
-data/match/lprr_louisiana_state_csc_1991_2020.csv: match/louisiana_state_csc.py data/clean/lprr_louisiana_state_csc_1991_2020.csv data/clean/pprr_post_2020_11_06.csv
+data/match/lprr_louisiana_state_csc_1991_2020.csv: match/louisiana_state_csc.py data/clean/lprr_louisiana_state_csc_1991_2020.csv data/clean/pprr_post_2020_11_06.csv data/clean/pprr_louisiana_csd_2021.csv
 	python match/louisiana_state_csc.py
 
 data/match/post_event_mandeville_pd_2019.csv data/match/cprr_mandeville_pd_2019.csv: match/mandeville_pd.py data/clean/pprr_mandeville_csd_2020.csv data/clean/pprr_post_2020_11_06.csv data/clean/cprr_mandeville_pd_2019.csv
@@ -160,6 +164,9 @@ data/match/post_event_slidell_pd_2020.csv: match/slidell_pd.py data/clean/pprr_s
 
 data/match/post_event_scott_pd_2021.csv: match/scott_pd.py data/clean/cprr_scott_pd_2020.csv data/clean/pprr_scott_pd_2021.csv data/clean/pprr_post_2020_11_06.csv
 	python match/scott_pd.py
+
+data/match/cprr_new_orleans_so_2019.csv: match/new_orleans_so.py data/clean/cprr_new_orleans_so_2019.csv data/clean/pprr_post_2020_11_06.csv
+	python match/new_orleans_so.py
 
 
 
@@ -273,3 +280,6 @@ data/clean/cprr_scott_pd_cprr_2020.csv: clean/scott_pd_cprr.py data/scott_pd/sco
 
 data/clean/pprr_scott_pd_2021.csv: clean/scott_pd_pprr.py data/scott_pd/scott_pd_pprr_2021.csv
 	python clean/scott_pd_pprr.py
+
+data/clean/cprr_new_orleans_so_2019.csv: clean/new_orleans_so_cprr.py data/new_orleans_so/new_orleans_so_cprr_2019_tabula.csv
+	python clean/new_orleans_so_cprr.py
