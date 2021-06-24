@@ -4,10 +4,10 @@ import pathlib
 _current_dir = os.path.dirname(os.path.realpath(__file__))
 
 
-def data_file_path(filepath: str) -> str:
+def data_file_path(filepath: str) -> pathlib.Path:
     """Gets full file path of file in data folder
     """
-    return os.path.join(_current_dir, "../data", filepath)
+    return pathlib.Path(_current_dir, "../data", filepath).resolve()
 
 
 def ensure_data_dir(name: str) -> None:

@@ -94,6 +94,7 @@ if __name__ == "__main__":
     ensure_uid_unique(event_df, 'event_uid')
     com_df = fuse_complaint()
     ensure_uid_unique(com_df, 'complaint_uid')
+    com_df.loc[:, 'allegation_uid'] = ''
     uof_df = fuse_use_of_force()
     ensure_uid_unique(uof_df, 'uof_uid')
     per_df.to_csv(data_file_path("fuse/personnel.csv"), index=False)
