@@ -244,7 +244,8 @@ def rearrange_personnel_columns(df: pd.DataFrame) -> pd.DataFrame:
         .drop_duplicates(ignore_index=True)
     return df\
         .pipe(names_to_title_case, ["first_name", "last_name", "middle_name", "middle_initial"])\
-        .pipe(float_to_int_str, ["birth_year", "birth_month", "birth_day"])
+        .pipe(float_to_int_str, ["birth_year", "birth_month", "birth_day"])\
+        .sort_values('uid')
 
 
 def rearrange_event_columns(df):
@@ -276,7 +277,7 @@ def rearrange_event_columns(df):
             "years_employed",
             "department_code",
             "rank_code"
-        ])
+        ]).sort_values(['agency', 'kind', 'event_uid'])
 
 
 def rearrange_complaint_columns(df):
@@ -300,7 +301,7 @@ def rearrange_complaint_columns(df):
         .drop_duplicates(ignore_index=True),
         [
             "paragraph_code",
-        ])
+        ]).sort_values(['agency', 'complaint_uid'])
 
 
 def rearrange_appeal_hearing_columns(df):
@@ -323,7 +324,7 @@ def rearrange_appeal_hearing_columns(df):
             col for col in APPEAL_HEARING_COLUMNS
             if col in existing_cols
             ]].drop_duplicates(ignore_index=True)
-    return df.pipe(names_to_title_case, ["counsel"])
+    return names_to_title_case(df, ["counsel"]).sort_values(['agency', 'appeal_uid'])
 
 
 def rearrange_use_of_force(df):
@@ -350,4 +351,4 @@ def rearrange_use_of_force(df):
         [
             'citizen_age', 'citizen_age_1', 'officer_current_supervisor', 'officer_age',
             'officer_years_exp', 'officer_years_with_unit'
-        ])
+        ]).sort_values(['agency', 'uof_uid'])
