@@ -1,4 +1,3 @@
-from clean.st_tammany_so_cprr import assign_agency
 import sys
 sys.path.append('../')
 from lib.path import data_file_path, ensure_data_dir
@@ -84,10 +83,7 @@ def clean_rule_violation(df):
         .str.replace('delayed responsetime', 'delayed response time', regex=False)\
         .str.replace('social mediathreat', 'social media threat', regex=False)\
         .str.replace('behaivor', 'behavior', regex=False)\
-        .str.replace(r'(\w\s{2}', r'(\w\s{1}', regex=True)
-        # .str.replace('civil  harrassment', 'civil harassment', regex=False)\
-        # .str.replace('driving complaint  speeding', 'driving complaint speeding', regex=False\
-        # .str.replace('care of property equipment', 'care of property equipment', regex=False)
+        .str.replace(r'(?:(\w+)  (\w+))', r'\1 \2', regex=True)
     return df.drop(columns='rule_violation')
 
 
@@ -99,15 +95,16 @@ def clean_investigating_supervisor(df):
         .str.replace('sgt', 'sargeant', regex=False)\
         .str.replace('km', 'kim', regex=False)\
         .str.replace('mke', 'mike', regex=False)\
-        .str.replace(r'^p$', 'panepinto', regex=True)\
+        .str.replace(r'(^p$|p$)', 'panepinto', regex=True)\
         .str.replace(r'\b(lt|ltj|it)\b', 'lieutenant', regex=True)\
         .str.replace('/', '', regex=False)\
         .str.replace(r'^captain$', '', regex=True)\
-        .str.replace(r'fe[cr]ra[nm]d', 'ferrand', regex=True)
+        .str.replace(r'fe[cr]ra[nm]d', 'ferrand', regex=True)\
+        .str.replace(r'(\w+\') (\w+)', r'\1\2', regex=True)
     parts = df.investigating_supervisor.str.extract(r'(?:(lieutenant|captain|detective|chief|major|sargeant) )?(?:([^ ]+) )?(.+)')
-    df.loc[:, 'supervisor_rank'] = parts[0]
-    df.loc[:, 'supervisor_first_name'] = parts[1]
-    df.loc[:, 'supervisor_last_name'] = parts[2]
+    df.loc[:, 'supervisor_rank'] = parts[0].fillna('')
+    df.loc[:, 'supervisor_first_name'] = parts[1].fillna('')
+    df.loc[:, 'supervisor_last_name'] = parts[2].fillna('')
     return df.drop(columns='investigating_supervisor')
 
 
