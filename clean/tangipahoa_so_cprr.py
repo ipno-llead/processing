@@ -83,8 +83,12 @@ def clean_rule_violation(df):
         .str.replace(' pursuit', 'pursuit', regex=False)\
         .str.replace('delayed responsetime', 'delayed response time', regex=False)\
         .str.replace('social mediathreat', 'social media threat', regex=False)\
-        .str.replace('behaivor', 'behavior', regex=False)
-    return df
+        .str.replace('behaivor', 'behavior', regex=False)\
+        .str.replace(r'(\w\s{2}', r'(\w\s{1}', regex=True)
+        # .str.replace('civil  harrassment', 'civil harassment', regex=False)\
+        # .str.replace('driving complaint  speeding', 'driving complaint speeding', regex=False\
+        # .str.replace('care of property equipment', 'care of property equipment', regex=False)
+    return df.drop(columns='rule_violation')
 
 
 def clean_investigating_supervisor(df):
@@ -150,7 +154,7 @@ def clean_action(df):
 
 def clean_received_by(df):
     df.loc[:, 'receiver'] = df.receive_by.str.lower().str.strip()\
-        .str.replace('/', '', regex=False)\
+        .str.replace('/','', regex=False)\
         .str.replace('.', '', regex=False)\
         .str.replace('d.', 'dawn', regex=False)\
         .str.replace(r'^in', 'lt', regex=True)\
@@ -163,10 +167,17 @@ def clean_received_by(df):
         .str.replace(r'shuma(haker|cher)', 'schumacher', regex=True)\
         .str.replace(r'^ry\b', 'ryan', regex=True)\
         .str.replace('dennise', 'denise', regex=False)
-    return df
+    return df.drop(columns='receive_by')
 
 def drop_rows_with_allegation_disposition_action_all_empty(df):
     return df[~((df.allegation == '') & (df.disposition == '') & (df.action == ''))]
+
+
+def clean_completion_date(df):
+    df.completion_date = df.completion_date.str.lower().str.strip()\
+        .str.replace(r'^8/1/200$', '8/1/2020', regex=True)
+    return df 
+
 
 def clean():
     df = pd.read_csv(data_file_path(
@@ -184,9 +195,10 @@ def clean():
         .pipe(clean_submission_type)\
         .pipe(clean_received_by)\
         .pipe(clean_action)\
+        .pipe(clean_completion_date)\
         .pipe(float_to_int_str, ['level'])\
         .pipe(drop_rows_with_allegation_disposition_action_all_empty)\
-        .pipe(clean_dates, ['receive_date'], expand=False)\
+        .pipe(clean_dates, ['receive_date', 'completion_date'], expand=False)\
         .pipe(set_values, {'agency':'Tangipahoa SO', 'data_production_year': '2021'})\
         .pipe(gen_uid, ['first_name', 'last_name', 'agency'])\
         .drop_duplicates(subset=['receive_date', 'uid', 'allegation'], keep='first')\
