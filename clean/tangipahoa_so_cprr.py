@@ -4,7 +4,7 @@ from lib.path import data_file_path, ensure_data_dir
 from lib.columns import clean_column_names, set_values
 from lib.uid import gen_uid
 from lib.clean import (
-    clean_names, standardize_desc_cols, clean_dates, float_to_int_str, clean_dates
+    clean_names, standardize_desc_cols, clean_dates, float_to_int_str
 )
 import pandas as pd
 
@@ -147,33 +147,36 @@ def clean_action(df):
         .str.replace(r'counseling', 'counseled', regex=True)\
         .str.replace('oral', 'verbal', regex=False)
     return df
-        
+
 
 def clean_received_by(df):
     df.loc[:, 'receiver'] = df.receive_by.str.lower().str.strip()\
         .str.replace('/','', regex=False)\
         .str.replace('.', '', regex=False)\
-        .str.replace('d.', 'dawn', regex=False)\
+        .str.replace(r'^d\b', 'dawn', regex=True)\
+        .str.replace(r'^panepinto$', 'dawn panepinto', regex=True)\
+        .str.replace(r'^chief$', '', regex=True)\
+        .str.replace('panepito', 'panepinto', regex=False)\
         .str.replace(r'^in', 'lt', regex=True)\
         .str.replace(r'^facebook comments$', '', regex=True)\
-        .str.replace(r'^lt', 'lieutenant', regex=True)\
-        .str.replace(r'^dy', 'deputy', regex=True)\
-        .str.replace(r'^cpl', 'corporal', regex=True)\
-        .str.replace(r'^sgt', 'sargeant', regex=True)\
-        .str.replace(r'^capt', 'captain', regex=True)\
         .str.replace(r'shuma(haker|cher)', 'schumacher', regex=True)\
         .str.replace(r'^ry\b', 'ryan', regex=True)\
-        .str.replace('dennise', 'denise', regex=False)
+        .str.replace('dennise', 'denise', regex=False)\
+        .str.replace('whittingtton', 'whittington', regex=False)
+    parts = df.receiver.str.extract(r'(?:(lt|cpl|capt|sgt|dy|major|chief) )?(.+)')
+    df.loc[:, 'receiver'] = parts[1].fillna('')
     return df.drop(columns='receive_by')
+
 
 def drop_rows_with_allegation_disposition_action_all_empty(df):
     return df[~((df.allegation == '') & (df.disposition == '') & (df.action == ''))]
 
 
 def clean_completion_date(df):
-    df.completion_date = df.completion_date.str.lower().str.strip()\
+    df.completion_date = df.completion_date.str.lower().str.strip().fillna('')\
         .str.replace(r'^8/1/200$', '8/1/2020', regex=True)
-    return df 
+    df = df.loc[~df.index.duplicated(keep='first')]
+    return df
 
 
 def clean():
@@ -195,7 +198,8 @@ def clean():
         .pipe(clean_completion_date)\
         .pipe(float_to_int_str, ['level'])\
         .pipe(drop_rows_with_allegation_disposition_action_all_empty)\
-        .pipe(clean_dates, ['receive_date', 'completion_date'], expand=False)\
+        .pipe(clean_dates, ['completion_date'], expand=True)\
+        .pipe(clean_dates, ['receive_date'], expand=False)\
         .pipe(set_values, {'agency':'Tangipahoa SO', 'data_production_year': '2021'})\
         .pipe(gen_uid, ['first_name', 'last_name', 'agency'])\
         .drop_duplicates(subset=['receive_date', 'uid', 'allegation'], keep='first')\
