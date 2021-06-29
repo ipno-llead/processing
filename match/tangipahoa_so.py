@@ -2,11 +2,11 @@ import sys
 sys.path.append('../')
 import pandas as pd
 from datamatch import ThresholdMatcher, JaroWinklerSimilarity, ColumnsIndex
-from lib.post import extract_events_from_post
 from lib.path import data_file_path, ensure_data_dir
+from lib.post import extract_events_from_post
 
 
-def prepare_post_data():
+def prepare_post():
     post = pd.read_csv(data_file_path('clean/pprr_post_2020_11_06.csv'))
     return post[post.agency == 'tangipahoa parish so']
 
@@ -42,7 +42,7 @@ def extract_post_events(cprr, post):
         'last_name': JaroWinklerSimilarity(),
         'first_name': JaroWinklerSimilarity(),
     }, dfa, dfb)
-    decision = .7
+    decision = .897
     matcher.save_pairs_to_excel(data_file_path(
         "match/tangipahoa_so_cprr_2015_2021_v_post_pprr_2020_11_06.xlsx"), decision)
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
@@ -52,10 +52,10 @@ def extract_post_events(cprr, post):
 if __name__ == '__main__':
     cprr = pd.read_csv(data_file_path('clean/cprr_tangipahoa_so_2015_2021.csv'))
     cprr = deduplicate_cprr_officers(cprr)
-    post = prepare_post_data()
+    post = prepare_post()
     post_event = extract_post_events(cprr, post)
     ensure_data_dir('match')
     cprr.to_csv(data_file_path(
         'match/cprr_tangipahoa_so_2015_2021.csv'), index=False)
     post_event.to_csv(data_file_path(
-        'match/post_event_tangipahoa_so_2021.csv'), index=False)
+        'match/post_event_tangipahoa_so_2015_2021.csv'), index=False)

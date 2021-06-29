@@ -123,7 +123,7 @@ def clean_appeal(df):
 
 
 def clean_policy_failure(df):
-    df.policy_failure = df.policy_failure.str.lower().str.strip()\
+    df.policy_failure = df.policy_failure.str.lower().str.strip().fillna('')\
         .str.replace(r'^$', 'yes', regex=True)
     return df
 
@@ -138,14 +138,15 @@ def clean_submission_type(df):
 
 
 def clean_action(df):
-    df.action = df.action.str.lower().str.strip()\
-        .str.replace('ocal', 'oral', regex=False)\
+    df.action = df.action.str.lower().str.strip().fillna('')\
         .str.replace(r'susp(ens?ion|ended)?', 'suspended', regex=True)\
         .str.replace('dem', 'demoted', regex=False)\
         .str.replace(r'terminat(e|ion)', 'terminated', regex=True)\
         .str.replace(r'disciplin(e|ary)', 'disciplined', regex=True)\
-        .str.replace(r'counseling', 'counseled', regex=True)\
-        .str.replace('oral', 'verbal', regex=False)
+        .str.replace(r'(counseling|^verbal$)', 'verbal counseling', regex=True)\
+        .str.replace(r'o[cr]al', 'verbal counseling', regex=True)\
+        .str.replace(r'^0$', 'none', regex=True)\
+        .str.replace(r'^3$', 'verbal counseling', regex=True)
     return df
 
 
