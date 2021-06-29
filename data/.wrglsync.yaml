@@ -136,6 +136,10 @@ repos:
     fileName: fuse/com_tangipahoa_so.csv
     primaryKey:
       - complaint_uid
+  com-new-orleans-so:
+    fileName: fuse/com_new_orleans_so.csv
+    primaryKey:
+      - complaint_uid
   uof-new-orleans-pd:
     fileName: fuse/uof_new_orleans_pd.csv
     primaryKey:
@@ -232,6 +236,10 @@ repos:
     fileName: fuse/per_scott_pd.csv
     primaryKey:
       - uid
+  per-new-orleans-so:
+    fileName: fuse/per_new_orleans_so.csv
+    primaryKey:
+      - uid
   event-new-orleans-pd:
     fileName: fuse/event_new_orleans_pd.csv
     primaryKey:
@@ -316,9 +324,15 @@ repos:
     fileName: fuse/event_scott_pd.csv
     primaryKey:
       - event_uid
+<<<<<<< HEAD
   event-tangipahoa-so:
     fileName: fuse/event_tangipahoa_so.csv
     primaryKey: 
+=======
+  event-new-orleans-so:
+    fileName: fuse/event_new_orleans_so.csv
+    primaryKey:
+>>>>>>> 9240ec865f6bf2d1002ee37427730d551439f56e
       - event_uid
   personnel:
     fileName: fuse/personnel.csv

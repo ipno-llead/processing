@@ -44,10 +44,11 @@ def assign_uid(df):
     return df
 
 
-def remove_NA_dates(df, cols):
+def remove_NA_values(df, cols):
     for col in cols:
         df.loc[:, col] = df[col].str.strip().str.replace(
-            r'^(Unk|N\/A)$', '', regex=True)
+            r'^(unk|n\/a)$', '', regex=True, case=False
+        )
     return df
 
 
@@ -59,7 +60,7 @@ def clean19():
         .rename(columns={
             'case_no': 'tracking_number',
             'reserve_full_time': 'employment_status',
-            'type_of_complaint_or_allegation': 'rule_violation',
+            'type_of_complaint_or_allegation': 'allegation',
             'assigned_investigator': 'investigator',
             'name_of_shift_supervisor_if_handeled_by_shift': 'shift_supervisor',
             'internal_external': 'complainant_type',
@@ -78,7 +79,7 @@ def clean19():
         .pipe(standardize_desc_cols, ['employment_status', 'disposition', 'action', 'complainant_type'])\
         .pipe(assign_uid)\
         .pipe(gen_uid, ['agency', 'tracking_number'], 'complaint_uid')\
-        .pipe(remove_NA_dates, ['occur_date', 'receive_date'])
+        .pipe(remove_NA_values, ['occur_date', 'receive_date', 'shift_supervisor', 'employment_status', 'action'])
 
 
 def clean20():
@@ -89,7 +90,7 @@ def clean20():
         .rename(columns={
             'case_no': 'tracking_number',
             'reserve_full_time': 'employment_status',
-            'type_of_complaint_or_allegation': 'rule_violation',
+            'type_of_complaint_or_allegation': 'allegation',
             'assigned_investigator': 'investigator',
             'name_of_shift_supervisor_if_handeled_by_shift': 'shift_supervisor',
             'internal_external': 'complainant_type',
@@ -107,7 +108,8 @@ def clean20():
         .pipe(clean_names, ['first_name', 'last_name'])\
         .pipe(standardize_desc_cols, ['employment_status', 'disposition', 'action', 'complainant_type'])\
         .pipe(assign_uid)\
-        .pipe(gen_uid, ['agency', 'tracking_number'], 'complaint_uid')
+        .pipe(gen_uid, ['agency', 'tracking_number'], 'complaint_uid')\
+        .pipe(remove_NA_values, ['shift_supervisor', 'action'])
 
 
 if __name__ == '__main__':

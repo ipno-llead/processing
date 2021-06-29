@@ -1,5 +1,5 @@
 ---
-name: "pull-request"
+name: "pr-check-label"
 
 on:
   pull_request_target:
