@@ -171,7 +171,7 @@ data/match/post_event_scott_pd_2021.csv: match/scott_pd.py data/clean/cprr_scott
 
 data/match/post_event_tangipahoa_so_2015_2021.csv: match/tangipahoa_so.py data/clean/cprr_tangipahoa_so_2015_2021.csv data/clean/pprr_post_2020_11_06.csv
 	python match/scott_pd.py
-
+	
 data/match/cprr_new_orleans_so_2019.csv: match/new_orleans_so.py data/clean/cprr_new_orleans_so_2019.csv data/clean/pprr_post_2020_11_06.csv
 	python match/new_orleans_so.py
 
@@ -290,6 +290,6 @@ data/clean/pprr_scott_pd_2021.csv: clean/scott_pd_pprr.py data/scott_pd/scott_pd
 
 data/clean/cprr_tangipahoa_so_2015_2021.csv: clean/tangipahoa_so_cprr.py data/tangipahoa_so/tangipahoa_so_cprr_2015_2021.csv
 	python clean/tangipahoa_so_cprr.py
-	
+
 data/clean/cprr_new_orleans_so_2019.csv: clean/new_orleans_so_cprr.py data/new_orleans_so/new_orleans_so_cprr_2019_tabula.csv
 	python clean/new_orleans_so_cprr.py
