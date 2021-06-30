@@ -204,10 +204,10 @@ data/clean/pprr_brusly_pd_2020.csv data/clean/cprr_brusly_pd_2020.csv data/clean
 data/clean/cprr_port_allen_pd_2019.csv data/clean/cprr_port_allen_pd_2017_2018.csv data/clean/cprr_port_allen_pd_2015_2016.csv: clean/port_allen_pd_cprr.py data/port_allen_pd/port_allen_cprr_2019.csv data/port_allen_pd/port_allen_cprr_2017-2018_byhand.csv data/port_allen_pd/port_allen_cprr_2015-2016_byhand.csv
 	python clean/port_allen_pd_cprr.py
 
-data/clean/cprr_madisonville_pd_2010_2020.csv: clean/madisonville_pd_cprr.py data/madisonville_pd/madisonville_pd_cprr_2010-2020.csv
+data/clean/cprr_madisonville_pd_2010_2020.csv: clean/madisonville_pd_cprr.py data/madisonville_pd/madisonville_pd_cprr_2010-2020_byhand.csv
 	python clean/madisonville_pd_cprr.py
 
-data/clean/pprr_madisonville_csd_2019.csv: clean/madisonville_csd_pprr.py data/madisonville_csd/madisonville_csd_pprr_2019.csv
+data/clean/pprr_madisonville_csd_2019.csv: clean/madisonville_csd_pprr.py data/madisonville_pd/madisonville_csd_pprr_2019.csv
 	python clean/madisonville_csd_pprr.py
 
 data/clean/pprr_post_2020_11_06.csv: clean/post_pprr.py data/post_council/post_pprr_11-6-2020.csv

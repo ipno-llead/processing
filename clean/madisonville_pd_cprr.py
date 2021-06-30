@@ -20,7 +20,7 @@ def extract_complainant_gender(df):
     df.loc[df.complainant_name == "Mr. Joe Mahon, Jr.",
            "complainant_sex"] = "male"
     df.loc[:, "complainant_name"] = df.complainant_name.str.replace(
-        r"^Mr\.\s+", "")
+        r"^Mr\.\s+", "", regex=True)
     return df
 
 
@@ -32,14 +32,15 @@ def assign_agency(df):
 
 def clean():
     df = pd.read_csv(data_file_path(
-        "madisonville_pd/madisonville_pd_cprr_2010-2020.csv"))
+        "madisonville_pd/madisonville_pd_cprr_2010-2020_byhand.csv"))
     df = clean_column_names(df)
-    df.columns = [
-        'rank_desc', 'last_name', 'first_name', 'occur_date', 'tracking_number', 'complainant_name']
     df = df\
+        .rename(columns={
+            'complaintant': 'complainant_name', 'title': 'rank_desc',
+            'incident_number': 'tracking_number'})\
         .pipe(swap_names)\
         .pipe(extract_complainant_gender)\
-        .pipe(clean_dates, ["occur_date"])\
+        .pipe(clean_dates, ["incident_date"])\
         .pipe(standardize_desc_cols, ["rank_desc"])\
         .pipe(assign_agency)\
         .pipe(clean_names, ["first_name", "last_name", "complainant_name"])\
