@@ -7,7 +7,9 @@ from urllib.parse import urlparse, unquote
 
 DATA_FILES = {
     "new_orleans_harbor_pd": [
-        "https://www.dropbox.com/s/oijixpqskkbm63k/new_orleans_harbor_pd_pprr_1991-2008.csv?dl=1",  # noqa
+        "https://www.dropbox.com/s/oijixpqskkbm63k/new_orleans_harbor_pd_pprr_1991-2008.csv?dl=1", # noqa
+        "https://www.dropbox.com/s/9orpa67xwfuheia/new_orleans_harbor_pd_pprr_2020.csv?dl=1", # noqa
+        "https://www.dropbox.com/s/37ghr57lpq8d5tw/new_orleans_harbor_pd_cprr_2014-2020.csv?dl=1", # noqa
     ],
     "new_orleans_csd": [
         "https://www.dropbox.com/sh/ymvc81kjfqqv9m6/AADoEpTWUNef0AMH5GaZxMPea/New%20Orleans_CSD_PPRR_2009_realigned.csv?dl=1",  # noqa

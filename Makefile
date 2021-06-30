@@ -96,7 +96,7 @@ data/fuse/per_scott_pd.csv data/fuse/com_scott_pd.csv data/fuse/event_scott_pd.c
 	python fuse/scott_pd.py
 
 data/fuse/com_tangipahoa_so.csv data/fuse/event_tangipahoa_so.csv: fuse/tangipahoa_so.py data/match/post_event_tangipahoa_so_2015_2021.csv data/clean/cprr_tangipahoa_so_2015_2021.csv
-	python fuse/scott_pd.py
+	python fuse/tangipahoa_so.py
 
 data/fuse/per_new_orleans_so.csv data/fuse/event_new_orleans_so.csv data/fuse/com_new_orleans_so.csv: fuse/new_orleans_so.py data/clean/pprr_post_2020_11_06.csv data/match/cprr_new_orleans_so_2019.csv
 	python fuse/new_orleans_so.py
@@ -169,8 +169,8 @@ data/match/post_event_slidell_pd_2020.csv: match/slidell_pd.py data/clean/pprr_s
 data/match/post_event_scott_pd_2021.csv: match/scott_pd.py data/clean/cprr_scott_pd_2020.csv data/clean/pprr_scott_pd_2021.csv data/clean/pprr_post_2020_11_06.csv
 	python match/scott_pd.py
 
-data/match/post_event_tangipahoa_so_2015_2021.csv: match/tangipahoa_so.py data/clean/cprr_tangipahoa_so_2015_2021.csv data/clean/pprr_post_2020_11_06.csv
-	python match/scott_pd.py
+data/match/cprr_tangipahoa_so_2015_2021.csv: match/tangipahoa_so.py data/clean/cprr_tangipahoa_so_2015_2021.csv data/clean/pprr_post_2020_11_06.csv
+	python match/tangipahoa_so.py
 	
 data/match/cprr_new_orleans_so_2019.csv: match/new_orleans_so.py data/clean/cprr_new_orleans_so_2019.csv data/clean/pprr_post_2020_11_06.csv
 	python match/new_orleans_so.py
