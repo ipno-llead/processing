@@ -19,12 +19,12 @@ def clean():
     )
     df = clean_column_names(df)
     df = df.rename(columns={
-        'job_class': 'rank_code',
-        'job_class_desc': 'rank_desc',
-        'year_of_birth': 'birth_year'
+        'pay_job_class_desc': 'rank_desc',
+        'terminated_date': 'term_date',
+        'employee': 'employee_id',
     })
     return df\
-        .pipe(float_to_int_str, ['birth_year'])\
+        .pipe(float_to_int_str, ['birth_year', 'hire_date', 'term_date'])\
         .pipe(standardize_desc_cols, ['rank_desc'])\
         .pipe(clean_dates, ['hire_date', 'term_date'])\
         .pipe(assign_agency)\

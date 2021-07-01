@@ -75,6 +75,7 @@ DATA_FILES = {
         "https://www.dropbox.com/sh/mwabzn85manxzo6/AACgbqjIwVL3XetaFcQHo-e5a/st_tammany_department_codes_tabula.csv?dl=1",  # noqa
         "https://www.dropbox.com/s/ir4jad3jm13n6se/st_tammany_so_cprr_2011-2020_tabula.csv?dl=1",  # noqa
         "https://www.dropbox.com/s/5o4z29raa7djvsh/st_tammany_so_cprr_2020-2021_tabula.csv?dl=1",  # noqa
+        "https://www.dropbox.com/s/2wsd2y9u2j4miqr/st._tammany_pprr_2020.csv?dl=1", # noqa
     ],
     "plaquemines_so": [
         "https://www.dropbox.com/s/g1b98kn4e4k1dtr/plaquemines_so_cprr_2019.csv?dl=1",  # noqa
