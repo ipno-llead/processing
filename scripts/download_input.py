@@ -7,34 +7,9 @@ from urllib.parse import urlparse, unquote
 
 DATA_FILES = {
     "new_orleans_harbor_pd": [
-        "https://www.dropbox.com/sh/nv366qnl1vmhgny/AADPg86iDeZz6kEmBKc6Pv6Za/Data%20Collected/New%20Orleans%20Harbor%20PD/Administrative%20Data/New%20Orleans_Harbor%20PD_PPRR_2020.csv?dl=1",  # noqa
-        "https://www.dropbox.com/sh/nv366qnl1vmhgny/AAD6dx5Kj-bY1XRFJ5sWeHl0a/Data%20Collected/New%20Orleans%20Harbor%20PD/Complaints%20Data/Datasets/New%20Orleans_Harbor%20PD_CPRR_2014-2020.csv?dl=1",  # noqa
-        "https://www.dropbox.com/s/oijixpqskkbm63k/new_orleans_harbor_pd_pprr_1991-2008.csv?dl=1",  # noqa
-    ],
-    "new_orleans_pd": [
-        "https://www.dropbox.com/sh/nv366qnl1vmhgny/AABVClAFyA1h-LtmYOCGY7-la/Data%20Collected/New%20Orleans%20PD/Administrative%20Data/Department%20ID%20Description%20List.csv?dl=1",  # noqa
-        "https://www.dropbox.com/sh/nv366qnl1vmhgny/AAC6eT1qKY9DfgfVj781NMJXa/Data%20Collected/New%20Orleans%20PD/Administrative%20Data/Job%20Code%20Description%20List.csv?dl=1",  # noqa
-        "https://www.dropbox.com/sh/nv366qnl1vmhgny/AACUNWDHkNmh8_TLg3mggr0Ra/Data%20Collected/New%20Orleans%20PD/Administrative%20Data/New%20Orleans_PD_PPRR_1999.csv?dl=1",  # noqa
-        "https://www.dropbox.com/sh/nv366qnl1vmhgny/AABMgxyYgGH1Zuben338rtpya/Data%20Collected/New%20Orleans%20PD/Administrative%20Data/New%20Orleans_PD_PPRR_2000.csv?dl=1",  # noqa
-        "https://www.dropbox.com/sh/nv366qnl1vmhgny/AAAjMJihsXLmUb_KFnaIKn6Na/Data%20Collected/New%20Orleans%20PD/Administrative%20Data/New%20Orleans_PD_PPRR_2001.csv?dl=1",  # noqa
-        "https://www.dropbox.com/sh/nv366qnl1vmhgny/AAAiJKmE3SrX9iY10-nCZ2lRa/Data%20Collected/New%20Orleans%20PD/Administrative%20Data/New%20Orleans_PD_PPRR_2002.csv?dl=1",  # noqa
-        "https://www.dropbox.com/sh/nv366qnl1vmhgny/AAClcL9IevAl1ZG3KoFQg5S5a/Data%20Collected/New%20Orleans%20PD/Administrative%20Data/New%20Orleans_PD_PPRR_2003.csv?dl=1",  # noqa
-        "https://www.dropbox.com/sh/nv366qnl1vmhgny/AADsUoAX0ERfIPfFseJUpvuTa/Data%20Collected/New%20Orleans%20PD/Administrative%20Data/New%20Orleans_PD_PPRR_2004.csv?dl=1",  # noqa
-        "https://www.dropbox.com/sh/nv366qnl1vmhgny/AABZs6MA3vWh9UR-j7sbS1jAa/Data%20Collected/New%20Orleans%20PD/Administrative%20Data/New%20Orleans_PD_PPRR_2005.csv?dl=1",  # noqa
-        "https://www.dropbox.com/sh/nv366qnl1vmhgny/AAAXIlYISJJllR4vvKCgdshga/Data%20Collected/New%20Orleans%20PD/Administrative%20Data/New%20Orleans_PD_PPRR_2006.csv?dl=1",  # noqa
-        "https://www.dropbox.com/sh/nv366qnl1vmhgny/AABKmXcbQIA1UM0wTXFEWK5Ka/Data%20Collected/New%20Orleans%20PD/Administrative%20Data/New%20Orleans_PD_PPRR_2007.csv?dl=1",  # noqa
-        "https://www.dropbox.com/sh/nv366qnl1vmhgny/AADCcL_5PPXAo84Lv9zCkXT_a/Data%20Collected/New%20Orleans%20PD/Administrative%20Data/New%20Orleans_PD_PPRR_2008.csv?dl=1",  # noqa
-        "https://www.dropbox.com/sh/nv366qnl1vmhgny/AABtXjpwMpLy5TKFD7-co07ba/Data%20Collected/New%20Orleans%20PD/Administrative%20Data/New%20Orleans_PD_PPRR_2009.csv?dl=1",  # noqa
-        "https://www.dropbox.com/sh/nv366qnl1vmhgny/AABridhmPH6rbyH4tHA2xTQha/Data%20Collected/New%20Orleans%20PD/Administrative%20Data/New%20Orleans_PD_PPRR_2010.csv?dl=1",  # noqa
-        "https://www.dropbox.com/sh/nv366qnl1vmhgny/AAC4akfoKn57ckuMiLeJ1kewa/Data%20Collected/New%20Orleans%20PD/Administrative%20Data/New%20Orleans_PD_PPRR_2011.csv?dl=1",  # noqa
-        "https://www.dropbox.com/sh/nv366qnl1vmhgny/AAAyzOIATVj3CLZ5K2qqHJPAa/Data%20Collected/New%20Orleans%20PD/Administrative%20Data/New%20Orleans_PD_PPRR_2012.csv?dl=1",  # noqa
-        "https://www.dropbox.com/sh/nv366qnl1vmhgny/AADT9yIa8NFxTK5Tp54H6GdIa/Data%20Collected/New%20Orleans%20PD/Administrative%20Data/New%20Orleans_PD_PPRR_2013.csv?dl=1",  # noqa
-        "https://www.dropbox.com/sh/nv366qnl1vmhgny/AAA-QJxnQYKjBFKIEAlpVKGta/Data%20Collected/New%20Orleans%20PD/Administrative%20Data/New%20Orleans_PD_PPRR_2014.csv?dl=1",  # noqa
-        "https://www.dropbox.com/sh/nv366qnl1vmhgny/AADkdyybix59ae9VZZrWjO6ka/Data%20Collected/New%20Orleans%20PD/Administrative%20Data/New%20Orleans_PD_PPRR_2015.csv?dl=1",  # noqa
-        "https://www.dropbox.com/sh/nv366qnl1vmhgny/AADvPZX_gZ_pCvMeTe9GDC3Ya/Data%20Collected/New%20Orleans%20PD/Administrative%20Data/New%20Orleans_PD_PPRR_2016.csv?dl=1",  # noqa
-        "https://www.dropbox.com/sh/nv366qnl1vmhgny/AADch5Cbc00xyaKat_OHl3A_a/Data%20Collected/New%20Orleans%20PD/Administrative%20Data/New%20Orleans_PD_PPRR_2017.csv?dl=1",  # noqa
-        "https://www.dropbox.com/sh/nv366qnl1vmhgny/AAAdK7KHdebOrtXSxhiLi64ha/Data%20Collected/New%20Orleans%20PD/Administrative%20Data/New%20Orleans_PD_PPRR_2018.csv?dl=1",  # noqa
-        "https://www.dropbox.com/sh/nv366qnl1vmhgny/AAD-Hi1Ae45yLjdPx9XFT3p_a/Data%20Collected/New%20Orleans%20PD/Administrative%20Data/New%20Orleans_PD_PPRR_2019.csv?dl=1",  # noqa
+        "https://www.dropbox.com/s/oijixpqskkbm63k/new_orleans_harbor_pd_pprr_1991-2008.csv?dl=1", # noqa
+        "https://www.dropbox.com/s/9orpa67xwfuheia/new_orleans_harbor_pd_pprr_2020.csv?dl=1", # noqa
+        "https://www.dropbox.com/s/37ghr57lpq8d5tw/new_orleans_harbor_pd_cprr_2014-2020.csv?dl=1", # noqa
     ],
     "new_orleans_csd": [
         "https://www.dropbox.com/sh/ymvc81kjfqqv9m6/AADoEpTWUNef0AMH5GaZxMPea/New%20Orleans_CSD_PPRR_2009_realigned.csv?dl=1",  # noqa
@@ -59,8 +34,6 @@ DATA_FILES = {
     ],
     "louisiana_state_csc": [
         "https://www.dropbox.com/sh/9zndy2dz3w60etq/AAAqcTxDk8GVj3uvQbUto3XBa/Log%20Records/LouisianaState_CSC_LPRR_1991-2020.csv?dl=1",  # noqa
-        "https://www.dropbox.com/s/h0ordt45fsaq4p5/colonel_full_names.csv?dl=1",  # noqa
-        "https://www.dropbox.com/s/5n72txx1us8k07r/la_lprr_appellants.csv?dl=1",  # noqa
     ],
     "louisiana_csd": [
         "https://www.dropbox.com/sh/tca7uxdcm2fqbgq/AAACRDPB2CJJoAcmR2Ws6KAsa/Louisiana_CSD_PPRR_2021.csv?dl=1",  # noqa
@@ -71,7 +44,7 @@ DATA_FILES = {
         "https://www.dropbox.com/sh/rfvtxt3dw204mu0/AAAPRhyKNsN6k0T7khmtxhP2a/brusly_pd_awards_2015-2020_byhand.csv?dl=1",  # noqa
     ],
     "post_council": [
-        "https://www.dropbox.com/sh/9fafm0yxbk4z8zt/AAC22Rm_L4FVRzuIZ-Rc_UL4a/POST_PPRR_11-6-2020.csv?dl=1",  # noqa
+        "https://www.dropbox.com/s/vzm4ihad72pkw2b/POST_PPRR_11-6-2020.csv?dl=1",  # noqa
     ],
     "port_allen_pd": [
         "https://www.dropbox.com/sh/8zs58ak2rpah9iu/AABUS6JdCHYyvjXWWk--RtGLa/Port_Allen_CPRR_2017-2018_byhand.csv?dl=1",  # noqa
@@ -80,12 +53,6 @@ DATA_FILES = {
     ],
     "port_allen_csd": [
         "https://www.dropbox.com/sh/5znysznypatmig0/AAD4gXEXXJMxnxNcK-TocbPDa/Port_Allen_CSD_PPRR_2020.csv?dl=1",  # noqa
-    ],
-    "madisonville_pd": [
-        "https://www.dropbox.com/sh/bv473hrxugw65qn/AAC-288ely1bv-Wl_o_kF2q2a/Madisonville_PD_CPRR_2010-2020.csv?dl=1",  # noqa
-    ],
-    "madisonville_csd": [
-        "https://www.dropbox.com/s/ovbrufp86phrc75/Madisonville_CSD_PPRR_2019.csv?dl=1",  # noqa
     ],
     "baton_rouge_da": [
         "https://www.dropbox.com/sh/vdpyhf3lbi7lxy9/AAB_Qc3S4usW8QMatRXimi_za/Baton_Rouge_DA_CPRR_2021.csv?dl=1",  # noqa
@@ -104,7 +71,6 @@ DATA_FILES = {
         "https://www.dropbox.com/sh/9yu4fe2z6xuwnaf/AAALIGMiq95b2ZylzxFcUdqga/greenwood_pd_cprr_2015-2020_byhand.csv?dl=1",  # noqa
     ],
     "st_tammany_so": [
-        "https://www.dropbox.com/sh/dtb2hn54ma59q2h/AAB_DLd50KBMkYBODy1PP1sFa/St.%20Tammany_SO_PPRR_2020.csv?dl=1",  # noqa
         "https://www.dropbox.com/sh/mwabzn85manxzo6/AACR-N1crrGx43ZJ2CYdtqUSa/St.Tammany_SO_CPRR_Lists_2015-2019_tabula.csv?dl=1",  # noqa
         "https://www.dropbox.com/sh/mwabzn85manxzo6/AACgbqjIwVL3XetaFcQHo-e5a/st_tammany_department_codes_tabula.csv?dl=1",  # noqa
         "https://www.dropbox.com/s/ir4jad3jm13n6se/st_tammany_so_cprr_2011-2020_tabula.csv?dl=1",  # noqa
@@ -113,19 +79,12 @@ DATA_FILES = {
     "plaquemines_so": [
         "https://www.dropbox.com/s/g1b98kn4e4k1dtr/plaquemines_so_cprr_2019.csv?dl=1",  # noqa
     ],
-    "mandeville_pd": [
-        "https://www.dropbox.com/sh/smup95ydqa8h1sb/AABR4CiSP6tcgTuqEyltcDmTa/mandeville_pd_cprr_2019_byhand.csv?dl=1",  # noqa
-        "https://www.dropbox.com/sh/d9vm391045yh68z/AAB3FfqGuXNielVZtWMcJwwXa/mandeville_csd_pprr_2020.csv?dl=1",  # noqa
-    ],
     "caddo_parish_so": [
         "https://www.dropbox.com/sh/8w4uff2emzbhcvr/AAC4YdwWdPudXeH4pdDvl-Fpa/Caddo%20Parish_SO_PPRR_2020.csv?dl=1",  # noqa
     ],
     "levee_pd": [
         "https://www.dropbox.com/sh/d1j6djl9jb7jvx3/AADgCrm6xbUHZJ0ATwfwZp2Ga/Log%20Records/levee_pd_cprr_2019.csv?dl=1",  # noqa
         "https://www.dropbox.com/sh/d1j6djl9jb7jvx3/AAB5DDSmd4Uo247gktnG3A9Za/Log%20Records/levee_pd_cprr_2020.csv?dl=1",  # noqa
-    ],
-    "grand_isle": [
-        "https://www.dropbox.com/sh/x8t0gh2dtw4wsp7/AABS1d3AD-F_1dreLV3_bFXUa/grand_isle_pd_pprr_2021_byhand.csv?dl=1",  # noqa
     ],
     "kenner_pd": [
         "https://www.dropbox.com/sh/x1b2ve5ei3mod94/AACL1pMApTujHaUfooMPKoBEa/Kenner_PD_PPRR_2020.csv?dl=1",  # noqa
@@ -173,7 +132,15 @@ DATA_FILES = {
         "https://www.dropbox.com/sh/d1z41ep6gpmys0d/AADRaYJj_kFnNZFwpYeYG8Oea/shreveport_pd_cprr_dispositions_2019.csv?dl=1",  # noqa
         "https://www.dropbox.com/sh/d1z41ep6gpmys0d/AADm2ePXquTLK0QkQZUYAsPoa/shreveport_pd_cprr_names_2018.csv?dl=1",  # noqa
         "https://www.dropbox.com/sh/d1z41ep6gpmys0d/AAAeN5dqSyb2woW-B9GTfbXta/shreveport_pd_cprr_names_2019.csv?dl=1",  # noqa
-    ]
+    ],
+    "tangipahoa_so": [
+        "https://www.dropbox.com/s/x034pjdzxamt3zk/tangipahoa_so_cprr_2015_2021.csv?dl=1",  # noqa
+    ],
+    "madisonville_pd": [
+        "https://www.dropbox.com/s/u43a9vfwp3hl99e/Madisonville_PD_CPRR_2010-2020_byhand.csv?dl=1", # noqa
+        "https://www.dropbox.com/s/57mvxvuh9pulalf/Madisonville_CSD_PPRR_2019.csv?dl=1", # noqa
+        "https://www.dropbox.com/s/wsqr83x4fhz5j51/Madisonville_CSD_PPRR_2020.csv?dl=1", # noqa
+    ],
 }
 _current_dir = os.path.dirname(os.path.realpath(__file__))
 
