@@ -127,6 +127,12 @@ DATA_FILES = {
         "https://www.dropbox.com/s/1z09ujt4ja3b4wx/Slidell_PD_PPRR_2009.csv?dl=1",  # noqa
         "https://www.dropbox.com/s/ejgypovnab90z0p/Slidell_PD_PPRR_2019.csv?dl=1",  # noqa
     ],
+    "shreveport_pd": [
+        "https://www.dropbox.com/sh/d1z41ep6gpmys0d/AABJCO_ZpZF4t3-qahiI6plTa/shreveport_pd_cprr_dispositions_2018.csv?dl=1",  # noqa
+        "https://www.dropbox.com/sh/d1z41ep6gpmys0d/AADRaYJj_kFnNZFwpYeYG8Oea/shreveport_pd_cprr_dispositions_2019.csv?dl=1",  # noqa
+        "https://www.dropbox.com/sh/d1z41ep6gpmys0d/AADm2ePXquTLK0QkQZUYAsPoa/shreveport_pd_cprr_names_2018.csv?dl=1",  # noqa
+        "https://www.dropbox.com/sh/d1z41ep6gpmys0d/AAAeN5dqSyb2woW-B9GTfbXta/shreveport_pd_cprr_names_2019.csv?dl=1",  # noqa
+    ],
     "tangipahoa_so": [
         "https://www.dropbox.com/s/x034pjdzxamt3zk/tangipahoa_so_cprr_2015_2021.csv?dl=1",  # noqa
     ],
@@ -134,7 +140,7 @@ DATA_FILES = {
         "https://www.dropbox.com/s/u43a9vfwp3hl99e/Madisonville_PD_CPRR_2010-2020_byhand.csv?dl=1", # noqa
         "https://www.dropbox.com/s/57mvxvuh9pulalf/Madisonville_CSD_PPRR_2019.csv?dl=1", # noqa
         "https://www.dropbox.com/s/wsqr83x4fhz5j51/Madisonville_CSD_PPRR_2020.csv?dl=1", # noqa
-    ]
+    ],
 }
 _current_dir = os.path.dirname(os.path.realpath(__file__))
 
