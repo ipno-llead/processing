@@ -136,6 +136,10 @@ DATA_FILES = {
         "https://www.dropbox.com/s/u43a9vfwp3hl99e/Madisonville_PD_CPRR_2010-2020_byhand.csv?dl=1", # noqa
         "https://www.dropbox.com/s/57mvxvuh9pulalf/Madisonville_CSD_PPRR_2019.csv?dl=1", # noqa
         "https://www.dropbox.com/s/wsqr83x4fhz5j51/Madisonville_CSD_PPRR_2020.csv?dl=1", # noqa
+    ],
+    "mandeville_pd": [
+        "https://www.dropbox.com/s/r65gv24wz7xl2ox/mandeville_pd_cprr_2019_byhand.csv?dl=1", # noqa
+        "https://www.dropbox.com/s/07kbandklabka5x/mandeville_csd_pprr_2020.csv?dl=1", # noqa
     ]
 }
 _current_dir = os.path.dirname(os.path.realpath(__file__))
