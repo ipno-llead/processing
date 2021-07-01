@@ -1,6 +1,6 @@
 from lib.path import data_file_path, ensure_data_dir
 from lib.columns import clean_column_names, set_values
-from lib.clean import clean_names, clean_dates, standardize_desc_cols, clean_salaries
+from lib.clean import clean_names, clean_dates, standardize_desc_cols, clean_salaries, clean_races, clean_sexes
 from lib.uid import gen_uid
 from lib import salary
 import pandas as pd
@@ -47,33 +47,38 @@ def clean_cprr():
 
 
 def split_pprr_name(df):
-    names = df.employee_name.str.split(", ", expand=True)
+    names = df.full_nme.str.split(", ", expand=True)
     df.loc[:, "last_name"] = names.loc[:, 0].fillna("")
     names = names.loc[:, 1].fillna("").str.split(" ", expand=True)
     df.loc[:, "first_name"] = names.loc[:, 0].fillna("")
     df.loc[:, "middle_initial"] = names.loc[:, 1].fillna("")
-    df = df.drop(columns="employee_name")
+    df = df.drop(columns="full_nme")
     return df
 
 
+def clean_position(df):
+    df.loc[:, 'rank_desc'] = df.position.str.lower().str.strip()\
+        .str.replace('police ', '', regex=False)
+    return df.drop(columns='position')
+
+
 def clean_pprr():
-    df = pd.read_csv(data_file_path("brusly_pd/brusly_pd_pprr_2020.csv"))
-    df = clean_column_names(df)
-    df.columns = [
-        'employee_name', 'birth_date', 'hire_date', 'term_date',
-        'company_name', 'department_name', 'rank_desc', 'salary']
-    df = df.drop(df[df.employee_name.isna()].index).reset_index(drop=True)\
-        .pipe(set_values, {'salary_freq': salary.YEARLY})\
+    df = pd.read_csv(data_file_path("brusly_pd/brusly_pd_pprr_2020.csv"))\
+        .pipe(clean_column_names)\
         .drop(columns=['company_name', 'department_name'])\
+        .rename(columns={'annual_salary':'salary'})\
+        .pipe(clean_salaries, ['salary'])\
+        .pipe(set_values, {'salary_freq': salary.YEARLY})\
         .pipe(split_pprr_name)\
-        .pipe(clean_dates, ['birth_date', 'hire_date', 'term_date'])\
-        .pipe(standardize_desc_cols, ["rank_desc"])\
-        .pipe(clean_salaries, ["salary"])\
+        .pipe(clean_names, ['first_name', 'last_name', 'middle_initial'])\
+        .pipe(clean_dates, ['hire_date', 'birth_date'])\
+        .pipe(clean_races, ['race'])\
+        .pipe(clean_sexes, ['sex'])\
+        .pipe(clean_position)\
         .pipe(set_values, {
             'data_production_year': 2020,
             'agency': 'Brusly PD'
         })\
-        .pipe(clean_names, ['first_name', 'last_name', 'middle_initial'])\
         .pipe(gen_uid, [
             "agency", "last_name", "first_name", "middle_initial", "birth_year", "birth_month", "birth_day"
         ])

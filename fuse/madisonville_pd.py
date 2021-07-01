@@ -20,7 +20,7 @@ def fuse_events(pprr, cprr):
     }, ['uid'])
     builder.extract_events(cprr, {
         events.COMPLAINT_INCIDENT: {
-            'prefix': 'occur', 'keep': ['uid', 'agency', 'complaint_uid']
+            'prefix': 'incident', 'keep': ['uid', 'agency', 'complaint_uid']
         }
     }, ['uid', 'complaint_uid'])
     return builder.to_frame()

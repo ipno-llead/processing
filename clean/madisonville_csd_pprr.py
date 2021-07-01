@@ -54,7 +54,7 @@ def assign_agency(df):
 
 def clean():
     df = pd.read_csv(data_file_path(
-        "madisonville_csd/madisonville_csd_pprr_2019.csv"))
+        "madisonville_pd/madisonville_csd_pprr_2019.csv"))
     df = clean_column_names(df)
     df.columns = [
         'name', 'badge_no', 'hire_date', '2012', '2013', '2014', '2015',

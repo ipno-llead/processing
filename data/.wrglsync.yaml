@@ -78,6 +78,8 @@ repos:
     fileName: match/lprr_louisiana_state_csc_1991_2020.csv
   match-cprr-scott-pd-2020:
     fileName: match/cprr_scott_pd_2020.csv
+  match-cprr-tangipahoa-so-2015-2021:
+    fileName: match/cprr_tangipahoa_2015_2021.csv
   com-baton-rouge-pd:
     fileName: fuse/com_baton_rouge_pd.csv
     primaryKey:
@@ -128,6 +130,10 @@ repos:
       - complaint_uid
   com-scott-pd:
     fileName: fuse/com_scott_pd.csv
+    primaryKey: 
+      - complaint_uid
+  com-tangipahoa-so:
+    fileName: fuse/com_tangipahoa_so.csv
     primaryKey:
       - complaint_uid
   com-new-orleans-so:
@@ -318,6 +324,9 @@ repos:
     fileName: fuse/event_scott_pd.csv
     primaryKey:
       - event_uid
+  event-tangipahoa-so:
+    fileName: fuse/event_tangipahoa_so.csv
+    primaryKey: 
   event-new-orleans-so:
     fileName: fuse/event_new_orleans_so.csv
     primaryKey:
