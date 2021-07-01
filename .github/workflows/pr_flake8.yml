@@ -3,6 +3,7 @@ name: "pr-flake8"
 
 on:
   pull_request:
+    types: ["opened", "edited", "reopened", "synchronize"]
     paths:
       - "*.py"
 
