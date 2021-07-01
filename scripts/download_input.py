@@ -34,6 +34,7 @@ DATA_FILES = {
     ],
     "louisiana_state_csc": [
         "https://www.dropbox.com/sh/9zndy2dz3w60etq/AAAqcTxDk8GVj3uvQbUto3XBa/Log%20Records/LouisianaState_CSC_LPRR_1991-2020.csv?dl=1",  # noqa
+        "https://www.dropbox.com/s/eidur1nb3od5l55/la_lprr_appellants.csv?dl=1", # noqa
     ],
     "louisiana_csd": [
         "https://www.dropbox.com/sh/tca7uxdcm2fqbgq/AAACRDPB2CJJoAcmR2Ws6KAsa/Louisiana_CSD_PPRR_2021.csv?dl=1",  # noqa
