@@ -167,6 +167,12 @@ DATA_FILES = {
     "slidell_pd": [
         "https://www.dropbox.com/s/1z09ujt4ja3b4wx/Slidell_PD_PPRR_2009.csv?dl=1",  # noqa
         "https://www.dropbox.com/s/ejgypovnab90z0p/Slidell_PD_PPRR_2019.csv?dl=1",  # noqa
+    ],
+    "shreveport_pd": [
+        "https://www.dropbox.com/sh/d1z41ep6gpmys0d/AABJCO_ZpZF4t3-qahiI6plTa/shreveport_pd_cprr_dispositions_2018.csv?dl=1",  # noqa
+        "https://www.dropbox.com/sh/d1z41ep6gpmys0d/AADRaYJj_kFnNZFwpYeYG8Oea/shreveport_pd_cprr_dispositions_2019.csv?dl=1",  # noqa
+        "https://www.dropbox.com/sh/d1z41ep6gpmys0d/AADm2ePXquTLK0QkQZUYAsPoa/shreveport_pd_cprr_names_2018.csv?dl=1",  # noqa
+        "https://www.dropbox.com/sh/d1z41ep6gpmys0d/AAAeN5dqSyb2woW-B9GTfbXta/shreveport_pd_cprr_names_2019.csv?dl=1",  # noqa
     ]
 }
 _current_dir = os.path.dirname(os.path.realpath(__file__))

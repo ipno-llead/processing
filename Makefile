@@ -27,6 +27,7 @@ all: data/fuse/per_covington_pd.csv data/fuse/event_covington_pd.csv
 all: data/fuse/per_slidell_pd.csv data/fuse/event_slidell_pd.csv
 all: data/fuse/per_scott_pd.csv data/fuse/event_scott_pd.csv data/fuse/com_scott_pd.csv
 all: data/fuse/per_new_orleans_so.csv data/fuse/event_new_orleans_so.csv data/fuse/com_new_orleans_so.csv
+all: data/fuse/per_shreveport_pd.csv data/fuse/event_shreveport_pd.csv data/fuse/com_shreveport_pd.csv
 
 data/fuse/per_new_orleans_harbor_pd.csv data/fuse/event_new_orleans_harbor_pd.csv data/fuse/com_new_orleans_harbor_pd.csv: fuse/new_orleans_harbor_pd.py data/match/post_event_new_orleans_harbor_pd_2020.csv data/match/cprr_new_orleans_harbor_pd_2020.csv data/clean/pprr_new_orleans_harbor_pd_1991_2008.csv data/clean/pprr_new_orleans_harbor_pd_2020.csv
 	python fuse/new_orleans_harbor_pd.py
@@ -96,6 +97,9 @@ data/fuse/per_scott_pd.csv data/fuse/com_scott_pd.csv data/fuse/event_scott_pd.c
 
 data/fuse/per_new_orleans_so.csv data/fuse/event_new_orleans_so.csv data/fuse/com_new_orleans_so.csv: fuse/new_orleans_so.py data/clean/pprr_post_2020_11_06.csv data/match/cprr_new_orleans_so_2019.csv
 	python fuse/new_orleans_so.py
+
+data/fuse/per_shreveport_pd.csv data/fuse/event_shreveport_pd.csv data/fuse/com_shreveport_pd.csv: fuse/shreveport_pd.py data/clean/pprr_post_2020_11_06.csv data/match/cprr_shreveport_pd_2018_2019.csv
+	python fuse/shreveport_pd.py
 
 
 
@@ -167,6 +171,9 @@ data/match/post_event_scott_pd_2021.csv: match/scott_pd.py data/clean/cprr_scott
 
 data/match/cprr_new_orleans_so_2019.csv: match/new_orleans_so.py data/clean/cprr_new_orleans_so_2019.csv data/clean/pprr_post_2020_11_06.csv
 	python match/new_orleans_so.py
+
+data/match/cprr_shreveport_pd_2018_2019.csv: match/shreveport_pd.py data/clean/cprr_shreveport_pd_2018_2019.csv data/clean/pprr_post_2020_11_06.csv
+	python match/shreveport_pd.py
 
 
 
@@ -283,3 +290,6 @@ data/clean/pprr_scott_pd_2021.csv: clean/scott_pd_pprr.py data/scott_pd/scott_pd
 
 data/clean/cprr_new_orleans_so_2019.csv: clean/new_orleans_so_cprr.py data/new_orleans_so/new_orleans_so_cprr_2019_tabula.csv
 	python clean/new_orleans_so_cprr.py
+
+data/clean/cprr_shreveport_pd_2018_2019.csv: clean/shreveport_pd_cprr.py data/shreveport_pd/shreveport_pd_cprr_dispositions_2018.csv data/shreveport_pd/shreveport_pd_cprr_names_2018.csv data/shreveport_pd/shreveport_pd_cprr_dispositions_2019.csv data/shreveport_pd/shreveport_pd_cprr_names_2019.csv
+	python clean/shreveport_pd_cprr.py
