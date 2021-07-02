@@ -146,7 +146,10 @@ DATA_FILES = {
     "mandeville_pd": [
         "https://www.dropbox.com/s/r65gv24wz7xl2ox/mandeville_pd_cprr_2019_byhand.csv?dl=1", # noqa
         "https://www.dropbox.com/s/07kbandklabka5x/mandeville_csd_pprr_2020.csv?dl=1", # noqa
-    ]
+    ],
+    "grand_isle": [
+        "https://www.dropbox.com/s/u5jh3bm14kgz3l0/grand_isle_pd_pprr_2021_byhand.csv?dl=1",# noqa
+    ],
 }
 _current_dir = os.path.dirname(os.path.realpath(__file__))
 
