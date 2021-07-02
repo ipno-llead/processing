@@ -22,6 +22,7 @@ def clean_pprr_20():
             'job_class_desc': 'rank_desc',
             'badge': 'badge_no',
             'terminated_date': 'term_date',
+            'gender': 'sex',
         })\
         .pipe(clean_dates, ['hire_date', 'term_date'])\
         .pipe(float_to_int_str, ['term_year', 'term_day', 'term_month', 'hire_year', 'hire_day', 'hire_month'])\
@@ -29,7 +30,7 @@ def clean_pprr_20():
         .pipe(set_values, {'salary_freq': salary.YEARLY})\
         .pipe(clean_salaries, ['salary'])\
         .pipe(clean_races, ['race'])\
-        .pipe(clean_sexes, ['gender'])\
+        .pipe(clean_sexes, ['sex'])\
         .pipe(assign_agency, 2020)\
         .pipe(clean_names, ['first_name', 'last_name'])\
         .pipe(gen_uid, ['agency', 'badge_no', 'first_name', 'last_name'])
