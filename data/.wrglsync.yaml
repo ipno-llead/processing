@@ -140,6 +140,10 @@ repos:
     fileName: fuse/com_new_orleans_so.csv
     primaryKey:
       - complaint_uid
+  com-shreveport-pd:
+    fileName: fuse/com_shreveport_pd.csv
+    primaryKey:
+      - complaint_uid
   uof-new-orleans-pd:
     fileName: fuse/uof_new_orleans_pd.csv
     primaryKey:
@@ -240,6 +244,10 @@ repos:
     fileName: fuse/per_new_orleans_so.csv
     primaryKey:
       - uid
+  per-shreveport-pd:
+    fileName: fuse/per_shreveport_pd.csv
+    primaryKey:
+      - uid
   event-new-orleans-pd:
     fileName: fuse/event_new_orleans_pd.csv
     primaryKey:
@@ -329,6 +337,10 @@ repos:
     primaryKey: 
   event-new-orleans-so:
     fileName: fuse/event_new_orleans_so.csv
+    primaryKey:
+      - event_uid
+  event-shreveport-pd:
+    fileName: fuse/event_shreveport_pd.csv
     primaryKey:
       - event_uid
   personnel:
