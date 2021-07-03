@@ -20,14 +20,17 @@ def clean_names(df):
 
 def clean_complaint(df):
     df.loc[:, 'charges'] = df.complaint.str.lower().str.strip()\
-        .str.replace('with drew', 'withdrew', regex=False)
-    return df
+        .str.replace(r'(^file for records ?(only)?)', '', regex=True)\
+        .str.replace('unable to locate', '', regex=False)\
+        .str.replace('with drew complaint', '', regex=False)
+    return df.drop(columns='complaint')
 
 
 def clean_disposition(df):
     df.disposition = df.disposition.str.lower().str.strip()\
         .str.replace('non-sustained', 'unsustained', regex=False)\
-        .str.replace(r'^policy fail$', 'policy failure', regex=True)
+        .str.replace(r'^policy fail$', 'policy failure', regex=True)\
+        .str.replace(r'(^file for records ?(only)?)', '', regex=True)
     return df
 
 def clean_action(df):
@@ -43,6 +46,10 @@ def clean_action(df):
     return df.drop(columns='leave')
 
 
+def drop_rows_undefined_charges_and_disposition(df):
+    return df[~((df.charges == '') & (df.disposition == ''))]
+
+
 def clean():
     df = pd.read_csv(data_file_path('lafayette_so/lafayette_so_cprr_2015_2020.csv'))\
         .pipe(clean_column_names)
@@ -56,6 +63,7 @@ def clean():
         .pipe(clean_complaint)\
         .pipe(standardize_desc_cols, ['complete', 'emp_assign'])\
         .pipe(clean_disposition)\
+        .pipe(drop_rows_undefined_charges_and_disposition)\
         .pipe(clean_action)
     return df 
 
