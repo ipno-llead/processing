@@ -5,7 +5,7 @@ import pandas as pd
 
 from lib.columns import clean_column_names
 from lib.path import data_file_path, ensure_data_dir
-from lib.clean import clean_names, clean_dates, clean_salary, float_to_int_str, standardize_desc_cols
+from lib.clean import clean_names, clean_dates, clean_salary, standardize_desc_cols
 from lib.uid import gen_uid
 from lib import salary
 sys.path.append('../')
@@ -113,7 +113,6 @@ def clean():
             'hire_date': 'hire_date_raw',
             'hourly_salary': 'salary_raw'
         })\
-        .pipe(float_to_int_str, ['salary_raw'])\
         .pipe(clean_names, ['first_name', 'last_name'])\
         .pipe(parse_birthdate)\
         .pipe(clean_dates, ['birth_date'])\
