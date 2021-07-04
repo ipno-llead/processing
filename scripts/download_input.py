@@ -150,7 +150,6 @@ DATA_FILES = {
     "grand_isle": [
         "https://www.dropbox.com/s/u5jh3bm14kgz3l0/grand_isle_pd_pprr_2021_byhand.csv?dl=1",# noqa
     ],
-    ]
 }
 _current_dir = os.path.dirname(os.path.realpath(__file__))
 
