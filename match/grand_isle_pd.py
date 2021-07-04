@@ -11,11 +11,11 @@ sys.path.append('../')
 
 def match_pprr_post(pprr, post):
     dfa = pprr[['first_name', 'last_name', 'uid']]
-    dfa.loc[:, 'fc'] = dfa.first_name.map(lambda x: x[:1])
+    dfa.loc[:, 'fc'] = dfa.fillna('').first_name.map(lambda x: x[:1])
     dfa = dfa.drop_duplicates().set_index('uid', drop=True)
 
     dfb = post[['first_name', 'last_name', 'uid']]
-    dfb.loc[:, 'fc'] = dfb.first_name.map(lambda x: x[:1])
+    dfb.loc[:, 'fc'] = dfb.fillna('').first_name.map(lambda x: x[:1])
     dfb = dfb.drop_duplicates().set_index('uid', drop=True)
 
     matcher = ThresholdMatcher(ColumnsIndex(['fc']), {
