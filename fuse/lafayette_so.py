@@ -6,6 +6,7 @@ from lib.columns import (
 )
 from lib import events
 from lib.uid import ensure_uid_unique
+from lib.personnel import fuse_personnel
 import pandas as pd
 
 
@@ -44,10 +45,8 @@ if __name__ == '__main__':
     complaints = rearrange_complaint_columns(cprr)
     ensure_uid_unique(complaints, 'complaint_uid')
     event = fuse_events(cprr, post)
+    personnel_df = fuse_personnel(cprr, post)
     ensure_data_dir('fuse')
-    event.to_csv(data_file_path(
-        'fuse/event_lafayette_so.csv'),
-        index=False)
-    complaints.to_csv(data_file_path(
-        'fuse/com_lafayette_so.csv'),
-        index=False)
+    personnel_df.to_csv(data_file_path('fuse/per_lafayette_so.csv'), index=False)
+    event.to_csv(data_file_path('fuse/event_lafayette_so.csv'), index=False)
+    complaints.to_csv(data_file_path('fuse/com_lafayette_so.csv'), index=False)
