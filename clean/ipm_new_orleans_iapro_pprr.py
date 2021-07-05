@@ -50,6 +50,14 @@ def remove_unnamed_officers(df):
     return df[df.last_name != ''].reset_index(drop=True)
 
 
+def clean_department_desc(df):
+    df.department_desc = df.department_desc.str.lower().str.strip()\
+        .str.replace(r'(fob|isb|msb|pib|not) - ', '', regex=True)\
+        .str.replace(r'\bservice\b', 'services', regex=True)\
+        .str.replace('nopd officer', '', regex=False)
+    return df
+
+
 def clean():
     df = pd.read_csv(data_file_path(
         "ipm/new_orleans_iapro_pprr_1946-2018.csv"), sep='\t')
@@ -82,6 +90,7 @@ def clean():
         .pipe(clean_employee_type)\
         .pipe(clean_sexes, ['sex'])\
         .pipe(clean_races, ['race'])\
+        .pipe(clean_department_desc)\
         .pipe(assign_agency)\
         .pipe(gen_uid, ['agency', 'employee_id'])\
         .pipe(strip_time_from_dates, ['hire_date', 'left_date', 'dept_date'])\

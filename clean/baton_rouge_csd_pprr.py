@@ -41,6 +41,16 @@ def assign_rank_year_and_pay_year(df):
     return df
 
 
+def clean_department_desc(df):
+    df.department_desc = df.department_desc.str.lower().str.strip()\
+        .str.replace(r'police ?(department)?-', '', regex=True)\
+        .str.replace('serv', 'services', regex=False)\
+        .str.replace('byrne crim jus innov (bcji)', 'byrne criminal justice innovation program', regex=False)\
+        .str.replace('special operations', 'special operations bureau', regex=False)\
+        .str.replace(r'^criminal invest(igation)? ?(bureau)?', 'criminal investigations bureau', regex=True)
+    return df
+
+
 def clean_17():
     df = pd.read_csv(data_file_path(
         "baton_rouge_csd/baton_rouge_csd_pprr_2017.csv"
@@ -64,6 +74,7 @@ def clean_17():
     }).pipe(clean_salaries, ["salary"])\
         .pipe(standardize_desc_cols, ["department_desc", "rank_desc"])\
         .pipe(parse_dates_with_known_format, ["hire_date", "resign_date"], "%m/%d/%Y")\
+        .pipe(clean_department_desc)\
         .pipe(assign_agency)\
         .pipe(clean_names, ["first_name", "last_name", "middle_initial"])\
         .pipe(gen_uid, [
@@ -100,6 +111,7 @@ def clean_19():
         .pipe(standardize_desc_cols, ["department_desc", "rank_desc"])\
         .pipe(parse_dates_with_known_format, ["hire_date", "resign_date"], "%m/%d/%Y")\
         .pipe(clean_employment_status, ["employment_status"])\
+        .pipe(clean_department_desc)\
         .pipe(assign_agency)\
         .pipe(clean_names, ["first_name", "last_name", "middle_initial"])\
         .pipe(gen_uid, ["agency", "data_production_year", "employee_id"])\

@@ -1,4 +1,7 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> origin
 import sys
 
 from datamatch import ThresholdMatcher, JaroWinklerSimilarity, ColumnsIndex
@@ -38,6 +41,7 @@ if __name__ == '__main__':
     ensure_data_dir('match')
     post_event.to_csv(data_file_path(
         'match/post_event_grand_isle_pd.csv'), index=False)
+<<<<<<< HEAD
 =======
 import sys
 
@@ -78,4 +82,6 @@ if __name__ == '__main__':
     ensure_data_dir('match')
     post_event.to_csv(data_file_path(
         'match/post_event_grand_isle_pd.csv'), index=False)
+>>>>>>> origin
+=======
 >>>>>>> origin

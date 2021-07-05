@@ -1,4 +1,7 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> origin
 import re
 import sys
 
@@ -136,6 +139,7 @@ if __name__ == '__main__':
     df.to_csv(data_file_path(
         'clean/pprr_grand_isle_pd_2021.csv'
     ), index=False)
+<<<<<<< HEAD
 =======
 import re
 import sys
@@ -273,4 +277,6 @@ if __name__ == '__main__':
     df.to_csv(data_file_path(
         'clean/pprr_grand_isle_pd_2021.csv'
     ), index=False)
+>>>>>>> origin
+=======
 >>>>>>> origin
