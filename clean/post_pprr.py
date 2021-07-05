@@ -36,7 +36,8 @@ def clean():
         .pipe(replace_impossible_dates)\
         .pipe(clean_dates, ['level_1_cert_date', 'last_pc_12_qualification_date'], expand=False)\
         .pipe(clean_names, ["first_name", "last_name"])\
-        .pipe(gen_uid, ['agency', 'last_name', 'first_name', 'hire_year', 'hire_month', 'hire_day'])
+        .pipe(gen_uid, ['agency', 'last_name', 'first_name', 'hire_year', 'hire_month', 'hire_day'])\
+        .drop_duplicates(subset=['hire_year', 'hire_month', 'hire_day', 'uid'], keep='first')
     return df
 
 
