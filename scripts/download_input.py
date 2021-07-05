@@ -153,6 +153,7 @@ DATA_FILES = {
     "lafayette_so": [
         "https://www.dropbox.com/s/4d9m1y5g4pnlmkj/lafayette_so_cprr_2015_2020.csv?dl=1", # noqa
     ],
+    ]
 }
 _current_dir = os.path.dirname(os.path.realpath(__file__))
 
