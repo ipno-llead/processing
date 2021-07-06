@@ -149,12 +149,6 @@ DATA_FILES = {
     ],
     "grand_isle": [
         "https://www.dropbox.com/s/u5jh3bm14kgz3l0/grand_isle_pd_pprr_2021_byhand.csv?dl=1", # noqa
-<<<<<<< HEAD
-    ],
-    "lafayette_so": [
-        "https://www.dropbox.com/s/4d9m1y5g4pnlmkj/lafayette_so_cprr_2015_2020.csv?dl=1", # noqa
-=======
->>>>>>> origin
     ],
     "lafayette_so": [
         "https://www.dropbox.com/s/4d9m1y5g4pnlmkj/lafayette_so_cprr_2015_2020.csv?dl=1", # noqa
