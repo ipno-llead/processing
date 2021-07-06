@@ -37,6 +37,22 @@ def assign_agency(df):
     return df
 
 
+def clean_rank_desc(df):
+    df.rank_desc = df.rank_desc.str.lower().str.strip()\
+        .str.replace(r'( ?-| ?/)', '', regex=True)\
+        .str.replace('.', '', regex=False)\
+        .str.replace(r' il?i?i?v?$', '', regex=True)\
+        .str.replace(r'^admin', 'administration', regex=True)\
+        .str.replace(r' exec\b', ' executive', regex=True)\
+        .str.replace('lpnexec asstmen hit sup', 'executive assistant', regex=False)\
+        .str.replace(r' prior service (sr)? ?(dep|corporal)?', '', regex=True)\
+        .str.replace(r' parttime employ(ee)? hourly', '', regex=True)\
+        .str.replace('sergeant', 'sargeant', regex=False)\
+        .str.replace(r'tco ?(i[il])? ?accoutant ?video', 'accountant', regex=True)\
+        .str.replace(r'special managers$', '', regex=True)
+    return df
+
+
 def clean():
     return pd.read_csv(data_file_path(
         'caddo_parish_so/caddo_parish_so_pprr_2020.csv'
@@ -54,6 +70,7 @@ def clean():
         .pipe(extract_name)\
         .pipe(clean_salaries, ['salary'])\
         .pipe(standardize_desc_cols, ['rank_desc'])\
+        .pipe(clean_rank_desc)\
         .pipe(assign_agency)\
         .pipe(clean_dates, ['hire_date'])\
         .pipe(clean_names, ['first_name', 'last_name', 'middle_name'])\
