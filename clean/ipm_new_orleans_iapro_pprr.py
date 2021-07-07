@@ -58,6 +58,43 @@ def clean_department_desc(df):
     return df
 
 
+def clean_rank_desc(df):
+    df.rank_desc = df.rank_desc.str.lower().str.strip()\
+        .str.replace('.', '', regex=False)\
+        .str.replace(r' ?police', '', regex=True)\
+        .str.replace('sergeant', 'sargeant', regex=False)\
+        .str.replace(r'dec$', 'decree', regex=True)\
+        .str.replace('supt', 'superintendent', regex=False)\
+        .str.replace(r'\bdev(e)?\b', 'development', regex=True)\
+        .str.replace(',', ' ', regex=False)\
+        .str.replace(r'iv$', '', regex=True)\
+        .str.replace(r' ?-', ' ', regex=True)\
+        .str.replace(r'(ii?i?|1|2|3|4)?$', '', regex=True)\
+        .str.replace(r'spec$', 'specialist', regex=True)\
+        .str.replace(r'sup(v)?$', 'supervisor', regex=True)\
+        .str.replace(r'\basst\b', 'assistant', regex=True)\
+        .str.replace(' ?sr', 'senior', regex=True)\
+        .str.replace(r' ?mgr', 'manager', regex=True)\
+        .str.replace(' academy', '', regex=False)\
+        .str.replace(r' \boff\b ?', ' officer', regex=True)\
+        .str.replace(r' of$', '', regex=True)\
+        .str.replace(r' analyt?', 'analyst', regex=True)\
+        .str.replace(r'(3|4|&|5)', '', regex=True)\
+        .str.replace(' coor', ' coordinator', regex=False)\
+        .str.replace(r'\bopr\b', 'operations', regex=True)\
+        .str.replace('default', '', regex=False)\
+        .str.replace(r'\bspec\b', 'specialist', regex=True)\
+        .str.replace('recov', 'recovery', regex=False)\
+        .str.replace(r'\bprog\b', 'program', regex=True)\
+        .str.replace(r'\btech\b', 'technician', regex=True)\
+        .str.replace('applic', 'application', regex=False)\
+        .str.replace(r'^admin', 'administrative', regex=True)\
+        .str.replace(r' \(nopd\)$', '', regex=True)\
+        .str.replace('cnslr', 'counseler', regex=False)\
+        .str.replace('info', 'information,', regex=False)
+    return df
+
+
 def clean():
     df = pd.read_csv(data_file_path(
         "ipm/new_orleans_iapro_pprr_1946-2018.csv"), sep='\t')
@@ -84,6 +121,7 @@ def clean():
     return df\
         .pipe(float_to_int_str, ["years_employed", "current_supervisor", 'birth_year'])\
         .pipe(remove_badge_number_zeroes_prefix)\
+        .pipe(clean_rank_desc)\
         .pipe(standardize_desc_cols, [
             "rank_desc", "employment_status", "officer_inactive", "department_desc"
         ])\
