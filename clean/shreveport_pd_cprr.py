@@ -37,7 +37,7 @@ def stack_disposition_rows(df):
         .str.replace(r'false compl(etion)?', 'FALSE COMPLETION', regex=True, case=False)\
         .str.replace(r'no policy vi(olation)?', 'NO POLICY VIOLATION', regex=True, case=False)\
         .str.replace(
-            disp_pattern+r' ?([^ ])',
+            disp_pattern + r' ?([^ ])',
             r'\1; \2',
             regex=True)\
         .str.replace(r'(\d+),(\d+)', r'\1.\2', regex=True)\
@@ -79,7 +79,7 @@ def clean_receive_date(df, year):
     df.loc[:, 'receive_date'] = df.receive_date.str.strip()\
         .str.replace(r'\b(\d)/', r'0\1/', regex=True)\
         .str.replace(r'-$', '', regex=True)\
-        .str.replace(r'(\d+)/(\d+)/\d+', r'\1/\2/'+year, regex=True)
+        .str.replace(r'(\d+)/(\d+)/\d+', r'\1/\2/' + year, regex=True)
     return df
 
 
