@@ -1,4 +1,3 @@
-from clean.scott_pd_pprr import clean_rank
 from lib.columns import clean_column_names
 from lib.path import data_file_path, ensure_data_dir
 from lib.clean import clean_names, standardize_desc_cols, clean_dates

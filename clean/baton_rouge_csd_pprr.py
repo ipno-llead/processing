@@ -1,4 +1,3 @@
-from clean.scott_pd_pprr import clean_rank
 from lib.columns import clean_column_names, set_values
 from lib.clean import (
     clean_names, parse_dates_with_known_format, clean_salaries, standardize_desc_cols,
