@@ -29,6 +29,7 @@ all: data/fuse/per_scott_pd.csv data/fuse/event_scott_pd.csv data/fuse/com_scott
 all: data/fuse/event_tangipahoa_so.csv data/fuse/com_tangipahoa_so.csv
 all: data/fuse/per_new_orleans_so.csv data/fuse/event_new_orleans_so.csv data/fuse/com_new_orleans_so.csv
 all: data/fuse/per_shreveport_pd.csv data/fuse/event_shreveport_pd.csv data/fuse/com_shreveport_pd.csv
+all: data/fuse/cprr_lafayette_so.csv data/fuse/event_lafayette_so.csv 
 
 data/fuse/per_new_orleans_harbor_pd.csv data/fuse/event_new_orleans_harbor_pd.csv data/fuse/com_new_orleans_harbor_pd.csv: fuse/new_orleans_harbor_pd.py data/match/post_event_new_orleans_harbor_pd_2020.csv data/match/cprr_new_orleans_harbor_pd_2020.csv data/clean/pprr_new_orleans_harbor_pd_1991_2008.csv data/clean/pprr_new_orleans_harbor_pd_2020.csv
 	python fuse/new_orleans_harbor_pd.py
@@ -104,6 +105,9 @@ data/fuse/per_new_orleans_so.csv data/fuse/event_new_orleans_so.csv data/fuse/co
 
 data/fuse/per_shreveport_pd.csv data/fuse/event_shreveport_pd.csv data/fuse/com_shreveport_pd.csv: fuse/shreveport_pd.py data/clean/pprr_post_2020_11_06.csv data/match/cprr_shreveport_pd_2018_2019.csv
 	python fuse/shreveport_pd.py
+
+data/fuse/event_lafayette_so.csv data/fuse/com_lafayette_so.csv: fuse/lafayette_so.py data/clean/cprr_lafayette_so_2015_2020.csv data/clean/pprr_post_2020_11_06.csv
+	python fuse/lafayette_so.py
 
 
 
@@ -182,6 +186,8 @@ data/match/cprr_new_orleans_so_2019.csv: match/new_orleans_so.py data/clean/cprr
 data/match/cprr_shreveport_pd_2018_2019.csv: match/shreveport_pd.py data/clean/cprr_shreveport_pd_2018_2019.csv data/clean/pprr_post_2020_11_06.csv
 	python match/shreveport_pd.py
 
+data/match/cprr_lafayette_so_2015_2020.csv: match/lafayette_so.py data/clean/cprr_lafayette_so_2015_2020.csv data/clean/pprr_post_2020_11_06.csv
+	python match/lafayette_so.py
 
 
 data/clean/pprr_new_orleans_harbor_pd_2020.csv data/clean/pprr_new_orleans_harbor_pd_1991_2008.csv: clean/new_orleans_harbor_pd_pprr.py data/new_orleans_harbor_pd/new_orleans_harbor_pd_pprr_2020.csv
@@ -303,3 +309,6 @@ data/clean/cprr_new_orleans_so_2019.csv: clean/new_orleans_so_cprr.py data/new_o
 
 data/clean/cprr_shreveport_pd_2018_2019.csv: clean/shreveport_pd_cprr.py data/shreveport_pd/shreveport_pd_cprr_dispositions_2018.csv data/shreveport_pd/shreveport_pd_cprr_names_2018.csv data/shreveport_pd/shreveport_pd_cprr_dispositions_2019.csv data/shreveport_pd/shreveport_pd_cprr_names_2019.csv
 	python clean/shreveport_pd_cprr.py
+
+data/clean/cprr_lafayette_so_2015_2020.csv: clean/lafayette_so.py data/lafayette_so/lafayette_so_cprr_2015_2020.csv
+	python clean/lafayette_so.py
