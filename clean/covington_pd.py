@@ -27,6 +27,7 @@ def assign_agency(df):
     return df
 
 
+<<<<<<< Updated upstream
 def clean_rank_desc(df):
     df.rank_desc = df.rank_desc.str.lower().str.strip()\
         .str.replace('police ', '', regex=False)\
@@ -38,6 +39,8 @@ def clean_rank_desc(df):
     return df
 
 
+=======
+>>>>>>> Stashed changes
 def clean_actions_history():
     return pd.read_csv(data_file_path(
         'covington_pd/covington_pd_actions_history.csv'
@@ -52,8 +55,12 @@ def clean_actions_history():
         .pipe(assign_agency)\
         .pipe(clean_names, ['first_name', 'last_name', 'middle_initial'])\
         .pipe(gen_uid, ['agency', 'employee_id'])\
+<<<<<<< Updated upstream
         .pipe(standardize_desc_cols, ['rank_desc', 'action_desc'])\
         .pipe(clean_rank_desc)
+=======
+        .pipe(standardize_desc_cols, ['rank_desc', 'action_desc'])
+>>>>>>> Stashed changes
 
 
 def sum_salaries(df):

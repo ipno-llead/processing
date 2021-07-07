@@ -37,6 +37,7 @@ def assign_agency(df):
     return df
 
 
+<<<<<<< Updated upstream
 def clean_rank_desc(df):
     df.rank_desc = df.rank_desc.str.lower().str.strip()\
         .str.replace(r'( ?-| ?/)', '', regex=True)\
@@ -53,6 +54,8 @@ def clean_rank_desc(df):
     return df
 
 
+=======
+>>>>>>> Stashed changes
 def clean():
     return pd.read_csv(data_file_path(
         'caddo_parish_so/caddo_parish_so_pprr_2020.csv'
@@ -70,7 +73,10 @@ def clean():
         .pipe(extract_name)\
         .pipe(clean_salaries, ['salary'])\
         .pipe(standardize_desc_cols, ['rank_desc'])\
+<<<<<<< Updated upstream
         .pipe(clean_rank_desc)\
+=======
+>>>>>>> Stashed changes
         .pipe(assign_agency)\
         .pipe(clean_dates, ['hire_date'])\
         .pipe(clean_names, ['first_name', 'last_name', 'middle_name'])\
