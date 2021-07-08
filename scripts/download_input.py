@@ -7,9 +7,9 @@ from urllib.parse import urlparse, unquote
 
 DATA_FILES = {
     "new_orleans_harbor_pd": [
-        "https://www.dropbox.com/s/oijixpqskkbm63k/new_orleans_harbor_pd_pprr_1991-2008.csv?dl=1", # noqa
-        "https://www.dropbox.com/s/9orpa67xwfuheia/new_orleans_harbor_pd_pprr_2020.csv?dl=1", # noqa
-        "https://www.dropbox.com/s/37ghr57lpq8d5tw/new_orleans_harbor_pd_cprr_2014-2020.csv?dl=1", # noqa
+        "https://www.dropbox.com/s/oijixpqskkbm63k/new_orleans_harbor_pd_pprr_1991-2008.csv?dl=1",  # noqa
+        "https://www.dropbox.com/s/9orpa67xwfuheia/new_orleans_harbor_pd_pprr_2020.csv?dl=1",  # noqa
+        "https://www.dropbox.com/s/37ghr57lpq8d5tw/new_orleans_harbor_pd_cprr_2014-2020.csv?dl=1",  # noqa
     ],
     "new_orleans_csd": [
         "https://www.dropbox.com/sh/ymvc81kjfqqv9m6/AADoEpTWUNef0AMH5GaZxMPea/New%20Orleans_CSD_PPRR_2009_realigned.csv?dl=1",  # noqa
@@ -34,10 +34,11 @@ DATA_FILES = {
     ],
     "louisiana_state_csc": [
         "https://www.dropbox.com/sh/9zndy2dz3w60etq/AAAqcTxDk8GVj3uvQbUto3XBa/Log%20Records/LouisianaState_CSC_LPRR_1991-2020.csv?dl=1",  # noqa
-        "https://www.dropbox.com/s/eidur1nb3od5l55/la_lprr_appellants.csv?dl=1", # noqa
+        "https://www.dropbox.com/s/eidur1nb3od5l55/la_lprr_appellants.csv?dl=1",  # noqa
     ],
     "louisiana_csd": [
-        "https://www.dropbox.com/sh/tca7uxdcm2fqbgq/AAACRDPB2CJJoAcmR2Ws6KAsa/Louisiana_CSD_PPRR_2021.csv?dl=1",  # noqa
+        "https://www.dropbox.com/sh/afmp68wb09jbtif/AABIYkrTYK_-pASqMf5Ysibya/louisiana_csd_pprr_demographics_2021.csv?dl=1",  # noqa
+        "https://www.dropbox.com/sh/afmp68wb09jbtif/AACTN6MNEjsp6sAs5_zCbUhKa/louisiana_csd_pprr_terminations_2021.csv?dl=1",  # noqa
     ],
     "brusly_pd": [
         "https://www.dropbox.com/sh/s3qchv84i0j5tsd/AAAx1lt_f2iqEERkEjK7wj2_a/Complaints%20Data/Brusly_PD_CPRR_2020.csv?dl=1",  # noqa
@@ -76,7 +77,7 @@ DATA_FILES = {
         "https://www.dropbox.com/sh/mwabzn85manxzo6/AACgbqjIwVL3XetaFcQHo-e5a/st_tammany_department_codes_tabula.csv?dl=1",  # noqa
         "https://www.dropbox.com/s/ir4jad3jm13n6se/st_tammany_so_cprr_2011-2020_tabula.csv?dl=1",  # noqa
         "https://www.dropbox.com/s/5o4z29raa7djvsh/st_tammany_so_cprr_2020-2021_tabula.csv?dl=1",  # noqa
-        "https://www.dropbox.com/s/2wsd2y9u2j4miqr/st._tammany_pprr_2020.csv?dl=1", # noqa
+        "https://www.dropbox.com/s/2wsd2y9u2j4miqr/st._tammany_pprr_2020.csv?dl=1",  # noqa
     ],
     "plaquemines_so": [
         "https://www.dropbox.com/s/g1b98kn4e4k1dtr/plaquemines_so_cprr_2019.csv?dl=1",  # noqa
@@ -139,19 +140,19 @@ DATA_FILES = {
         "https://www.dropbox.com/s/x034pjdzxamt3zk/tangipahoa_so_cprr_2015_2021.csv?dl=1",  # noqa
     ],
     "madisonville_pd": [
-        "https://www.dropbox.com/s/u43a9vfwp3hl99e/Madisonville_PD_CPRR_2010-2020_byhand.csv?dl=1", # noqa
-        "https://www.dropbox.com/s/57mvxvuh9pulalf/Madisonville_CSD_PPRR_2019.csv?dl=1", # noqa
-        "https://www.dropbox.com/s/wsqr83x4fhz5j51/Madisonville_CSD_PPRR_2020.csv?dl=1", # noqa
+        "https://www.dropbox.com/s/u43a9vfwp3hl99e/Madisonville_PD_CPRR_2010-2020_byhand.csv?dl=1",  # noqa
+        "https://www.dropbox.com/s/57mvxvuh9pulalf/Madisonville_CSD_PPRR_2019.csv?dl=1",  # noqa
+        "https://www.dropbox.com/s/wsqr83x4fhz5j51/Madisonville_CSD_PPRR_2020.csv?dl=1",  # noqa
     ],
     "mandeville_pd": [
-        "https://www.dropbox.com/s/r65gv24wz7xl2ox/mandeville_pd_cprr_2019_byhand.csv?dl=1", # noqa
-        "https://www.dropbox.com/s/07kbandklabka5x/mandeville_csd_pprr_2020.csv?dl=1", # noqa
+        "https://www.dropbox.com/s/r65gv24wz7xl2ox/mandeville_pd_cprr_2019_byhand.csv?dl=1",  # noqa
+        "https://www.dropbox.com/s/07kbandklabka5x/mandeville_csd_pprr_2020.csv?dl=1",  # noqa
     ],
     "grand_isle": [
-        "https://www.dropbox.com/s/u5jh3bm14kgz3l0/grand_isle_pd_pprr_2021_byhand.csv?dl=1", # noqa
+        "https://www.dropbox.com/s/u5jh3bm14kgz3l0/grand_isle_pd_pprr_2021_byhand.csv?dl=1",  # noqa
     ],
     "lafayette_so": [
-        "https://www.dropbox.com/s/4d9m1y5g4pnlmkj/lafayette_so_cprr_2015_2020.csv?dl=1", # noqa
+        "https://www.dropbox.com/s/4d9m1y5g4pnlmkj/lafayette_so_cprr_2015_2020.csv?dl=1",  # noqa
     ]
 }
 _current_dir = os.path.dirname(os.path.realpath(__file__))

@@ -165,6 +165,7 @@ EVENT_COLUMNS = [
     "sub_division_a_desc",
     "sub_division_b_desc",
     "current_supervisor",
+    "left_reason",
     "employee_class",
     "rank_code",  # rank code
     "rank_desc",  # rank title or description

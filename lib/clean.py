@@ -104,7 +104,7 @@ def clean_dates(df: pd.DataFrame, cols: list[str], expand: bool = True) -> pd.Da
         )
         if expand:
             prefix = col[:-5]
-            dates.columns = [prefix+"_year", prefix+"_month", prefix+"_day"]
+            dates.columns = [prefix + "_year", prefix + "_month", prefix + "_day"]
             df = pd.concat([df, dates], axis=1)
         else:
             df.loc[:, col] = combine_date_columns(dates, 0, 1, 2)
@@ -162,8 +162,8 @@ def clean_datetimes(df: pd.DataFrame, cols: list[str], expand: bool = True) -> p
             df[col].str.strip().map(clean_datetime))
         if expand:
             prefix = col[:-9]
-            dates.columns = [prefix+"_year", prefix +
-                             "_month", prefix+"_day", prefix+"_time"]
+            dates.columns = [prefix + "_year", prefix +
+                             "_month", prefix + "_day", prefix + "_time"]
             df = pd.concat([df, dates], axis=1)
         else:
             df.loc[:, col] = combine_datetime_columns(dates, 0, 1, 2, 3)
@@ -191,7 +191,7 @@ def parse_dates_with_known_format(df: pd.DataFrame, cols: list[str], format: str
         dates = pd.DataFrame.from_records(pd.to_datetime(df[col], format=format).map(lambda x: (
             "", "", "") if pd.isnull(x) else (str(x.year), str(x.month), str(x.day))))
         prefix = col[:-5]
-        dates.columns = [prefix+"_year", prefix+"_month", prefix+"_day"]
+        dates.columns = [prefix + "_year", prefix + "_month", prefix + "_day"]
         df = pd.concat([df, dates], axis=1)
     df = df.drop(columns=cols)
     return df
@@ -230,8 +230,12 @@ def clean_races(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
     """
     for col in cols:
         df.loc[:, col] = df[col].str.strip().str.lower()\
-            .str.replace(r"^w$", "white", regex=True).str.replace(r"^b(lack.+)?$", "black", regex=True)\
-            .str.replace(r"^h$", "hispanic", regex=True).str.replace(r"^unknown.*", "", regex=True)
+            .str.replace(r"^w$", "white", regex=True)\
+            .str.replace(r"^b(lack.+)?$", "black", regex=True)\
+            .str.replace(r"^h$", "hispanic", regex=True)\
+            .str.replace(r"^unknown.*", "", regex=True)\
+            .str.replace(r"^declined to state.+", "", regex=True)\
+            .str.replace(r"islande$", "islander", regex=True)
     return df
 
 
@@ -315,8 +319,8 @@ def names_to_title_case(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
         if col not in cols_set:
             continue
         df.loc[:, col] = df[col].str.title()\
-            .str.replace(r" I(i|ii|v|x)$", lambda m: " I"+m.group(1).upper(), regex=True)\
-            .str.replace(r" V(i|ii|iii)$", lambda m: " V"+m.group(1).upper(), regex=True)
+            .str.replace(r" I(i|ii|v|x)$", lambda m: " I" + m.group(1).upper(), regex=True)\
+            .str.replace(r" V(i|ii|iii)$", lambda m: " V" + m.group(1).upper(), regex=True)
     return df
 
 

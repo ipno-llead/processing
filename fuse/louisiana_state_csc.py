@@ -1,16 +1,17 @@
 from lib.path import data_file_path, ensure_data_dir
 from lib.columns import (
-    rearrange_appeal_hearing_columns
+    rearrange_appeal_hearing_columns,
+    rearrange_event_columns
 )
-from lib.post import keep_latest_row_for_each_post_officer
 from lib.personnel import fuse_personnel
+from lib.uid import ensure_uid_unique
 from lib import events
 import pandas as pd
 import sys
 sys.path.append('../')
 
 
-def fuse_events(lprr, post):
+def fuse_events(lprr, pprr, pprr_term):
     builder = events.Builder()
     builder.extract_events(lprr, {
         events.APPEAL_FILE: {
@@ -20,14 +21,15 @@ def fuse_events(lprr, post):
             'prefix': 'rendered', 'keep': ['uid', 'agency', 'appeal_uid']
         }
     }, ['uid', 'appeal_uid'])
-    builder.extract_events(post, {
-        events.OFFICER_LEVEL_1_CERT: {'prefix': 'level_1_cert', 'parse_date': '%Y-%m-%d', 'keep': [
-            'uid', 'agency'
+    builder.extract_events(pprr, {
+        events.OFFICER_HIRE: {'prefix': 'hire', 'parse_date': True, 'keep': [
+            'uid', 'agency', 'department_desc', 'rank_desc', 'salary', 'salary_freq'
         ]},
-        events.OFFICER_PC_12_QUALIFICATION: {'prefix': 'last_pc_12_qualification', 'parse_date': '%Y-%m-%d', 'keep': [
-            'uid', 'agency'
-        ]},
-        events.OFFICER_HIRE: {'prefix': 'hire', 'keep': ['uid', 'agency']},
+    }, ['uid'])
+    builder.extract_events(pprr_term, {
+        events.OFFICER_LEFT: {'prefix': 'left', 'parse_date': True, 'keep': [
+            'uid', 'agency', 'department_desc', 'rank_desc', 'left_reason',
+        ]}
     }, ['uid'])
     return builder.to_frame()
 
@@ -35,11 +37,22 @@ def fuse_events(lprr, post):
 if __name__ == '__main__':
     lprr = pd.read_csv(data_file_path(
         'match/lprr_louisiana_state_csc_1991_2020.csv'))
-    post = pd.read_csv(data_file_path('clean/pprr_post_2020_11_06.csv'))
-    post = post[post.agency == 'la state police']
-    post.loc[:, 'agency'] = 'Louisiana State Police'
-    per_df = fuse_personnel(lprr, keep_latest_row_for_each_post_officer(post))
-    event_df = fuse_events(lprr, post)
+    pprr = pd.read_csv(data_file_path(
+        'clean/pprr_louisiana_csd_2021.csv'
+    ))
+    pprr_term = pd.read_csv(data_file_path(
+        'match/pprr_term_louisiana_csd_2021.csv'
+    ))
+    post_event = pd.read_csv(data_file_path(
+        'match/post_event_louisiana_state_police_2020.csv'
+    ))
+    per_df = fuse_personnel(pprr, lprr, pprr_term)
+    event_df = fuse_events(lprr, pprr, pprr_term)
+    events_df = rearrange_event_columns(pd.concat([
+        post_event,
+        fuse_events(lprr, pprr, pprr_term)
+    ]))
+    ensure_uid_unique(events_df, 'event_uid', True)
     ensure_data_dir('fuse')
     per_df.to_csv(data_file_path(
         'fuse/per_louisiana_state_police.csv'
