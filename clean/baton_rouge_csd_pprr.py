@@ -51,6 +51,28 @@ def clean_department_desc(df):
     return df
 
 
+def clean_rank_desc(df):
+    df.rank_desc = df.rank_desc.str.lower().str.strip()\
+        .str.replace(r' \b ?i(i)?-?(42 ?/?hrs)?\b', '', regex=True)\
+        .str.replace(r' \(job-?share\)?', '', regex=True)\
+        .str.replace(r'\bof police\b', '', regex=True)\
+        .str.replace(r'off?cr?', 'officer', regex=True)\
+        .str.replace('college student intern/contract', 'college student intern', regex=False)\
+        .str.replace('sergeant', 'sargeant', regex=False)\
+        .str.replace(r'\bspec\b', 'specialist', regex=True)\
+        .str.replace(r'\bmech\b', 'mechanic', regex=True)\
+        .str.replace(r'pol(ice)? ', '', regex=True)\
+        .str.replace('exception job code', '', regex=False)\
+        .str.replace(r'\bcomm\b', 'communications', regex=True)\
+        .str.replace(r'spc$', 'specialist', regex=True)\
+        .str.replace(r'^sr', 'senior', regex=True)\
+        .str.replace(r'tech$', 'technician', regex=True)\
+        .str.replace(r'\binfo\b', 'information', regex=True)\
+        .str.replace(r'supvr$', 'supervisor', regex=True)\
+        .str.replace(r'prog(rammer)?/?sys(tems)? ?analy(st)?', 'programmer and systems analyst', regex=True)
+    return df
+
+
 def clean_17():
     df = pd.read_csv(data_file_path(
         "baton_rouge_csd/baton_rouge_csd_pprr_2017.csv"
@@ -72,9 +94,10 @@ def clean_17():
         'data_production_year': '2017',
         'salary_freq': salary.YEARLY
     }).pipe(clean_salaries, ["salary"])\
-        .pipe(standardize_desc_cols, ["department_desc", "rank_desc"])\
-        .pipe(parse_dates_with_known_format, ["hire_date", "resign_date"], "%m/%d/%Y")\
         .pipe(clean_department_desc)\
+        .pipe(standardize_desc_cols, ["department_desc", "rank_desc"])\
+        .pipe(clean_rank_desc)\
+        .pipe(parse_dates_with_known_format, ["hire_date", "resign_date"], "%m/%d/%Y")\
         .pipe(assign_agency)\
         .pipe(clean_names, ["first_name", "last_name", "middle_initial"])\
         .pipe(gen_uid, [
@@ -108,6 +131,7 @@ def clean_19():
         'salary_freq': salary.YEARLY
     }).drop_duplicates()\
         .pipe(clean_salaries, ["salary"])\
+        .pipe(clean_rank_desc)\
         .pipe(standardize_desc_cols, ["department_desc", "rank_desc"])\
         .pipe(parse_dates_with_known_format, ["hire_date", "resign_date"], "%m/%d/%Y")\
         .pipe(clean_employment_status, ["employment_status"])\
