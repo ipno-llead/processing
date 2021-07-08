@@ -14,6 +14,15 @@ def assign_agency(df, year):
     return df
 
 
+def clean_rank_desc(df):
+    df.rank_desc = df.rank_desc.str.lower().str.strip()\
+        .str.replace(r'(officer )?', '', regex=True)\
+        .str.replace('community policing', 'community service officer', regex=False)\
+        .str.replace('sergeant', 'sargeant', regex=False)\
+        .str.replace('police ', '', regex=False)
+    return df
+
+
 def clean_pprr_20():
     return pd.read_csv(data_file_path('mandeville_pd/mandeville_csd_pprr_2020.csv'))\
         .pipe(clean_column_names)\
@@ -27,6 +36,7 @@ def clean_pprr_20():
         .pipe(clean_dates, ['hire_date', 'term_date'])\
         .pipe(float_to_int_str, ['term_year', 'term_day', 'term_month', 'hire_year', 'hire_day', 'hire_month'])\
         .pipe(standardize_desc_cols, ['rank_desc'])\
+        .pipe(clean_rank_desc)\
         .pipe(set_values, {'salary_freq': salary.YEARLY})\
         .pipe(clean_salaries, ['salary'])\
         .pipe(clean_races, ['race'])\

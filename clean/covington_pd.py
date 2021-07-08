@@ -27,6 +27,17 @@ def assign_agency(df):
     return df
 
 
+def clean_rank_desc(df):
+    df.rank_desc = df.rank_desc.str.lower().str.strip()\
+        .str.replace('police ', '', regex=False)\
+        .str.replace(r' i\b', '', regex=True)\
+        .str.replace(r'^tac', '', regex=True)\
+        .str.replace('&', '', regex=False)\
+        .str.replace('  admin suppport spe', ' administrative support specialist', regex=False)\
+        .str.replace(r'^ ', '', regex=True)
+    return df
+
+
 def clean_actions_history():
     return pd.read_csv(data_file_path(
         'covington_pd/covington_pd_actions_history.csv'
@@ -41,7 +52,8 @@ def clean_actions_history():
         .pipe(assign_agency)\
         .pipe(clean_names, ['first_name', 'last_name', 'middle_initial'])\
         .pipe(gen_uid, ['agency', 'employee_id'])\
-        .pipe(standardize_desc_cols, ['rank_desc', 'action_desc'])
+        .pipe(standardize_desc_cols, ['rank_desc', 'action_desc'])\
+        .pipe(clean_rank_desc)
 
 
 def sum_salaries(df):
