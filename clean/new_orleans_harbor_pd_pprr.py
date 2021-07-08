@@ -16,14 +16,27 @@ def assign_agency(df, year):
     return df
 
 
+<<<<<<< HEAD
 def clean_rank_desc(df):
     df.rank_desc = df.rank_desc.str.lower().str.strip()\
         .str.replace(r'(police|policy)?', '', regex=True)\
+=======
+<<<<<<< Updated upstream
+def clean_rank_desc(df):
+    df.rank_desc = df.rank_desc.str.lower().str.strip()\
+        .str.replace(r'(police|policy)?', '', regex=True)\
+        .str.replace('sergeant', 'sargeant', regex=False)\
+>>>>>>> 993648416e8c9cf8c8eb8647a6b77e935d63cf7d
         .str.replace('admin', 'administrative', regex=False)\
         .str.replace(r' ?(1|2|2$|3|4$)?(-+)?(\ba\b|port)?$', '', regex=True)
     return df
 
 
+<<<<<<< HEAD
+=======
+=======
+>>>>>>> Stashed changes
+>>>>>>> 993648416e8c9cf8c8eb8647a6b77e935d63cf7d
 def assign_pay_date_and_rank_date(df):
     df = df.sort_values(['uid', 'effective_date'], ignore_index=True)\
         .drop_duplicates(ignore_index=True)
@@ -59,7 +72,14 @@ def clean_personnel_2008():
         "term_date": "resign_date",
     })
     return df\
+<<<<<<< HEAD
         .pipe(clean_rank_desc)\
+=======
+<<<<<<< Updated upstream
+        .pipe(clean_rank_desc)\
+=======
+>>>>>>> Stashed changes
+>>>>>>> 993648416e8c9cf8c8eb8647a6b77e935d63cf7d
         .pipe(standardize_desc_cols, ["rank_desc"])\
         .pipe(set_values, {'salary_freq': salary.HOURLY})\
         .pipe(clean_salaries, ["salary"])\
@@ -89,7 +109,14 @@ def clean_personnel_2020():
     return df\
         .pipe(set_values, {'salary_freq': salary.HOURLY})\
         .pipe(clean_salaries, ['salary'])\
+<<<<<<< HEAD
         .pipe(clean_rank_desc)\
+=======
+<<<<<<< Updated upstream
+        .pipe(clean_rank_desc)\
+=======
+>>>>>>> Stashed changes
+>>>>>>> 993648416e8c9cf8c8eb8647a6b77e935d63cf7d
         .pipe(standardize_desc_cols, ['rank_desc'])\
         .pipe(assign_agency, 2020)\
         .pipe(clean_names, ["last_name", "middle_initial", "first_name"])\

@@ -30,6 +30,7 @@ def assign_agency(df):
     return df
 
 
+<<<<<<< HEAD
 def clean_rank_desc(df):
     df.rank_desc = df.rank_desc.str.lower().str.strip()\
         .str.replace(r' \(d.\)$', '', regex=True)\
@@ -37,6 +38,18 @@ def clean_rank_desc(df):
     return df 
 
 
+=======
+<<<<<<< Updated upstream
+def clean_rank_desc(df):
+    df.rank_desc = df.rank_desc.str.lower().str.strip()\
+        .str.replace(r' \(d.\)$', '', regex=True)\
+        .str.replace(r'sergeant ?(officer)?', 'sargeant', regex=True)
+    return df 
+
+
+=======
+>>>>>>> Stashed changes
+>>>>>>> 993648416e8c9cf8c8eb8647a6b77e935d63cf7d
 def clean():
     return pd.read_csv(data_file_path(
         'gretna_pd/gretna_pd_pprr_2018.csv'
@@ -51,7 +64,14 @@ def clean():
         .pipe(clean_salaries, ['salary'])\
         .pipe(clean_dates, ['hire_date'])\
         .pipe(standardize_desc_cols, ['rank_desc'])\
+<<<<<<< HEAD
         .pipe(clean_rank_desc)\
+=======
+<<<<<<< Updated upstream
+        .pipe(clean_rank_desc)\
+=======
+>>>>>>> Stashed changes
+>>>>>>> 993648416e8c9cf8c8eb8647a6b77e935d63cf7d
         .pipe(assign_agency)\
         .pipe(gen_uid, ['agency', 'first_name', 'middle_name', 'last_name'])
 
