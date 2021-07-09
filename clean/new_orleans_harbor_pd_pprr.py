@@ -16,6 +16,14 @@ def assign_agency(df, year):
     return df
 
 
+def clean_rank_desc(df):
+    df.rank_desc = df.rank_desc.str.lower().str.strip()\
+        .str.replace(r'(police|policy)?', '', regex=True)\
+        .str.replace('admin', 'administrative', regex=False)\
+        .str.replace(r' ?(1|2|2$|3|4$)?(-+)?(\ba\b|port)?$', '', regex=True)
+    return df
+
+
 def assign_pay_date_and_rank_date(df):
     df = df.sort_values(['uid', 'effective_date'], ignore_index=True)\
         .drop_duplicates(ignore_index=True)
@@ -51,6 +59,7 @@ def clean_personnel_2008():
         "term_date": "resign_date",
     })
     return df\
+        .pipe(clean_rank_desc)\
         .pipe(standardize_desc_cols, ["rank_desc"])\
         .pipe(set_values, {'salary_freq': salary.HOURLY})\
         .pipe(clean_salaries, ["salary"])\
@@ -80,6 +89,7 @@ def clean_personnel_2020():
     return df\
         .pipe(set_values, {'salary_freq': salary.HOURLY})\
         .pipe(clean_salaries, ['salary'])\
+        .pipe(clean_rank_desc)\
         .pipe(standardize_desc_cols, ['rank_desc'])\
         .pipe(assign_agency, 2020)\
         .pipe(clean_names, ["last_name", "middle_initial", "first_name"])\
