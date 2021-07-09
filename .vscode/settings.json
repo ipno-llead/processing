@@ -1,7 +1,6 @@
 {
-    "jupyter.jupyterServerType": "local",
-    "python.pythonPath": "C:\\Users\\AyyubI\\AppData\\Local\\Programs\\Python\\Python39\\python.exe",
-    "python.linting.pylintEnabled": false,
-    "python.linting.flake8Enabled": true,
-    "python.linting.enabled": true
+  "jupyter.jupyterServerType": "local",
+  "python.linting.pylintEnabled": false,
+  "python.linting.flake8Enabled": true,
+  "python.linting.enabled": true
 }
