@@ -37,10 +37,6 @@ def assign_agency(df):
     return df
 
 
-<<<<<<< HEAD
-=======
-<<<<<<< Updated upstream
->>>>>>> 993648416e8c9cf8c8eb8647a6b77e935d63cf7d
 def clean_rank_desc(df):
     df.rank_desc = df.rank_desc.str.lower().str.strip()\
         .str.replace(r'( ?-| ?/)', '', regex=True)\
@@ -51,20 +47,11 @@ def clean_rank_desc(df):
         .str.replace('lpnexec asstmen hit sup', 'executive assistant', regex=False)\
         .str.replace(r' prior service (sr)? ?(dep|corporal)?', '', regex=True)\
         .str.replace(r' parttime employ(ee)? hourly', '', regex=True)\
-<<<<<<< HEAD
-=======
-        .str.replace('sergeant', 'sargeant', regex=False)\
->>>>>>> 993648416e8c9cf8c8eb8647a6b77e935d63cf7d
         .str.replace(r'tco ?(i[il])? ?accoutant ?video', 'accountant', regex=True)\
         .str.replace(r'special managers$', '', regex=True)
     return df
 
 
-<<<<<<< HEAD
-=======
-=======
->>>>>>> Stashed changes
->>>>>>> 993648416e8c9cf8c8eb8647a6b77e935d63cf7d
 def clean():
     return pd.read_csv(data_file_path(
         'caddo_parish_so/caddo_parish_so_pprr_2020.csv'
@@ -82,14 +69,7 @@ def clean():
         .pipe(extract_name)\
         .pipe(clean_salaries, ['salary'])\
         .pipe(standardize_desc_cols, ['rank_desc'])\
-<<<<<<< HEAD
         .pipe(clean_rank_desc)\
-=======
-<<<<<<< Updated upstream
-        .pipe(clean_rank_desc)\
-=======
->>>>>>> Stashed changes
->>>>>>> 993648416e8c9cf8c8eb8647a6b77e935d63cf7d
         .pipe(assign_agency)\
         .pipe(clean_dates, ['hire_date'])\
         .pipe(clean_names, ['first_name', 'last_name', 'middle_name'])\

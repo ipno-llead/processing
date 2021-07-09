@@ -1,6 +1,6 @@
 from lib.columns import clean_column_names, set_values
 from lib.clean import (
-    clean_names, parse_dates_with_known_format, clean_salaries, standardize_desc_cols,
+    clean_names, parse_dates_with_known_format, clean_salaries, standardize_desc_cols, 
     clean_employment_status
 )
 from lib.path import data_file_path, ensure_data_dir
@@ -58,10 +58,6 @@ def clean_rank_desc(df):
         .str.replace(r'\bof police\b', '', regex=True)\
         .str.replace(r'off?cr?', 'officer', regex=True)\
         .str.replace('college student intern/contract', 'college student intern', regex=False)\
-<<<<<<< HEAD
-=======
-        .str.replace('sergeant', 'sargeant', regex=False)\
->>>>>>> 993648416e8c9cf8c8eb8647a6b77e935d63cf7d
         .str.replace(r'\bspec\b', 'specialist', regex=True)\
         .str.replace(r'\bmech\b', 'mechanic', regex=True)\
         .str.replace(r'pol(ice)? ', '', regex=True)\

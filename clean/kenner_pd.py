@@ -50,17 +50,8 @@ def clean():
         .pipe(standardize_desc_cols, [
             'sex', 'department_desc', 'rank_desc', 'employment_status', 'officer_inactive', 'sworn'])\
         .pipe(remove_non_officers)\
-<<<<<<< HEAD
         .pipe(clean_dates, ['hire_date'])\
         .pipe(clean_rank)
-=======
-<<<<<<< Updated upstream
-        .pipe(clean_dates, ['hire_date'])\
-        .pipe(clean_rank)
-=======
-        .pipe(clean_dates, ['hire_date'])
->>>>>>> Stashed changes
->>>>>>> 993648416e8c9cf8c8eb8647a6b77e935d63cf7d
 
 
 def drop_volunteers(df):
@@ -88,27 +79,14 @@ def clean_rank(df):
         .str.replace(r'coll\.', 'collector', regex=True)\
         .str.replace(r'invest.', 'investigator', regex=True)\
         .str.replace(r' prop\.', ' property', regex=True)\
-<<<<<<< HEAD
-        .str.replace(r' (\bi[il]?\b)', '', regex=True)\
-        .str.replace(r' maint$', ' maintainer', regex=True)\
-=======
-<<<<<<< Updated upstream
         .str.replace(r' (\bi[il]?\b)', '', regex=True)\
         .str.replace(r' maint$', ' maintainer', regex=True)\
         .str.replace('sergeant', 'sargeant', regex=False)\
->>>>>>> 993648416e8c9cf8c8eb8647a6b77e935d63cf7d
         .str.replace(r' - ', ' ', regex=False)\
         .str.replace("chief's secretary", 'secretary to the chief', regex=False)\
         .str.replace(r'super$', 'superintendent', regex=True)\
         .str.replace('emerg mgm speci', 'emergency mgm specialist', regex=False)\
         .str.replace(r'\bco\b', 'coordinator', regex=True)
-<<<<<<< HEAD
-=======
-=======
-        .str.replace(r' il$', ' ii', regex=True)\
-        .str.replace(r' maint$', ' maintainer', regex=True)
->>>>>>> Stashed changes
->>>>>>> 993648416e8c9cf8c8eb8647a6b77e935d63cf7d
     return df
 
 
