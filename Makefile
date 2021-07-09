@@ -26,7 +26,10 @@ all: data/fuse/per_vivian_pd.csv data/fuse/event_vivian_pd.csv
 all: data/fuse/per_covington_pd.csv data/fuse/event_covington_pd.csv
 all: data/fuse/per_slidell_pd.csv data/fuse/event_slidell_pd.csv
 all: data/fuse/per_scott_pd.csv data/fuse/event_scott_pd.csv data/fuse/com_scott_pd.csv
+all: data/fuse/event_tangipahoa_so.csv data/fuse/com_tangipahoa_so.csv
 all: data/fuse/per_new_orleans_so.csv data/fuse/event_new_orleans_so.csv data/fuse/com_new_orleans_so.csv
+all: data/fuse/per_shreveport_pd.csv data/fuse/event_shreveport_pd.csv data/fuse/com_shreveport_pd.csv
+all: data/fuse/event_lafayette_so.csv data/fuse/per_lafayette_so.csv data/fuse/com_lafayette_so.csv 
 
 data/fuse/per_new_orleans_harbor_pd.csv data/fuse/event_new_orleans_harbor_pd.csv data/fuse/com_new_orleans_harbor_pd.csv: fuse/new_orleans_harbor_pd.py data/match/post_event_new_orleans_harbor_pd_2020.csv data/match/cprr_new_orleans_harbor_pd_2020.csv data/clean/pprr_new_orleans_harbor_pd_1991_2008.csv data/clean/pprr_new_orleans_harbor_pd_2020.csv
 	python fuse/new_orleans_harbor_pd.py
@@ -94,8 +97,17 @@ data/fuse/per_slidell_pd.csv data/fuse/event_slidell_pd.csv: fuse/slidell_pd.py 
 data/fuse/per_scott_pd.csv data/fuse/com_scott_pd.csv data/fuse/event_scott_pd.csv: fuse/scott_pd.py data/match/post_event_scott_pd_2021.csv data/clean/pprr_scott_pd_2021.csv
 	python fuse/scott_pd.py
 
+data/fuse/com_tangipahoa_so.csv data/fuse/event_tangipahoa_so.csv: fuse/tangipahoa_so.py data/match/post_event_tangipahoa_so_2015_2021.csv data/clean/cprr_tangipahoa_so_2015_2021.csv
+	python fuse/tangipahoa_so.py
+
 data/fuse/per_new_orleans_so.csv data/fuse/event_new_orleans_so.csv data/fuse/com_new_orleans_so.csv: fuse/new_orleans_so.py data/clean/pprr_post_2020_11_06.csv data/match/cprr_new_orleans_so_2019.csv
 	python fuse/new_orleans_so.py
+
+data/fuse/per_shreveport_pd.csv data/fuse/event_shreveport_pd.csv data/fuse/com_shreveport_pd.csv: fuse/shreveport_pd.py data/clean/pprr_post_2020_11_06.csv data/match/cprr_shreveport_pd_2018_2019.csv
+	python fuse/shreveport_pd.py
+
+data/fuse/event_lafayette_so.csv data/fuse/per_lafayette_so.csv data/fuse/com_lafayette_so.csv: fuse/lafayette_so.py data/clean/cprr_lafayette_so_2015_2020.csv data/clean/pprr_post_2020_11_06.csv
+	python fuse/lafayette_so.py
 
 
 
@@ -165,9 +177,17 @@ data/match/post_event_slidell_pd_2020.csv: match/slidell_pd.py data/clean/pprr_s
 data/match/post_event_scott_pd_2021.csv: match/scott_pd.py data/clean/cprr_scott_pd_2020.csv data/clean/pprr_scott_pd_2021.csv data/clean/pprr_post_2020_11_06.csv
 	python match/scott_pd.py
 
+data/match/cprr_tangipahoa_so_2015_2021.csv: match/tangipahoa_so.py data/clean/cprr_tangipahoa_so_2015_2021.csv data/clean/pprr_post_2020_11_06.csv
+	python match/tangipahoa_so.py
+	
 data/match/cprr_new_orleans_so_2019.csv: match/new_orleans_so.py data/clean/cprr_new_orleans_so_2019.csv data/clean/pprr_post_2020_11_06.csv
 	python match/new_orleans_so.py
 
+data/match/cprr_shreveport_pd_2018_2019.csv: match/shreveport_pd.py data/clean/cprr_shreveport_pd_2018_2019.csv data/clean/pprr_post_2020_11_06.csv
+	python match/shreveport_pd.py
+
+data/match/cprr_lafayette_so_2015_2020.csv: match/lafayette_so.py data/clean/cprr_lafayette_so_2015_2020.csv data/clean/pprr_post_2020_11_06.csv
+	python match/lafayette_so.py
 
 
 data/clean/pprr_new_orleans_harbor_pd_2020.csv data/clean/pprr_new_orleans_harbor_pd_1991_2008.csv: clean/new_orleans_harbor_pd_pprr.py data/new_orleans_harbor_pd/new_orleans_harbor_pd_pprr_2020.csv
@@ -197,10 +217,10 @@ data/clean/pprr_brusly_pd_2020.csv data/clean/cprr_brusly_pd_2020.csv data/clean
 data/clean/cprr_port_allen_pd_2019.csv data/clean/cprr_port_allen_pd_2017_2018.csv data/clean/cprr_port_allen_pd_2015_2016.csv: clean/port_allen_pd_cprr.py data/port_allen_pd/port_allen_cprr_2019.csv data/port_allen_pd/port_allen_cprr_2017-2018_byhand.csv data/port_allen_pd/port_allen_cprr_2015-2016_byhand.csv
 	python clean/port_allen_pd_cprr.py
 
-data/clean/cprr_madisonville_pd_2010_2020.csv: clean/madisonville_pd_cprr.py data/madisonville_pd/madisonville_pd_cprr_2010-2020.csv
+data/clean/cprr_madisonville_pd_2010_2020.csv: clean/madisonville_pd_cprr.py data/madisonville_pd/madisonville_pd_cprr_2010-2020_byhand.csv
 	python clean/madisonville_pd_cprr.py
 
-data/clean/pprr_madisonville_csd_2019.csv: clean/madisonville_csd_pprr.py data/madisonville_csd/madisonville_csd_pprr_2019.csv
+data/clean/pprr_madisonville_csd_2019.csv: clean/madisonville_csd_pprr.py data/madisonville_pd/madisonville_csd_pprr_2019.csv
 	python clean/madisonville_csd_pprr.py
 
 data/clean/pprr_post_2020_11_06.csv: clean/post_pprr.py data/post_council/post_pprr_11-6-2020.csv
@@ -275,11 +295,20 @@ data/clean/actions_history_covington_pd_2021.csv data/clean/pprr_covington_pd_20
 data/clean/pprr_slidell_pd_2019.csv: clean/slidell_pd.py data/slidell_pd/slidell_pd_pprr_2009.csv data/slidell_pd/slidell_pd_pprr_2019.csv
 	python clean/slidell_pd.py
 
-data/clean/cprr_scott_pd_cprr_2020.csv: clean/scott_pd_cprr.py data/scott_pd/scott_pd_cprr_2020.csv
+data/clean/cprr_scott_pd_2020.csv: clean/scott_pd_cprr.py data/scott_pd/scott_pd_cprr_2020.csv
 	python clean/scott_pd_cprr.py
 
 data/clean/pprr_scott_pd_2021.csv: clean/scott_pd_pprr.py data/scott_pd/scott_pd_pprr_2021.csv
 	python clean/scott_pd_pprr.py
 
+data/clean/cprr_tangipahoa_so_2015_2021.csv: clean/tangipahoa_so_cprr.py data/tangipahoa_so/tangipahoa_so_cprr_2015_2021.csv
+	python clean/tangipahoa_so_cprr.py
+
 data/clean/cprr_new_orleans_so_2019.csv: clean/new_orleans_so_cprr.py data/new_orleans_so/new_orleans_so_cprr_2019_tabula.csv
 	python clean/new_orleans_so_cprr.py
+
+data/clean/cprr_shreveport_pd_2018_2019.csv: clean/shreveport_pd_cprr.py data/shreveport_pd/shreveport_pd_cprr_dispositions_2018.csv data/shreveport_pd/shreveport_pd_cprr_names_2018.csv data/shreveport_pd/shreveport_pd_cprr_dispositions_2019.csv data/shreveport_pd/shreveport_pd_cprr_names_2019.csv
+	python clean/shreveport_pd_cprr.py
+
+data/clean/cprr_lafayette_so_2015_2020.csv: clean/lafayette_so.py data/lafayette_so/lafayette_so_cprr_2015_2020.csv
+	python clean/lafayette_so.py

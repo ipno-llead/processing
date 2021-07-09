@@ -1,7 +1,7 @@
 from lib.path import data_file_path, ensure_data_dir
 from lib.columns import clean_column_names
 from lib.clean import (
-    clean_races, float_to_int_str, standardize_desc_cols, clean_sexes, clean_names
+    clean_races, float_to_int_str, standardize_desc_cols, clean_sexes, clean_names, clean_dates
 )
 from lib.uid import gen_uid
 import pandas as pd
@@ -10,7 +10,7 @@ sys.path.append("../")
 
 
 def remove_badge_number_zeroes_prefix(df):
-    df.loc[:, 'badge_no'] = df.badge_no.str.replace(r'^0+', '')
+    df.loc[:, 'badge_no'] = df.badge_no.str.replace(r'^0+', '', regex=True)
     return df
 
 
@@ -19,19 +19,9 @@ def clean_employee_type(df):
         r'commisioned', 'commissioned')
     return df
 
-
-def split_dates(df, cols):
+def strip_time_from_dates(df, cols):
     for col in cols:
-        assert col.endswith('_date')
-        dates = df[col].fillna('').str.replace(r' \d{2}:\d{2}:\d{2}$', '')\
-            .str.split('-', expand=True)
-        prefix = col[:-5]
-        dates.columns = [prefix+"_year", prefix+"_month", prefix+"_day"]
-        for date_col in dates.columns:
-            dates.loc[:, date_col] = dates[date_col].where(
-                ~dates[date_col].isnull(), "")
-        df = pd.concat([df, dates], axis=1)
-    df = df.drop(columns=cols)
+        df.loc[:, col] = df[col].str.replace(r' \d+:\d+$', '', regex=True)
     return df
 
 
@@ -60,9 +50,53 @@ def remove_unnamed_officers(df):
     return df[df.last_name != ''].reset_index(drop=True)
 
 
+def clean_department_desc(df):
+    df.department_desc = df.department_desc.str.lower().str.strip()\
+        .str.replace(r'(fob|isb|msb|pib|not) - ', '', regex=True)\
+        .str.replace(r'\bservice\b', 'services', regex=True)\
+        .str.replace('nopd officer', '', regex=False)
+    return df
+
+
+def clean_rank_desc(df):
+    df.rank_desc = df.rank_desc.str.lower().str.strip()\
+        .str.replace('.', '', regex=False)\
+        .str.replace(r' ?police', '', regex=True)\
+        .str.replace(r'dec$', 'decree', regex=True)\
+        .str.replace('supt', 'superintendent', regex=False)\
+        .str.replace(r'\bdev(e)?\b', 'development', regex=True)\
+        .str.replace(',', ' ', regex=False)\
+        .str.replace(r'iv$', '', regex=True)\
+        .str.replace(r' ?-', ' ', regex=True)\
+        .str.replace(r'(ii?i?|1|2|3|4)?$', '', regex=True)\
+        .str.replace(r'spec$', 'specialist', regex=True)\
+        .str.replace(r'sup(v)?$', 'supervisor', regex=True)\
+        .str.replace(r'\basst\b', 'assistant', regex=True)\
+        .str.replace(' ?sr', 'senior', regex=True)\
+        .str.replace(r' ?mgr', 'manager', regex=True)\
+        .str.replace(' academy', '', regex=False)\
+        .str.replace(r' \boff\b ?', ' officer', regex=True)\
+        .str.replace(r' of$', '', regex=True)\
+        .str.replace(r' analyt?', 'analyst', regex=True)\
+        .str.replace(r'(3|4|&|5)', '', regex=True)\
+        .str.replace(' coor', ' coordinator', regex=False)\
+        .str.replace(r'\bopr\b', 'operations', regex=True)\
+        .str.replace('default', '', regex=False)\
+        .str.replace(r'\bspec\b', 'specialist', regex=True)\
+        .str.replace('recov', 'recovery', regex=False)\
+        .str.replace(r'\bprog\b', 'program', regex=True)\
+        .str.replace(r'\btech\b', 'technician', regex=True)\
+        .str.replace('applic', 'application', regex=False)\
+        .str.replace(r'^admin', 'administrative', regex=True)\
+        .str.replace(r' \(nopd\)$', '', regex=True)\
+        .str.replace('cnslr', 'counseler', regex=False)\
+        .str.replace('info', 'information,', regex=False)
+    return df
+
+
 def clean():
     df = pd.read_csv(data_file_path(
-        "ipm/new_orleans_iapro_pprr_1946-2018.csv"))
+        "ipm/new_orleans_iapro_pprr_1946-2018.csv"), sep='\t')
     df = df.dropna(axis=1, how="all")
     df = clean_column_names(df)
     df = df.drop(columns=[
@@ -86,15 +120,18 @@ def clean():
     return df\
         .pipe(float_to_int_str, ["years_employed", "current_supervisor", 'birth_year'])\
         .pipe(remove_badge_number_zeroes_prefix)\
+        .pipe(clean_rank_desc)\
         .pipe(standardize_desc_cols, [
             "rank_desc", "employment_status", "officer_inactive", "department_desc"
         ])\
         .pipe(clean_employee_type)\
         .pipe(clean_sexes, ['sex'])\
         .pipe(clean_races, ['race'])\
+        .pipe(clean_department_desc)\
         .pipe(assign_agency)\
         .pipe(gen_uid, ['agency', 'employee_id'])\
-        .pipe(split_dates, ['hire_date', 'left_date', 'dept_date'])\
+        .pipe(strip_time_from_dates, ['hire_date', 'left_date', 'dept_date'])\
+        .pipe(clean_dates, ['hire_date', 'left_date', 'dept_date'])\
         .pipe(clean_names, ['first_name', 'middle_name', 'last_name'])\
         .pipe(remove_unnamed_officers)\
         .pipe(generate_middle_initial)\
