@@ -14,7 +14,7 @@ all: data/fuse/com_new_orleans_pd.csv data/fuse/uof_new_orleans_pd.csv data/fuse
 all: data/match/cprr_new_orleans_da_2021.csv
 all: data/fuse/per_st_tammany_so.csv data/fuse/event_st_tammany_so.csv data/fuse/com_st_tammany_so.csv
 all: data/fuse/com_plaquemines_so.csv data/fuse/per_plaquemines_so.csv data/fuse/event_plaquemines_so.csv
-all: data/fuse/per_louisiana_state_police.csv data/fuse/event_louisiana_state_police.csv data/fuse/app_louisiana_state_police.csv
+# all: data/fuse/per_louisiana_state_police.csv data/fuse/event_louisiana_state_police.csv data/fuse/app_louisiana_state_police.csv
 all: data/match/cprr_baton_rouge_da_2021.csv
 all: data/fuse/per_caddo_parish_so.csv data/fuse/event_caddo_parish_so.csv
 all: data/fuse/event_mandeville_pd.csv data/fuse/com_mandeville_pd.csv data/fuse/per_mandeville_pd.csv
