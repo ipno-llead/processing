@@ -14,7 +14,7 @@ all: data/fuse/com_new_orleans_pd.csv data/fuse/uof_new_orleans_pd.csv data/fuse
 all: data/match/cprr_new_orleans_da_2021.csv
 all: data/fuse/per_st_tammany_so.csv data/fuse/event_st_tammany_so.csv data/fuse/com_st_tammany_so.csv
 all: data/fuse/com_plaquemines_so.csv data/fuse/per_plaquemines_so.csv data/fuse/event_plaquemines_so.csv
-all: data/fuse/per_louisiana_state_police.csv data/fuse/event_louisiana_state_police.csv data/fuse/app_louisiana_state_police.csv
+# all: data/fuse/per_louisiana_state_police.csv data/fuse/event_louisiana_state_police.csv data/fuse/app_louisiana_state_police.csv
 all: data/match/cprr_baton_rouge_da_2021.csv
 all: data/fuse/per_caddo_parish_so.csv data/fuse/event_caddo_parish_so.csv
 all: data/fuse/event_mandeville_pd.csv data/fuse/com_mandeville_pd.csv data/fuse/per_mandeville_pd.csv
@@ -61,7 +61,7 @@ data/fuse/per_st_tammany_so.csv data/fuse/event_st_tammany_so.csv data/fuse/com_
 data/fuse/com_plaquemines_so.csv data/fuse/per_plaquemines_so.csv data/fuse/event_plaquemines_so.csv: fuse/plaquemines_so.py data/match/cprr_plaquemines_so_2019.csv data/clean/pprr_post_2020_11_06.csv
 	python fuse/plaquemines_so.py
 
-data/fuse/per_louisiana_state_police.csv data/fuse/event_louisiana_state_police.csv data/fuse/app_louisiana_state_police.csv: fuse/louisiana_state_csc.py data/match/lprr_louisiana_state_csc_1991_2020.csv data/clean/pprr_post_2020_11_06.csv
+data/fuse/per_louisiana_state_police.csv data/fuse/event_louisiana_state_police.csv data/fuse/app_louisiana_state_police.csv: fuse/louisiana_state_csc.py data/match/lprr_louisiana_state_csc_1991_2020.csv data/match/post_event_louisiana_state_police_2020.csv data/clean/pprr_louisiana_csd_2021.csv
 	python fuse/louisiana_state_csc.py
 
 data/match/post_event_new_orleans_pd.csv: match/new_orleans_pd.py data/clean/pprr_post_2020_11_06.csv data/clean/pprr_new_orleans_pd_1946_2018.csv
@@ -144,7 +144,7 @@ data/match/cprr_st_tammany_so_2011_2021.csv data/match/post_event_st_tammany_so_
 data/match/cprr_plaquemines_so_2019.csv: match/plaquemines_so.py data/clean/cprr_plaquemines_so_2019.csv
 	python match/plaquemines_so.py
 
-data/match/lprr_louisiana_state_csc_1991_2020.csv: match/louisiana_state_csc.py data/clean/lprr_louisiana_state_csc_1991_2020.csv data/clean/pprr_post_2020_11_06.csv data/clean/pprr_louisiana_csd_2021.csv
+data/match/lprr_louisiana_state_csc_1991_2020.csv data/match/post_event_louisiana_state_police_2020.csv: match/louisiana_state_csc.py data/clean/lprr_louisiana_state_csc_1991_2020.csv data/clean/pprr_post_2020_11_06.csv data/clean/pprr_louisiana_csd_2021.csv
 	python match/louisiana_state_csc.py
 
 data/match/post_event_mandeville_pd_2019.csv data/match/cprr_mandeville_pd_2019.csv: match/mandeville_pd.py data/clean/pprr_mandeville_csd_2020.csv data/clean/pprr_post_2020_11_06.csv data/clean/cprr_mandeville_pd_2019.csv
