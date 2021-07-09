@@ -60,6 +60,7 @@ def stack_disposition_rows(df):
 
 def clean_allegation(df):
     df.loc[:, 'allegation'] = df.allegation.str.strip().str.lower()\
+        .str.replace(r'(\d+),(\d+)', r'\1.\2', regex=True)\
         .str.replace(r'chain of( co?)?$', 'chain of command', regex=True)\
         .str.replace(r'sick le$', 'sick leave', regex=True)\
         .str.replace(r'courtes$', 'courtesy', regex=True)\
@@ -71,7 +72,8 @@ def clean_allegation(df):
         .str.replace(r'misdem$', 'misdemeanor', regex=True)\
         .str.replace(r'evidenc$', 'evidencence', regex=True)\
         .str.replace(r'felony/misd$', 'felony/misdemeanor', regex=True)\
-        .str.replace(r'unbeco$', 'unbecoming', regex=True)
+        .str.replace(r'unbeco$', 'unbecoming', regex=True)\
+        .str.replace(r'^(spd|scj|sfd|scja) ?', '', regex=True)
     return df
 
 
@@ -195,6 +197,16 @@ def clean_cprr(disposition_file, name_file, year):
         .reset_index(drop=True)
 
 
+def clean_codebook():
+    df = pd.read_csv(data_file_path(
+        'shreveport_pd/shreveport_codebook.csv'
+    ), names=['name', 'code'])
+    df.loc[:, 'name'] = df.name.str.strip().str.lower()
+    df.loc[:, 'code'] = df.code.str.strip()\
+        .str.replace(r'(\d+),(\d+)', r'\1\.\2', regex=True)
+    return df
+
+
 if __name__ == '__main__':
     df = pd.concat([
         clean_cprr(
@@ -208,7 +220,11 @@ if __name__ == '__main__':
             '2019',
         ),
     ])
+    cb_df = clean_codebook()
     ensure_data_dir('clean')
     df.to_csv(data_file_path(
         'clean/cprr_shreveport_pd_2018_2019.csv'
+    ), index=False)
+    cb_df.to_csv(data_file_path(
+        'clean/cprr_codebook_shreveport_pd.csv'
     ), index=False)

@@ -179,7 +179,7 @@ data/match/cprr_tangipahoa_so_2015_2021.csv: match/tangipahoa_so.py data/clean/c
 data/match/cprr_new_orleans_so_2019.csv: match/new_orleans_so.py data/clean/cprr_new_orleans_so_2019.csv data/clean/pprr_post_2020_11_06.csv
 	python match/new_orleans_so.py
 
-data/match/cprr_shreveport_pd_2018_2019.csv: match/shreveport_pd.py data/clean/cprr_shreveport_pd_2018_2019.csv data/clean/pprr_post_2020_11_06.csv
+data/match/cprr_shreveport_pd_2018_2019.csv: match/shreveport_pd.py data/clean/cprr_shreveport_pd_2018_2019.csv data/clean/pprr_post_2020_11_06.csv data/clean/cprr_codebook_shreveport_pd.csv
 	python match/shreveport_pd.py
 
 
@@ -301,5 +301,5 @@ data/clean/cprr_tangipahoa_so_2015_2021.csv: clean/tangipahoa_so_cprr.py data/ta
 data/clean/cprr_new_orleans_so_2019.csv: clean/new_orleans_so_cprr.py data/new_orleans_so/new_orleans_so_cprr_2019_tabula.csv
 	python clean/new_orleans_so_cprr.py
 
-data/clean/cprr_shreveport_pd_2018_2019.csv: clean/shreveport_pd_cprr.py data/shreveport_pd/shreveport_pd_cprr_dispositions_2018.csv data/shreveport_pd/shreveport_pd_cprr_names_2018.csv data/shreveport_pd/shreveport_pd_cprr_dispositions_2019.csv data/shreveport_pd/shreveport_pd_cprr_names_2019.csv
+data/clean/cprr_shreveport_pd_2018_2019.csv data/clean/cprr_codebook_shreveport_pd.csv: clean/shreveport_pd_cprr.py data/shreveport_pd/shreveport_pd_cprr_dispositions_2018.csv data/shreveport_pd/shreveport_pd_cprr_names_2018.csv data/shreveport_pd/shreveport_pd_cprr_dispositions_2019.csv data/shreveport_pd/shreveport_pd_cprr_names_2019.csv data/shreveport_pd/shreveport_codebook.csv
 	python clean/shreveport_pd_cprr.py
