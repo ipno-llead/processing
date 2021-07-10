@@ -50,12 +50,8 @@ def clean():
         .pipe(standardize_desc_cols, [
             'sex', 'department_desc', 'rank_desc', 'employment_status', 'officer_inactive', 'sworn'])\
         .pipe(remove_non_officers)\
-<<<<<<< Updated upstream
         .pipe(clean_dates, ['hire_date'])\
         .pipe(clean_rank)
-=======
-        .pipe(clean_dates, ['hire_date'])
->>>>>>> Stashed changes
 
 
 def drop_volunteers(df):
@@ -83,7 +79,6 @@ def clean_rank(df):
         .str.replace(r'coll\.', 'collector', regex=True)\
         .str.replace(r'invest.', 'investigator', regex=True)\
         .str.replace(r' prop\.', ' property', regex=True)\
-<<<<<<< Updated upstream
         .str.replace(r' (\bi[il]?\b)', '', regex=True)\
         .str.replace(r' maint$', ' maintainer', regex=True)\
         .str.replace('sergeant', 'sargeant', regex=False)\
@@ -92,10 +87,6 @@ def clean_rank(df):
         .str.replace(r'super$', 'superintendent', regex=True)\
         .str.replace('emerg mgm speci', 'emergency mgm specialist', regex=False)\
         .str.replace(r'\bco\b', 'coordinator', regex=True)
-=======
-        .str.replace(r' il$', ' ii', regex=True)\
-        .str.replace(r' maint$', ' maintainer', regex=True)
->>>>>>> Stashed changes
     return df
 
 
