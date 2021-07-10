@@ -1,6 +1,6 @@
 from lib.columns import clean_column_names, set_values
 from lib.clean import (
-    clean_names, parse_dates_with_known_format, clean_salaries, standardize_desc_cols, 
+    clean_names, parse_dates_with_known_format, clean_salaries, standardize_desc_cols,
     clean_employment_status
 )
 from lib.path import data_file_path, ensure_data_dir
@@ -44,10 +44,12 @@ def assign_rank_year_and_pay_year(df):
 def clean_department_desc(df):
     df.department_desc = df.department_desc.str.lower().str.strip()\
         .str.replace(r'police ?(department)?-', '', regex=True)\
-        .str.replace('serv', 'services', regex=False)\
-        .str.replace('byrne crim jus innov (bcji)', 'byrne criminal justice innovation program', regex=False)\
-        .str.replace('special operations', 'special operations bureau', regex=False)\
-        .str.replace(r'^criminal invest(igation)? ?(bureau)?', 'criminal investigations bureau', regex=True)
+        .str.replace('uniform ', '', regex=False)\
+        .str.replace(' bureau', '', regex=False)\
+        .str.replace(' serv', '', regex=False)\
+        .str.replace(r'invest(igation)?', 'investigations', regex=True)\
+        .str.replace(r'\boperation(al)?\b', 'operations', regex=True)\
+        .str.replace('byrne crim jus innov (bcji)', 'byrne criminal justice innovation program', regex=False)
     return df
 
 

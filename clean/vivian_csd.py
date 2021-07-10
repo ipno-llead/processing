@@ -27,6 +27,13 @@ def assign_agency(df):
     return df
 
 
+def clean_rank(df):
+    df.rank_desc = df.rank_desc.str.lower().str.strip()\
+        .str.replace(r'( ?(of)? ?(police ?))', '', regex=True)\
+        .str.replace('supervisor dispatcher', 'dispatch supervisor', regex=False)
+    return df
+
+
 def clean():
     return pd.read_csv(data_file_path(
         'vivian_csd/vivian_csd_pprr_2021.csv'
@@ -43,6 +50,7 @@ def clean():
         .pipe(float_to_int_str, ['rank_year'])\
         .pipe(clean_dates, ['hire_date'])\
         .pipe(standardize_desc_cols, ['rank_desc', 'employment_status'])\
+        .pipe(clean_rank)\
         .pipe(assign_agency)\
         .pipe(gen_uid, ['agency', 'first_name', 'last_name'])
 

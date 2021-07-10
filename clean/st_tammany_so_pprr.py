@@ -13,6 +13,13 @@ def assign_agency(df):
     return df
 
 
+def clean_rank(df):
+    df.rank_desc = df.rank_desc.str.lower().str.strip()\
+        .str.replace(r'(chief deputy|deputy chiefs)', 'deputy chief', regex=True)\
+        .str.replace('part time', 'part-time', regex=False)
+    return df
+
+
 def clean():
     df = pd.read_csv(
         data_file_path('st_tammany_so/st._tammany_so_pprr_2020.csv')
@@ -25,8 +32,9 @@ def clean():
     })
     return df\
         .pipe(float_to_int_str, ['birth_year', 'hire_date', 'term_date'])\
-        .pipe(standardize_desc_cols, ['rank_desc'])\
         .pipe(clean_dates, ['hire_date', 'term_date'])\
+        .pipe(standardize_desc_cols, ['rank_desc'])\
+        .pipe(clean_rank)\
         .pipe(assign_agency)\
         .pipe(clean_names, ['first_name', 'last_name'])\
         .pipe(gen_uid, ['agency', 'employee_id', 'first_name', 'last_name', 'birth_year'])\
