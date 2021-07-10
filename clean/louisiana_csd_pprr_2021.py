@@ -52,7 +52,7 @@ def clean():
         .pipe(standardize_desc_cols, ['rank_desc', 'department_desc'])\
         .pipe(split_names)\
         .pipe(clean_names, ['first_name', 'last_name', 'middle_initial'])\
-        .pipe(gen_uid, ['agency', 'first_name', 'last_name'])
+        .pipe(gen_uid, ['agency', 'first_name', 'last_name', 'middle_initial'])
 
 
 if __name__ == '__main__':

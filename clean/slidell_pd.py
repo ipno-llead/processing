@@ -30,28 +30,16 @@ def split_names(df):
 
 def clean_rank(df):
     df.loc[:, 'rank_desc'] = df.rank_desc\
-        .str.replace(r'(,|-$| \bs\b|/)', '', regex=True)\
-        .str.replace(r'(\b3rd$|iii$)', '3rd class', regex=True)\
-        .str.replace(r'ii$', '2nd class', regex=True)\
-        .str.replace('2 nd', '2nd', regex=False)\
-        .str.replace(' - wal-mart', '', regex=False)\
         .str.replace('temp.', 'temporary', regex=False)\
-        .str.replace(' - sr', '', regex=False)\
-        .str.replace(r'asst\.', 'assistant', regex=True)\
-        .str.replace(r' of$', '', regex=True)\
-        .str.replace('acting ', '', regex=False)\
-        .str.replace(r'c$', 'chief', regex=True)\
-        .str.replace(r'(reserve|temporary| of )? ?(police|p$|elect) ?', '', regex=True)\
-        .str.replace(r'(sgt\.|sergeamt)', 'sergeant', regex=True)\
-        .str.replace('sergeanttech', 'sergeant technology', regex=False)\
-        .str.replace(r'^captain assistant chief$', 'captain | assistant chief', regex=True)
-    return df
-
-
-def clean_department_desc(df):
-    df.department_desc = df.department_desc.str.lower().str.strip()\
-        .str.replace(r' ?division', '', regex=True)\
-        .str.replace(r'administration ?/ ?chief', 'administration', regex=True)
+        .str.replace('asst.', 'assistant', regex=False)\
+        .str.replace(r'(sergeamt|sgt.)', 'sergeant', regex=True)\
+        .str.replace(r'\/tech ', ' technology ', regex=True)\
+        .str.replace(r'support s$', 'support special', regex=True)\
+        .str.replace(r' (c of|chief of( p)?)$', ' chief of police', regex=True)\
+        .str.replace(r'-$', '', regex=True)\
+        .str.replace(r' 3rd$', ' 3rd class', regex=True)\
+        .str.replace(' 2 nd ', ' 2nd ', regex=False)\
+        .str.replace('policesergeant', 'police sergeant', regex=False)
     return df
 
 
@@ -122,7 +110,6 @@ def clean19():
         .pipe(clean_names, ['first_name', 'last_name'])\
         .pipe(clean_dates, ['hire_date', 'salary_date'])\
         .pipe(standardize_desc_cols, ['rank_desc', 'department_desc', 'employment_status'])\
-        .pipe(clean_department_desc)\
         .pipe(clean_rank)\
         .pipe(set_values, {
             'data_production_year': 2019,

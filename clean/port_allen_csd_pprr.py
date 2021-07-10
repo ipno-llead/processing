@@ -39,14 +39,6 @@ def assign_agency(df):
     return df
 
 
-def clean_rank_desc(df):
-    df.rank_desc = df.rank_desc.str.lower().str.lower()\
-        .str.replace(r'(of)? ?police', '', regex=True)\
-        .str.replace('part time', 'part-time', regex=False)\
-        .str.replace('administrative', 'admin', regex=False)
-    return df
-
-
 def clean():
     df = pd.read_csv(data_file_path(
         "port_allen_csd/port_allen_csd_pprr_2020.csv"))
@@ -63,7 +55,6 @@ def clean():
         .pipe(clean_names, ['first_name', 'last_name', 'middle_initial'])\
         .pipe(standardize_employment_status)\
         .pipe(clean_dates, ['hire_date'])\
-        .pipe(clean_rank_desc)\
         .pipe(standardize_desc_cols, ['rank_desc'])\
         .pipe(fix_typo)\
         .pipe(assign_agency)\

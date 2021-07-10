@@ -23,7 +23,7 @@ def fuse_personnel(df: pd.DataFrame, *other_dfs: list[pd.DataFrame]) -> pd.DataF
     try:
         records = df.set_index("uid", drop=False).to_dict('index')
     except ValueError:
-        print(df[df.uid.duplicated(keep=False)])
+        print(df[df.uid.duplicated(keep=False)].sort_index())
         raise
     for other_df in other_dfs:
         for idx, row in rearrange_personnel_columns(other_df).set_index("uid", drop=False).iterrows():

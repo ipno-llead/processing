@@ -1,6 +1,6 @@
 from lib.columns import clean_column_names
 from lib.path import data_file_path, ensure_data_dir
-from lib.clean import split_names, float_to_int_str, clean_names, standardize_desc_cols
+from lib.clean import split_names, float_to_int_str, clean_names
 from lib.uid import gen_uid
 import pandas as pd
 import sys
@@ -61,16 +61,6 @@ def remove_new_lines_from_charges(df):
     return df
 
 
-def clean_department_desc(df):
-    df.department_desc = df.department_desc.str.lower().str.strip()\
-        .str.replace('.', '', regex=False)\
-        .str.replace('detectives', 'criminal investigations', regex=False)\
-        .str.replace(r'radio ?(room/911)?', 'communications', regex=True)\
-        .str.replace(r'^is$', '', regex=True)\
-        .str.replace(r'^school resource officers$', 'school resources', regex=True)
-    return df
-
-
 def clean():
     df = pd.concat([
         pd.read_csv(data_file_path(
@@ -89,8 +79,6 @@ def clean():
         .pipe(float_to_int_str, ["department_code"])\
         .pipe(pad_dept_code)\
         .pipe(assign_department_desc)\
-        .pipe(standardize_desc_cols, ['department_desc'])\
-        .pipe(clean_department_desc)\
         .pipe(extract_occur_date)\
         .pipe(assign_agency)\
         .pipe(clean_names, ['first_name', 'last_name', 'middle_name'])\
