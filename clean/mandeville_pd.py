@@ -27,7 +27,7 @@ def clean_pprr_20():
     return pd.read_csv(data_file_path('mandeville_pd/mandeville_csd_pprr_2020.csv'))\
         .pipe(clean_column_names)\
         .rename(columns={
-            'recurring_annual_salary': 'salary', 
+            'recurring_annual_salary': 'salary',
             'job_class_desc': 'rank_desc',
             'badge': 'badge_no',
             'terminated_date': 'term_date',
