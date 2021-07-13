@@ -313,3 +313,6 @@ data/clean/cprr_shreveport_pd_2018_2019.csv data/clean/cprr_codebook_shreveport_
 
 data/clean/cprr_lafayette_so_2015_2020.csv: clean/lafayette_so.py data/lafayette_so/lafayette_so_cprr_2015_2020.csv
 	python clean/lafayette_so.py
+
+data/clean/pprr_baton_rouge_pd_2021.csv: clean/baton_rouge_pd_pprr.py data/baton_rouge_pd/baton_rouge_pd_pprr_2021.csv
+	python clean/baton_rouge_pd_pprr.py
