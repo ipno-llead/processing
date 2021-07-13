@@ -32,10 +32,9 @@ def clean_rank_desc(df):
         .str.replace('police ', '', regex=False)\
         .str.replace(r' i\b', '', regex=True)\
         .str.replace(r'^tac', '', regex=True)\
-        .str.replace(r' ?&', '', regex=True)\
-        .str.replace(' suppport spe', ' support specialist', regex=False)\
-        .str.replace(r'^ ', '', regex=True)\
-        .str.replace(r'administrative', 'admin', regex=False)
+        .str.replace('&', '', regex=False)\
+        .str.replace('  admin suppport spe', ' administrative support specialist', regex=False)\
+        .str.replace(r'^ ', '', regex=True)
     return df
 
 
@@ -53,8 +52,8 @@ def clean_actions_history():
         .pipe(assign_agency)\
         .pipe(clean_names, ['first_name', 'last_name', 'middle_initial'])\
         .pipe(gen_uid, ['agency', 'employee_id'])\
-        .pipe(clean_rank_desc)\
         .pipe(standardize_desc_cols, ['rank_desc', 'action_desc'])\
+        .pipe(clean_rank_desc)
 
 
 def sum_salaries(df):

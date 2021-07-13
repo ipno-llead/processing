@@ -33,8 +33,8 @@ def assign_agency(df):
 def clean_rank_desc(df):
     df.rank_desc = df.rank_desc.str.lower().str.strip()\
         .str.replace(r' \(d.\)$', '', regex=True)\
-        .str.replace(' officer', '', regex=False)
-    return df 
+        .str.replace(r'sergeant ?(officer)?', 'sargeant', regex=True)
+    return df
 
 
 def clean():

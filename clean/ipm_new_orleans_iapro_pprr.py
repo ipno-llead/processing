@@ -55,57 +55,43 @@ def clean_department_desc(df):
     df.department_desc = df.department_desc.str.lower().str.strip()\
         .str.replace(r'(fob|isb|msb|pib|not) - ', '', regex=True)\
         .str.replace(r'\bservice\b', 'services', regex=True)\
-        .str.replace('nopd officer', '', regex=False)\
-        .str.replace(' bureau', '', regex=False)\
-        .str.replace('public integrity', 'internal affairs (public integrity bureau)', regex=False)
+        .str.replace('nopd officer', '', regex=False)
     return df
 
 
 def clean_rank_desc(df):
     df.rank_desc = df.rank_desc.str.lower().str.strip()\
         .str.replace('.', '', regex=False)\
-        .str.replace(',', '', regex=False)\
         .str.replace(r' ?police', '', regex=True)\
         .str.replace(r'dec$', 'decree', regex=True)\
         .str.replace('supt', 'superintendent', regex=False)\
         .str.replace(r'\bdev(e)?\b', 'development', regex=True)\
+        .str.replace(',', ' ', regex=False)\
         .str.replace(r'iv$', '', regex=True)\
         .str.replace(r' ?-', ' ', regex=True)\
         .str.replace(r'(ii?i?|1|2|3|4)?$', '', regex=True)\
-        .str.replace(r'\bspec(ial)?\b', 'specialist', regex=True)\
+        .str.replace(r'spec$', 'specialist', regex=True)\
         .str.replace(r'sup(v)?$', 'supervisor', regex=True)\
+        .str.replace(r'\basst\b', 'assistant', regex=True)\
         .str.replace(' ?sr', 'senior', regex=True)\
-        .str.replace(r'( ?mgr)', 'manager', regex=True)\
+        .str.replace(r' ?mgr', 'manager', regex=True)\
         .str.replace(' academy', '', regex=False)\
         .str.replace(r' \boff\b ?', ' officer', regex=True)\
         .str.replace(r' of$', '', regex=True)\
-        .str.replace(r'analy(t)?\b', 'analyst', regex=True)\
-        .str.replace(r'(3|4|5)', '', regex=True)\
-        .str.replace(r' coor(d)?\b', ' coordinator', regex=True)\
-        .str.replace(r'\bopr\b', 'operator', regex=True)\
+        .str.replace(r' analyt?', 'analyst', regex=True)\
+        .str.replace(r'(3|4|&|5)', '', regex=True)\
+        .str.replace(' coor', ' coordinator', regex=False)\
+        .str.replace(r'\bopr\b', 'operations', regex=True)\
         .str.replace('default', '', regex=False)\
+        .str.replace(r'\bspec\b', 'specialist', regex=True)\
         .str.replace('recov', 'recovery', regex=False)\
         .str.replace(r'\bprog\b', 'program', regex=True)\
-        .str.replace(r' \btech\b', ' technician', regex=True)\
-        .str.replace('techniciantrainee', 'technician trainee', regex=False)\
+        .str.replace(r'\btech\b', 'technician', regex=True)\
         .str.replace('applic', 'application', regex=False)\
+        .str.replace(r'^admin', 'administrative', regex=True)\
         .str.replace(r' \(nopd\)$', '', regex=True)\
-        .str.replace('sectionmanager', 'manager', regex=False)\
-        .str.replace(r'( ?c(ou)?ns(lr)?\b)', ' counselor', regex=True)\
-        .str.replace('pr specialist senior', 'senior public relations specialist', regex=False)\
-        .str.replace(r'\( dept\)', '', regex=True)\
-        .str.replace('applicationations', 'applications', regex=False)\
-        .str.replace('unknown rank', '', regex=False)\
-        .str.replace(r'instru\b', 'instructor', regex=True)\
-        .str.replace('app inv a', '', regex=False)\
-        .str.replace(' & ', ' and ', regex=False)\
-        .str.replace(r' ?\band\b ?', ' ', regex=True)\
-        .str.replace(' sup sup', '', regex=False)\
-        .str.replace(r'se$', '', regex=True)\
-        .str.replace(r'(^asst\b|asst ?$)', 'assistant', regex=True)\
-        .str.replace(r'info\b', 'information', regex=True)\
-        .str.replace(r'admin(in|ist)?(i?stra(tive|tor)?)?', 'admin', regex=True)\
-        .str.replace(r'\bex\b', 'examiner', regex=True)
+        .str.replace('cnslr', 'counseler', regex=False)\
+        .str.replace('info', 'information,', regex=False)
     return df
 
 

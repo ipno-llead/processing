@@ -44,12 +44,10 @@ def assign_rank_year_and_pay_year(df):
 def clean_department_desc(df):
     df.department_desc = df.department_desc.str.lower().str.strip()\
         .str.replace(r'police ?(department)?-', '', regex=True)\
-        .str.replace('uniform ', '', regex=False)\
-        .str.replace(' bureau', '', regex=False)\
-        .str.replace(' serv', '', regex=False)\
-        .str.replace(r'invest(igation)?', 'investigations', regex=True)\
-        .str.replace(r'\boperation(al)?\b', 'operations', regex=True)\
-        .str.replace('byrne crim jus innov (bcji)', 'byrne criminal justice innovation program', regex=False)
+        .str.replace('serv', 'services', regex=False)\
+        .str.replace('byrne crim jus innov (bcji)', 'byrne criminal justice innovation program', regex=False)\
+        .str.replace('special operations', 'special operations bureau', regex=False)\
+        .str.replace(r'^criminal invest(igation)? ?(bureau)?', 'criminal investigations bureau', regex=True)
     return df
 
 

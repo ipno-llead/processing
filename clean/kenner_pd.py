@@ -28,17 +28,6 @@ def split_names(df):
     return df.reset_index(drop=True)
 
 
-def clean_department_desc(df):
-    df.department_desc = df.department_desc.str.lower().str.strip()\
-        .str.replace('invest', 'investigative', regex=False)\
-        .str.replace('maint', 'maintenance', regex=False)\
-        .str.replace("chief's office", 'administration', regex=False)\
-        .str.replace(r'( custodian| staff| serv(ices)?| mgmt)', '', regex=True)\
-        .str.replace('not stated', '', regex=False)\
-        .str.replace('resource', 'resouces', regex=False)
-    return df
-
-
 def clean():
     return pd.read_csv(data_file_path(
         'kenner_pd/kenner_pd_pprr_2020.csv'
@@ -60,7 +49,6 @@ def clean():
         .pipe(clean_names, ['first_name', 'last_name', 'middle_name', 'middle_initial'])\
         .pipe(standardize_desc_cols, [
             'sex', 'department_desc', 'rank_desc', 'employment_status', 'officer_inactive', 'sworn'])\
-        .pipe(clean_department_desc)\
         .pipe(remove_non_officers)\
         .pipe(clean_dates, ['hire_date'])\
         .pipe(clean_rank)
@@ -86,13 +74,14 @@ def clean_rank(df):
     df.loc[:, 'rank_desc'] = df.rank_desc\
         .str.replace(r' off(er|c)?$', ' officer', regex=True)\
         .str.replace(r' tech$', ' technician', regex=True)\
-        .str.replace(r'admin(\.)?(istrative)?', 'admin', regex=True)\
+        .str.replace(r'admin\.', 'administrative', regex=True)\
         .str.replace(r'dir\. of', 'director of', regex=True)\
         .str.replace(r'coll\.', 'collector', regex=True)\
         .str.replace(r'invest.', 'investigator', regex=True)\
         .str.replace(r' prop\.', ' property', regex=True)\
         .str.replace(r' (\bi[il]?\b)', '', regex=True)\
         .str.replace(r' maint$', ' maintainer', regex=True)\
+        .str.replace('sergeant', 'sargeant', regex=False)\
         .str.replace(r' - ', ' ', regex=False)\
         .str.replace("chief's secretary", 'secretary to the chief', regex=False)\
         .str.replace(r'super$', 'superintendent', regex=True)\
@@ -141,7 +130,6 @@ def clean_former_short():
         .pipe(clean_names, ['first_name', 'last_name', 'middle_name', 'middle_initial'])\
         .pipe(standardize_desc_cols, ['department_desc', 'rank_desc', 'sex'])\
         .pipe(remove_non_officers)\
-        .pipe(clean_department_desc)\
         .pipe(clean_dates, ['hire_date', 'left_date'])
 
 
