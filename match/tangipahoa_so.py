@@ -24,9 +24,10 @@ def deduplicate_cprr_officers(cprr):
     )
     matches = matcher.get_index_pairs_within_thresholds(decision)
     match_dict = dict(matches)
-    
+
     cprr.loc[:, 'uid'] = cprr.uid.map(lambda x: match_dict.get(x, x))
-    return cprr
+    return cprr.sort_values(['uid', 'first_name', 'last_name'], ascending=[True, False, False])\
+        .drop_duplicates(['uid'], keep='first')
 
 
 def match_cprr_post(cprr, post):

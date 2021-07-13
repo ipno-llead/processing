@@ -1,6 +1,8 @@
 from lib.path import data_file_path, ensure_data_dir
 from lib.columns import clean_column_names, set_values
-from lib.clean import clean_dates, clean_races, clean_sexes, float_to_int_str, clean_names, standardize_desc_cols, clean_salaries
+from lib.clean import (
+    clean_dates, clean_races, clean_sexes, float_to_int_str, clean_names, standardize_desc_cols, clean_salaries
+)
 from lib.uid import gen_uid
 from lib import salary
 import pandas as pd
