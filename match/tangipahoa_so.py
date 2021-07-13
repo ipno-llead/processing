@@ -26,8 +26,14 @@ def deduplicate_cprr_officers(cprr):
     match_dict = dict(matches)
 
     cprr.loc[:, 'uid'] = cprr.uid.map(lambda x: match_dict.get(x, x))
-    return cprr.sort_values(['uid', 'first_name', 'last_name'], ascending=[True, False, False])\
-        .drop_duplicates(['uid'], keep='first')
+    cprr = cprr.sort_values(['uid', 'first_name', 'last_name'], ascending=[True, False, False])
+    names = dict()
+    for idx, row in cprr.iterrows():
+        if row.uid in names:
+            cprr.loc[idx, 'first_name'], cprr.loc[idx, 'last_name'] = names[row.uid]
+        else:
+            names[row.uid] = (row.first_name, row.last_name)
+    return cprr
 
 
 def match_cprr_post(cprr, post):
