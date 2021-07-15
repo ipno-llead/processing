@@ -91,13 +91,15 @@ def combine_duplicate_action_disposition_and_charges_rows(df):
         'first_name': 'first',
         'last_name': 'first',
         'department_desc': 'first',
-        'investigation_start_date': 'first',
         'disposition': ''.join, 
         'action': ''.join,
         'charges': ' |'.join,
         'incident_year': 'first',
         'incident_month': 'first',
         'incident_day': 'first',
+        'investigation_start_year': 'first',
+        'investigation_start_month': 'first',
+        'investigation_start_day': 'first',
         'data_production_year': 'first',
         'agency': 'first',
         'complaint_uid': 'first'
@@ -123,7 +125,7 @@ def clean():
         .pipe(clean_action)\
         .pipe(combine_columns)\
         .pipe(clean_charges)\
-        .pipe(clean_dates, ['incident_date'])\
+        .pipe(clean_dates, ['incident_date', 'investigation_start_date'])\
         .pipe(drop_rows_without_tracking_number)\
         .pipe(standardize_desc_cols, ['department_desc', 'action', 'charges'])\
         .pipe(set_values, {
@@ -132,7 +134,7 @@ def clean():
         })\
         .pipe(gen_uid, ['first_name', 'last_name', 'agency'])\
         .pipe(gen_uid, 
-        ['uid', 'charges', 'tracking_number', 'disposition', 'investigation_start_date'], 'complaint_uid')\
+        ['uid', 'charges', 'tracking_number', 'disposition'], 'complaint_uid')\
         .pipe(combine_duplicate_action_disposition_and_charges_rows)
     return df
 
