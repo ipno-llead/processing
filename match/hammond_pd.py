@@ -40,4 +40,3 @@ if __name__ == '__main__':
     cprr = match_cprr_and_post(cprr, post)
     ensure_data_dir('match')
     cprr.to_csv(data_file_path('match/cprr_hammond_pd_2015_2020.csv'))
-

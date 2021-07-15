@@ -1,3 +1,4 @@
+from re import T
 import sys
 from numpy import result_type
 sys.path.append('../')
@@ -83,7 +84,30 @@ def clean_charges(df):
         .str.replace(r' ?(unbec?o?i?mo?ing) ?( ?(of)? ?(an officer)?)? ?', ' unbecoming ', regex=True)\
         .str.replace('video conduct unbecoming', 'video | conduct unbecoming', regex=False)
     return df
-    
+
+
+def combine_duplicate_action_disposition_and_charges_rows(df):
+    df = df.groupby(['uid', 'tracking_number']).agg({
+        'first_name': 'first',
+        'last_name': 'first',
+        'department_desc': 'first',
+        'investigation_start_date': 'first',
+        'disposition': ''.join, 
+        'action': ''.join,
+        'charges': ' |'.join,
+        'incident_year': 'first',
+        'incident_month': 'first',
+        'incident_day': 'first',
+        'data_production_year': 'first',
+        'agency': 'first',
+        'complaint_uid': 'first'
+        }).reset_index()
+    return df
+
+
+def drop_rows_without_tracking_number(df):
+    return df[df.tracking_number != ''].reset_index(drop=True)
+
 
 def clean():
     df = pd.read_csv(data_file_path('hammond_pd/hammond_pd_cprr_2015_2020.csv'))\
@@ -100,6 +124,7 @@ def clean():
         .pipe(combine_columns)\
         .pipe(clean_charges)\
         .pipe(clean_dates, ['incident_date'])\
+        .pipe(drop_rows_without_tracking_number)\
         .pipe(standardize_desc_cols, ['department_desc', 'action', 'charges'])\
         .pipe(set_values, {
             'agency': 'Hammond PD',
@@ -107,7 +132,8 @@ def clean():
         })\
         .pipe(gen_uid, ['first_name', 'last_name', 'agency'])\
         .pipe(gen_uid, 
-        ['uid', 'charges', 'tracking_number', 'disposition', 'investigation_start_date'], 'complaint_uid')
+        ['uid', 'charges', 'tracking_number', 'disposition', 'investigation_start_date'], 'complaint_uid')\
+        .pipe(combine_duplicate_action_disposition_and_charges_rows)
     return df
 
 
