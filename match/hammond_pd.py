@@ -7,12 +7,12 @@ from datamatch import JaroWinklerSimilarity, ThresholdMatcher, ColumnsIndex
 
 
 def prepare_post_data():
-    post = pd.read_csv(data_file_path('clean/post_pprr_2020_11_06'))
+    post = pd.read_csv(data_file_path('clean/pprr_post_2020_11_06.csv'))
     return post[post.agency == 'hammond pd']
 
 
 def match_cprr_and_post(cprr, post):
-    dfa = cprr[['uid', 'first_name', 'last_name']]
+    dfa = cprr[['uid', 'first_name', 'last_name']]git
     dfa = dfa.drop_duplicates(subset=['uid']).set_index('uid')
     dfa.loc[:, 'fc'] = dfa.first_name.fillna('').map(lambda x: x[:1])
 
