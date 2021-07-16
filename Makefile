@@ -110,7 +110,7 @@ data/fuse/per_shreveport_pd.csv data/fuse/event_shreveport_pd.csv data/fuse/com_
 data/fuse/event_lafayette_so.csv data/fuse/per_lafayette_so.csv data/fuse/com_lafayette_so.csv: fuse/lafayette_so.py data/clean/cprr_lafayette_so_2015_2020.csv data/clean/pprr_post_2020_11_06.csv
 	python fuse/lafayette_so.py
 
-data/fuse/event_hammond_pd.csv data/fuse/per_hammond_pd.csv data/fuse/com_hammond_pd.csv: fuse/hammond_pd.py data/clean/cprr_hammond_pd_2015_2020.csv data/clean/post_pprr_2020_11_06.csv
+data/fuse/event_hammond_pd.csv data/fuse/per_hammond_pd.csv data/fuse/com_hammond_pd.csv: fuse/hammond_pd.py data/clean/cprr_hammond_pd_2015_2020.csv data/clean/pprr_post_2020_11_06.csv
 	python fuse/hammond_pd.py
 
 
