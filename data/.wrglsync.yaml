@@ -83,7 +83,7 @@ repos:
   match-cprr-scott-pd-2020:
     fileName: match/cprr_scott_pd_2020.csv
   match-cprr-tangipahoa-so-2015-2021:
-    fileName: match/cprr_tangipahoa_2015_2021.csv
+    fileName: match/cprr_tangipahoa_so_2015_2021.csv
   match-cprr-lafayette-so-2015-2020:
     fileName: match/cprr_lafayette_2015_2020.csv
   com-baton-rouge-pd:
