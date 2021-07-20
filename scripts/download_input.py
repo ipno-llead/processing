@@ -20,6 +20,7 @@ DATA_FILES = {
     ],
     "baton_rouge_pd": [
         "https://www.dropbox.com/sh/rc4a4961qqxu0co/AADmtLqCxY_k5ZlbPKtOmcKHa/Data%20Collected/Baton%20Rouge%20Police%20Department/Baton%20Rouge_PD_CPRR_2018.csv?dl=1",  # noqa
+        "https://www.dropbox.com/s/f5rk03616g00dsn/baton_rouge_pd_cprr_2010_2021.csv?dl=0", # noqa
     ],
     "baton_rouge_csd": [
         "https://www.dropbox.com/sh/rc4a4961qqxu0co/AAATpIeZNzv0NJlzfSFOJKqZa/Data%20Collected/Baton%20Rouge%20Civil%20Service%20Department/Baton%20Rouge_CSD_PPRR_2017.csv?dl=1",  # noqa
@@ -156,7 +157,7 @@ DATA_FILES = {
         "https://www.dropbox.com/s/4d9m1y5g4pnlmkj/lafayette_so_cprr_2015_2020.csv?dl=1",  # noqa
     ],
     "hammond_pd": [
-        "https://www.dropbox.com/s/zj4atlmhve9gw5i/hammond_pd_cprr_2015-2020.csv?dl=1", # noqa
+        "https://www.dropbox.com/s/zj4atlmhve9gw5i/hammond_pd_cprr_2015_    2020.csv?dl=1", # noqa
     ]
 }
 _current_dir = os.path.dirname(os.path.realpath(__file__))
