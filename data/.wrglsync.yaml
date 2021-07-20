@@ -150,7 +150,14 @@ repos:
     fileName: fuse/com_shreveport_pd.csv
     primaryKey:
       - complaint_uid
-  com-lafayette-so: fileName/fuse_com_lafayette_so.csv
+  com-lafayette-so:
+    fileName: fuse/com_lafayette_so.csv
+    primaryKey:
+      - complaint_uid
+  com-lafayette-pd:
+    fileName: fuse/com_lafayette_pd.csv
+    primaryKey:
+      - complaint_uid
   uof-new-orleans-pd:
     fileName: fuse/uof_new_orleans_pd.csv
     primaryKey:
@@ -255,6 +262,14 @@ repos:
     fileName: fuse/per_shreveport_pd.csv
     primaryKey:
       - uid
+  per-lafayette-so:
+    fileName: fuse/per_lafayette_so.csv
+    primaryKey:
+      - uid
+  per-lafayette-pd:
+    fileName: fuse/per_lafayette_pd.csv
+    primaryKey:
+      - uid
   event-new-orleans-pd:
     fileName: fuse/event_new_orleans_pd.csv
     primaryKey:
@@ -352,6 +367,10 @@ repos:
       - event_uid
   event-lafayette-so:
     fileName: fuse/event_lafayette_so.csv
+    primaryKey:
+      - event_uid
+  event-lafayette-pd:
+    fileName: fuse/event_lafayette_pd.csv
     primaryKey:
       - event_uid
   personnel:

@@ -7,6 +7,7 @@ from lib.path import data_file_path, ensure_data_dir
 from lib.clean import (
     clean_names, clean_salaries, clean_sexes, clean_races, float_to_int_str
 )
+from lib.uid import gen_uid
 from lib import salary
 from lib.standardize import standardize_from_lookup_table
 
@@ -64,7 +65,8 @@ def clean_pprr():
         .pipe(float_to_int_str, ['birth_year'])\
         .pipe(standardize_rank)\
         .pipe(split_names)\
-        .pipe(clean_names, ['first_name', 'last_name', 'middle_initial'])
+        .pipe(clean_names, ['first_name', 'last_name', 'middle_initial'])\
+        .pipe(gen_uid, ['agency', 'first_name', 'last_name', 'middle_initial'])
 
 
 def clean_tracking_number(df):
@@ -217,6 +219,16 @@ def split_disposition(df):
     return df
 
 
+def clean_cprr_dates(df):
+    df.loc[:, 'complete_date'] = df.complete_date.str.strip()\
+        .str.replace('2B', '28', regex=False)\
+        .str.replace(r'/(\d)(\d{2})$', r'/\1/\2', regex=True)\
+        .str.replace(r'/(1\d$)', r'/20\1', regex=True)
+    df.loc[:, 'receive_date'] = df.receive_date.str.strip()\
+        .str.replace('i', '/', regex=False)
+    return df
+
+
 def clean_cprr():
     return pd.read_csv(data_file_path(
         'lafayette_pd/lafayette_pd_cprr_2015_2020.csv'
@@ -235,6 +247,7 @@ def clean_cprr():
         .pipe(extract_rank)\
         .pipe(split_cprr_name)\
         .pipe(split_investigator)\
+        .pipe(clean_cprr_dates)\
         .pipe(lower_strip, ['allegation', 'disposition'])\
         .pipe(standardize_from_lookup_table, 'allegation', [
             ['attention to duty', 'att. to duty', 'attention', 'atd'],
@@ -335,12 +348,22 @@ def clean_cprr():
             ['special evaluation', 'special eval'],
             ['proffessional conduct', 'prof conduct'],
             ['evidence'],
-        ])
+        ]).pipe(set_values, {
+            'data_production_year': 2020,
+            'agency': 'Lafayette PD'
+        }).pipe(clean_names, ['first_name', 'last_name', 'investigator_first_name', 'investigator_last_name'])\
+        .pipe(gen_uid, ['agency', 'first_name', 'last_name'])\
+        .pipe(gen_uid, ['agency', 'investigator_first_name', 'investigator_last_name'], 'investigator_uid')\
+        .pipe(gen_uid, ['agency', 'tracking_number', 'allegation', 'uid'], 'complaint_uid')
 
 
 if __name__ == '__main__':
     pprr = clean_pprr()
+    cprr = clean_cprr()
     ensure_data_dir('clean')
+    cprr.to_csv(data_file_path(
+        'clean/cprr_lafayette_pd_2015_2020.csv'
+    ), index=False)
     pprr.to_csv(data_file_path(
-        'clean/.csv'
+        'clean/pprr_lafayette_pd_2010_2021.csv'
     ), index=False)
