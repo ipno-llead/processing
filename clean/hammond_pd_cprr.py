@@ -38,6 +38,12 @@ def split_name(df):
     return df.drop(columns='ee_name')
 
 
+def clean_department_desc(df):
+    df.loc[:, 'department_desc'] = df.division.str.lower().str.strip()\
+        .str.replace('jailer', 'corrections', regex=False)
+    return df.drop(columns=['dept', 'division'])
+
+
 def clean_action(df):
     df.loc[:, 'action'] = df.final_recommendation.fillna('').str.lower().str.strip()\
         .str.replace(
@@ -115,9 +121,6 @@ def clean():
     df = pd.read_csv(data_file_path('hammond_pd/hammond_pd_cprr_2015_2020.csv'))\
         .pipe(clean_column_names)
     df = df\
-        .rename(columns={
-            'dept': 'department_desc',
-        })\
         .pipe(split_name)\
         .pipe(clean_tracking_number)\
         .pipe(clean_incident_date)\
@@ -125,6 +128,7 @@ def clean():
         .pipe(clean_action)\
         .pipe(combine_columns)\
         .pipe(clean_charges)\
+        .pipe(clean_department_desc)\
         .pipe(clean_dates, ['incident_date', 'investigation_start_date'])\
         .pipe(drop_rows_without_tracking_number)\
         .pipe(standardize_desc_cols, ['department_desc', 'action', 'charges'])\
