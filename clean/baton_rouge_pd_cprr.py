@@ -369,6 +369,15 @@ def clean_2021():
             ['shirking', '(shirking)'],
             ['exonerated'],
             ['', ' ']
+        ])\
+        .pipe(standardize_from_lookup_table, 'action', [
+            ['1-day suspension', '1- day suspension', '1 day susp', '1 day suspension'], 
+            ['letter of reprimand', 'lor'], 
+            ['sustained', 'suslained', 'sust.', 'sust,', '(sust)'],
+            ['5-day suspension', '5 day suspension'], 
+            ['2-day suspension', '2 day suspension'],
+            ['8 hour driving school', '8 hr drv sch', '8 hr dr sch', '8 hr driv. school, '],
+            ['30-day', '30 day']
         ])
     return df
 
