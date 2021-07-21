@@ -413,6 +413,6 @@ def clean_18():
 if __name__ == "__main__":
     df = clean_18()
     ensure_data_dir("clean")
-    df.to_csv(
+    df.to_csv(git
         data_file_path("clean/cprr_baton_rouge_pd_2018.csv"),
         index=False)
