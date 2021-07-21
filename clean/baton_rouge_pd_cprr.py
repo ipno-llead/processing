@@ -241,6 +241,16 @@ def clean_receive_incident_dates(df):
     return df
 
 
+def clean_complainant(df):
+    df.complainant = df.complainant.fillna('').str.lower().str.strip()\
+        .str.replace(r'\< ?(\d+) ?\-? (\d+) \>', '', regex=True)\
+        .str.replace('-', '', regex=False)\
+        .str.replace(r'(h/)?[8b](p|r)(p|r)d?o?i?/? ?', 'brpd', regex=True)\
+        .str.replace('damaging dept. equipment', '', regex=False)
+
+    return df
+
+
 def clean_charges(df):
     df.loc[:, 'charges'] = df.complaint.str.lower().str.strip().fillna('')\
         .str.replace(r' >i? ', ' - ', regex=True)\
@@ -294,10 +304,29 @@ def clean_charges(df):
         .str.replace(r'^320\b', '3:20', regex=True)\
         .str.replace(r' a shooting', ' / shooting', regex=False)\
         .str.replace(r'\binvest\b', 'investigation', regex=True)\
-        .str.replace(r' (\(drugs\))? ', ' - ')\
+        .str.replace(r' (\(drugs\))? ', ' - ', regex=True)\
         .str.replace(r'^fai[tl](urr?e)? ?(to)? ?(secu[tr]e)? ?(property)? ?/? ?(or)? ?(evid(ence)?)?$',
          '3:4 failure to secure property or evidence - 26', regex=True)
     return df.drop(columns='complaint')
+
+
+def parse_officer_name_2021(df):
+    dep = df.officer_name.str.replace(r'^(.+), (PC?\d+) (.+)$', r'\1 # \2 # \3').str.split(' # ', expand = True)
+    dep.columns = ['name', 'department_code', 'dept_description']
+    dep.loc[:, 'name'] = dep['name'].str.lower().str.strip()
+
+    names = dep["name"].str.lower().str.replace(r"\s+", " ").str.replace(
+        r"^(\w+(?: (?:iii?|iv|v|jr|sr))?) (\w+)(?: (\w+|n\/a))?$", r"\1 # \2 # \3").str.split(" # ", expand=True)
+    names.columns = ["last_name", "first_name", "middle_initial"]
+    names.loc[:, "middle_initial"] = names["middle_initial"]\
+        .str.replace("n/a", "", regex=False).fillna("")
+    names.loc[:, "middle_name"] = names.middle_initial.map(
+        lambda v: "" if len(v) < 2 else v)
+    names.loc[:, "middle_initial"] = names.middle_initial.map(lambda v: v[:1])
+
+    df = pd.concat([df, dep, names], axis=1)
+    df.drop(columns=["officer_name", "name"], inplace=True)
+    return df
 
 
 def clean_2021():
@@ -313,9 +342,34 @@ def clean_2021():
         .pipe(float_to_int_str, ['ia_seq', 'ia_year'])\
         .pipe(create_tracking_number)\
         .pipe(clean_receive_incident_dates)\
+        .pipe(clean_complainant)\
         .pipe(clean_dates, ['receive_date', 'incident_date'])\
         .pipe(clean_charges)\
-        .pipe(standardize_desc_cols, ['charges'])
+        .pipe(parse_officer_name_2021)\
+        .pipe(standardize_desc_cols, ['charges', 'action', 'disposition'])\
+        .pipe(standardize_from_lookup_table, 'disposition', [
+            ['administrative review', 'admin. review', 'admin, review', '/admin. review', '/admin, review', '/admin review', 'admin review'],
+            ['office investigation', '/office investigation', 'office inv.', 'ofc. investigation'],
+            ['referral', '/referral', '/referral to cib', 'referra)', 
+            'referred to capt. bloom by payne 6/27/13*checl with up 11/14/13 and 02/03/14',
+            'referred to capt. bloom by payne 6/27/13*check with up 11/14/13 and 02/03/14',
+            'referred to capt. dunn', '/referred to capt. dunn', '/referred to capt. a. lee',
+            'referred to capt. lee/', 'referred 7/26/16'], 
+            ['pre-termination hearing', 'pre termination hearing', 'pre- termination hearing', '/pre- termination hearing',
+            '/pre-term'],
+            ['pre-disciplinary hearing', 'pre-disc hearing', '/pre-disc hearing', 'pre disc', '/pre disc', '/pre-disc', 'pre-disc'],
+            ['sustained', 'sust.', '/sustained', '(sust.)', '/sustained', 'sust'],
+            ['not sustained', '/not sustained', 'not sust'],
+            ['confidentiality', '/confidentiality'],
+            [',', ', '],
+            ['', '- -', '-'],
+            ['/', '/ '],
+            ['hearing', ' hearing'],
+            ['chief operating officer', ' (coo) and ', '; coo (n/s)'],
+            ['shirking', '(shirking)'],
+            ['exonerated'],
+            ['', ' ']
+        ])
     return df
 
 
