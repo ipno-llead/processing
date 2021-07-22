@@ -10,6 +10,15 @@ from lib.uid import gen_uid
 sys.path.append('../')
 
 
+def clean_department_desc(df):
+    df.loc[:, 'department_desc'] = df.department_desc.str.lower().str.strip()\
+        .replace({
+            'pol': 'police',
+            'disp': 'communications'
+        })
+    return df
+
+
 def clean():
     return pd.read_csv(data_file_path(
         'ponchatoula_pd/ponchatoula_pd_pprr_2010_2020.csv'
@@ -23,7 +32,8 @@ def clean():
         })\
         .pipe(clean_names, ['first_name', 'middle_initial', 'last_name'])\
         .pipe(clean_salaries, ['salary'])\
-        .pipe(standardize_desc_cols, ['salary_freq', 'department_desc'])\
+        .pipe(standardize_desc_cols, ['salary_freq'])\
+        .pipe(clean_department_desc)\
         .pipe(clean_sexes, ['sex'])\
         .pipe(clean_dates, ['hire_date'])\
         .pipe(set_values, {
