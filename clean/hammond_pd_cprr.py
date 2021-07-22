@@ -7,6 +7,8 @@ from lib.path import data_file_path, ensure_data_dir
 from lib.columns import clean_column_names, set_values
 from lib.clean import clean_dates, standardize_desc_cols
 from lib.uid import gen_uid
+from lib.rows import duplicate_row
+import re
 
 
 def clean_tracking_number(df):
@@ -26,7 +28,6 @@ def clean_incident_date(df):
 
 def clean_disposition(df):
     df.loc[:, 'disposition'] = df.finding.fillna('').str.lower().str.strip()\
-        .str.replace('/', ' | ')\
         .str.replace('no action', '', regex=False)
     return df.drop(columns='finding')
 
@@ -61,11 +62,12 @@ def clean_action(df):
         .str.replace('frrom', 'from', regex=False)\
         .str.replace('edwin bergeron 10/2/2019', '', regex=False)\
         .str.replace(r'^(\d+) (\w+)', r'\1-\2', regex=True)\
-        .str.replace(' / ', ' | ', regex=False)
+        .str.replace('no action', '', regex=False)\
+        .str.replace('/', '', regex=False)
     return df.drop(columns='final_recommendation')
 
 
-def combine_columns(df):
+def combine_charge_columns(df):
     def combine(row):
         txts = []
         if pd.notnull(row.violation_1):
@@ -92,25 +94,29 @@ def clean_charges(df):
     return df
 
 
-def combine_duplicate_action_disposition_and_charges_rows(df):
-    df = df.groupby(['uid', 'tracking_number']).agg({
-        'first_name': 'first',
-        'last_name': 'first',
-        'department_desc': 'first',
-        'disposition': ''.join, 
-        'action': ''.join,
-        'charges': ' |'.join,
-        'incident_year': 'first',
-        'incident_month': 'first',
-        'incident_day': 'first',
-        'investigation_start_year': 'first',
-        'investigation_start_month': 'first',
-        'investigation_start_day': 'first',
-        'data_production_year': 'first',
-        'agency': 'first',
-        'complaint_uid': 'first'
-        }).reset_index()
+def split_rows_with_multiple_charges(df):
+    i = 0
+    for idx in df[df.charges.str.contains(" | ")].index:
+        s = df.loc[idx+i, "charges"]
+        parts = re.split(r"\s*(?:\|)\s*", s)
+        df = duplicate_row(df, idx+i, len(parts))
+        for j, name in enumerate(parts):
+            df.loc[idx+i+j, "charges"] = name
+        i += len(parts) - 1
     return df
+
+
+def realign_action_column(df):
+    df.loc[
+        (df.tracking_number == '15-10') & (df.incident_month == '10'),
+        'action',
+    ] = '3-day suspension without pay'
+
+    df.loc[
+        (df.tracking_number == '15-09') & (df.incident_month == '10'),
+        'action',
+    ] = '5-day suspension without pay'
+    return df 
 
 
 def drop_rows_without_tracking_number(df):
@@ -126,10 +132,12 @@ def clean():
         .pipe(clean_incident_date)\
         .pipe(clean_disposition)\
         .pipe(clean_action)\
-        .pipe(combine_columns)\
+        .pipe(combine_charge_columns)\
         .pipe(clean_charges)\
+        .pipe(split_rows_with_multiple_charges)\
         .pipe(clean_department_desc)\
         .pipe(clean_dates, ['incident_date', 'investigation_start_date'])\
+        .pipe(realign_action_column)\
         .pipe(drop_rows_without_tracking_number)\
         .pipe(standardize_desc_cols, ['department_desc', 'action', 'charges'])\
         .pipe(set_values, {
@@ -138,8 +146,7 @@ def clean():
         })\
         .pipe(gen_uid, ['first_name', 'last_name', 'agency'])\
         .pipe(gen_uid, 
-        ['uid', 'charges', 'tracking_number', 'disposition'], 'complaint_uid')\
-        .pipe(combine_duplicate_action_disposition_and_charges_rows)
+        ['uid', 'charges', 'tracking_number', 'disposition'], 'complaint_uid')
     return df
 
 
