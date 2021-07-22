@@ -44,31 +44,44 @@ def fuse_events(csd_pprr_17, csd_pprr_19, pd_cprr_18, lprr):
 
 
 if __name__ == "__main__":
-    csd_pprr_17 = pd.read_csv(
-        data_file_path("match/pprr_baton_rouge_csd_2017.csv")
-    )
-    csd_pprr_19 = pd.read_csv(
-        data_file_path("match/pprr_baton_rouge_csd_2019.csv")
-    )
+    csd_pprr_17 = pd.read_csv(data_file_path(
+        "match/pprr_baton_rouge_csd_2017.csv"
+    ))
+    csd_pprr_19 = pd.read_csv(data_file_path(
+        "match/pprr_baton_rouge_csd_2019.csv"
+    ))
+    lprr = pd.read_csv(data_file_path(
+        "match/lprr_baton_rouge_fpcsb_1992_2012.csv"
+    ))
+    post_event = pd.read_csv(data_file_path(
+        'match/event_post_baton_rouge_pd.csv'
+    ))
+    cprr_18 = pd.read_csv(data_file_path(
+        "match/cprr_baton_rouge_pd_2018.csv"
+    ))
+    pprr = pd.read_csv(data_file_path(
+        'clean/pprr_baton_rouge_pd_2021.csv'
+    ))
+
     csd_pprr_17.loc[:, 'agency'] = 'Baton Rouge PD'
     csd_pprr_19.loc[:, 'agency'] = 'Baton Rouge PD'
-    pd_cprr_18 = pd.read_csv(
-        data_file_path("match/cprr_baton_rouge_pd_2018.csv"))
-    lprr = pd.read_csv(data_file_path(
-        "match/lprr_baton_rouge_fpcsb_1992_2012.csv"))
-    post_event = pd.read_csv(data_file_path(
-        'match/event_post_baton_rouge_pd.csv'))
+    uids = pprr.uid.unique().tolist()
     personnel_df = fuse_personnel(
+        pprr,
         csd_pprr_17.drop_duplicates(subset='uid', keep='last'),
-        csd_pprr_19, pd_cprr_18, lprr)
-    events_df = fuse_events(csd_pprr_17, csd_pprr_19, pd_cprr_18, lprr)
+        csd_pprr_19.drop_duplicates(subset='uid', keep='last'),
+        cprr_18,
+        lprr,
+    )
+
+    events_df = fuse_events(csd_pprr_17, csd_pprr_19, cprr_18, lprr)
     events_df = rearrange_event_columns(pd.concat([
         post_event,
         events_df
     ]))
     ensure_uid_unique(events_df, 'event_uid', True)
 
-    complaint_df = rearrange_complaint_columns(pd_cprr_18)
+    complaint_df = rearrange_complaint_columns(cprr_18)
     ensure_uid_unique(complaint_df, 'complaint_uid')
     lprr_df = rearrange_appeal_hearing_columns(lprr)
 

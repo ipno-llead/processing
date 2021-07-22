@@ -323,3 +323,6 @@ data/clean/cprr_lafayette_so_2015_2020.csv: clean/lafayette_so.py data/lafayette
 
 data/clean/cprr_lafayette_pd_2015_2020.csv data/clean/pprr_lafayette_pd_2010_2021.csv: clean/lafayette_pd.py data/lafayette_pd/lafayette_pd_pprr_2010_2021.csv data/lafayette_pd/lafayette_pd_cprr_2015_2020.csv
 	python clean/lafayette_pd.py
+
+data/clean/pprr_baton_rouge_pd_2021.csv: clean/baton_rouge_pd_pprr.py data/baton_rouge_pd/baton_rouge_pd_pprr_2021.csv
+	python clean/baton_rouge_pd_pprr.py
