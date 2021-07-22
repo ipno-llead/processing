@@ -260,6 +260,14 @@ repos:
     fileName: fuse/per_shreveport_pd.csv
     primaryKey:
       - uid
+  per-tangipahoa-pd:
+    fileName: fuse/per_tangipahoa_pd.csv
+    primaryKey:
+      - uid
+  per-ponchatoula-pd:
+    fileName: fuse/per_ponchatoula_pd.csv
+    primaryKey:
+      - uid
   per-lafayette-so:
     fileName: fuse/per_lafayette_so.csv
     primaryKey:
@@ -355,6 +363,7 @@ repos:
   event-tangipahoa-so:
     fileName: fuse/event_tangipahoa_so.csv
     primaryKey:
+      - event_uid
   event-new-orleans-so:
     fileName: fuse/event_new_orleans_so.csv
     primaryKey:
@@ -365,6 +374,10 @@ repos:
       - event_uid
   event-lafayette-so:
     fileName: fuse/event_lafayette_so.csv
+    primaryKey:
+      - event_uid
+  event-ponchatoula-so:
+    fileName: fuse/event_ponchatoula_so.csv
     primaryKey:
       - event_uid
   event-lafayette-pd:
