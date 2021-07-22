@@ -158,6 +158,10 @@ DATA_FILES = {
     "ponchatoula_pd": [
         "https://www.dropbox.com/s/z9qtvy40jcvk518/ponchatoula_pd_pprr_2010_2020.csv?dl=1",  # noqa
     ],
+    "lafayette_pd": [
+        "https://www.dropbox.com/s/mzanvltddi52lpw/lafayette_pd_cprr_2015_2020.csv?dl=1",  # noqa
+        "https://www.dropbox.com/s/vea5bh178sn7vpu/lafayette_pd_pprr_2010_2021.csv?dl=1",  # noqa
+    ]
 }
 _current_dir = os.path.dirname(os.path.realpath(__file__))
 

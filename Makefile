@@ -31,6 +31,7 @@ all: data/fuse/per_new_orleans_so.csv data/fuse/event_new_orleans_so.csv data/fu
 all: data/fuse/per_shreveport_pd.csv data/fuse/event_shreveport_pd.csv data/fuse/com_shreveport_pd.csv
 all: data/fuse/event_lafayette_so.csv data/fuse/per_lafayette_so.csv data/fuse/com_lafayette_so.csv
 all: data/fuse/per_ponchatoula_pd.csv data/fuse/event_ponchatoula_pd.csv
+all: data/fuse/per_lafayette_pd.csv data/fuse/com_lafayette_pd.csv data/fuse/event_lafayette_pd.csv
 
 data/fuse/per_new_orleans_harbor_pd.csv data/fuse/event_new_orleans_harbor_pd.csv data/fuse/com_new_orleans_harbor_pd.csv: fuse/new_orleans_harbor_pd.py data/match/post_event_new_orleans_harbor_pd_2020.csv data/match/cprr_new_orleans_harbor_pd_2020.csv data/clean/pprr_new_orleans_harbor_pd_1991_2008.csv data/clean/pprr_new_orleans_harbor_pd_2020.csv
 	python fuse/new_orleans_harbor_pd.py
@@ -109,6 +110,9 @@ data/fuse/per_shreveport_pd.csv data/fuse/event_shreveport_pd.csv data/fuse/com_
 
 data/fuse/event_lafayette_so.csv data/fuse/per_lafayette_so.csv data/fuse/com_lafayette_so.csv: fuse/lafayette_so.py data/clean/cprr_lafayette_so_2015_2020.csv data/clean/pprr_post_2020_11_06.csv
 	python fuse/lafayette_so.py
+	
+data/fuse/per_lafayette_pd.csv data/fuse/com_lafayette_pd.csv data/fuse/event_lafayette_pd.csv: fuse/lafayette_pd.py data/match/cprr_lafayette_pd_2015_2020.csv data/clean/pprr_lafayette_pd_2010_2021.csv data/match/post_event_lafayette_pd_2020.csv
+	python fuse/lafayette_pd.py
 
 data/fuse/per_ponchatoula_pd.csv data/fuse/event_ponchatoula_pd.csv: fuse/ponchatoula_pd.py data/clean/pprr_ponchatoula_pd_2010_2020.csv data/match/post_event_ponchatoula_pd_2020.csv
 	python fuse/ponchatoula_pd.py
@@ -195,6 +199,9 @@ data/match/cprr_lafayette_so_2015_2020.csv: match/lafayette_so.py data/clean/cpr
 
 data/match/post_event_ponchatoula_pd_2020.csv: match/ponchatoula_pd.py data/clean/pprr_ponchatoula_pd_2010_2020.csv data/clean/pprr_post_2020_11_06.csv
 	python match/ponchatoula_pd.py
+	
+data/match/cprr_lafayette_pd_2015_2020.csv data/match/post_event_lafayette_pd_2020.csv: match/lafayette_pd.py data/clean/cprr_lafayette_pd_2015_2020.csv data/clean/pprr_lafayette_pd_2010_2021.csv data/clean/pprr_post_2020_11_06.csv
+	python match/lafayette_pd.py
 
 
 
@@ -323,3 +330,6 @@ data/clean/cprr_lafayette_so_2015_2020.csv: clean/lafayette_so.py data/lafayette
 
 data/clean/pprr_ponchatoula_pd_2010_2020.csv: clean/ponchatoula_pd.py data/ponchatoula_pd/ponchatoula_pd_pprr_2010_2020.csv
 	python clean/ponchatoula_pd.py
+
+data/clean/cprr_lafayette_pd_2015_2020.csv data/clean/pprr_lafayette_pd_2010_2021.csv: clean/lafayette_pd.py data/lafayette_pd/lafayette_pd_pprr_2010_2021.csv data/lafayette_pd/lafayette_pd_cprr_2015_2020.csv
+	python clean/lafayette_pd.py
