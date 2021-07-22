@@ -55,13 +55,13 @@ def realign_18():
     df.iloc[12, 5] = df.iloc[12, 5] + "P10467 Patrol 3rd District"
     df.iloc[12, 6] = df.iloc[12, 6] + "Orders - (Pursuit) - 40"
     for ind in [16, 23, 25, 29]:
-        m = re.match(r"^(.+) (\d+\:\d+) *$", df.iloc[ind-1, 6])
-        df.iloc[ind-1, 6] = m.group(1)
+        m = re.match(r"^(.+) (\d+\:\d+) *$", df.iloc[ind - 1, 6])
+        df.iloc[ind - 1, 6] = m.group(1)
         df.iloc[ind, 6] = "%s %s" % (m.group(2), df.iloc[ind, 6])
     for ind in [39]:
-        m = re.match(r"^(\d+) (.+)$", df.iloc[ind+1, 6])
+        m = re.match(r"^(\d+) (.+)$", df.iloc[ind + 1, 6])
         df.iloc[ind, 6] = df.iloc[ind, 6] + m.group(1)
-        df.iloc[ind+1, 6] = m.group(2)
+        df.iloc[ind + 1, 6] = m.group(2)
     df.iloc[24, 5] = df.iloc[24, 5][21:]
     df.iloc[38, 5] = df.iloc[38, 5] + "Operational Services"
     df.iloc[66, 6] = df.iloc[66, 6] + "Orders - (Pursuit) - 40"
@@ -234,8 +234,7 @@ def clean_18():
         .pipe(assign_agency_18)\
         .pipe(assign_data_production_year_18)\
         .pipe(gen_uid, ["agency", "first_name", "middle_initial", "last_name"])\
-        .pipe(gen_uid, ['agency', 'tracking_number', 'uid', 'action', 'charges'], 'charge_uid')\
-        .pipe(gen_uid, ['charge_uid'], 'complaint_uid')
+        .pipe(gen_uid, ['agency', 'tracking_number', 'uid', 'action', 'charges'], 'complaint_uid')
 
     return df
 
