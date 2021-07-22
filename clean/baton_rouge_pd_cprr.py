@@ -1,4 +1,4 @@
-from lib.columns import clean_column_names
+from lib.columns import clean_column_names, float_to_int_str
 from lib.clean import clean_dates, standardize_desc_cols
 from lib.uid import gen_uid
 from lib.standardize import standardize_from_lookup_table
@@ -210,6 +210,231 @@ def assign_agency_18(df):
 
 def drop_office_investigation_rows(df):
     return df[~(df.action == 'office investigation')].reset_index(drop=True)
+
+
+def clean_status(df):
+    df.loc[:, 'investigation_status'] = df.status.fillna('').str.lower().str.strip()\
+        .str.replace(r'invesligation$', 'investigation', regex=True)\
+        .str.replace(r'(- ?|\.)', '', regex=True)\
+        .str.replace('&', 'and', regex=False)
+    return df.drop(columns='status')
+
+
+def create_tracking_number(df):
+    df.loc[:, "tracking_number"] = df.ia_year.apply(str) + '-' + df.ia_seq.apply(str)
+    return df.drop(columns=['ia_seq', 'ia_year'])
+
+
+def clean_receive_incident_dates(df):
+    df.receive_date = df.receive_date\
+        .str.replace('- ', '', regex=False)
+    df.incident_date = df.incident_date\
+        .str.replace('- ', '', regex=False)\
+        .str.replace('. ', '', regex=False)\
+        .str.replace('13-Oct', '10/13/2015', regex=False)\
+        .str.replace('16-Feb', '2/16/2016', regex=False)\
+        .str.replace('16-Jul', '7/16/2017', regex=False)\
+        .str.replace('17-Jul', '7/17/2017', regex=False)\
+        .str.replace('1092019', '10/9/2019', regex=False)\
+        .str.replace('2019-06', '', regex=False)
+    return df
+
+
+def clean_complainant(df):
+    df.complainant = df.complainant.fillna('').str.lower().str.strip()\
+        .str.replace(r'\< ?(\d+) ?\-? (\d+) \>', '', regex=True)\
+        .str.replace('-', '', regex=False)\
+        .str.replace(r'(h/)?[8b](p|r)(p|r)d?o?i?/? ?', 'brpd', regex=True)\
+        .str.replace('damaging dept. equipment', '', regex=False)
+
+    return df
+
+
+def clean_charges(df):
+    df.loc[:, 'charges'] = df.complaint.str.lower().str.strip().fillna('')\
+        .str.replace(r' >i? ', ' - ', regex=True)\
+        .str.replace('.', '', regex=False)\
+        .str.replace(',', '', regex=False)\
+        .str.replace(r'^use ', '3:20 use ', regex=True)\
+        .str.replace(r' [rd]ep[lt]\.? ?', ' department ', regex=True)\
+        .str.replace(r'(\d+)\.(\d+)', r'\1:\2', regex=True)\
+        .str.replace(r'(2:1[43])? ?d?dmvr ?(violation)? ?(-)? ?(68)?', '2:14 dmvr violation - 68', regex=True)\
+        .str.replace(' - - ', ' - ', regex=False)\
+        .str.replace(' / - ', ' / ', regex=False)\
+        .str.replace(r'(2:[23])? ?shirking ?(duties)? ?(14)?', '2:2 shirking duties - 14', regex=True)\
+        .str.replace(r'^-$', '', regex=True)\
+        .str.replace(r'(\w+)/(\w+)', r'\1 / \2', regex=True)\
+        .str.replace(r'^3:22$', '3:22 violation of known laws', regex=True)\
+        .str.replace(r'(failure to report)? ?(2:[87])? ?damag(ed?|ing)? ?(to)? ?(department)? ?(equip?(ment)?)? ?(- 18)?',
+        '2:7 damaging department equipment - 18', regex=True)\
+        .str.replace(r'(\w+) - (\(?\w+\)?)', r'\1 \2', regex=True)\
+        .str.replace('shooling', 'shooting', regex=False)\
+        .str.replace(r'^carr[ry]?(ing)? out orders\b', '3:17 carrying out orders', regex=True)\
+        .str.replace(r'\((veh)? ?(pursuit)?\)$', '(pursuit) - 40', regex=True)\
+        .str.replace(r'(^22?:?[12]?2?)? ?command ?(of)? temper ?(13)?', '2:2 command of temper - 13', regex=True)\
+        .str.replace(r'^(viol)?(ation)? ?of (known)? ?laws', '3:22 violation of known laws', regex=True)\
+        .str.replace(r' \/(\w+)', r' / \1', regex=True)\
+        .str.replace(r' (\d+) (\d+):(\d+)', r'\1', regex=True)\
+        .str.replace(r'(2:?1[12])? ?(conduct)? ?unbecoming ?(an)? ?(officer)? ?(\(?harrassment\)?)? ?(21)? ?(violation)?',
+        '2:12 conduct unbecoming an officer - 21 ', regex=True)\
+        .str.replace(r'(1:7)? ?(fail)?(ure)? ?(to)? ?(comp(lete?)?(ion)?)? ?(required)? ?(and)? ?&? ?/? ?(submissions?)? ?(of)? ?(required)? forms? ?(8)?',
+        '1:7 failure to submit required forms', regex=True)\
+        .str.replace(r'^insubordination$', '3:18 insubordination - 43', regex=True)\
+        .str.replace(r'(2:5)? ?awol ?(15)?', '2:5 absent without leave - 15', regex=True)\
+        .str.replace(r'^punctuality$', '1:5 punctuality - 6', regex=True)\
+        .str.replace(r'^truthfulness$', '3:23 truthfulness - 58', regex=True)\
+        .str.replace(r'^sexual harrassment$', '3:14 sexual harassment - 37', regex=True)\
+        .str.replace(r'^(release of prisoner)? ?/? ?allow(ing)? ?escape ?(30)?', 
+        '3:7 release of prisoners / allowing escape - 30', regex=True)\
+        .str.replace(r'(2:1[23])? ?respect ?(of)? ?(fellow)? ?(officers|members)? ?(22)?', '2:13 respect of fellow officers - 22')\
+        .str.replace(r'(3:9)? ?failure to provide info(rmation)? ?(to superior)? ?(32)?', '3:9 failure to provide information to superior - 39', regex=True)\
+        .str.replace(r'(\w+)-', r'\1', regex=True)\
+        .str.replace('incar', 'in car', regex=False)\
+        .str.replace('accidentl discharge', 'accidental shooting', regex=False)\
+        .str.replace(r'^assc with known criminals$', '3:21 association with known criminals - 55', regex=True)\
+        .str.replace(r'\(contact person\)45 failure to$', '(contact person) - 45', regex=True)\
+        .str.replace(r'desertion', '2:5 absent without leave - 15', regex=False)\
+        .str.replace(r'^cowardice$', '3:15 cowardice - 38', regex=True)\
+        .str.replace(r'^confidentiality$', '3:8 confidentiality - 31', regex=True)\
+        .str.replace(r'^unauth public statements$', '3:5 unauthorized public statements - 27', regex=True)\
+        .str.replace(r'^fals[ei]f?i?(cation)? ?(of)? documents', '3:19 falsification of documents - 44')\
+        .str.replace(r'dl suspension', "suspended driver's license", regex=False)\
+        .str.replace(' i intermediate weapon ', ' / intermediate weapon - ', regex=False)\
+        .str.replace(r'^320\b', '3:20', regex=True)\
+        .str.replace(r' a shooting', ' / shooting', regex=False)\
+        .str.replace(r'\binvest\b', 'investigation', regex=True)\
+        .str.replace(r' (\(drugs\))? ', ' - ', regex=True)\
+        .str.replace(r'^fai[tl](urr?e)? ?(to)? ?(secu[tr]e)? ?(property)? ?/? ?(or)? ?(evid(ence)?)?$',
+         '3:4 failure to secure property or evidence - 26', regex=True)
+    return df.drop(columns='complaint')
+
+
+def parse_officer_name_2021(df):
+    dep = df.officer_name.str.replace(r'^(.+), (PC?\d+) (.+)$', r'\1 # \2 # \3').str.split(' # ', expand = True)
+    dep.columns = ['name', 'department_code', 'dept_description']
+    dep.loc[:, 'name'] = dep['name'].str.lower().str.strip()
+
+    names = dep["name"].str.lower().str.replace(r"\s+", " ").str.replace(
+        r"^(\w+(?: (?:iii?|iv|v|jr|sr))?) (\w+)(?: (\w+|n\/a))?$", r"\1 # \2 # \3").str.split(" # ", expand=True)
+    names.columns = ["last_name", "first_name", "middle_initial"]
+    names.loc[:, "middle_initial"] = names["middle_initial"]\
+        .str.replace("n/a", "", regex=False).fillna("")
+    names.loc[:, "middle_name"] = names.middle_initial.map(
+        lambda v: "" if len(v) < 2 else v)
+    names.loc[:, "middle_initial"] = names.middle_initial.map(lambda v: v[:1])
+
+    df = pd.concat([df, dep, names], axis=1)
+    df.drop(columns=["officer_name", "name"], inplace=True)
+    return df
+
+
+def clean_action(df):
+    df.action = df.action.str.lower().str.strip()\
+        .str.replace('loc', 'letter of caution', regex=False)\
+        .str.replace('lor', 'letter of reprimand', regex=False)\
+        .str.replace(r'l\.?o\.?u\.?', 'loss of unit', regex=True)\
+        .str.replace(r'sust\.?,?\b', 'sustained', regex=True)\
+        .str.replace(r'hr\.?\b', 'hour', regex=True)\
+        .str.replace(r'(\d+)-? (\w+)', r'\1-\2', regex=True)
+    return df
+
+def extract(df):
+    parts = df.action.str.extract(r'((/?sustained/? ?))?')
+    df.loc[:, 'dis'] = parts[0]
+    df.dis = df.dis.str.lower().str.strip()\
+        .str.replace(r'sustained/? ?', 'sustained')
+    return df
+
+        # .pipe(standardize_from_lookup_table, 'action', [
+        #     ['1-day', '1- day', '1 day', '1 day'],
+        #     ['letter of reprimand', 'lor'], 
+        #     ['rescinded', 'recinded'],
+        #     ['insubordination', 'insub'],
+        #     ['sexual harassment', ')/sexual harass(n/s)'],
+        #     ['exonerated;', 'exonerated/', ';exonerated'],
+        #     ['demotion; truthfulness', 'demotion; truth(n/s)'],
+        #     ['vehicle', 'veh.'],
+        #     ['captain', 'capt'],
+        #     ['office', 'ofc.'],
+        #     ['counseled', 'counselec'],
+        #     ['and', '&'],
+        #     ['hour', 'hr', 'hr.'],
+        #     ['driving school', 'school', 'drv school', 'dr sch', 'driv. school', 'driv sch', 'drv sch'],
+        #     ['suspension', 'susp', 'susp.'],
+        #     ['shirking and truthfulness', 'shirking&truthful', 'shirking&truthfu'],
+        #     ['shirking and cowardice', 'cowardice&shirking'],
+        #     ['sustained', 'suslained', 'sust.', 'sust,', '(sust)', 'sust'],
+        #     ['de-escalation', 'de- escalation'],
+        #     ['use of force', 'uof'],
+        #     ['driving while intoxicated', 'dwi'],
+        #     ['roll', 'roli'],
+        #     ['5-day', '5 day'], 
+        #     ['2-day', '2 day'],
+        #     ['8 hour driving school', '8 hr drv sch', '8 hr dr sch', '8 hr driv. school, '],
+        #     ['30-day', '30 day', '30- day'],
+        #     ['70-day', '70- day'],
+        #     ['7-day', '7- day'],
+        #     ['10-day', '10 day', '10- day', '10-days', '10 ', '10day'],
+        #     ['60-day', '60-day rule', '(60-day rule'],
+        #     ['6 month', '6 mo.', '6 mo'],
+        #     ['loss of unit', 'lou', 'lou-'],
+        #     ['office investigation; terminated', 'office investigation terminated'],
+        #     ['terminated', 'termination', '/terminated', 'terminated 11/09/12'],
+        #     ['office investigation', 'office investiation'],
+        #     ['letter of caution', 'letter of cautin', 'lette of caution', 'loc'],
+        #     ['office investigation; officer resigned', 'office investigation/resigned', 'office investigation/officer resigned'],
+        #     ['sustained/1-day suspension', 'sustained 1- day suspension'], 
+        #     ['not sustained', 'not sust.', 'not sust'],
+        #     ['resigned in lieu of termination', '/resigned in lieu of termination'],
+        #     ['sustained/20-day suspension; suspension overturned 1/19/12', 'sustained/20-day suspension(suspension overturned 1/19/12)'],
+        #     ['mandatory training accident investigation', 'mandatory trianing - accident investigation'],
+        # ])
+
+
+def clean_2021():
+    df = pd.read_csv(data_file_path(
+        'baton_rouge_pd/baton_rouge_pd_2021.csv'))\
+        .pipe(clean_column_names)
+    df = df\
+        .rename(columns={
+            'received': 'receive_date',
+            'occur_date': 'incident_date'
+        })\
+        .pipe(clean_status)\
+        .pipe(float_to_int_str, ['ia_seq', 'ia_year'])\
+        .pipe(create_tracking_number)\
+        .pipe(clean_receive_incident_dates)\
+        .pipe(clean_complainant)\
+        .pipe(clean_dates, ['receive_date', 'incident_date'])\
+        .pipe(clean_charges)\
+        .pipe(clean_action)\
+        .pipe(extract)\
+        .pipe(parse_officer_name_2021)\
+        .pipe(standardize_desc_cols, ['charges', 'action', 'disposition'])\
+        .pipe(standardize_from_lookup_table, 'disposition', [
+            ['administrative review', 'admin. review', 'admin, review', '/admin. review', '/admin, review', '/admin review', 'admin review'],
+            ['office investigation', '/office investigation', 'office inv.', 'ofc. investigation'],
+            ['referral', '/referral', '/referral to cib', 'referra)', 
+            'referred to capt. bloom by payne 6/27/13*checl with up 11/14/13 and 02/03/14',
+            'referred to capt. bloom by payne 6/27/13*check with up 11/14/13 and 02/03/14',
+            'referred to capt. dunn', '/referred to capt. dunn', '/referred to capt. a. lee',
+            'referred to capt. lee/', 'referred 7/26/16'], 
+            ['pre-termination hearing', 'pre termination hearing', 'pre- termination hearing', '/pre- termination hearing',
+            '/pre-term'],
+            ['pre-disciplinary hearing', 'pre-disc hearing', '/pre-disc hearing', 'pre disc', '/pre disc', '/pre-disc', 'pre-disc'],
+            ['sustained', 'sust.', '/sustained', '(sust.)', '/sustained', 'sust'],
+            ['not sustained', '/not sustained', 'not sust'],
+            ['confidentiality', '/confidentiality'],
+            [',', ', '],
+            ['', '- -', '-'],
+            ['/', '/ '],
+            ['hearing', ' hearing'],
+            ['chief operating officer', ' (coo) and ', '; coo (n/s)'],
+            ['shirking', '(shirking)'],
+            ['exonerated'],
+            ['', ' ']
+        ])
+    return df
 
 
 def clean_18():
