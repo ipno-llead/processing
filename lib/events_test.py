@@ -20,7 +20,7 @@ class EventsBuilderTestCase(unittest.TestCase):
         if 'salary_freq' in columns:
             df.loc[:, 'salary_freq'] = df.salary_freq.astype(salary.cat_type)
         frame = builder.to_frame()
-        assert_frame_equal(frame, df)
+        assert_frame_equal(frame, df.sort_values(['agency', 'kind', 'event_uid']))
 
     def test_append_record(self):
         builder = Builder()

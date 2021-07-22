@@ -229,6 +229,66 @@ def clean_cprr_dates(df):
     return df
 
 
+def split_rows_with_multiple_allegations(df):
+    indices_to_remove = []
+    records = []
+    for idx, row in df.loc[df.allegation.str.contains(';')].iterrows():
+        indices_to_remove.append(idx)
+        allegations = row.allegation.split('; ')
+        dispositions = row.disposition.split('; ')
+        values = [
+            (k, v) for k, v in row.to_dict().items()
+            if k not in ['allegation', 'disposition']
+        ]
+        if len(dispositions) <= 1:
+            for allegation in allegations:
+                records.append(dict(values + [
+                    ('allegation', allegation),
+                    ('disposition', row.disposition)
+                ]))
+        elif len(dispositions) == len(allegations):
+            for i, allegation in enumerate(allegations):
+                records.append(dict(values + [
+                    ('allegation', allegation),
+                    ('disposition', dispositions[i])
+                ]))
+        else:
+            assert dispositions[0] == allegations[0]
+            start = 1
+            end = 1
+            for i, allegation in enumerate(allegations):
+                if i == len(allegations) - 1:
+                    end = len(dispositions)
+                else:
+                    while dispositions[end] != allegations[i + 1] and end < len(dispositions):
+                        end += 1
+                records.append(dict(values + [
+                    ('allegation', allegation),
+                    ('disposition', '; '.join(dispositions[start:end]))
+                ]))
+                start = end + 1
+    return pd.concat([
+        df.drop(index=indices_to_remove),
+        pd.DataFrame.from_records(records),
+    ]).sort_values('tracking_number').reset_index(drop=True)
+
+
+def split_action_from_disposition(df):
+    dispositions = [
+        'sustained',
+        'not sustained',
+        'unfounded',
+        'exonerated',
+    ]
+    disp_action = df.disposition.str.extract(
+        r'^(?:(%s)(?:; (.+))?|(.+))$' % ('|'.join(dispositions))
+    )
+    df.loc[:, 'action'] = disp_action[1].fillna('')\
+        .str.cat(disp_action[2].fillna(''))
+    df.loc[:, 'disposition'] = disp_action[0]
+    return df
+
+
 def clean_cprr():
     return pd.read_csv(data_file_path(
         'lafayette_pd/lafayette_pd_cprr_2015_2020.csv'
@@ -303,7 +363,7 @@ def clean_cprr():
             ['rumors'],
         ]).pipe(split_disposition)\
         .pipe(standardize_from_lookup_table, 'disposition', [
-            ['sustained', 'sust.'],
+            ['sustained', 'sust.', 'sus'],
             ['not sustained'],
             ['unfounded'],
             ['exonerated'],
@@ -325,7 +385,7 @@ def clean_cprr():
             ['suspension 45 days', '45'],
             ['suspension 60 days', '60 day suspension'],
             ['suspension 90 days', '90 suspension'],
-            ['suspension', 'sus'],
+            ['suspension'],
             ['6 months probation', '6months probation'],
             ['sensitivity training'],
             ['1 year no vehicle'],
@@ -346,9 +406,11 @@ def clean_cprr():
             ['complaint withdrawn', 'withdrawn'],
             ['bwc'],
             ['special evaluation', 'special eval'],
-            ['proffessional conduct', 'prof conduct'],
-            ['evidence'],
-        ]).pipe(set_values, {
+            ['professional conduct', 'prof conduct'],
+            ['handling of evidence', 'evidence'],
+        ]).pipe(split_rows_with_multiple_allegations)\
+        .pipe(split_action_from_disposition)\
+        .pipe(set_values, {
             'data_production_year': 2020,
             'agency': 'Lafayette PD'
         }).pipe(clean_names, ['first_name', 'last_name', 'investigator_first_name', 'investigator_last_name'])\
