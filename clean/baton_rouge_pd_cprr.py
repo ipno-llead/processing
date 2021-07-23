@@ -1,3 +1,4 @@
+from pandas.io.parsers import read_csv
 from lib.columns import clean_column_names, float_to_int_str
 from lib.clean import clean_dates, standardize_desc_cols
 from lib.uid import gen_uid
@@ -328,67 +329,76 @@ def parse_officer_name_2021(df):
     return df
 
 
+def clean_disposition(df):
+    df.loc[:, 'dispositions'] = df.disposition.str.lower().str.strip().fillna('')\
+        .str.replace(r'/?admin\.?,?', 'admin', regex=True)\
+        .str.replace('.', '', regex=True)\
+        .str.replace(r'^/?', '', regex=True)\
+        .str.replace(r'pre-? ?disc ?(hearing)?', 'pre-disciplinary hearing', regex=True)\
+        .str.replace(r'sust\.?\b', 'sustained', regex=True)\
+        .str.replace(r'(\w+)- (\w+)', r'\1-\2', regex=True)\
+        .str.replace(r'(\w+)/ (\w+)', r'\1/\2', regex=True)\
+        .str.replace(r'pre-? ?term(ination)? ?(hearing)?', 'pre-termination hearing', regex=True)\
+        .str.replace(r'\binv\b', 'investigation', regex=True)\
+        .str.replace(r'\bofc\b', 'office', regex=True)\
+        .str.replace('referraladmin', 'referral/admin', regex=False)\
+        .str.replace(r'^- ?-?$', '', regex=True)\
+        .str.replace('referra)', 'referral', regex=False)
+    return df.drop(columns='disposition')
+
+
+
 def clean_action(df):
-    df.action = df.action.str.lower().str.strip()\
+    df.loc[:, 'actions'] = df.action.str.lower().str.strip()\
+        .str.replace(r'^/', '', regex=True)\
         .str.replace('loc', 'letter of caution', regex=False)\
         .str.replace('lor', 'letter of reprimand', regex=False)\
         .str.replace(r'l\.?o\.?u\.?', 'loss of unit', regex=True)\
-        .str.replace(r'sust\.?,?\b', 'sustained', regex=True)\
+        .str.replace(r' ?sust?(alned)?\.?,?(l?aine?d)?\b', 'sustained', regex=True)\
         .str.replace(r'hr\.?\b', 'hour', regex=True)\
-        .str.replace(r'(\d+)-? (\w+)', r'\1-\2', regex=True)
+        .str.replace(r'(\d+)-? (\w+)', r'\1-\2', regex=True)\
+        .str.replace(r',|\.', '', regex=True)\
+        .str.replace(r'\bnotsustained\b', 'not sustained', regex=True)\
+        .str.replace(r'^hord/not sustained blust/not sustained$', 'not sustained', regex=True)\
+        .str.replace(r'^-$', '', regex=True)
+    return df.drop(columns='action')
+
+# def extract_disposition_from_action(df):
+#     action_parts = df.action.str.extract(r'(( ?/?\(?sustained ?\)?/? ?/?| ?/?not sustained/? ?/?))?')
+#     df.loc[:, 'extracted_disposition'] = action_parts[0]
+#     df.disposition = df.disposition.str.lower().str.strip().fillna('')\
+#         .str.cat(df.extracted_disposition, sep=';')
+#     return df
+
+def combine_action_and_disposition(df):
+    df.loc[:, 'disposition'] = df.dispositions.str.cat(df.actions, sep=' | ')
+    df.loc[:, 'action'] = df.dispositions.str.cat(df.actions, sep=' | ')
+    df.disposition = df.disposition.str.extract(r'(( ?/?\(?sustained ?\)?/? ?/?| ?/?not sustained/? ?/?))?')
     return df
 
-def extract(df):
-    parts = df.action.str.extract(r'((/?sustained/? ?))?')
-    df.loc[:, 'dis'] = parts[0]
-    df.dis = df.dis.str.lower().str.strip()\
-        .str.replace(r'sustained/? ?', 'sustained')
-    return df
 
-        # .pipe(standardize_from_lookup_table, 'action', [
-        #     ['1-day', '1- day', '1 day', '1 day'],
-        #     ['letter of reprimand', 'lor'], 
-        #     ['rescinded', 'recinded'],
-        #     ['insubordination', 'insub'],
-        #     ['sexual harassment', ')/sexual harass(n/s)'],
-        #     ['exonerated;', 'exonerated/', ';exonerated'],
-        #     ['demotion; truthfulness', 'demotion; truth(n/s)'],
-        #     ['vehicle', 'veh.'],
-        #     ['captain', 'capt'],
-        #     ['office', 'ofc.'],
-        #     ['counseled', 'counselec'],
-        #     ['and', '&'],
-        #     ['hour', 'hr', 'hr.'],
-        #     ['driving school', 'school', 'drv school', 'dr sch', 'driv. school', 'driv sch', 'drv sch'],
-        #     ['suspension', 'susp', 'susp.'],
-        #     ['shirking and truthfulness', 'shirking&truthful', 'shirking&truthfu'],
-        #     ['shirking and cowardice', 'cowardice&shirking'],
-        #     ['sustained', 'suslained', 'sust.', 'sust,', '(sust)', 'sust'],
-        #     ['de-escalation', 'de- escalation'],
-        #     ['use of force', 'uof'],
-        #     ['driving while intoxicated', 'dwi'],
-        #     ['roll', 'roli'],
-        #     ['5-day', '5 day'], 
-        #     ['2-day', '2 day'],
-        #     ['8 hour driving school', '8 hr drv sch', '8 hr dr sch', '8 hr driv. school, '],
-        #     ['30-day', '30 day', '30- day'],
-        #     ['70-day', '70- day'],
-        #     ['7-day', '7- day'],
-        #     ['10-day', '10 day', '10- day', '10-days', '10 ', '10day'],
-        #     ['60-day', '60-day rule', '(60-day rule'],
-        #     ['6 month', '6 mo.', '6 mo'],
-        #     ['loss of unit', 'lou', 'lou-'],
-        #     ['office investigation; terminated', 'office investigation terminated'],
-        #     ['terminated', 'termination', '/terminated', 'terminated 11/09/12'],
-        #     ['office investigation', 'office investiation'],
-        #     ['letter of caution', 'letter of cautin', 'lette of caution', 'loc'],
-        #     ['office investigation; officer resigned', 'office investigation/resigned', 'office investigation/officer resigned'],
-        #     ['sustained/1-day suspension', 'sustained 1- day suspension'], 
-        #     ['not sustained', 'not sust.', 'not sust'],
-        #     ['resigned in lieu of termination', '/resigned in lieu of termination'],
-        #     ['sustained/20-day suspension; suspension overturned 1/19/12', 'sustained/20-day suspension(suspension overturned 1/19/12)'],
-        #     ['mandatory training accident investigation', 'mandatory trianing - accident investigation'],
-        # ])
+
+        # .pipe(standardize_from_lookup_table, 'disposition', [
+        #                 ['sustained', 'admin review;sustained', 'pre-disciplinary hearing; sustained', 
+        #                 'pre-disciplinary hearing; sustained/', 'referral;sustained/',
+        #                 'pre-disciplinary hearing; sustained/', 
+        #                 'pre-disciplinary hearing ', 
+        #                 'referred to capt bloom by payne 6/27/13*checl with up 11/14/13 and 02/03/14;sustained/',
+        #                 'referred to capt bloom by payne 6/27/13*check with up 11/14/13 and 02/03/14;sustained/',
+        #                 'pre-disciplinary hearing;sustained /', 'referral/admin review;sustained/',
+        #                 'admin review;sustained', 'referral;sustained', 'referred to capt dunn;sustained/',
+        #                 'sustained;sustained', 'referred to capt a lee;sustained', 'referred to capt lee/sustained;sustained/', 
+        #                 'referred 7/26/16;sustained/', 'confidentiality (sustained); coo (n/s);sustained',
+        #                 'sustained;sustained/ ',],
+        #                 ['not sustained', 'admin review;not sustained', 'referral;not sustained',
+        #                 'pre-disciplinary hearing;not sustained', 'referral;not sustained/',
+        #                 'referral to cib;not sustained', 'office investigation;not sustained/',
+        #                 'admin review;not sustained/', 'referral;not sustained /',
+        #                 'pre-disciplinary hearing;not sustained/', 'pre-disciplinary hearing;not sustained ',
+        #                 'admin review;not sustained ', 'not sustained;not sustained'],
+        #                 ])
+
+
 
 
 def clean_2021():
@@ -408,32 +418,11 @@ def clean_2021():
         .pipe(clean_dates, ['receive_date', 'incident_date'])\
         .pipe(clean_charges)\
         .pipe(clean_action)\
-        .pipe(extract)\
+        .pipe(clean_disposition)\
         .pipe(parse_officer_name_2021)\
-        .pipe(standardize_desc_cols, ['charges', 'action', 'disposition'])\
-        .pipe(standardize_from_lookup_table, 'disposition', [
-            ['administrative review', 'admin. review', 'admin, review', '/admin. review', '/admin, review', '/admin review', 'admin review'],
-            ['office investigation', '/office investigation', 'office inv.', 'ofc. investigation'],
-            ['referral', '/referral', '/referral to cib', 'referra)', 
-            'referred to capt. bloom by payne 6/27/13*checl with up 11/14/13 and 02/03/14',
-            'referred to capt. bloom by payne 6/27/13*check with up 11/14/13 and 02/03/14',
-            'referred to capt. dunn', '/referred to capt. dunn', '/referred to capt. a. lee',
-            'referred to capt. lee/', 'referred 7/26/16'], 
-            ['pre-termination hearing', 'pre termination hearing', 'pre- termination hearing', '/pre- termination hearing',
-            '/pre-term'],
-            ['pre-disciplinary hearing', 'pre-disc hearing', '/pre-disc hearing', 'pre disc', '/pre disc', '/pre-disc', 'pre-disc'],
-            ['sustained', 'sust.', '/sustained', '(sust.)', '/sustained', 'sust'],
-            ['not sustained', '/not sustained', 'not sust'],
-            ['confidentiality', '/confidentiality'],
-            [',', ', '],
-            ['', '- -', '-'],
-            ['/', '/ '],
-            ['hearing', ' hearing'],
-            ['chief operating officer', ' (coo) and ', '; coo (n/s)'],
-            ['shirking', '(shirking)'],
-            ['exonerated'],
-            ['', ' ']
-        ])
+        .pipe(combine_action_and_disposition)\
+        .pipe(standardize_desc_cols, ['charges', 'action', 'disposition'])
+
     return df
 
 
