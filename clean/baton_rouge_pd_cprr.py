@@ -330,7 +330,7 @@ def parse_officer_name_2021(df):
 
 
 def clean_disposition(df):
-    df.loc[:, 'dispositions'] = df.disposition.str.lower().str.strip().fillna('')\
+    df.disposition = df.disposition.str.lower().str.strip().fillna('')\
         .str.replace(r'/?admin\.?,?', 'admin', regex=True)\
         .str.replace('.', '', regex=True)\
         .str.replace(r'^/?', '', regex=True)\
@@ -344,12 +344,11 @@ def clean_disposition(df):
         .str.replace('referraladmin', 'referral/admin', regex=False)\
         .str.replace(r'^- ?-?$', '', regex=True)\
         .str.replace('referra)', 'referral', regex=False)
-    return df.drop(columns='disposition')
+    return df.drop
 
 
-
-def clean_action(df):
-    df.loc[:, 'actions'] = df.action.str.lower().str.strip()\
+def combine_action_and_disposition(df):
+    df.loc[:, 'disposition'] = df.dispositions.str.cat(df.action, sep='|')\
         .str.replace(r'^/', '', regex=True)\
         .str.replace('loc', 'letter of caution', regex=False)\
         .str.replace('lor', 'letter of reprimand', regex=False)\
@@ -361,44 +360,31 @@ def clean_action(df):
         .str.replace(r'\bnotsustained\b', 'not sustained', regex=True)\
         .str.replace(r'^hord/not sustained blust/not sustained$', 'not sustained', regex=True)\
         .str.replace(r'^-$', '', regex=True)
-    return df.drop(columns='action')
-
-# def extract_disposition_from_action(df):
-#     action_parts = df.action.str.extract(r'(( ?/?\(?sustained ?\)?/? ?/?| ?/?not sustained/? ?/?))?')
-#     df.loc[:, 'extracted_disposition'] = action_parts[0]
-#     df.disposition = df.disposition.str.lower().str.strip().fillna('')\
-#         .str.cat(df.extracted_disposition, sep=';')
-#     return df
-
-def combine_action_and_disposition(df):
-    df.loc[:, 'disposition'] = df.dispositions.str.cat(df.actions, sep=' | ')
-    df.loc[:, 'action'] = df.dispositions.str.cat(df.actions, sep=' | ')
-    df.disposition = df.disposition.str.extract(r'(( ?/?\(?sustained ?\)?/? ?/?| ?/?not sustained/? ?/?))?')
+    df.disposition = df.disposition.str.extract(r'(sustained|not sustained|exonerated)')
     return df
 
-
-
-        # .pipe(standardize_from_lookup_table, 'disposition', [
-        #                 ['sustained', 'admin review;sustained', 'pre-disciplinary hearing; sustained', 
-        #                 'pre-disciplinary hearing; sustained/', 'referral;sustained/',
-        #                 'pre-disciplinary hearing; sustained/', 
-        #                 'pre-disciplinary hearing ', 
-        #                 'referred to capt bloom by payne 6/27/13*checl with up 11/14/13 and 02/03/14;sustained/',
-        #                 'referred to capt bloom by payne 6/27/13*check with up 11/14/13 and 02/03/14;sustained/',
-        #                 'pre-disciplinary hearing;sustained /', 'referral/admin review;sustained/',
-        #                 'admin review;sustained', 'referral;sustained', 'referred to capt dunn;sustained/',
-        #                 'sustained;sustained', 'referred to capt a lee;sustained', 'referred to capt lee/sustained;sustained/', 
-        #                 'referred 7/26/16;sustained/', 'confidentiality (sustained); coo (n/s);sustained',
-        #                 'sustained;sustained/ ',],
-        #                 ['not sustained', 'admin review;not sustained', 'referral;not sustained',
-        #                 'pre-disciplinary hearing;not sustained', 'referral;not sustained/',
-        #                 'referral to cib;not sustained', 'office investigation;not sustained/',
-        #                 'admin review;not sustained/', 'referral;not sustained /',
-        #                 'pre-disciplinary hearing;not sustained/', 'pre-disciplinary hearing;not sustained ',
-        #                 'admin review;not sustained ', 'not sustained;not sustained'],
-        #                 ])
-
-
+def clean_action(df):
+    df.action = df.action.str.lower().str.strip()\
+        .str.replace(r'not ?(sustained)? ?', '', regex=True)\
+        .str.replace(r' ?sust?(alned)?\.?,?(l?aine?d)?\b', '', regex=True)\
+        .str.replace(r'exonerated', '', regex=True)\
+        .str.replace(r'^\.', '', regex=True)\
+        .str.replace(r'^,', '', regex=True)\
+        .str.replace(r'^/', '', regex=True)\
+        .str.replace(r'^-', '', regex=True)\
+        .str.replace(r'^;', '', regex=True)\
+        .str.replace(r'(\d+)-? (\w+)', r'\1-\2', regex=True)\
+        .str.replace('loc', 'letter of caution', regex=False)\
+        .str.replace('lor', 'letter of reprimand', regex=False)\
+        .str.replace(r'l\.?o\.?u\.?', 'loss of unit', regex=True)\
+        .str.replace(r'hr\.?\b', 'hour', regex=True)\
+        .str.replace(';', '/', regex=False)\
+        .str.replace('.', '', regex=False)\
+        .str.replace(',', '/', regex=False)\
+        .str.replace(':', '/', regex=False)\
+        .str.replace('&', '/', regex=False)\
+        .str.replace(r' dri?v?\.? \bsch\b', 'driving school', regex=True)
+    return df
 
 
 def clean_2021():
@@ -421,9 +407,12 @@ def clean_2021():
         .pipe(clean_disposition)\
         .pipe(parse_officer_name_2021)\
         .pipe(combine_action_and_disposition)\
-        .pipe(standardize_desc_cols, ['charges', 'action', 'disposition'])
-
+        .pipe(standardize_desc_cols, ['charges', 'action', 'disposition'])\
+        .pipe(standardize_from_lookup_table, 'action' [
+            ['letter of caution', ]
+        ])
     return df
+
 
 
 def clean_18():
