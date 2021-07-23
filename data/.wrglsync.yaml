@@ -50,6 +50,8 @@ repos:
     fileName: clean/cprr_tangipahoa_so_2015_2021.csv
   clean-cprr-lafayette-so-2015-2020:
     fileName: clean/cprr_lafayette_so_2015_2020.csv
+  clean-cprr-hammond-pd-2015-2020:
+    fileName: clean/cprr_hammond_pd_2015_2020.csv
   match-cprr-new-orleans-harbor-pd-2020:
     fileName: match/cprr_new_orleans_harbor_pd_2020.csv
   match-pprr-baton-rouge-csd-2017:
@@ -84,6 +86,8 @@ repos:
     fileName: match/cprr_scott_pd_2020.csv
   match-cprr-tangipahoa-so-2015-2021:
     fileName: match/cprr_tangipahoa_so_2015_2021.csv
+  match-cprr-hammond-pd-2015-2020:
+    fileName: match/cprr_hammond_pd_2015_2020.csv
   com-baton-rouge-pd:
     fileName: fuse/com_baton_rouge_pd.csv
     primaryKey:
@@ -154,6 +158,10 @@ repos:
       - complaint_uid
   com-lafayette-pd:
     fileName: fuse/com_lafayette_pd.csv
+    primaryKey:
+      - complaint_uid
+  com-hammond-pd:
+    fileName: fuse/com_hammond_pd.csv
     primaryKey:
       - complaint_uid
   uof-new-orleans-pd:
@@ -260,12 +268,24 @@ repos:
     fileName: fuse/per_shreveport_pd.csv
     primaryKey:
       - uid
+  per-tangipahoa-pd:
+    fileName: fuse/per_tangipahoa_pd.csv
+    primaryKey:
+      - uid
+  per-ponchatoula-pd:
+    fileName: fuse/per_ponchatoula_pd.csv
+    primaryKey:
+      - uid
   per-lafayette-so:
     fileName: fuse/per_lafayette_so.csv
     primaryKey:
       - uid
   per-lafayette-pd:
     fileName: fuse/per_lafayette_pd.csv
+    primaryKey:
+      - uid
+  per-hammond-pd:
+    fileName: fuse/per_hammond_pd.csv
     primaryKey:
       - uid
   event-new-orleans-pd:
@@ -355,6 +375,7 @@ repos:
   event-tangipahoa-so:
     fileName: fuse/event_tangipahoa_so.csv
     primaryKey:
+      - event_uid
   event-new-orleans-so:
     fileName: fuse/event_new_orleans_so.csv
     primaryKey:
@@ -367,8 +388,16 @@ repos:
     fileName: fuse/event_lafayette_so.csv
     primaryKey:
       - event_uid
+  event-ponchatoula-so:
+    fileName: fuse/event_ponchatoula_so.csv
+    primaryKey:
+      - event_uid
   event-lafayette-pd:
     fileName: fuse/event_lafayette_pd.csv
+    primaryKey:
+      - event_uid
+  event-hammond-pd:
+    fileName: fuse/event_hammond_pd.csv
     primaryKey:
       - event_uid
   personnel:

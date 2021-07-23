@@ -12,7 +12,7 @@ def prepare_post_data():
 
 
 def match_cprr_and_post(cprr, post):
-    dfa = cprr[['uid', 'first_name', 'last_name']]git
+    dfa = cprr[['uid', 'first_name', 'last_name']]
     dfa = dfa.drop_duplicates(subset=['uid']).set_index('uid')
     dfa.loc[:, 'fc'] = dfa.first_name.fillna('').map(lambda x: x[:1])
 
@@ -24,7 +24,7 @@ def match_cprr_and_post(cprr, post):
         'first_name':  JaroWinklerSimilarity(),
         'last_name': JaroWinklerSimilarity(),
     }, dfa, dfb)
-    decision = .5
+    decision = .865
     matcher.save_pairs_to_excel(
         data_file_path('match/hammond_pd_cprr_2015_2020_v_post_pprr_2020_11_06.xlsx'), decision)
     matches = matcher.get_index_pairs_within_thresholds(decision)

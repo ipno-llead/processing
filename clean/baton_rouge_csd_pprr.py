@@ -99,8 +99,7 @@ def clean_17():
         .pipe(parse_dates_with_known_format, ["hire_date", "resign_date"], "%m/%d/%Y")\
         .pipe(assign_agency)\
         .pipe(clean_names, ["first_name", "last_name", "middle_initial"])\
-        .pipe(gen_uid, [
-            "agency", "data_production_year", "first_name", "last_name", "middle_initial"])\
+        .pipe(gen_uid, ["agency", "employee_id"])\
         .pipe(assign_rank_year_and_pay_year)
     return df
 
@@ -137,7 +136,7 @@ def clean_19():
         .pipe(clean_department_desc)\
         .pipe(assign_agency)\
         .pipe(clean_names, ["first_name", "last_name", "middle_initial"])\
-        .pipe(gen_uid, ["agency", "data_production_year", "employee_id"])\
+        .pipe(gen_uid, ["agency", "employee_id"])\
         .pipe(assign_rank_year_and_pay_year)
     return df
 

@@ -20,6 +20,7 @@ DATA_FILES = {
     ],
     "baton_rouge_pd": [
         "https://www.dropbox.com/sh/rc4a4961qqxu0co/AADmtLqCxY_k5ZlbPKtOmcKHa/Data%20Collected/Baton%20Rouge%20Police%20Department/Baton%20Rouge_PD_CPRR_2018.csv?dl=1",  # noqa
+        "https://www.dropbox.com/s/oco6pc2hf9zoe07/baton_rouge_pd_pprr_2021.csv?dl=1",  # noqa
     ],
     "baton_rouge_csd": [
         "https://www.dropbox.com/sh/rc4a4961qqxu0co/AAATpIeZNzv0NJlzfSFOJKqZa/Data%20Collected/Baton%20Rouge%20Civil%20Service%20Department/Baton%20Rouge_CSD_PPRR_2017.csv?dl=1",  # noqa
@@ -154,6 +155,9 @@ DATA_FILES = {
     ],
     "lafayette_so": [
         "https://www.dropbox.com/s/4d9m1y5g4pnlmkj/lafayette_so_cprr_2015_2020.csv?dl=1",  # noqa
+    ],
+    "ponchatoula_pd": [
+        "https://www.dropbox.com/s/z9qtvy40jcvk518/ponchatoula_pd_pprr_2010_2020.csv?dl=1",  # noqa
     ],
     "lafayette_pd": [
         "https://www.dropbox.com/s/mzanvltddi52lpw/lafayette_pd_cprr_2015_2020.csv?dl=1",  # noqa
