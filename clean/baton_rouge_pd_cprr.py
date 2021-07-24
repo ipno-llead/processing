@@ -344,11 +344,11 @@ def clean_disposition(df):
         .str.replace('referraladmin', 'referral/admin', regex=False)\
         .str.replace(r'^- ?-?$', '', regex=True)\
         .str.replace('referra)', 'referral', regex=False)
-    return df.drop
+    return df
 
 
 def combine_action_and_disposition(df):
-    df.loc[:, 'disposition'] = df.dispositions.str.cat(df.action, sep='|')\
+    df.disposition = df.disposition.str.cat(df.action, sep='|')\
         .str.replace(r'^/', '', regex=True)\
         .str.replace('loc', 'letter of caution', regex=False)\
         .str.replace('lor', 'letter of reprimand', regex=False)\
@@ -409,10 +409,88 @@ def clean_2021():
         .pipe(combine_action_and_disposition)\
         .pipe(standardize_desc_cols, ['charges', 'action', 'disposition'])\
         .pipe(standardize_from_lookup_table, 'action' [
-            ['letter of caution', ]
+            ['letter of caution', 'letter of caution(carrying out orders)/use of force ()',
+            'lette of caution', 'young(letter of caution)/ adkins(n/s)/ fonte(n/s)',
+            'conduct unbecoming/letter of caution', 'coo//letter of caution/ uof/',
+            'letter of cautin'
+            ],
+            ['10-day suspension/letter of reprimand/letter of caution',
+            'crawford(10-day susp)/iverson(letter of reprimand)/srantz(letter of caution)',
+            ],
+            ['letter of caution/60-day loss of unit', 'letter of caution/ 60-day loss of unit'
+            ],
+            ['letter of caution/8-hour driving school', 'letter of caution/8-hourdriving school',
+             'letter of caution/ 8-hour drv school', 'letter of caution/ 8-hour driv school',
+             'letter of caution/ 8-hourdriving school', 'letter of caution/ 8-hour driving school',
+             'letter of caution / 8-hour drv school', 'letter of caution/8-hour drv school'
+             ],
+             ['letter of caution/8-hour driving school/5-day loss of unit',
+              'letter of caution/ 8-hourdriving school/ 5-day loss of unit'
+             ],
+            ['letter of reprimand/20-day loss of unit', 'letter of reprimand/ 20-day loss of unit'
+            ],
+            ['letter of reprimand/10-day vehicle suspension', 'letter of reprimand/ vehicle susp 10-days'
+            ],
+            ['letter of reprimand/15-day loss of unit', 'letter of reprimand / 15-day loss of unit'
+            ],
+            ['letter of reprimand/5-day vehicle suspension', 'letter of reprimand/veh susp 5-days'
+            ],
+            ['letter of reprimand/8-hour driving school', 'letter of reprimand/ 8-hour driving school',
+             'letter of reprimand/ 8-hourdriving school', 'letter of reprimand / 8-hour driving school',
+             'letter of reprimand/ 8-hourdriving school'
+            ],
+            ['letter of reprimand/8-hour driving school/30-day loss of unit',
+             'letter of reprimand/8hourdriving school/30-day loss of unit',
+             'letter of reprimand/ 8-hour driving school/ 30-day loss of unit',
+             'letter of reprimand/ 8-hourdriving school/ 30-day loss of unit'
+            ],
+            ['letter of reprimand/8-hour driving school/10-day loss of unit',
+             'letter of reprimand/ hour school/ 10-loss of unit',
+             'letter of reprimand/ 8-hour driving school/ 10-day loss of unit',
+             'letter of reprimand/ 8-hourdriving school/ 10-day loss of unit'
+            ],
+            ['letter of reprimand/10-day loss of unit', 'letter of reprimand/loss of unit- 10day'
+            ],
+            ['letter of reprimand/8-hour driving school/15-day loss of unit',
+             'letter of reprimand/ 8hourdriving school/ 15-day loss of unit', 
+             'letter of reprimand/8-hour driving school/15-loss of unit',
+             'letter of reprimand/8-hourdriving school/15-day loss of unit'
+            ],
+            ['letter of reprimand/8-hour driving school/5-day loss of unit',
+            'letter of reprimand/8hourdriving school/ 5-day loss of unit',
+            'letter of reprimand/ 8-hourdriving school/ 5-day loss of unit'
+            ],
+            ['letter of reprimand/8-hour driving school/45-day loss of unit',
+             'letter of reprimand/ 8-hourdriving school/ 45-day loss of unit'
+            ],
+            ['letter of reprimand',
+             'letter of reprimand / dwi/roll call training on good samaritan law'
+            ],
+            ['letter of instruction',
+             'letter of instruction - mandatory roli call training on crime scene securing witnesses',
+             'letter of instruction - mandatory roll call training on crime scene securing witnesses'
+            ],
+            ['2-day suspension', '2-day suspension (conduct)'
+            ],
+            ['20-day suspension/suspension overturned 1/19/12', '20-day suspension(suspension overturned 1/19/12)'
+            ],
+            ['30-day suspension/6-month loss of unit', '30-day suspension (consent)/6-mo loss of unit'
+            ],
+            ['30-day suspension', '30-day susp'
+            ],
+            ['1-day suspension', 'insub/respect/conduct( 1-day susp)/sexual harrass(n/s)'
+            ],
+            ['1-day suspension/60-day loss of unit', '1-day suspension-60-day loss of unit'
+            ],
+            ['5-day suspension without pay', 'conduct(5-day w/o pay)/truthful-'
+            ],
+            ['5-day suspension', '5-day susp (consent discipline)', '5-day suspension (truthfulness)'
+            ],
+            ['8-hour driving school/45-day loss of unit', '8-hour class/ 45-day loss of unit'
+            ],
+            
         ])
     return df
-
 
 
 def clean_18():
