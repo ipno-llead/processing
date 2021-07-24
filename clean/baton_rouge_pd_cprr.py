@@ -408,7 +408,7 @@ def clean_2021():
         .pipe(parse_officer_name_2021)\
         .pipe(combine_action_and_disposition)\
         .pipe(standardize_desc_cols, ['charges', 'action', 'disposition'])\
-        .pipe(standardize_from_lookup_table, 'action' [
+        .pipe(standardize_from_lookup_table, 'action', [
             ['letter of caution', 'letter of caution(carrying out orders)/use of force ()',
             'lette of caution', 'young(letter of caution)/ adkins(n/s)/ fonte(n/s)',
             'conduct unbecoming/letter of caution', 'coo//letter of caution/ uof/',
@@ -423,10 +423,10 @@ def clean_2021():
              'letter of caution/ 8-hour drv school', 'letter of caution/ 8-hour driv school',
              'letter of caution/ 8-hourdriving school', 'letter of caution/ 8-hour driving school',
              'letter of caution / 8-hour drv school', 'letter of caution/8-hour drv school'
-             ],
-             ['letter of caution/8-hour driving school/5-day loss of unit',
-              'letter of caution/ 8-hourdriving school/ 5-day loss of unit'
-             ],
+            ],
+            ['letter of caution/8-hour driving school/5-day loss of unit',
+            'letter of caution/ 8-hourdriving school/ 5-day loss of unit'
+            ],
             ['letter of reprimand/20-day loss of unit', 'letter of reprimand/ 20-day loss of unit'
             ],
             ['letter of reprimand/10-day vehicle suspension', 'letter of reprimand/ vehicle susp 10-days'
@@ -472,7 +472,7 @@ def clean_2021():
             ],
             ['2-day suspension', '2-day suspension (conduct)'
             ],
-            ['20-day suspension/suspension overturned 1/19/12', '20-day suspension(suspension overturned 1/19/12)'
+            ['20-day suspension/suspension overturned on 1/19/12', '20-day suspension(suspension overturned 1/19/12)'
             ],
             ['30-day suspension/6-month loss of unit', '30-day suspension (consent)/6-mo loss of unit'
             ],
@@ -488,6 +488,72 @@ def clean_2021():
             ],
             ['8-hour driving school/45-day loss of unit', '8-hour class/ 45-day loss of unit'
             ],
+            ['3-day suspension', '/ 3-day suspension'
+            ],
+            ['7-day suspension', 'coo(7-day susp)'
+            ],
+            ['20-day suspension',
+            ],
+            ['60-day suspension', '(60-day)', '60-day', 
+            ],
+            ['65-day suspension/demotion', '65-day susp / demotion/truth(n/s)',
+            '65-day susp / demotion/ truth(n/s)'
+            ],
+            ['10-day suspension',
+            ],
+            ['90-day suspension'
+            ],
+            ['80-day suspension',
+            ],
+            ['25-day suspension', '25-day susp'
+            ],
+            ['60-day suspension/6-month loss of unit', '60-day suspension / 6-mo loss of unit'
+            ],
+            ['70-day suspension/30-day loss of unit'
+            ],
+            ['demotion', '/ demotion' 
+            ],
+            ['15-day loss of unit', '15-day loss of unit (for no dmvr)'
+            ],
+            ['5-day loss of unit'
+            ],
+            ['1-day driving school'
+            ],
+            ['suspended', 'suspension from rso'
+            ],
+            ['resigned', 'office investigation/officer resigned', 'office investigation/resigned',
+            'officer resigned 6-1-13'
+            ],
+            ['resigned in lieu of termination'
+            ],
+            ['2-week loss of extra duty', '/ 2-week loss of extra duty / unit'
+            ],
+            ['5-day loss of unit', '/ 5-day loss of unit'
+            ],
+            ['30-day loss of unit', '/ 30-day loss of unit'
+            ],
+            ['counseling', 'counselec', 'oral reprimand', 'counseled'
+            ],
+            ['verbal counseling/30-day loss of unit'
+            ],
+            ['verbal counseling'
+            ],
+            ['resigned in lieu of suspension', 'ofc investigation/ resigned in lieu of suspension'
+            ],
+            ['terminated', 'terminated 11/09/12', 'termination'
+            ],
+            ['mandatory training', 'mandatory training - accident investigation /de- escalation',
+            'mandatory training accident investigation /de- escalation'
+            ],
+            ['firearms training', 'advanced training from firearms supervisor'
+            ],
+            ['dismissed', 'charges dismissed'
+            ],
+            ['deferred', 'deferred/ handeled upon rehire', '/ handeled upon re'
+            ],
+            ['suspension rescinded', 'suspension recinded'
+            ],
+            ['crisis intervention training', 'cit training / effective decision making']
             
         ])
     return df
