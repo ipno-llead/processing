@@ -17,10 +17,11 @@ def split_cprr_name(df):
 
 
 def split_supervisor(df):
-    sup = df.supervisor.str.replace(
-        r"^(.+) (\w+ \w+)$", r"\1@@\2").str.split("@@", expand=True)
+    sup = df.supervisor.str.replace(r"^(.+) (\w+ \w+)$", r"\1@@\2", regex=True)\
+        .str.split("@@", expand=True)
     df.loc[:, "supervisor_rank"] = sup.loc[:, 0].str.lower()\
-        .str.replace(r"asst\.", "assistant").str.replace(r"lt\.", "lieutenant")
+        .str.replace(r"asst\.", "assistant", regex=True)\
+        .str.replace(r"lt\.", "lieutenant", regex=True)
     names = sup.loc[:, 1].str.split(" ", expand=True)
     df.loc[:, "supervisor_first_name"] = names.loc[:, 0].str.lower()
     df.loc[:, "supervisor_last_name"] = names.loc[:, 1].str.lower()
@@ -66,7 +67,7 @@ def clean_pprr():
     df = pd.read_csv(data_file_path("brusly_pd/brusly_pd_pprr_2020.csv"))\
         .pipe(clean_column_names)\
         .drop(columns=['company_name', 'department_name'])\
-        .rename(columns={'annual_salary':'salary'})\
+        .rename(columns={'annual_salary': 'salary'})\
         .pipe(clean_salaries, ['salary'])\
         .pipe(set_values, {'salary_freq': salary.YEARLY})\
         .pipe(split_pprr_name)\

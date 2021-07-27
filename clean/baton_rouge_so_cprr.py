@@ -68,8 +68,8 @@ def clean_complainant(df):
     df.loc[:, "complainant_type"] = df.complainant_type.str.lower().str.strip()\
         .str.replace("brpd detective", "baton rouge police department detective", regex=False)\
         .str.replace("deer park texas pd", 'deer park texas police department', regex=False)\
-        .str.replace("ebrso administration and brpd", "administration and baton rouge police department")\
-        .str.replace("administration (see also 17-19)", "administration")
+        .str.replace("ebrso administration and brpd", "administration and baton rouge police department", regex=False)\
+        .str.replace("administration (see also 17-19)", "administration", regex=False)
     return df
 
 
@@ -91,7 +91,7 @@ def clean_charges(df):
         .str.replace("1-d1.05", "01-01.05", regex=False)\
         .str.replace("1- 01.14 ", "01-01.14", regex=False)\
         .str.replace("01-1.06", "01-01.06", regex=False)\
-        .str.replace("1-01.14", "01-01.14")\
+        .str.replace("1-01.14", "01-01.14", regex=False)\
         .str.replace("performanceb", "performance", regex=False)\
         .str.replace("use offorce", "use of force", regex=False)\
         .str.replace("performanced", "performance", regex=False)\

@@ -230,9 +230,14 @@ def clean_races(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
         the updated frame
     """
     for col in cols:
-        df.loc[:, col] = df[col].str.strip().str.lower()
+        # replacing one-letter race because they are too short
+        # to use with standardize_from_lookup_table safely
+        df.loc[:, col] = df[col].str.strip().str.lower()\
+            .str.replace(r'^w$', 'white', regex=True)\
+            .str.replace(r'^h$', 'hispanic', regex=True)\
+            .str.replace(r'^b$', 'black', regex=True)
         df = standardize_from_lookup_table(df, col, [
-            ['black', 'african american'],
+            ['black', 'african american', 'black / african american'],
             ['white'],
             ['hispanic', 'latino'],
             ['native american', 'american indian'],
