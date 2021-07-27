@@ -1,10 +1,10 @@
 import sys
 sys.path.append('../')
 from lib.path import data_file_path, ensure_data_dir
-from lib.columns import clean_column_names, set_values
+from lib.columns import set_values
 from lib.uid import gen_uid
 from lib.clean import (
-    clean_names, standardize_desc_cols, clean_dates, float_to_int_str
+    clean_dates, float_to_int_str
 )
 import pandas as pd
 
@@ -101,7 +101,8 @@ def clean_investigating_supervisor(df):
         .str.replace(r'^captain$', '', regex=True)\
         .str.replace(r'fe[cr]ra[nm]d', 'ferrand', regex=True)\
         .str.replace(r'(\w+\') (\w+)', r'\1\2', regex=True)
-    parts = df.investigating_supervisor.str.extract(r'(?:(lieutenant|captain|detective|chief|major|sargeant) )?(?:([^ ]+) )?(.+)')
+    parts = df.investigating_supervisor.str.extract(
+        r'(?:(lieutenant|captain|detective|chief|major|sargeant) )?(?:([^ ]+) )?(.+)')
     df.loc[:, 'supervisor_rank'] = parts[0].fillna('')
     df.loc[:, 'supervisor_first_name'] = parts[1].fillna('')
     df.loc[:, 'supervisor_last_name'] = parts[2].fillna('')
@@ -152,7 +153,7 @@ def clean_action(df):
 
 def clean_received_by(df):
     df.loc[:, 'receiver'] = df.receive_by.str.lower().str.strip()\
-        .str.replace('/','', regex=False)\
+        .str.replace('/', '', regex=False)\
         .str.replace('.', '', regex=False)\
         .str.replace(r'^d\b', 'dawn', regex=True)\
         .str.replace(r'^panepinto$', 'dawn panepinto', regex=True)\
@@ -183,7 +184,7 @@ def clean_completion_date(df):
 def clean():
     df = pd.read_csv(data_file_path(
         'tangipahoa_so/tangipahoa_so_cprr_2015_2021.csv')
-        )\
+    )\
         .pipe(split_rows_with_name)\
         .pipe(split_full_name)\
         .pipe(clean_dept_desc)\
@@ -201,7 +202,7 @@ def clean():
         .pipe(drop_rows_with_allegation_disposition_action_all_empty)\
         .pipe(clean_dates, ['completion_date'], expand=True)\
         .pipe(clean_dates, ['receive_date'], expand=False)\
-        .pipe(set_values, {'agency':'Tangipahoa SO', 'data_production_year': '2021'})\
+        .pipe(set_values, {'agency': 'Tangipahoa SO', 'data_production_year': '2021'})\
         .pipe(gen_uid, ['first_name', 'last_name', 'agency'])\
         .drop_duplicates(subset=['receive_date', 'uid', 'allegation'], keep='first')\
         .pipe(gen_uid, ['receive_date', 'uid', 'allegation'], 'complaint_uid')\

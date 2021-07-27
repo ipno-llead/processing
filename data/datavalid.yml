@@ -38,6 +38,7 @@ files:
           - hispanic
           - native american
           - asian / pacific islander
+          - mixed
       sex:
         options:
           - female
@@ -129,6 +130,7 @@ files:
           - hispanic
           - native american
           - asian / pacific islander
+          - mixed
       action:
         description: >
           what (disciplinary) actions were taken regarding this complaint
@@ -376,6 +378,7 @@ files:
           - hispanic
           - native american
           - asian / pacific islander
+          - mixed
       citizen_age_1:
         integer: true
       officer_current_supervisor:
