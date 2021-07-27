@@ -91,7 +91,7 @@ repos:
   com-baton-rouge-pd:
     fileName: fuse/com_baton_rouge_pd.csv
     primaryKey:
-      - charge_uid
+      - complaint_uid
   com-baton-rouge-so:
     fileName: fuse/com_baton_rouge_so.csv
     primaryKey:
