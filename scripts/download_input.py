@@ -21,6 +21,7 @@ DATA_FILES = {
     "baton_rouge_pd": [
         "https://www.dropbox.com/sh/rc4a4961qqxu0co/AADmtLqCxY_k5ZlbPKtOmcKHa/Data%20Collected/Baton%20Rouge%20Police%20Department/Baton%20Rouge_PD_CPRR_2018.csv?dl=1",  # noqa
         "https://www.dropbox.com/s/oco6pc2hf9zoe07/baton_rouge_pd_pprr_2021.csv?dl=1",  # noqa
+        "https://www.dropbox.com/s/t24wgq7pdrcklxa/baton_rouge_pd_cprr_2021.csv?dl=1", # noqa
     ],
     "baton_rouge_csd": [
         "https://www.dropbox.com/sh/rc4a4961qqxu0co/AAATpIeZNzv0NJlzfSFOJKqZa/Data%20Collected/Baton%20Rouge%20Civil%20Service%20Department/Baton%20Rouge_CSD_PPRR_2017.csv?dl=1",  # noqa

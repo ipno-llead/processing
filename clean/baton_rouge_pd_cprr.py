@@ -312,7 +312,7 @@ def clean_charges(df):
 
 def parse_officer_name_2021(df):
     dep = df.officer_name.str.replace(r'^(.+), (PC?\d+) (.+)$', r'\1 # \2 # \3').str.split(' # ', expand = True)
-    dep.columns = ['name', 'department_code', 'dept_description']
+    dep.columns = ['name', 'department_code', 'department_desc']
     dep.loc[:, 'name'] = dep['name'].str.lower().str.strip()
 
     names = dep["name"].str.lower().str.replace(r"\s+", " ").str.replace(
@@ -328,6 +328,21 @@ def parse_officer_name_2021(df):
     df.drop(columns=["officer_name", "name"], inplace=True)
     return df
 
+
+def split_department_and_division_desc(df):
+    df.department_desc = df.department_desc.str.lower().str.strip()\
+        .str.replace('patro)', 'patrol', regex=False)\
+        .str.replace('&', 'and', regex=False)\
+        .str.replace(r'\bop\b', 'operations', regex=True)\
+        .str.replace(r'((operation service|communications)? comm center)$', 
+        'operations service communications center', regex=True)\
+        .str.replace(r'\bcib\b', 'criminal investigations', regex=True)\
+        .str.replace(r'^special$|^special operations tru$', 'special operations', regex=True)\
+        .str.replace(r'\bcommunications communications\b', 'communications', regex=True)\
+        .str.replace('criminal investigations criminal investigations', 
+        'criminal investigations', regex=False)
+    names = df.department_desc.str.extract(r'(patrol|operation service|administration|special operations|criminal investigations) (.+)')
+    return df
 
 def clean_disposition(df):
     df.disposition = df.disposition.str.lower().str.strip().fillna('')\
@@ -389,7 +404,7 @@ def clean_action(df):
 
 def clean_2021():
     df = pd.read_csv(data_file_path(
-        'baton_rouge_pd/baton_rouge_pd_2021.csv'))\
+        'baton_rouge_pd/baton_rouge_pd_cprr_2021.csv'))\
         .pipe(clean_column_names)
     df = df\
         .rename(columns={
@@ -407,154 +422,99 @@ def clean_2021():
         .pipe(clean_disposition)\
         .pipe(parse_officer_name_2021)\
         .pipe(combine_action_and_disposition)\
-        .pipe(standardize_desc_cols, ['charges', 'action', 'disposition'])\
+        .pipe(split_department_and_division_desc)\
+        .pipe(standardize_desc_cols, 
+        ['charges', 'action', 'disposition',
+         'department_code', 'department_desc']
+         )\
         .pipe(standardize_from_lookup_table, 'action', [
             ['letter of caution', 'letter of caution(carrying out orders)/use of force ()',
             'lette of caution', 'young(letter of caution)/ adkins(n/s)/ fonte(n/s)',
             'conduct unbecoming/letter of caution', 'coo//letter of caution/ uof/',
-            'letter of cautin'
-            ],
+            'letter of cautin'],
             ['10-day suspension/letter of reprimand/letter of caution',
-            'crawford(10-day susp)/iverson(letter of reprimand)/srantz(letter of caution)',
-            ],
-            ['letter of caution/60-day loss of unit', 'letter of caution/ 60-day loss of unit'
-            ],
+            'crawford(10-day susp)/iverson(letter of reprimand)/srantz(letter of caution)'],
+            ['letter of caution/60-day loss of unit', 'letter of caution/ 60-day loss of unit'],
             ['letter of caution/8-hour driving school', 'letter of caution/8-hourdriving school',
              'letter of caution/ 8-hour drv school', 'letter of caution/ 8-hour driv school',
              'letter of caution/ 8-hourdriving school', 'letter of caution/ 8-hour driving school',
-             'letter of caution / 8-hour drv school', 'letter of caution/8-hour drv school'
-            ],
+             'letter of caution / 8-hour drv school', 'letter of caution/8-hour drv school'],
             ['letter of caution/8-hour driving school/5-day loss of unit',
-            'letter of caution/ 8-hourdriving school/ 5-day loss of unit'
-            ],
-            ['letter of reprimand/20-day loss of unit', 'letter of reprimand/ 20-day loss of unit'
-            ],
-            ['letter of reprimand/10-day vehicle suspension', 'letter of reprimand/ vehicle susp 10-days'
-            ],
-            ['letter of reprimand/15-day loss of unit', 'letter of reprimand / 15-day loss of unit'
-            ],
-            ['letter of reprimand/5-day vehicle suspension', 'letter of reprimand/veh susp 5-days'
-            ],
+            'letter of caution/ 8-hourdriving school/ 5-day loss of unit'],
+            ['letter of reprimand/20-day loss of unit', 'letter of reprimand/ 20-day loss of unit'],
+            ['letter of reprimand/10-day vehicle suspension', 'letter of reprimand/ vehicle susp 10-days'],
+            ['letter of reprimand/15-day loss of unit', 'letter of reprimand / 15-day loss of unit'],
+            ['letter of reprimand/5-day vehicle suspension', 'letter of reprimand/veh susp 5-days'],
             ['letter of reprimand/8-hour driving school', 'letter of reprimand/ 8-hour driving school',
              'letter of reprimand/ 8-hourdriving school', 'letter of reprimand / 8-hour driving school',
-             'letter of reprimand/ 8-hourdriving school'
-            ],
+             'letter of reprimand/ 8-hourdriving school'],
             ['letter of reprimand/8-hour driving school/30-day loss of unit',
              'letter of reprimand/8hourdriving school/30-day loss of unit',
              'letter of reprimand/ 8-hour driving school/ 30-day loss of unit',
-             'letter of reprimand/ 8-hourdriving school/ 30-day loss of unit'
-            ],
+             'letter of reprimand/ 8-hourdriving school/ 30-day loss of unit'],
             ['letter of reprimand/8-hour driving school/10-day loss of unit',
              'letter of reprimand/ hour school/ 10-loss of unit',
              'letter of reprimand/ 8-hour driving school/ 10-day loss of unit',
-             'letter of reprimand/ 8-hourdriving school/ 10-day loss of unit'
-            ],
-            ['letter of reprimand/10-day loss of unit', 'letter of reprimand/loss of unit- 10day'
-            ],
+             'letter of reprimand/ 8-hourdriving school/ 10-day loss of unit'],
+            ['letter of reprimand/10-day loss of unit', 'letter of reprimand/loss of unit- 10day'],
             ['letter of reprimand/8-hour driving school/15-day loss of unit',
              'letter of reprimand/ 8hourdriving school/ 15-day loss of unit', 
              'letter of reprimand/8-hour driving school/15-loss of unit',
-             'letter of reprimand/8-hourdriving school/15-day loss of unit'
-            ],
+             'letter of reprimand/8-hourdriving school/15-day loss of unit'],
             ['letter of reprimand/8-hour driving school/5-day loss of unit',
             'letter of reprimand/8hourdriving school/ 5-day loss of unit',
-            'letter of reprimand/ 8-hourdriving school/ 5-day loss of unit'
-            ],
+            'letter of reprimand/ 8-hourdriving school/ 5-day loss of unit'],
             ['letter of reprimand/8-hour driving school/45-day loss of unit',
-             'letter of reprimand/ 8-hourdriving school/ 45-day loss of unit'
-            ],
+             'letter of reprimand/ 8-hourdriving school/ 45-day loss of unit'],
             ['letter of reprimand',
-             'letter of reprimand / dwi/roll call training on good samaritan law'
-            ],
+             'letter of reprimand / dwi/roll call training on good samaritan law'],
             ['letter of instruction',
              'letter of instruction - mandatory roli call training on crime scene securing witnesses',
-             'letter of instruction - mandatory roll call training on crime scene securing witnesses'
-            ],
-            ['2-day suspension', '2-day suspension (conduct)'
-            ],
-            ['20-day suspension/suspension overturned on 1/19/12', '20-day suspension(suspension overturned 1/19/12)'
-            ],
-            ['30-day suspension/6-month loss of unit', '30-day suspension (consent)/6-mo loss of unit'
-            ],
-            ['30-day suspension', '30-day susp'
-            ],
-            ['1-day suspension', 'insub/respect/conduct( 1-day susp)/sexual harrass(n/s)'
-            ],
-            ['1-day suspension/60-day loss of unit', '1-day suspension-60-day loss of unit'
-            ],
-            ['5-day suspension without pay', 'conduct(5-day w/o pay)/truthful-'
-            ],
-            ['5-day suspension', '5-day susp (consent discipline)', '5-day suspension (truthfulness)'
-            ],
-            ['8-hour driving school/45-day loss of unit', '8-hour class/ 45-day loss of unit'
-            ],
-            ['3-day suspension', '/ 3-day suspension'
-            ],
-            ['7-day suspension', 'coo(7-day susp)'
-            ],
-            ['20-day suspension',
-            ],
-            ['60-day suspension', '(60-day)', '60-day', 
-            ],
+             'letter of instruction - mandatory roll call training on crime scene securing witnesses'],
+            ['2-day suspension', '2-day suspension (conduct)'],
+            ['20-day suspension/suspension overturned on 1/19/12', '20-day suspension(suspension overturned 1/19/12)'],
+            ['30-day suspension/6-month loss of unit', '30-day suspension (consent)/6-mo loss of unit'],
+            ['30-day suspension', '30-day susp'],
+            ['1-day suspension', 'insub/respect/conduct( 1-day susp)/sexual harrass(n/s)'],
+            ['1-day suspension/60-day loss of unit', '1-day suspension-60-day loss of unit'],
+            ['5-day suspension without pay', 'conduct(5-day w/o pay)/truthful-'],
+            ['5-day suspension', '5-day susp (consent discipline)', '5-day suspension (truthfulness)'],
+            ['8-hour driving school/45-day loss of unit', '8-hour class/ 45-day loss of unit'],
+            ['3-day suspension', '/ 3-day suspension'],
+            ['7-day suspension', 'coo(7-day susp)'],
+            ['20-day suspension'],
+            ['60-day suspension', '(60-day)', '60-day'],
             ['65-day suspension/demotion', '65-day susp / demotion/truth(n/s)',
-            '65-day susp / demotion/ truth(n/s)'
-            ],
-            ['10-day suspension',
-            ],
-            ['90-day suspension'
-            ],
-            ['80-day suspension',
-            ],
-            ['25-day suspension', '25-day susp'
-            ],
-            ['60-day suspension/6-month loss of unit', '60-day suspension / 6-mo loss of unit'
-            ],
-            ['70-day suspension/30-day loss of unit'
-            ],
-            ['demotion', '/ demotion' 
-            ],
-            ['15-day loss of unit', '15-day loss of unit (for no dmvr)'
-            ],
-            ['5-day loss of unit'
-            ],
-            ['1-day driving school'
-            ],
-            ['suspended', 'suspension from rso'
-            ],
+            '65-day susp / demotion/ truth(n/s)'],
+            ['10-day suspension'],
+            ['90-day suspension'],
+            ['80-day suspension'],
+            ['25-day suspension', '25-day susp'],
+            ['60-day suspension/6-month loss of unit', '60-day suspension / 6-mo loss of unit'],
+            ['70-day suspension/30-day loss of unit'],
+            ['demotion', '/ demotion'],
+            ['15-day loss of unit', '15-day loss of unit (for no dmvr)'],
+            ['5-day loss of unit'],
+            ['1-day driving school'],
+            ['suspended', 'suspension from rso'],
             ['resigned', 'office investigation/officer resigned', 'office investigation/resigned',
-            'officer resigned 6-1-13'
-            ],
-            ['resigned in lieu of termination'
-            ],
-            ['2-week loss of extra duty', '/ 2-week loss of extra duty / unit'
-            ],
-            ['5-day loss of unit', '/ 5-day loss of unit'
-            ],
-            ['30-day loss of unit', '/ 30-day loss of unit'
-            ],
-            ['counseling', 'counselec', 'oral reprimand', 'counseled'
-            ],
-            ['verbal counseling/30-day loss of unit'
-            ],
-            ['verbal counseling'
-            ],
-            ['resigned in lieu of suspension', 'ofc investigation/ resigned in lieu of suspension'
-            ],
-            ['terminated', 'terminated 11/09/12', 'termination'
-            ],
+            'officer resigned 6-1-13'],
+            ['resigned in lieu of termination'],
+            ['2-week loss of extra duty', '/ 2-week loss of extra duty / unit'],
+            ['5-day loss of unit', '/ 5-day loss of unit'],
+            ['30-day loss of unit', '/ 30-day loss of unit'],
+            ['counseling', 'counselec', 'oral reprimand', 'counseled'],
+            ['verbal counseling/30-day loss of unit'],
+            ['verbal counseling'],
+            ['resigned in lieu of suspension', 'ofc investigation/ resigned in lieu of suspension'],
+            ['terminated', 'terminated 11/09/12', 'termination'],
             ['mandatory training', 'mandatory training - accident investigation /de- escalation',
-            'mandatory training accident investigation /de- escalation'
-            ],
-            ['firearms training', 'advanced training from firearms supervisor'
-            ],
-            ['dismissed', 'charges dismissed'
-            ],
-            ['deferred', 'deferred/ handeled upon rehire', '/ handeled upon re'
-            ],
-            ['suspension rescinded', 'suspension recinded'
-            ],
+            'mandatory training accident investigation /de- escalation'],
+            ['firearms training', 'advanced training from firearms supervisor'],
+            ['dismissed', 'charges dismissed'],
+            ['deferred', 'deferred/ handeled upon rehire', '/ handeled upon re'],
+            ['suspension rescinded', 'suspension recinded'],
             ['crisis intervention training', 'cit training / effective decision making']
-            
         ])
     return df
 
