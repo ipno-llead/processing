@@ -388,8 +388,8 @@ repos:
     fileName: fuse/event_lafayette_so.csv
     primaryKey:
       - event_uid
-  event-ponchatoula-so:
-    fileName: fuse/event_ponchatoula_so.csv
+  event-ponchatoula-pd:
+    fileName: fuse/event_ponchatoula_pd.csv
     primaryKey:
       - event_uid
   event-lafayette-pd:
