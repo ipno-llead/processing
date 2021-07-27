@@ -30,10 +30,12 @@ def fuse_events(cprr, post):
             'prefix': 'level_1_cert', 'parse_date': '%Y-%m-%d', 'keep': ['uid', 'agency', 'employement_status']
         },
         events.OFFICER_PC_12_QUALIFICATION: {
-            'prefix': 'last_pc_12_qualification', 'parse_date': '%Y-%m-%d', 'keep': ['uid', 'agency', 'employment status']
+            'prefix': 'last_pc_12_qualification', 'parse_date': '%Y-%m-%d', 'keep': [
+                'uid', 'agency', 'employment status'
+            ]
         },
         events.OFFICER_HIRE: {
-            'prefix': 'hire', 'keep': ['uid', 'agency', 'employment_status'] 
+            'prefix': 'hire', 'keep': ['uid', 'agency', 'employment_status']
         },
     }, ['uid'],
     )
@@ -41,7 +43,7 @@ def fuse_events(cprr, post):
 
 
 if __name__ == '__main__':
-    cprr = pd.read_csv(data_file_path('clean/cprr_hammond_pd_2015_2020.csv')) 
+    cprr = pd.read_csv(data_file_path('match/cprr_hammond_pd_2015_2020.csv'))
     post = prepare_post_data()
     complaints = rearrange_complaint_columns(cprr)
     ensure_uid_unique(complaints, 'complaint_uid')

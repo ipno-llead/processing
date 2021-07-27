@@ -39,6 +39,8 @@ def standardize_from_lookup_table(
     table = []
     for i, seqs in enumerate(lookup_table):
         for s in seqs:
+            if len(s) == 0:
+                raise ValueError("empty sequence found in lookup table")
             table.append((len(s), s, i))
     table.sort(key=lambda x: x[0], reverse=True)
     sorted_lens, sorted_seqs, sorted_inds = zip(*table)

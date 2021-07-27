@@ -91,7 +91,7 @@ repos:
   com-baton-rouge-pd:
     fileName: fuse/com_baton_rouge_pd.csv
     primaryKey:
-      - charge_uid
+      - complaint_uid
   com-baton-rouge-so:
     fileName: fuse/com_baton_rouge_so.csv
     primaryKey:
@@ -268,8 +268,8 @@ repos:
     fileName: fuse/per_shreveport_pd.csv
     primaryKey:
       - uid
-  per-tangipahoa-pd:
-    fileName: fuse/per_tangipahoa_pd.csv
+  per-tangipahoa-so:
+    fileName: fuse/per_tangipahoa_so.csv
     primaryKey:
       - uid
   per-ponchatoula-pd:
@@ -388,8 +388,8 @@ repos:
     fileName: fuse/event_lafayette_so.csv
     primaryKey:
       - event_uid
-  event-ponchatoula-so:
-    fileName: fuse/event_ponchatoula_so.csv
+  event-ponchatoula-pd:
+    fileName: fuse/event_ponchatoula_pd.csv
     primaryKey:
       - event_uid
   event-lafayette-pd:
