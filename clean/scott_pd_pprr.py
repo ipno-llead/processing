@@ -15,7 +15,7 @@ def split_name(df):
     for col, pat in [('first_name', r"^([\w'-]+)(.*)$"), ('middle_initial', r'^(\w\.|\w\s)(.*)$')]:
         names = series[series.str.match(pat)].str.extract(pat)
         df.loc[series.str.match(pat), col] = names[0]
-        series = series.str.replace(pat, r'\2').str.strip()
+        series = series.str.replace(pat, r'\2', regex=True).str.strip()
     df.loc[:, 'last_name'] = series
     return df.drop(columns=['full_name'])
 
@@ -23,11 +23,14 @@ def split_name(df):
 def clean_rank(df):
     df.loc[:, 'rank_desc'] = df.rank_desc.str.lower().str.strip()\
         .str.replace('asst.', 'assistant', regex=False)\
-        .str.replace('police', '', regex=True)\
-        .str.replace('admin', 'administration')\
-        .str.replace('sro', 'school resource officer')\
-        .str.replace('drc', 'department records clerk')\
-        .str.replace('lieutenant/ school resource officer sup.', 'lieutenant | school resource officer supervisor')
+        .str.replace('police', '', regex=False)\
+        .str.replace('admin', 'administration', regex=False)\
+        .str.replace('sro', 'school resource officer', regex=False)\
+        .str.replace('drc', 'department records clerk', regex=False)\
+        .str.replace(
+            'lieutenant/ school resource officer sup.',
+            'lieutenant | school resource officer supervisor',
+            regex=False)
     return df
 
 

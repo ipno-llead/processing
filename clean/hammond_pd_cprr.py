@@ -1,7 +1,6 @@
 import sys
-from numpy import result_type
 sys.path.append('../')
-import pandas as pd 
+import pandas as pd
 from lib.path import data_file_path, ensure_data_dir
 from lib.columns import clean_column_names, set_values
 from lib.clean import clean_dates, standardize_desc_cols
@@ -96,11 +95,11 @@ def clean_charges(df):
 def split_rows_with_multiple_charges(df):
     i = 0
     for idx in df[df.charges.str.contains(" | ")].index:
-        s = df.loc[idx+i, "charges"]
+        s = df.loc[idx + i, "charges"]
         parts = re.split(r"\s*(?:\|)\s*", s)
-        df = duplicate_row(df, idx+i, len(parts))
+        df = duplicate_row(df, idx + i, len(parts))
         for j, name in enumerate(parts):
-            df.loc[idx+i+j, "charges"] = name
+            df.loc[idx + i + j, "charges"] = name
         i += len(parts) - 1
     return df
 
@@ -115,7 +114,7 @@ def realign_action_column(df):
         (df.tracking_number == '15-09') & (df.incident_month == '10'),
         'action',
     ] = '5-day suspension without pay'
-    return df 
+    return df
 
 
 def drop_rows_without_tracking_number(df):
@@ -144,8 +143,8 @@ def clean():
             'data_production_year': '2021'
         })\
         .pipe(gen_uid, ['first_name', 'last_name', 'agency'])\
-        .pipe(gen_uid, 
-        ['uid', 'charges', 'tracking_number', 'disposition'], 'complaint_uid')
+        .pipe(gen_uid,
+              ['uid', 'charges', 'tracking_number', 'disposition'], 'complaint_uid')
     return df
 
 

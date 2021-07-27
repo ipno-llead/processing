@@ -162,6 +162,9 @@ DATA_FILES = {
     "lafayette_pd": [
         "https://www.dropbox.com/s/mzanvltddi52lpw/lafayette_pd_cprr_2015_2020.csv?dl=1",  # noqa
         "https://www.dropbox.com/s/vea5bh178sn7vpu/lafayette_pd_pprr_2010_2021.csv?dl=1",  # noqa
+    ],
+    "hammond_pd": [
+        "https://www.dropbox.com/sh/2a1aoihf1fu1hgh/AABMEwlLwef0YR-VkQNt-o1ka/Hammond%20Police%20Department/hammond_pd_cprr_2015_2020.csv?dl=1"  # noqa
     ]
 }
 _current_dir = os.path.dirname(os.path.realpath(__file__))

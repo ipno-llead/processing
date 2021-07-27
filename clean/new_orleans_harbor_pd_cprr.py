@@ -28,7 +28,7 @@ def split_name(df):
 
 def strip_badge(df):
     df.loc[:, "badge_no"] = df.badge_no.str.strip(
-    ).str.replace(r"\s+\(call sign\)$", "")
+    ).str.replace(r"\s+\(call sign\)$", "", regex=True)
     return df
 
 

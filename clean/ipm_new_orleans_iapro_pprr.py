@@ -46,8 +46,9 @@ def clean_current_supervisor(df):
 
 
 def remove_unnamed_officers(df):
-    df.loc[:, 'last_name'] = df.last_name.str.replace(r'^unknown.*', '')\
-        .str.replace(r'^none$', '').str.replace(r'not an nopd officer', '')
+    df.loc[:, 'last_name'] = df.last_name.str.replace(r'^unknown.*', '', regex=True)\
+        .str.replace(r'^none$', '', regex=True)\
+        .str.replace('not an nopd officer', '', regex=False)
     return df[df.last_name != ''].reset_index(drop=True)
 
 

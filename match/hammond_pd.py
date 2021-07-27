@@ -1,5 +1,4 @@
-from match.lafayette_so import prepare_post
-import sys 
+import sys
 sys.path.append('../')
 import pandas as pd
 from lib.path import data_file_path, ensure_data_dir
@@ -21,7 +20,7 @@ def match_cprr_and_post(cprr, post):
     dfb.loc[:, 'fc'] = dfb.first_name.fillna('').map(lambda x: x[:1])
 
     matcher = ThresholdMatcher(ColumnsIndex('fc'), {
-        'first_name':  JaroWinklerSimilarity(),
+        'first_name': JaroWinklerSimilarity(),
         'last_name': JaroWinklerSimilarity(),
     }, dfa, dfb)
     decision = .865
