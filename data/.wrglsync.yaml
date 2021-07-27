@@ -268,8 +268,8 @@ repos:
     fileName: fuse/per_shreveport_pd.csv
     primaryKey:
       - uid
-  per-tangipahoa-pd:
-    fileName: fuse/per_tangipahoa_pd.csv
+  per-tangipahoa-so:
+    fileName: fuse/per_tangipahoa_so.csv
     primaryKey:
       - uid
   per-ponchatoula-pd:
