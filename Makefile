@@ -32,6 +32,7 @@ all: data/fuse/per_shreveport_pd.csv data/fuse/event_shreveport_pd.csv data/fuse
 all: data/fuse/event_lafayette_so.csv data/fuse/per_lafayette_so.csv data/fuse/com_lafayette_so.csv
 all: data/fuse/per_ponchatoula_pd.csv data/fuse/event_ponchatoula_pd.csv
 all: data/fuse/per_lafayette_pd.csv data/fuse/com_lafayette_pd.csv data/fuse/event_lafayette_pd.csv
+all: data/fuse/event_hammond_pd.csv data/fuse/per_hammond_pd.csv data/fuse/com_hammond_pd.csv
 
 data/fuse/per_new_orleans_harbor_pd.csv data/fuse/event_new_orleans_harbor_pd.csv data/fuse/com_new_orleans_harbor_pd.csv: fuse/new_orleans_harbor_pd.py data/match/post_event_new_orleans_harbor_pd_2020.csv data/match/cprr_new_orleans_harbor_pd_2020.csv data/clean/pprr_new_orleans_harbor_pd_1991_2008.csv data/clean/pprr_new_orleans_harbor_pd_2020.csv
 	python fuse/new_orleans_harbor_pd.py
@@ -116,6 +117,9 @@ data/fuse/per_lafayette_pd.csv data/fuse/com_lafayette_pd.csv data/fuse/event_la
 
 data/fuse/per_ponchatoula_pd.csv data/fuse/event_ponchatoula_pd.csv: fuse/ponchatoula_pd.py data/clean/pprr_ponchatoula_pd_2010_2020.csv data/match/post_event_ponchatoula_pd_2020.csv
 	python fuse/ponchatoula_pd.py
+
+data/fuse/event_hammond_pd.csv data/fuse/per_hammond_pd.csv data/fuse/com_hammond_pd.csv: fuse/hammond_pd.py data/match/cprr_hammond_pd_2015_2020.csv data/clean/pprr_post_2020_11_06.csv
+	python fuse/hammond_pd.py
 
 
 
@@ -202,6 +206,9 @@ data/match/post_event_ponchatoula_pd_2020.csv: match/ponchatoula_pd.py data/clea
 	
 data/match/cprr_lafayette_pd_2015_2020.csv data/match/post_event_lafayette_pd_2020.csv: match/lafayette_pd.py data/clean/cprr_lafayette_pd_2015_2020.csv data/clean/pprr_lafayette_pd_2010_2021.csv data/clean/pprr_post_2020_11_06.csv
 	python match/lafayette_pd.py
+
+data/match/cprr_hammond_pd_2015_2020.csv: match/hammond_pd.py data/clean/pprr_post_2020_11_06.csv data/clean/cprr_hammond_pd_2015_2020.csv
+	python match/hammond_pd.py
 
 
 
@@ -336,3 +343,6 @@ data/clean/cprr_lafayette_pd_2015_2020.csv data/clean/pprr_lafayette_pd_2010_202
 
 data/clean/pprr_baton_rouge_pd_2021.csv: clean/baton_rouge_pd_pprr.py data/baton_rouge_pd/baton_rouge_pd_pprr_2021.csv
 	python clean/baton_rouge_pd_pprr.py
+
+data/clean/cprr_hammond_pd_2015_2020.csv: clean/hammond_pd_cprr.py data/hammond_pd/hammond_pd_cprr_2015_2020.csv
+	python clean/hammond_pd_cprr.py
