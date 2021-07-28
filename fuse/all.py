@@ -33,8 +33,11 @@ def fuse_personnel():
         pd.read_csv(data_file_path("fuse/per_new_orleans_so.csv")),
         pd.read_csv(data_file_path("fuse/per_scott_pd.csv")),
         pd.read_csv(data_file_path("fuse/per_shreveport_pd.csv")),
+        pd.read_csv(data_file_path("fuse/per_tangipahoa_so.csv")),
+        pd.read_csv(data_file_path("fuse/per_ponchatoula_pd.csv")),
         pd.read_csv(data_file_path("fuse/per_lafayette_so.csv")),
         pd.read_csv(data_file_path("fuse/per_lafayette_pd.csv")),
+        pd.read_csv(data_file_path("fuse/per_hammond_pd.csv")),
     ])).sort_values('uid', ignore_index=True)
 
 
@@ -64,8 +67,10 @@ def fuse_event():
         pd.read_csv(data_file_path("fuse/event_scott_pd.csv")),
         pd.read_csv(data_file_path("fuse/event_shreveport_pd.csv")),
         pd.read_csv(data_file_path("fuse/event_tangipahoa_so.csv")),
+        pd.read_csv(data_file_path("fuse/event_ponchatoula_pd.csv")),
         pd.read_csv(data_file_path("fuse/event_lafayette_so.csv")),
         pd.read_csv(data_file_path("fuse/event_lafayette_pd.csv")),
+        pd.read_csv(data_file_path("fuse/event_hammond_pd.csv")),
     ])).sort_values(['agency', 'event_uid'], ignore_index=True)
 
 
@@ -89,6 +94,7 @@ def fuse_complaint():
         pd.read_csv(data_file_path("fuse/com_tangipahoa_so.csv")),
         pd.read_csv(data_file_path("fuse/com_lafayette_so.csv")),
         pd.read_csv(data_file_path("fuse/com_lafayette_pd.csv")),
+        pd.read_csv(data_file_path("fuse/com_hammond_pd.csv")),
     ])).sort_values(['agency', 'data_production_year', 'tracking_number'], ignore_index=True)
 
 

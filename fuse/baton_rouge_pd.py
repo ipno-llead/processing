@@ -63,8 +63,16 @@ if __name__ == "__main__":
         'clean/pprr_baton_rouge_pd_2021.csv'
     ))
 
+    # limit csd data to just officers found in PD roster
     csd_pprr_17.loc[:, 'agency'] = 'Baton Rouge PD'
+    csd_pprr_17 = csd_pprr_17.loc[
+        csd_pprr_17.uid.isin(pprr.uid.unique())
+    ].reset_index()
     csd_pprr_19.loc[:, 'agency'] = 'Baton Rouge PD'
+    csd_pprr_19 = csd_pprr_19.loc[
+        csd_pprr_19.uid.isin(pprr.uid.unique())
+    ].reset_index()
+
     uids = pprr.uid.unique().tolist()
     personnel_df = fuse_personnel(
         pprr,
