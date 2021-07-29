@@ -315,22 +315,38 @@ def parse_officer_name_2021(df):
     dep.columns = ['name', 'department_code', 'department_desc']
     dep.loc[:, 'name'] = dep['name'].str.lower().str.strip()
 
-    names = dep["name"].str.lower().str.replace(r"\s+", " ").str.replace(
-        r"^(\w+(?: (?:iii?|iv|v|jr|sr))?) (\w+)(?: (\w+|n\/a))?$", r"\1 # \2 # \3").str.split(" # ", expand=True)
-    names.columns = ["last_name", "first_name", "middle_initial"]
-    names.loc[:, "middle_initial"] = names["middle_initial"]\
-        .str.replace("n/a", "", regex=False).fillna("")
-    names.loc[:, "middle_name"] = names.middle_initial.map(
-        lambda v: "" if len(v) < 2 else v)
-    names.loc[:, "middle_initial"] = names.middle_initial.map(lambda v: v[:1])
 
-    df = pd.concat([df, dep, names], axis=1)
-    df.drop(columns=["officer_name", "name"], inplace=True)
+    df = pd.concat([df, dep], axis=1)
+    return df
+
+
+def split_name(df):
+    df.name = df.name\
+        .str.replace('.', '', regex=False)\
+        .str.replace(r'(\w+), (\w+)', r'\2 \1', regex=True)\
+        .str.replace(r'(\w+) (\b\w{1}) (\b\w{2}\b) (?:(p\d+) )', r'\2 \1 \3 \4 ')\
+        .str.replace(r' (\w+) (\b\w{1}\b) (?:(p\d+) )', r' \2 \1 \3 ')\
+        .str.replace('traffic homicide', '', regex=False)\
+        .str.replace('task force', '', regex=False)\
+        .str.replace('-', '', regex=False)\
+        .str.replace('none', '', regex=False)\
+        .str.replace(r' (p\d+) ?(.+)?', '', regex=True)\
+    names = df.name.str.extract(r'(?:(lt|cpl|capt|ofc|sgt) )?(?:([^ ]+) )?(\w{1} )?(.+)')
+    df.loc[:, 'rank_desc'] = names[0].replace({
+            'sgt': 'sergeant',
+            'lt': 'lieutenant',
+            'cpl': 'corporal',
+            'ofc': 'officer',
+            'capt': 'captain'
+        })
+    df.loc[:, 'first_name'] = names[1]
+    df.loc[:, 'middle_initial'] = names[2]
+    df.loc[:, 'last_name'] = names[3]
     return df
 
 
 def split_department_and_division_desc(df):
-    df.department_desc = df.department_desc.str.lower().str.strip()\
+    df.department_desc = df.department_desc.str.lower().str.strip().fillna('')\
         .str.replace('patro)', 'patrol', regex=False)\
         .str.replace('&', 'and', regex=False)\
         .str.replace(r'\bop\b', 'operations', regex=True)\
@@ -342,6 +358,8 @@ def split_department_and_division_desc(df):
         .str.replace('criminal investigations criminal investigations', 
         'criminal investigations', regex=False)
     names = df.department_desc.str.extract(r'(patrol|operation service|administration|special operations|criminal investigations) (.+)')
+    df.department_desc = names[0]
+    df.loc[:, 'division_desc'] = names[1]
     return df
 
 def clean_disposition(df):
@@ -419,10 +437,11 @@ def clean_2021():
         .pipe(clean_dates, ['receive_date', 'incident_date'])\
         .pipe(clean_charges)\
         .pipe(clean_action)\
-        .pipe(clean_disposition)\
         .pipe(parse_officer_name_2021)\
-        .pipe(combine_action_and_disposition)\
+        .pipe(split_name)\
         .pipe(split_department_and_division_desc)\
+        .pipe(clean_disposition)\
+        .pipe(combine_action_and_disposition)\
         .pipe(standardize_desc_cols, 
         ['charges', 'action', 'disposition',
          'department_code', 'department_desc']
