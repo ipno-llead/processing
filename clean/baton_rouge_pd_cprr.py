@@ -247,7 +247,6 @@ def clean_complainant(df):
         .str.replace('-', '', regex=False)\
         .str.replace(r'(h/)?[8b](p|r)(p|r)d?o?i?/? ?', 'brpd', regex=True)\
         .str.replace('damaging dept. equipment', '', regex=False)
-
     return df
 
 
@@ -315,33 +314,54 @@ def parse_officer_name_2021(df):
     dep.columns = ['name', 'department_code', 'department_desc']
     dep.loc[:, 'name'] = dep['name'].str.lower().str.strip()
 
-
     df = pd.concat([df, dep], axis=1)
-    return df
+    return df.dropna(subset=['name']).reset_index(drop=True).drop(columns='officer_name')
 
 
 def split_name(df):
-    df.name = df.name\
-        .str.replace('.', '', regex=False)\
+    df.name = df.name.str.lower().str.strip()\
         .str.replace(r'(\w+), (\w+)', r'\2 \1', regex=True)\
-        .str.replace(r'(\w+) (\b\w{1}) (\b\w{2}\b) (?:(p\d+) )', r'\2 \1 \3 \4 ')\
-        .str.replace(r' (\w+) (\b\w{1}\b) (?:(p\d+) )', r' \2 \1 \3 ')\
-        .str.replace('traffic homicide', '', regex=False)\
+        .str.replace(',', '', regex=False)\
+        .str.replace('.', '', regex=False)\
+        .str.replace(r'(\w+) (\b\w{1}) (\b\w{2}\b) (?:(p\d+) )?', r'\2 \1 \3 \4 ', regex=True)\
+        .str.replace(r' (\w+) (\b\w{1}\b) (?:(p\d+) )?', r' \2 \1 \3 ', regex=True)\
+        .str.replace(r'^(\w+) (\w+) (\w{1})$', r'\1 \3 \2', regex=True)\
+        .str.replace(r'^(\w{2}) (\w+) (\w+) (\w{1})$', r'\2 \4 \3 \1', regex=True)\
+        .str.replace(r'^(\w+) (\w{2}) (\w+) (\w+)$', r'\1 \3 \4 \2', regex=True)\
+        .str.replace(r'^(\w+) (\w{2}) (\w+) (p\d+) (\w{1})$', r'\1 \5 \3 \2 \4', regex=True)\
+        .str.replace(r'^(\w+) (\w+) (\w{1}) (\w{2})', r'\1 \3 \2 \4', regex=True)\
+        .str.replace(r'^(\w+) (\w{3}) (\w+) (\w+)', r'\3 \4 \1 \2', regex=True)\
+        .str.replace(r'(\w{3}) (\w{1}) (\w+)  (\w+)', r'\1 \3 \2 \4', regex=True)\
+        .str.replace(r'^(\w+) (\w+) (\w{3})$', r'\1 \3 \2', regex=True)\
+        .str.replace(r'^(\w{1}) (\w+) (\w+)$', r'\2 \1 \3', regex=True)\
+        .str.replace(r'^special operations traffic homicide$', '', regex=True)\
+        .str.replace(r' (p\d+) ?(.+)?', '', regex=True)\
+        .str.replace('none', '', regex=False)\
+        .str.replace('duane lt scrantz', 'lt duane scrantz', regex=False)\
+        .str.replace(r'^\bll\b', 'lt', regex=True)\
+        .str.replace(r'^\bcpi\b', 'cpl', regex=True)\
         .str.replace('task force', '', regex=False)\
         .str.replace('-', '', regex=False)\
-        .str.replace('none', '', regex=False)\
-        .str.replace(r' (p\d+) ?(.+)?', '', regex=True)\
-    names = df.name.str.extract(r'(?:(lt|cpl|capt|ofc|sgt) )?(?:([^ ]+) )?(\w{1} )?(.+)')
+        .str.replace('krumm amy e', 'amy e krumm', regex=False)\
+        .str.replace(r'passman (m|jon) (jon|m)', 'jon m passman', regex=True)
+    names = df.name.str.lower().str.strip().str.extract(r'(?:(lt|cpl|capt|ofc|sgt|maj|det) )?(?:([^ ]+) )?(\w+ )?(.+)')
     df.loc[:, 'rank_desc'] = names[0].replace({
             'sgt': 'sergeant',
             'lt': 'lieutenant',
             'cpl': 'corporal',
             'ofc': 'officer',
-            'capt': 'captain'
+            'capt': 'captain',
+            'maj': 'major',
+            'det': 'detective'
         })
-    df.loc[:, 'first_name'] = names[1]
-    df.loc[:, 'middle_initial'] = names[2]
-    df.loc[:, 'last_name'] = names[3]
+    df.loc[:, 'first_name'] = names[1]\
+        .str.strip()
+    df.loc[:, 'last_name'] = names[3]\
+        .str.strip()
+    df.loc[:, 'middle_name'] = names.loc[:, 2].str.strip().fillna('')\
+        .map(lambda s: '' if len(s) < 2 else s)
+    df.loc[:, 'middle_initial'] = names.loc[:, 2].str.strip().fillna('')\
+        .map(lambda s: '' if len(s) > 2 else s)
     return df
 
 
@@ -361,6 +381,7 @@ def split_department_and_division_desc(df):
     df.department_desc = names[0]
     df.loc[:, 'division_desc'] = names[1]
     return df
+
 
 def clean_disposition(df):
     df.disposition = df.disposition.str.lower().str.strip().fillna('')\
@@ -396,31 +417,75 @@ def combine_action_and_disposition(df):
     df.disposition = df.disposition.str.extract(r'(sustained|not sustained|exonerated)')
     return df
 
+
 def clean_action(df):
     df.action = df.action.str.lower().str.strip()\
-        .str.replace(r'not ?(sustained)? ?', '', regex=True)\
-        .str.replace(r' ?sust?(alned)?\.?,?(l?aine?d)?\b', '', regex=True)\
-        .str.replace(r'exonerated', '', regex=True)\
-        .str.replace(r'^\.', '', regex=True)\
-        .str.replace(r'^,', '', regex=True)\
-        .str.replace(r'^/', '', regex=True)\
-        .str.replace(r'^-', '', regex=True)\
-        .str.replace(r'^;', '', regex=True)\
-        .str.replace(r'(\d+)-? (\w+)', r'\1-\2', regex=True)\
+        .str.replace(r'^//?/?', '', regex=True)\
+        .str.replace(';', '/', regex=False)\
+        .str.replace(r' ?(\w+); (\w+) ?', r'\1/\2', regex=True)\
+        .str.replace(r' ?(\w+) ?/ (\w+)/? ?', r'\1/\2', regex=True)\
+        .str.replace(r' (\w+) /(\w+)-? ', r' \1/\2 ', regex=True)\
         .str.replace('loc', 'letter of caution', regex=False)\
         .str.replace('lor', 'letter of reprimand', regex=False)\
         .str.replace(r'l\.?o\.?u\.?', 'loss of unit', regex=True)\
-        .str.replace(r'hr\.?\b', 'hour', regex=True)\
-        .str.replace(';', '/', regex=False)\
-        .str.replace('.', '', regex=False)\
+        .str.replace(r' ?sust?/?(alned)?\.?,?(l?aine?d)?/?\b', '', regex=True)\
+        .str.replace(r'not ?(sustained)?/? ?/?', '', regex=True)\
+        .str.replace(r'(\d+)-? (\w+)', r'\1-\2', regex=True)\
+        .str.replace(r' ?(8)?(-)?hr\.? ?(dr)?i?v?\.?(iv?ng)? ?(sch)?(ool)? ?', '8-hour driving school', regex=True)\
         .str.replace(',', '/', regex=False)\
+        .str.replace('.', '', regex=False)\
         .str.replace(':', '/', regex=False)\
-        .str.replace('&', '/', regex=False)\
-        .str.replace(r' dri?v?\.? \bsch\b', 'driving school', regex=True)
+        .str.replace(r' ?& ?', '  ', regex=True)\
+        .str.replace(r'^#name\?$', '', regex=True)\
+        .str.replace(r' ?\bsusp\b ?', ' suspension', regex=True)\
+        .str.replace('effective decision making', '', regex=False)\
+        .str.replace(r'mandatory training -? ?(accident)? ?investigation/de escalation',
+        'mandatory accident and de-escalation training', regex=True)\
+        .str.replace('advanced training from firearms supervisor',
+        'advanced firearms training', regex=False)\
+        .str.replace('letterof', 'letter of', regex=True)\
+        .str.replace(r' ?conduct| ?truthfulness?| ?\bn/s\b', '', regex=True)\
+        .str.replace(r'(\d)-mo', r'\1-month', regex=True)\
+        .str.replace(r'(\w+)- (\d+)(\w+)', r'\1 \2-\3', regex=True)\
+        .str.replace(r'crawford|iverson|srantz|hernandez|thomas|ofc|/?cowardice', '', regex=True)\
+        .str.replace(r'(unbecoming/?|officer?| ?investig?ation/? ?| ?coo/?|/?uof| from rso)', '', regex=True)\
+        .str.replace(r' ?shirking ?| ?truth(ful?)? ?|hord/?|blust/?|insub/?|respect/?|/?sexual harrass', '', regex=True)\
+        .str.replace(r'consent|handled by lt/? dabadie|discipline|carrying out orders|use of force', '', regex=True)\
+        .str.replace('vehiclesusp 10-days' ,' 10 day loss of unit', regex=True)\
+        .str.replace('veh suspension5-days', '5-day loss of unit')\
+        .str.replace(r'(\d{2})(\w{3})\b', r'\1-\2', regex=True)\
+        .str.replace(r'^(\d{2})-(\w{3})(\w+)', r'\1-\2 \3', regex=True)\
+        .str.replace(r'(\w+)-(\d+)', r'\1/\2', regex=True)\
+        .str.replace(r'(\w+)  (\d{2})', r'\1/\2', regex=True)\
+        .str.replace(r'(\w+) (\d{2})', r'\1/\2', regex=True)\
+        .str.replace('oral reprimand', 'verbal counseling', regex=False)\
+        .str.replace(r'letter? ?(of)? c?autio?n', 'letter of caution', regex=True)\
+        .str.replace('ofreprimand/', 'of reprimand', regex=True)\
+        .str.replace('counselec', 'counseled', regex=False)\
+        .str.replace('resignedin', 'resigned in', regex=False)\
+        .str.replace('suspensionrecinded', 'suspension rescinded', regex=False)\
+        .str.replace(r'-\(5-day w/o pay\)/-', '5-day suspension without pay', regex=True)\
+        .str.replace(r'no action taken/|\(|\)?|^//?|^-$|^-', '', regex=True)\
+        .str.replace(r' (\w+)/ (\d+)(\w{3}) ', r'\1/\2-\3 ', regex=True)\
+        .str.replace(r'-loss', '-day loss', regex=False)\
+        .str.replace('5day', '5-day', regex=False)\
+        .str.replace(r' ?(\w+)/ (\d+)-(\w+) ', r'\1/\2-\3 ', regex=True)\
+        .str.replace(r'^/', '', regex=True)\
+        .str.replace(r'/$', '', regex=True)\
+        .str.replace('suspensionsuspension', 'suspension/suspension', regex=False)\
+        .str.replace(r'(\w+) /(\d+)-(\w+)', r'\1/\2-\3', regex=True)\
+        .str.replace(r' (\w+) demotion', r' \1/demotion', regex=True)\
+        .str.replace(r'(\w+)/ (\w+)', r'\1/\2', regex=True)\
+        .str.replace(r' (\w+)  (\d+)-(\w+) ', r' \1/\2-\3 ', regex=True)\
+        .str.replace(r'letter of instruction - mandatory roll?i? call training on crime scene securing witnesses',
+        'letter of instruction/mandatory crime scene and securing witnesses training', regex=True)\
+        .str.replace('letter of reprimand  dwi/roll call training on good samaritan law', 
+        'letter of reprimand/good samaritan law training', regex=False)\
+        .str.replace(r' 6/1-13|per capt bloom|young|/ adkins|/ fonte|class|/?conference worksheet/?', '', regex=True)
     return df
 
 
-def clean_2021():
+def clean_21():
     df = pd.read_csv(data_file_path(
         'baton_rouge_pd/baton_rouge_pd_cprr_2021.csv'))\
         .pipe(clean_column_names)
@@ -444,97 +509,7 @@ def clean_2021():
         .pipe(combine_action_and_disposition)\
         .pipe(standardize_desc_cols, 
         ['charges', 'action', 'disposition',
-         'department_code', 'department_desc']
-         )\
-        .pipe(standardize_from_lookup_table, 'action', [
-            ['letter of caution', 'letter of caution(carrying out orders)/use of force ()',
-            'lette of caution', 'young(letter of caution)/ adkins(n/s)/ fonte(n/s)',
-            'conduct unbecoming/letter of caution', 'coo//letter of caution/ uof/',
-            'letter of cautin'],
-            ['10-day suspension/letter of reprimand/letter of caution',
-            'crawford(10-day susp)/iverson(letter of reprimand)/srantz(letter of caution)'],
-            ['letter of caution/60-day loss of unit', 'letter of caution/ 60-day loss of unit'],
-            ['letter of caution/8-hour driving school', 'letter of caution/8-hourdriving school',
-             'letter of caution/ 8-hour drv school', 'letter of caution/ 8-hour driv school',
-             'letter of caution/ 8-hourdriving school', 'letter of caution/ 8-hour driving school',
-             'letter of caution / 8-hour drv school', 'letter of caution/8-hour drv school'],
-            ['letter of caution/8-hour driving school/5-day loss of unit',
-            'letter of caution/ 8-hourdriving school/ 5-day loss of unit'],
-            ['letter of reprimand/20-day loss of unit', 'letter of reprimand/ 20-day loss of unit'],
-            ['letter of reprimand/10-day vehicle suspension', 'letter of reprimand/ vehicle susp 10-days'],
-            ['letter of reprimand/15-day loss of unit', 'letter of reprimand / 15-day loss of unit'],
-            ['letter of reprimand/5-day vehicle suspension', 'letter of reprimand/veh susp 5-days'],
-            ['letter of reprimand/8-hour driving school', 'letter of reprimand/ 8-hour driving school',
-             'letter of reprimand/ 8-hourdriving school', 'letter of reprimand / 8-hour driving school',
-             'letter of reprimand/ 8-hourdriving school'],
-            ['letter of reprimand/8-hour driving school/30-day loss of unit',
-             'letter of reprimand/8hourdriving school/30-day loss of unit',
-             'letter of reprimand/ 8-hour driving school/ 30-day loss of unit',
-             'letter of reprimand/ 8-hourdriving school/ 30-day loss of unit'],
-            ['letter of reprimand/8-hour driving school/10-day loss of unit',
-             'letter of reprimand/ hour school/ 10-loss of unit',
-             'letter of reprimand/ 8-hour driving school/ 10-day loss of unit',
-             'letter of reprimand/ 8-hourdriving school/ 10-day loss of unit'],
-            ['letter of reprimand/10-day loss of unit', 'letter of reprimand/loss of unit- 10day'],
-            ['letter of reprimand/8-hour driving school/15-day loss of unit',
-             'letter of reprimand/ 8hourdriving school/ 15-day loss of unit', 
-             'letter of reprimand/8-hour driving school/15-loss of unit',
-             'letter of reprimand/8-hourdriving school/15-day loss of unit'],
-            ['letter of reprimand/8-hour driving school/5-day loss of unit',
-            'letter of reprimand/8hourdriving school/ 5-day loss of unit',
-            'letter of reprimand/ 8-hourdriving school/ 5-day loss of unit'],
-            ['letter of reprimand/8-hour driving school/45-day loss of unit',
-             'letter of reprimand/ 8-hourdriving school/ 45-day loss of unit'],
-            ['letter of reprimand',
-             'letter of reprimand / dwi/roll call training on good samaritan law'],
-            ['letter of instruction',
-             'letter of instruction - mandatory roli call training on crime scene securing witnesses',
-             'letter of instruction - mandatory roll call training on crime scene securing witnesses'],
-            ['2-day suspension', '2-day suspension (conduct)'],
-            ['20-day suspension/suspension overturned on 1/19/12', '20-day suspension(suspension overturned 1/19/12)'],
-            ['30-day suspension/6-month loss of unit', '30-day suspension (consent)/6-mo loss of unit'],
-            ['30-day suspension', '30-day susp'],
-            ['1-day suspension', 'insub/respect/conduct( 1-day susp)/sexual harrass(n/s)'],
-            ['1-day suspension/60-day loss of unit', '1-day suspension-60-day loss of unit'],
-            ['5-day suspension without pay', 'conduct(5-day w/o pay)/truthful-'],
-            ['5-day suspension', '5-day susp (consent discipline)', '5-day suspension (truthfulness)'],
-            ['8-hour driving school/45-day loss of unit', '8-hour class/ 45-day loss of unit'],
-            ['3-day suspension', '/ 3-day suspension'],
-            ['7-day suspension', 'coo(7-day susp)'],
-            ['20-day suspension'],
-            ['60-day suspension', '(60-day)', '60-day'],
-            ['65-day suspension/demotion', '65-day susp / demotion/truth(n/s)',
-            '65-day susp / demotion/ truth(n/s)'],
-            ['10-day suspension'],
-            ['90-day suspension'],
-            ['80-day suspension'],
-            ['25-day suspension', '25-day susp'],
-            ['60-day suspension/6-month loss of unit', '60-day suspension / 6-mo loss of unit'],
-            ['70-day suspension/30-day loss of unit'],
-            ['demotion', '/ demotion'],
-            ['15-day loss of unit', '15-day loss of unit (for no dmvr)'],
-            ['5-day loss of unit'],
-            ['1-day driving school'],
-            ['suspended', 'suspension from rso'],
-            ['resigned', 'office investigation/officer resigned', 'office investigation/resigned',
-            'officer resigned 6-1-13'],
-            ['resigned in lieu of termination'],
-            ['2-week loss of extra duty', '/ 2-week loss of extra duty / unit'],
-            ['5-day loss of unit', '/ 5-day loss of unit'],
-            ['30-day loss of unit', '/ 30-day loss of unit'],
-            ['counseling', 'counselec', 'oral reprimand', 'counseled'],
-            ['verbal counseling/30-day loss of unit'],
-            ['verbal counseling'],
-            ['resigned in lieu of suspension', 'ofc investigation/ resigned in lieu of suspension'],
-            ['terminated', 'terminated 11/09/12', 'termination'],
-            ['mandatory training', 'mandatory training - accident investigation /de- escalation',
-            'mandatory training accident investigation /de- escalation'],
-            ['firearms training', 'advanced training from firearms supervisor'],
-            ['dismissed', 'charges dismissed'],
-            ['deferred', 'deferred/ handeled upon rehire', '/ handeled upon re'],
-            ['suspension rescinded', 'suspension recinded'],
-            ['crisis intervention training', 'cit training / effective decision making']
-        ])
+         'department_code', 'department_desc'])
     return df
 
 
@@ -562,13 +537,17 @@ def clean_18():
         .pipe(gen_uid, ["agency", "first_name", "middle_initial", "last_name"])\
         .pipe(gen_uid, ['agency', 'tracking_number', 'uid', 'action', 'charges'], 'charge_uid')\
         .pipe(gen_uid, ['charge_uid'], 'complaint_uid')
-
     return df
 
 
 if __name__ == "__main__":
-    df = clean_18()
+    df18 = clean_18()
+    df21 = clean_21()
+
     ensure_data_dir("clean")
-    df.to_csv(
+    df18.to_csv(
         data_file_path("clean/cprr_baton_rouge_pd_2018.csv"),
+        index=False)
+    df21.to_csv(
+        data_file_path("clean/cprr_baton_rouge_pd_2021.csv"),
         index=False)
