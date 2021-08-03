@@ -39,39 +39,57 @@ def find_main(root: ast.Module) -> List[ast.stmt]:
     raise ValueError('main block not found')
 
 
-def process_local_func_call(fn_map: Dict[str, List[ast.stmt]], fn_name: str) -> Set[str]:
+def process_local_func_call(fn_map: Dict[str, List[ast.stmt]], fn_name: str) -> Tuple[Set[str], Set[str]]:
     csvs = set()
+    outputs = set()
     fn_body = fn_map[fn_name]
     for stmt in fn_body:
         if isinstance(stmt, ast.Assign):
-            csvs = csvs.union(process_expr(fn_map, stmt.value))
+            a, b = process_expr(fn_map, stmt.value)
+            csvs = csvs.union(a)
+            outputs = outputs.union(b)
             continue
         elif isinstance(stmt, ast.Return):
-            csvs = csvs.union(process_expr(fn_map, stmt.value))
+            a, b = process_expr(fn_map, stmt.value)
+            csvs = csvs.union(a)
+            outputs = outputs.union(b)
             continue
         elif isinstance(stmt, ast.For) or isinstance(stmt, ast.With):
-            csvs = csvs.union(process_expr(fn_map, stmt))
+            a, b = process_expr(fn_map, stmt)
+            csvs = csvs.union(a)
+            outputs = outputs.union(b)
             continue
         s = ast.dump(stmt)
         if 'read_csv' in s:
             raise ValueError('unhandled node %s' % ast.dump(stmt, indent=4))
-    return csvs
+    return csvs, outputs
 
 
-def process_expr(fn_map: Dict[str, List[ast.stmt]], expr) -> Set[str]:
+def process_expr(fn_map: Dict[str, List[ast.stmt]], expr) -> Tuple[Set[str], Set[str]]:
     csvs = set()
+    outputs = set()
     for node in ast.walk(expr):
         if isinstance(node, ast.Constant) and type(node.value) is str and node.value.endswith('.csv'):
             csvs.add(node.value)
         if isinstance(node, ast.Call):
+            if isinstance(node.func, ast.Attribute) and node.func.attr == 'to_csv':
+                if isinstance(node.args[0], ast.Call) \
+                        and is_name(node.args[0].func, 'data_file_path') \
+                        and isinstance(node.args[0].args[0], ast.Constant):
+                    outputs.add(node.args[0].args[0].value)
+                else:
+                    raise ValueError('unhandled node %s' % ast.dump(node, indent=4))
             if isinstance(node.func, ast.Name):
                 if node.func.id in fn_map:
-                    csvs = csvs.union(process_local_func_call(fn_map, node.func.id))
-    return csvs
+                    a, b = process_local_func_call(fn_map, node.func.id)
+                    csvs = csvs.union(a)
+                    outputs = outputs.union(b)
+    return csvs, outputs
 
 
-def detect_script_input_output(output_prefix: str, q: pathlib.Path) -> Tuple[List[str], List[str]]:
+def detect_script_input_output(q: pathlib.Path) -> Tuple[List[str], List[str]]:
     csvs = set()
+    outputs = set()
     with q.open() as f:
         root = ast.parse(f.read(), q.name)
         fn_map = dict()
@@ -79,24 +97,24 @@ def detect_script_input_output(output_prefix: str, q: pathlib.Path) -> Tuple[Lis
             fn_map[fn.name] = fn.body
         main = find_main(root)
         for stmt in main:
-            csvs = csvs.union(process_expr(fn_map, stmt))
+            a, b = process_expr(fn_map, stmt)
+            csvs = csvs.union(a)
+            outputs = outputs.union(b)
     inputs = []
-    outputs = []
     for name in csvs:
-        if name.startswith(output_prefix):
-            outputs.append(name.split('/')[1])
-        else:
+        if name not in outputs:
             inputs.append(name)
-    return sorted(inputs), sorted(outputs)
+    return sorted(inputs), sorted([name.split('/')[1] for name in outputs])
 
 
-def write_make_rules(dir: pathlib.Path, scripts: List[Tuple[str, List[str], List[str]]]):
+def write_make_rules(all: bool, dir: pathlib.Path, scripts: List[Tuple[str, List[str], List[str]]]):
     scripts.sort(key=lambda x: x[0])
     dir_var = 'DATA_%s_DIR' % dir.name.upper()
     with open(dir / 'data.d', 'w') as f:
         for script, inputs, outputs in scripts:
             targets = ' '.join(['$(%s)/%s' % (dir_var, name) for name in outputs])
-            f.write('all: %s\n\n' % targets)
+            if all:
+                f.write('all: %s\n\n' % targets)
             f.write('%s: %s %s | $(%s)\n\tpython %s\n\n' % (
                 targets,
                 '$(MD5_DIR)/%s.md5' % (dir / script),
@@ -119,6 +137,9 @@ if __name__ == '__main__':
         '-e', '--exclude', action='append', type=pathlib.Path, default=[],
         help='exclude this script from generated make file.'
     )
+    parser.add_argument(
+        '-a', '--all', action='store_true', help="add rule targets to all's dependencies"
+    )
     args = parser.parse_args()
     if not args.scripts_dir.exists():
         raise FileNotFoundError(
@@ -130,11 +151,10 @@ if __name__ == '__main__':
         )
 
     scripts = []
-    output_prefix = args.scripts_dir.name + '/'
     for q in args.scripts_dir.glob('*.py'):
         if q in args.exclude:
             continue
-        inputs, outputs = detect_script_input_output(output_prefix, q)
+        inputs, outputs = detect_script_input_output(q)
         scripts.append((q.name, inputs, outputs))
 
-    write_make_rules(args.scripts_dir, scripts)
+    write_make_rules(args.all, args.scripts_dir, scripts)
