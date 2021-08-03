@@ -275,7 +275,7 @@ def clean_charges(df):
         .str.replace(r'^(viol)?(ation)? ?of (known)? ?laws', '3:22 violation of known laws', regex=True)\
         .str.replace(r' \/(\w+)', r' / \1', regex=True)\
         .str.replace(r' (\d+) (\d+):(\d+)', r'\1', regex=True)\
-        .str.replace(r'(2:?1[12])? ?(conduct)? ?unbecoming ?(an)? ?(officer)? ?(\(?harrassment\)?)? ?(21)? ?(violation)?',
+        .str.replace(r'(2:?1[12])? ?conduct? ?(unbecoming)? ?(an)? ?(officer)? ?(\(?harrassment\)?)? ?(21)? ?(violation)?',
         '2:12 conduct unbecoming an officer - 21 ', regex=True)\
         .str.replace(r'(1:7)? ?(fail)?(ure)? ?(to)? ?(comp(lete?)?(ion)?)? ?(required)? ?(and)? ?&? ?/? ?(submissions?)? ?(of)? ?(required)? forms? ?(8)?',
         '1:7 failure to submit required forms', regex=True)\
@@ -287,7 +287,8 @@ def clean_charges(df):
         .str.replace(r'^(release of prisoner)? ?/? ?allow(ing)? ?escape ?(30)?', 
         '3:7 release of prisoners / allowing escape - 30', regex=True)\
         .str.replace(r'(2:1[23])? ?respect ?(of)? ?(fellow)? ?(officers|members)? ?(22)?', '2:13 respect of fellow officers - 22')\
-        .str.replace(r'(3:9)? ?failure to provide info(rmation)? ?(to superior)? ?(32)?', '3:9 failure to provide information to superior - 39', regex=True)\
+        .str.replace(r'(3:9)? ?fail(ure)? ?(to)? ?(provide)? ?info(rmation)? ?(to superior)? ?(32)?',
+         '3:9 failure to provide information to superior - 39', regex=True)\
         .str.replace(r'(\w+)-', r'\1', regex=True)\
         .str.replace('incar', 'in car', regex=False)\
         .str.replace('accidentl discharge', 'accidental shooting', regex=False)\
@@ -305,7 +306,9 @@ def clean_charges(df):
         .str.replace(r'\binvest\b', 'investigation', regex=True)\
         .str.replace(r' (\(drugs\))? ', ' - ', regex=True)\
         .str.replace(r'^fai[tl](urr?e)? ?(to)? ?(secu[tr]e)? ?(property)? ?/? ?(or)? ?(evid(ence)?)?$',
-         '3:4 failure to secure property or evidence - 26', regex=True)
+         '3:4 failure to secure property or evidence - 26', regex=True)\
+        .str.replace(r' (\(?\w+\)?) (\d+)$', r' \1 - \2 ', regex=True)\
+        .str.replace('discharge firearm', 'firearm discharge', regex=False)
     return df.drop(columns='complaint')
 
 
@@ -401,7 +404,7 @@ def clean_disposition(df):
     return df
 
 
-def combine_action_and_disposition(df):
+def consolidate_action_and_disposition(df):
     df.disposition = df.disposition.str.cat(df.action, sep='|')\
         .str.replace(r'^/', '', regex=True)\
         .str.replace('loc', 'letter of caution', regex=False)\
@@ -429,7 +432,7 @@ def clean_action(df):
         .str.replace('lor', 'letter of reprimand', regex=False)\
         .str.replace(r'l\.?o\.?u\.?', 'loss of unit', regex=True)\
         .str.replace(r' ?sust?/?(alned)?\.?,?(l?aine?d)?/?\b', '', regex=True)\
-        .str.replace(r'not ?(sustained)?/? ?/?', '', regex=True)\
+        .str.replace(r'/?not ?(sustained)?/? ?/?', '', regex=True)\
         .str.replace(r'(\d+)-? (\w+)', r'\1-\2', regex=True)\
         .str.replace(r' ?(8)?(-)?hr\.? ?(dr)?i?v?\.?(iv?ng)? ?(sch)?(ool)? ?', '8-hour driving school', regex=True)\
         .str.replace(',', '/', regex=False)\
@@ -444,13 +447,14 @@ def clean_action(df):
         .str.replace('advanced training from firearms supervisor',
         'advanced firearms training', regex=False)\
         .str.replace('letterof', 'letter of', regex=True)\
-        .str.replace(r' ?conduct| ?truthfulness?| ?\bn/s\b', '', regex=True)\
+        .str.replace(r'/? ?conduct|/? ?truthfulness?|/? ?\bn/s\b', '', regex=True)\
         .str.replace(r'(\d)-mo', r'\1-month', regex=True)\
         .str.replace(r'(\w+)- (\d+)(\w+)', r'\1 \2-\3', regex=True)\
-        .str.replace(r'crawford|iverson|srantz|hernandez|thomas|ofc|/?cowardice', '', regex=True)\
-        .str.replace(r'(unbecoming/?|officer?| ?investig?ation/? ?| ?coo/?|/?uof| from rso)', '', regex=True)\
-        .str.replace(r' ?shirking ?| ?truth(ful?)? ?|hord/?|blust/?|insub/?|respect/?|/?sexual harrass', '', regex=True)\
-        .str.replace(r'consent|handled by lt/? dabadie|discipline|carrying out orders|use of force', '', regex=True)\
+        .str.replace('uof', 'use of force', regex=False)\
+        .str.replace(r'/?crawford|/?iverson|/?srantz|/?hernandez|/?thomas|/?ofc|/?cowardice|/?adkins', '', regex=True)\
+        .str.replace(r'/?(unbecoming/?|/?officer?|/? ?investig?ation/? ?|/? ?coo/?| from rso)', '', regex=True)\
+        .str.replace(r'/? ?shirking ?|/? ?truth(ful?)? ?|hord/?|blust/?|/?insub/?|/?respect/?|/?sexual harrass', '', regex=True)\
+        .str.replace(r'/?consent|/?handled by lt/? dabadie|/?discipline|/?carrying out orders|/?use of force/?', '', regex=True)\
         .str.replace('vehiclesusp 10-days' ,' 10 day loss of unit', regex=True)\
         .str.replace('veh suspension5-days', '5-day loss of unit')\
         .str.replace(r'(\d{2})(\w{3})\b', r'\1-\2', regex=True)\
@@ -459,19 +463,18 @@ def clean_action(df):
         .str.replace(r'(\w+)  (\d{2})', r'\1/\2', regex=True)\
         .str.replace(r'(\w+) (\d{2})', r'\1/\2', regex=True)\
         .str.replace('oral reprimand', 'verbal counseling', regex=False)\
-        .str.replace(r'letter? ?(of)? c?autio?n', 'letter of caution', regex=True)\
-        .str.replace('ofreprimand/', 'of reprimand', regex=True)\
+        .str.replace(r'letter? ?(of)? c?autio?n/?', 'letter of caution', regex=True)\
+        .str.replace(r'ofreprimand', 'of reprimand', regex=True)\
         .str.replace('counselec', 'counseled', regex=False)\
         .str.replace('resignedin', 'resigned in', regex=False)\
         .str.replace('suspensionrecinded', 'suspension rescinded', regex=False)\
         .str.replace(r'-\(5-day w/o pay\)/-', '5-day suspension without pay', regex=True)\
-        .str.replace(r'no action taken/|\(|\)?|^//?|^-$|^-', '', regex=True)\
+        .str.replace(r'/?no action taken/|\(|\)?|^//?|^-$|^-', '', regex=True)\
         .str.replace(r' (\w+)/ (\d+)(\w{3}) ', r'\1/\2-\3 ', regex=True)\
         .str.replace(r'-loss', '-day loss', regex=False)\
         .str.replace('5day', '5-day', regex=False)\
         .str.replace(r' ?(\w+)/ (\d+)-(\w+) ', r'\1/\2-\3 ', regex=True)\
         .str.replace(r'^/', '', regex=True)\
-        .str.replace(r'/$', '', regex=True)\
         .str.replace('suspensionsuspension', 'suspension/suspension', regex=False)\
         .str.replace(r'(\w+) /(\d+)-(\w+)', r'\1/\2-\3', regex=True)\
         .str.replace(r' (\w+) demotion', r' \1/demotion', regex=True)\
@@ -481,7 +484,13 @@ def clean_action(df):
         'letter of instruction/mandatory crime scene and securing witnesses training', regex=True)\
         .str.replace('letter of reprimand  dwi/roll call training on good samaritan law', 
         'letter of reprimand/good samaritan law training', regex=False)\
-        .str.replace(r' 6/1-13|per capt bloom|young|/ adkins|/ fonte|class|/?conference worksheet/?', '', regex=True)
+        .str.replace(r'extra duty  unit', 'extra duty and unit', regex=False)\
+        .str.replace('drivingschool', 'driving school', regex=False)\
+        .str.replace('loss of unit/10-day', '10-day loss of unit', regex=False)\
+        .str.replace('terminated', 'termination', regex=False)\
+        .str.replace(r'/11/09/12| 6/1-13|per capt bloom|young|/ adkins|/ fonte|class|/?conference worksheet/?', '', regex=True)\
+        .str.replace(r'/$', '', regex=True)\
+        .str.replace('exonerated', '', regex=False)
     return df
 
 
@@ -506,7 +515,7 @@ def clean_21():
         .pipe(split_name)\
         .pipe(split_department_and_division_desc)\
         .pipe(clean_disposition)\
-        .pipe(combine_action_and_disposition)\
+        .pipe(consolidate_action_and_disposition)\
         .pipe(standardize_desc_cols, 
         ['charges', 'action', 'disposition',
          'department_code', 'department_desc'])
