@@ -30,14 +30,14 @@ def discard_rows(events: pd.DataFrame, bool_index: pd.Series, desc: str, reset_i
 
 def assign_min_col(events: pd.DataFrame, per: pd.DataFrame, col: str):
     min_dict = events[col].min(level='uid').to_dict()
-    per.loc[:, 'min_'+col] = per.index.map(
+    per.loc[:, 'min_' + col] = per.index.map(
         lambda x: min_dict.get(x, np.NaN)
     )
 
 
 def assign_max_col(events: pd.DataFrame, per: pd.DataFrame, col: str):
     max_dict = events[col].max(level='uid').to_dict()
-    per.loc[:, 'max_'+col] = per.index.map(
+    per.loc[:, 'max_' + col] = per.index.map(
         lambda x: max_dict.get(x, np.NaN)
     )
 
@@ -63,14 +63,15 @@ def cross_match_officers_between_agencies(per, events):
 
     per = per[['uid', 'first_name', 'last_name']]
     per = discard_rows(
-        per, per.first_name.notna() & per.last_name.notna(), 'officers with empty name', reset_index=True
+        per, per.first_name.notna() & per.last_name.notna(),
+        'officers without either first name or last name', reset_index=True,
     )
     per.loc[:, 'fc'] = per.first_name.map(lambda x: x[:1])
     agency_dict = events.loc[:, ['uid', 'agency']].drop_duplicates()\
         .set_index('uid').agency.to_dict()
     per.loc[:, 'agency'] = per.uid.map(lambda x: agency_dict.get(x, ''))
     per = discard_rows(
-        per, per.agency != '', 'officers with empty agency', reset_index=True
+        per, per.agency != '', 'officers not linked to any event', reset_index=True
     )
     per = per.set_index('uid')
 
@@ -95,8 +96,8 @@ def cross_match_officers_between_agencies(per, events):
         NonOverlappingFilter('min_timestamp', 'max_timestamp')
     ], show_progress=True)
     decision = 0.98
-    with Spinner('saving pairs to Excel file'):
-        matcher.save_pairs_to_excel(excel_path, decision)
+    with Spinner('saving matched clusters to Excel file'):
+        matcher.save_clusters_to_excel(excel_path, decision, lower_bound=decision)
     print('saved pairs to %s' % excel_path.relative_to(pathlib.Path.cwd()))
 
 
