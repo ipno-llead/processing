@@ -9,12 +9,11 @@ from lib.post import extract_events_from_post
 sys.path.append('../')
 
 
-def extract_post_events(ah, post):
+def extract_post_events(roster, post):
     post = post.loc[post.agency == 'covington pd']
 
-    dfa = ah[['first_name', 'last_name', 'uid']]
+    dfa = roster.set_index('uid', drop=True)
     dfa.loc[:, 'fc'] = dfa.first_name.fillna('').map(lambda x: x[:1])
-    dfa = dfa.drop_duplicates().set_index('uid', drop=True)
 
     dfb = post[['last_name', 'first_name', 'uid']]
     dfb.loc[:, 'fc'] = dfb.first_name.fillna('').map(lambda x: x[:1])
@@ -34,9 +33,19 @@ def extract_post_events(ah, post):
 
 if __name__ == '__main__':
     ah = pd.read_csv(data_file_path(
-        'clean/actions_history_covington_pd_2021.csv'))
+        'clean/actions_history_covington_pd_2021.csv'
+    ))
+    pprr = pd.read_csv(data_file_path(
+        'clean/pprr_covington_pd_2020.csv'
+    ))
     post = pd.read_csv(data_file_path('clean/pprr_post_2020_11_06.csv'))
-    post_events = extract_post_events(ah, post)
+    post_events = extract_post_events(
+        pd.concat([
+            ah[['first_name', 'last_name', 'uid']],
+            pprr[['first_name', 'last_name', 'uid']]
+        ]).drop_duplicates(),
+        post
+    )
     ensure_data_dir("match")
     post_events.to_csv(data_file_path(
         "match/post_event_covington_pd_2020.csv"), index=False)
