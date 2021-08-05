@@ -47,7 +47,7 @@ def assign_pay_date_and_rank_date(df):
 
 def clean_personnel_2008():
     df = pd.read_csv(data_file_path(
-        "new_orleans_harbor_pd/new_orleans_harbor_pd_pprr_1991-2008.csv"
+        "dropbox/new_orleans_harbor_pd/new_orleans_harbor_pd_pprr_1991-2008.csv"
     ))
     df = clean_column_names(df)
     df = df.dropna(axis=1, how="all")
@@ -72,7 +72,7 @@ def clean_personnel_2008():
 
 def clean_personnel_2020():
     df = pd.read_csv(data_file_path(
-        "new_orleans_harbor_pd/new_orleans_harbor_pd_pprr_2020.csv"))
+        "dropbox/new_orleans_harbor_pd/new_orleans_harbor_pd_pprr_2020.csv"))
     df = clean_column_names(df)
     df = df.dropna(how="all")
     df = df[["first_name", "last_name", "position_rank", "date_hired",

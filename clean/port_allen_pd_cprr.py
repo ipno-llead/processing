@@ -27,7 +27,7 @@ def clean_occur_time(df):
         p = s.split(":")
         if len(p) == 1:
             if int(p[0]) > 12:
-                p = ["00"]+p
+                p = ["00"] + p
             else:
                 p.append("00")
         return ":".join([v.zfill(2) for v in p])
@@ -54,13 +54,13 @@ def split_rows_by_charges(df):
         if pd.isna(row.charge):
             continue
         parts = row.charge.split("#")[1:]
-        df = duplicate_row(df, idx+i, len(parts))
+        df = duplicate_row(df, idx + i, len(parts))
         for j, p in enumerate(parts):
-            df.loc[idx+i+j, "charge"] = re.sub(
+            df.loc[idx + i + j, "charge"] = re.sub(
                 r" \(.+\)$", "",
                 p.lower().strip().replace(": ", " ").replace("n/a", "")
             )
-        i += len(parts)-1
+        i += len(parts) - 1
     return df
 
 
@@ -94,7 +94,7 @@ def assign_prod_year(df, year):
 
 
 def clean19():
-    df = pd.read_csv(data_file_path("port_allen_pd/port_allen_cprr_2019.csv"))
+    df = pd.read_csv(data_file_path("dropbox/port_allen_pd/port_allen_cprr_2019.csv"))
     df = clean_column_names(df)
     df.columns = [
         'receive_date', 'rank_desc', 'first_name', 'last_name', 'badge_no', 'charge',
@@ -138,7 +138,7 @@ def combine_appeal_and_action_columns(df):
 
 def clean18():
     return pd.read_csv(data_file_path(
-        "port_allen_pd/port_allen_cprr_2017-2018_byhand.csv"))\
+        "dropbox/port_allen_pd/port_allen_cprr_2017-2018_byhand.csv"))\
         .pipe(clean_column_names)\
         .rename(columns={
             "case_number": "tracking_number",
@@ -164,7 +164,7 @@ def clean18():
 
 def clean16():
     return pd.read_csv(data_file_path(
-        "port_allen_pd/port_allen_cprr_2015-2016_byhand.csv"))\
+        "dropbox/port_allen_pd/port_allen_cprr_2015-2016_byhand.csv"))\
         .pipe(clean_column_names)\
         .dropna(how="all")\
         .dropna(subset=['tracking_number'])\

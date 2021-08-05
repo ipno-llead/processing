@@ -45,7 +45,7 @@ def clean_rank(df):
 
 def clean09():
     return pd.read_csv(data_file_path(
-        'slidell_pd/slidell_pd_pprr_2009.csv'
+        'dropbox/slidell_pd/slidell_pd_pprr_2009.csv'
     ), delimiter=';')\
         .pipe(clean_column_names)\
         .rename(columns={
@@ -87,7 +87,7 @@ def realign19(df):
 
 def clean19():
     return pd.read_csv(data_file_path(
-        'slidell_pd/slidell_pd_pprr_2019.csv'
+        'dropbox/slidell_pd/slidell_pd_pprr_2019.csv'
     ), delimiter=';')\
         .pipe(realign19)\
         .pipe(clean_column_names)\

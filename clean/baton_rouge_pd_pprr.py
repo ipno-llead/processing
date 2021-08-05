@@ -46,7 +46,7 @@ def clean_badge_no(df):
 
 def clean():
     return pd.read_csv(data_file_path(
-        'baton_rouge_pd/baton_rouge_pd_pprr_2021.csv'
+        'dropbox/baton_rouge_pd/baton_rouge_pd_pprr_2021.csv'
     )).pipe(clean_column_names)\
         .rename(columns={
             'rank': 'rank_desc',

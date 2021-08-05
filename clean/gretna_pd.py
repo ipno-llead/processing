@@ -39,7 +39,7 @@ def clean_rank_desc(df):
 
 def clean():
     return pd.read_csv(data_file_path(
-        'gretna_pd/gretna_pd_pprr_2018.csv'
+        'dropbox/gretna_pd/gretna_pd_pprr_2018.csv'
     )).pipe(clean_column_names)\
         .rename(columns={
             'rank': 'rank_desc',

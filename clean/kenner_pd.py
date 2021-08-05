@@ -30,7 +30,7 @@ def split_names(df):
 
 def clean():
     return pd.read_csv(data_file_path(
-        'kenner_pd/kenner_pd_pprr_2020.csv'
+        'dropbox/kenner_pd/kenner_pd_pprr_2020.csv'
     ))\
         .pipe(clean_column_names)\
         .rename(columns={
@@ -92,7 +92,7 @@ def clean_rank(df):
 
 def clean_former_long():
     return pd.read_csv(data_file_path(
-        'kenner_pd/kenner_pd_pprr_formeremployees_long.csv'
+        'dropbox/kenner_pd/kenner_pd_pprr_formeremployees_long.csv'
     ))\
         .pipe(clean_column_names)\
         .rename(columns={
@@ -112,7 +112,7 @@ def clean_former_long():
 
 def clean_former_short():
     return pd.read_csv(data_file_path(
-        'kenner_pd/kenner_pd_pprr_formeremployees_short.csv'
+        'dropbox/kenner_pd/kenner_pd_pprr_formeremployees_short.csv'
     )).pipe(clean_column_names)\
         .rename(columns={
             'date_hired': 'hire_date',

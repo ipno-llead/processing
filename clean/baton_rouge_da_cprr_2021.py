@@ -9,7 +9,7 @@ sys.path.append("../")
 
 def clean():
     df = pd.read_csv(data_file_path(
-        "baton_rouge_da/baton_rouge_da_cprr_2021.csv"))
+        "dropbox/baton_rouge_da/baton_rouge_da_cprr_2021.csv"))
     df = clean_column_names(df)
     return df\
         .pipe(clean_names, ['first_name', 'last_name', 'middle_name'])\

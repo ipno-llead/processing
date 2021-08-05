@@ -26,7 +26,7 @@ def clean_rank_desc(df):
 
 
 def clean_pprr_20():
-    return pd.read_csv(data_file_path('mandeville_pd/mandeville_csd_pprr_2020.csv'))\
+    return pd.read_csv(data_file_path('dropbox/mandeville_pd/mandeville_csd_pprr_2020.csv'))\
         .pipe(clean_column_names)\
         .rename(columns={
             'recurring_annual_salary': 'salary',
@@ -49,7 +49,7 @@ def clean_pprr_20():
 
 
 def clean_cprr_19():
-    return pd.read_csv(data_file_path('mandeville_pd/mandeville_pd_cprr_2019_byhand.csv'))\
+    return pd.read_csv(data_file_path('dropbox/mandeville_pd/mandeville_pd_cprr_2019_byhand.csv'))\
         .pipe(clean_column_names)\
         .rename(columns={
             'title': 'rank_desc'

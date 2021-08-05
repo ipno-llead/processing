@@ -44,7 +44,7 @@ def clean_charges(df):
 
 def clean():
     df = pd.read_csv(data_file_path(
-        "scott_pd/scott_pd_cprr_2020.csv")
+        "dropbox/scott_pd/scott_pd_cprr_2020.csv")
     ).pipe(clean_column_names)\
         .drop(columns="appeal")\
         .dropna()\

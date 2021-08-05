@@ -66,7 +66,7 @@ def split_appellant_column(df):
 
 def assign_additional_appellant_names(df):
     names = pd.read_csv(data_file_path(
-        'louisiana_state_csc/la_lprr_appellants.csv'))
+        'dropbox/louisiana_state_csc/la_lprr_appellants.csv'))
     for _, row in names.iterrows():
         for col in ['first_name', 'last_name', 'middle_initial']:
             df.loc[df.docket_no == row.docket_no,
@@ -150,7 +150,7 @@ def assign_charging_supervisor(df):
 
 def clean():
     df = pd.read_csv(data_file_path(
-        "louisiana_state_csc/louisianastate_csc_lprr_1991-2020.csv"))
+        "dropbox/louisiana_state_csc/louisianastate_csc_lprr_1991-2020.csv"))
     df = clean_column_names(df)
     df = df.rename(columns={
         'docket': 'docket_no',

@@ -37,8 +37,8 @@ def split_rows_by_salary(df):
             df = duplicate_row(df, idx, salaries_count)
         j = 0
         for k, v in salaries.items():
-            df.loc[idx+j, "salary"] = v
-            df.loc[idx+j, "pay_effective_year"] = k
+            df.loc[idx + j, "salary"] = v
+            df.loc[idx + j, "pay_effective_year"] = k
             j += 1
         idx += salaries_count
     df = df.drop(columns=salary_cols)
@@ -54,7 +54,7 @@ def assign_agency(df):
 
 def clean():
     df = pd.read_csv(data_file_path(
-        "madisonville_pd/madisonville_csd_pprr_2019.csv"))
+        "dropbox/madisonville_pd/madisonville_csd_pprr_2019.csv"))
     df = clean_column_names(df)
     df.columns = [
         'name', 'badge_no', 'hire_date', '2012', '2013', '2014', '2015',

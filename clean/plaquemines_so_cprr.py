@@ -23,7 +23,7 @@ def assign_agency(df):
 
 def clean():
     df = pd.read_csv(data_file_path(
-        'plaquemines_so/plaquemines_so_cprr_2019.csv'
+        'dropbox/plaquemines_so/plaquemines_so_cprr_2019.csv'
     ))
     df = clean_column_names(df)
     df = df.rename(columns={

@@ -71,7 +71,7 @@ def clean_days(df):
 
 
 def clean():
-    df = pd.read_csv(data_file_path('lafayette_so/lafayette_so_cprr_2015_2020.csv'))\
+    df = pd.read_csv(data_file_path('dropbox/lafayette_so/lafayette_so_cprr_2015_2020.csv'))\
         .pipe(clean_column_names)
     df = df\
         .rename(columns={

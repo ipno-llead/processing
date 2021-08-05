@@ -74,7 +74,7 @@ def clean_rank_desc(df):
 
 def clean_17():
     df = pd.read_csv(data_file_path(
-        "baton_rouge_csd/baton_rouge_csd_pprr_2017.csv"
+        "dropbox/baton_rouge_csd/baton_rouge_csd_pprr_2017.csv"
     )).pipe(clean_column_names)
     df = df[[
         'year', 'employee_num', 'last_name', 'first_name', 'middle_init', 'division_num', 'division_name', 'job_code',
@@ -106,7 +106,7 @@ def clean_17():
 
 def clean_19():
     df = pd.read_csv(data_file_path(
-        "baton_rouge_csd/baton_rouge_csd_pprr_2019.csv"
+        "dropbox/baton_rouge_csd/baton_rouge_csd_pprr_2019.csv"
     )).pipe(clean_column_names)
 
     df = df[[

@@ -199,7 +199,7 @@ def clean_cprr(disposition_file, name_file, year):
 
 def clean_codebook():
     df = pd.read_csv(data_file_path(
-        'shreveport_pd/shreveport_codebook.csv'
+        'dropbox/shreveport_pd/shreveport_codebook.csv'
     ), names=['name', 'code'])
     df.loc[:, 'name'] = df.name.str.strip().str.lower()
     df.loc[:, 'code'] = df.code.str.strip()\

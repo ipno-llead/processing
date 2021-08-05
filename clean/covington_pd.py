@@ -40,7 +40,7 @@ def clean_rank_desc(df):
 
 def clean_actions_history():
     return pd.read_csv(data_file_path(
-        'covington_pd/covington_pd_actions_history.csv'
+        'dropbox/covington_pd/covington_pd_actions_history.csv'
     )).pipe(clean_column_names)\
         .rename(columns={
             'emp': 'employee_id',
@@ -71,31 +71,36 @@ def sum_salaries(df):
     return df
 
 
-def clean_pprr():
-    dfs = []
-    for year in range(2010, 2021):
-        df = pd.read_csv(data_file_path(
-            'covington_pd/covington_pd_pprr_%d.csv' % year
-        )).pipe(clean_column_names)\
-            .rename(columns={
-                'emp': 'employee_id',
-                'year': 'salary_year',
-                'employee_gross': 'salary',
-            })\
-            .drop(columns=['code'])\
-            .pipe(set_values, {'salary_freq': salary.YEARLY})\
-            .pipe(clean_names, ['first_name', 'last_name'])\
-            .pipe(clean_salaries, ['salary'])\
-            .pipe(sum_salaries)\
-            .pipe(assign_agency)\
-            .pipe(gen_uid, ['agency', 'employee_id'])
-        dfs.append(df)
-    return pd.concat(dfs)
+def clean_pprr(filename):
+    return pd.read_csv(filename).pipe(clean_column_names)\
+        .rename(columns={
+            'emp': 'employee_id',
+            'year': 'salary_year',
+            'employee_gross': 'salary',
+        })\
+        .drop(columns=['code'])\
+        .pipe(set_values, {'salary_freq': salary.YEARLY})\
+        .pipe(clean_names, ['first_name', 'last_name'])\
+        .pipe(clean_salaries, ['salary'])\
+        .pipe(sum_salaries)\
+        .pipe(assign_agency)\
+        .pipe(gen_uid, ['agency', 'employee_id'])
+
+
+def clean_pprrs():
+    return pd.concat([
+        clean_pprr(data_file_path(
+            'dropbox/covington_pd/covington_pd_pprr_2010.csv'
+        )),
+        clean_pprr(data_file_path(
+            'dropbox/covington_pd/covington_pd_pprr_2021.csv'
+        ))
+    ])
 
 
 if __name__ == '__main__':
     actions_history = clean_actions_history()
-    pprr = clean_pprr()
+    pprr = clean_pprrs()
     ensure_data_dir('clean')
     actions_history.to_csv(data_file_path(
         'clean/actions_history_covington_pd_2021.csv'
