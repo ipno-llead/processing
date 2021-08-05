@@ -8,7 +8,7 @@ sys.path.append("../")
 
 def initial_processing():
     df = pd.read_csv(data_file_path(
-        "dropbox/ipm/new_orleans_pd_cprr_actions_taken_1931-2020.csv"), escapechar="\\")
+        "raw/ipm/new_orleans_pd_cprr_actions_taken_1931-2020.csv"), escapechar="\\")
     df = df.dropna(axis=1, how="all")
     df = clean_column_names(df)
     df = df[[

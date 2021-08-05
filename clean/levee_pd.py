@@ -54,7 +54,7 @@ def remove_NA_values(df, cols):
 
 def clean19():
     return pd.read_csv(data_file_path(
-        'dropbox/levee_pd/levee_pd_cprr_2019.csv'
+        'raw/levee_pd/levee_pd_cprr_2019.csv'
     ))\
         .pipe(clean_column_names)\
         .rename(columns={
@@ -84,7 +84,7 @@ def clean19():
 
 def clean20():
     return pd.read_csv(data_file_path(
-        'dropbox/levee_pd/levee_pd_cprr_2020.csv'
+        'raw/levee_pd/levee_pd_cprr_2020.csv'
     ))\
         .pipe(clean_column_names)\
         .rename(columns={

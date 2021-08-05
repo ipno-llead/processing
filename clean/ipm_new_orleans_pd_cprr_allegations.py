@@ -11,7 +11,7 @@ sys.path.append("../")
 
 def initial_processing():
     df = pd.read_csv(data_file_path(
-        "dropbox/ipm/new_orleans_pd_cprr_allegations_1931-2020.csv"), escapechar="\\")
+        "raw/ipm/new_orleans_pd_cprr_allegations_1931-2020.csv"), escapechar="\\")
     df = df.dropna(axis=1, how="all")
     df = df.drop_duplicates()
     return clean_column_names(df)

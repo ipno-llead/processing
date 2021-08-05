@@ -40,7 +40,7 @@ def clean_rank_desc(df):
 
 def clean_actions_history():
     return pd.read_csv(data_file_path(
-        'dropbox/covington_pd/covington_pd_actions_history.csv'
+        'raw/covington_pd/covington_pd_actions_history.csv'
     )).pipe(clean_column_names)\
         .rename(columns={
             'emp': 'employee_id',
@@ -90,10 +90,10 @@ def clean_pprr(filename):
 def clean_pprrs():
     return pd.concat([
         clean_pprr(data_file_path(
-            'dropbox/covington_pd/covington_pd_pprr_2010.csv'
+            'raw/covington_pd/covington_pd_pprr_2010.csv'
         )),
         clean_pprr(data_file_path(
-            'dropbox/covington_pd/covington_pd_pprr_2021.csv'
+            'raw/covington_pd/covington_pd_pprr_2021.csv'
         ))
     ])
 

@@ -118,7 +118,7 @@ def split_investigating_supervisor(df):
 
 def clean():
     df = pd.read_csv(data_file_path(
-        "dropbox/new_orleans_so/new_orleans_so_cprr_2019_tabula.csv"))
+        "raw/new_orleans_so/new_orleans_so_cprr_2019_tabula.csv"))
     df = clean_column_names(df)
     return df\
         .pipe(remove_header_rows)\

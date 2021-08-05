@@ -118,7 +118,7 @@ def assign_prod_year(df, year):
 
 def clean18():
     df = pd.read_csv(data_file_path(
-        "dropbox/baton_rouge_so/baton_rouge_so_cprr_2018.csv"))
+        "raw/baton_rouge_so/baton_rouge_so_cprr_2018.csv"))
     df = clean_column_names(df)
     df.columns = ['name', 'badge_no', 'rank_desc', 'rank_date', 'race', 'sex',
                   'birth_year', 'infraction',
@@ -146,7 +146,7 @@ def clean18():
 
 def clean20():
     df = pd.read_csv(data_file_path(
-        "dropbox/baton_rouge_so/baton_rouge_so_cprr_2016-2020.csv"))
+        "raw/baton_rouge_so/baton_rouge_so_cprr_2016-2020.csv"))
     df = clean_column_names(df)
     df.columns = ['tracking_number', 'name', 'badge_no', 'rank_desc', 'rank_date', 'race', 'sex',
                   'birth_year', "department_desc", 'infraction',

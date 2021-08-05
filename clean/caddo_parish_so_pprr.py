@@ -54,7 +54,7 @@ def clean_rank_desc(df):
 
 def clean():
     return pd.read_csv(data_file_path(
-        'dropbox/caddo_parish_so/caddo_parish_so_pprr_2020.csv'
+        'raw/caddo_parish_so/caddo_parish_so_pprr_2020.csv'
     ))\
         .dropna(axis=1, how='all')\
         .drop_duplicates(ignore_index=True)\

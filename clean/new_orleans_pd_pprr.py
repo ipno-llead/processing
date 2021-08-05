@@ -13,7 +13,7 @@ sys.path.append("../")
 
 
 def read_csv_files():
-    prefix = data_file_path("dropbox/new_orleans_pd")
+    prefix = data_file_path("raw/new_orleans_pd")
     pat = re.compile(r".+_\d{4}\.csv$")
     csv_files = [name for name in os.listdir(
         prefix) if pat.match(name) is not None]
@@ -23,7 +23,7 @@ def read_csv_files():
 
 def extract_rank_map(matched_dfs):
     rank_codes = pd.read_csv(data_file_path(
-        "dropbox/new_orleans_pd/job_code_description_list.csv"))
+        "raw/new_orleans_pd/job_code_description_list.csv"))
     rank_codes.columns = ["rank_code", "rank_desc"]
 
     rank_dfs = []

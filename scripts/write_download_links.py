@@ -16,14 +16,17 @@ def filename_from_url(url):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Write each dropbox link from json file to NAME.link files.')
+    parser = argparse.ArgumentParser(description=(
+        'Extract CSV NAME from each link found in json file and write link to NAME.link files. '
+        'It will only update NAME.link files for links that have changed.'
+    ))
     parser.add_argument(
         'links_file', type=pathlib.Path, metavar='LINKS_FILE',
-        help='Read Dropbox links from this file (must be in JSON format).',
+        help='Read links from this file (must be a JSON file).',
     )
     parser.add_argument(
         'link_dir', type=pathlib.Path, metavar='LINK_DIR',
-        help='Write link files to this folder.',
+        help='Write NAME.link files to this folder.',
     )
     args = parser.parse_args()
     if not args.links_file.exists():

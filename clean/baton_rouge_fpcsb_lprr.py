@@ -12,7 +12,7 @@ sys.path.append("../")
 
 
 def realign():
-    with open(data_file_path("dropbox/baton_rouge_fpcsb/baton_rouge_fpcsb_logs_1992-2012.csv"), "r", encoding="latin-1") as f:
+    with open(data_file_path("raw/baton_rouge_fpcsb/baton_rouge_fpcsb_logs_1992-2012.csv"), "r", encoding="latin-1") as f:
         # remove extraneous column names
         s = re.sub(
             r"(Date of Hearing|Hearing (Scheduled|Date)).?,(Docket|Case) #.+", "", f.read())

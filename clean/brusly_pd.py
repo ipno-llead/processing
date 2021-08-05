@@ -30,7 +30,7 @@ def split_supervisor(df):
 
 
 def clean_cprr():
-    df = pd.read_csv(data_file_path("dropbox/brusly_pd/brusly_pd_cprr_2020.csv"))
+    df = pd.read_csv(data_file_path("raw/brusly_pd/brusly_pd_cprr_2020.csv"))
     df = clean_column_names(df)
     df.columns = ['receive_date', 'occur_date', 'officer_name', 'supervisor',
                   'charges', 'action', 'suspension_start_date', 'suspension_end_date']
@@ -64,7 +64,7 @@ def clean_position(df):
 
 
 def clean_pprr():
-    df = pd.read_csv(data_file_path("dropbox/brusly_pd/brusly_pd_pprr_2020.csv"))\
+    df = pd.read_csv(data_file_path("raw/brusly_pd/brusly_pd_pprr_2020.csv"))\
         .pipe(clean_column_names)\
         .drop(columns=['company_name', 'department_name'])\
         .rename(columns={'annual_salary': 'salary'})\
@@ -87,7 +87,7 @@ def clean_pprr():
 
 
 def clean_award():
-    return pd.read_csv(data_file_path('dropbox/brusly_pd/brusly_pd_awards_2015-2020_byhand.csv'))\
+    return pd.read_csv(data_file_path('raw/brusly_pd/brusly_pd_awards_2015-2020_byhand.csv'))\
         .pipe(clean_column_names)\
         .rename(columns={
             'l_name': "last_name",

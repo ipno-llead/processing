@@ -98,7 +98,7 @@ def clean_rank_desc(df):
 
 def clean():
     df = pd.read_csv(data_file_path(
-        "dropbox/ipm/new_orleans_iapro_pprr_1946-2018.csv"), sep='\t')
+        "raw/ipm/new_orleans_iapro_pprr_1946-2018.csv"), sep='\t')
     df = df.dropna(axis=1, how="all")
     df = clean_column_names(df)
     df = df.drop(columns=[

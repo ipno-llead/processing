@@ -45,7 +45,7 @@ actions_lookup = [
 
 def realign_18():
     df = pd.read_csv(
-        data_file_path("dropbox/baton_rouge_pd/baton_rouge_pd_cprr_2018.csv"),
+        data_file_path("raw/baton_rouge_pd/baton_rouge_pd_cprr_2018.csv"),
         encoding="latin1")
     df.rename(columns=lambda x: x.strip(), inplace=True)
     df.rename(columns={"Comptaint": "Complaint"}, inplace=True)

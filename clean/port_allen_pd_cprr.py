@@ -94,7 +94,7 @@ def assign_prod_year(df, year):
 
 
 def clean19():
-    df = pd.read_csv(data_file_path("dropbox/port_allen_pd/port_allen_cprr_2019.csv"))
+    df = pd.read_csv(data_file_path("raw/port_allen_pd/port_allen_cprr_2019.csv"))
     df = clean_column_names(df)
     df.columns = [
         'receive_date', 'rank_desc', 'first_name', 'last_name', 'badge_no', 'charge',
@@ -138,7 +138,7 @@ def combine_appeal_and_action_columns(df):
 
 def clean18():
     return pd.read_csv(data_file_path(
-        "dropbox/port_allen_pd/port_allen_cprr_2017-2018_byhand.csv"))\
+        "raw/port_allen_pd/port_allen_cprr_2017-2018_byhand.csv"))\
         .pipe(clean_column_names)\
         .rename(columns={
             "case_number": "tracking_number",
@@ -164,7 +164,7 @@ def clean18():
 
 def clean16():
     return pd.read_csv(data_file_path(
-        "dropbox/port_allen_pd/port_allen_cprr_2015-2016_byhand.csv"))\
+        "raw/port_allen_pd/port_allen_cprr_2015-2016_byhand.csv"))\
         .pipe(clean_column_names)\
         .dropna(how="all")\
         .dropna(subset=['tracking_number'])\

@@ -29,7 +29,7 @@ def assign_agency(df):
 
 def clean():
     return pd.read_csv(data_file_path(
-        'dropbox/vivian_csd/vivian_csd_pprr_2021.csv'
+        'raw/vivian_csd/vivian_csd_pprr_2021.csv'
     )).pipe(clean_column_names)\
         .drop(columns=['length_of_service'])\
         .rename(columns={

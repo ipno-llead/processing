@@ -19,7 +19,7 @@ export PYTHONPATH := $(shell pwd):$(PYTHONPATH)
 .SECONDARY:
 .PHONY: all clean
 
-all: download_deps
+all: download_links
 clean:
 	rm -f $(DATA_DEP_FILES)
 	rm -rf $(BUILD_DIR)
@@ -36,5 +36,5 @@ $(BUILD_DIR) $(DATA_DIR): ; @-mkdir $@ 2>/dev/null
 $(MD5_DIR): | $(BUILD_DIR) ; @-mkdir $@ 2>/dev/null
 $(DATA_CLEAN_DIR) $(DATA_MATCH_DIR) $(DATA_FUSE_DIR): | $(DATA_DIR) ; @-mkdir $@ 2>/dev/null
 
+include raw_datasets.mk
 include $(DATA_DEP_FILES)
-include dropbox.mk

@@ -36,7 +36,7 @@ def clean_rank(df):
 
 def clean():
     df = pd.read_csv(data_file_path(
-        'dropbox/scott_pd/scott_pd_pprr_2021.csv'))
+        'raw/scott_pd/scott_pd_pprr_2021.csv'))
     df = clean_column_names(df)
     df.columns = ['full_name', 'sex', 'race', 'birth_date', 'salary', 'hire_date', 'termination_date',
                   'badge_no', 'rank_desc', 'assigned_zone']

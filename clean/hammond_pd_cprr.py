@@ -122,7 +122,7 @@ def drop_rows_without_tracking_number(df):
 
 
 def clean():
-    df = pd.read_csv(data_file_path('dropbox/hammond_pd/hammond_pd_cprr_2015_2020.csv'))\
+    df = pd.read_csv(data_file_path('raw/hammond_pd/hammond_pd_cprr_2015_2020.csv'))\
         .pipe(clean_column_names)
     df = df\
         .pipe(split_name)\
