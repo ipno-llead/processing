@@ -91,7 +91,8 @@ def clean_action(df):
         .str.replace('by', 'from', regex=True)\
         .str.replace('suspended five day/the 60-day loss of take home vehicle privileges',
                      '5-day suspension/60-day loss of take home vehicle privileges', regex=False)\
-        .str.replace('verbal warning from captain andrew stevens/also captain flynn in internal affairs afterwards',
+        .str.replace('verbal warning from captain andrew stevens/'
+                     'also captain flynn in internal affairs afterwards',
                      'verbal warning from captain andrew stevens/verbal warning from captain flynn', regex=False)\
         .str.replace('loss of take home vehicle privilegesfor/30-day', 
                      '30-day loss of take home vehicle privileges', regex=False)\
