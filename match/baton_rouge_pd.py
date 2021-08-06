@@ -58,6 +58,32 @@ def match_pd_cprr_2018_v_pprr(cprr, pprr):
     return cprr
 
 
+def match_pd_cprr_2021_v_pprr(cprr, pprr):
+    dfa = cprr[["first_name", "last_name", "middle_initial", "uid"]
+               ].drop_duplicates("uid").set_index("uid", drop=True)
+    dfa.loc[:, "fc"] = dfa.first_name.fillna("").map(lambda x: x[:1])
+
+    dfb = pprr[["first_name", "last_name", "middle_initial", "uid"]
+               ].drop_duplicates("uid").set_index("uid", drop=True)
+    dfb.loc[:, "fc"] = dfb.first_name.map(lambda x: x[:1])
+
+    matcher = ThresholdMatcher(ColumnsIndex(["fc"]), {
+        "last_name": JaroWinklerSimilarity(),
+        "first_name": JaroWinklerSimilarity(),
+        "middle_initial": JaroWinklerSimilarity(),
+    }, dfa, dfb)
+    decision = 1
+    matcher.save_pairs_to_excel(data_file_path(
+        "match/baton_rouge_pd_cprr_2021_v_pd_pprr_2021.xlsx"), decision)
+    matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
+
+    # cprr takes on uid from pprr whenever there is a match
+    matches = dict(matches)
+    cprr.loc[:, "uid"] = cprr.uid.map(lambda x: matches.get(x, x))
+
+    return cprr
+
+
 def prepare_post_data():
     post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
     return post[post.agency == 'baton rouge pd'].reset_index(drop=True)
@@ -117,8 +143,11 @@ if __name__ == "__main__":
     lprr = pd.read_csv(data_file_path(
         "clean/lprr_baton_rouge_fpcsb_1992_2012.csv",
     ))
-    cprr = pd.read_csv(data_file_path(
+    cprr18 = pd.read_csv(data_file_path(
         "clean/cprr_baton_rouge_pd_2018.csv",
+    ))
+    cprr21 = pd.read_csv(data_file_path(
+        "clean/cprr_baton_rouge_pd_2021.csv",
     ))
     pprr = pd.read_csv(data_file_path(
         'clean/pprr_baton_rouge_pd_2021.csv'
@@ -126,7 +155,8 @@ if __name__ == "__main__":
     csd17 = match_csd_and_pd_pprr(csd17, pprr, 2017, 0.88)
     csd19 = match_csd_and_pd_pprr(csd19, pprr, 2019, 0.88)
     lprr = match_lprr_against_pprr(lprr, pprr)
-    cprr = match_pd_cprr_2018_v_pprr(cprr, pprr)
+    cprr18 = match_pd_cprr_2018_v_pprr(cprr18, pprr)
+    cprr21 = match_pd_cprr_2021_v_pprr(cprr21, pprr)
     post = prepare_post_data()
     post_event = match_pprr_against_post(pprr, post)
     assert post_event[post_event.duplicated(
@@ -141,8 +171,11 @@ if __name__ == "__main__":
     csd19.to_csv(
         data_file_path("match/pprr_baton_rouge_csd_2019.csv"),
         index=False)
-    cprr.to_csv(
+    cprr18.to_csv(
         data_file_path("match/cprr_baton_rouge_pd_2018.csv"),
+        index=False)
+    cprr21.to_csv(
+        data_file_path("match/cprr_baton_rouge_pd_2021.csv"),
         index=False)
     post_event.to_csv(
         data_file_path("match/event_post_baton_rouge_pd.csv"),
