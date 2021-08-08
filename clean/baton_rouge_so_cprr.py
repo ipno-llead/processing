@@ -27,7 +27,6 @@ def clean_action(df):
         .str.replace(r"privlie?d?ges", "privileges", regex=True)\
         .str.replace("demotion to cpl to deputy and suspended for 7 days",
                      "7-day suspension/demotion from corporal to deputy", regex=False)\
-        .str.replace("capt.", "captain", regex=False)\
         .str.replace("suspended five days and the loss of take home vehicle privileges for 60 days.",
                      "5-day suspension/loss of take home vehicle privileges for 60 days", regex=False)\
         .str.replace(r"\badmin\b", "administration", regex=True)\
@@ -39,7 +38,8 @@ def clean_action(df):
         .str.replace("one day suspension", "1-day suspension", regex=False)\
         .str.replace("one-day suspension", "1-day suspension", regex=False)\
         .str.replace("suspended two days", "2-day suspension", regex=False)\
-        .str.replace("suspended without pay for two days", "2-day suspension without pay", regex=False)\
+        .str.replace("suspended without pay for two days", 
+                     "2-day suspension without pay", regex=False)\
         .str.replace("seven day suspension.", "7-day suspension", regex=False)\
         .str.replace("3 day suspension", "3-day suspension", regex=False)\
         .str.replace("10 day suspension", "10-day suspension", regex=False)\
@@ -60,7 +60,8 @@ def clean_action(df):
                      '2-week suspensionde/demotion', regex=False)\
         .str.replace('seven day suspension', '7-day suspension', regex=False)\
         .str.replace('suspension loss of unit prev', 'suspension/loss of unit', regex=False)\
-        .str.replace('incident investigated and forwarded to ebrso administration for discipline outcome', 
+        .str.replace('incident investigated and forwarded to '
+                     'ebrso administration for discipline outcome', 
                      'forwarded to administration for review', regex=False)\
         .str.replace('transferred to corrections', 'forwarded to corrections', regex=False)\
         .str.replace('no action taken', '', regex=False)\
@@ -76,13 +77,12 @@ def clean_action(df):
         .str.replace('counseled/cautioned verbally', 'counseled/verbal caution', regex=False)\
         .str.replace(r' (\w+) (\d+) ', r'\1/\2', regex=True)\
         .str.replace(r' (\d{2})(\w{3})', r' \1-\2', regex=True)\
-        .str.replace('capt', 'captain', regex=False)\
+        .str.replace(r'capa?ti?n?', 'captain', regex=True)\
         .str.replace(r'\bia\b', 'internal affairs', regex=True)\
-        .str.replace('due to other, multiple complaints - 20-day loss of take of home vehicle privileges',
-                     '20-day loss of take home vehicle privileges due to multiple other complaints', regex=False)\
         .str.replace('days', 'day', regex=False)\
         .str.replace('privelages', 'privileges', regex=False)\
-        .str.replace('appledetail', 'apple detail', regex=False)\
+        .str.replace('suspension permanent removal from appledetail', 
+                     'suspension/permanent removal from apple detail', regex=False)\
         .str.replace(r' \bdiversity class\b', ' diversity/cultural sensitivity class', regex=True)\
         .str.replace('10-dayuspension', '10-day suspension', regex=False)\
         .str.replace('suspensionde', 'suspension', regex=False)\
@@ -93,19 +93,31 @@ def clean_action(df):
                      '5-day suspension/60-day loss of take home vehicle privileges', regex=False)\
         .str.replace('verbal warning from captain andrew stevens/'
                      'also captain flynn in internal affairs afterwards',
-                     'verbal warning from captain andrew stevens/verbal warning from captain flynn', regex=False)\
-        .str.replace('loss of take home vehicle privilegesfor/30-day', 
+                     'verbal warning from captain andrew '
+                     'stevens/verbal warning from captain flynn', regex=False)\
+        .str.replace('loss of take of home vehicle priviledgesfor/20-day', 
                      '30-day loss of take home vehicle privileges', regex=False)\
         .str.replace('captainain', 'captain', regex=False)\
         .str.replace('7-dayuspension/6month', '7-day suspension/6-month', regex=False)\
-        .str.replace(r',  ?(\w+)', r'/\1', regex=True)
+        .str.replace(r',  ?(\w+)', r'/\1', regex=True)\
+        .str.replace(' (other than captain flynn speaking to blackwood/his supervisors)', '', regex=False)\
+        .str.replace('terminetd', 'terminated', regex=False)\
+        .str.replace(' note no report see phone log', '', regex=False)\
+        .str.replace('due to other/multiple complaints - '
+                     '30-day loss of take home vehicle privileges',
+                     '30-day loss of take home vehicle privileges '
+                     'due to multiple other complaints', regex=False)\
+        .str.replace('loss of take home vehicle privilegesfor/30-day', 
+                     '30-day loss of take home vehicle privileges', regex=False)
     return df
 
 
 def clean_complainant(df):
     df.loc[:, "complainant_type"] = df.complainant_type.str.lower().str.strip()\
-        .str.replace("brpd detective", "baton rouge police department detective", regex=False)\
-        .str.replace("deer park texas pd", 'deer park texas police department', regex=False)\
+        .str.replace("brpd detective", 
+                     "baton rouge police department detective", regex=False)\
+        .str.replace("deer park texas pd", 
+                     'deer park texas police department', regex=False)\
         .str.replace("ebrso administration and brpd",
                      "administration and baton rouge police department", regex=False)\
         .str.replace("administration (see also 17-19)", "administration", regex=False)\
@@ -145,7 +157,7 @@ def clean_charges(df):
     return df
 
 
-def clean_rank_desc(df):
+def clean_rank_desc_20(df):
     df.rank_desc = df.rank_desc\
         .str.replace('reserves', 'reserve', regex=False)\
         .str.replace(' 1', '', regex=False)
@@ -164,13 +176,13 @@ def clean_department_desc(df):
     return df 
 
 
-def clean_disposition(df):
+def clean_disposition_20(df):
     df.disposition = df.disposition\
         .str.replace('o unfounded', 'unfounded', regex=False)
     return df 
 
 
-def clean_birth_year(df):
+def clean_birth_year_20(df):
     df.birth_year = df.birth_year.astype(str)\
         .str.replace(r'(\d{2})', r'19\1', regex=True)
     return df 
@@ -238,12 +250,12 @@ def clean20():
         .pipe(clean_datetimes, ['occur_datetime'])\
         .pipe(clean_action)\
         .pipe(clean_charges)\
-        .pipe(clean_rank_desc)\
-        .pipe(clean_birth_year)\
+        .pipe(clean_rank_desc_20)\
+        .pipe(clean_birth_year_20)\
         .pipe(clean_department_desc)\
         .pipe(assign_agency)\
         .pipe(clean_complainant)\
-        .pipe(clean_disposition)\
+        .pipe(clean_disposition_20)\
         .pipe(assign_prod_year, '2020')\
         .pipe(clean_names, ['first_name', 'last_name', 'middle_initial'])\
         .pipe(gen_uid, ["agency", "first_name", "last_name", "birth_year", "badge_no"])\
