@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import argparse
+import re
 import ast
 import pathlib
 import errno
@@ -39,23 +40,23 @@ def find_main(root: ast.Module) -> List[ast.stmt]:
     raise ValueError('main block not found')
 
 
-def process_local_func_call(fn_map: Dict[str, List[ast.stmt]], fn_name: str) -> Tuple[Set[str], Set[str]]:
+def process_local_func_call(fn_map: Dict[str, List[ast.stmt]], fn_name: str, debug: bool) -> Tuple[Set[str], Set[str]]:
     csvs = set()
     outputs = set()
     fn_body = fn_map[fn_name]
     for stmt in fn_body:
         if isinstance(stmt, ast.Assign):
-            a, b = process_expr(fn_map, stmt.value)
+            a, b = process_expr(fn_map, stmt.value, debug)
             csvs = csvs.union(a)
             outputs = outputs.union(b)
             continue
         elif isinstance(stmt, ast.Return):
-            a, b = process_expr(fn_map, stmt.value)
+            a, b = process_expr(fn_map, stmt.value, debug)
             csvs = csvs.union(a)
             outputs = outputs.union(b)
             continue
         elif isinstance(stmt, ast.For) or isinstance(stmt, ast.With):
-            a, b = process_expr(fn_map, stmt)
+            a, b = process_expr(fn_map, stmt, debug)
             csvs = csvs.union(a)
             outputs = outputs.union(b)
             continue
@@ -65,13 +66,15 @@ def process_local_func_call(fn_map: Dict[str, List[ast.stmt]], fn_name: str) -> 
     return csvs, outputs
 
 
-def process_expr(fn_map: Dict[str, List[ast.stmt]], expr) -> Tuple[Set[str], Set[str]]:
+def process_expr(fn_map: Dict[str, List[ast.stmt]], expr, debug: bool) -> Tuple[Set[str], Set[str]]:
     csvs = set()
     outputs = set()
+    if debug:
+        print(ast.dump(expr, indent=4))
     for node in ast.walk(expr):
         if isinstance(node, ast.Constant) and type(node.value) is str and node.value.endswith('.csv'):
             csvs.add(node.value)
-        if isinstance(node, ast.Call):
+        elif isinstance(node, ast.Call):
             if isinstance(node.func, ast.Attribute) and node.func.attr == 'to_csv':
                 if isinstance(node.args[0], ast.Call) \
                         and is_name(node.args[0].func, 'data_file_path') \
@@ -79,15 +82,15 @@ def process_expr(fn_map: Dict[str, List[ast.stmt]], expr) -> Tuple[Set[str], Set
                     outputs.add(node.args[0].args[0].value)
                 else:
                     raise ValueError('unhandled node %s' % ast.dump(node, indent=4))
-            if isinstance(node.func, ast.Name):
-                if node.func.id in fn_map:
-                    a, b = process_local_func_call(fn_map, node.func.id)
-                    csvs = csvs.union(a)
-                    outputs = outputs.union(b)
+        elif isinstance(node, ast.Name):
+            if node.id in fn_map:
+                a, b = process_local_func_call(fn_map, node.id, debug)
+                csvs = csvs.union(a)
+                outputs = outputs.union(b)
     return csvs, outputs
 
 
-def detect_script_input_output(q: pathlib.Path) -> Tuple[List[str], List[str]]:
+def detect_script_input_output(q: pathlib.Path, debug: bool) -> Tuple[List[str], List[str]]:
     csvs = set()
     outputs = set()
     with q.open() as f:
@@ -97,7 +100,7 @@ def detect_script_input_output(q: pathlib.Path) -> Tuple[List[str], List[str]]:
             fn_map[fn.name] = fn.body
         main = find_main(root)
         for stmt in main:
-            a, b = process_expr(fn_map, stmt)
+            a, b = process_expr(fn_map, stmt, debug)
             csvs = csvs.union(a)
             outputs = outputs.union(b)
     inputs = []
@@ -140,6 +143,13 @@ if __name__ == '__main__':
     parser.add_argument(
         '-a', '--all', action='store_true', help="add rule targets to all's dependencies"
     )
+    parser.add_argument(
+        '-p', '--pattern', action='store', type=str, default='',
+        help='only analyze file whose name match this Regexp pattern'
+    )
+    parser.add_argument(
+        '-d', '--debug', action='store_true', help='print debug information'
+    )
     args = parser.parse_args()
     if not args.scripts_dir.exists():
         raise FileNotFoundError(
@@ -149,12 +159,17 @@ if __name__ == '__main__':
         raise NotADirectoryError(
             errno.ENOTDIR, os.strerror(errno.ENOTDIR), args.scripts_dir
         )
+    pat = None
+    if args.pattern != '':
+        pat = re.compile(args.pattern)
 
     scripts = []
     for q in args.scripts_dir.glob('*.py'):
         if q in args.exclude:
             continue
-        inputs, outputs = detect_script_input_output(q)
+        if pat is not None and pat.search(q.name) is None:
+            continue
+        inputs, outputs = detect_script_input_output(q, args.debug)
         scripts.append((q.name, inputs, outputs))
 
     write_make_rules(args.all, args.scripts_dir, scripts)
