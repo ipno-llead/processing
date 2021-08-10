@@ -1,6 +1,7 @@
 SHELL = /bin/bash
 
-MD5 := md5
+OS := $(shell uname -s)
+MD5 := $(if $(findstring Darwin,$(OS)),md5,md5sum)
 BUILD_DIR := build
 MD5_DIR := $(BUILD_DIR)/md5
 DATA_DIR := data
