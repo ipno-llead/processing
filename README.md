@@ -19,8 +19,6 @@ conda install --file requirements.txt
 ## Get started
 
 ```bash
-# Download input data files from Dropbox
-scripts/download_input.py
 # process all data files, check `data` folder for all generated files.
 make
 # combine all data into personnel, personnel_history and complaint data
@@ -48,15 +46,21 @@ Each major step above should output CSV files which can then be saved in a versi
 
 ## Project layout
 
+- **raw_datasets.json**: Links to download raw input files organized under agency names.
 - **scripts**: Scripts that can be called directly go here.
-  - **download_input.py**: Download relevant input files from Dropbox to folder `data` if they don't already exist.
+  - **rawfiles.sh**: Download and display raw input files for a certain agency (list of agencies is in raw_datasets.json). Useful when starting write a script
   - **test.sh**: Run tests against `lib/` folder.
+  - **run.sh**: Run a script with PYTHONPATH set to proper value.
 - **clean**: This folder correspond to the `Standardization & cleaning` step above. Each module should be dedicated to clean only 1 file or a group of files with similar format (i.e. yearly data from a single police department). Each module take input data from `data` folder and output CSV files back to `data/clean` with name like `{data_type}_{agency_name}_{optional_date}.csv`.
 - **match**: This folder correspond to the `Data matching` step. Each module take cleaned data from the previous step, do any matching and save to `data/match` folder with name like `{data_type}_{agency_name}_{optional_date}.csv`.
 - **fuse**: This folder correspond to the `Data fusion` step. Data files from previous steps are combined and saved to `data/fuse` folder with name like `{data_type}.csv` (agency name and date info should be present in the data itself).
 - **lib**: Any shared Python code go in here.
 - **references**: Any data table kept for consultation in standardization step live here.
 - **data**: Data files downloaded from Dropbox or produced by scripts go here.
+  - **raw**: Raw data input files
+  - **clean**: Output of clean scripts
+  - **match**: Output of match scripts
+  - **fuse**: Output of fuse scripts
 - **notebooks**: Keep all Jupyter notebooks for exploration or demonstration purpose.
 - **Makefile**: Contain file & processing dependencies. Anytime data or code change, run `make` once to re-process only files which might be affected.
 
