@@ -15,7 +15,7 @@ def assign_agency(df):
 
 def clean():
     df = pd.read_csv(
-        data_file_path('st_tammany_so/st._tammany_so_pprr_2020.csv')
+        data_file_path('raw/st_tammany_so/st._tammany_so_pprr_2020.csv')
     )
     df = clean_column_names(df)
     df = df.rename(columns={

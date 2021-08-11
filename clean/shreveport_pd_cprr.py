@@ -199,7 +199,7 @@ def clean_cprr(disposition_file, name_file, year):
 
 def clean_codebook():
     df = pd.read_csv(data_file_path(
-        'shreveport_pd/shreveport_codebook.csv'
+        'raw/shreveport_pd/shreveport_codebook.csv'
     ), names=['name', 'code'])
     df.loc[:, 'name'] = df.name.str.strip().str.lower()
     df.loc[:, 'code'] = df.code.str.strip()\
@@ -210,13 +210,13 @@ def clean_codebook():
 if __name__ == '__main__':
     df = pd.concat([
         clean_cprr(
-            'shreveport_pd/shreveport_pd_cprr_dispositions_2018.csv',
-            'shreveport_pd/shreveport_pd_cprr_names_2018.csv',
+            'raw/shreveport_pd/shreveport_pd_cprr_dispositions_2018.csv',
+            'raw/shreveport_pd/shreveport_pd_cprr_names_2018.csv',
             '2018',
         ),
         clean_cprr(
-            'shreveport_pd/shreveport_pd_cprr_dispositions_2019.csv',
-            'shreveport_pd/shreveport_pd_cprr_names_2019.csv',
+            'raw/shreveport_pd/shreveport_pd_cprr_dispositions_2019.csv',
+            'raw/shreveport_pd/shreveport_pd_cprr_names_2019.csv',
             '2019',
         ),
     ])

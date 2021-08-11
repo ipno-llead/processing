@@ -54,7 +54,7 @@ if __name__ == '__main__':
         'clean/actions_history_covington_pd_2021.csv'
     ))
     pprr = pd.read_csv(data_file_path(
-        'clean/pprr_covington_pd_2021.csv'
+        'clean/pprr_covington_pd_2020.csv'
     ))
     events_df = rearrange_event_columns(pd.concat([
         post_event,

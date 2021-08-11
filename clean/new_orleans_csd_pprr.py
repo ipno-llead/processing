@@ -54,7 +54,7 @@ def assign_cols_2014(df):
 
 def clean_2014():
     df = pd.read_csv(data_file_path(
-        "new_orleans_csd/new_orleans_csd_pprr_2014.csv"))
+        "raw/new_orleans_csd/new_orleans_csd_pprr_2014.csv"))
     df = df\
         .pipe(match_schema_2014)\
         .pipe(
@@ -110,7 +110,7 @@ def assign_cols_2009(df):
 
 def clean_2009():
     df = pd.read_csv(data_file_path(
-        "new_orleans_csd/new_orleans_csd_pprr_2009_realigned.csv"))
+        "raw/new_orleans_csd/new_orleans_csd_pprr_2009_realigned.csv"))
     df = df\
         .pipe(match_schema_2009)\
         .pipe(clean_dates, ['term_date', 'pay_prog_start_date'])\

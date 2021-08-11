@@ -16,7 +16,7 @@ def assign_charges(df):
 
 def clean():
     df = pd.read_csv(
-        data_file_path("greenwood_pd/greenwood_pd_cprr_2015-2020_byhand.csv"))
+        data_file_path("raw/greenwood_pd/greenwood_pd_cprr_2015-2020_byhand.csv"))
     df = clean_column_names(df)
     df = df.rename(columns={
         'title': 'rank_desc',

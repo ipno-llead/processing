@@ -106,7 +106,7 @@ def assign_agency(df):
 
 def clean():
     return pd.read_csv(data_file_path(
-        'grand_isle/grand_isle_pd_pprr_2021_byhand.csv'
+        'raw/grand_isle/grand_isle_pd_pprr_2021_byhand.csv'
     ), encoding='latin-1')\
         .pipe(clean_column_names)\
         .rename(columns={

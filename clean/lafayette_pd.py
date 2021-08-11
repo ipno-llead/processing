@@ -44,7 +44,7 @@ def standardize_rank(df):
 
 def clean_pprr():
     return pd.read_csv(data_file_path(
-        'lafayette_pd/lafayette_pd_pprr_2010_2021.csv'
+        'raw/lafayette_pd/lafayette_pd_pprr_2010_2021.csv'
     )).pipe(clean_column_names)\
         .drop(columns=['assigned_zone', 'badge_number'])\
         .rename(columns={
@@ -291,7 +291,7 @@ def split_action_from_disposition(df):
 
 def clean_cprr():
     return pd.read_csv(data_file_path(
-        'lafayette_pd/lafayette_pd_cprr_2015_2020.csv'
+        'raw/lafayette_pd/lafayette_pd_cprr_2015_2020.csv'
     )).pipe(clean_column_names)\
         .dropna(how='all')\
         .rename(columns={

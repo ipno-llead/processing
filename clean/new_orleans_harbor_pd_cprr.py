@@ -11,7 +11,7 @@ sys.path.append("../")
 
 def realign() -> pd.DataFrame:
     df = pd.read_csv(data_file_path(
-        "new_orleans_harbor_pd/new_orleans_harbor_pd_cprr_2014-2020.csv"))
+        "raw/new_orleans_harbor_pd/new_orleans_harbor_pd_cprr_2014-2020.csv"))
     df = df.set_index("Unnamed: 0").transpose().dropna(
         1, how="all").reset_index(drop=True)
     df = clean_column_names(df)

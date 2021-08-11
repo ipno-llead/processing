@@ -179,6 +179,7 @@ EVENT_COLUMNS = [
     "salary_freq",
     "award",
     "award_comments",
+    "left_reason",
 ]
 
 

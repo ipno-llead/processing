@@ -189,7 +189,7 @@ def parse_dates_with_known_format(df: pd.DataFrame, cols: list[str], format: str
     """
     for col in cols:
         assert col.endswith("_date")
-        dates = pd.DataFrame.from_records(pd.to_datetime(df[col], format=format).map(lambda x: (
+        dates = pd.DataFrame.from_records(pd.to_datetime(df[col].astype(str), format=format).map(lambda x: (
             "", "", "") if pd.isnull(x) else (str(x.year), str(x.month), str(x.day))))
         prefix = col[:-5]
         dates.columns = [prefix + "_year", prefix + "_month", prefix + "_day"]
@@ -235,14 +235,15 @@ def clean_races(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
         df.loc[:, col] = df[col].str.strip().str.lower()\
             .str.replace(r'^w$', 'white', regex=True)\
             .str.replace(r'^h$', 'hispanic', regex=True)\
-            .str.replace(r'^b$', 'black', regex=True)
+            .str.replace(r'^b$', 'black', regex=True)\
+            .str.replace(r'\bislande\b', 'islander', regex=True)
         df = standardize_from_lookup_table(df, col, [
-            ['black', 'african american', 'black / african american'],
+            ['black', 'african american', 'black / african american', 'black or african american'],
             ['white'],
             ['hispanic', 'latino'],
-            ['native american', 'american indian'],
-            ['asian / pacific islander', 'asian'],
-            ['mixed', 'two or more races'],
+            ['native american', 'american indian', 'american indian or alaskan native'],
+            ['asian / pacific islander', 'asian', 'native hawaiian or other pacific islander'],
+            ['mixed', 'two or more races', 'multi-racial'],
         ])
     return df
 

@@ -22,7 +22,7 @@ def pad_dept_code(df):
 
 def assign_department_desc(df):
     dept_df = pd.read_csv(data_file_path(
-        "st_tammany_so/st_tammany_department_codes_tabula.csv"
+        "raw/st_tammany_so/st_tammany_department_codes_tabula.csv"
     ))
     dept_df = clean_column_names(dept_df)
     dept_df.loc[:, 'loc'] = dept_df.loc[:, 'loc'].str.replace(r'\*$', '')
@@ -64,9 +64,9 @@ def remove_new_lines_from_charges(df):
 def clean():
     df = pd.concat([
         pd.read_csv(data_file_path(
-            'st_tammany_so/st_tammany_so_cprr_2011-2020_tabula.csv')),
+            'raw/st_tammany_so/st_tammany_so_cprr_2011-2020_tabula.csv')),
         pd.read_csv(data_file_path(
-            'st_tammany_so/st_tammany_so_cprr_2020-2021_tabula.csv'))
+            'raw/st_tammany_so/st_tammany_so_cprr_2020-2021_tabula.csv'))
     ])
     df = clean_column_names(df)
     df = df.rename(columns={
