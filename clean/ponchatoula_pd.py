@@ -21,7 +21,7 @@ def clean_department_desc(df):
 
 def clean():
     return pd.read_csv(data_file_path(
-        'ponchatoula_pd/ponchatoula_pd_pprr_2010_2020.csv'
+        'raw/ponchatoula_pd/ponchatoula_pd_pprr_2010_2020.csv'
     )).pipe(clean_column_names)\
         .drop(columns=['class', 'status_code'])\
         .rename(columns={

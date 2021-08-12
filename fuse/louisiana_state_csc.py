@@ -10,7 +10,7 @@ import sys
 sys.path.append('../')
 
 
-def fuse_events(lprr, pprr):
+def fuse_events(lprr, pprr, pprr_term):
     builder = events.Builder()
     builder.extract_events(lprr, {
         events.APPEAL_FILE: {
@@ -20,11 +20,20 @@ def fuse_events(lprr, pprr):
             'prefix': 'rendered', 'keep': ['uid', 'agency', 'appeal_uid']
         }
     }, ['uid', 'appeal_uid'])
-    # TODO: There are multiple salaries per hire date. Put salary and rank info into
-    # their proper event when we get date info for those events.
+    pprr.loc[:, 'salary_date'] = pprr.salary_date.astype(str)
     builder.extract_events(pprr, {
         events.OFFICER_HIRE: {'prefix': 'hire', 'keep': [
-            'uid', 'agency', 'department_desc', 'rank_desc', 'salary', 'salary_freq'
+            'uid', 'agency'
+        ]},
+        events.OFFICER_PAY_EFFECTIVE: {
+            'prefix': 'salary', 'parse_date': '%Y%m%d', 'keep': [
+                'uid', 'agency', 'salary', 'salary_freq', 'department_desc', 'rank_desc'
+            ],
+        }
+    }, ['uid'])
+    builder.extract_events(pprr_term, {
+        events.OFFICER_LEFT: {'prefix': 'left', 'keep': [
+            'uid', 'agency', 'department_desc', 'rank_desc', 'left_reason'
         ]}
     }, ['uid'])
     return builder.to_frame()
@@ -33,13 +42,14 @@ def fuse_events(lprr, pprr):
 if __name__ == '__main__':
     lprr = pd.read_csv(data_file_path(
         'match/lprr_louisiana_state_csc_1991_2020.csv'))
-    pprr = pd.read_csv(data_file_path('clean/pprr_louisiana_csd_2021.csv'))
+    pprr = pd.read_csv(data_file_path('clean/pprr_demo_louisiana_csd_2021.csv'))
+    pprr_term = pd.read_csv(data_file_path('clean/pprr_term_louisiana_csd_2021.csv'))
     post_event = pd.read_csv(data_file_path(
         'match/post_event_louisiana_state_police_2020.csv'))
-    per_df = fuse_personnel(pprr, lprr)
+    per_df = fuse_personnel(pprr, pprr_term, lprr)
     event_df = rearrange_event_columns(pd.concat([
         post_event,
-        fuse_events(lprr, pprr)
+        fuse_events(lprr, pprr, pprr_term)
     ]))
     ensure_uid_unique(event_df, 'event_uid', True)
     ensure_data_dir('fuse')

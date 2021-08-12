@@ -200,7 +200,7 @@ def assign_prod_year(df, year):
 
 def clean18():
     df = pd.read_csv(data_file_path(
-        "baton_rouge_so/baton_rouge_so_cprr_2018.csv"))
+        "raw/baton_rouge_so/baton_rouge_so_cprr_2018.csv"))
     df = clean_column_names(df)
     df.columns = ['name', 'badge_no', 'rank_desc', 'rank_date', 'race', 'sex',
                   'birth_year', 'infraction',
@@ -231,7 +231,7 @@ def clean18():
 
 def clean20():
     df = pd.read_csv(data_file_path(
-        "baton_rouge_so/baton_rouge_so_cprr_2016_2020.csv"))
+        "raw/baton_rouge_so/baton_rouge_so_cprr_2016-2020.csv"))
     df = clean_column_names(df)
     df.columns = ['tracking_number', 'name', 'badge_no', 'rank_desc', 'rank_date', 'race', 'sex',
                   'birth_year', "department_desc", 'infraction',
@@ -269,6 +269,9 @@ if __name__ == "__main__":
     ensure_data_dir("clean")
     df18.to_csv(
         data_file_path("clean/cprr_baton_rouge_so_2018.csv"),
+        index=False)
+    df20.to_csv(
+        data_file_path("clean/cprr_baton_rouge_so_2016_2020.csv"),
         index=False)
     df20.to_csv(
         data_file_path("clean/cprr_baton_rouge_so_2016_2020.csv"),

@@ -41,7 +41,7 @@ def assign_agency(df):
 
 def clean():
     df = pd.read_csv(data_file_path(
-        "port_allen_csd/port_allen_csd_pprr_2020.csv"))
+        "raw/port_allen_csd/port_allen_csd_pprr_2020.csv"))
     df = clean_column_names(df)
     df = df.rename(columns={
         'dept_number': 'department_code',

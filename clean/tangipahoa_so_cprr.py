@@ -183,7 +183,7 @@ def clean_completion_date(df):
 
 def clean():
     df = pd.read_csv(data_file_path(
-        'tangipahoa_so/tangipahoa_so_cprr_2015_2021.csv')
+        'raw/tangipahoa_so/tangipahoa_so_cprr_2015_2021.csv')
     )\
         .pipe(split_rows_with_name)\
         .pipe(split_full_name)\

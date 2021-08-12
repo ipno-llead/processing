@@ -88,7 +88,7 @@ def assign_agency(df):
 
 def clean():
     return pd.read_csv(data_file_path(
-        'harahan_csd/harahan_csd_pprr_roster_by_employment_status_2020.csv'
+        'raw/harahan_csd/harahan_csd_pprr_roster_by_employment_status_2020.csv'
     )).pipe(clean_column_names)\
         .fillna("")\
         .pipe(realign)\
@@ -110,7 +110,7 @@ def clean():
 
 def join_employment_date(df):
     emp_dates = pd.read_csv(data_file_path(
-        'harahan_csd/harahan_csd_prrr_roster_by_employment_date_2020.csv'
+        'raw/harahan_csd/harahan_csd_prrr_roster_by_employment_date_2020.csv'
     )).pipe(clean_column_names)\
         .drop(columns=['employee_s_name', 'status', 'p_f_dept'])\
         .rename(columns={

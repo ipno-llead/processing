@@ -45,7 +45,7 @@ actions_lookup = [
 
 def realign_18():
     df = pd.read_csv(
-        data_file_path("baton_rouge_pd/baton_rouge_pd_cprr_2018.csv"),
+        data_file_path("raw/baton_rouge_pd/baton_rouge_pd_cprr_2018.csv"),
         encoding="latin1")
     df.rename(columns=lambda x: x.strip(), inplace=True)
     df.rename(columns={"Comptaint": "Complaint"}, inplace=True)
@@ -558,7 +558,7 @@ def assign_agency(df):
 
 def clean_21():
     df = pd.read_csv(data_file_path(
-        'baton_rouge_pd/baton_rouge_pd_cprr_2021.csv'))\
+        'raw/baton_rouge_pd/baton_rouge_pd_cprr_2021.csv'))\
         .pipe(clean_column_names)
     df = df\
         .rename(columns={

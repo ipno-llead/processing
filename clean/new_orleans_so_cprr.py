@@ -103,7 +103,7 @@ def split_investigating_supervisor(df):
         first_word = s[:s.index(' ')]
         if first_word in ranks:
             df.loc[idx, 'supervisor_rank'] = first_word
-            df.loc[idx, 'supervisor_name'] = s[s.index(' ')+1:]
+            df.loc[idx, 'supervisor_name'] = s[s.index(' ') + 1:]
         else:
             df.loc[idx, 'supervisor_name'] = s
     df.loc[:, 'supervisor_name'] = df.supervisor_name.str.replace(
@@ -118,7 +118,7 @@ def split_investigating_supervisor(df):
 
 def clean():
     df = pd.read_csv(data_file_path(
-        "new_orleans_so/new_orleans_so_cprr_2019_tabula.csv"))
+        "raw/new_orleans_so/new_orleans_so_cprr_2019_tabula.csv"))
     df = clean_column_names(df)
     return df\
         .pipe(remove_header_rows)\

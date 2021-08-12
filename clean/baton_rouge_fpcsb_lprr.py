@@ -12,7 +12,7 @@ sys.path.append("../")
 
 
 def realign():
-    with open(data_file_path("baton_rouge_fpcsb/baton_rouge_fpcsb_logs_1992-2012.csv"), "r", encoding="latin-1") as f:
+    with open(data_file_path("raw/baton_rouge_fpcsb/baton_rouge_fpcsb_logs_1992-2012.csv"), "r", encoding="latin-1") as f:
         # remove extraneous column names
         s = re.sub(
             r"(Date of Hearing|Hearing (Scheduled|Date)).?,(Docket|Case) #.+", "", f.read())
@@ -25,36 +25,36 @@ def realign():
     idx = df[df.docket_no == "12/6/07"].index[0]
     df = duplicate_row(df, idx)
     df.loc[idx, "docket_no"] = "12-06"
-    df.loc[idx+1, "docket_no"] = "12-07"
+    df.loc[idx + 1, "docket_no"] = "12-07"
     df.loc[idx, "name"] = "Milton J. Cutrer"
-    df.loc[idx+1, "name"] = "Wilton R. Cutrer"
+    df.loc[idx + 1, "name"] = "Wilton R. Cutrer"
 
     # split rows with newline character
     i = 1
     for idx in df[df.name.fillna("").str.contains("\n")].index:
         df = duplicate_row(df, idx)
-        df.loc[idx+i-1, "docket_no"] = re.sub(
-            r"^(\d+-\d+).+", r"\1", df.loc[idx+i-1, "docket_no"].strip())
-        df.loc[idx+i, "docket_no"] = re.sub(
-            r".+(\d+-\d+)$", r"\1", df.loc[idx+i, "docket_no"].strip())
-        df.loc[idx+i-1, "name"] = re.sub(
-            r"^(.+)\n.+", r"\1", df.loc[idx+i-1, "name"].strip())
-        df.loc[idx+i, "name"] = re.sub(
-            r".+\n(.+)$", r"\1", df.loc[idx+i, "name"].strip())
-        parts = df.loc[idx+i-1, "action"].split("\n")
+        df.loc[idx + i - 1, "docket_no"] = re.sub(
+            r"^(\d+-\d+).+", r"\1", df.loc[idx + i - 1, "docket_no"].strip())
+        df.loc[idx + i, "docket_no"] = re.sub(
+            r".+(\d+-\d+)$", r"\1", df.loc[idx + i, "docket_no"].strip())
+        df.loc[idx + i - 1, "name"] = re.sub(
+            r"^(.+)\n.+", r"\1", df.loc[idx + i - 1, "name"].strip())
+        df.loc[idx + i, "name"] = re.sub(
+            r".+\n(.+)$", r"\1", df.loc[idx + i, "name"].strip())
+        parts = df.loc[idx + i - 1, "action"].split("\n")
         if len(parts) == 2:
             [upper_action, lower_action] = parts
         else:
             m = re.match(r"^(\d+[^\d]+)\s*(\d+.+)$",
-                         df.loc[idx+i-1, "action"])
+                         df.loc[idx + i - 1, "action"])
             if m is not None:
                 upper_action = m.group(1)
                 lower_action = m.group(2)
             else:
-                upper_action = df.loc[idx+i-1, "action"]
-                lower_action = df.loc[idx+i-1, "action"]
-        df.loc[idx+i-1, "action"] = upper_action.strip()
-        df.loc[idx+i, "action"] = lower_action.strip()
+                upper_action = df.loc[idx + i - 1, "action"]
+                lower_action = df.loc[idx + i - 1, "action"]
+        df.loc[idx + i - 1, "action"] = upper_action.strip()
+        df.loc[idx + i, "action"] = lower_action.strip()
 
         i += 1
 
@@ -139,14 +139,14 @@ def split_row_by_hearing_date(df):
     for idx in df[df.hearing_date.str.match(r".+(\&|\n).+")].index:
         try:
             [upper_date, lower_date] = re.split(
-                r"\s*(?:\&|\n)\s*", df.loc[idx+i, "hearing_date"])
+                r"\s*(?:\&|\n)\s*", df.loc[idx + i, "hearing_date"])
         except ValueError:
-            raise ValueError(df.loc[idx+i, "hearing_date"])
+            raise ValueError(df.loc[idx + i, "hearing_date"])
         if re.match(r"^\d+\/\d+$", upper_date):
             upper_date = "%s/%s" % (upper_date, lower_date.strip()[-2:])
         df = duplicate_row(df, idx)
-        df.loc[idx+i, "hearing_date"] = upper_date
-        df.loc[idx+i+1, "hearing_date"] = lower_date
+        df.loc[idx + i, "hearing_date"] = upper_date
+        df.loc[idx + i + 1, "hearing_date"] = lower_date
         i += 1
     return df
 
@@ -230,11 +230,11 @@ def extract_appellant_rank(df):
 def split_rows_with_multiple_appellants(df):
     i = 0
     for idx in df[df.appellant.str.contains(",") | df.appellant.str.contains("&")].index:
-        s = df.loc[idx+i, "appellant"]
+        s = df.loc[idx + i, "appellant"]
         parts = re.split(r"\s*(?:,|&)\s*", s)
-        df = duplicate_row(df, idx+i, len(parts))
+        df = duplicate_row(df, idx + i, len(parts))
         for j, name in enumerate(parts):
-            df.loc[idx+i+j, "appellant"] = name
+            df.loc[idx + i + j, "appellant"] = name
         i += len(parts) - 1
     return df
 
@@ -401,7 +401,7 @@ def clean():
         .pipe(drop_invalid_rows)\
         .pipe(split_appellant_names)\
         .pipe(assign_agency)\
-        .pipe(clean_names, ["first_name",  "last_name", "counsel"])\
+        .pipe(clean_names, ["first_name", "last_name", "counsel"])\
         .pipe(clean_resolution)\
         .pipe(remove_invalid_rows)\
         .pipe(assign_counsel_for_empty_rows)\

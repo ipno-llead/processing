@@ -36,7 +36,7 @@ def assign_agency(df):
 
 def clean():
     df = pd.read_csv(data_file_path(
-        'ipm/new_orleans_pd_use_of_force_2012-2019.csv'))
+        'raw/ipm/new_orleans_pd_use_of_force_2012-2019.csv'))
     df = df.dropna(axis=1, how='all')
     df = clean_column_names(df)
     df = df.drop(columns=[
@@ -72,7 +72,7 @@ def clean():
     ])
     return df\
         .pipe(float_to_int_str, [
-            'officer_primary_key', 'occur_hour', 'citizen_primary_key',  'citizen_age', 'citizen_age_1',
+            'officer_primary_key', 'occur_hour', 'citizen_primary_key', 'citizen_age', 'citizen_age_1',
             'officer_current_supervisor', 'officer_age', 'officer_years_exp', 'officer_years_with_unit'
         ])\
         .pipe(standardize_desc_cols, [
