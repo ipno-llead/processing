@@ -24,13 +24,10 @@ files:
         title_case: true
       birth_year:
         integer: true
-        range: [1900, 2010]
       birth_month:
         integer: true
-        range: [1, 12]
       birth_day:
         integer: true
-        range: [1, 31]
       race:
         options:
           - black
@@ -43,6 +40,14 @@ files:
         options:
           - female
           - male
+    validation_tasks:
+      - name: birth dates should be valid
+        valid_date:
+          date_from:
+            year_column: birth_year
+            month_column: birth_month
+            day_column: birth_day
+          min_date: "1900-01-01"
   fuse/complaint.csv:
     schema:
       uid:
@@ -220,13 +225,10 @@ files:
       year:
         integer: true
         no_na: true
-        range: [1900, 2021]
       month:
         integer: true
-        range: [1, 12]
       day:
         integer: true
-        range: [1, 31]
       time:
         match_regex: ^\d{2}:\d{2}$
       raw_date:
@@ -309,6 +311,13 @@ files:
         description: >
           further description of the award
     validation_tasks:
+      - name: event dates should be valid
+        valid_date:
+          date_from:
+            year_column: year
+            month_column: month
+            day_column: day
+          min_date: "1900-01-01"
       - name: no officer with more than 1 left date in a calendar month
         where:
           column: kind
