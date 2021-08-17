@@ -21,5 +21,5 @@ if [ ! -d "build/raw/$1" ]; then
     exit 1
 fi
 
-make $(find build/raw/$1 -name '*.link' | sed -r 's/build\/(.+)\.link/data\/\1/')
+make $(find build/raw/$1 -name '*.link' | sed -r 's/build\/(.+)\.link/data\/\1/' | tr '\n' ' ')
 echo "$(find build/raw/$1 -name '*.link' | sed -r 's/build\/(.+)\.link/\1/')"
