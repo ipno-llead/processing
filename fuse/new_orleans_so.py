@@ -12,7 +12,7 @@ sys.path.append('../')
 
 def fuse_events(cprr, post):
     builder = events.Builder()
-    builder.extract_events(cprr, {
+    builder.extract_events(cprr19, cprr20, {
         events.COMPLAINT_RECEIVE: {
             'prefix': 'receive', 'parse_date': True, 'keep': ['uid', 'agency', 'complaint_uid'],
         },
@@ -41,11 +41,20 @@ if __name__ == '__main__':
     post = pd.read_csv(data_file_path('clean/pprr_post_2020_11_06.csv'))
     post = post[post.agency == 'orleans parish so']
     post.loc[:, 'agency'] = 'New Orleans SO'
-    cprr = pd.read_csv(data_file_path('match/cprr_new_orleans_so_2019.csv'))
-    per = fuse_personnel(post, cprr)
-    event = fuse_events(cprr, post)
-    com = rearrange_complaint_columns(cprr)
+    cprr19 = pd.read_csv(data_file_path('match/cprr_new_orleans_so_2019.csv'))
+    cprr20 = pd.read_csv(data_file_path('match/cprr_new_orelans_so_2020.csv'))
+    personnel_df = fuse_personnel(
+        cprr20,
+        cprr19,
+        post)
+    events_df = fuse_events(
+        cprr19,
+        cprr20,
+        post
+    )
+    complaint_df = rearrange_complaint_columns(
+        pd.concat([cprr19, cprr20]))
     ensure_data_dir('fuse')
-    per.to_csv(data_file_path('fuse/per_new_orleans_so.csv'), index=False)
-    event.to_csv(data_file_path('fuse/event_new_orleans_so.csv'), index=False)
-    com.to_csv(data_file_path('fuse/com_new_orleans_so.csv'), index=False)
+    personnel_df.to_csv(data_file_path('fuse/per_new_orleans_so.csv'), index=False)
+    events_df.to_csv(data_file_path('fuse/event_new_orleans_so.csv'), index=False)
+    complaint_df.to_csv(data_file_path('fuse/com_new_orleans_so.csv'), index=False)
