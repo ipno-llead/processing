@@ -1,5 +1,6 @@
 import re
 import json
+from typing import List
 import pandas as pd
 import numpy as np
 import datetime
@@ -489,4 +490,42 @@ def float_to_int_str(df: pd.DataFrame, cols: list[str], cast_as_str: bool = Fals
                 df.loc[~idx, col] = df.loc[~idx, col].astype(str)
         elif cast_as_str:
             df.loc[:, col] = df[col].astype(str)
+    return df
+
+
+def remove_future_dates(df: pd.DataFrame, max_date: str, prefixes: List[str]) -> pd.DataFrame:
+    """Sets to empty any date that is greater than max_date
+
+    Args:
+        df (pd.DataFrame):
+            the dataframe to process
+        max_date (str):
+            maximum date in YYYY-MM-DD format
+        prefixes (list of str):
+            prefixes of date columns (such as those produced by clean_dates) to process.
+            i.e. prefixes=['hire'] means 'hire_year', 'hire_month' and 'hire_day' will
+            be consulted.
+
+    Returns:
+        the updated frame
+    """
+    md = datetime.datetime.strptime(max_date, '%Y-%m-%d')
+    for prefix in prefixes:
+        cols = [prefix + '_year', prefix + '_month', prefix + '_day']
+        dates = df[cols].replace({'': np.NaN}).astype(float).astype('Int64')
+        for idx, _ in df.loc[
+            (dates.iloc[:, 0] > md.year)
+            | (
+                (dates.iloc[:, 0] == md.year)
+                & (
+                    (dates.iloc[:, 1].notna() & (dates.iloc[:, 1] > md.month))
+                    | (
+                        dates.iloc[:, 2].notna() & (dates.iloc[:, 1] == md.month)
+                        & (dates.iloc[:, 2] > md.day)
+                    )
+                )
+            )
+        ].iterrows():
+            for col in cols:
+                df.loc[idx, col] = ''
     return df
