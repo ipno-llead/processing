@@ -38,5 +38,4 @@ if __name__ == '__main__':
     post_events = extract_post_events(pprr, post)
     ensure_data_dir("match")
     post_events.to_csv(data_file_path(
-        "match/post_event_ponchatoula_pd_2020.csv",
-    ), index=False)
+        "match/post_event_ponchatoula_pd_2020.csv"), index=False)

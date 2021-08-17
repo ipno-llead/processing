@@ -42,8 +42,6 @@ if __name__ == '__main__':
     ensure_uid_unique(event_df, 'event_uid')
     ensure_data_dir('fuse')
     rearrange_personnel_columns(pprr).to_csv(data_file_path(
-        'fuse/per_ponchatoula_pd.csv'
-    ), index=False)
+        'fuse/per_ponchatoula_pd.csv'), index=False)
     event_df.to_csv(data_file_path(
-        'fuse/event_ponchatoula_pd.csv'
-    ), index=False)
+        'fuse/event_ponchatoula_pd.csv'), index=False)

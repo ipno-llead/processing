@@ -21,7 +21,7 @@ def split_name(df):
 
 
 def clean_action(df):
-    df.action = df.action.str.lower().str.strip()\
+    df.loc[:, 'action'] = df.action.str.lower().str.strip()\
         .str.replace('.', '', regex=False)\
         .str.replace(r"(\. |, | and )", " | ", regex=False).str.replace(r"\.$", "", regex=False)\
         .str.replace(r"privlie?d?ges", "privileges", regex=True)\
@@ -52,7 +52,7 @@ def clean_action(df):
         .str.replace("10 day suspension 30 day loss of extra duty detail privelages",
                      "10-day suspension/30-day loss of extra duty detail privileges", regex=False)\
         .str.replace("loss of take home vehicle privileges for 60 days", 
-                    "60-day loss of take home vehicle privileges", regex=False)\
+                     "60-day loss of take home vehicle privileges", regex=False)\
         .str.replace("loss of take of home vehicle privileges for 20 days",
                      "20-day loss of take of home vehicle privileges", regex=False)\
         .str.replace('none', '', regex=False)\
@@ -140,7 +140,7 @@ def split_infraction(df):
 
 
 def clean_charges(df):
-    df.loc[:, "charges"] = df.charges.str.lower().str.strip() \
+    df.loc[:, 'charges'] = df.charges.str.lower().str.strip() \
         .str.replace(r'^([^\s]*)\s+', "", regex=False)\
         .str.replace(r'^(\d+)- (\d+)', r'\1-\2', regex=True)\
         .str.replace(r'^1', '01', regex=True)\
@@ -158,14 +158,14 @@ def clean_charges(df):
 
 
 def clean_rank_desc_20(df):
-    df.rank_desc = df.rank_desc\
+    df.loc[:, 'rank_desc'] = df.rank_desc\
         .str.replace('reserves', 'reserve', regex=False)\
         .str.replace(' 1', '', regex=False)
     return df 
 
 
 def clean_department_desc(df):
-    df.department_desc = df.department_desc\
+    df.loc[:, 'department_desc'] = df.department_desc\
         .str.replace('.', '', regex=False)\
         .str.replace('admin', 'administration', regex=False)\
         .str.replace('sub', 'substation', regex=False)\
@@ -177,13 +177,13 @@ def clean_department_desc(df):
 
 
 def clean_disposition_20(df):
-    df.disposition = df.disposition\
+    df.loc[:, 'disposition'] = df.disposition\
         .str.replace('o unfounded', 'unfounded', regex=False)
     return df 
 
 
 def clean_birth_year_20(df):
-    df.birth_year = df.birth_year.astype(str)\
+    df.loc[:, 'birth_year'] = df.birth_year.astype(str)\
         .str.replace(r'(\d{2})', r'19\1', regex=True)
     return df 
 
@@ -269,9 +269,6 @@ if __name__ == "__main__":
     ensure_data_dir("clean")
     df18.to_csv(
         data_file_path("clean/cprr_baton_rouge_so_2018.csv"),
-        index=False)
-    df20.to_csv(
-        data_file_path("clean/cprr_baton_rouge_so_2016_2020.csv"),
         index=False)
     df20.to_csv(
         data_file_path("clean/cprr_baton_rouge_so_2016_2020.csv"),
