@@ -1,7 +1,7 @@
 from lib.path import data_file_path, ensure_data_dir
 from lib.columns import clean_column_names
 from lib.clean import (
-    float_to_int_str, clean_sexes, clean_races, standardize_desc_cols, clean_dates
+    float_to_int_str, clean_sexes, clean_races, remove_future_dates, standardize_desc_cols, clean_dates
 )
 from lib.uid import gen_uid
 import pandas as pd
@@ -122,13 +122,6 @@ def replace_disposition(df):
     return df
 
 
-def remove_impossible_dates(df):
-    df.loc[df.occur_year > '2021', 'occur_year'] = ''
-    df.loc[df.occur_year > '2021', 'occur_month'] = ''
-    df.loc[df.occur_year > '2021', 'occur_day'] = ''
-    return df
-
-
 def clean():
     df = initial_processing()
     return df\
@@ -182,7 +175,7 @@ def clean():
         ], 'complaint_uid')\
         .pipe(discard_allegations_with_same_description)\
         .pipe(replace_disposition)\
-        .pipe(remove_impossible_dates)
+        .pipe(remove_future_dates, '2020-12-31', ['receive', 'allegation_create', 'occur'])
 
 
 if __name__ == '__main__':

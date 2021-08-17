@@ -6,7 +6,8 @@ import pandas as pd
 from lib.columns import clean_column_names
 from lib.path import data_file_path, ensure_data_dir
 from lib.clean import (
-    clean_names, clean_dates, clean_races, clean_salary, clean_sexes, float_to_int_str, standardize_desc_cols
+    clean_names, clean_dates, clean_races, clean_salary, clean_sexes, float_to_int_str,
+    remove_future_dates, standardize_desc_cols
 )
 from lib.uid import gen_uid
 from lib import salary
@@ -130,6 +131,7 @@ def clean():
         .pipe(extract_pay_effective_date)\
         .pipe(extract_salary)\
         .pipe(clean_dates, ['hire_date', 'pay_effective_date'])\
+        .pipe(remove_future_dates, '2021-05-12', ['hire', 'pay_effective'])\
         .pipe(standardize_desc_cols, ['rank_desc'])
 
 
