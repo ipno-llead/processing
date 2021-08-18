@@ -62,13 +62,10 @@ if __name__ == '__main__':
     ensure_data_dir('fuse')
     per.to_csv(
         data_file_path('fuse/per_greenwood_pd.csv'),
-        index=False
-    )
+        index=False)
     com.to_csv(
         data_file_path('fuse/com_greenwood_pd.csv'),
-        index=False
-    )
+        index=False)
     event.to_csv(
         data_file_path('fuse/event_greenwood_pd.csv'),
-        index=False
-    )
+        index=False)
