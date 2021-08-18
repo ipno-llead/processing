@@ -181,6 +181,13 @@ def clean_completion_date(df):
     return df
 
 
+def discard_impossible_dates(df):
+    df.loc[df.completion_year > '2021', 'completion_year'] = ''
+    df.loc[df.completion_year > '2021', 'completion_month'] = ''
+    df.loc[df.completion_year > '2021', 'completion_day'] = ''
+    return df
+
+
 def clean():
     df = pd.read_csv(data_file_path(
         'raw/tangipahoa_so/tangipahoa_so_cprr_2015_2021.csv')
@@ -202,6 +209,7 @@ def clean():
         .pipe(drop_rows_with_allegation_disposition_action_all_empty)\
         .pipe(clean_dates, ['completion_date'], expand=True)\
         .pipe(clean_dates, ['receive_date'], expand=False)\
+        .pipe(discard_impossible_dates)\
         .pipe(set_values, {'agency': 'Tangipahoa SO', 'data_production_year': '2021'})\
         .pipe(gen_uid, ['first_name', 'last_name', 'agency'])\
         .drop_duplicates(subset=['receive_date', 'uid', 'allegation'], keep='first')\

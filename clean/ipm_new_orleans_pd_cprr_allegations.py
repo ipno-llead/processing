@@ -1,7 +1,7 @@
 from lib.path import data_file_path, ensure_data_dir
 from lib.columns import clean_column_names
 from lib.clean import (
-    float_to_int_str, clean_sexes, clean_races, standardize_desc_cols, clean_dates
+    float_to_int_str, clean_sexes, clean_races, remove_future_dates, standardize_desc_cols, clean_dates
 )
 from lib.uid import gen_uid
 import pandas as pd
@@ -107,8 +107,10 @@ def remove_rows_with_conflicting_disposition(df):
 
 
 def clean_tracking_number(df):
-    df.loc[:, 'tracking_number'] = df.tracking_number.str\
-        .replace(r'^Rule9-', '', regex=True)
+    df.loc[:, 'tracking_number'] = df.tracking_number\
+        .str.replace(r'^Rule9-', '', regex=True)
+    for idx, row in df.loc[df.tracking_number.str.match(r'^\d{3}-')].iterrows():
+        df.loc[idx, 'tracking_number'] = row.allegation_create_year + row.tracking_number[3:]
     return df
 
 
@@ -150,7 +152,6 @@ def clean():
             'allegation_created_on': 'allegation_create_date'
         })\
         .pipe(drop_rows_without_tracking_number)\
-        .pipe(clean_tracking_number)\
         .pipe(clean_sexes, ['citizen_sex'])\
         .pipe(clean_races, ['citizen_race'])\
         .pipe(combine_citizen_columns)\
@@ -165,6 +166,7 @@ def clean():
         .pipe(clean_occur_time)\
         .pipe(clean_trailing_empty_time, ['receive_date', 'allegation_create_date'])\
         .pipe(clean_dates, ['receive_date', 'allegation_create_date', 'occur_date'])\
+        .pipe(clean_tracking_number)\
         .pipe(clean_complainant_type)\
         .pipe(combine_rule_and_paragraph)\
         .pipe(assign_agency)\
@@ -172,7 +174,8 @@ def clean():
             'agency', 'tracking_number', 'officer_primary_key', 'allegation', 'allegation_class'
         ], 'complaint_uid')\
         .pipe(discard_allegations_with_same_description)\
-        .pipe(replace_disposition)
+        .pipe(replace_disposition)\
+        .pipe(remove_future_dates, '2020-12-31', ['receive', 'allegation_create', 'occur'])
 
 
 if __name__ == '__main__':

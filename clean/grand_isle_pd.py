@@ -5,7 +5,10 @@ import pandas as pd
 
 from lib.columns import clean_column_names
 from lib.path import data_file_path, ensure_data_dir
-from lib.clean import clean_names, clean_dates, clean_salary, float_to_int_str, standardize_desc_cols
+from lib.clean import (
+    clean_names, clean_dates, clean_races, clean_salary, clean_sexes, float_to_int_str,
+    remove_future_dates, standardize_desc_cols
+)
 from lib.uid import gen_uid
 from lib import salary
 sys.path.append('../')
@@ -117,6 +120,8 @@ def clean():
         .pipe(clean_names, ['first_name', 'last_name'])\
         .pipe(parse_birthdate)\
         .pipe(clean_dates, ['birth_date'])\
+        .pipe(clean_races, ['race'])\
+        .pipe(clean_sexes, ['sex'])\
         .pipe(assign_agency)\
         .pipe(gen_uid, ['agency', 'first_name', 'last_name', 'birth_year', 'birth_month', 'birth_day'])\
         .pipe(split_rows)\
@@ -126,6 +131,7 @@ def clean():
         .pipe(extract_pay_effective_date)\
         .pipe(extract_salary)\
         .pipe(clean_dates, ['hire_date', 'pay_effective_date'])\
+        .pipe(remove_future_dates, '2021-05-12', ['hire', 'pay_effective'])\
         .pipe(standardize_desc_cols, ['rank_desc'])
 
 
