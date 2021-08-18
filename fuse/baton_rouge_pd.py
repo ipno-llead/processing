@@ -11,7 +11,7 @@ import sys
 sys.path.append("../")
 
 
-def fuse_events(csd_pprr_17, csd_pprr_19, pd_cprr_18, lprr):
+def fuse_events(csd_pprr_17, csd_pprr_19, cprr_18, cprr_21, lprr):
     builder = events.Builder()
 
     builder.extract_events(csd_pprr_17, {
@@ -33,7 +33,11 @@ def fuse_events(csd_pprr_17, csd_pprr_19, pd_cprr_18, lprr):
             'prefix': 'dept', 'keep': ['uid', 'agency', 'department_code', 'department_desc'],
             'id_cols': ['uid', 'department_code']},
     }, ['uid'])
-    builder.extract_events(pd_cprr_18, {
+    builder.extract_events(cprr_18, {
+        events.COMPLAINT_RECEIVE: {'prefix': 'receive', 'keep': ['uid', 'agency', 'complaint_uid']},
+        events.COMPLAINT_INCIDENT: {'prefix': 'occur', 'keep': ['uid', 'agency', 'complaint_uid']},
+    }, ['uid', 'complaint_uid'])
+    builder.extract_events(cprr_21, {
         events.COMPLAINT_RECEIVE: {'prefix': 'receive', 'keep': ['uid', 'agency', 'complaint_uid']},
         events.COMPLAINT_INCIDENT: {'prefix': 'occur', 'keep': ['uid', 'agency', 'complaint_uid']},
     }, ['uid', 'complaint_uid'])
@@ -59,6 +63,9 @@ if __name__ == "__main__":
     cprr_18 = pd.read_csv(data_file_path(
         "match/cprr_baton_rouge_pd_2018.csv"
     ))
+    cprr_21 = pd.read_csv(data_file_path(
+        "match/cprr_baton_rouge_pd_2021.csv"
+    ))
     pprr = pd.read_csv(data_file_path(
         'clean/pprr_baton_rouge_pd_2021.csv'
     ))
@@ -79,17 +86,19 @@ if __name__ == "__main__":
         csd_pprr_17.drop_duplicates(subset='uid', keep='last'),
         csd_pprr_19.drop_duplicates(subset='uid', keep='last'),
         cprr_18,
+        cprr_21,
         lprr,
     )
 
-    events_df = fuse_events(csd_pprr_17, csd_pprr_19, cprr_18, lprr)
+    events_df = fuse_events(csd_pprr_17, csd_pprr_19, cprr_18, cprr_21, lprr)
     events_df = rearrange_event_columns(pd.concat([
         post_event,
         events_df
     ]))
     ensure_uid_unique(events_df, 'event_uid', True)
 
-    complaint_df = rearrange_complaint_columns(cprr_18)
+    complaint_df = rearrange_complaint_columns(
+        pd.concat([cprr_18, cprr_21]))
     ensure_uid_unique(complaint_df, 'complaint_uid')
     lprr_df = rearrange_appeal_hearing_columns(lprr)
 

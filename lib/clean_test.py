@@ -28,5 +28,4 @@ class RemoveFutureDates(unittest.TestCase):
                 ['cate', '', '', ''],
                 ['tate', '', '', ''],
                 ['dave', '', '', '']
-            ], columns=columns)
-        )
+            ], columns=columns))
