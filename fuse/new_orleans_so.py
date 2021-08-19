@@ -10,9 +10,20 @@ from lib import events
 sys.path.append('../')
 
 
-def fuse_events(cprr, post):
+def fuse_events(cprr19, cprr20, post):
     builder = events.Builder()
-    builder.extract_events(cprr19, cprr20, {
+    builder.extract_events(cprr19, {
+        events.COMPLAINT_RECEIVE: {
+            'prefix': 'receive', 'parse_date': True, 'keep': ['uid', 'agency', 'complaint_uid'],
+        },
+        events.INVESTIGATION_START: {
+            'prefix': 'investigation_start', 'parse_date': True, 'keep': ['uid', 'agency', 'complaint_uid'],
+        },
+        events.INVESTIGATION_COMPLETE: {
+            'prefix': 'investigation_complete', 'parse_date': True, 'keep': ['uid', 'agency', 'complaint_uid'],
+        }
+    }, ['uid', 'complaint_uid'])
+    builder.extract_events(cprr20, {
         events.COMPLAINT_RECEIVE: {
             'prefix': 'receive', 'parse_date': True, 'keep': ['uid', 'agency', 'complaint_uid'],
         },
@@ -42,7 +53,7 @@ if __name__ == '__main__':
     post = post[post.agency == 'orleans parish so']
     post.loc[:, 'agency'] = 'New Orleans SO'
     cprr19 = pd.read_csv(data_file_path('match/cprr_new_orleans_so_2019.csv'))
-    cprr20 = pd.read_csv(data_file_path('match/cprr_new_orelans_so_2020.csv'))
+    cprr20 = pd.read_csv(data_file_path('match/cprr_new_orleans_so_2020.csv'))
     personnel_df = fuse_personnel(
         cprr20,
         cprr19,

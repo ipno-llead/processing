@@ -51,7 +51,7 @@ def deduplicate_cprr_20_personnel(cprr):
         'first_name': JaroWinklerSimilarity(),
         'last_name': JaroWinklerSimilarity(),
     }, df, variator=Swap('first_name', 'last_name'))
-    decision = 0.5
+    decision = 0.9
     matcher.save_clusters_to_excel(data_file_path(
         "match/new_orleans_so_cprr_20_dedup.xlsx"
     ), decision, decision)
@@ -89,7 +89,7 @@ def assign_uid_19_from_post(cprr, post):
     }, dfa, dfb)
     decision = 0.97
     matcher.save_pairs_to_excel(data_file_path(
-        "match/new_orleans_so_cprr_officer_v_post_pprr_2020_11_06.xlsx"), decision)
+        "match/new_orleans_so_cprr_19_officer_v_post_pprr_2020_11_06.xlsx"), decision)
     matches = matcher.get_index_pairs_within_thresholds(decision)
     match_dict = dict(matches)
 
@@ -100,7 +100,7 @@ def assign_uid_19_from_post(cprr, post):
 def assign_uid_20_from_post(cprr, post):
     dfa = cprr.loc[cprr.uid.notna(), ['uid', 'first_name', 'last_name']].drop_duplicates(subset=['uid'])\
         .set_index('uid', drop=True)
-    dfa.loc[:, 'fc'] = dfa.first_name.map(lambda x: x[:1])
+    dfa.loc[:, 'fc'] = dfa.first_name.fillna('').map(lambda x: x[:1])
 
     dfb = post[['uid', 'first_name', 'last_name']].drop_duplicates()\
         .set_index('uid', drop=True)
@@ -110,7 +110,7 @@ def assign_uid_20_from_post(cprr, post):
         'first_name': JaroWinklerSimilarity(),
         'last_name': JaroWinklerSimilarity(),
     }, dfa, dfb)
-    decision = 0.97
+    decision = 0.93
     matcher.save_pairs_to_excel(data_file_path(
         "match/new_orleans_so_cprr_20_officer_v_post_pprr_2020_11_06.xlsx"), decision)
     matches = matcher.get_index_pairs_within_thresholds(decision)
@@ -183,7 +183,7 @@ if __name__ == '__main__':
     post = post[post.agency == 'orleans parish so']
     ensure_data_dir('match')
     cprr19 = deduplicate_cprr_19_personnel(cprr19)
-    # cprr20 = deduplicate_cprr_20_personnel(cprr20)
+    cprr20 = deduplicate_cprr_20_personnel(cprr20)
     cprr19 = assign_uid_19_from_post(cprr19, post)
     cprr20 = assign_uid_20_from_post(cprr20, post)
     cprr19 = assign_supervisor_19_uid_from_post(cprr19, post)
