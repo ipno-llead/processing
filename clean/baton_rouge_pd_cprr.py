@@ -197,11 +197,11 @@ def combine_rule_and_paragraph(df):
     return df
 
 
-def drop_office_investigation_rows(df):
+def drop_office_investigation_rows_from_action(df):
     return df[~(df.action == 'office investigation')].reset_index(drop=True)
 
 
-def clean_status_21(df):
+def clean_investigation_status_21(df):
     df.loc[:, 'investigation_status'] = df.status.fillna('').str.lower().str.strip()\
         .str.replace(r'invesligation$', 'investigation', regex=True)\
         .str.replace(r'(- ?|\.)', '', regex=True)\
@@ -209,15 +209,15 @@ def clean_status_21(df):
     return df.drop(columns='status')
 
 
-def create_tracking_number_21(df):
+def assign_tracking_number_21(df):
     df.loc[:, "tracking_number"] = df.ia_year.apply(str) + '-' + df.ia_seq.apply(str)
     return df.drop(columns=['ia_seq', 'ia_year'])
 
 
-def clean_receive_occur_dates_21(df):
-    df.receive_date = df.receive_date\
+def clean_receive_and_occur_dates_21(df):
+    df.loc[:, 'receive_date'] = df.received\
         .str.replace('- ', '', regex=False)
-    df.occur_date = df.occur_date\
+    df.loc[:, 'occur_date'] = df.occur_date\
         .str.replace('- ', '', regex=False)\
         .str.replace('. ', '', regex=False)\
         .str.replace('13-Oct', '10/13/2015', regex=False)\
@@ -230,12 +230,12 @@ def clean_receive_occur_dates_21(df):
 
 
 def clean_complainant_21(df):
-    df.complainant = df.complainant.fillna('').str.lower().str.strip()\
+    df.loc[:, 'complainant'] = df.complainant.fillna('').str.lower().str.strip()\
         .str.replace(r'\< ?(\d+) ?\-? (\d+) \>', '', regex=True)\
         .str.replace('-', '', regex=False)\
         .str.replace(r'(h/)?[8b](p|r)(p|r)d?o?i?/? ?', 'brpd', regex=True)\
         .str.replace('damaging dept. equipment', '', regex=False)\
-        .str.replace('brpdtim browning', 'brpd/tim browning', regex=False)
+        .str.replace('brpdtim browning', 'baton rouge police department/tim browning', regex=False)
     return df
 
 
@@ -298,7 +298,7 @@ def clean_charges_21(df):
         .str.replace(r'^unauth public statements$', 
                      '3:5 unauthorized public statements - 27', regex=True)\
         .str.replace(r'^fals[ei]f?i?(cation)? ?(of)? documents', 
-                     '3:19 falsification of documents - 44')\
+                     '3:19 falsification of documents - 44', regex=True)\
         .str.replace(r'dl suspension', "suspended driver's license", regex=False)\
         .str.replace(' i intermediate weapon ', ' / intermediate weapon - ', regex=False)\
         .str.replace(r'^320\b', '3:20', regex=True)\
@@ -327,7 +327,7 @@ def clean_charges_21(df):
 
 def parse_officer_name_21(df):
     dep = df.officer_name.str.replace(
-        r'^(.+), (PC?\d+) (.+)$', r'\1 # \2 # \3').str.split(' # ', expand = True)
+        r'^(.+), (PC?\d+) (.+)$', r'\1 # \2 # \3', regex=True).str.split(' # ', expand=True)
     dep.columns = ['name', 'department_code', 'department_desc']
     dep.loc[:, 'name'] = dep['name'].str.lower().str.strip()
 
@@ -380,8 +380,7 @@ def split_name_21(df):
             'ofc': 'officer',
             'capt': 'captain',
             'maj': 'major',
-            'det': 'detective'
-        })
+            'det': 'detective'})
     df.loc[:, 'first_name'] = names[1]\
         .str.strip()
     df.loc[:, 'last_name'] = names[3]\
@@ -394,7 +393,7 @@ def split_name_21(df):
 
 
 def split_department_and_division_desc_21(df):
-    df.department_desc = df.department_desc.str.lower().str.strip().fillna('')\
+    df.loc[:, 'department_desc'] = df.department_desc.str.lower().str.strip().fillna('')\
         .str.replace('patro)', 'patrol', regex=False)\
         .str.replace('&', 'and', regex=False)\
         .str.replace(r'\bop\b', 'operations', regex=True)\
@@ -404,18 +403,16 @@ def split_department_and_division_desc_21(df):
         .str.replace(r'^special$|^special operations tru$', 'special operations', regex=True)\
         .str.replace(r'\bcommunications communications\b', 'communications', regex=True)\
         .str.replace('criminal investigations criminal investigations', 
-        'criminal investigations', regex=False)
-    names = df.department_desc\
-        .str.extract\
-    (r'(patrol|operation service|administration|'
-     r'special operations|criminal investigations) (.+)')
+                     'criminal investigations', regex=False)
+    names = df.department_desc.str.extract(
+        r'(patrol|operation service|administration|special operations|criminal investigations) (.+)')
     df.department_desc = names[0]
     df.loc[:, 'division_desc'] = names[1]
     return df
 
 
 def clean_disposition_21(df):
-    df.disposition = df.disposition.str.lower().str.strip().fillna('')\
+    df.loc[:, 'disposition'] = df.disposition.str.lower().str.strip().fillna('')\
         .str.replace(r'/?admin\.?,?', 'admin', regex=True)\
         .str.replace('.', '', regex=True)\
         .str.replace(r'^/?', '', regex=True)\
@@ -435,7 +432,7 @@ def clean_disposition_21(df):
 
 
 def consolidate_action_and_disposition_21(df):
-    df.disposition = df.disposition.str.cat(df.action, sep='|')\
+    df.loc[:, 'disposition'] = df.disposition.str.cat(df.action, sep='|')\
         .str.replace(r'^/', '', regex=True)\
         .str.replace('loc', 'letter of caution', regex=False)\
         .str.replace('lor', 'letter of reprimand', regex=False)\
@@ -449,13 +446,12 @@ def consolidate_action_and_disposition_21(df):
         .str.replace(r'^hord/not sustained blust/not sustained$', 
                      'not sustained', regex=True)\
         .str.replace(r'^-$', '', regex=True)
-    df.disposition = df.disposition.str.extract(
-                     r'(sustained|not sustained|exonerated)')
+    df.disposition = df.disposition.str.extract(r'(sustained|not sustained|exonerated)')
     return df
 
 
 def clean_action_21(df):
-    df.action = df.action.str.lower().str.strip().fillna('')\
+    df.loc[:, 'action'] = df.action.str.lower().str.strip().fillna('')\
         .str.replace(r'^//?/?', '', regex=True)\
         .str.replace(';', '/', regex=False)\
         .str.replace(r' ?(\w+); (\w+) ?', r'\1/\2', regex=True)\
@@ -556,18 +552,41 @@ def assign_agency(df):
     return df
 
 
+def clean_18():
+    df = realign_18()
+    df = clean_column_names(df)
+    df = df.rename(columns={
+        "status": "investigation_status",
+        "received": "receive_date",
+    })
+    df = df\
+        .pipe(parse_officer_name_18)\
+        .pipe(parse_complaint_18)\
+        .pipe(
+            standardize_desc_cols,
+            ["department_desc", "action", "disposition", "rule_violation",
+             "paragraph_violation", "investigation_status"])\
+        .pipe(drop_office_investigation_rows_from_action)\
+        .pipe(clean_dates, ["receive_date", "occur_date"])\
+        .pipe(assign_tracking_num_18)\
+        .pipe(standardize_action_18)\
+        .pipe(combine_rule_and_paragraph)\
+        .pipe(assign_agency)\
+        .pipe(assign_prod_year, '2020')\
+        .pipe(gen_uid, ["agency", "first_name", "middle_initial", "last_name"])\
+        .pipe(gen_uid, ['agency', 'tracking_number', 'uid', 'action', 'charges'], 'complaint_uid')
+    return df
+
+
 def clean_21():
     df = pd.read_csv(data_file_path(
         'raw/baton_rouge_pd/baton_rouge_pd_cprr_2021.csv'))\
         .pipe(clean_column_names)
     df = df\
-        .rename(columns={
-            'received': 'receive_date'
-        })\
-        .pipe(clean_status_21)\
+        .pipe(clean_investigation_status_21)\
         .pipe(float_to_int_str, ['ia_seq', 'ia_year'])\
-        .pipe(create_tracking_number_21)\
-        .pipe(clean_receive_occur_dates_21)\
+        .pipe(assign_tracking_number_21)\
+        .pipe(clean_receive_and_occur_dates_21)\
         .pipe(clean_complainant_21)\
         .pipe(clean_dates, ['receive_date', 'occur_date'])\
         .pipe(clean_charges_21)\
@@ -577,9 +596,8 @@ def clean_21():
         .pipe(split_department_and_division_desc_21)\
         .pipe(clean_disposition_21)\
         .pipe(consolidate_action_and_disposition_21)\
-        .pipe(standardize_desc_cols, 
-            ['charges', 'action', 'disposition',
-            'department_code', 'department_desc'])\
+        .pipe(standardize_desc_cols, ['charges', 'action', 'disposition',
+                                      'department_code', 'department_desc'])\
         .pipe(drop_rows_with_charges_disposition_action_all_empty_21)\
         .pipe(assign_agency)\
         .pipe(assign_prod_year, '2021')\
@@ -599,7 +617,7 @@ def clean_21():
             ['2:2 command of temper - 13'],
             ['2:2 shirking duties - 14'],
             ['abuse of sick leave - 66', '2:4 abuse of sick leave - 66',
-            '2:3 abuse of sick leave - 66'],
+                '2:3 abuse of sick leave - 66'],
             ['2:5 absent without leave - 15'],
             ['2:7 damaging department equipment - 18'],
             ['2:7 damaging department equipment - 18 / failure to report lost'],
@@ -610,7 +628,7 @@ def clean_21():
             ['3:17 carrying out orders (in car camera)'],
             ['3:17 carrying out orders (pursuit) - 40'],
             ['3:17 carrying out orders / general orders (pursuit) - 40',
-            '3:17 carrying out orders a general orders (pursuit) - 40'],
+                '3:17 carrying out orders a general orders (pursuit) - 40'],
             ['3:17 carrying out orders / memorandums - 41'],
             ['3:17 carrying out orders / verbal orders - 42'],
             ['3:18 insubordination - 43'],
@@ -656,32 +674,6 @@ def clean_21():
             ["suspended driver's license"],
             ['traffic violations']
         ])
-    return df
-
-
-def clean_18():
-    df = realign_18()
-    df = clean_column_names(df)
-    df = df.rename(columns={
-        "status": "investigation_status",
-        "received": "receive_date",
-    })
-    df = df\
-        .pipe(parse_officer_name_18)\
-        .pipe(parse_complaint_18)\
-        .pipe(
-            standardize_desc_cols,
-            ["department_desc", "action", "disposition", "rule_violation",
-             "paragraph_violation", "investigation_status"])\
-        .pipe(drop_office_investigation_rows)\
-        .pipe(clean_dates, ["receive_date", "occur_date"])\
-        .pipe(assign_tracking_num_18)\
-        .pipe(standardize_action_18)\
-        .pipe(combine_rule_and_paragraph)\
-        .pipe(assign_agency)\
-        .pipe(assign_prod_year, '2020')\
-        .pipe(gen_uid, ["agency", "first_name", "middle_initial", "last_name"])\
-        .pipe(gen_uid, ['agency', 'tracking_number', 'uid', 'action', 'charges'], 'complaint_uid')
     return df
 
 

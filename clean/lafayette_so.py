@@ -102,5 +102,4 @@ if __name__ == "__main__":
     ensure_data_dir("clean")
     df.to_csv(
         data_file_path('clean/cprr_lafayette_so_2015_2020.csv'),
-        index=False
-    )
+        index=False)

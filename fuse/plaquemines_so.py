@@ -39,13 +39,10 @@ if __name__ == '__main__':
     ensure_uid_unique(complaints, 'complaint_uid')
     complaints.to_csv(
         data_file_path('fuse/com_plaquemines_so.csv'),
-        index=False
-    )
+        index=False)
     rearrange_personnel_columns(post).to_csv(
         data_file_path('fuse/per_plaquemines_so.csv'),
-        index=False
-    )
+        index=False)
     event.to_csv(
         data_file_path('fuse/event_plaquemines_so.csv'),
-        index=False
-    )
+        index=False)
