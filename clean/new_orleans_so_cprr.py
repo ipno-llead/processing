@@ -299,7 +299,7 @@ def clean_investigation_complete_date_20(df):
 
 
 def clean_action_20(df):
-    df.action = df.action.str.lower().str.strip()\
+    df.loc[:, 'action'] = df.action.str.lower().str.strip()\
         .str.replace(r' ^(\w+)', r'\1', regex=True)\
         .str.replace('.', '', regex=False)\
         .str.replace(r'on  (\d+)', r'on \1', regex=True)\
@@ -312,12 +312,12 @@ def clean_action_20(df):
 
 
 def standardize_action_20(df):
-    df.action = df.action
+    df.loc[:, 'action'] = df.action
     return standardize_from_lookup_table(df, 'action', action_lookup)
 
 
 def clean_rank_desc_20(df):
-    df.rank_desc = df.rank_desc.str.lower().str.strip().fillna('')\
+    df.loc[:, 'rank_desc'] = df.rank_desc.str.lower().str.strip().fillna('')\
         .str.replace(r'recu?c?r?u?it', 'recruit', regex=True)\
         .str.replace(r'deo?u?p?u?i?ti?e?s?y?', 'deputy', regex=True)\
         .str.replace('lieuteant', 'lieutenant', regex=False)\
@@ -328,7 +328,7 @@ def clean_rank_desc_20(df):
 
 
 def clean_charges_20(df):
-    df.charges = df.charges.str.strip()\
+    df.loc[:, 'charges'] = df.charges.str.strip()\
         .str.replace('and', '', regex=False)\
         .str.replace(r', ?', '/', regex=True)\
         .str.replace('dtuy', 'duty', regex=False)\
@@ -429,7 +429,7 @@ def clean_charges_20(df):
 
 
 def split_name_20(df):
-    df.name_of_accused = df.name_of_accused.str.lower().str.strip()\
+    df.loc[:, 'name_of_accused'] = df.name_of_accused.str.lower().str.strip()\
         .str.replace('la shanda ezidor', 'lashanda ezidor', regex=False)\
         .str.replace('lieutenant latoya armwood', 'latoya armwood', regex=False)\
         .str.replace('various', '', regex=False)\
@@ -476,7 +476,7 @@ def clean_summary(df):
 
 
 def clean_disposition_20(df):
-    df.disposition = df.disposition.str.lower().str.strip()
+    df.loc[:, 'disposition'] = df.disposition.str.lower().str.strip()
 
     names = df.disposition.str.extract(r'(non-? ?sustaine?d?|sustaine?d?|exonerated|unfounded|founded)')
     df.loc[:, 'disposition'] = names[0]\
