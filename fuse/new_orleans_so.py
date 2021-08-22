@@ -31,7 +31,7 @@ def fuse_events(cprr19, cprr20, post):
         events.OFFICER_ARRESTED: {
             'prefix': 'arrest',
             'parse_date': True,
-             'keep': ['uid', 'agency', 'complaint_uid'],
+            'keep': ['uid', 'agency', 'complaint_uid'],
         },
         events.OFFICER_SUSPENDED: {
             'prefix': 'suspension',
@@ -78,15 +78,18 @@ def fuse_events(cprr19, cprr20, post):
     }, ['uid', 'complaint_uid'])
     builder.extract_events(post, {
         events.OFFICER_LEVEL_1_CERT: {
-            'prefix': 'level_1_cert', 
-            'parse_date': '%Y-%m-%d', 'keep': ['uid', 'agency']
+            'prefix': 'level_1_cert',
+            'parse_date': '%Y-%m-%d',
+            'keep': ['uid', 'agency']
         },
         events.OFFICER_PC_12_QUALIFICATION: {
-            'prefix': 'last_pc_12_qualification', 
-            'parse_date': '%Y-%m-%d', 'keep': ['uid', 'agency']
+            'prefix': 'last_pc_12_qualification',
+            'parse_date': '%Y-%m-%d',
+            'keep': ['uid', 'agency']
         },
         events.OFFICER_HIRE: {
-            'prefix': 'hire', 'keep': ['uid', 'agency']
+            'prefix': 'hire',
+            'keep': ['uid', 'agency']
         }
     }, ['uid'])
     return builder.to_frame()
