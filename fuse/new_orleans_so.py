@@ -14,33 +14,77 @@ def fuse_events(cprr19, cprr20, post):
     builder = events.Builder()
     builder.extract_events(cprr19, {
         events.COMPLAINT_RECEIVE: {
-            'prefix': 'receive', 'parse_date': True, 'keep': ['uid', 'agency', 'complaint_uid'],
+            'prefix': 'receive',
+            'parse_date': True,
+            'keep': ['uid', 'agency', 'complaint_uid'],
         },
         events.INVESTIGATION_START: {
-            'prefix': 'investigation_start', 'parse_date': True, 'keep': ['uid', 'agency', 'complaint_uid'],
+            'prefix': 'investigation_start',
+            'parse_date': True,
+            'keep': ['uid', 'agency', 'complaint_uid'],
         },
         events.INVESTIGATION_COMPLETE: {
-            'prefix': 'investigation_complete', 'parse_date': True, 'keep': ['uid', 'agency', 'complaint_uid'],
+            'prefix': 'investigation_complete',
+            'parse_date': True,
+            'keep': ['uid', 'agency', 'complaint_uid'],
+        },
+        events.OFFICER_ARRESTED: {
+            'prefix': 'arrest',
+            'parse_date': True,
+             'keep': ['uid', 'agency', 'complaint_uid'],
+        },
+        events.OFFICER_SUSPENDED: {
+            'prefix': 'suspension',
+            'parse_date': True,
+            'keep': ['uid', 'agency', 'complaint_uid'],
+        },
+        events.OFFICER_RESIGNED: {
+            'prefix': 'resignation',
+            'parse_date': True, 
+            'keep': ['uid', 'agency', 'complaint_uid'],
         }
     }, ['uid', 'complaint_uid'])
     builder.extract_events(cprr20, {
         events.COMPLAINT_RECEIVE: {
-            'prefix': 'receive', 'parse_date': True, 'keep': ['uid', 'agency', 'complaint_uid'],
+            'prefix': 'receive',
+            'parse_date': True,
+            'keep': ['uid', 'agency', 'complaint_uid'],
         },
         events.INVESTIGATION_START: {
-            'prefix': 'investigation_start', 'parse_date': True, 'keep': ['uid', 'agency', 'complaint_uid'],
+            'prefix': 'investigation_start',
+            'parse_date': True,
+            'keep': ['uid', 'agency', 'complaint_uid'],
         },
         events.INVESTIGATION_COMPLETE: {
-            'prefix': 'investigation_complete', 'parse_date': True, 'keep': ['uid', 'agency', 'complaint_uid'],
+            'prefix': 'investigation_complete',
+            'parse_date': True,
+            'keep': ['uid', 'agency', 'complaint_uid'],
+        },
+        events.OFFICER_ARRESTED: {
+            'prefix': 'arrest',
+            'parse_date': True,
+            'keep': ['uid', 'agency', 'complaint_uid'],
+        },
+        events.OFFICER_SUSPENDED: {
+            'prefix': 'suspension',
+             'parse_date': True,
+             'keep': ['uid', 'agency', 'complaint_uid'],
+        },
+        events.OFFICER_RESIGNED: {
+            'prefix': 'resignation',
+            'parse_date': True,
+            'keep': ['uid', 'agency', 'complaint_uid'],
         }
     }, ['uid', 'complaint_uid'])
     builder.extract_events(post, {
-        events.OFFICER_LEVEL_1_CERT: {'prefix': 'level_1_cert', 'parse_date': '%Y-%m-%d', 'keep': [
-            'uid', 'agency'
-        ]},
-        events.OFFICER_PC_12_QUALIFICATION: {'prefix': 'last_pc_12_qualification', 'parse_date': '%Y-%m-%d', 'keep': [
-            'uid', 'agency'
-        ]},
+        events.OFFICER_LEVEL_1_CERT: {
+            'prefix': 'level_1_cert', 
+            'parse_date': '%Y-%m-%d', 'keep': ['uid', 'agency']
+        },
+        events.OFFICER_PC_12_QUALIFICATION: {
+            'prefix': 'last_pc_12_qualification', 
+            'parse_date': '%Y-%m-%d', 'keep': ['uid', 'agency']
+        },
         events.OFFICER_HIRE: {
             'prefix': 'hire', 'keep': ['uid', 'agency']
         }

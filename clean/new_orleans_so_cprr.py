@@ -185,7 +185,15 @@ def clean_action_19(df):
         .str.replace(r'\bhr\b', 'human resources', regex=True)\
         .str.replace('unfouned all charges', 'unfouded', regex=False)\
         .str.replace(r'^n$', '', regex=True)\
-        .str.replace(' and ', '/', regex=False)
+        .str.replace(' and ', '/', regex=False)\
+        .str.replace('inmate was on special diet/deputy was given '
+                     'permission to give inmate his special diet', '', regex=False)\
+        .str.replace('accused of spreading a rumor of a sexual '
+                     'relationship between shaka milton', '', regex=False)\
+        .str.replace('board non sustained charges', '', regex=False)\
+        .str.replace('no charges were filed by the nopd', '', regex=False)\
+        .str.replace('h.r', 'human resources', regex=False)\
+        .str.replace(r'^under investigation$', '', regex=True)
     return df
 
 
@@ -484,6 +492,45 @@ def clean_disposition_20(df):
     return df
 
 
+def extract_suspension_date(df):
+    df.loc[:, 'suspension_date'] = df.action\
+        .str.replace(r'suspended (\d+)', r'suspended on \1', regex=True)\
+        .str.replace(r'suspended (\d+)', r'suspended on \1', regex=True)\
+        .str.replace('suspended/arrested on 07/01/2020', 
+                     'suspended on 07/01/2020', regex=False)\
+        .str.replace('suspended/arrested on 04/13/2020', 
+                     'suspended on 04/13/2020', regex=False)\
+        .str.replace('suspended/arrested on 12/3/2019/terminated on 12/04/2019', 
+                     'suspended on 12/3/2019', regex=False)
+    dates = df.action.str.extract(r'(suspended on (\d+)/(\d+)/(\d+))')
+    df.loc[:, 'suspension_date'] = dates[0]\
+        .str.replace('suspended on ', '', regex=False)
+    return df    
+
+
+def extract_resignation_date(df):
+    df.loc[:, 'resignation_date'] = df.action
+    dates = df.action.str.extract(r'(resigned.+)')
+    df.loc[:, 'resignation_date'] = dates[0]\
+        .str.replace(r'resigned (under)? ?(investigation)? ?(on)? ?', '', regex=True)\
+        .str.replace(r' ?prior to going to disciplinary review board ?' , '', regex=True)\
+        .str.replace(r' ?at 0930 hours| under Internal affairs department case# d-025 19|'
+                     r' ?under case number h-049-19 ?|in |from opso on |'
+                     r' ?prior to start of investigation ', '', regex=True)
+    return df    
+
+
+def extract_arrest_date(df):
+    df.loc[:, 'arrest_date'] = df.action
+    dates = df.action.str.extract(r'(arrested.+)')
+    df.loc[:, 'arrest_date'] = dates[0]\
+        .str.replace('/resigned under investigation on 07/13/2020', '', regex=False)\
+        .str.replace(r' (12/04/2019)$', '', regex=True)\
+        .str.replace(r'(/terminated on 04/20/2020)$', '', regex=True)\
+        .str.replace(r'/terminated on ?| on case d-003-2020|arrested ?(on)? ?', '', regex=True)
+    return df
+
+
 def clean19():
     df = pd.read_csv(data_file_path(
         "raw/new_orleans_so/new_orleans_so_cprr_2019_tabula.csv"))
@@ -527,7 +574,10 @@ def clean19():
         .sort_values(['tracking_number', 'investigation_complete_date'])\
         .drop_duplicates(subset=['complaint_uid'], keep='last', ignore_index=True)\
         .pipe(split_investigating_supervisor)\
-        .pipe(clean_summary)
+        .pipe(clean_summary)\
+        .pipe(extract_arrest_date)\
+        .pipe(extract_resignation_date)\
+        .pipe(extract_suspension_date)
     return df
 
 
@@ -564,6 +614,9 @@ def clean20():
         .pipe(fix_rank_desc_20)\
         .pipe(clean_summary)\
         .pipe(clean_disposition_20)\
+        .pipe(extract_suspension_date)\
+        .pipe(extract_resignation_date)\
+        .pipe(extract_arrest_date)\
         .pipe(standardize_desc_cols, [
             'action', 'summary'])\
         .pipe(split_investigating_supervisor)\

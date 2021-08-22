@@ -18,7 +18,7 @@ def prepare_post():
 def fuse_events(cprr, post):
     builder = events.Builder()
     builder.extract_events(cprr, {
-        events.INVESTIGATION_START: {
+        events.COMPLAINT_RECEIVE: {
             'prefix': 'receive', 'keep': ['uid', 'agency', 'complaint_uid']
         },
     },
