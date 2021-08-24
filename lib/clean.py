@@ -312,6 +312,41 @@ def clean_name(series: pd.Series) -> pd.Series:
         .str.lower().str.strip().fillna("").str.strip("-")
 
 
+def clean_rank(series: pd.Series) -> pd.Series:
+    """Cleans and standardize name series
+
+    Args:
+        series (pd.Series):
+            the series to process
+
+    Returns:
+        the updated series
+    """
+    return series.str.strip().str.replace("s/ofc", 'senior officer', regex=False)\
+        .str.replace("sgt", "sergeant", regex=False).str.replace("ofc", "officer", regex=False)\
+        .str.replace("lt", "lieutenant", regex=False).str.replace("cpt", "captain", regex=False)\
+        .str.replace("a/supt", "superintendent", regex=False).str.replace(r"\(|\)", " ", regex=True)\
+        .str.lower().str.strip().fillna("").str.strip("-")
+
+
+
+def clean_ranks(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
+    """Cleans and standardize description columns
+
+    Args:
+        df (pd.DataFrame):
+            the frame to process
+        cols (list of str):
+            descriptive columns such as rank_desc and department_desc
+
+    Returns:
+        the updated frame
+    """
+    for col in cols:
+        df.loc[:, col] = clean_rank(df[col])
+    return df
+
+
 def names_to_title_case(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
     """Converts name columns to title case
 

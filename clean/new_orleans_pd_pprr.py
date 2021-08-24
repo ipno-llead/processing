@@ -1,8 +1,9 @@
+from pandas.io.parsers import read_csv
 from lib.columns import clean_column_names
 from lib.uid import gen_uid
 from lib.path import data_file_path, ensure_data_dir
 from lib.clean import (
-    clean_name, parse_dates_with_known_format, standardize_desc_cols
+    clean_name, parse_dates_with_known_format, standardize_desc_cols, clean_ranks
 )
 import pandas as pd
 import numpy as np
@@ -118,6 +119,55 @@ def normalize_other_years(df):
 def remove_pol_prefix_from_department(df):
     df.loc[:, "department_desc"] = df.department_desc.fillna(
         "").str.replace(r"^pol ", "")
+    return df
+
+
+def extract_rank(df):
+    ranks = df.nominee.str.lower().str.strip()\
+        .str.replace('\.', '', regex=False)\
+        .str.replace('sgt', 'sergeant', regex=False)\
+        .str.extract(r'(\(\w+/?\w+\)|special agent|atf agent|agent|detective|deputy|investigative analyst|'
+                     r'mag unit crime analyst|task force officer|retired detective|supervisory special agent|'
+                     r'group supervisor|supervisory special agent|s/t|tpr)')
+    df.loc[:, 'rank_desc'] = ranks[0]
+    return df
+
+
+def extract_badge_no(df):
+    badges = df.nominee.str.lower().str.strip()\
+        .str.extract(r'(^\d+) ')
+    df.loc[:, 'badge_no'] = badges[0]
+    return df 
+
+
+def split_name_award(df):
+    df.loc[:, 'nominee'] = df.nominee.str.lower().str.strip()\
+        .str.replace(r'-', '', regex=False)\
+        .str.replace(r'\.', '', regex=True)\
+        .str.replace((r'(\(\w+/?\w+\)|special agent |atf agent |agent |detective |deputy |investigative analyst |'
+                     r'mag unit crime analyst |task force officer |retired detective |supervisory special agent |'
+                     r'group supervisor |supervisory special agent |s/t |tpr|sgt |mt |lt)'), '', regex=True)\
+        .str.replace(r'(^\d+)  ', '', regex=True)\
+        .str.replace(r'(\w+) ?(\w+)? ?(\w+)?, (\w+) ?(\w+)?', r'\4 \5 \1 \2 \3', regex=True)
+    names = df.nominee.str.extract(r'(\w+) ?(\w{1})? (.+)')
+    df.loc[:, 'first_name'] = names[0]
+    df.loc[:, 'middle_initial'] = names[1]
+    df.loc[:, 'last_name'] = names[2]
+    return df
+
+
+def clean_award():
+    df = pd.read_csv(data_file_path('raw/ipm/new_orleans_pd_commendations_2016_2021.csv'))
+    df = df\
+        .pipe(clean_column_names)\
+        .rename(columns={
+            'date': 'receive_date'
+        })\
+        .pipe(extract_rank)\
+        .pipe(clean_ranks, ['rank_desc'])\
+        .pipe(extract_badge_no)\
+        .pipe(split_name_award)\
+        .pipe(clean_names, ['first_name', 'middle_initial', 'last_name'])
     return df
 
 
