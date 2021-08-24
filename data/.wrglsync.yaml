@@ -4,8 +4,12 @@ repos:
     fileName: clean/pprr_new_orleans_harbor_pd_2020.csv
   clean-cprr-baton-rouge-pd-2018:
     fileName: clean/cprr_baton_rouge_pd_2018.csv
+  clean-cprr-baton-rouge-pd-2021:
+    fileName: clean/cprr_baton_rouge_pd_2021.csv
   clean-cprr-baton-rouge-so-2018:
     fileName: clean/cprr_baton_rouge_so_2018.csv
+  clean-cprr-baton-rouge-so-2016-2020:
+    fileName: clean/cprr_baton_rouge_so_2016_2020.csv
   clean-cprr-new-orleans-harbor-pd-2020:
     fileName: clean/cprr_new_orleans_harbor_pd_2020.csv
   clean-pprr-baton-rouge-csd-2017:
@@ -60,6 +64,8 @@ repos:
     fileName: match/pprr_baton_rouge_csd_2019.csv
   match-cprr-baton-rouge-pd-2018:
     fileName: match/cprr_baton_rouge_pd_2018.csv
+  match-cprr-baton-rouge-pd-2021:
+    fileName: match/cprr_baton_rouge_pd_2021.csv
   match-lprr-baton-rouge-fpcsb-1992-2012:
     fileName: match/lprr_baton_rouge_fpcsb_1992_2012.csv
   match-brusly-pd-2020:
@@ -76,6 +82,8 @@ repos:
     fileName: match/cprr_greenwood_pd_2015_2020.csv
   match-cprr-baton-rouge-so-2018:
     fileName: match/cprr_baton_rouge_so_2018.csv
+  match-cprr-baton-rouge-so-2016-2020:
+    fileName: match/cprr_baton_rouge_so_2016_2020.csv
   match-pprr-st-tammany-so-2020:
     fileName: match/pprr_st_tammany_so_2020.csv
   match-cprr-plaquemines-so-2019:

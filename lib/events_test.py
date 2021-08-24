@@ -171,5 +171,4 @@ class DiscardEventsOccurMoreThanOnceEvery30DaysTestCase(unittest.TestCase):
                 ['hire', '10', 'def', '1990', '5', '4'],
                 ['hire', '11', 'def', '1990', '3', '28'],
                 ['hire', '12', 'qwe', '1990', '4', '10'],
-            ], columns=columns)
-        )
+            ], columns=columns))

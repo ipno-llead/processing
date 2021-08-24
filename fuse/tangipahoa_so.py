@@ -53,13 +53,10 @@ if __name__ == '__main__':
     ensure_data_dir('fuse')
     event.to_csv(
         data_file_path('fuse/event_tangipahoa_so.csv'),
-        index=False,
-    )
+        index=False)
     complaints.to_csv(
         data_file_path('fuse/com_tangipahoa_so.csv'),
-        index=False,
-    )
+        index=False)
     per.to_csv(
         data_file_path('fuse/per_tangipahoa_so.csv'),
-        index=False,
-    )
+        index=False)

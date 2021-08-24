@@ -16,9 +16,14 @@ def prepare_post_data():
     return post
 
 
-def fuse_events(cprr, post):
+def fuse_events(cprr_18, cprr_21, post):
     builder = events.Builder()
-    builder.extract_events(cprr, {
+    builder.extract_events(cprr_18, {
+        events.OFFICER_RANK: {
+            'prefix': 'rank', 'keep': ['uid', 'agency', 'badge_no', 'rank_desc'], 'id_cols': ['uid']},
+        events.COMPLAINT_INCIDENT: {'prefix': 'occur', 'keep': ['uid', 'agency', 'complaint_uid']},
+    }, ['uid', 'complaint_uid'])
+    builder.extract_events(cprr_21, {
         events.OFFICER_RANK: {
             'prefix': 'rank', 'keep': ['uid', 'agency', 'badge_no', 'rank_desc'], 'id_cols': ['uid']},
         events.COMPLAINT_INCIDENT: {'prefix': 'occur', 'keep': ['uid', 'agency', 'complaint_uid']},
@@ -36,12 +41,15 @@ def fuse_events(cprr, post):
 
 
 if __name__ == "__main__":
-    cprr = pd.read_csv(
+    cprr_18 = pd.read_csv(
         data_file_path("match/cprr_baton_rouge_so_2018.csv"))
+    cprr_20 = pd.read_csv(
+        data_file_path("match/cprr_baton_rouge_so_2016_2020.csv"))
     post = prepare_post_data()
-    personnel_df = fuse_personnel(cprr, post)
-    event_df = fuse_events(cprr, post)
-    complaint_df = rearrange_complaint_columns(cprr)
+    personnel_df = fuse_personnel(cprr_18, cprr_20, post)
+    event_df = fuse_events(cprr_18, cprr_20, post)
+    complaint_df = rearrange_complaint_columns(
+        pd.concat([cprr_18, cprr_20]))
     ensure_uid_unique(complaint_df, 'complaint_uid')
     ensure_data_dir("fuse")
     personnel_df.to_csv(data_file_path(

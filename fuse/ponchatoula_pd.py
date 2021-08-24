@@ -57,5 +57,4 @@ if __name__ == '__main__':
         'fuse/com_ponchatoula_pd.csv'
     ), index=False)
     event_df.to_csv(data_file_path(
-        'fuse/event_ponchatoula_pd.csv'
-    ), index=False)
+        'fuse/event_ponchatoula_pd.csv'), index=False)
