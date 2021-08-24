@@ -51,6 +51,11 @@ def clean_allegation(df):
     return df
 
 
+def replace_names(df):
+    df.loc[df.first_name == 'rj', 'first_name'] = 'randy'
+    return df
+
+
 def clean_cprr():
     return pd.read_csv(data_file_path(
         'raw/ponchatoula_pd/ponchatoula_cprr_2010_2020.csv'
@@ -62,6 +67,8 @@ def clean_cprr():
         .pipe(set_values, {
             'agency': 'Ponchatoula PD'
         })\
+        .pipe(clean_names, ['first_name', 'last_name'])\
+        .pipe(replace_names)\
         .pipe(gen_uid, ['agency', 'first_name', 'last_name'])\
         .pipe(gen_uid, ['agency', 'uid', 'receive_date', 'allegation'], 'complaint_uid')
 
