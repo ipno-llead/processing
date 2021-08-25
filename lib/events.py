@@ -16,9 +16,6 @@ OFFICER_RANK = "officer_rank"
 OFFICER_DEPT = "officer_dept"
 OFFICER_HIRE = "officer_hire"
 OFFICER_LEFT = "officer_left"
-OFFICER_ARRESTED = 'officer_arrested'
-OFFICER_SUSPENDED = 'officer_suspended'
-OFFICER_RESIGNED = 'officer_resigned'
 OFFICER_PAY_PROG_START = "officer_pay_prog_start"
 OFFICER_PAY_EFFECTIVE = "officer_pay_effective"
 
@@ -70,9 +67,6 @@ cat_type = CategoricalDtype(categories=[
     UOF_CREATED,
     UOF_DUE,
     AWARD_RECEIVE,
-    OFFICER_ARRESTED,
-    OFFICER_SUSPENDED,
-    OFFICER_RESIGNED
 ], ordered=True)
 
 
