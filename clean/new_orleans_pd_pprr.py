@@ -3,7 +3,7 @@ from lib.columns import clean_column_names
 from lib.uid import gen_uid
 from lib.path import data_file_path, ensure_data_dir
 from lib.clean import (
-    clean_name, parse_dates_with_known_format, standardize_desc_cols, clean_ranks
+    clean_name, parse_dates_with_known_format, standardize_desc_cols, clean_ranks, clean_names
 )
 import pandas as pd
 import numpy as np
@@ -140,7 +140,7 @@ def extract_badge_no(df):
     return df 
 
 
-def split_name_award(df):
+def split_award_nominee_name(df):
     df.loc[:, 'nominee'] = df.nominee.str.lower().str.strip()\
         .str.replace(r'-', '', regex=False)\
         .str.replace(r'\.', '', regex=True)\
@@ -153,6 +153,48 @@ def split_name_award(df):
     df.loc[:, 'first_name'] = names[0]
     df.loc[:, 'middle_initial'] = names[1]
     df.loc[:, 'last_name'] = names[2]
+    return df.drop(columns={'nominee'})
+
+
+def split_award_nominator_name(df):
+    df.loc[:, 'nominated_by'] = df.nominated_by.str.lower().str.strip()\
+        .str.replace(' -', '', regex=False)\
+        .str.replace(r'\.', '', regex=True)
+    attributes = df.nominated_by.str.extract(r'(\d+) (\w+), (\w+) ?(\w{1})? (.+)')
+    df.loc[:, 'nominator_badge_no'] = attributes[0]
+    df.loc[:, 'nominator_last_name'] = attributes[1]
+    df.loc[:, 'nominator_first_name'] = attributes[2]
+    df.loc[:, 'nominator_middle_initial'] = attributes[3]
+    df.loc[:, 'nominator_rank_desc'] = attributes[4].fillna('')\
+        .str.replace(r'\(|\)', '', regex=True)\
+        .str.replace(r'^sgt$', 'sergeant', regex=True)\
+        .str.replace(r'^cpt$', 'captain', regex=True)\
+        .str.replace(r'^lt$', 'lieutenant', regex=True)\
+        .str.replace(r'^d$', 'detective', regex=True)\
+        .str.replace(r'^s/ofc$', 'senior officer', regex=True)\
+        .str.replace(r'^ofc$', 'officer', regex=True)\
+        .str.replace(r'^r$', 'reserve', regex=True)\
+        .str.replace(r'^c$', 'corporal', regex=True)
+    return df.drop(columns={'nominated_by'})
+
+
+def clean_decision(df):
+    df.loc[:, 'award_decision'] = df.command_decision.str.lower().str.strip()\
+        .str.replace('approval', 'approved', regex=False)
+    return df.drop(columns={'command_decision'})
+
+
+def clean_recommended_award(df):
+    df.loc[:, 'recommended_award'] = df.recommended_award.str.lower().str.strip()\
+        .str.replace(r'�s |� |� ', '', regex=True)\
+        .str.replace('superintendentaward', 'superintendent award', regex=False)
+    return df
+
+
+def clean_award_disposition(df):
+    df.loc[:, 'award_given'] = df.award_disposition.str.lower().str.strip()\
+        .str.replace(r'�s |� |� ', '', regex=True)\
+        .str.replace('superintendentaward', 'superintendent award', regex=False)
     return df
 
 
@@ -160,14 +202,23 @@ def clean_award():
     df = pd.read_csv(data_file_path('raw/ipm/new_orleans_pd_commendations_2016_2021.csv'))
     df = df\
         .pipe(clean_column_names)\
+        .drop(columns={
+            'item_number'
+        })\
         .rename(columns={
-            'date': 'receive_date'
+            'date': 'receive_date',
+            'disposition_date': 'decision_date',
+            'award_date': 'award_given_date'
         })\
         .pipe(extract_rank)\
-        .pipe(clean_ranks, ['rank_desc'])\
         .pipe(extract_badge_no)\
-        .pipe(split_name_award)\
-        .pipe(clean_names, ['first_name', 'middle_initial', 'last_name'])
+        .pipe(split_award_nominee_name)\
+        .pipe(split_award_nominator_name)\
+        .pipe(clean_decision)\
+        .pipe(clean_ranks, ['rank_desc', 'nominator_rank_desc'])\
+        .pipe(standardize_desc_cols, ['recommended_award', 'award_disposition'])\
+        .pipe(clean_recommended_award)\
+        .pipe(clean_award_disposition)
     return df
 
 
