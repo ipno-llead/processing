@@ -61,9 +61,10 @@ action_lookup = [
     ['suspended on 03/17/2020/terminated by human resources on 03/18/2020',
         'suspended on 03/17/2020/terminated by hr on 03/18/2020'],
     ['suspended on 03/18/2020/terminated on 04/21/2020'],
-    ['suspended on 03/24/2020/terminaed by disciplinary review board on 04/22/2020'],
+    ['suspended on 03/24/2020/terminated by disciplinary review board on 04/22/2020',
+        'suspended on 03/24/2020/terminaed by disciplinary review board on 04/22/2020'],
     ['suspended on 04/02/2020/terminated by disciplinary review board on 04/21/2020',
-    'suspended on 04/02/2020/terminated by disciplinary review board 04/21/2020'],
+        'suspended on 04/02/2020/terminated by disciplinary review board 04/21/2020'],
     ['suspended on 04/20/2020/terminated by disciplinary review board on 06/03/2020'],
     ['suspended on 04/24/2020'],
     ['suspended on 04/24/2020/resigned under investigation on 04/24/2020',
@@ -494,17 +495,13 @@ def clean_disposition_20(df):
 
 def extract_suspension_date(df):
     df.loc[:, 'suspension_date'] = df.action\
-        .str.replace(r'suspended (\d+)', r'suspended on \1', regex=True)\
-        .str.replace(r'suspended (\d+)', r'suspended on \1', regex=True)\
-        .str.replace('suspended/arrested on 07/01/2020',
-                     'suspended on 07/01/2020', regex=False)\
-        .str.replace('suspended/arrested on 04/13/2020',
-                     'suspended on 04/13/2020', regex=False)\
-        .str.replace('suspended/arrested on 12/3/2019/terminated on 12/04/2019',
-                     'suspended on 12/3/2019', regex=False)
-    dates = df.action.str.extract(r'(suspended on (\d+)/(\d+)/(\d+))')
+        .str.replace(r'suspended (\d+)', r'suspeneded on \1', regex=True)\
+        .str.replace('suspeneded', 'suspended', regex=False)\
+        .str.replace(r'^suspended/arrested on', 'suspended on', regex=True)\
+        .str.replace('1-6-21-1/8/21', '1/6/2021', regex=False)
+    dates = df.suspension_date.str.extract(r'(suspended on (\d+)/(\d+)/(\d+)/)')
     df.loc[:, 'suspension_date'] = dates[0]\
-        .str.replace('suspended on ', '', regex=False)
+        .str.replace('suspended on ', '').str.replace(r'/$', '')
     return df
 
 
@@ -547,25 +544,20 @@ def extract_termination_date(df):
 
 
 def add_left_reason_column(df):
-    df.loc[:, 'arrest_left_reason'] = df.arrest_date.fillna('')\
-        .str.replace(r'.+', 'arrest', regex=True)
+    df.loc[df.arrest_date.notna(), 'arrest_left_reason'] = 'arrest'
 
-    df.loc[:, 'suspension_left_reason'] = df.suspension_date.fillna('')\
-        .str.replace(r'.+', 'suspension', regex=True)
+    df.loc[df.suspension_date.notna(), 'suspension_left_reason'] = 'suspension'
 
-    df.loc[:, 'resignation_left_reason'] = df.resignation_date.fillna('')\
-        .str.replace(r'.+', 'resignation', regex=True)
+    df.loc[df.resignation_date.notna(), 'resignation_left_reason'] = 'resignation'
 
-    df.loc[:, 'termination_left_reason'] = df.termination_date.fillna('')\
-        .str.replace(r'.+', 'termination', regex=True)
+    df.loc[df.termination_date.notna(), 'termination_left_reason'] = 'termination'
 
     cols = [
         'arrest_left_reason', 'suspension_left_reason',
         'resignation_left_reason', 'termination_left_reason']
-     
+    
     df.loc[:, 'left_reason'] = df[cols].apply(lambda row: '|'.join(row.values.astype(str)), axis=1)\
-        .str.replace(r'^\|\|?\|?|\|?\|$|', '', regex=True)\
-        .str.replace(r'(\w+)\|?\|\|(\w+)', r'\1|\2', regex=True)
+        .str.replace('nan', '').str.replace(r'\|+', '|').str.replace(r'\|$', '').str.replace(r'^\|', '')
     return df.drop(columns={
         'arrest_left_reason', 'suspension_left_reason',
         'resignation_left_reason', 'termination_left_reason'})

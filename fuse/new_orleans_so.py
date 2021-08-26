@@ -81,11 +81,6 @@ def fuse_events(cprr19, cprr20, post):
             'keep': ['uid', 'agency', 'complaint_uid', 'left_reason'],
         },
         events.OFFICER_LEFT: {
-            'prefix': 'resignation',
-            'parse_date': True,
-            'keep': ['uid', 'agency', 'complaint_uid', 'left_reason'],
-        },
-        events.OFFICER_LEFT: {
             'prefix': 'termination',
             'parse_date': True,
             'keep': ['uid', 'agency', 'complaint_uid', 'left_reason'],
