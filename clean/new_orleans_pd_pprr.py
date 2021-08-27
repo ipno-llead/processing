@@ -148,11 +148,24 @@ def split_award_nominee_name(df):
                      r'mag unit crime analyst |task force officer |retired detective |supervisory special agent |'
                      r'group supervisor |supervisory special agent |s/t |tpr|sgt |mt |lt)'), '', regex=True)\
         .str.replace(r'(^\d+)  ', '', regex=True)\
-        .str.replace(r'(\w+) ?(\w+)? ?(\w+)?, (\w+) ?(\w+)?', r'\4 \5 \1 \2 \3', regex=True)
-    names = df.nominee.str.extract(r'(\w+) ?(\w{1})? (.+)')
-    df.loc[:, 'first_name'] = names[0]
-    df.loc[:, 'middle_initial'] = names[1]
-    df.loc[:, 'last_name'] = names[2]
+        .str.replace(r'(\w+) ?(\w+)? ?(\w+)?, (\w+) ?(\w+)?', r'\4 \5 \1 \2 \3', regex=True)\
+        .str.replace('t sean mccaffery', 'sean t mccaffery', regex=False)\
+        .str.replace('lewiswilliams', 'lewis williams', regex=False)\
+        .str.replace('mc gee', 'mcgee', regex=False)\
+        .str.replace('brownrobertson', 'brown robertson', regex=False)\
+        .str.replace('jonesbrewer', 'jones brewer', regex=False)\
+        .str.replace('trooper', '', regex=False)\
+        .str.replace(r'(\w+)  ? ? ?(\w+)', r'\1 \2', regex=True)
+    names = df.nominee.str.lower().str.strip().str.extract(
+        r'((\w+) (\w+ )?(.+))')
+    df.loc[:, 'first_name'] = names[1]\
+        .str.strip()
+    df.loc[:, 'last_name'] = names[3]\
+        .str.strip()
+    df.loc[:, 'middle_name'] = names.loc[:, 2].str.strip().fillna('')\
+        .map(lambda s: '' if len(s) < 2 else s)
+    df.loc[:, 'middle_initial'] = names.loc[:, 2].str.strip().fillna('')\
+        .map(lambda s: '' if len(s) > 2 else s)
     return df.drop(columns={'nominee'})
 
 
@@ -195,7 +208,7 @@ def clean_award_disposition(df):
     df.loc[:, 'award_given'] = df.award_disposition.str.lower().str.strip()\
         .str.replace(r'�s |� |� ', '', regex=True)\
         .str.replace('superintendentaward', 'superintendent award', regex=False)
-    return df
+    return df.drop(columns=('award_disposition'))
 
 
 def clean_award():
