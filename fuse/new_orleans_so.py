@@ -33,7 +33,7 @@ def fuse_events(cprr19, cprr20, post):
             'parse_date': True,
             'keep': ['uid', 'agency', 'complaint_uid', 'left_reason'],
         },
-        events.OFFICER_LEFT: {
+        events.OFFICER_SUSPENDED: {
             'prefix': 'suspension',
             'parse_date': True,
             'keep': ['uid', 'agency', 'complaint_uid', 'left_reason'],
@@ -70,7 +70,7 @@ def fuse_events(cprr19, cprr20, post):
             'parse_date': True,
             'keep': ['uid', 'agency', 'complaint_uid', 'left_reason'],
         },
-        events.OFFICER_LEFT: {
+        events.OFFICER_SUSPENDED: {
             'prefix': 'suspension',
             'parse_date': True,
             'keep': ['uid', 'agency', 'complaint_uid', 'left_reason'],

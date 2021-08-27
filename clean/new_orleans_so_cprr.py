@@ -546,20 +546,18 @@ def extract_termination_date(df):
 def add_left_reason_column(df):
     df.loc[df.arrest_date.notna(), 'arrest_left_reason'] = 'arrest'
 
-    df.loc[df.suspension_date.notna(), 'suspension_left_reason'] = 'suspension'
-
     df.loc[df.resignation_date.notna(), 'resignation_left_reason'] = 'resignation'
 
     df.loc[df.termination_date.notna(), 'termination_left_reason'] = 'termination'
 
     cols = [
-        'arrest_left_reason', 'suspension_left_reason',
+        'arrest_left_reason', 
         'resignation_left_reason', 'termination_left_reason']
     
     df.loc[:, 'left_reason'] = df[cols].apply(lambda row: '|'.join(row.values.astype(str)), axis=1)\
         .str.replace('nan', '').str.replace(r'\|+', '|').str.replace(r'\|$', '').str.replace(r'^\|', '')
     return df.drop(columns={
-        'arrest_left_reason', 'suspension_left_reason',
+        'arrest_left_reason', 
         'resignation_left_reason', 'termination_left_reason'})
 
 
