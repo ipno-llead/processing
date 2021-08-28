@@ -3,7 +3,7 @@ sys.path.append("../")
 import pandas as pd
 from lib.columns import clean_column_names, set_values
 from lib.path import data_file_path, ensure_data_dir
-from lib.clean import clean_names, float_to_int_str, standardize_desc_cols
+from lib.clean import clean_dates, clean_names, float_to_int_str, standardize_desc_cols
 from lib.uid import gen_uid
 from lib.standardize import standardize_from_lookup_table
 
@@ -493,15 +493,35 @@ def clean_disposition_20(df):
     return df
 
 
-def extract_suspension_date(df):
-    df.loc[:, 'suspension_date'] = df.action\
+def extract_suspension_start_date(df):
+    df.loc[:, 'suspension_start_date'] = df.action\
         .str.replace(r'suspended (\d+)', r'suspeneded on \1', regex=True)\
         .str.replace('suspeneded', 'suspended', regex=False)\
         .str.replace(r'^suspended/arrested on', 'suspended on', regex=True)\
         .str.replace('1-6-21-1/8/21', '1/6/2021', regex=False)
-    dates = df.suspension_date.str.extract(r'(suspended on (\d+)/(\d+)/(\d+)/)')
-    df.loc[:, 'suspension_date'] = dates[0]\
+    dates = df.suspension_start_date.str.extract(r'(suspended on (\d+)/(\d+)/(\d+)/)')
+    df.loc[:, 'suspension_start_date'] = dates[0]\
         .str.replace('suspended on ', '').str.replace(r'/$', '')
+    return df
+
+
+def extract_suspension_end_date(df):
+    df.loc[:, 'suspension_end_date'] = df.action.str.lower().str.strip()\
+        .str.replace(r'\breturn\b', 'returned', regex=True)
+    dates = df.suspension_end_date.str.extract(r'(returned.+)')
+    df.loc[:, 'suspension_end_date'] = dates[0]\
+        .str.replace(r'returned ?(back)? ?(to)? ?(duty)? ?(on)? ?', '', regex=True)
+    return df
+
+
+def extract_arrest_date(df):
+    df.loc[:, 'arrest_date'] = df.action
+    dates = df.action.str.extract(r'(arrested.+)')
+    df.loc[:, 'arrest_date'] = dates[0]\
+        .str.replace('/resigned under investigation on 07/13/2020', '', regex=False)\
+        .str.replace(r' (12/04/2019)$', '', regex=True)\
+        .str.replace(r'(/terminated on 04/20/2020)$', '', regex=True)\
+        .str.replace(r'/terminated on ?| on case d-003-2020|arrested ?(on)? ?', '', regex=True)
     return df
 
 
@@ -514,17 +534,6 @@ def extract_resignation_date(df):
         .str.replace(r' ?at 0930 hours| under Internal affairs department case# d-025 19|'
                      r' ?under case number h-049-19 ?|in |from opso on |'
                      r' ?prior to start of investigation ', '', regex=True)
-    return df
-
-
-def extract_arrest_date(df):
-    df.loc[:, 'arrest_date'] = df.action
-    dates = df.action.str.extract(r'(arrested.+)')
-    df.loc[:, 'arrest_date'] = dates[0]\
-        .str.replace('/resigned under investigation on 07/13/2020', '', regex=False)\
-        .str.replace(r' (12/04/2019)$', '', regex=True)\
-        .str.replace(r'(/terminated on 04/20/2020)$', '', regex=True)\
-        .str.replace(r'/terminated on ?| on case d-003-2020|arrested ?(on)? ?', '', regex=True)
     return df
 
 
@@ -544,21 +553,16 @@ def extract_termination_date(df):
 
 
 def add_left_reason_column(df):
+    df.loc[df.resignation_date.notna(), 'resignation_left_reason'] = 'resignation'
+    df.loc[df.termination_date.notna(), 'termination_left_reason'] = 'termination'
     df.loc[df.arrest_date.notna(), 'arrest_left_reason'] = 'arrest'
 
-    df.loc[df.resignation_date.notna(), 'resignation_left_reason'] = 'resignation'
-
-    df.loc[df.termination_date.notna(), 'termination_left_reason'] = 'termination'
-
-    cols = [
-        'arrest_left_reason', 
-        'resignation_left_reason', 'termination_left_reason']
-    
+    cols = ['resignation_left_reason', 'termination_left_reason', 'arrest_left_reason']
+   
     df.loc[:, 'left_reason'] = df[cols].apply(lambda row: '|'.join(row.values.astype(str)), axis=1)\
         .str.replace('nan', '').str.replace(r'\|+', '|').str.replace(r'\|$', '').str.replace(r'^\|', '')
     return df.drop(columns={
-        'arrest_left_reason', 
-        'resignation_left_reason', 'termination_left_reason'})
+        'resignation_left_reason', 'termination_left_reason', 'arrest_left_reason'})
 
 
 def clean19():
@@ -607,7 +611,8 @@ def clean19():
         .pipe(clean_summary)\
         .pipe(extract_arrest_date)\
         .pipe(extract_resignation_date)\
-        .pipe(extract_suspension_date)\
+        .pipe(extract_suspension_start_date)\
+        .pipe(extract_suspension_end_date)\
         .pipe(extract_termination_date)\
         .pipe(add_left_reason_column)
     return df
@@ -646,7 +651,8 @@ def clean20():
         .pipe(fix_rank_desc_20)\
         .pipe(clean_summary)\
         .pipe(clean_disposition_20)\
-        .pipe(extract_suspension_date)\
+        .pipe(extract_suspension_start_date)\
+        .pipe(extract_suspension_end_date)\
         .pipe(extract_resignation_date)\
         .pipe(extract_arrest_date)\
         .pipe(extract_termination_date)\

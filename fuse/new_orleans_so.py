@@ -28,18 +28,23 @@ def fuse_events(cprr19, cprr20, post):
             'parse_date': True,
             'keep': ['uid', 'agency', 'complaint_uid'],
         },
-        events.OFFICER_LEFT: {
-            'prefix': 'arrest',
+        events.SUSPENSION_START: {
+            'prefix': 'suspension_start',
             'parse_date': True,
-            'keep': ['uid', 'agency', 'complaint_uid', 'left_reason'],
+            'keep': ['uid', 'agency', 'complaint_uid'],
         },
-        events.OFFICER_SUSPENDED: {
-            'prefix': 'suspension',
+        events.SUSPENSION_END: {
+            'prefix': 'suspension_end',
             'parse_date': True,
-            'keep': ['uid', 'agency', 'complaint_uid', 'left_reason'],
+            'keep': ['uid', 'agency', 'complaint_uid'],
         },
         events.OFFICER_LEFT: {
             'prefix': 'resignation',
+            'parse_date': True,
+            'keep': ['uid', 'agency', 'complaint_uid', 'left_reason'],
+        },
+        events.OFFICER_LEFT: {
+            'prefix': 'arrest',
             'parse_date': True,
             'keep': ['uid', 'agency', 'complaint_uid', 'left_reason'],
         },
@@ -65,18 +70,23 @@ def fuse_events(cprr19, cprr20, post):
             'parse_date': True,
             'keep': ['uid', 'agency', 'complaint_uid'],
         },
-        events.OFFICER_LEFT: {
-            'prefix': 'arrest',
+        events.SUSPENSION_START: {
+            'prefix': 'suspension_start',
             'parse_date': True,
-            'keep': ['uid', 'agency', 'complaint_uid', 'left_reason'],
+            'keep': ['uid', 'agency', 'complaint_uid'],
         },
-        events.OFFICER_SUSPENDED: {
-            'prefix': 'suspension',
+        events.SUSPENSION_END: {
+            'prefix': 'suspension_end',
             'parse_date': True,
-            'keep': ['uid', 'agency', 'complaint_uid', 'left_reason'],
+            'keep': ['uid', 'agency', 'complaint_uid'],
         },
         events.OFFICER_LEFT: {
             'prefix': 'resignation',
+            'parse_date': True,
+            'keep': ['uid', 'agency', 'complaint_uid', 'left_reason'],
+        },
+        events.OFFICER_LEFT: {
+            'prefix': 'arrest',
             'parse_date': True,
             'keep': ['uid', 'agency', 'complaint_uid', 'left_reason'],
         },
