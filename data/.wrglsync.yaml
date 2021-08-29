@@ -172,6 +172,10 @@ repos:
     fileName: fuse/com_hammond_pd.csv
     primaryKey:
       - complaint_uid
+  com-ponchatoula-pd:
+    fileName: fuse/com_ponchatoula_pd.csv
+    primaryKey:
+      - complaint_uid
   uof-new-orleans-pd:
     fileName: fuse/uof_new_orleans_pd.csv
     primaryKey:
