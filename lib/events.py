@@ -42,6 +42,7 @@ UOF_CREATED = "uof_created"
 UOF_DUE = "uof_due"
 
 AWARD_RECEIVE = "award_receive"
+AWARD_RECOMMENDED = 'award_recommended'
 
 
 cat_type = CategoricalDtype(categories=[
