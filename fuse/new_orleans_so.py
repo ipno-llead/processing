@@ -28,20 +28,30 @@ def fuse_events(cprr19, cprr20, post):
             'parse_date': True,
             'keep': ['uid', 'agency', 'complaint_uid'],
         },
-        events.OFFICER_ARRESTED: {
+        events.SUSPENSION_START: {
+            'prefix': 'suspension_start',
+            'parse_date': True,
+            'keep': ['uid', 'agency', 'complaint_uid'],
+        },
+        events.SUSPENSION_END: {
+            'prefix': 'suspension_end',
+            'parse_date': True,
+            'keep': ['uid', 'agency', 'complaint_uid'],
+        },
+        events.OFFICER_LEFT: {
+            'prefix': 'resignation',
+            'parse_date': True,
+            'keep': ['uid', 'agency', 'complaint_uid', 'left_reason'],
+        },
+        events.OFFICER_LEFT: {
             'prefix': 'arrest',
             'parse_date': True,
-            'keep': ['uid', 'agency', 'complaint_uid'],
+            'keep': ['uid', 'agency', 'complaint_uid', 'left_reason'],
         },
-        events.OFFICER_SUSPENDED: {
-            'prefix': 'suspension',
+        events.OFFICER_LEFT: {
+            'prefix': 'termination',
             'parse_date': True,
-            'keep': ['uid', 'agency', 'complaint_uid'],
-        },
-        events.OFFICER_RESIGNED: {
-            'prefix': 'resignation',
-            'parse_date': True, 
-            'keep': ['uid', 'agency', 'complaint_uid'],
+            'keep': ['uid', 'agency', 'complaint_uid', 'left_reason'],
         }
     }, ['uid', 'complaint_uid'])
     builder.extract_events(cprr20, {
@@ -60,20 +70,30 @@ def fuse_events(cprr19, cprr20, post):
             'parse_date': True,
             'keep': ['uid', 'agency', 'complaint_uid'],
         },
-        events.OFFICER_ARRESTED: {
-            'prefix': 'arrest',
+        events.SUSPENSION_START: {
+            'prefix': 'suspension_start',
             'parse_date': True,
             'keep': ['uid', 'agency', 'complaint_uid'],
         },
-        events.OFFICER_SUSPENDED: {
-            'prefix': 'suspension',
-             'parse_date': True,
-             'keep': ['uid', 'agency', 'complaint_uid'],
+        events.SUSPENSION_END: {
+            'prefix': 'suspension_end',
+            'parse_date': True,
+            'keep': ['uid', 'agency', 'complaint_uid'],
         },
-        events.OFFICER_RESIGNED: {
+        events.OFFICER_LEFT: {
             'prefix': 'resignation',
             'parse_date': True,
-            'keep': ['uid', 'agency', 'complaint_uid'],
+            'keep': ['uid', 'agency', 'complaint_uid', 'left_reason'],
+        },
+        events.OFFICER_LEFT: {
+            'prefix': 'arrest',
+            'parse_date': True,
+            'keep': ['uid', 'agency', 'complaint_uid', 'left_reason'],
+        },
+        events.OFFICER_LEFT: {
+            'prefix': 'termination',
+            'parse_date': True,
+            'keep': ['uid', 'agency', 'complaint_uid', 'left_reason'],
         }
     }, ['uid', 'complaint_uid'])
     builder.extract_events(post, {
