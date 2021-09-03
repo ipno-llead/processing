@@ -22,7 +22,7 @@ def extract_badge_no(df):
     badges = df.nominee.str.lower().str.strip()\
         .str.extract(r'(^\d+) ')
     df.loc[:, 'badge_no'] = badges[0]
-    return df 
+    return df
 
 
 def split_award_nominee_name(df):
@@ -93,18 +93,18 @@ def clean_recommended_award(df):
     return df
 
 
-def clean_award_disposition(df):
-    df.loc[:, 'award_given'] = df.award_disposition.str.lower().str.strip().fillna('')\
+def clean_award(df):
+    df.loc[:, 'award'] = df.award_disposition.str.lower().str.strip().fillna('')\
         .str.replace(r'�s |� |� ', '', regex=True)\
         .str.replace('superintendentaward', 'superintendent award', regex=False)
     return df.drop(columns=('award_disposition'))
 
 
-def drop_rows_where_award_recommended_and_given_is_empty(df):
-    return df[~((df.award_decision == '') & (df.award_given == ''))]
+def drop_rows_where_award_recommended_and_award_is_empty(df):
+    return df[~((df.award_decision == '') & (df.award == ''))]
 
 
-def clean_award():
+def clean():
     df = pd.read_csv(data_file_path('raw/ipm/new_orleans_pd_commendations_2016_2021.csv'))
     df = df\
         .pipe(clean_column_names)\
@@ -124,18 +124,17 @@ def clean_award():
         .pipe(clean_ranks, ['rank_desc', 'nominator_rank_desc'])\
         .pipe(standardize_desc_cols, ['recommended_award', 'award_disposition'])\
         .pipe(clean_recommended_award)\
-        .pipe(clean_award_disposition)\
-        .pipe(drop_rows_where_award_recommended_and_given_is_empty)\
+        .pipe(clean_award)\
+        .pipe(drop_rows_where_award_recommended_and_award_is_empty)\
         .pipe(set_values, {
             'agency': 'New Orleans PD',
         })\
-        .pipe(float_to_int_str, ['badge_no'])\
-        .pipe(gen_uid, ['first_name', 'last_name', 'middle_initial', 'badge_no', 'agency'])
+        .pipe(gen_uid, ['first_name', 'last_name', 'agency'])
     return df
 
 
 if __name__ == "__main__":
-    award = clean_award()
+    award = clean()
     ensure_data_dir("clean")
     award.to_csv(
         data_file_path("clean/award_new_orleans_pd_2016_2021.csv"),

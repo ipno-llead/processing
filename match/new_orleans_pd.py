@@ -35,7 +35,7 @@ def match_pprr_against_post(pprr, post):
     return extract_events_from_post(post, matches, 'New Orleans PD')
 
 
-def add_uid_to_award(award, pprr):
+def match_award_to_pprr(award, pprr):
     dfa = award[['uid', 'first_name', 'last_name']].drop_duplicates()\
         .set_index('uid', drop=True)
 
@@ -61,8 +61,8 @@ if __name__ == '__main__':
     post = pd.read_csv(data_file_path('clean/pprr_post_2020_11_06.csv'))
     award = pd.read_csv(data_file_path('clean/award_new_orleans_pd_2016_2021.csv'))
     post = post[post.agency == 'new orleans pd'].reset_index(drop=True)
-    award = add_uid_to_award(award, pprr)
     event_df = match_pprr_against_post(pprr, post)
+    award = match_award_to_pprr(award, pprr)
     ensure_data_dir('match')
     award.to_csv(data_file_path(
         'match/award_new_orleans_pd_2016_2021.csv'), index=False)

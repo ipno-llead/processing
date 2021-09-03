@@ -1,9 +1,8 @@
-from pandas.io.parsers import read_csv
 from lib.columns import clean_column_names
 from lib.uid import gen_uid
 from lib.path import data_file_path, ensure_data_dir
 from lib.clean import (
-    clean_name, float_to_int_str, parse_dates_with_known_format, standardize_desc_cols, clean_ranks, clean_names
+    clean_name, parse_dates_with_known_format, standardize_desc_cols, clean_ranks, clean_names
 )
 import pandas as pd
 import numpy as np
