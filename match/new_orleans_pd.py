@@ -1,7 +1,7 @@
 from lib.date import combine_date_columns
 from lib.path import data_file_path, ensure_data_dir
 from datamatch import (
-    ThresholdMatcher, JaroWinklerSimilarity, DateSimilarity, ColumnsIndex, NoopIndex, Swap
+    ThresholdMatcher, JaroWinklerSimilarity, DateSimilarity, ColumnsIndex, NoopIndex
 )
 from lib.post import extract_events_from_post
 import pandas as pd
