@@ -38,7 +38,7 @@ def fuse_use_of_force(uof, officer_number_dict):
     return rearrange_use_of_force(uof)
 
 
-def fuse_events(pprr, cprr, uof):
+def fuse_events(pprr, cprr, uof, award):
     builder = events.Builder()
     builder.extract_events(pprr, {
         events.OFFICER_HIRE: {'prefix': 'hire'},
@@ -58,6 +58,18 @@ def fuse_events(pprr, cprr, uof):
         events.UOF_CREATED: {'prefix': 'created', 'parse_date': True},
         events.UOF_DUE: {'prefix': 'due', 'parse_datetime': True},
     }, ['uid', 'uof_uid'])
+    builder.extract_events(award, {
+        events.AWARD_RECEIVE: {
+            'prefix': 'receive',
+            'parse_date': True,
+            'keep': ['uid', 'agency', 'award'],
+        },
+        events.AWARD_RECOMMENDED: {
+            'prefix': 'recommendation',
+            'parse_date': True,
+            'keep': ['uid', 'agency', 'recommended_award'],
+        },
+    }, ['uid', 'award'])
     return builder.to_frame()
 
 
@@ -77,11 +89,14 @@ if __name__ == "__main__":
     ))
     post_event = pd.read_csv(data_file_path(
         'match/post_event_new_orleans_pd.csv'))
+    award = pd.read_csv(data_file_path(
+        'match/award_new_orleans_pd_2016_2021.csv'
+    ))
     complaints = fuse_cprr(cprr, actions, officer_number_dict)
     ensure_uid_unique(complaints, 'complaint_uid')
     use_of_force = fuse_use_of_force(uof, officer_number_dict)
     personnel = rearrange_personnel_columns(pprr)
-    events_df = fuse_events(pprr, cprr, uof)
+    events_df = fuse_events(pprr, cprr, uof, award)
     events_df = rearrange_event_columns(pd.concat([
         post_event,
         events_df
