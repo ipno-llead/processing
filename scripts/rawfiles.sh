@@ -12,6 +12,10 @@ if [ -z "$1" ]; then
   exit 2
 fi
 
+# ensure build/raw/*/*.link files are updated
+make download_links
+
+# prints valid options for SUB_DIR if incorrect ones are given.
 if [ ! -d "build/raw/$1" ]; then
     echo "invalid SUB_DIR. Valid options are:"
     for name in $(find build/raw -maxdepth 1 -mindepth 1 | sed -r 's/^build\/raw\///')
@@ -21,5 +25,8 @@ if [ ! -d "build/raw/$1" ]; then
     exit 1
 fi
 
+# download raw files
 make $(find build/raw/$1 -name '*.link' | sed -r 's/build\/(.+)\.link/data\/\1/' | tr '\n' ' ')
+
+# print raw files under $1
 echo "$(find build/raw/$1 -name '*.link' | sed -r 's/build\/(.+)\.link/\1/')"
