@@ -44,15 +44,20 @@ if __name__ == '__main__':
 
     with open(args.links_file) as f:
         dirs = json.load(f)
+
     for dir_name, links in dirs.items():
         link_dir = args.link_dir / dir_name
         try:
             os.mkdir(link_dir, 0o755)
         except FileExistsError:
             pass
+
+        # add new links/update existing links
+        names = set()
         for link in links:
             name = filename_from_url(link)
             fp = link_dir / ('%s.link' % name)
+            names.add(fp.name)
             link_match = False
             try:
                 with open(fp, 'r') as f:
@@ -63,3 +68,12 @@ if __name__ == '__main__':
             if not link_match:
                 with open(fp, 'w') as f:
                     f.write(link)
+
+        # remove files that are no longer found in links_file
+        for file in link_dir.iterdir():
+            if not file.is_dir() and file.name not in names:
+                os.remove(file)
+
+    for subdir in args.link_dir.iterdir():
+        if subdir.is_dir() and subdir.name not in dirs:
+            os.removedirs(subdir)
