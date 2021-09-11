@@ -48,6 +48,7 @@ if __name__ == '__main__':
     com = rearrange_complaint_columns(cprr)
     ensure_uid_unique(com, 'complaint_uid')
     event = fuse_events(cprr, post)
+    ensure_uid_unique(event, 'event_uid')
     ensure_data_dir('fuse')
     event.to_csv(
         data_file_path('fuse/event_lake_charles_pd.csv'), index=False)
