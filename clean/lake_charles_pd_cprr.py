@@ -2,7 +2,7 @@ import sys
 sys.path.append('../')
 import pandas as pd
 from lib.path import data_file_path, ensure_data_dir
-from lib.clean import clean_names, float_to_int_str
+from lib.clean import float_to_int_str
 from lib.columns import clean_column_names
 from lib.rows import duplicate_row
 from lib.uid import gen_uid
@@ -43,7 +43,7 @@ def clean_action(df):
 
 def consolidate_action_and_disposition(df):
     df.loc[:, 'action'] = df.action.str.cat(df.disposition, sep='|')\
-        .str.replace(r'(not)? ?sustained ?|exonerated ?|unfounded ?|invalid complaint ?', '', regex=True)\
+        .str.replace(r'((not)? ?sustained|exonerated|unfounded|invalid complaint) ?')\
         .str.replace(r'^\|', '', regex=True)\
         .str.replace(r'\|$', '', regex=True)\
         .str.replace(r'(\d+) (\w+)', r'\1-\2', regex=True)
