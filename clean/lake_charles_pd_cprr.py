@@ -43,7 +43,7 @@ def clean_action(df):
 
 def consolidate_action_and_disposition(df):
     df.loc[:, 'action'] = df.action.str.cat(df.disposition, sep='|')\
-        .str.replace(r'((not)? ?sustained|exonerated|unfounded|invalid complaint) ?')\
+        .str.replace(r'((not)? ?sustained|exonerated|unfounded|invalid complaint) ?', '', regex=True)\
         .str.replace(r'^\|', '', regex=True)\
         .str.replace(r'\|$', '', regex=True)\
         .str.replace(r'(\d+) (\w+)', r'\1-\2', regex=True)

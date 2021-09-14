@@ -31,7 +31,7 @@ def split_award_nominee_name(df):
         .str.replace("'", '', regex=False)\
         .str.replace((r'(\(\w+/?\w+\)|special agent |atf agent |agent |detective |deputy |investigative analyst |'
                      r'mag unit crime analyst |task force officer |retired detective |supervisory special agent |'
-                     r'group supervisor |supervisory special agent |s/t |tpr|sgt |mt |lt)'), '', regex=True)\
+                      r'group supervisor |supervisory special agent |s/t |tpr|sgt |mt |lt)'), '', regex=True)\
         .str.replace(r'(\d+)', '', regex=True)\
         .str.replace(r'(\w+) ?(\w+)? ?(\w+)?, (\w+) ?(\w+)?', r'\4 \5 \1 \2 \3', regex=True)\
         .str.replace(r'(\w+)  ? ? ?(\w+)', r'\1 \2', regex=True)\
@@ -104,6 +104,12 @@ def drop_rows_where_award_recommended_and_award_is_empty(df):
     return df[~((df.award_decision == '') & (df.award == ''))]
 
 
+def remove_future_dates(df):
+    df.loc[:, 'receive_date'] = df.receive_date\
+        .str.replace('12/31/9999', '', regex=False)
+    return df
+
+
 def clean():
     df = pd.read_csv(data_file_path('raw/ipm/new_orleans_pd_commendations_2016_2021.csv'))
     df = df\
@@ -116,6 +122,7 @@ def clean():
             'disposition_date': 'decision_date',
             'award_date': 'receive_date'
         })\
+        .pipe(remove_future_dates)\
         .pipe(extract_rank)\
         .pipe(extract_badge_no)\
         .pipe(split_award_nominee_name)\

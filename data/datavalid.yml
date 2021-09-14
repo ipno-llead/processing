@@ -221,6 +221,7 @@ files:
           - uof_created
           - uof_due
           - award_receive
+          - award_recommended
         no_na: true
       year:
         integer: true
