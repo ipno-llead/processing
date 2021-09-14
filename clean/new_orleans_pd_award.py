@@ -1,7 +1,7 @@
 from lib.columns import clean_column_names, set_values
 from lib.uid import gen_uid
 from lib.path import data_file_path, ensure_data_dir
-from lib.clean import (float_to_int_str, standardize_desc_cols, clean_ranks)
+from lib.clean import standardize_desc_cols, clean_ranks
 import pandas as pd
 import sys
 sys.path.append("../")
