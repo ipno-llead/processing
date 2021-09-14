@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import shutil
 import errno
 import os
 import argparse
@@ -76,4 +77,4 @@ if __name__ == '__main__':
 
     for subdir in args.link_dir.iterdir():
         if subdir.is_dir() and subdir.name not in dirs:
-            os.removedirs(subdir)
+            shutil.rmtree(subdir, ignore_errors=True)
