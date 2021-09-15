@@ -1,10 +1,10 @@
 import pandas as pd
-from lib.path import data_file_path, ensure_data_dir
+from lib.path import data_file_path
 from lib.columns import (
-    rearrange_personnel_columns, rearrange_complaint_columns,
-    rearrange_use_of_force, rearrange_event_columns
-)
+    rearrange_appeal_hearing_columns, rearrange_complaint_columns,
+    rearrange_use_of_force, rearrange_event_columns)
 from lib.clean import float_to_int_str
+from lib.personnel import fuse_personnel
 from lib.uid import ensure_uid_unique
 from lib import events
 
@@ -38,7 +38,7 @@ def fuse_use_of_force(uof, officer_number_dict):
     return rearrange_use_of_force(uof)
 
 
-def fuse_events(pprr, cprr, uof, award):
+def fuse_events(pprr, cprr, uof, award, lprr):
     builder = events.Builder()
     builder.extract_events(pprr, {
         events.OFFICER_HIRE: {'prefix': 'hire'},
@@ -70,6 +70,24 @@ def fuse_events(pprr, cprr, uof, award):
             'keep': ['uid', 'agency', 'recommended_award'],
         },
     }, ['uid', 'award'])
+    builder.extract_events(lprr, {
+        events.APPEAL_DISPOSITION: {
+            'prefix': 'appeal_disposition',
+            'keep': ['uid', 'agency', 'appeal_uid'],
+        },
+        events.APPEAL_RECEIVE: {
+            'prefix': 'appeal_receive',
+            'keep': ['uid', 'agency', 'appeal_uid']
+        },
+        events.APPEAL_HEARING: {
+            'prefix': 'appeal_hearing',
+            'keep': ['uid', 'agency', 'appeal_uid']
+        },
+        events.APPEAL_HEARING_2: {
+            'prefix': 'appeal_hearing_2',
+            'keep': ['uid', 'agency', 'appeal_uid']
+        }
+    }, ['uid', 'appeal_uid'])
     return builder.to_frame()
 
 
@@ -92,16 +110,19 @@ if __name__ == "__main__":
     award = pd.read_csv(data_file_path(
         'match/award_new_orleans_pd_2016_2021.csv'
     ))
+    lprr = pd.read_csv(data_file_path(
+        'match/lprr_new_orleans_csc_2000_2016.csv'
+    ))
     complaints = fuse_cprr(cprr, actions, officer_number_dict)
     ensure_uid_unique(complaints, 'complaint_uid')
     use_of_force = fuse_use_of_force(uof, officer_number_dict)
-    personnel = rearrange_personnel_columns(pprr)
-    events_df = fuse_events(pprr, cprr, uof, award)
+    personnel = fuse_personnel(pprr, lprr)
+    events_df = fuse_events(pprr, cprr, uof, award, lprr)
     events_df = rearrange_event_columns(pd.concat([
         post_event,
         events_df
     ]))
-    ensure_data_dir("fuse")
+    lprr_df = rearrange_appeal_hearing_columns(lprr)
     complaints.to_csv(data_file_path(
         'fuse/com_new_orleans_pd.csv'), index=False)
     use_of_force.to_csv(data_file_path(
@@ -110,3 +131,5 @@ if __name__ == "__main__":
         'fuse/per_new_orleans_pd.csv'), index=False)
     events_df.to_csv(data_file_path(
         'fuse/event_new_orleans_pd.csv'), index=False)
+    lprr_df.to_csv(data_file_path(
+        'fuse/lprr_new_orleans_csc.csv'), index=False)
