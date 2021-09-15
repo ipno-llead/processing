@@ -304,6 +304,10 @@ repos:
     fileName: fuse/per_youngsville_pd.csv
     primaryKey:
       - uid
+  per-west-monroe-pd:
+    fileName: fuse/per_west_monroe_pd.csv
+    primaryKey:
+      - uid
   event-new-orleans-pd:
     fileName: fuse/event_new_orleans_pd.csv
     primaryKey:
@@ -418,6 +422,10 @@ repos:
       - event_uid
   event-youngsville-pd:
     fileName: fuse/event_youngsville_pd.csv
+    primaryKey:
+      - event_uid
+  event-west-monroe-pd:
+    fileName: fuse/event_west_monroe_pd.csv
     primaryKey:
       - event_uid
   personnel:
