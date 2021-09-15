@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import shutil
 import errno
 import shutil
 import os
