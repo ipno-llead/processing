@@ -279,6 +279,7 @@ def clean_salary(series: pd.Series) -> pd.Series:
     """
     return series.str.strip().str.lower()\
         .str.replace('k', '000', regex=False)\
+        .str.replace(r'\.?(\d+),(\d{2})$', r'\1.\2', regex=True)\
         .str.replace(r"[^\d\.]", "", regex=True)\
         .astype("float64")
 
@@ -565,4 +566,25 @@ def remove_future_dates(df: pd.DataFrame, max_date: str, prefixes: List[str]) ->
         ].iterrows():
             for col in cols:
                 df.loc[idx, col] = ''
+    return df
+
+
+def clean_officer_inactive(df, cols):
+    """Cleans and standardize "officer_inactive" columns.
+
+    Args:
+        df (pd.DataFrame):
+            the frame to process
+        cols (list of str):
+            race columns
+
+    Returns:
+        the updated frame
+    """
+    for col in cols:
+        df.loc[:, col] = df[col].fillna('').str.lower().str.strip()
+        df = standardize_from_lookup_table(df, col, [
+            ['yes', 'former', 'inactive', 'i'],
+            ['no', 'active', 'a']
+        ])
     return df
