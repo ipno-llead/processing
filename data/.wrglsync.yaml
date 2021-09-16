@@ -300,6 +300,10 @@ repos:
     fileName: fuse/per_hammond_pd.csv
     primaryKey:
       - uid
+  per-sterlington-pd:
+    fileName: fuse/per_sterlington_pd.csv
+    primaryKey:
+      - uid
   per-youngsville-pd:
     fileName: fuse/per_youngsville_pd.csv
     primaryKey:
@@ -418,6 +422,10 @@ repos:
       - event_uid
   event-hammond-pd:
     fileName: fuse/event_hammond_pd.csv
+    primaryKey:
+      - event_uid
+  event-sterlington-pd:
+    fileName: fuse/event_sterlington_pd.csv
     primaryKey:
       - event_uid
   event-youngsville-pd:
