@@ -82,7 +82,7 @@ def standardize_from_lookup_table(
 
     df.loc[:, col] = df[col].map(find_seq).map(join_seqs)
 
-    if not quiet and len(unmatched_seqs) > 0:
+    if not quiet:
         print(
             "standardize_from_lookup_table: unmatched sequences:\n  %s" %
             unmatched_seqs

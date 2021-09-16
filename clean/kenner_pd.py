@@ -1,6 +1,6 @@
 from lib.columns import clean_column_names
 from lib.path import data_file_path, ensure_data_dir
-from lib.clean import clean_names, clean_officer_inactive, standardize_desc_cols, clean_dates
+from lib.clean import clean_names, standardize_desc_cols, clean_dates
 from lib.uid import gen_uid
 import pandas as pd
 import sys
@@ -47,7 +47,6 @@ def clean():
         .pipe(split_names)\
         .drop(columns=['name'])\
         .pipe(clean_names, ['first_name', 'last_name', 'middle_name', 'middle_initial'])\
-        .pipe(clean_officer_inactive, ['officer_inactive'])\
         .pipe(standardize_desc_cols, [
             'sex', 'department_desc', 'rank_desc', 'employment_status', 'officer_inactive', 'sworn'])\
         .pipe(remove_non_officers)\
