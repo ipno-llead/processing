@@ -23,7 +23,7 @@ def split_names(df):
 
 def standardize_rank(df):
     df.loc[:, 'rank_desc'] = df.rank_desc.str.lower().str.strip()\
-        .str.replace(r'\basst\b', 'assitant', regex=True)\
+        .str.replace(r'\basst\b', 'assistant', regex=True)\
         .str.replace(r'\bsgt\b', 'sergeant', regex=True)
     return df
 
