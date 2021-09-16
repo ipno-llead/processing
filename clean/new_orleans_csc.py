@@ -36,7 +36,7 @@ def clean_on_docket(df):
         .str.replace(r'(\w+) - (\w+)', r'\1-\2', regex=True)\
         .str.replace('motion / pteition for nullity', 'motion to petition for nullity', regex=False)\
         .str.replace(r', (\w+)', r'/\1', regex=True)\
-        .str.replace(r'(\w+)   ? ? ?(\w+)', r'\1 \2', regex=True)\
+        .str.replace(r'(\w+) +(\w+)', r'\1 \2', regex=True)\
         .str.replace(r'(\w+); (\w+)', r'\1/\2', regex=True)\
         .str.replace('gtranted', 'granted', regex=False)\
         .str.replace(r'motion for rehearing ?(and)? ?(request)? ?(for)? oral argument/?',
