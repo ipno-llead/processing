@@ -169,7 +169,15 @@
   "lake_charles_pd": [
     "https://www.dropbox.com/s/xzd2pr1nozb01ux/lake_charles_pd_cprr_2020.csv?dl=1"
   ],
-  "new_orleans_csc": [
-    "https://www.dropbox.com/s/hy73117fmdx13z4/new_orleans_csc_lprr_2000_2016.csv?dl=1"
+  "sterlington_pd": [
+    "https://www.dropbox.com/s/wdhdn7g97cid57i/sterlington_csd_ppprr_2010_2020.csv?dl=1"
+  ],
+  "youngsville_pd": [
+    "https://www.dropbox.com/s/wit4yp65a118mcr/youngsville_csd_pprr_2017.csv?dl=1",
+    "https://www.dropbox.com/s/1qu3dfpkhpbxk4g/youngsville_csd_pprr_2018.csv?dl=1",
+    "https://www.dropbox.com/s/sg4bn2irswdr087/youngsville_csd_pprr_2019.csv?dl=1"
+  ],
+  "west_monroe_pd": [
+    "https://www.dropbox.com/s/tjuwpmcpwpeegvt/west_monroe_pd_pprr_2015_2020.csv?dl=1"
   ]
 }
