@@ -4,14 +4,13 @@ import pandas as pd
 from lib.path import data_file_path, ensure_data_dir
 
 
-def extract_lsu_roster(post):
-    post = pd.read_csv(data_file_path('clean/pprr_post_2020_11_06.csv'))
-    return post[post.agency == 'univ. pd - baton rouge cc']
+def extract_lsu_roster(df):
+    return df[df.agency == 'univ. pd - baton rouge cc']
 
 
 def clean_agency(df):
     df.loc[:, 'agency'] = df.agency\
-        .str.replace('univ. pd - baton rouge cc', 'baton rouge community college police department', regex=False)
+        .str.replace('univ. pd - baton rouge cc', 'Baton Rouge Community College PD', regex=False)
     return df
 
 

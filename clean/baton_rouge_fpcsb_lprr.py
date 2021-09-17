@@ -100,53 +100,53 @@ def add_missing_year_to_hearing_date(df):
             return "%s-%s-%s" % (year, month, day)
         return process
 
-    df.loc[:, "hearing_date"] = df.hearing_date.fillna("").str.strip()\
+    df.loc[:, "appeal_hearing_date"] = df.hearing_date.fillna("").str.strip()\
         .str.replace(r"\.", "").str.replace(r"^(\d+)-(\d+)-(\d+)$", r"\1/\2/\3")
 
-    bool_idx = df.hearing_date.str.match(r"^\d+-[A-Za-z]{3}$")
+    bool_idx = df.appeal_hearing_date.str.match(r"^\d+-[A-Za-z]{3}$")
 
     row_idx = bool_idx & (df.index <= 18)
-    df.loc[row_idx, "hearing_date"] = df.loc[row_idx, "hearing_date"]\
+    df.loc[row_idx, "appeal_hearing_date"] = df.loc[row_idx, "appeal_hearing_date"]\
         .map(construct_date("2006"))
 
     row_idx = bool_idx & (df.index > 18) & (df.index <= 26)
-    df.loc[row_idx, "hearing_date"] = df.loc[row_idx, "hearing_date"]\
+    df.loc[row_idx, "appeal_hearing_date"] = df.loc[row_idx, "appeal_hearing_date"]\
         .map(construct_date("2007"))
 
     row_idx = bool_idx & (df.docket_no == "01-06")
-    df.loc[row_idx, "hearing_date"] = df.loc[row_idx, "hearing_date"]\
+    df.loc[row_idx, "appeal_hearing_date"] = df.loc[row_idx, "appeal_hearing_date"]\
         .map(construct_date("2001"))
 
     row_idx = bool_idx & (df.docket_no == "08-12")
-    df.loc[row_idx, "hearing_date"] = df.loc[row_idx, "hearing_date"]\
+    df.loc[row_idx, "appeal_hearing_date"] = df.loc[row_idx, "appeal_hearing_date"]\
         .map(construct_date("2009"))
 
     row_idx = bool_idx & (
         (df.docket_no == "99-24") | (df.docket_no == "99-25"))
-    df.loc[row_idx, "hearing_date"] = df.loc[row_idx, "hearing_date"]\
+    df.loc[row_idx, "appeal_hearing_date"] = df.loc[row_idx, "appeal_hearing_date"]\
         .map(construct_date("1999"))
 
-    df.loc[df.hearing_date == "Jan", "hearing_date"] = "2005-01"
-    df.loc[df.hearing_date == "August", "hearing_date"] = "2004-08"
-    df.loc[df.hearing_date == "Dec", "hearing_date"] = "2003-12"
-    df.loc[df.hearing_date == "June", "hearing_date"] = "2007-06"
+    df.loc[df.appeal_hearing_date == "Jan", "appeal_hearing_date"] = "2005-01"
+    df.loc[df.appeal_hearing_date == "August", "appeal_hearing_date"] = "2004-08"
+    df.loc[df.appeal_hearing_date == "Dec", "appeal_hearing_date"] = "2003-12"
+    df.loc[df.appeal_hearing_date == "June", "appeal_hearing_date"] = "2007-06"
 
     return df
 
 
-def split_row_by_hearing_date(df):
+def split_row_by_appeal_hearing_date(df):
     i = 0
-    for idx in df[df.hearing_date.str.match(r".+(\&|\n).+")].index:
+    for idx in df[df.appeal_hearing_date.str.match(r".+(\&|\n).+")].index:
         try:
             [upper_date, lower_date] = re.split(
-                r"\s*(?:\&|\n)\s*", df.loc[idx + i, "hearing_date"])
+                r"\s*(?:\&|\n)\s*", df.loc[idx + i, "appeal_hearing_date"])
         except ValueError:
-            raise ValueError(df.loc[idx + i, "hearing_date"])
+            raise ValueError(df.loc[idx + i, "appeal_hearing_date"])
         if re.match(r"^\d+\/\d+$", upper_date):
             upper_date = "%s/%s" % (upper_date, lower_date.strip()[-2:])
         df = duplicate_row(df, idx)
-        df.loc[idx + i, "hearing_date"] = upper_date
-        df.loc[idx + i + 1, "hearing_date"] = lower_date
+        df.loc[idx + i, "appeal_hearing_date"] = upper_date
+        df.loc[idx + i + 1, "appeal_hearing_date"] = lower_date
         i += 1
     return df
 
@@ -173,19 +173,19 @@ def standardize_hearing_date(df):
             return "-".join([year, month])
         return v
 
-    df.loc[:, "hearing_date"] = df.hearing_date.str.replace(r"\/\/", "/")\
+    df.loc[:, "appeal_hearing_date"] = df.appeal_hearing_date.str.replace(r"\/\/", "/")\
         .str.replace("5/4/2000 9-21-2000", "2000-09-21")\
         .str.replace("8-27-92 626-92", "1992-08-27").map(replace)\
         .str.replace(r"^[^\d].*", "")
 
-    dates = df.hearing_date.str.split("-", expand=True)
-    dates.columns = ["hearing_year", "hearing_month", "hearing_day"]
-    dates.loc[:, "hearing_day"] = dates.hearing_day.fillna("").map(
+    dates = df.appeal_hearing_date.str.split("-", expand=True)
+    dates.columns = ["appeal_hearing_year", "appeal_hearing_month", "appeal_hearing_day"]
+    dates.loc[:, "appeal_hearing_day"] = dates.appeal_hearing_day.fillna("").map(
         lambda x: x if not x.startswith("0") else x[1:])
-    dates.loc[:, "hearing_month"] = dates.hearing_month.fillna("").map(
+    dates.loc[:, "appeal_hearing_month"] = dates.appeal_hearing_month.fillna("").map(
         lambda x: x if not x.startswith("0") else x[1:])
     df = pd.concat([df, dates], axis=1)
-    df = df.drop(columns=["hearing_date"])
+    df = df.drop(columns=["appeal_hearing_date"])
 
     return df
 
@@ -370,15 +370,15 @@ def condense_rows_with_same_docket_no(df):
                 row1.middle_initial != row2.middle_initial or
                 row1.first_name != row2.first_name or
                 row1.rank_desc != row2.rank_desc or
-                (row1.hearing_year != '' and row2.hearing_year != row1.hearing_year)
+                (row1.appeal_hearing_year != '' and row2.appeal_hearing_year != row1.appeal_hearing_year)
             ):
                 continue
             if pd.notnull(row2.resolution):
                 df.loc[idx1, 'resolution'] = row2.resolution
-            if row2.hearing_year != '':
-                df.loc[idx1, 'hearing_year'] = row2.hearing_year
-                df.loc[idx1, 'hearing_month'] = row2.hearing_month
-                df.loc[idx1, 'hearing_day'] = row2.hearing_day
+            if row2.appeal_hearing_year != '':
+                df.loc[idx1, 'appeal_hearing_year'] = row2.appeal_hearing_year
+                df.loc[idx1, 'appeal_hearing_month'] = row2.appeal_hearing_month
+                df.loc[idx1, 'appeal_hearing_day'] = row2.appeal_hearing_day
     return df
 
 
@@ -393,7 +393,7 @@ def clean():
     df = df\
         .pipe(clean_docket_no)\
         .pipe(add_missing_year_to_hearing_date)\
-        .pipe(split_row_by_hearing_date)\
+        .pipe(split_row_by_appeal_hearing_date)\
         .pipe(standardize_hearing_date)\
         .pipe(extract_counsel)\
         .pipe(extract_appellant_rank)\
@@ -409,7 +409,8 @@ def clean():
         .pipe(condense_rows_with_same_docket_no)\
         .pipe(gen_uid, ["agency", "first_name", "last_name", "middle_name", "middle_initial"])\
         .pipe(gen_uid, ['uid', 'docket_no'], 'appeal_uid')\
-        .pipe(gen_uid, ['appeal_uid', 'hearing_year', 'hearing_month', 'hearing_day', 'resolution'], 'resolution_uid')
+        .pipe(gen_uid, ['appeal_uid', 'appeal_hearing_year', 'appeal_hearing_month', 
+                        'appeal_hearing_day', 'resolution'], 'resolution_uid')
     return df.drop_duplicates().reset_index(drop=True)
 
 
