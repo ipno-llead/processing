@@ -277,7 +277,10 @@ def clean_salary(series: pd.Series) -> pd.Series:
     Returns:
         the updated series
     """
-    return series.str.strip().str.replace(r"[^\d\.]", "", regex=True).astype("float64")
+    return series.str.strip().str.lower()\
+        .str.replace('k', '000', regex=False)\
+        .str.replace(r"[^\d\.]", "", regex=True)\
+        .astype("float64")
 
 
 def clean_salaries(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
@@ -327,7 +330,6 @@ def clean_rank(series: pd.Series) -> pd.Series:
         .str.replace("lt", "lieutenant", regex=False).str.replace("cpt", "captain", regex=False)\
         .str.replace("a/supt", "superintendent", regex=False).str.replace(r"\(|\)", " ", regex=True)\
         .str.lower().str.strip().fillna("").str.strip("-")
-
 
 
 def clean_ranks(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
