@@ -5,7 +5,7 @@ from lib.path import data_file_path, ensure_data_dir
 
 
 def extract_roster(df):
-    return df[df.agency == 'univ. pd - southern']
+    return df[(df.agency == 'univ. pd - southern')]
 
 
 def clean_agency(df):

@@ -11,12 +11,12 @@ def extract_roster(df):
 def clean_agency(df):
     df.loc[:, 'agency'] = df.agency\
         .str.replace('univ. pd - ull',
-                     'ull university police department', regex=False)
+                     'University of Louisiana at Lafayette PD', regex=False)
     return df
 
 
 def clean():
-    df = pd.read_csv(data_file_path('raw/ull_university_pd/pprr_post_2020_11_06.csv'))
+    df = pd.read_csv(data_file_path('raw/university_of_louisiana_lafayette_pd/pprr_post_2020_11_06.csv'))
     df = df\
         .pipe(extract_roster)\
         .pipe(clean_agency)
@@ -26,4 +26,4 @@ def clean():
 if __name__ == '__main__':
     df = clean()
     ensure_data_dir('clean')
-    df.to_csv(data_file_path('clean/pprr_ull_university_pd_2020.csv'), index=False)
+    df.to_csv(data_file_path('clean/pprr_university_of_louisiana_lafayette_pd_2020.csv'), index=False)

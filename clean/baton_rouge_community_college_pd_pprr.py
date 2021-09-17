@@ -25,4 +25,4 @@ def clean():
 if __name__ == '__main__':
     df = clean()
     ensure_data_dir('clean')
-    df.to_csv(data_file_path('clean/baton_rouge_community_college_pd_pprr_2020.csv'), index=False)
+    df.to_csv(data_file_path('clean/pprr_baton_rouge_community_college_pd_2020.csv'), index=False)

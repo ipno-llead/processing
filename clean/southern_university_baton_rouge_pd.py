@@ -10,7 +10,7 @@ def extract_roster(df):
 
 def clean_agency(df):
     df.loc[:, 'agency'] = df.agency\
-        .str.replace('univ. pd - southern - br', 'southern university baton rouge campus police department', regex=False)
+        .str.replace('univ. pd - southern - br', 'Southern University - Baton Rouge PD', regex=False)
     return df
 
 
