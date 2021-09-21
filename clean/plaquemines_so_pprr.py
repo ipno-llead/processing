@@ -1,11 +1,9 @@
 import sys
-
-from pandas.io.parsers import read_csv
 sys.path.append('../')
 import pandas as pd
 from lib.path import data_file_path
 from lib.columns import clean_column_names, set_values
-from lib.clean import standardize_desc_cols, clean_dates, clean_names
+from lib.clean import standardize_desc_cols, clean_dates
 from lib.uid import gen_uid
 
 
@@ -15,9 +13,8 @@ def clean_department(df):
 
     df.loc[:, 'department'] = df.department.str.lower().str.strip()\
         .str.replace(r'-district (\d+)', '', regex=True)\
-        .str.replace('.', '', regex=False)\
-        .str.replace(r'(\w+) (\w+)', r'\1\2', regex=True)
-    return df 
+        .str.replace('.', '', regex=False)
+    return df.fillna('')
 
 
 def clean_rank_desc(df):
@@ -35,9 +32,22 @@ def clean_rank_desc(df):
         .str.replace(r'supe?rvi?sor', 'supervisor', regex=True)\
         .str.replace('sgt', 'sergeant', regex=False)\
         .str.replace(' civilpurchasing', '', regex=False)\
-        .str.replace('secretarycase', 'secretary case', regex=False)
+        .str.replace('secretarycase', 'secretary case', regex=False)\
+        .str.replace('parttime', '', regex=False)\
+        .str.replace('code enforcement', 'code enforcer', regex=False)\
+        .str.replace('communications', '', regex=False)\
+        .str.replace(r'operator$', 'dispatcher', regex=True)
     return df.drop(columns='position')
 
+
+
+def split_names(df):
+    col_name = [col for col in df.columns if col.endswith('employee_name')][0]
+    names = df[col_name].str.strip().str.lower()\
+        .str.extract(r'^(\w+)[ ,]+(\w+)$')
+    df.loc[:, 'first_name'] = names[1]
+    df.loc[:, 'last_name'] = names[0]
+    return df.drop(columns=[col_name])
 
 def split_name(df):
     df.loc[:, 'name'] = df.name.str.lower().str.strip()\
