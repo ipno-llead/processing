@@ -46,7 +46,7 @@ def match_award_to_pprr(award, pprr):
         "first_name": JaroWinklerSimilarity(),
         "last_name": JaroWinklerSimilarity()
     }, dfa, dfb)
-    decision = 0.85
+    decision = 0.93
     matcher.save_pairs_to_excel(data_file_path(
         "match/new_orleans_pd_award_2016_2021_v_pprr.xlsx"), decision)
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
