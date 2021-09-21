@@ -9,12 +9,12 @@ from lib.uid import gen_uid
 
 def clean_department(df):
     sub_departments = df.department.str.lower().str.strip().str.extract(r'-(\w+) (\d+)$')
-    df.loc[:, 'sub_department'] = sub_departments[0] + ' ' + sub_departments[1]
+    df.loc[:, 'sub_department_desc'] = sub_departments[0] + ' ' + sub_departments[1]
 
-    df.loc[:, 'department'] = df.department.str.lower().str.strip()\
+    df.loc[:, 'department_desc'] = df.department.str.lower().str.strip()\
         .str.replace(r'-district (\d+)', '', regex=True)\
         .str.replace('.', '', regex=False)
-    return df.fillna('')
+    return df.drop(columns='department').fillna('')
 
 
 def clean_rank_desc(df):
@@ -40,33 +40,22 @@ def clean_rank_desc(df):
     return df.drop(columns='position')
 
 
-
-def split_names(df):
-    col_name = [col for col in df.columns if col.endswith('employee_name')][0]
-    names = df[col_name].str.strip().str.lower()\
-        .str.extract(r'^(\w+)[ ,]+(\w+)$')
-    df.loc[:, 'first_name'] = names[1]
-    df.loc[:, 'last_name'] = names[0]
-    return df.drop(columns=[col_name])
-
 def split_name(df):
     df.loc[:, 'name'] = df.name.str.lower().str.strip()\
         .str.replace(',', ' ', regex=False)\
         .str.replace(r' +', ' ', regex=True)\
-        .str.replace(r'(\w+) (\w+) ?(?:(\w{1}) )? ?(?:(\w+))?', r'\1 \2 \4 \3', regex=True)
-    names = df.name.str.extract(r'(?:(\w+)) (?:(\w+) ) ?(?:(\w{2,3}) )? ?(?:(\w+) )?')
-    df.loc[:, 'first_name'] = names[1]
-    df.loc[:, 'last_names'] = names[0] 
+        .str.replace('.', '', regex=False)\
+        .str.replace(r' (\w{1}) (\w{2,3}) ?', r' \2 \1', regex=True)
+    names = df.name.str.extract(r'(?:(\w+)) (?:(\w+)) ?(jr|sr|iii?|iv)? ?(.+)?')
+    df.loc[:, 'first_name'] = names[1].fillna('')
+    df.loc[:, 'last_name'] = names[0].fillna('')
     df.loc[:, 'suffixes'] = names[2].fillna('')
     df.loc[:, 'middle_name'] = names.loc[:, 3].str.strip().fillna('')\
-        .map(lambda s: '' if len(s) < 5 else s)
+        .map(lambda s: '' if len(s) < 3 else s)
     df.loc[:, 'middle_initial'] = names.loc[:, 3].str.strip().fillna('')\
         .map(lambda s: '' if len(s) > 1 else s)
-    df.loc[:, 'last_name'] = df.last_names.fillna('') + ' ' + df.suffixes.fillna('')
-    return df.drop(columns={'last_names', 'suffixes'})
-
-
-## there are duplicate badge_nos
+    df.loc[:, 'last_name'] = df.last_name.fillna('') + ' ' + df.suffixes.fillna('')
+    return df.drop(columns={'suffixes', 'name'})
 
 
 def assign_agency(df):
@@ -88,7 +77,7 @@ def clean():
         .pipe(standardize_desc_cols, ['employment_status', 'rank_desc'])\
         .pipe(set_values, {
             'agency': 'Plaqumines SO'})\
-        .pipe(gen_uid, ['first_name', 'last_name', 'middle_initial', 'middle_name', 'agency'])
+        .pipe(gen_uid, ['first_name', 'middle_initial', 'middle_name', 'last_name', 'agency'])
     return df
 
 

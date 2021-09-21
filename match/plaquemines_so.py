@@ -47,7 +47,7 @@ def match_pprr_and_post(pprr, post):
         "last_name": JaroWinklerSimilarity(),
         "first_name": JaroWinklerSimilarity(),
     }, dfa, dfb)
-    decision = 0.9
+    decision = 0.93
     matcher.save_pairs_to_excel(data_file_path(
         "match/plaquemines_so_pprr_2018_v_post_pprr_2020_11_06.xlsx"), decision)
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
