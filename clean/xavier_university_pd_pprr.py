@@ -16,7 +16,7 @@ def clean_agency(df):
 
 
 def clean():
-    df = pd.read_csv(data_file_path('raw/xavier_university_pd/pprr_post_2020_11_06.csv'))
+    df = pd.read_csv(data_file_path('raw/universities/pprr_post_2020_11_06.csv'))
     df = df\
         .pipe(extract_roster)\
         .pipe(clean_agency)
