@@ -179,5 +179,11 @@
   ],
   "west_monroe_pd": [
     "https://www.dropbox.com/s/tjuwpmcpwpeegvt/west_monroe_pd_pprr_2015_2020.csv?dl=1"
+  ],
+  "carencro_pd": [
+    "https://www.dropbox.com/s/1r90j1ebbzdzhfq/carencro_pd_pprr_2021.csv?dl=1"
+  ],
+  "new_orleans_csc": [
+    "https://www.dropbox.com/s/p4n5ykrdsg097ur/new_orleans_csc_lprr_2000_2016.csv?dl=1"
   ]
 }
