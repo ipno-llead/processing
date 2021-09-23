@@ -58,6 +58,13 @@ def split_name(df):
     return df.drop(columns={'suffixes', 'name'})
 
 
+def clean_birth_year(df):
+    df.loc[:, 'birth_year'] = df.birth_date.apply(str)\
+        .str.replace('1049', '1949', regex=False)\
+        .str.replace('1040', '1940', regex=False)
+    return df.drop(columns='birth_date')
+
+
 def assign_agency(df):
     df.loc[:, 'agency'] = 'Plaquemines SO'
 
@@ -67,9 +74,9 @@ def clean():
     df = df\
         .pipe(clean_column_names)\
         .rename(columns={
-            'birth_date': 'birth_year',
             'emp_type': 'employment_status'
         })\
+        .pipe(clean_birth_year)\
         .pipe(clean_department)\
         .pipe(clean_rank_desc)\
         .pipe(split_name)\

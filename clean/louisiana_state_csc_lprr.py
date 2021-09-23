@@ -157,7 +157,7 @@ def clean():
         'apellant': 'appellant',
         'colonel': 'charging_supervisor',
         'filed': 'filed_date',
-        'rendered': 'rendered_date',
+        'rendered': 'appeal_disposition_date',
         'decision': 'resolution'
     })
     df = df.drop(columns=['delay'])
@@ -167,7 +167,7 @@ def clean():
         .pipe(split_appellant_column)\
         .pipe(split_rows_with_multiple_docket_no)\
         .pipe(assign_additional_appellant_names)\
-        .pipe(clean_dates, ['filed_date', 'rendered_date'])\
+        .pipe(clean_dates, ['filed_date', 'appeal_disposition_date'])\
         .pipe(correct_docket_no)\
         .pipe(clean_resolution)\
         .pipe(assign_agency)\
