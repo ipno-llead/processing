@@ -1,3 +1,4 @@
+from pandas.io.parsers import read_csv
 from lib.clean import clean_dates, clean_names
 from lib.columns import clean_column_names
 from lib.path import data_file_path, ensure_data_dir
@@ -9,7 +10,13 @@ sys.path.append("../")
 
 
 def standardize_appealed(df):
-    df.loc[:, "appealed"] = df.appealed.str.strip()
+    df.loc[:, "appealed"] = df.appealed.str.strip().fillna("")\
+        .str.replace(r"^(\w+) (\w+)", r'\1 - \2')\
+        .str.replace("1st circuit", "to 1st circuit court of appeals", regex=False)\
+        .str.replace("to supreme court", "and to supreme court of appeals", regex=False)\
+        .str.replace("LSP - Filed appeal - Yes - to 1st circuit court of appeals",
+                     "Yes - Louisiana State Police filed appeal to 1st circuit court of appeals",
+                     regex=False)
     return df
 
 
@@ -108,14 +115,14 @@ def correct_docket_no(df):
     return df
 
 
-def clean_resolution(df):
-    df.loc[:, 'resolution'] = df.resolution.str.strip().str.lower()\
+def clean_appeal_disposition(df):
+    df.loc[:, 'appeal_disposition'] = df.decision.str.strip().str.lower()\
         .str.replace(r'dnied', 'denied')\
         .str.replace(r'denited', 'denied')\
         .str.replace(r'ganted', 'granted')\
         .str.replace(r'settlemenet', 'settlement')\
         .str.replace(r'(\w)- ', r'\1 - ')
-    return df
+    return df.drop(columns='decision')
 
 
 def assign_agency(df):
@@ -158,7 +165,6 @@ def clean():
         'colonel': 'charging_supervisor',
         'filed': 'filed_date',
         'rendered': 'appeal_disposition_date',
-        'decision': 'resolution'
     })
     df = df.drop(columns=['delay'])
     df = df\
@@ -169,7 +175,7 @@ def clean():
         .pipe(assign_additional_appellant_names)\
         .pipe(clean_dates, ['filed_date', 'appeal_disposition_date'])\
         .pipe(correct_docket_no)\
-        .pipe(clean_resolution)\
+        .pipe(clean_appeal_disposition)\
         .pipe(assign_agency)\
         .pipe(clean_names, ['first_name', 'middle_initial', 'last_name'])\
         .pipe(gen_uid, ['agency', 'first_name', 'middle_initial', 'last_name'])\
