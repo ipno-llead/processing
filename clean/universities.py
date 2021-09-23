@@ -45,16 +45,19 @@ def clean_agency(df):
                      'Holy Cross University PD', regex=False)\
         .str.replace('univ. pd - lsu - alexandria',
                      'Louisiana State University - Alexandria PD', regex=False)\
-        .str.replace('univ. pd - lsu', 'Louisiana State University - Eunice PD', regex=False)\
-        .str.replace('univ. pd - lsu',
+        .str.replace('univ. pd - lsu - eunice', 'Louisiana State University - Eunice PD', regex=False)\
+        .str.replace('univ. pd - lsuhsc - monroe',
                      'Louisiana State University Health Sciences Center - Monroe PD', regex=False)\
-        .str.replace('univ. pd - lsu',
+        .str.replace('univ. pd - lsuhsc - no',
                      'Louisiana State University Health Sciences Center - New Orleans PD',
                      regex=False)\
-        .str.replace('univ. pd - lsu',
-                     'Louisiana State University Health Sciences Center PD', regex=False)\
+        .str.replace(r'^univ. pd - lsuhsc$',
+                     'Louisiana State University Health Sciences Center PD', regex=True)\
+        .str.replace('univ. pd - lsu - shreveport',
+                     'Louisiana State University - Shreveport PD', regex=False)\
         .str.replace('univ. pd - lsuhsc - shreveport',
-                     'Louisiana State University Health Services Center - Shreveport PD', regex=False)\
+                     'Louisiana State University Health Sciences Center - Shreveport PD',
+                     regex=False)\
         .str.replace('univ. pd - lsu', 'Louisiana State University PD', regex=False)\
         .str.replace('univ. pd - la tech',
                      'Louisiana Technical University PD', regex=False)\
@@ -68,14 +71,14 @@ def clean_agency(df):
         .str.replace('univ. pd - southeastern', 'Southeastern University PD', regex=False)\
         .str.replace('univ. pd - southern - br', 'Southern University - Baton Rouge PD', regex=False)\
         .str.replace('univ. pd - southern - no', 'Southern University - New Orleans PD', regex=False)\
-        .str.replace('univ. pd - southern', 'southern university police department', regex=False)\
-        .str.replace('univ. pd - southern - shreveport',
-                     'Southern University - Shreveport PD', regex=False)\
+        .str.replace(r'^univ. pd - southern$', 'Southern University Police Department', regex=True)\
+        .str.replace(r'^univ. pd - southern - ?shreveport$',
+                     'Southern University - Shreveport PD', regex=True)\
         .str.replace('tulane univ pd', 'Tulane University PD', regex=False)\
         .str.replace('univ. pd - ull',
                      'University of Louisiana at Lafayette PD', regex=False)\
         .str.replace('univ. pd - ulm',
-                     'University of Louisiana Monroe PD', regex=False)\
+                     'University of Louisiana - Monroe PD', regex=False)\
         .str.replace('univ. pd - uno',
                      'University of New Orleans PD', regex=False)\
         .str.replace('univ. pd - usl',
