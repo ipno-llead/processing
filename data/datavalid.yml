@@ -213,6 +213,10 @@ files:
           - suspension_end
           - appeal_file
           - appeal_hearing
+          - appeal_hearing_2
+          - appeal_render
+          - appeal_receive
+          - appeal_disposition
           - uof_incident
           - uof_receive
           - uof_assigned

@@ -1,7 +1,8 @@
 from lib.path import data_file_path
 from lib.columns import (
-    rearrange_complaint_columns, rearrange_event_columns, rearrange_personnel_columns
+    rearrange_complaint_columns, rearrange_event_columns
 )
+from lib.personnel import fuse_personnel
 from lib import events
 import pandas as pd
 import sys
@@ -37,7 +38,7 @@ if __name__ == '__main__':
         fuse_events(cprr, pprr),
         post_event
     ]))
-    rearrange_personnel_columns(pprr).to_csv(data_file_path(
+    fuse_personnel(pprr, cprr).to_csv(data_file_path(
         'fuse/per_plaquemines_so.csv'
     ), index=False)
     rearrange_complaint_columns(cprr).to_csv(data_file_path(

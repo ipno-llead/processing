@@ -2,7 +2,6 @@
 
 import shutil
 import errno
-import shutil
 import os
 import argparse
 import pathlib

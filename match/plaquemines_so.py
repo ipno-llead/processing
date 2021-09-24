@@ -30,7 +30,7 @@ def match_cprr_and_pprr(cprr, pprr):
     matches = matcher.get_index_pairs_within_thresholds(decision)
     match_dict = dict(matches)
 
-    cprr.loc[:, 'uid'] = cprr.uid.map(lambda x: match_dict[x])
+    cprr.loc[:, 'uid'] = cprr.uid.map(lambda x: match_dict.get(x, x))
     return cprr
 
 
