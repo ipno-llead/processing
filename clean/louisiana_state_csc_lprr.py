@@ -11,7 +11,7 @@ sys.path.append("../")
 
 def standardize_appealed(df):
     df.loc[:, "appealed"] = df.appealed.str.strip().fillna("")\
-        .str.replace(r"^(\w+) (\w+)", r'\1 - \2')\
+        .str.replace(r"^(\w+) (\w+)", r'\1 - \2', regex=True)\
         .str.replace("1st circuit", "to 1st circuit court of appeals", regex=False)\
         .str.replace("to supreme court", "and to supreme court of appeals", regex=False)\
         .str.replace("LSP - Filed appeal - Yes - to 1st circuit court of appeals",
