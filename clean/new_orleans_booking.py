@@ -3,7 +3,7 @@ sys.path.append('../')
 import pandas as pd
 from lib.path import data_file_path
 from lib.columns import clean_column_names
-from lib.clean import clean_dates, float_to_int_str
+from lib.clean import clean_dates, clean_sexes, float_to_int_str, clean_races
 
 
 def clean_disposition(df):
@@ -39,6 +39,12 @@ def clean_sentence_date(df):
     return df
 
 
+def clean_check_in_date(df):
+    df.loc[:, 'check_in_date'] = df.check_in_date\
+         .str.replace(r'(\d+)/(\d+)/(\d+)', r'\2/\3/\1', regex=True)
+    return df
+
+
 def clean_court_time(df):
     df.loc[:, 'am_pm'] = df.court_time_flag_am_pm.str.lower().fillna('')\
         .str.replace(r'8?0?0', '', regex=True)\
@@ -70,26 +76,54 @@ def clean_arresting_department(df):
     return df
 
 
+def clean_race(df):
+    df.loc[:, 'citizen_race'] = df.race.str.lower()\
+        .str.replace(r'w$', 'white', regex=True)\
+        .str.replace(r'b$', 'black', regex=True)\
+        .str.replace(r'a$', 'asian', regex=True)\
+        .str.replace(r'h$', 'hispanic', regex=True)\
+        .str.replace(r'u$', 'unknown', regex=True)\
+        .str.replace(r'i', 'indian', regex=True)
+    return df.drop(columns='race')
+
+
+def clean_release_reason(df):
+    df.loc[:, 'release_reason'] = df.release_reason.str.lower().str.strip()\
+        .str.replace(r'  +', ' ', regex=True)\
+        .str.replace(r'\bror\b', 'released on ones own recognizance', regex=True)
+    return df
+
+
+def convert_bond_amount_to_dollars(df):
+    df.loc[:, 'bond_amount'] = df.bond_amount.astype(int).map('{:,d}'.format)
+    return df
+
+
 def clean():
     dfa = pd.read_csv(data_file_path('raw/ipm/new_orleans_so_charges_2015_2021.csv'))\
         .pipe(clean_column_names)
     dfb = pd.read_csv(data_file_path('raw/ipm/new_orleans_so_bookings_2015_2021.csv'))\
         .pipe(clean_column_names)
-    
+
     df = pd.merge(dfa, dfb, on='folder_no', how='outer')\
+        .drop(columns=['bond_amt'])\
         .rename(columns={
             'sentence_yrs': 'sentence_years',
             'sentence_mos': 'sentence_months',
             'sentence_dys': 'sentence_days',
-            'sentence_oth': 'sentence_other'
+            'sentence_oth': 'sentence_other',
+            'race': 'citizen_race',
+            'sex': 'citizen_sex'
         })\
         .pipe(float_to_int_str, ['arrest_credit'])\
         .pipe(clean_court_date)\
         .pipe(clean_sentence_date)\
-        .pipe(clean_dates, ['court_date', 'sentence_date'])\
+        .pipe(clean_check_in_date)\
+        .pipe(clean_dates, ['court_date', 'sentence_date', 'check_in_date'])\
         .pipe(clean_disposition)\
         .pipe(clean_court_type)\
         .pipe(clean_court_time)\
-        .pipe(clean_arresting_department)
-
+        .pipe(clean_arresting_department)\
+        .pipe(clean_release_reason)\
+        .pipe(convert_bond_amount_to_dollars)
     return df
