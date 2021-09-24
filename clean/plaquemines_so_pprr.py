@@ -63,7 +63,7 @@ def assign_agency(df):
 
 
 def clean():
-    df = pd.read_csv(data_file_path('raw/plaquemines_so/plaquemines_so_pprr_2018.csv'))
+    df = pd.read_csv(data_file_path('raw/plaquemines_so/plaqumines_so_pprr_2018.csv'))
     df = df\
         .pipe(clean_column_names)\
         .rename(columns={
@@ -76,7 +76,7 @@ def clean():
         .pipe(clean_dates, ['hire_date'])\
         .pipe(standardize_desc_cols, ['employment_status', 'rank_desc'])\
         .pipe(set_values, {
-            'agency': 'Plaqumines SO'})\
+            'agency': 'Plaquemines SO'})\
         .pipe(gen_uid, ['first_name', 'middle_initial', 'middle_name', 'last_name', 'agency'])
     return df
 
