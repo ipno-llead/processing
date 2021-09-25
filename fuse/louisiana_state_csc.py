@@ -16,8 +16,8 @@ def fuse_events(lprr, pprr, pprr_term):
         events.APPEAL_FILE: {
             'prefix': 'filed', 'keep': ['uid', 'agency', 'appeal_uid']
         },
-        events.APPEAL_RENDER: {
-            'prefix': 'rendered', 'keep': ['uid', 'agency', 'appeal_uid']
+        events.APPEAL_DISPOSITION: {
+            'prefix': 'appeal_disposition', 'keep': ['uid', 'agency', 'appeal_uid']
         }
     }, ['uid', 'appeal_uid'])
     pprr.loc[:, 'salary_date'] = pprr.salary_date.astype(str)

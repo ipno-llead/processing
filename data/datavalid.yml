@@ -214,7 +214,6 @@ files:
           - appeal_file
           - appeal_hearing
           - appeal_hearing_2
-          - appeal_render
           - appeal_receive
           - appeal_disposition
           - uof_incident

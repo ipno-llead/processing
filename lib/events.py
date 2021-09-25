@@ -30,7 +30,6 @@ SUSPENSION_END = "suspension_end"
 APPEAL_FILE = "appeal_file"
 APPEAL_HEARING = "appeal_hearing"
 APPEAL_HEARING_2 = "appeal_hearing_2"
-APPEAL_RENDER = "appeal_render"
 APPEAL_RECEIVE = "appeal_receive"
 APPEAL_DISPOSITION = "appeal_disposition"
 
@@ -63,7 +62,6 @@ cat_type = CategoricalDtype(categories=[
     APPEAL_FILE,
     APPEAL_HEARING,
     APPEAL_HEARING_2,
-    APPEAL_RENDER,
     APPEAL_RECEIVE,
     APPEAL_DISPOSITION,
     UOF_INCIDENT,
