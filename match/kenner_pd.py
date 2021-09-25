@@ -67,7 +67,6 @@ if __name__ == '__main__':
     uof = pd.read_csv(data_file_path('clean/uof_kenner_pd_2005_2021.csv'))
     post_events = extract_post_events(pprr, post)
     uof = match_uof_pprr(uof, pprr)
-    ensure_data_dir("match")
     post_events.to_csv(data_file_path(
         'match/post_event_kenner_pd_2020.csv'), index=False)
     uof.to_csv(data_file_path(

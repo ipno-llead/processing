@@ -1,9 +1,8 @@
-from fuse.new_orleans_pd import fuse_use_of_force
 import sys
 
 import pandas as pd
 
-from lib.path import data_file_path, ensure_data_dir
+from lib.path import data_file_path
 from lib.columns import (
     rearrange_personnel_columns, rearrange_event_columns, rearrange_use_of_force
 )

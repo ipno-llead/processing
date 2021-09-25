@@ -6,15 +6,19 @@ from lib.columns import clean_column_names
 from lib.clean import clean_dates
 from lib.uid import gen_uid
 
+
 def split_name(df):
     df.loc[:, 'officer'] = df.officer.str.lower().str.strip()\
         .str.replace(r'(\w+), (\w{2}).,', r'\1 \2,', regex=True)\
         .str.replace(r'\.', '', regex=True)
-    names = df.officer.str.extract(r'(?:(\w+)) ?(jr|iii)?, (?:(\w+)) ?(\w{1})?$')
+    names = df.officer.str.extract(r'(?:(\w+)) ?(?:(jr|iii|sr))?, (?:(\w+)) ?(.+)?')
     df.loc[:, 'last_name'] = names[0]
     df.loc[:, 'suffix'] = names[1]
     df.loc[:, 'first_name'] = names[2]
-    df.loc[:, 'middle_initial'] = names[3].fillna('')
+    df.loc[:, 'middle_name'] = names.loc[:, 3].str.strip().fillna('')\
+        .map(lambda s: '' if len(s) < 3 else s)
+    df.loc[:, 'middle_initial'] = names.loc[:, 3].str.strip().fillna('')\
+        .map(lambda s: '' if len(s) > 1 else s)
     df.loc[:, 'last_name'] = df.last_name.fillna('') + ' ' + df.suffix.fillna('')
     return df.drop(columns=['suffix', 'officer'])
 
