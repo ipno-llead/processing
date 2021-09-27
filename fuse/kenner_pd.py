@@ -1,11 +1,11 @@
 import sys
 
 import pandas as pd
-
 from lib.path import data_file_path
 from lib.columns import (
     rearrange_personnel_columns, rearrange_event_columns, rearrange_use_of_force
 )
+from lib.personnel import fuse_personnel
 from lib.uid import ensure_uid_unique
 from lib import events
 
@@ -41,13 +41,13 @@ if __name__ == '__main__':
         'match/post_event_kenner_pd_2020.csv'))
     pprr = pd.read_csv(data_file_path('clean/pprr_kenner_pd_2020.csv'))
     uof = pd.read_csv(data_file_path('clean/uof_kenner_pd_2005_2021.csv'))
+    per = fuse_personnel(pprr, uof)
     uof_df = rearrange_use_of_force(uof)
     events_df = rearrange_event_columns(pd.concat([
         post_event,
-        fuse_events(pprr, uof)
-    ]))
+        fuse_events(pprr, uof)]))
     ensure_uid_unique(events_df, 'event_uid', True)
-    rearrange_personnel_columns(pprr).to_csv(data_file_path(
+    per.to_csv(data_file_path(
         "fuse/per_kenner_pd.csv"), index=False)
     events_df.to_csv(data_file_path(
         "fuse/event_kenner_pd.csv"), index=False)
