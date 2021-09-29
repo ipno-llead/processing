@@ -12,9 +12,10 @@ import re
 
 disposition_lookup = [
     ['exonerated', 'closeexhor', 'close/exhan'],
-    ['sustained/resigned', 'sust/r', 'sust//r', 'sustr/r',
+    ['sustained; resigned', 'sust/r', 'sust//r', 'sustr/r',
      'sust /r', 'sustr', 'bust//r', 'sustr the',
-     'sustresign', 'sust/', 'sust//', 'bust/'],
+     'sustresign', 'sust/', 'sust//', 'bust/',
+     'singe/resign', 'sustained; resigned'],
     ['resigned', 'name /resigne', 'resigne', 'susp/resign',
      'clogul resigne', 'kesigne', '/r', '. term resign', 'close resisne'],
     ['no investigation merited', 'no invest,', 'no. invest.'],
@@ -23,7 +24,6 @@ disposition_lookup = [
      'susth', 'sust/aya', 'sustflo', 'sust//eap', 'sustl',
      'sast./2days', 'sast. /w'],
     ['sustained/exonerated', 'sust exoa', 'erhon/yst'],
-    ['sustained/resigned', 'singe/resign', 'sustained; resigned'],
     ['unfounded', 'unfoune'],
     ['exonerated', 'examprate', 'exomerate', 'exopplate',
      'exhoreate', 'exhonerate', 'exhonesete',
@@ -155,7 +155,8 @@ def clean_tracking_number_19(df):
         .str.replace(' ', '', regex=False)\
         .str.replace(',', '', regex=False)\
         .str.replace(r':|\.', '-', regex=True)\
-        .str.replace(r'(\d{1})(\d{1})(\d{1})', r'\1\2-\3', regex=True)
+        .str.replace(r'(\d{1})(\d{1})(\d{1})', r'\1\2-\3', regex=True)\
+        .str.replace('14-68', '16-68', regex=False)
     return df.drop(columns='iad_file')
 
 
@@ -167,37 +168,64 @@ def clean_complainant_19(df):
 
 
 def extract_rank_from_name_19(df):
-    ranks = df.officer_s_accused.str.lower().str.strip()\
-        .str.extract(r'(cpl|sgt|pt|p.o|e.o|e.p|cal|ca)')
-    df.loc[:, 'rank_desc'] = ranks[0].fillna('')\
-        .str.replace('p.o', 'parole officer', regex=False)\
-        .str.replace('cpl', 'corporal', regex=False)\
-        .str.replace('sgt', 'sergeant', regex=False)
+    df.loc[:, 'rank_desc'] = df.officer_s_accused.str.lower().str.strip()\
+        .str.replace(',', '', regex=False)\
+        .str.replace(r'ca?p?l?g?\.? ', 'corporal ', regex=True)\
+        .str.replace(r'ca/ p\. ', 'captain ', regex=True)\
+        .str.replace(r'^p\.?d?o?\.?t?\.? ', 'parole officer ', regex=True)\
+        .str.replace(r'^e\.?p?\.?o?\.? ', 'evidence officer ', regex=True)\
+        .str.replace(r'^sgt\.? ', 'sergeant ', regex=True)
+    ranks = df.rank_desc.str.lower().str.strip()\
+        .str.extract(r'(corporal|captain|parole officer|evidence officer|sergeant)')
+    df.loc[:, 'rank_desc'] = ranks[0].fillna('')
     return df
 
 
-def split_name_19(df):
+def clean_and_split_name_19(df):
     df.loc[:, 'officer_s_accused'] = df.officer_s_accused.str.lower().str.strip().fillna('')\
-        .str.replace(r'cp[gl] ?|sgt ?|pt ?|p.o ?|e.o ?|e.p ?|cal ?|ca ?|e.o.l ?|(\d+) ?'
-                     r'|, ?||& ?|unf?k?nown?l?y? ?|/ ?| ?- ?', '', regex=True)\
-        .str.replace(r'^(\w{1})$', '', regex=True)\
+        .str.replace(',', '', regex=False)\
+        .str.replace(r'ca?p?l?g?\.? ', '', regex=True)\
+        .str.replace(r'ca/ p\. ', '', regex=True)\
+        .str.replace(r'^p\.?d?o?\.?t?\.? ', '', regex=True)\
+        .str.replace(r'^e\.?p?\.?o?\.? ', '', regex=True)\
+        .str.replace(r'^sgt\.? ', '', regex=True)\
         .str.replace('stickell stickell', 'stickell', regex=False)\
         .str.replace('pd', '', regex=False)\
         .str.replace('for ', '', regex=False)\
         .str.replace('kwashington', 'k. washington', regex=False)\
+        .str.replace(r'unknown??l?y?', '', regex=True)\
         .str.replace(r'riveraalicea|rivesa alecie|riveraalecia', 'rivera-alecia', regex=True)\
-        .str.replace(r'^\. ?', '', regex=True)\
-        .str.replace(r'(\w+)\.(\w+)', r'\1 \2', regex=True)\
-        .str.replace(r'^(\w{1})\.? (\w+)\'?(\w+)?$', r'\2 \1', regex=True)\
-        .str.replace('lmanual', 'manual l', regex=False)\
-        .str.replace(r'^clouse$', 'clouse s', regex=True)\
-        .str.replace(r'^an hunter$', 'hunter a', regex=True)\
-        .str.replace('kyoung', 'young k', regex=False)
-
-    names = df.officer_s_accused.str.extract(r'(\w{1}) ?(\w+)? ?(\w+)?')
-
+        .str.replace(r'^(\w{1})\.(\w+)', r'\1. \2', regex=True)\
+        .str.replace(r'^a\.$', 'a. meheb', regex=True)\
+        .str.replace(r'^f$', 'f. padille', regex=True)\
+        .str.replace(r'^f simier 1', 'josh simien', regex=True)\
+        .str.replace(r'3\. ewing', 'b. ewing', regex=True)\
+        .str.replace(r'^n$', '', regex=True)\
+        .str.replace(r'^j\.$', '', regex=True)\
+        .str.replace(r'^booth$', 'c. booth', regex=True)\
+        .str.replace(r'^5. misaariel$', 'c. mamuel', regex=True)\
+        .str.replace(r'^5 clouse$', 's. clouse', regex=True)\
+        .str.replace(r'^i dlusted$', 'olmstead', regex=True)\
+        .str.replace(r'^c\.$', '', regex=True)
+        #### stickell 
+        # .str.replace(r'^\. ?', '', regex=True)
+        # .str.replace(r'(\w+)\.(\w+)', r'\1 \2', regex=True)\
+        # .str.replace(r'^(\w{1})\.? (\w+)\'?(\w+)?$', r'\2 \1', regex=True)\
+        # .str.replace('lmanual', 'manual l', regex=False)\
+        # .str.replace(r'^clouse$', 'clouse s', regex=True)\
+        # .str.replace(r'^an hunter$', 'hunter a', regex=True)\
+        # .str.replace('kyoung', 'young k', regex=False)\
+        # .str.replace('fontt', 'fontenot', regex=False)\
     return df
 
+
+def assign_missing_names(df):
+    df.loc[(df.rank_desc == '17-27'), 'officer_s_accused'] = ''
+    df.loc[(df.rank_desc == '17-36'), 'officer_s_accused'] = ''
+    df.loc[(df.rank_desc == '17-38'), 'officer_s_accused'] = ''
+    df.loc[(df.rank_desc == '18-4'), 'officer_s_accused'] = 'c. manuel'
+    df.loc[(df.rank_desc == '16-40'), 'officer_s_accused'] = 'c. young'
+    return df
 
 def clean_investigation_start_date_19(df):
     df.loc[:, 'investigation_start_date'] = df.date\
@@ -262,14 +290,23 @@ def clean_disposition19(df):
     return standardize_from_lookup_table(df, 'disposition', disposition_lookup)
 
 
-def clean_investigator19(df):
-    df.loc[:, 'investigator_name'] = df.investigator.str.lower().str.strip()\
+def clean_and_split_investigator_19(df):
+    df.loc[:, 'investigator'] = df.investigator.str.lower().str.strip().fillna('')\
         .str.replace('refferred', '', regex=False)\
         .str.replace(r',|< |-|\.', '', regex=True)\
+        .str.replace(' correct', '', regex=False)\
         .str.replace(r'^(\w{1})\.? ?', '', regex=True)\
-        .str.replace(r'^h(\w+)', 'richard harrell', regex=True)\
-        .str.replace(r'^c(\w+)', 'kirk carroll')
-    return df
+        .str.replace(r'^(\w+) (\w+)', r'\1\2', regex=True)\
+        .str.replace(r'^(a|h|t|k|i|e|s|n|d)(\w+)', 'lieutenant richard harrell', regex=True)\
+        .str.replace(r'^(c|f)(\w+)', 'deputy kirk carroll', regex=True)\
+        .str.replace(r'^g(\w+)', 'dustin gaudet', regex=True)
+    
+    names = df.investigator.str.extract(r'(lieutenant|deputy) (\w+) (\w+)')
+    df.loc[:, 'investigator_rank_desc'] = names[0]
+    df.loc[:, 'investigator_first_name'] = names[1]
+    df.loc[:, 'investigator_last_name'] = names[2]
+
+    return df.drop(columns='investigator')
 
 
 def clean20():
@@ -303,11 +340,11 @@ def clean19():
         .pipe(clean_tracking_number_19)\
         .pipe(clean_complainant_19)\
         .pipe(extract_rank_from_name_19)\
-        .pipe(split_name_19)\
+        .pipe(clean_and_split_name_19)\
         .pipe(clean_charges_19)\
         .pipe(extract_actions_from_disposition19)\
         .pipe(clean_disposition19)\
-        .pipe(clean_investigator19)
+        .pipe(clean_and_split_investigator_19)
     return df
 
 
