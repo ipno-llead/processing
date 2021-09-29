@@ -113,6 +113,7 @@ def fuse_complaint():
 def fuse_use_of_force():
     return rearrange_use_of_force(pd.concat([
         pd.read_csv(data_file_path("fuse/uof_new_orleans_pd.csv")),
+        pd.read_csv(data_file_path("fuse/uof_kenner_pd.csv")),
     ])).sort_values(['agency', 'data_production_year', 'uof_tracking_number'])
 
 
