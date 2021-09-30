@@ -170,13 +170,13 @@ def clean_complainant_19(df):
 def extract_rank_from_name_19(df):
     df.loc[:, 'rank_desc'] = df.officer_s_accused.str.lower().str.strip()\
         .str.replace(',', '', regex=False)\
-        .str.replace(r'ca?p?l?g?\.? ', 'corporal ', regex=True)\
-        .str.replace(r'ca/ p\. ', 'captain ', regex=True)\
-        .str.replace(r'^p\.?d?o?\.?t?\.? ', 'parole officer ', regex=True)\
-        .str.replace(r'^e\.?p?\.?o?\.? ', 'evidence officer ', regex=True)\
-        .str.replace(r'^sgt\.? ', 'sergeant ', regex=True)
+        .str.replace('brister', 'cpl brister', regex=False)\
+        .str.replace(r'^[cg]a?g?p?l?6?g?\.? ', 'corporal ', regex=True)\
+        .str.replace(r'^p\.?d?o?\.?,?\.?i?\.? ', 'parole officer ', regex=True)\
+        .str.replace(r'^e\.?d?\.?p?6?\.?o?\.?s?\.? ', 'evidence officer ', regex=True)\
+        .str.replace(r'^5?s?gt\.? ', 'sergeant ', regex=True)
     ranks = df.rank_desc.str.lower().str.strip()\
-        .str.extract(r'(corporal|captain|parole officer|evidence officer|sergeant)')
+        .str.extract(r'(corporal|parole officer|evidence officer|sergeant)')
     df.loc[:, 'rank_desc'] = ranks[0].fillna('')
     return df
 
@@ -184,29 +184,58 @@ def extract_rank_from_name_19(df):
 def clean_and_split_name_19(df):
     df.loc[:, 'officer_s_accused'] = df.officer_s_accused.str.lower().str.strip().fillna('')\
         .str.replace(',', '', regex=False)\
-        .str.replace(r'ca?p?l?g?\.? ', '', regex=True)\
-        .str.replace(r'ca/ p\. ', '', regex=True)\
-        .str.replace(r'^p\.?d?o?\.?t?\.? ', '', regex=True)\
-        .str.replace(r'^e\.?p?\.?o?\.? ', '', regex=True)\
-        .str.replace(r'^sgt\.? ', '', regex=True)\
+        .str.replace(r'^[cg]a?g?p?l?6?g?\.? ', 'corporal ', regex=True)\
+        .str.replace(r'^p\.?d?o?\.?,?\.?i?\.? ', 'parole officer ', regex=True)\
+        .str.replace(r'^e\.?d?\.?p?6?\.?o?\.?s?\.? ', 'evidence officer ', regex=True)\
+        .str.replace(r'^5?s?gt\.? ', 'sergeant ', regex=True)\
         .str.replace('stickell stickell', 'stickell', regex=False)\
-        .str.replace('pd', '', regex=False)\
-        .str.replace('for ', '', regex=False)\
-        .str.replace('kwashington', 'k. washington', regex=False)\
-        .str.replace(r'unknown??l?y?', '', regex=True)\
-        .str.replace(r'riveraalicea|rivesa alecie|riveraalecia', 'rivera-alecia', regex=True)\
+        .str.replace(r'riveraalicea|rivesa alecie|riveraalecia|rivera - alicea', 'rivera-alecia', regex=True)\
+        .str.replace(r'unf?k?nown??l?y?', '', regex=True)\
         .str.replace(r'^(\w{1})\.(\w+)', r'\1. \2', regex=True)\
-        .str.replace(r'^a\.$', 'a. meheb', regex=True)\
-        .str.replace(r'^f$', 'f. padille', regex=True)\
-        .str.replace(r'^f simier 1', 'josh simien', regex=True)\
-        .str.replace(r'3\. ewing', 'b. ewing', regex=True)\
+        .str.replace(r'^k\.$', 'k. holiday', regex=True)\
+        .str.replace(' haliday', ' holiday', regex=False)\
+        .str.replace(r'(^holiday$|l. registration)', 'k. holiday', regex=True)\
+        .str.replace(r'^(\w+) (\w{1})\.? ', r'\2. ', regex=True)\
+        .str.replace(r'^5\. clouse$', 's. clouse', regex=True)\
         .str.replace(r'^n$', '', regex=True)\
+        .str.replace(r'^gruspier$', 'g. gruspier', regex=True)\
+        .str.replace(r'^k$', 'k. washington', regex=True)\
+        .str.replace(r'^m\.$', 'm. montgomery', regex=True)\
+        .str.replace(r'^b\.$', 'b. ewing', regex=True)\
+        .str.replace(r'^a\.$', '', regex=True)\
+        .str.replace(r'^k. mixon to', 'r. mixon', regex=True)\
+        .str.replace(r'^byb? agillory', 'branden guillory', regex=True)\
+        .str.replace(r'^an\b ', 'a. ', regex=True)\
+        .str.replace(r'^i$', 'jonathan landrum', regex=True)\
+        .str.replace(r'^ryjj?ennis', 'russell dennis', regex=True)\
+        .str.replace(r'^/ saunigg', 'john saunier', regex=True)\
+        .str.replace(r'^4. smith', 'joseph smith', regex=True)\
+        .str.replace(r'^f simien 1', 'josh simien', regex=True)\
+        .str.replace(r'^5. doughary', 'scott dougerty', regex=True)\
+        .str.replace(r'^c\.$', 'c. young', regex=True)\
+        .str.replace(r'^officer\(s\) accused$', '', regex=True)\
+        .str.replace(r'^1. hebert b. it neeley$', 'a. williams', regex=True)\
+        .str.replace(r'^lajessika jalk$', 'lajessika jack', regex=True)\
+        .str.replace(r'^h. nevels 1.4. miller$', 'h. nevels/a. miller', regex=True)\
+        .str.replace(r' fontenpt$', ' fontenot', regex=True)\
+        .str.replace(r'^l.$', 'l. jack', regex=True)\
+        .str.replace(r'^r$', '', regex=True)\
         .str.replace(r'^j\.$', '', regex=True)\
-        .str.replace(r'^booth$', 'c. booth', regex=True)\
-        .str.replace(r'^5. misaariel$', 'c. mamuel', regex=True)\
-        .str.replace(r'^5 clouse$', 's. clouse', regex=True)\
-        .str.replace(r'^i dlusted$', 'olmstead', regex=True)\
-        .str.replace(r'^c\.$', '', regex=True)
+        .str.replace(r'^j. ex littletony$', 'j. littleton', regex=True)
+        # .str.replace('pd', '', regex=False)\
+        # .str.replace('for ', '', regex=False)\
+        # .str.replace('kwashington', 'k. washington', regex=False)\
+        # .str.replace(r'^a\.$', 'a. meheb', regex=True)\
+        # .str.replace(r'^f$', 'f. padille', regex=True)\
+        # .str.replace(r'^f simier 1', 'josh simien', regex=True)\
+        # .str.replace(r'3\. ewing', 'b. ewing', regex=True)\
+ 
+        # .str.replace(r'^j\.$', '', regex=True)\
+        # .str.replace(r'^booth$', 'c. booth', regex=True)\
+        # .str.replace(r'^5. misaariel$', 'c. mamuel', regex=True)\
+    
+        # .str.replace(r'^i dlusted$', 'olmstead', regex=True)\
+        # .str.replace(r'^c\.$', '', regex=True)
         #### stickell 
         # .str.replace(r'^\. ?', '', regex=True)
         # .str.replace(r'(\w+)\.(\w+)', r'\1 \2', regex=True)\
@@ -220,12 +249,18 @@ def clean_and_split_name_19(df):
 
 
 def assign_missing_names(df):
-    df.loc[(df.rank_desc == '17-27'), 'officer_s_accused'] = ''
-    df.loc[(df.rank_desc == '17-36'), 'officer_s_accused'] = ''
-    df.loc[(df.rank_desc == '17-38'), 'officer_s_accused'] = ''
-    df.loc[(df.rank_desc == '18-4'), 'officer_s_accused'] = 'c. manuel'
-    df.loc[(df.rank_desc == '16-40'), 'officer_s_accused'] = 'c. young'
+    df.loc[(df.tracking_number == '16-7'), 'officer_s_accused'] = 'a. malveaux'
+    df.loc[(df.tracking_number == '19-54'), 'officer_s_accused'] = 'a. aeheb'
+    df.loc[(df.tracking_number == '17-36'), 'officer_s_accused'] = 'john saunier'
+    df.loc[(df.tracking_number == '17-38'), 'officer_s_accused'] = 'j. littleton'
     return df
+
+
+def assign_proper_charges(df):
+    df.loc[(df.tracking_number == '19-2'), 'charges'] = 'fleet crash'
+    df.loc[(df.tracking_number == '17-14'), 'charges'] = 'unauthorized force/unsatisfactory performance'
+    return df
+
 
 def clean_investigation_start_date_19(df):
     df.loc[:, 'investigation_start_date'] = df.date\
@@ -336,7 +371,6 @@ def clean19():
     df = pd.read_csv(data_file_path('raw/lake_charles_pd/lake_charles_pd_cprr_2014_2019.csv'))\
         .pipe(clean_column_names)\
         .pipe(clean_investigation_start_date_19)\
-        .pipe(clean_dates, ['investigation_start_date'])\
         .pipe(clean_tracking_number_19)\
         .pipe(clean_complainant_19)\
         .pipe(extract_rank_from_name_19)\
@@ -344,7 +378,8 @@ def clean19():
         .pipe(clean_charges_19)\
         .pipe(extract_actions_from_disposition19)\
         .pipe(clean_disposition19)\
-        .pipe(clean_and_split_investigator_19)
+        .pipe(clean_and_split_investigator_19)\
+        .pipe(assign_proper_charges)
     return df
 
 
