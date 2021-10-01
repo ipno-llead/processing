@@ -169,9 +169,9 @@ def clean_complainant_19(df):
 
 def extract_rank_from_name_19(df):
     df.loc[:, 'rank_desc'] = df.officer_s_accused.str.lower().str.strip()\
-        .str.replace(',', '', regex=False)\
+        .str.replace(r'(,|\.)', '', regex=True)\
         .str.replace('brister', 'cpl brister', regex=False)\
-        .str.replace(r'^[cg]a?g?p?l?6?g?\.? ', 'corporal ', regex=True)\
+        .str.replace(r'c?g?pl?6?\.? ', 'corporal ', regex=True)\
         .str.replace(r'^p\.?d?o?\.?,?\.?i?\.? ', 'parole officer ', regex=True)\
         .str.replace(r'^e\.?d?\.?p?6?\.?o?\.?s?\.? ', 'evidence officer ', regex=True)\
         .str.replace(r'^5?s?gt\.? ', 'sergeant ', regex=True)
@@ -181,13 +181,13 @@ def extract_rank_from_name_19(df):
     return df
 
 
-def clean_and_split_name_19(df):
+def split_and_clean_name_19(df):
     df.loc[:, 'officer_s_accused'] = df.officer_s_accused.str.lower().str.strip().fillna('')\
         .str.replace(',', '', regex=False)\
-        .str.replace(r'^[cg]a?g?p?l?6?g?\.? ', 'corporal ', regex=True)\
-        .str.replace(r'^p\.?d?o?\.?,?\.?i?\.? ', 'parole officer ', regex=True)\
-        .str.replace(r'^e\.?d?\.?p?6?\.?o?\.?s?\.? ', 'evidence officer ', regex=True)\
-        .str.replace(r'^5?s?gt\.? ', 'sergeant ', regex=True)\
+        .str.replace(r'c?g?pl?6?\.? ', '', regex=True)\
+        .str.replace(r'^p\.?d?o?\.?,?\.?i?\.? ', '', regex=True)\
+        .str.replace(r'^e\.?d?\.?p?6?\.?o?\.?s?\.? ', '', regex=True)\
+        .str.replace(r'^5?s?gt\.? ', '', regex=True)\
         .str.replace('stickell stickell', 'stickell', regex=False)\
         .str.replace(r'riveraalicea|rivesa alecie|riveraalecia|rivera - alicea', 'rivera-alecia', regex=True)\
         .str.replace(r'unf?k?nown??l?y?', '', regex=True)\
@@ -207,7 +207,6 @@ def clean_and_split_name_19(df):
         .str.replace(r'^byb? agillory', 'branden guillory', regex=True)\
         .str.replace(r'^an\b ', 'a. ', regex=True)\
         .str.replace(r'^i$', 'jonathan landrum', regex=True)\
-        .str.replace(r'^ryjj?ennis', 'russell dennis', regex=True)\
         .str.replace(r'^/ saunigg', 'john saunier', regex=True)\
         .str.replace(r'^4. smith', 'joseph smith', regex=True)\
         .str.replace(r'^f simien 1', 'josh simien', regex=True)\
@@ -217,34 +216,55 @@ def clean_and_split_name_19(df):
         .str.replace(r'^1. hebert b. it neeley$', 'a. williams', regex=True)\
         .str.replace(r'^lajessika jalk$', 'lajessika jack', regex=True)\
         .str.replace(r'^h. nevels 1.4. miller$', 'h. nevels/a. miller', regex=True)\
-        .str.replace(r' fontenpt$', ' fontenot', regex=True)\
+        .str.replace(r' f[ao]nten[op]t$', ' fontenot', regex=True)\
         .str.replace(r'^l.$', 'l. jack', regex=True)\
         .str.replace(r'^r$', '', regex=True)\
         .str.replace(r'^j\.$', '', regex=True)\
-        .str.replace(r'^j. ex littletony$', 'j. littleton', regex=True)
-        # .str.replace('pd', '', regex=False)\
-        # .str.replace('for ', '', regex=False)\
-        # .str.replace('kwashington', 'k. washington', regex=False)\
-        # .str.replace(r'^a\.$', 'a. meheb', regex=True)\
-        # .str.replace(r'^f$', 'f. padille', regex=True)\
-        # .str.replace(r'^f simier 1', 'josh simien', regex=True)\
-        # .str.replace(r'3\. ewing', 'b. ewing', regex=True)\
- 
-        # .str.replace(r'^j\.$', '', regex=True)\
-        # .str.replace(r'^booth$', 'c. booth', regex=True)\
-        # .str.replace(r'^5. misaariel$', 'c. mamuel', regex=True)\
+        .str.replace(r'^j. ex littletony$', 'j. littleton', regex=True)\
+        .str.replace(r'^5. kingsley$', 's. kingsley', regex=True)\
+        .str.replace(r'^d.$', '', regex=True)\
+        .str.replace(r'^f$', '', regex=True)\
+        .str.replace(r'^to wofford$', 'j. walford', regex=True)\
+        .str.replace(r'(mg kaughenbaugh|c\. daughen baugh)',
+                      'marie daughenbaugh', regex=True)\
+        .str.replace(r'j. eving', 'j. ewing/marie daughenbaugh', regex=True)\
+        .str.replace(r'^2. harrell', 'r. harrell', regex=True)\
+        .str.replace(r'i?\.? ?stickell', 'j. stickell', regex=True)\
+        .str.replace(r'lig janice', 'robert janice', regex=True)\
+        .str.replace(r'^p\.$', '', regex=True)\
+        .str.replace(r'(\w{1})\.? holiday', r'k. holiday', regex=True)\
+        .str.replace(r"s\.? m ?'?[dbp]aniel?/?", 's. mcdaniel', regex=True)\
+        .str.replace(r'c\. booth', 'chad booth', regex=True)\
+        .str.replace(r'(\w+) /(\w+)', r' \1/\2', regex=True)\
+        .str.replace(r'^j. antonistration$', 'j. redd/n. stratton', regex=True)\
+        .str.replace(r't\.? bup[fl]echan', 't. suplechan', regex=True)\
+        .str.replace(' flurcy/p.', 'michael flurry/c. breland', regex=True)\
+        .str.replace(r'b?\.? ?randolph', 'benjamin randolph', regex=True)\
+        .str.replace(' comville', ' courville', regex=False)\
+        .str.replace(' veiller', ' veillon', regex=False)\
+        .str.replace(r'c\.  ?manu?el?', 'carlos manuel', regex=True)\
+        .str.replace(r'^a.  ake/c.boudin$', 'a. ake/c. boudin', regex=True)\
+        .str.replace('cbbeland', 'c. breland', regex=False)\
+        .str.replace('hammee', 'hammer', regex=False)\
+        .str.replace(' manual', ' manuel', regex=False)\
+        .str.replace(r'^ryjjennis$', 'russell dennis', regex=True)\
+        .str.replace(' \bdenyis\b', ' dennis', regex=False)\
+        .str.replace(r'\.', '', regex=True)\
+        .str.replace('  ', ' ', regex=False)\
+        .str.replace(r'^(\w+)$', r' \1', regex=True)
+
+    i = 0
+    for idx in df[df.officer_s_accused.str.contains("/")].index:
+        s = df.loc[idx + i, "officer_s_accused"]
+        parts = re.split(r"\s*(?:\/)\s*", s)
+        df = duplicate_row(df, idx + i, len(parts))
+        for j, name in enumerate(parts):
+            df.loc[idx + i + j, "officer_s_accused"] = name
+        i += len(parts) - 1
     
-        # .str.replace(r'^i dlusted$', 'olmstead', regex=True)\
-        # .str.replace(r'^c\.$', '', regex=True)
-        #### stickell 
-        # .str.replace(r'^\. ?', '', regex=True)
-        # .str.replace(r'(\w+)\.(\w+)', r'\1 \2', regex=True)\
-        # .str.replace(r'^(\w{1})\.? (\w+)\'?(\w+)?$', r'\2 \1', regex=True)\
-        # .str.replace('lmanual', 'manual l', regex=False)\
-        # .str.replace(r'^clouse$', 'clouse s', regex=True)\
-        # .str.replace(r'^an hunter$', 'hunter a', regex=True)\
-        # .str.replace('kyoung', 'young k', regex=False)\
-        # .str.replace('fontt', 'fontenot', regex=False)\
+    names = df.officer_s_accused.str.extract(r'(\w+)? ?(\w+)')
+    df.loc[:, 'first_name'] = names[0].fillna('')
+    df.loc[:, 'last_name'] = names[1].fillna('')
     return df
 
 
@@ -254,6 +274,10 @@ def assign_missing_names(df):
     df.loc[(df.tracking_number == '17-36'), 'officer_s_accused'] = 'john saunier'
     df.loc[(df.tracking_number == '17-38'), 'officer_s_accused'] = 'j. littleton'
     return df
+
+
+def drop_rows_missing_name(df):
+    return df[~((df.first_name == '') & (df.last_name == ''))]
 
 
 def assign_proper_charges(df):
@@ -374,7 +398,8 @@ def clean19():
         .pipe(clean_tracking_number_19)\
         .pipe(clean_complainant_19)\
         .pipe(extract_rank_from_name_19)\
-        .pipe(clean_and_split_name_19)\
+        .pipe(split_and_clean_name_19)\
+        .pipe(drop_rows_missing_name)\
         .pipe(clean_charges_19)\
         .pipe(extract_actions_from_disposition19)\
         .pipe(clean_disposition19)\
