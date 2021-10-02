@@ -68,8 +68,32 @@ def clean_complainant_type(df):
 
 
 def combine_rule_and_paragraph(df):
-    df.loc[:, "charges"] = df.rule_violation.str.cat(df.paragraph_violation, sep='; ')\
-        .str.replace(r'^; ', '', regex=True).str.replace(r'; $', '', regex=True)
+    df.loc[:, "allegation"] = df.rule_violation.str.cat(df.paragraph_violation, sep='; ')\
+        .str.replace(r'^; ', '', regex=True).str.replace(r'; $', '', regex=True)\
+        .str.replace(r'\bperf\b', 'performance', regex=True).str.replace('prof', 'professional', regex=False)\
+        .str.replace('dept', 'department', regex=False).str.replace(r'-(\w+)', r'- \1', regex=True)\
+        .str.replace(r'no violation observed;? '
+                     r'?(no violation was observed to have been committed)?|'
+                     r'no alligations assigned at this time', '', regex=True)\
+        .str.replace(r'\binfo\b', 'information', regex=True).str.replace('mobil', 'mobile', regex=False)\
+        .str.replace('drugs off- duty', 'drugs while off duty', regex=False)\
+        .str.replace(r'social networking(.+)', 'social networking', regex=True)\
+        .str.replace(', giving', ' or giving', regex=False)\
+        .str.replace('professionalessionalism', 'professionalism', regex=False)\
+        .str.replace(r'^policy$', '', regex=True).str.replace('perform before', 'perform duty before', regex=False)\
+        .str.replace('use of alcohol / on- duty', 'use of alcohol while on duty')\
+        .str.replace('use of alcohol / off- duty', 'use of alcohol while off duty', regex=False)\
+        .str.replace(r'(\w+) / (\w+)', r'\1/\2', regex=True)\
+        .str.replace('department property', 'department equipment', regex=False)\
+        .str.replace('civil service rules; rule v, section 9 - to wit paragraph 1 and paragraph 18', '', regex=False)\
+        .str.replace('paragraph 05 - ceasing to perform duty before end of shift',
+                     'paragraph 03 - devoting entire time to duty', regex=False)\
+        .str.replace('rest activities', 'restricted activities', regex=False)\
+        .str.replace('from authoritative', 'from an authoritative', regex=False)\
+        .str.replace('paprgraph', 'paragraph', regex=False)\
+        .str.replace('digital mobile video audio recording', 'digital, mobile, video, or audio recording', regex=False)\
+        .str.replace(r'\bparagraph 1\b', 'paragraph 01', regex=True)\
+        .str.replace('policy;', 'policy:', regex=False)
     df = df.drop(columns=['rule_violation', 'paragraph_violation'])
     return df
 
@@ -129,7 +153,7 @@ def clean():
             'all_findings', 'allegation_1', 'allegation_alert_processed', 'allegation_alert_processed_date',
             'allegation_class_1', 'allegation_directive', 'allegation_final_disposition',
             'allegation_final_disposition_date', 'allegation_finding', 'allegation_finding_date', 'assigned_date',
-            'cit_complaint', 'citizen_age', 'citizen_involvement', 'citizen_num_shots', 'completed_date', 'county',
+            'citizen_age', 'citizen_num_shots', 'completed_date', 'county',
             'created_date', 'day_of_week', 'disposition_nopd', 'due_date', 'field_unit_level',
             'hour_of_day', 'is_anonymous', 'length_of_job', 'month_occurred', 'officer_age_at_time_of_uof',
             'officer_badge_number', 'officer_current_supervisor', 'officer_department', 'officer_division',
@@ -137,7 +161,7 @@ def clean():
             'officer_sub_division_b', 'officer_title', 'officer_type', 'officer_unknown_id',
             'officer_years_exp_at_time_of_uof', 'officer_years_with_unit', 'open_date', 'priority', 'service_type',
             'shift_details', 'status', 'sustained', 'unidentified_officer', 'why_forwarded', 'working_status',
-            'year_occurred'
+            'year_occurred', 'allegation', 'citizen_involvement', 'allegation_class', 'cit_complaint'
         ])\
         .drop_duplicates()\
         .dropna(how="all")\
@@ -157,8 +181,7 @@ def clean():
         .pipe(combine_citizen_columns)\
         .pipe(standardize_desc_cols, [
             'incident_type', 'disposition', 'rule_violation', 'paragraph_violation',
-            'traffic_stop', 'body_worn_camera_available', 'citizen_arrested', 'allegation_finding',
-            'allegation', 'allegation_class'
+            'traffic_stop', 'body_worn_camera_available', 'citizen_arrested', 'allegation_finding'
         ])\
         .pipe(float_to_int_str, [
             'officer_primary_key', 'allegation_primary_key'
@@ -171,7 +194,7 @@ def clean():
         .pipe(combine_rule_and_paragraph)\
         .pipe(assign_agency)\
         .pipe(gen_uid, [
-            'agency', 'tracking_number', 'officer_primary_key', 'allegation', 'allegation_class'
+            'agency', 'tracking_number', 'officer_primary_key', 'allegation'
         ], 'complaint_uid')\
         .pipe(discard_allegations_with_same_description)\
         .pipe(replace_disposition)\
