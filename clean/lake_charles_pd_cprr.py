@@ -2,7 +2,7 @@ import sys
 sys.path.append('../')
 import pandas as pd
 from lib.path import data_file_path, ensure_data_dir
-from lib.clean import float_to_int_str, clean_dates
+from lib.clean import float_to_int_str
 from lib.columns import clean_column_names
 from lib.rows import duplicate_row
 from lib.uid import gen_uid
@@ -39,7 +39,49 @@ disposition_lookup = [
     ['not sustained', 'not sust', 'not sast']]
 
 
-def clean_charges(df):
+charges_lookup = [
+    ['fleet crash', 'fleet crash crash', 'fleet crash gash',
+     'gash', 'fleet crash cash', 'fleet crash mash', 'crash',
+     'fileet ', '/gast', ' cigsh'],
+    ['adherence to law', 'adherenceency to law ments', 'adhan to law'],
+    ['unsatisfactory performance', 'performance', 'unzatisfactory performance',
+     'unsatisfantary performance', 'unsetisfactory performance',
+     'unsetofec tay performance', 'unitisfactory fe form', 'unsptar performance',
+     'ungat performance', 'unsatisfactory', 'unsatisfectory performance',
+     'unsatistactory performance', 'unsatperformance', 'unsatisfactory ferf',
+     'unsatisfactory restory', 'unsada performance', 'unsatisfactory uasat performance',
+     'unsatperform', 'unsatfertorm'],
+    ['unauthorized force', 'unauthogized force', 'unanthorized force', 'unauthf force',
+     'unauth force', 'unsatfertorm', 'unauth'],
+    ['neglect of duty', 'neglect of duty of buty', 'neglect of duty of duty',
+     'neglect of duty of wuty', 'wednefof daty'],
+    ['theft/false arrest', 'theft /fase arrest'],
+    ['false or inaccurate statement', 'falze ordnaccumate state', 'false on fracanta',
+     'false or strace statement'],
+    ['sexual harrassment', 'sexual has massment', 'harassment'],
+    ['use of department equipment', 'use of deptequip', 'use f lept equipment',
+     'of rept equipment use', 'department vehicles'],
+    ['two counts of insubordination'],
+    ['insubordination', 'ansabordination', 'ansubord linbering', 'disaboridation', 'dispordingtion',
+     'huspbodization'],
+    ['insubordination; conduct unbecoming', 'ansub /conduct unbecon'],
+    ['unauthorized force', 'lignauth force', 'unaathorized force'],
+    ['adherence to law', 'adner to', 'adherenceence to law', 'to law',
+     'addre to ('],
+    ['conduct unbecoming', '/conduct'],
+    ['chain of command', 'chaind com'],
+    ['discrimination/bias', 'discrimination isias'],
+    ['unsatisfactory performance/insubordination', 'unsatient ansupendination',
+     'ansub'],
+    ['tardiness', 'tandiness'],
+    ['officer involved shooting', 'officer', 'office involved streeting f'],
+    ['assocations', 'associations'],
+    ['abuse of position', 'abuse of '],
+    ['workplace violence'],
+    ['employee harrassment', 'employee contact']]
+
+
+def clean_charges_20(df):
     df.loc[:, 'charges'] = df.nature_of_complaint.str.lower().str.strip()\
         .str.replace(r'\. ?', ' ', regex=True)\
         .str.replace(',', '', regex=False)\
@@ -53,7 +95,7 @@ def clean_charges(df):
     return df.drop(columns='nature_of_complaint')
 
 
-def split_rows_with_multiple_charges(df):
+def split_rows_with_multiple_charges_20(df):
     i = 0
     for idx in df[df.charges.str.contains(r'/')].index:
         s = df.loc[idx + i, 'charges']
@@ -65,13 +107,13 @@ def split_rows_with_multiple_charges(df):
     return df
 
 
-def clean_action(df):
+def clean_action_20(df):
     df.loc[:, 'action'] = df.action_taken.str.lower().str.strip()\
         .str.replace(r'no action ?(tak[eo]n)?', '', regex=True)
     return df.drop(columns=('action_taken'))
 
 
-def consolidate_action_and_disposition(df):
+def consolidate_action_and_disposition_20(df):
     df.loc[:, 'action'] = df.action.str.cat(df.disposition, sep='|')\
         .str.replace(r'((not)? ?sustained|exonerated|unfounded|invalid complaint) ?', '', regex=True)\
         .str.replace(r'^\|', '', regex=True)\
@@ -80,14 +122,14 @@ def consolidate_action_and_disposition(df):
     return df
 
 
-def clean_disposition(df):
+def clean_disposition_20(df):
     df.loc[:, 'disposition'] = df.disposition.str.lower().str.strip()\
         .str.replace('invalid complaint', '', regex=False)\
         .str.replace('suspended', '', regex=False)
     return df
 
 
-def split_rows_with_multiple_officers(df):
+def split_rows_with_multiple_officers_20(df):
     i = 0
     for idx in df[df.name.str.contains(r"/|,")].index:
         s = df.loc[idx + i, "name"]
@@ -99,23 +141,23 @@ def split_rows_with_multiple_officers(df):
     return df
 
 
-def drop_rows_missing_disp_charges_and_action(df):
+def drop_rows_missing_disp_charges_and_action_20(df):
     return df[~((df.disposition == '') & (df.charges == '') & (df.action == ''))]
 
 
-def assign_empty_first_name_column(df):
+def assign_empty_first_name_column_20(df):
     df.loc[:, 'first_name'] = ''
     return df
 
 
-def review_first_names_from_post():
-    df = pd.read_csv(data_file_path('match/lake_charles_pd_cprr_2020_extracted_first_names.csv'))
+def review_first_names_from_post_20():
+    df = pd.read_csv(data_file_path('match/lake_charles_pd_cprr_2020_assign_first_name_from_post_pprr_2020_11_06.xlsx'))
     df = df\
         .pipe(clean_column_names)
     return df
 
 
-def assign_first_names_from_post(df):
+def assign_first_names_from_post_20(df):
     df.loc[:, 'name'] = df.name.str.lower().str.strip()\
         .str.replace('torres', 'torres paul', regex=False)\
         .str.replace('redd', 'redd jeffrey', regex=False)\
@@ -162,8 +204,9 @@ def clean_tracking_number_19(df):
 
 def clean_complainant_19(df):
     df.loc[:, 'complainant'] = df.complainant_s.str.lower().str.strip().fillna('')\
-        .str.replace(r'\blcps\b', "lake charles parish sheriff's office", regex=True)\
-        .str.replace(r'\blcpd\b', 'lake charles police department', regex=True)
+        .str.replace(r'(rcpb|ucps|ups|^\/|kepb|admini station lcpa)', 'lcpd', regex=True)\
+        .str.replace(r'^l(.+)', 'lake charles police department or sheriffs office', regex=True)\
+        .str.replace(r'^(?!lake).*', '', regex=True)
     return df.drop(columns='complainant_s')
 
 
@@ -181,7 +224,7 @@ def extract_rank_from_name_19(df):
     return df
 
 
-def split_and_clean_name_19(df):
+def clean_names_19(df):
     df.loc[:, 'officer_s_accused'] = df.officer_s_accused.str.lower().str.strip().fillna('')\
         .str.replace(',', '', regex=False)\
         .str.replace(r'c?g?pl?6?\.? ', '', regex=True)\
@@ -206,7 +249,6 @@ def split_and_clean_name_19(df):
         .str.replace(r'^k. mixon to', 'r. mixon', regex=True)\
         .str.replace(r'^byb? agillory', 'branden guillory', regex=True)\
         .str.replace(r'^an\b ', 'a. ', regex=True)\
-        .str.replace(r'^i$', 'jonathan landrum', regex=True)\
         .str.replace(r'^/ saunigg', 'john saunier', regex=True)\
         .str.replace(r'^4. smith', 'joseph smith', regex=True)\
         .str.replace(r'^f simien 1', 'josh simien', regex=True)\
@@ -226,7 +268,7 @@ def split_and_clean_name_19(df):
         .str.replace(r'^f$', '', regex=True)\
         .str.replace(r'^to wofford$', 'j. walford', regex=True)\
         .str.replace(r'(mg kaughenbaugh|c\. daughen baugh)',
-                      'marie daughenbaugh', regex=True)\
+                     'marie daughenbaugh', regex=True)\
         .str.replace(r'j. eving', 'j. ewing/marie daughenbaugh', regex=True)\
         .str.replace(r'^2. harrell', 'r. harrell', regex=True)\
         .str.replace(r'i?\.? ?stickell', 'j. stickell', regex=True)\
@@ -248,11 +290,25 @@ def split_and_clean_name_19(df):
         .str.replace('hammee', 'hammer', regex=False)\
         .str.replace(' manual', ' manuel', regex=False)\
         .str.replace(r'^ryjjennis$', 'russell dennis', regex=True)\
-        .str.replace(' \bdenyis\b', ' dennis', regex=False)\
+        .str.replace(' \bdenyis\b', ' dennis', regex=True)\
+        .str.replace(' williays', ' williams', regex=False)\
+        .str.replace(r'(\w+) \b(\w{1})\b', r'\2 \1', regex=True)\
         .str.replace(r'\.', '', regex=True)\
-        .str.replace('  ', ' ', regex=False)\
-        .str.replace(r'^(\w+)$', r' \1', regex=True)
+        .str.replace(r'^(\w+)$', r' \1', regex=True)\
+        .str.replace(r'^ i$', 'jonathan landrum', regex=True)\
+        .str.replace(r'^j n', 'j', regex=True)
+    return df
 
+
+def assign_missing_names_19(df):
+    df.loc[(df.tracking_number == '16-7'), 'officer_s_accused'] = 'a malveaux'
+    df.loc[(df.tracking_number == '19-54'), 'officer_s_accused'] = 'a aeheb'
+    df.loc[(df.tracking_number == '17-36'), 'officer_s_accused'] = 'john saunier'
+    df.loc[(df.tracking_number == '17-38'), 'officer_s_accused'] = 'j littleton'
+    return df
+
+
+def split_rows_with_multiple_officers_19(df):
     i = 0
     for idx in df[df.officer_s_accused.str.contains("/")].index:
         s = df.loc[idx + i, "officer_s_accused"]
@@ -261,26 +317,63 @@ def split_and_clean_name_19(df):
         for j, name in enumerate(parts):
             df.loc[idx + i + j, "officer_s_accused"] = name
         i += len(parts) - 1
-    
-    names = df.officer_s_accused.str.extract(r'(\w+)? ?(\w+)')
+    return df
+
+
+def review_first_names_from_post_19(df):
+    df = pd.read_csv(data_file_path('match/lake_charles_pd_cprr_2014_2019_assign_first_name_from_post_pprr_2020_11_06.xlsx'))
+    df = df\
+        .pipe(clean_column_names)
+    return df
+
+
+def assign_first_names_from_post_19(df):
+    df.loc[:, 'officer_s_accused'] = df.officer_s_accused.str.lower().str.strip().fillna('')\
+        .str.replace('s clouse', 'samuel clouse', regex=False)\
+        .str.replace('j courville', 'julia courville', regex=False)\
+        .str.replace('r rainwater', 'robert rainwater', regex=False)\
+        .str.replace('j redd', 'jeffrey redd', regex=False)\
+        .str.replace('s kingsley', 'samuel kingsley', regex=False)\
+        .str.replace('j savoie', 'joe savoie', regex=False)\
+        .str.replace('j saunier', 'john saunier', regex=False)\
+        .str.replace('h nevels', 'harold nevels', regex=False)\
+        .str.replace('b dommert', 'bret dommert', regex=False)\
+        .str.replace('t duplechan', 'timothy duplechan', regex=False)\
+        .str.replace('s dougherty', 'scott dougherty', regex=False)\
+        .str.replace('l mills', 'logan mills', regex=False)\
+        .str.replace('j wall', 'judith wall', regex=False)\
+        .str.replace('m wilson', 'michael wilson', regex=False)\
+        .str.replace('whitfield', 'michael whitfield', regex=False)\
+        .str.replace('k washington', 'kalon washington', regex=False)\
+        .str.replace('g geheb', 'gary geheb', regex=False)\
+        .str.replace('k hoover', 'kevin hoover', regex=False)\
+        .str.replace('t toten', 'travis toten', regex=False)\
+        .str.replace('m johnson', 'martin johnson', regex=False)\
+        .str.replace('c johnson', 'christopher johnson', regex=False)\
+        .str.replace('h rivera-alicea', 'hector rivera-alicea', regex=False)\
+        .str.replace('r milled', 'rickey miller', regex=False)\
+        .str.replace('gardener', 'phillip gardiner', regex=False)\
+        .str.replace('r rathbenn', 'ross rathburn', regex=False)\
+        .str.replace('m treadery', 'michael treadway', regex=False)\
+        .str.replace('t scheoner', 'thadius shecher', regex=False)\
+        .str.replace('t masee', 'tony magee', regex=False)\
+        .str.replace('j mccopley', 'john mccloskey', regex=False)\
+        .str.replace('m bentrand', 'mandy bertrand', regex=False)
+    return df
+
+
+def split_names_19(df):
+    names = df.officer_s_accused.fillna('').str.extract(r'(?:(\w+) )? ?(.+)')
     df.loc[:, 'first_name'] = names[0].fillna('')
     df.loc[:, 'last_name'] = names[1].fillna('')
     return df
 
 
-def assign_missing_names(df):
-    df.loc[(df.tracking_number == '16-7'), 'officer_s_accused'] = 'a. malveaux'
-    df.loc[(df.tracking_number == '19-54'), 'officer_s_accused'] = 'a. aeheb'
-    df.loc[(df.tracking_number == '17-36'), 'officer_s_accused'] = 'john saunier'
-    df.loc[(df.tracking_number == '17-38'), 'officer_s_accused'] = 'j. littleton'
-    return df
-
-
-def drop_rows_missing_name(df):
+def drop_rows_missing_name_19(df):
     return df[~((df.first_name == '') & (df.last_name == ''))]
 
 
-def assign_proper_charges(df):
+def assign_charges_19(df):
     df.loc[(df.tracking_number == '19-2'), 'charges'] = 'fleet crash'
     df.loc[(df.tracking_number == '17-14'), 'charges'] = 'unauthorized force/unsatisfactory performance'
     return df
@@ -292,27 +385,26 @@ def clean_investigation_start_date_19(df):
         .str.replace('.', '/', regex=False)\
         .str.replace('9817', '', regex=False)\
         .str.replace('412', '4/12', regex=False)\
-        .str.replace(r'(\w+)/(\d+)', '', regex=True)\
         .str.replace('48/19', '4/8/2019', regex=False)\
         .str.replace('3716', '3/17/2016', regex=False)\
         .str.replace('5/416', '5/4/2016', regex=False)\
-        .str.replace(r'^/(\d+)', '', regex=True)
+        .str.replace(r'(\d+) $', r'\1', regex=True)\
+        .str.replace('Apr', '04', regex=False)\
+        .str.replace('5/417', '5/04/2017', regex=False)\
+        .str.replace('10/24116', '10/24/2016', regex=False)\
+        .str.replace('04/17', '', regex=False)
     return df.drop(columns='date')
 
 
 def clean_charges_19(df):
-    df.loc[:, 'charges'] = df.complaint.str.lower().str.strip()\
+    df.loc[:, 'charges'] = df.complaint.str.lower().str.strip().fillna('')\
         .str.replace('  ', ' ', regex=False)\
         .str.replace('if', 'of', regex=False)\
         .str.replace(r'\.', '', regex=True)\
         .str.replace(r', ?', '', regex=True)\
-        .str.replace(r'f?i?e?leet/? f?c?i?r?a?g?a?s?hy?t?', 'fleet crash', regex=True)\
-        .str.replace(r'fa[ls]e', 'false', regex=True)\
-        .str.replace(r'(unhacancy|hopcoring|unbecom)', 'unbecoming', regex=True)\
         .str.replace(r'un?g?h?ss?ae?l?f?t?i?y?\b', 'unsatisfactory', regex=True)\
         .str.replace('viplence', 'violance', regex=False)\
         .str.replace('chaindcom', 'chain of command', regex=False)\
-        .str.replace(r'perf?o?r?m', 'performance', regex=False)\
         .str.replace('ha passment', 'harrassment', regex=False)\
         .str.replace(r'destequip|equit', 'department equipment', regex=True)\
         .str.replace(r'profes?s?i?o?n?a?l?i?s?t?y?', 'professionalism', regex=True)\
@@ -320,11 +412,15 @@ def clean_charges_19(df):
         .str.replace('uncuthorized', 'unauthorized', regex=False)\
         .str.replace(r'd?w?uty', 'duty', regex=False)\
         .str.replace('olinace', 'online', regex=False)\
-        .str.replace('adher', 'adherence', regex=False)
-    return df.drop(columns='complaint')
+        .str.replace('adher', 'adherence', regex=False)\
+        .str.replace(r'\bp(\w+)', 'performance', regex=True)\
+        .str.replace(r'^co(.+)', 'conduct unbecoming', regex=True)\
+        .str.replace(r'^fl(\w+)', 'fleet crash', regex=True)\
+        .str.replace(r'^n(\w+)', 'neglect of duty', regex=True)
+    return standardize_from_lookup_table(df, 'charges', charges_lookup).drop(columns='complaint')
 
 
-def extract_actions_from_disposition19(df):
+def extract_actions_from_disposition_19(df):
     actions = df.disposition.str.lower().str.strip()\
         .str.replace('/', '', regex=False)\
         .str.replace(r're[dp]', 'reprimand', regex=True)\
@@ -343,7 +439,7 @@ def extract_actions_from_disposition19(df):
     return df
 
 
-def clean_disposition19(df):
+def clean_disposition_19(df):
     df.loc[:, 'disposition'] = df.disposition.str.lower().str.strip().fillna('')\
         .str.replace('  ', ' ', regex=False)
     return standardize_from_lookup_table(df, 'disposition', disposition_lookup)
@@ -359,7 +455,7 @@ def clean_and_split_investigator_19(df):
         .str.replace(r'^(a|h|t|k|i|e|s|n|d)(\w+)', 'lieutenant richard harrell', regex=True)\
         .str.replace(r'^(c|f)(\w+)', 'deputy kirk carroll', regex=True)\
         .str.replace(r'^g(\w+)', 'dustin gaudet', regex=True)
-    
+
     names = df.investigator.str.extract(r'(lieutenant|deputy) (\w+) (\w+)')
     df.loc[:, 'investigator_rank_desc'] = names[0]
     df.loc[:, 'investigator_first_name'] = names[1]
@@ -368,22 +464,22 @@ def clean_and_split_investigator_19(df):
     return df.drop(columns='investigator')
 
 
-def clean20():
+def clean_20():
     df = pd.read_csv(data_file_path('raw/lake_charles_pd/lake_charles_pd_cprr_2020.csv'))
     df = df\
         .pipe(clean_column_names)\
         .rename(columns={
             'date_of_investigation': 'investigation_start_date'
         })\
-        .pipe(clean_charges)\
-        .pipe(split_rows_with_multiple_charges)\
-        .pipe(clean_action)\
-        .pipe(consolidate_action_and_disposition)\
-        .pipe(clean_disposition)\
-        .pipe(split_rows_with_multiple_officers)\
-        .pipe(drop_rows_missing_disp_charges_and_action)\
-        .pipe(assign_empty_first_name_column)\
-        .pipe(assign_first_names_from_post)\
+        .pipe(clean_charges_20)\
+        .pipe(split_rows_with_multiple_charges_20)\
+        .pipe(clean_action_20)\
+        .pipe(consolidate_action_and_disposition_20)\
+        .pipe(clean_disposition_20)\
+        .pipe(split_rows_with_multiple_officers_20)\
+        .pipe(drop_rows_missing_disp_charges_and_action_20)\
+        .pipe(assign_empty_first_name_column_20)\
+        .pipe(assign_first_names_from_post_20)\
         .pipe(assign_agency)\
         .pipe(float_to_int_str, ['investigation_start_date'])\
         .pipe(gen_uid, ['first_name', 'last_name', 'agency'])\
@@ -391,24 +487,35 @@ def clean20():
     return df
 
 
-def clean19():
+def clean_19():
     df = pd.read_csv(data_file_path('raw/lake_charles_pd/lake_charles_pd_cprr_2014_2019.csv'))\
         .pipe(clean_column_names)\
+        .drop(columns=['shift'])\
         .pipe(clean_investigation_start_date_19)\
         .pipe(clean_tracking_number_19)\
         .pipe(clean_complainant_19)\
         .pipe(extract_rank_from_name_19)\
-        .pipe(split_and_clean_name_19)\
-        .pipe(drop_rows_missing_name)\
+        .pipe(clean_names_19)\
+        .pipe(assign_missing_names_19)\
+        .pipe(split_rows_with_multiple_officers_19)\
+        .pipe(assign_first_names_from_post_19)\
+        .pipe(split_names_19)\
+        .pipe(drop_rows_missing_name_19)\
+        .pipe(assign_charges_19)\
         .pipe(clean_charges_19)\
-        .pipe(extract_actions_from_disposition19)\
-        .pipe(clean_disposition19)\
+        .pipe(extract_actions_from_disposition_19)\
+        .pipe(clean_disposition_19)\
         .pipe(clean_and_split_investigator_19)\
-        .pipe(assign_proper_charges)
+        .pipe(assign_agency)\
+        .pipe(gen_uid, ['first_name', 'last_name', 'agency'])\
+        .pipe(gen_uid, ['first_name', 'last_name', 'tracking_number',
+                        'investigation_start_date', 'charges', 'action'], 'complaint_uid')
     return df
 
 
 if __name__ == '__main__':
-    df20 = clean20()
+    df20 = clean_20()
+    df19 = clean_19()
     ensure_data_dir('clean')
     df20.to_csv(data_file_path('clean/cprr_lake_charles_pd_2020.csv'), index=False)
+    df19.to_csv(data_file_path('clean/cprr_lake_charles_pd_2014_2019.csv'), index=False)

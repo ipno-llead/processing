@@ -1,7 +1,7 @@
 import sys
 sys.path.append("../")
 import pandas as pd
-from lib.path import data_file_path, ensure_data_dir
+from lib.path import data_file_path
 from lib import events
 from lib.columns import rearrange_complaint_columns
 from lib.personnel import fuse_personnel
@@ -13,9 +13,16 @@ def prepare_post_data():
     return post[post.agency == 'lake charles pd']
 
 
-def fuse_events(cprr, post):
+def fuse_events(cprr20, cprr19, post):
     builder = events.Builder()
-    builder.extract_events(cprr, {
+    builder.extract_events(cprr20, {
+        events.INVESTIGATION_START: {
+            'prefix': 'investigation_start',
+            'parse_date': True,
+            'keep': ['uid', 'agency', 'complaint_uid'],
+        },
+    }, ['uid', 'complaint_uid'])
+    builder.extract_events(cprr19, {
         events.INVESTIGATION_START: {
             'prefix': 'investigation_start',
             'parse_date': True,
@@ -42,14 +49,14 @@ def fuse_events(cprr, post):
 
 
 if __name__ == '__main__':
-    cprr = pd.read_csv(data_file_path('match/cprr_lake_charles_pd_2020.csv'))
+    cprr20 = pd.read_csv(data_file_path('match/cprr_lake_charles_pd_2020.csv'))
+    cprr19 = pd.read_csv(data_file_path('match/cprr_lake_charles_pd_2014_2019.csv'))
     post = prepare_post_data()
-    per = fuse_personnel(cprr, post)
-    com = rearrange_complaint_columns(cprr)
+    per = fuse_personnel(cprr20, cprr19, post)
+    com = rearrange_complaint_columns(pd.concat([cprr20, cprr19]))
     ensure_uid_unique(com, 'complaint_uid')
-    event = fuse_events(cprr, post)
+    event = fuse_events(cprr20, cprr19, post)
     ensure_uid_unique(event, 'event_uid')
-    ensure_data_dir('fuse')
     event.to_csv(
         data_file_path('fuse/event_lake_charles_pd.csv'), index=False)
     com.to_csv(
