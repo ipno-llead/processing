@@ -19,7 +19,7 @@ def extract_post_events(pprr, post):
     dfa.loc[:, 'fc'] = dfa.first_name.fillna('').map(lambda x: x[:1])
     dfa = dfa.drop_duplicates().set_index('uid', drop=True)
 
-    dfb = post[['last_name', 'first_name', 'uid']]
+    dfb = post[['last_name', 'first_name',  'uid']]
     dfb.loc[:, 'hire_date'] = combine_date_columns(
         post, 'hire_year', 'hire_month', 'hire_day')
     dfb.loc[:, 'fc'] = dfb.first_name.fillna('').map(lambda x: x[:1])
@@ -38,10 +38,36 @@ def extract_post_events(pprr, post):
     return extract_events_from_post(post, matches, "Kenner PD")
 
 
+def match_uof_pprr(uof, ppprr):
+    dfa = uof[['uid', 'first_name', 'last_name', 'middle_initial']]
+    dfa = dfa.drop_duplicates(subset=['uid']).set_index('uid')
+    dfa.loc[:, 'fc'] = dfa.first_name.fillna('').map(lambda x: x[:1])
+
+    dfb = pprr[['uid', 'first_name', 'last_name', 'middle_initial']]
+    dfb = dfb.drop_duplicates(subset=['uid']).set_index('uid')
+    dfb.loc[:, 'fc'] = dfb.first_name.fillna('').map(lambda x: x[:1])
+
+    matcher = ThresholdMatcher(ColumnsIndex('fc'), {
+        'first_name': JaroWinklerSimilarity(),
+        'last_name': JaroWinklerSimilarity(),
+    }, dfa, dfb)
+    decision = .98
+    matcher.save_pairs_to_excel(
+        data_file_path('match/kenner_pd_uof_2005_2021_v_pprr_post_2020_11_06.xlsx'), decision)
+    matches = matcher.get_index_pairs_within_thresholds(decision)
+    match_dict = dict(matches)
+
+    uof.loc[:, 'uid'] = uof.uid.map(lambda x: match_dict.get(x, x))
+    return uof
+
+
 if __name__ == '__main__':
     pprr = pd.read_csv(data_file_path('clean/pprr_kenner_pd_2020.csv'))
     post = pd.read_csv(data_file_path('clean/pprr_post_2020_11_06.csv'))
+    uof = pd.read_csv(data_file_path('clean/uof_kenner_pd_2005_2021.csv'))
     post_events = extract_post_events(pprr, post)
-    ensure_data_dir("match")
+    uof = match_uof_pprr(uof, pprr)
     post_events.to_csv(data_file_path(
-        "match/post_event_kenner_pd_2020.csv"), index=False)
+        'match/post_event_kenner_pd_2020.csv'), index=False)
+    uof.to_csv(data_file_path(
+        'match/uof_kenner_pd_2005_2021.csv'), index=False)

@@ -41,7 +41,8 @@ def fuse_personnel():
         pd.read_csv(data_file_path("fuse/per_lake_charles_pd.csv")),
         pd.read_csv(data_file_path("fuse/per_sterlington_pd.csv")),
         pd.read_csv(data_file_path("fuse/per_youngsville_pd.csv")),
-        pd.read_Csv(data_file_path("fuse/per_west_monroe_pd.csv")),
+        pd.read_csv(data_file_path("fuse/per_west_monroe_pd.csv")),
+        pd.read_csv(data_file_path("fuse/per_carencro_pd.csv")),
     ])).sort_values('uid', ignore_index=True)
 
 
@@ -79,6 +80,7 @@ def fuse_event():
         pd.read_csv(data_file_path("fuse/event_sterlington_pd.csv")),
         pd.read_csv(data_file_path("fuse/event_youngsville_pd.csv")),
         pd.read_csv(data_file_path("fuse/event_west_monroe_pd.csv")),
+        pd.read_csv(data_file_path("fuse/event_carencro_pd.csv")),
     ])).sort_values(['agency', 'event_uid'], ignore_index=True)
 
 
@@ -111,6 +113,7 @@ def fuse_complaint():
 def fuse_use_of_force():
     return rearrange_use_of_force(pd.concat([
         pd.read_csv(data_file_path("fuse/uof_new_orleans_pd.csv")),
+        pd.read_csv(data_file_path("fuse/uof_kenner_pd.csv")),
     ])).sort_values(['agency', 'data_production_year', 'uof_tracking_number'])
 
 

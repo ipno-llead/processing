@@ -11,7 +11,7 @@ sys.path.append('../')
 
 def prepare_post_data():
     post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
-    return post[post.agency == 'west monroe pd']
+    return post[post.agency == 'carencro pd']
 
 
 def match_pprr_and_post(pprr, post):
@@ -29,15 +29,15 @@ def match_pprr_and_post(pprr, post):
     }, dfa, dfb)
     decision = 0.9
     matcher.save_pairs_to_excel(data_file_path(
-        "match/west_monroe_pd_pprr_2015_2020_v_post_pprr_2020_11_06.xlsx"), decision)
+        "match/carencro_pd_pprr_2015_2020_v_post_pprr_2020_11_06.xlsx"), decision)
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
-    return extract_events_from_post(post, matches, 'West Monroe PD')
+    return extract_events_from_post(post, matches, 'Carencro PD')
 
 
 if __name__ == '__main__':
-    pprr = pd.read_csv(data_file_path('clean/pprr_west_monroe_pd_2015_2020.csv'))
+    pprr = pd.read_csv(data_file_path('clean/pprr_carencro_pd_2021.csv'))
     post = prepare_post_data()
     post_event = match_pprr_and_post(pprr, post)
     post_event.to_csv(data_file_path(
-        'match/post_event_west_monroe_pd_2020_11_06.csv'
+        'match/post_event_carencro_pd_2020_11_06.csv'
     ), index=False)
