@@ -1,7 +1,7 @@
 import sys
 sys.path.append('../')
 import pandas as pd
-from lib.path import data_file_path, ensure_data_dir
+from lib.path import data_file_path
 
 
 def extract_da_rosters(df):
@@ -32,7 +32,7 @@ def clean_agency(df):
         .str.replace(r'4th (da office|jdc)', "4th District Attorney's Office", regex=True)\
         .str.replace("5th jdc district attorney's office", "5th District Attorney's Office", regex=False)\
         .str.replace('allen da office', "33rd District Attorney's Office", regex=False)\
-        .str.replace('attorney generals office', "Attorney Generals Office", regex=False)\
+        .str.replace('attorney generals office', "Attorney General's Office", regex=False)\
         .str.replace('caldwell da office', "37th District Attorney's Office", regex=False)\
         .str.replace('east baton rouge da office', "19th District Attorney's office", regex=False)\
         .str.replace('iberia da office', "16th District ATtorney's Office", regex=False)\
@@ -55,5 +55,4 @@ def clean():
 
 if __name__ == '__main__':
     df = clean()
-    ensure_data_dir('clean')
-    df.to_csv(data_file_path('clean/pprr_da.csv'), index=False)
+    df.to_csv(data_file_path('clean/pprr_da_offices.csv'), index=False)
