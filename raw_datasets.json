@@ -79,7 +79,8 @@
     "https://www.dropbox.com/s/j20pcmebe97ql7y/st._tammany_so_pprr_2020.csv?dl=1"
   ],
   "plaquemines_so": [
-    "https://www.dropbox.com/s/g1b98kn4e4k1dtr/plaquemines_so_cprr_2019.csv?dl=1"
+    "https://www.dropbox.com/s/g1b98kn4e4k1dtr/plaquemines_so_cprr_2019.csv?dl=1",
+    "https://www.dropbox.com/s/0blyx05qcb0lbyw/plaqumines_so_pprr_2018.csv?dl=1"
   ],
   "caddo_parish_so": [
     "https://www.dropbox.com/sh/8w4uff2emzbhcvr/AAC4YdwWdPudXeH4pdDvl-Fpa/Caddo%20Parish_SO_PPRR_2020.csv?dl=1"
@@ -181,5 +182,14 @@
   ],
   "west_monroe_pd": [
     "https://www.dropbox.com/s/tjuwpmcpwpeegvt/west_monroe_pd_pprr_2015_2020.csv?dl=1"
+  ],
+  "universities": [
+    "https://www.dropbox.com/s/f0m3ym4vvk66134/pprr_post_2020_11_06.csv?dl=1"
+  ],
+  "carencro_pd": [
+    "https://www.dropbox.com/s/1r90j1ebbzdzhfq/carencro_pd_pprr_2021.csv?dl=1"
+  ],
+  "new_orleans_csc": [
+    "https://www.dropbox.com/s/p4n5ykrdsg097ur/new_orleans_csc_lprr_2000_2016.csv?dl=1"
   ]
 }

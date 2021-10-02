@@ -312,6 +312,10 @@ repos:
     fileName: fuse/per_west_monroe_pd.csv
     primaryKey:
       - uid
+  per-carencro-pd:
+    fileName: fuse/per_carencro_pd.csv
+    primaryKey:
+      - uid
   event-new-orleans-pd:
     fileName: fuse/event_new_orleans_pd.csv
     primaryKey:
@@ -434,6 +438,10 @@ repos:
       - event_uid
   event-west-monroe-pd:
     fileName: fuse/event_west_monroe_pd.csv
+    primaryKey:
+      - event_uid
+  event-carencro-pd:
+    fileName: fuse/event_carencro_pd.csv
     primaryKey:
       - event_uid
   personnel:

@@ -3,7 +3,7 @@ sys.path.append("../")
 import pandas as pd
 from lib.columns import clean_column_names, set_values
 from lib.path import data_file_path, ensure_data_dir
-from lib.clean import clean_dates, clean_names, float_to_int_str, standardize_desc_cols
+from lib.clean import clean_names, float_to_int_str, standardize_desc_cols
 from lib.uid import gen_uid
 from lib.standardize import standardize_from_lookup_table
 
@@ -377,11 +377,11 @@ def clean_charges_20(df):
         .str.replace(r'(\w+)  ? ?/(\w+)', r'\1/\2', regex=True)\
         .str.replace(r'(\w+)   ? ? ? ? ? ?(\w+)', r'\1 \2', regex=True)\
         .str.replace('neglect of duty/neglect of duty-failure to act '
-                     'neglect of duty-failure to act/neglect of duty-failure to act', 
+                     'neglect of duty-failure to act/neglect of duty-failure to act',
                      'neglect of duty/neglect of duty-failure to act', regex=False)\
         .str.replace(r'act ? ?ceasing', 'act/ceasing', regex=True)\
         .str.replace(r'act (\w+)', r'act/\1', regex=True)\
-        .str.replace(r'/? ?(knowledge)? ?(of)? ?(opso)? ?policy?i?e?s?  ?procedures', 
+        .str.replace(r'/? ?(knowledge)? ?(of)? ?(opso)? ?policy?i?e?s?  ?procedures',
                      " knowledge of orleans parish sheriff's office policy procedures", regex=True)\
         .str.replace(r'(\w+) knowledge', r'\1/knowledge', regex=True)\
         .str.replace(r'(\w+)  ?false', r'\1/false', regex=True)\
@@ -558,7 +558,7 @@ def add_left_reason_column(df):
     df.loc[df.arrest_date.notna(), 'arrest_left_reason'] = 'arrest'
 
     cols = ['resignation_left_reason', 'termination_left_reason', 'arrest_left_reason']
-   
+
     df.loc[:, 'left_reason'] = df[cols].apply(lambda row: '|'.join(row.values.astype(str)), axis=1)\
         .str.replace('nan', '').str.replace(r'\|+', '|').str.replace(r'\|$', '').str.replace(r'^\|', '')
     return df.drop(columns={
@@ -624,7 +624,7 @@ def clean20():
     df = clean_column_names(df)
     df = df\
         .drop(columns=[
-            'month', 'quarter', 'intial_action', 
+            'month', 'quarter', 'intial_action',
             'number_of_cases', 'date_of_board', 'a_i',
             'inmate_grievance', 'related_item_number'])\
         .rename(columns={
@@ -636,7 +636,7 @@ def clean20():
             'terminated_resigned': 'action',
             'referred_by': 'complainant'})\
         .pipe(clean_names, [
-            'investigating_supervisor', 'name_of_accused', 'charges', 
+            'investigating_supervisor', 'name_of_accused', 'charges',
             'complainant', 'action'])\
         .pipe(clean_receive_date_20)\
         .pipe(clean_investigation_start_date_20)\
