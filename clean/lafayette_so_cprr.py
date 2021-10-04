@@ -8,41 +8,40 @@ from lib.uid import gen_uid
 
 
 def clean_and_split_names(df):
-    df.name = df.name.str.lower().str.strip()\
+    df.loc[:, 'name'] = df.name.str.lower().str.strip()\
         .str.replace('bourque,john', 'bourque john', regex=False)\
         .str.replace('cressionie,justin', 'cressionie justin', regex=False)\
         .str.replace('deshotel,shannor', 'deshotel shannor', regex=False)\
-        .str.replace(r',|intake booking|file for records|'
-                     r'unknown|only', '', regex=True)\
         .str.replace('auzennejames', 'auzenne james', regex=False)\
         .str.replace('st.cyrneil', 'st.cyr neil', regex=False)\
         .str.replace('anceletjordan', 'ancelet jordan', regex=False)\
-        .str.replace('suarezrichard', 'suarez richard')
-    names = df.name.str.extract(r'(?:(\w+\.?|\w+\.?-?\w+) )?(?:(\w+) )?(\w+)')
-    df.loc[:, 'last_name'] = names[0].fillna('')
+        .str.replace('suarezrichard', 'suarez richard')\
+        .str.replace(r'(unknown|records for file|file for records only|'
+                     r'intake booking|corrections intake)', 'file for records', regex=True)\
+        .str.replace(r'(\w+)[,\.] ?(\w+)', r'\1, \2', regex=True)
+    names = df.name.str.extract(r'(?:(\w+,?|\w+\.?-?\w+,?) )?(?:(\w+) )?(.+)')
+    df.loc[:, 'last_name'] = names[0]\
+        .str.replace(',', '', regex=False).fillna('')
     df.loc[:, 'middle_name'] = names[1].fillna('')
-    df.loc[:, 'first_name'] = names[2].fillna('')
-    return df.drop(columns='name').fillna('')
-
-
-def drop_rows_missing_names(df):
-    return df[~((df.first_name == '') & (df.middle_name == '') & (df.last_name == ''))]
+    df.loc[:, 'first_name'] = names[2]
+    return df.drop(columns='name')
 
 
 def clean_charges(df):
-    df.loc[:, 'charges'] = df.complaint.str.lower().str.strip().fillna('')\
+    df.loc[:, 'charges'] = df.complaint.str.lower().str.strip()\
         .str.replace(',', '', regex=False)\
         .str.replace(r'(^file for records ?(only)?)', '', regex=True)\
         .str.replace('unable to locate', '', regex=False)\
         .str.replace('with drew complaint', '', regex=False)\
         .str.replace(r'^courtesy/ identification$', 'courtesy/identification', regex=True)\
         .str.replace(r'(\w+) ?/ ?(\w+)', r'\1/\2', regex=True)\
-        .str.replace(r'(.+)/courtesy', r'courtesy/\1', regex=True)\
         .str.replace('report writing', 'departmental reports', regex=False)\
         .str.replace('search seizure', 'search and seizure', regex=False)\
         .str.replace('citizen complaint', '', regex=False)\
         .str.replace('biased biased', 'bias-based', regex=False)\
-        .str.replace('fire arm', 'firearm', regex=False)
+        .str.replace('fire arm', 'firearm', regex=False)\
+        .str.replace(r'(\w+)/performance of duty', r'performance of duty/\1', regex=True)\
+        .str.replace(r'(\w+)/unsatisfactory performance', r'unsatisfactory performance/\1', regex=True)
     return df.drop(columns='complaint')
 
 
@@ -50,9 +49,8 @@ def clean_disposition(df):
     df.disposition = df.disposition.str.lower().str.strip()\
         .str.replace('non-sustained', 'not sustained', regex=False)\
         .str.replace(r'^policy fail$', 'policy failure', regex=True)\
-        .str.replace(r'(^file for records ?(only)?)', '', regex=True)\
-        .str.replace('n/a', '', regex=False)\
-        .str.replace(r'comp\. withdrew', '', regex=True)
+        .str.replace(r'(n/a|^file for records ?(only)?|comp\. withdrew|'
+                     r'|withdrew com\.)', '', regex=True)
     return df
 
 
@@ -80,7 +78,7 @@ def clean_complete(df):
 
 
 def clean_days(df):
-    df.loc[:, 'duration_of_action'] = df.days.str.lower().str.strip().fillna('')\
+    df.loc[:, 'duration_of_action'] = df.days.str.lower().str.strip()\
         .str.replace('1', '1 day', regex=False)\
         .str.replace('3', '3 days', regex=False)\
         .str.replace('inlieu', 'in lieu', regex=False)
@@ -88,7 +86,7 @@ def clean_days(df):
 
 
 def clean_tracking_number_14(df):
-    df.loc[:, 'tracking_number'] = df.case.str.lower().str.strip().fillna('')\
+    df.loc[:, 'tracking_number'] = df.case.str.lower().str.strip()\
         .str.replace(r'(\d+)?-?sep-?(\d+)?', r'09-\1', regex=True)\
         .str.replace(r'(\d+)?-?oct-?(\d+)?', r'10-\1', regex=True)\
         .str.replace(r'(\d+)?-?nov-?(\d+)?', r'11-\1', regex=True)\
@@ -98,7 +96,7 @@ def clean_tracking_number_14(df):
 
 def clean_level(df):
     df.loc[:, 'level'] = df.level.astype(str)\
-        .str.replace(r'\.', '', regex=True).fillna('')
+        .str.replace(r'\.', '', regex=True)
     return df
 
 
@@ -144,7 +142,6 @@ def clean14():
         })\
         .drop(columns='days')\
         .pipe(clean_and_split_names)\
-        .pipe(drop_rows_missing_names)\
         .pipe(clean_tracking_number_14)\
         .pipe(clean_level)\
         .pipe(clean_charges)\
@@ -155,9 +152,9 @@ def clean14():
         .pipe(set_values, {
             'agency': 'Lafayette SO'
         })\
-        .pipe(clean_dates, ['receive_date'])\
         .pipe(gen_uid, ['first_name', 'last_name', 'agency'])\
-        .pipe(gen_uid, ['uid', 'charges', 'action', 'tracking_number'], 'complaint_uid')
+        .pipe(gen_uid, ['uid', 'charges', 'action',
+                        'tracking_number', 'receive_date'], 'complaint_uid')
     return df
 
 

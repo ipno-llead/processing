@@ -46,7 +46,7 @@ def match_cprr_14_and_post(cprr, post):
         'first_name': JaroWinklerSimilarity(),
         'last_name': JaroWinklerSimilarity(),
     }, dfa, dfb)
-    decision = .8
+    decision = .95
     matcher.save_pairs_to_excel(
         data_file_path('match/lafayette_so_2009_2014_vs_post_2020_11_06.xlsx'), decision)
     matches = matcher.get_index_pairs_within_thresholds(decision)
