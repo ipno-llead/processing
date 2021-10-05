@@ -88,7 +88,8 @@ def combine_rule_and_paragraph(df):
         .str.replace('paprgraph', 'paragraph', regex=False)\
         .str.replace('digital mobile video audio recording', 'digital, mobile, video, or audio recording', regex=False)\
         .str.replace(r'\bparagraph 1\b', 'paragraph 01', regex=True)\
-        .str.replace('policy;', 'policy:', regex=False)
+        .str.replace('policy;', 'policy:', regex=False)\
+        .str.replace('&', 'and', regex=False)
     df = df.drop(columns=['rule_violation', 'paragraph_violation'])
     return df
 
@@ -150,9 +151,6 @@ def clean_investigating_unit(df):
     return df.drop(columns='assigned_unit')
 
 
-def split_citizen(df):
-    citi
-
 def clean():
     df = initial_processing()
     return df\
@@ -180,6 +178,10 @@ def clean():
             'received_date': 'receive_date',
             'allegation_finding_oipm': 'allegation_finding',
             'allegation_created_on': 'allegation_create_date',
+            'assigned_department': 'investigating_department',
+            'assigned_division': 'investigating_division', 
+            'assigned_sub_division_a': 'investigating_sub_division_a',
+            'assigned_sub_division_b': 'investigating_sub_division_b'
         })\
         .pipe(drop_rows_without_tracking_number)\
         .pipe(clean_sexes, ['citizen_sex'])\
