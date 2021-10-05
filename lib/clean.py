@@ -237,7 +237,7 @@ def clean_races(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
             .str.replace(r'^w$', 'white', regex=True)\
             .str.replace(r'^h$', 'hispanic', regex=True)\
             .str.replace(r'^b$', 'black', regex=True)\
-            .str.replace(r'(\bislande\b|^i$)', 'islander', regex=True)\
+            .str.replace(r'\bislande\b)', 'islander', regex=True)\
             .str.replace(r'^a$', 'asian', regex=True)
         df = standardize_from_lookup_table(df, col, [
             ['black', 'african american', 'black / african american', 'black or african american'],
