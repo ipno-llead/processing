@@ -22,6 +22,7 @@ def match_cprr_with_lsp_and_opso_post(cprr, post):
     matcher = ThresholdMatcher(ColumnsIndex(['fc']), {
         'last_name': JaroWinklerSimilarity(),
         'first_name': JaroWinklerSimilarity(),
+        'agency': JaroWinklerSimilarity(),
     }, dfa, dfb)
     decision = 1
     matcher.save_pairs_to_excel(data_file_path(

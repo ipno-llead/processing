@@ -34,7 +34,7 @@ def clean_charges(df):
 def extract_agency_and_department_desc(df):
     agency = df.action.str.extract(r'(lsp)')
     df.loc[:, 'agency'] = agency[0]\
-        .str.replace('lsp', 'louisiana state police', regex=False)
+        .str.replace('lsp', 'la state police', regex=False)
 
     departments = df.action.str.extract(r'(troof f)')
     df.loc[:, 'department_desc'] = departments[0]\
@@ -49,7 +49,12 @@ def clean_action(df):
 
 
 def assign_agency(df):
-    df.loc[df.agency ', 'last_name' == 'smith'] ==  ''
+    df.loc[(df.last_name == 'brown'), 'agency'] = 'la state police'
+    df.loc[(df.last_name == 'smith'), 'agency'] = 'ouachita parish so'
+    df.loc[(df.last_name == 'desadier'), 'agency'] = 'monroe pd'
+    df.loc[(df.last_name == 'dickerson'), 'agency'] = 'la state police'
+    return df
+
 
 def clean():
     df = pd.read_csv(data_file_path('raw/ouachita_da/ouachita_da_cprr_2021_by_hand.csv'))\
@@ -59,7 +64,9 @@ def clean():
         .pipe(clean_charges)\
         .pipe(extract_agency_and_department_desc)\
         .pipe(clean_action)\
-        .pipe(gen_uid, ['first_name', 'last_name', 'agency'])
+        .pipe(assign_agency)\
+        .pipe(gen_uid, ['first_name', 'last_name', 'agency'])\
+        .pipe(gen_uid, ['uid', 'charges', 'action', 'disposition'], 'complaint_uid')
     return df
 
 
