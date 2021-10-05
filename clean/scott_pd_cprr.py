@@ -9,7 +9,7 @@ import sys
 sys.path.append("../")
 
 
-def split_name(df):
+def split_name_20(df):
     names = df.full_name.str.split(" ", expand=True)
     df.loc[:, "rank_desc"] = names.loc[:, 0].fillna("")
     df.loc[:, "first_name"] = names.loc[:, 1].fillna("")
@@ -18,11 +18,30 @@ def split_name(df):
     return df
 
 
-def split_disposition_action(df):
+def split_name_14(df):
+    names = df.officer.str.split(" ", expand=True)
+    df.loc[:, "rank_desc"] = names.loc[:, 0].fillna("")
+    df.loc[:, "first_name"] = names.loc[:, 1].fillna("")
+    df.loc[:, "last_name"] = names.loc[:, 2].fillna("")
+    df = df.drop(columns="officer")
+    return df
+
+
+def split_disposition_action_20(df):
     outcomes = df["disposition_action"].str.split("/", expand=True)
     df.loc[:, "disposition"] = outcomes.loc[:, 0].fillna("")
     df.loc[:, "action"] = outcomes.loc[:, 1].fillna("")
     df = df.drop(columns="disposition_action")
+    return df
+
+
+def split_disposition_action_14(df):
+    df.loc[:, 'outcome_final_disposition'] = df.outcome_final_disposition.str.strip().str.lower()\
+        .str.replace('arrest/ termination', 'arrested; terminated', regex=False)
+    outcomes = df["outcome_final_disposition"].str.split("/", expand=True)
+    df.loc[:, "disposition"] = outcomes.loc[:, 0].fillna("")
+    df.loc[:, "action"] = outcomes.loc[:, 1].fillna("")
+    df = df.drop(columns="outcome_final_disposition")
     return df
 
 
@@ -42,13 +61,13 @@ def clean_charges(df):
     return df
 
 
-def clean():
+def clean20():
     df = pd.read_csv(data_file_path(
         "raw/scott_pd/scott_pd_cprr_2020.csv")
     ).pipe(clean_column_names)\
         .drop(columns="appeal")\
         .dropna()\
-        .pipe(split_name)\
+        .pipe(split_name_20)\
         .pipe(
             standardize_desc_cols,
             ["rank_desc", "disposition_action"])\
@@ -57,7 +76,7 @@ def clean():
         .pipe(set_values, {
             'data_production_year': 2020,
             'agency': 'Scott PD'})\
-        .pipe(split_disposition_action)\
+        .pipe(split_disposition_action_20)\
         .pipe(clean_dates, ["notification_date"]) \
         .rename(columns={
             'notification_year': 'receive_year',
@@ -69,9 +88,27 @@ def clean():
     return df
 
 
+def clean14():
+    df = pd.read_csv(data_file_path('raw/scott_pd/scott_pd_cprr_2009_2014.csv'))\
+        .pipe(clean_column_names)\
+        .drop(columns=['appeal'])\
+        .rename(columns={
+            'date': 'receive_date',
+            'offense': 'charges'})\
+        .pipe(split_name_14)\
+        .pipe(clean_rank)\
+        .pipe(standardize_desc_cols, ['rank_desc', 'charges'])\
+        .pipe(clean_names, ['first_name', 'last_name'])\
+        .pipe(split_disposition_action_14)
+    return df
+
+
 if __name__ == "__main__":
-    df = clean()
-    ensure_data_dir("clean")
-    df.to_csv(
+    df20 = clean20()
+    df14 = clean14()
+    df20.to_csv(
         data_file_path("clean/cprr_scott_pd_2020.csv"),
+        index=False)
+    df14.to_csv(
+        data_file_path("clean/cprr_scott_pd_2009_2014.csv"),
         index=False)
