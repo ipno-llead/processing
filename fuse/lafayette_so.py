@@ -26,7 +26,8 @@ def fuse_events(cprr20, cprr14, post):
         ['uid', 'complaint_uid'])
     builder.extract_events(cprr14, {
         events.COMPLAINT_RECEIVE: {
-            'prefix': 'receive', 
+            'prefix': 'receive',
+            'parse_date': True,
             'keep': ['uid', 'agency', 'complaint_uid']
         },
     },
