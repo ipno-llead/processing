@@ -48,12 +48,6 @@ def drop_rows_without_tracking_number(df):
     return df.dropna(subset=['tracking_number']).reset_index(drop=True)
 
 
-def clean_occur_time(df):
-    df.loc[:, 'occur_time'] = df.occur_time.str.replace(
-        r'\.0$', '', regex=True)
-    return df
-
-
 def clean_trailing_empty_time(df, cols):
     for col in cols:
         df.loc[:, col] = df[col].str.replace(r' 0:00$', '', regex=True)
@@ -61,10 +55,11 @@ def clean_trailing_empty_time(df, cols):
 
 
 def clean_complainant_type(df):
-    df.loc[:, 'complainant_type'] = df.complainant_type.str.lower().str.strip()\
+    df.loc[:, 'complainant_type'] = df.source.str.lower().str.strip()\
         .str.replace(r' \# \d+$', '', regex=True).str.replace(r' complain(t|ant)$', '', regex=True)\
-        .str.replace(r'civilian', 'citizen', regex=True).str.replace(r' offi$', ' office', regex=True)
-    return df
+        .str.replace(r'civilian', 'citizen', regex=True).str.replace(r' offi$', ' office', regex=True)\
+        .str.replace('rank', 'nopd employee', regex=False).str.replace('known', '', regex=False)
+    return df.drop(columns='source')
 
 
 def combine_rule_and_paragraph(df):
@@ -146,6 +141,18 @@ def replace_disposition(df):
     return df
 
 
+def clean_investigating_unit(df):
+    df.loc[:, 'investigating_unit'] = df.assigned_unit.str.lower().str.strip()\
+        .str.replace('un-assigned', '', regex=False).str.replace('administrative', 'administration', regex=False)\
+        .str.replace(r'serv\.', 'service', regex=True).str.replace(r'fob ?-? ?|igo ?-? ?|', '', regex=True)\
+        .str.replace(r'isb ?-? ?|msb ?-? ?', '', regex=True).str.replace(r'invest\.', 'investigative', regex=True)\
+        .str.replace(r'indep\.', 'independent', regex=True).str.replace('section', '', regex=False)
+    return df.drop(columns='assigned_unit')
+
+
+def split_citizen(df):
+    citi
+
 def clean():
     df = initial_processing()
     return df\
@@ -161,7 +168,8 @@ def clean():
             'officer_sub_division_b', 'officer_title', 'officer_type', 'officer_unknown_id',
             'officer_years_exp_at_time_of_uof', 'officer_years_with_unit', 'open_date', 'priority', 'service_type',
             'shift_details', 'status', 'sustained', 'unidentified_officer', 'why_forwarded', 'working_status',
-            'year_occurred', 'allegation', 'citizen_involvement', 'allegation_class', 'cit_complaint'
+            'year_occurred', 'allegation', 'citizen_involvement', 'allegation_class', 'cit_complaint', 'incident_type',
+            'ocurred_time'
         ])\
         .drop_duplicates()\
         .dropna(how="all")\
@@ -169,29 +177,27 @@ def clean():
             'pib_control_number': 'tracking_number',
             'occurred_date': 'occur_date',
             'disposition_oipm_by_officer': 'disposition',
-            'ocurred_time': 'occur_time',
             'received_date': 'receive_date',
-            'source': 'complainant_type',
             'allegation_finding_oipm': 'allegation_finding',
-            'allegation_created_on': 'allegation_create_date'
+            'allegation_created_on': 'allegation_create_date',
         })\
         .pipe(drop_rows_without_tracking_number)\
         .pipe(clean_sexes, ['citizen_sex'])\
         .pipe(clean_races, ['citizen_race'])\
         .pipe(combine_citizen_columns)\
         .pipe(standardize_desc_cols, [
-            'incident_type', 'disposition', 'rule_violation', 'paragraph_violation',
+            'disposition', 'rule_violation', 'paragraph_violation',
             'traffic_stop', 'body_worn_camera_available', 'citizen_arrested', 'allegation_finding'
         ])\
         .pipe(float_to_int_str, [
             'officer_primary_key', 'allegation_primary_key'
         ])\
-        .pipe(clean_occur_time)\
         .pipe(clean_trailing_empty_time, ['receive_date', 'allegation_create_date'])\
         .pipe(clean_dates, ['receive_date', 'allegation_create_date', 'occur_date'])\
         .pipe(clean_tracking_number)\
         .pipe(clean_complainant_type)\
         .pipe(combine_rule_and_paragraph)\
+        .pipe(clean_investigating_unit)\
         .pipe(assign_agency)\
         .pipe(gen_uid, [
             'agency', 'tracking_number', 'officer_primary_key', 'allegation'
