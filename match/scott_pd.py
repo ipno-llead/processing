@@ -11,7 +11,7 @@ def prepare_post_data():
     return post[post.agency == 'scott pd']
 
 
-def match_cprr(cprr, pprr):
+def match_cprr_and_post_20(cprr, pprr):
     dfa = cprr[['first_name', 'last_name', 'uid']]
     dfa.loc[:, 'fc'] = dfa.first_name.map(lambda x: x[:1])
     dfa = dfa.drop_duplicates(subset=['uid']).set_index('uid')
@@ -27,6 +27,29 @@ def match_cprr(cprr, pprr):
     decision = 1
     matcher.save_pairs_to_excel(data_file_path(
         'match/scott_pd_cprr_2020_v_scott_pd_pprr_2021.xlsx'), decision)
+    matches = matcher.get_index_pairs_within_thresholds(decision)
+    match_dict = dict(matches)
+
+    cprr.loc[:, 'uid'] = cprr['uid'].map(lambda v: match_dict.get(v, v))
+    return cprr
+
+
+def match_cprr_and_post_14(cprr, pprr):
+    dfa = cprr[['first_name', 'last_name', 'uid']]
+    dfa.loc[:, 'fc'] = dfa.first_name.map(lambda x: x[:1])
+    dfa = dfa.drop_duplicates(subset=['uid']).set_index('uid')
+
+    dfb = pprr[['first_name', 'last_name', 'uid']]
+    dfb.loc[:, 'fc'] = dfb.first_name.map(lambda x: x[:1])
+    dfb = dfb.drop_duplicates(subset=['uid']).set_index('uid', drop=True)
+
+    matcher = ThresholdMatcher(ColumnsIndex(['fc']), {
+        'last_name': JaroWinklerSimilarity(),
+        'first_name': JaroWinklerSimilarity(),
+    }, dfa, dfb)
+    decision = 1
+    matcher.save_pairs_to_excel(data_file_path(
+        'match/scott_pd_cprr_2009_2014_v_scott_pd_pprr_2021.xlsx'), decision)
     matches = matcher.get_index_pairs_within_thresholds(decision)
     match_dict = dict(matches)
 
@@ -55,13 +78,17 @@ def extract_post_events(pprr, post):
 
 
 if __name__ == '__main__':
-    cprr = pd.read_csv(data_file_path('clean/cprr_scott_pd_2020.csv'))
+    cprr20 = pd.read_csv(data_file_path('clean/cprr_scott_pd_2020.csv'))
+    cprr14 = pd.read_csv(data_file_path('clean/cprr_scott_pd_2009_2014.csv'))
     pprr = pd.read_csv(data_file_path('clean/pprr_scott_pd_2021.csv'))
     post = prepare_post_data()
-    cprr = match_cprr(cprr, pprr)
+    cprr20 = match_cprr_and_post_20(cprr20, pprr)
+    cprr14 = match_cprr_and_post_14(cprr14, pprr)
     post_event = extract_post_events(pprr, post)
     ensure_data_dir('match')
-    cprr.to_csv(data_file_path(
+    cprr20.to_csv(data_file_path(
         'match/cprr_scott_pd_2020.csv'), index=False)
+    cprr14.to_csv(data_file_path(
+        'match/cprr_scott_pd_2009_2014.csv'), index=False)
     post_event.to_csv(data_file_path(
         'match/post_event_scott_pd_2021.csv'), index=False)

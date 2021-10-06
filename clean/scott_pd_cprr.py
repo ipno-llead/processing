@@ -9,7 +9,7 @@ import sys
 sys.path.append("../")
 
 
-def split_name_20(df):
+def split_names_20(df):
     names = df.full_name.str.split(" ", expand=True)
     df.loc[:, "rank_desc"] = names.loc[:, 0].fillna("")
     df.loc[:, "first_name"] = names.loc[:, 1].fillna("")
@@ -18,13 +18,13 @@ def split_name_20(df):
     return df
 
 
-def split_name_14(df):
-    names = df.officer.str.split(" ", expand=True)
-    df.loc[:, "rank_desc"] = names.loc[:, 0].fillna("")
-    df.loc[:, "first_name"] = names.loc[:, 1].fillna("")
-    df.loc[:, "last_name"] = names.loc[:, 2].fillna("")
-    df = df.drop(columns="officer")
-    return df
+def split_names_14(df):
+    df.loc[:, 'officer'] = df.officer.fillna('')
+    names = df.officer.str.extract(r'(\w+) (\w+) (\w+)')
+    df.loc[:, 'rank_desc'] = names[0]
+    df.loc[:, 'first_name'] = names[1]
+    df.loc[:, 'last_name'] = names[2]
+    return df.dropna()
 
 
 def split_disposition_action_20(df):
@@ -67,14 +67,13 @@ def clean20():
     ).pipe(clean_column_names)\
         .drop(columns="appeal")\
         .dropna()\
-        .pipe(split_name_20)\
+        .pipe(split_names_20)\
         .pipe(
             standardize_desc_cols,
             ["rank_desc", "disposition_action"])\
         .pipe(clean_charges)\
         .pipe(clean_rank)\
         .pipe(set_values, {
-            'data_production_year': 2020,
             'agency': 'Scott PD'})\
         .pipe(split_disposition_action_20)\
         .pipe(clean_dates, ["notification_date"]) \
@@ -95,11 +94,15 @@ def clean14():
         .rename(columns={
             'date': 'receive_date',
             'offense': 'charges'})\
-        .pipe(split_name_14)\
+        .pipe(split_names_14)\
         .pipe(clean_rank)\
-        .pipe(standardize_desc_cols, ['rank_desc', 'charges'])\
         .pipe(clean_names, ['first_name', 'last_name'])\
-        .pipe(split_disposition_action_14)
+        .pipe(split_disposition_action_14)\
+        .pipe(clean_dates, ['receive_date'])\
+        .pipe(set_values, {
+            'agency': 'Scott PD'})\
+        .pipe(gen_uid, ['first_name', 'last_name', 'agency'])\
+        .pipe(gen_uid, ['uid', 'charges', 'disposition', 'action'], 'complaint_uid')
     return df
 
 
