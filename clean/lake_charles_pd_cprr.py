@@ -150,13 +150,6 @@ def assign_empty_first_name_column_20(df):
     return df
 
 
-def review_first_names_from_post_20():
-    df = pd.read_csv(data_file_path('match/lake_charles_pd_cprr_2020_assign_first_name_from_post_pprr_2020_11_06.xlsx'))
-    df = df\
-        .pipe(clean_column_names)
-    return df
-
-
 def assign_first_names_from_post_20(df):
     df.loc[:, 'name'] = df.name.str.lower().str.strip()\
         .str.replace('torres', 'torres paul', regex=False)\
@@ -317,13 +310,6 @@ def split_rows_with_multiple_officers_19(df):
         for j, name in enumerate(parts):
             df.loc[idx + i + j, "officer_s_accused"] = name
         i += len(parts) - 1
-    return df
-
-
-def review_first_names_from_post_19(df):
-    df = pd.read_csv(data_file_path('match/lake_charles_pd_cprr_2014_2019_assign_first_name_from_post_pprr_2020_11_06.xlsx'))
-    df = df\
-        .pipe(clean_column_names)
     return df
 
 
