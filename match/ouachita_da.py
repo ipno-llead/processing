@@ -19,10 +19,9 @@ def match_cprr_with_lsp_and_opso_post(cprr, post):
     dfb.loc[:, 'fc'] = dfb.first_name.fillna('').map(lambda x: x[:1])
     dfb = dfb.drop_duplicates(subset=['uid']).set_index('uid')
 
-    matcher = ThresholdMatcher(ColumnsIndex(['fc']), {
+    matcher = ThresholdMatcher(ColumnsIndex(['fc', 'agency']), {
         'last_name': JaroWinklerSimilarity(),
         'first_name': JaroWinklerSimilarity(),
-        'agency': JaroWinklerSimilarity(),
     }, dfa, dfb)
     decision = 1
     matcher.save_pairs_to_excel(data_file_path(
