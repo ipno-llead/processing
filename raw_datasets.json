@@ -62,7 +62,9 @@
     "https://www.dropbox.com/sh/1zdvf08kjarefyf/AACJmVSIiBlUL5j8cFa8-RuJa/new_orleans_PD_use_of_force_2012-2019.csv?dl=1",
     "https://www.dropbox.com/s/zhedsrle8itb2eh/missing_dates_8_6_2021.csv?dl=1",
     "https://www.dropbox.com/s/wyqzauow1bd416z/new_orleans_pd_commendations_2016_2021.csv?dl=1",
-    "https://www.dropbox.com/s/dnroduov6dnj5o3/job_code_description_list.csv?dl=1"
+    "https://www.dropbox.com/s/dnroduov6dnj5o3/job_code_description_list.csv?dl=1",
+    "https://www.dropbox.com/s/if0g2l5muaccegt/new_orleans_so_charges_2015_2021.csv?dl=1",
+    "https://www.dropbox.com/s/3nnvwsedqifwpoc/new_orleans_so_bookings_2015_2021.CSV?dl=1"
   ],
   "new_orleans_so": [
     "https://www.dropbox.com/sh/dsrzc28teybtf4q/AAAq2PQtK_cM5Mt3PpknAoMOa/new_orleans_so_cprr_2019_tabula.csv?dl=1",
@@ -169,7 +171,8 @@
     "https://www.dropbox.com/s/6vtokmaqb2bn9ar/hammond_pd_cprr_2009_2014.csv?dl=1"
   ],
   "lake_charles_pd": [
-    "https://www.dropbox.com/s/xzd2pr1nozb01ux/lake_charles_pd_cprr_2020.csv?dl=1"
+    "https://www.dropbox.com/s/xzd2pr1nozb01ux/lake_charles_pd_cprr_2020.csv?dl=1",
+    "https://www.dropbox.com/s/b2s5rbtz8u2hflb/lake_charles_pd_cprr_2014_2019.csv?dl=1"
   ],
   "sterlington_pd": [
     "https://www.dropbox.com/s/wdhdn7g97cid57i/sterlington_csd_ppprr_2010_2020.csv?dl=1"
