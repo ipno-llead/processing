@@ -1,9 +1,7 @@
 from lib.columns import clean_column_names, set_values
 from lib.uid import gen_uid
-from lib.path import data_file_path, ensure_data_dir
-from lib.clean import (
-    clean_names, standardize_desc_cols, clean_dates
-)
+from lib.path import data_file_path
+from lib.clean import clean_names, standardize_desc_cols, clean_dates
 import pandas as pd
 import sys
 sys.path.append("../")
@@ -24,7 +22,7 @@ def split_names_14(df):
     df.loc[:, 'rank_desc'] = names[0]
     df.loc[:, 'first_name'] = names[1]
     df.loc[:, 'last_name'] = names[2]
-    return df.dropna()
+    return df.dropna().drop(columns='officer')
 
 
 def split_disposition_action_20(df):
@@ -38,11 +36,12 @@ def split_disposition_action_20(df):
 def split_disposition_action_14(df):
     df.loc[:, 'outcome_final_disposition'] = df.outcome_final_disposition.str.strip().str.lower()\
         .str.replace('arrest/ termination', 'arrested; terminated', regex=False)
-    outcomes = df["outcome_final_disposition"].str.split("/", expand=True)
+
+    outcomes = df.outcome_final_disposition.str.split("/", expand=True)
+
     df.loc[:, "disposition"] = outcomes.loc[:, 0].fillna("")
-    df.loc[:, "action"] = outcomes.loc[:, 1].fillna("")
-    df = df.drop(columns="outcome_final_disposition")
-    return df
+    df.loc[:, "action"] = outcomes.loc[:, 1].fillna("").str.replace('no action', '', regex=False)
+    return df.drop(columns='outcome_final_disposition')
 
 
 def clean_rank(df):
@@ -98,6 +97,7 @@ def clean14():
         .pipe(clean_rank)\
         .pipe(clean_names, ['first_name', 'last_name'])\
         .pipe(split_disposition_action_14)\
+        .pipe(standardize_desc_cols, ['charges'])\
         .pipe(clean_dates, ['receive_date'])\
         .pipe(set_values, {
             'agency': 'Scott PD'})\
