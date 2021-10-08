@@ -62,7 +62,9 @@
     "https://www.dropbox.com/sh/1zdvf08kjarefyf/AACJmVSIiBlUL5j8cFa8-RuJa/new_orleans_PD_use_of_force_2012-2019.csv?dl=1",
     "https://www.dropbox.com/s/zhedsrle8itb2eh/missing_dates_8_6_2021.csv?dl=1",
     "https://www.dropbox.com/s/wyqzauow1bd416z/new_orleans_pd_commendations_2016_2021.csv?dl=1",
-    "https://www.dropbox.com/s/dnroduov6dnj5o3/job_code_description_list.csv?dl=1"
+    "https://www.dropbox.com/s/dnroduov6dnj5o3/job_code_description_list.csv?dl=1",
+    "https://www.dropbox.com/s/if0g2l5muaccegt/new_orleans_so_charges_2015_2021.csv?dl=1",
+    "https://www.dropbox.com/s/3nnvwsedqifwpoc/new_orleans_so_bookings_2015_2021.CSV?dl=1"
   ],
   "new_orleans_so": [
     "https://www.dropbox.com/sh/dsrzc28teybtf4q/AAAq2PQtK_cM5Mt3PpknAoMOa/new_orleans_so_cprr_2019_tabula.csv?dl=1",
@@ -193,5 +195,8 @@
   ],
   "new_orleans_csc": [
     "https://www.dropbox.com/s/p4n5ykrdsg097ur/new_orleans_csc_lprr_2000_2016.csv?dl=1"
+  ],
+  "district_attorney": [
+    "https://www.dropbox.com/s/f0m3ym4vvk66134/pprr_post_2020_11_06.csv?dl=1"
   ]
 }
