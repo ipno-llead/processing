@@ -178,3 +178,9 @@ def clean():
         .pipe(clean_arresting_department)\
         .pipe(clean_race)
     return df
+
+
+if __name__ == '__main__':
+    df = clean()
+    df.to_csv(data_file_path(
+        'clean/booking_new_orleans_so_2015_2021.csv'), index=False)
