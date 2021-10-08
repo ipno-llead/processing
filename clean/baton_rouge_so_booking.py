@@ -24,13 +24,24 @@ def clean():
         .pipe(clean_column_names)\
         .drop(columns=['inmate_first_name', 'middle_name', 'last_name',
                        'suffix', 'inmate_zip', 'inmate_dob', 'employer',
-                       'occupation', 'is_out_of_parish', 'is_out_of_state'])\
+                       'occupation', 'is_out_of_parish', 'is_out_of_state',
+                       'inmate_dl'])\
         .rename(columns={
             'booking_number': 'tracking_number',
-            'gender': 'citizen_sex', 
-            'admission_date': 'check_in_date'})\
+            'gender': 'citizen_sex',
+            'admission_date': 'check_in_date',
+            'is_doc': 'is_department_of_corrections'
+        })\
         .pipe(clean_race)\
         .pipe(clean_sexes, ['citizen_sex'])\
         .pipe(clean_homeless)\
-        .pipe(standardize_desc_cols, ['jail_name'])
+        .pipe(standardize_desc_cols, [
+              'jail_name', 'is_weekender',
+              'is_work_release'])
     return df
+
+
+if __name__ == '__main__':
+    df = clean()
+    df.to_csv(data_file_path(
+        'clean/booking_baton_rouge_so_2020.csv'), index=False)
