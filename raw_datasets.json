@@ -62,7 +62,9 @@
     "https://www.dropbox.com/sh/1zdvf08kjarefyf/AACJmVSIiBlUL5j8cFa8-RuJa/new_orleans_PD_use_of_force_2012-2019.csv?dl=1",
     "https://www.dropbox.com/s/zhedsrle8itb2eh/missing_dates_8_6_2021.csv?dl=1",
     "https://www.dropbox.com/s/wyqzauow1bd416z/new_orleans_pd_commendations_2016_2021.csv?dl=1",
-    "https://www.dropbox.com/s/dnroduov6dnj5o3/job_code_description_list.csv?dl=1"
+    "https://www.dropbox.com/s/dnroduov6dnj5o3/job_code_description_list.csv?dl=1",
+    "https://www.dropbox.com/s/if0g2l5muaccegt/new_orleans_so_charges_2015_2021.csv?dl=1",
+    "https://www.dropbox.com/s/3nnvwsedqifwpoc/new_orleans_so_bookings_2015_2021.CSV?dl=1"
   ],
   "new_orleans_so": [
     "https://www.dropbox.com/sh/dsrzc28teybtf4q/AAAq2PQtK_cM5Mt3PpknAoMOa/new_orleans_so_cprr_2019_tabula.csv?dl=1",
@@ -154,7 +156,8 @@
     "https://www.dropbox.com/s/u5jh3bm14kgz3l0/grand_isle_pd_pprr_2021_byhand.csv?dl=1"
   ],
   "lafayette_so": [
-    "https://www.dropbox.com/s/4d9m1y5g4pnlmkj/lafayette_so_cprr_2015_2020.csv?dl=1"
+    "https://www.dropbox.com/s/4d9m1y5g4pnlmkj/lafayette_so_cprr_2015_2020.csv?dl=1",
+    "https://www.dropbox.com/s/czyj8gi55dv72jf/lafayette_so_cprr_2009_2014.csv?dl=1"
   ],
   "ponchatoula_pd": [
     "https://www.dropbox.com/s/z9qtvy40jcvk518/ponchatoula_pd_pprr_2010_2020.csv?dl=1",
@@ -194,5 +197,8 @@
   ],
   "ouachita_da": [
     "https://www.dropbox.com/s/as7meor55frymtg/ouachita_da_cprr_2021_by_hand.csv?dl=1"
+  ],
+  "district_attorney": [
+    "https://www.dropbox.com/s/f0m3ym4vvk66134/pprr_post_2020_11_06.csv?dl=1"
   ]
 }

@@ -1,6 +1,6 @@
 import sys
 sys.path.append('../')
-from lib.path import data_file_path, ensure_data_dir
+from lib.path import data_file_path
 from lib.columns import (
     rearrange_complaint_columns,
 )
@@ -15,15 +15,23 @@ def prepare_post():
     return post[post.agency == 'lafayette parish so']
 
 
-def fuse_events(cprr, post):
+def fuse_events(cprr20, cprr14, post):
     builder = events.Builder()
-    builder.extract_events(cprr, {
+    builder.extract_events(cprr20, {
         events.COMPLAINT_RECEIVE: {
-            'prefix': 'receive', 'keep': ['uid', 'agency', 'complaint_uid']
+            'prefix': 'receive', 
+            'keep': ['uid', 'agency', 'complaint_uid']
         },
     },
-        ['uid', 'complaint_uid'],
-    )
+        ['uid', 'complaint_uid'])
+    builder.extract_events(cprr14, {
+        events.COMPLAINT_RECEIVE: {
+            'prefix': 'receive',
+            'parse_date': True,
+            'keep': ['uid', 'agency', 'complaint_uid']
+        },
+    },
+        ['uid', 'complaint_uid'])
     builder.extract_events(post, {
         events.OFFICER_LEVEL_1_CERT: {
             'prefix': 'level_1_cert', 'parse_date': '%Y-%m-%d', 'keep': ['uid', 'agency', 'employment_status']
@@ -40,13 +48,13 @@ def fuse_events(cprr, post):
 
 
 if __name__ == '__main__':
-    cprr = pd.read_csv(data_file_path('clean/cprr_lafayette_so_2015_2020.csv'))
+    cprr20 = pd.read_csv(data_file_path('clean/cprr_lafayette_so_2015_2020.csv'))
+    cprr14 = pd.read_csv(data_file_path('clean/cprr_lafayette_so_2009_2014.csv'))
     post = prepare_post()
-    complaints = rearrange_complaint_columns(cprr)
+    complaints = rearrange_complaint_columns(pd.concat([cprr20, cprr14]))
     ensure_uid_unique(complaints, 'complaint_uid')
-    event = fuse_events(cprr, post)
-    personnel_df = fuse_personnel(cprr, post)
-    ensure_data_dir('fuse')
+    event = fuse_events(cprr20, cprr14, post)
+    personnel_df = fuse_personnel(cprr20, cprr14, post)
     personnel_df.to_csv(data_file_path('fuse/per_lafayette_so.csv'), index=False)
     event.to_csv(data_file_path('fuse/event_lafayette_so.csv'), index=False)
     complaints.to_csv(data_file_path('fuse/com_lafayette_so.csv'), index=False)
