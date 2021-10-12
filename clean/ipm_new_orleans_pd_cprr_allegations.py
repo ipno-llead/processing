@@ -261,7 +261,7 @@ def clean():
         .pipe(clean_investigating_unit)\
         .pipe(assign_agency)\
         .pipe(gen_uid, [
-            'agency', 'tracking_number', 'officer_primary_key', 'charges'
+            'agency', 'tracking_number', 'officer_primary_key', 'charges', 'allegation_primary_key'
         ], 'complaint_uid')\
         .pipe(replace_disposition)\
         .pipe(remove_future_dates, '2020-12-31', ['receive', 'charges_create', 'occur'])
