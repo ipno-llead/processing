@@ -1,4 +1,4 @@
-from lib.path import data_file_path, ensure_data_dir
+from lib.path import data_file_path
 from lib.columns import (
     rearrange_complaint_columns, rearrange_event_columns
 )
@@ -10,7 +10,7 @@ import sys
 sys.path.append('../')
 
 
-def fuse_events(pprr, cprr):
+def fuse_events(pprr, cprr20, cprr14):
     builder = events.Builder()
     pprr.loc[:, 'agency'] = 'Scott PD'
     builder.extract_events(pprr, {
@@ -21,33 +21,42 @@ def fuse_events(pprr, cprr):
             'prefix': 'term', 'keep': ['uid', 'badge_no', 'agency', 'rank_desc', 'salary', 'salary_freq']
         }
     }, ['uid'])
-    builder.extract_events(cprr, {
+    builder.extract_events(cprr20, {
         events.COMPLAINT_RECEIVE: {
-            'prefix': 'receive', 'keep': ['uid', 'agency', 'complaint_uid']
+            'prefix': 'receive',
+            'keep': ['uid', 'agency', 'complaint_uid']
+        }
+    }, ['uid', 'complaint_uid'])
+    builder.extract_events(cprr14, {
+        events.COMPLAINT_RECEIVE: {
+            'prefix': 'receive',
+            'keep': ['uid', 'agency', 'complaint_uid']
         }
     }, ['uid', 'complaint_uid'])
     return builder.to_frame()
 
 
 if __name__ == '__main__':
-    cprr = pd.read_csv(data_file_path(
+    cprr20 = pd.read_csv(data_file_path(
         'match/cprr_scott_pd_2020.csv'
+    ))
+    cprr14 = pd.read_csv(data_file_path(
+        'match/cprr_scott_pd_2009_2014.csv'
     ))
     pprr = pd.read_csv(data_file_path(
         'clean/pprr_scott_pd_2021.csv'
     ))
     post_event = pd.read_csv(data_file_path(
         'match/post_event_scott_pd_2021.csv'))
-    personnels = fuse_personnel(pprr, cprr)
-    complaints = rearrange_complaint_columns(cprr)
+    personnels = fuse_personnel(pprr, cprr20, cprr14)
+    complaints = rearrange_complaint_columns(pd.concat([cprr20, cprr14]))
     ensure_uid_unique(complaints, 'complaint_uid', True)
-    events_df = fuse_events(pprr, cprr)
+    events_df = fuse_events(pprr, cprr20, cprr14)
     events_df = rearrange_event_columns(pd.concat([
         post_event,
         events_df
     ]))
     ensure_uid_unique(events_df, 'event_uid', True)
-    ensure_data_dir('fuse')
     personnels.to_csv(data_file_path(
         'fuse/per_scott_pd.csv'), index=False)
     events_df.to_csv(data_file_path(
