@@ -33,9 +33,11 @@ def extract_post_events(pprr, post):
 
 
 if __name__ == '__main__':
-    pprr = pd.read_csv(data_file_path('clean/pprr_slidell_pd_2019.csv'))
+    pprr_09 = pd.read_csv(data_file_path('clean/pprr_slidell_pd_2009.csv'))
+    pprr_19 = pd.read_csv(data_file_path('clean/pprr_slidell_pd_2019.csv'))
+    pprr_csd = pd.read_csv(data_file_path('clean/pprr_slidell_csd_2010_2019.csv'))
     post = pd.read_csv(data_file_path('clean/pprr_post_2020_11_06.csv'))
-    post_events = extract_post_events(pprr, post)
+    post_events = extract_post_events(pd.concat([pprr_csd, pprr_09, pprr_19]), post)
     ensure_data_dir("match")
     post_events.to_csv(data_file_path(
         "match/post_event_slidell_pd_2020.csv"), index=False)

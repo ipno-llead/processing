@@ -138,6 +138,32 @@ class EventsBuilderTestCase(unittest.TestCase):
         ], ['event_uid', 'kind', 'year', 'month', 'day', 'time', 'raw_date',
             'uid', 'complaint_uid', 'agency', 'rank_desc', 'salary', 'salary_freq'])
 
+    def test_deduplicate_with_merge_cols(self):
+        builder = Builder()
+
+        df = pd.DataFrame([
+            ['1234', 'Brusly PD', 2020, 5, 3, '321'],
+            ['1234', 'Brusly PD', 2020, 5, 3, ''],
+            ['1235', 'Brusly PD', 2019, 10, 12, '445'],
+            ['1235', 'Brusly PD', 2019, 10, 12, '442'],
+        ], columns=['uid', 'agency', 'hire_year', 'hire_month', 'hire_day', 'badge_no'])
+        builder.extract_events(df, {
+            OFFICER_HIRE: {
+                'prefix': 'hire',
+                'keep': ['uid', 'agency', 'badge_no'],
+                'merge_cols': ['badge_no']
+            }
+        }, ['uid', 'agency'])
+
+        with self.assertRaises(Exception) as cm:
+            builder.to_frame()
+        self.assertEqual(cm.exception.args[0], '\n'.join([
+            'rows are not unique:',
+            '                          event_uid          kind  year month day   uid     agency badge_no',
+            '2  ee9b823279d8f0a9595567012a81a7f1  officer_hire  2019    10  12  1235  Brusly PD      445',
+            '3  ee9b823279d8f0a9595567012a81a7f1  officer_hire  2019    10  12  1235  Brusly PD      442',
+        ]))
+
 
 class DiscardEventsOccurMoreThanOnceEvery30DaysTestCase(unittest.TestCase):
     def test_discard(self):
