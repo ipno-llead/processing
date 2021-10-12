@@ -11,7 +11,7 @@ def prepare_post_data():
     return post[post.agency == 'scott pd']
 
 
-def match_cprr_and_post_20(cprr, pprr):
+def match_cprr_20_and_pprr(cprr, pprr):
     dfa = cprr[['first_name', 'last_name', 'uid']]
     dfa.loc[:, 'fc'] = dfa.first_name.map(lambda x: x[:1])
     dfa = dfa.drop_duplicates(subset=['uid']).set_index('uid')
@@ -34,7 +34,7 @@ def match_cprr_and_post_20(cprr, pprr):
     return cprr
 
 
-def match_cprr_and_post_14(cprr, pprr):
+def match_cprr_14_and_pprr(cprr, pprr):
     dfa = cprr[['first_name', 'last_name', 'uid']]
     dfa.loc[:, 'fc'] = dfa.first_name.map(lambda x: x[:1])
     dfa = dfa.drop_duplicates(subset=['uid']).set_index('uid')
@@ -82,8 +82,8 @@ if __name__ == '__main__':
     cprr14 = pd.read_csv(data_file_path('clean/cprr_scott_pd_2009_2014.csv'))
     pprr = pd.read_csv(data_file_path('clean/pprr_scott_pd_2021.csv'))
     post = prepare_post_data()
-    cprr20 = match_cprr_and_post_20(cprr20, pprr)
-    cprr14 = match_cprr_and_post_14(cprr14, pprr)
+    cprr20 = match_cprr_20_and_pprr(cprr20, pprr)
+    cprr14 = match_cprr_14_and_pprr(cprr14, pprr)
     post_event = extract_post_events(pprr, post)
     ensure_data_dir('match')
     cprr20.to_csv(data_file_path(
