@@ -169,7 +169,13 @@ if __name__ == '__main__':
             continue
         if pat is not None and pat.search(q.name) is None:
             continue
-        inputs, outputs = detect_script_input_output(q, args.debug)
+        try:
+            inputs, outputs = detect_script_input_output(q, args.debug)
+        except ValueError as e:
+            if str(e) == 'main block not found':
+                print('main block not found in %s' % q)
+                continue
+            raise
         scripts.append((q.name, inputs, outputs))
 
     write_make_rules(args.all, args.scripts_dir, scripts)

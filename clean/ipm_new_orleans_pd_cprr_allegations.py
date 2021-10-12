@@ -1,8 +1,7 @@
-from pandas.io.parsers import read_csv
 from lib.path import data_file_path, ensure_data_dir
 from lib.columns import clean_column_names
 from lib.clean import (
-    clean_datetimes, float_to_int_str, clean_sexes, clean_races, remove_future_dates, standardize_desc_cols, clean_dates
+    float_to_int_str, clean_sexes, clean_races, remove_future_dates, standardize_desc_cols, clean_dates
 )
 from lib.uid import gen_uid
 import pandas as pd
@@ -83,7 +82,7 @@ def clean_charges(df):
                      'paragraph 04 - accepting, giving anything of value', regex=False)\
         .str.replace('paragraph 11 - interfering with investigations',
                      'paragraph 13 - interfering with investigations', regex=False)\
-        .str.replace('no violation was observed to have been committed by officer/employee', 
+        .str.replace('no violation was observed to have been committed by officer/employee',
                      '', regex=False)\
         .str.replace('from authoritative', 'from an authoritative', regex=False)\
         .str.replace(r'paragraph 09 - use of alcohol/(drugs)? ?on-?duty',
@@ -107,7 +106,7 @@ def clean_charges(df):
                      r'paragraph 05 - referrals|paragraph 06 - commercial endorsement|'
                      r'paragraph 07 - use of drugs/substance abuse testing|'
                      r'paragraph 08 - use of alcohol/drugs on duty|paragraph 10 - alcohol/drugs influence test|'
-                     r'paragraph 11 - use of t[ao]bacco|paragraph 12 - retaliation|paragraph 13 - social networking)', 
+                     r'paragraph 11 - use of t[ao]bacco|paragraph 12 - retaliation|paragraph 13 - social networking)',
                      r'rule 03: moral conduct; \1', regex=True)\
         .str.replace(r'(paragraph 01 - adherence to law|paragraph 02 - courtesy|'
                      r'paragraph 03 - honesty and truthfulness|paragraph 04 - discrimination|'
@@ -133,7 +132,7 @@ def clean_charges(df):
                      r'paragraph 15 - rewards)', r'rule 05: restricted activities; \1', regex=True)\
         .str.replace(r'(paragraph 01 - security of records|paragraph 02 - false or inaccurate reports|'
                      r'paragraph 03 - public statement and appearances|paragraph 04 - citizens report complaint|'
-                     r'paragraph 05 - informants|paragraph 06 - confidentiality of internal investigations)', 
+                     r'paragraph 05 - informants|paragraph 06 - confidentiality of internal investigations)',
                      r'rule 06: offical information; \1', regex=True)\
         .str.replace(r'(paragraph 01 - use of department property|'
                      r'paragraph 02 - authorized operator of department vehicle|'
@@ -235,7 +234,7 @@ def clean():
             'received_date': 'receive_date',
             'allegation_created_on': 'charges_create_date',
             'assigned_department': 'investigating_department',
-            'assigned_divison': 'investigating_division', 
+            'assigned_divison': 'investigating_division',
             'assigned_sub_division_a': 'investigating_sub_divison_a',
             'assigned_sub_division_b': 'investigating_sub_division_b'
         })\
