@@ -173,7 +173,7 @@ if __name__ == '__main__':
             inputs, outputs = detect_script_input_output(q, args.debug)
         except ValueError as e:
             if str(e) == 'main block not found':
-                print('main block not found in %s' % q)
+                print('WARNING: main block not found in %s' % q)
                 continue
             raise
         scripts.append((q.name, inputs, outputs))
