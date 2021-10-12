@@ -19,7 +19,8 @@ def clean_division_desc(df):
         .str.replace(r'\badministrative\b', '', regex=True)\
         .str.replace('civil moveables', 'forfeitures', regex=False)\
         .str.replace('chief of corrections staff', 'corrections', regex=False)\
-        .str.replace('civil ', '', regex=False)
+        .str.replace('civil ', '', regex=False)\
+        .str.replace('orleans justice complex', '', regex=False)
     return df.drop(columns='home_department_description')
 
 
@@ -98,7 +99,7 @@ def split_names(df):
         .str.replace('spellman mi', 'spellman-mi', regex=False)\
         .str.replace('savwoir ge', 'savwoir-ge', regex=False)
 
-    names = df.payroll_name.str.extract(r'(\w+\'?\w+?\-?\w+) ?(jr|sr|ii)?, (\w+\'?-?\w+) ?(\w{2,})? ?(\w{1})?')
+    names = df.payroll_name.str.extract(r'(?:(\w+\'?\w+?\-?\w+)) ?(jr|sr|ii)?, (\w+\'?-?\w+) ?(\w{2,})? ?(\w{1})?')
     df.loc[:, 'last_name'] = names[0]\
         .fillna('')
     df.loc[:, 'suffix'] = names[1]\
@@ -109,7 +110,7 @@ def split_names(df):
         .fillna('')
     df.loc[:, 'middle_initial'] = names[4]\
         .fillna('')
-    return df
+    return df.drop(columns='payroll_name')
 
 
 def drop_rows_with_missing_names(df):

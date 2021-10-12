@@ -106,7 +106,7 @@ def fuse_events(cprr19, cprr20, pprr):
 
 
 if __name__ == '__main__':
-    post_event = pd.read_csv(data_file_path('match/post_event_new_orleans_so.csv'))
+    post_events = pd.read_csv(data_file_path('match/post_event_new_orleans_so.csv'))
     cprr19 = pd.read_csv(data_file_path('match/cprr_new_orleans_so_2019.csv'))
     cprr20 = pd.read_csv(data_file_path('match/cprr_new_orleans_so_2020.csv'))
     pprr = pd.read_csv(data_file_path('clean/pprr_new_orleans_so_2021.csv'))
@@ -120,7 +120,7 @@ if __name__ == '__main__':
         pprr
     )
     events_df = rearrange_event_columns(pd.concat([
-        post_event,
+        post_events,
         events_df
     ]))
     complaint_df = rearrange_complaint_columns(
