@@ -117,12 +117,12 @@ def drop_rows_with_missing_names(df):
 
 
 def assign_agency(df):
-    df.loc[:, 'agency'] = 'E. Baton Rouge SO'
+    df.loc[:, 'agency'] = 'Orleans Parish SO'
     return df
 
 
 def clean():
-    df = pd.read_csv(data_file_path('raw/baton_rouge_so/baton_rouge_so_pprr_2021.csv'))\
+    df = pd.read_csv(data_file_path('raw/new_orleans_so/new_orleans_so_pprr_2021.csv'))\
         .pipe(clean_column_names)\
         .rename(columns={
             'location_description': 'department_desc',
@@ -149,4 +149,4 @@ def clean():
 if __name__ == '__main__':
     df = clean()
     df.to_csv(data_file_path(
-        'clean/pprr_baton_rouge_so_2021.csv'), index=False)
+        'clean/pprr_new_orleans_so_2021.csv'), index=False)
