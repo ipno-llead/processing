@@ -4,7 +4,7 @@ import pandas as pd
 from lib.path import data_file_path
 from lib.columns import clean_column_names, set_values
 from lib.uid import gen_uid
-from lib.clean import clean_salaries
+from lib.clean import clean_salaries, clean_dates
 from lib import salary
 
 
@@ -25,7 +25,7 @@ def clean_rank(df):
 def split_name(df):
     df.loc[:, 'name_of_officer'] = df.name_of_officer.str.lower().str.strip().fillna('')\
         .str.replace('doug browning', 'browning, doug', regex=False)
-    names =  df.name_of_officer.str.extract(r'^(?:(\w+)) ?(jr|sr)?,? (\w+) ?(.+)?')
+    names = df.name_of_officer.str.extract(r'^(?:(\w+)) ?(jr|sr)?,? (\w+) ?(.+)?')
     df.loc[:, 'last_name'] = names[0]
     df.loc[:, 'suffix'] = names[1]\
         .fillna('')
@@ -54,5 +54,12 @@ def clean():
         .pipe(assign_agency)\
         .pipe(clean_salaries, ['salary'])\
         .pipe(set_values, {'salary_freq': salary.YEARLY})\
+        .pipe(clean_dates, ['hire_date', 'termination_date'])\
         .pipe(gen_uid, ['last_name', 'first_name', 'agency'])
     return df
+
+
+if __name__ == '__main__':
+    df = clean()
+    df.to_csv(data_file_path(
+        'clean/pprr_central_csd_2014_2019.csv'), index=False)
