@@ -246,8 +246,10 @@ def clean_races(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
             ['native american', 'american indian', 'american indian or alaskan native'],
             ['asian / pacific islander', 'asian', 'native hawaiian or other pacific islander', 'islander'],
             ['mixed', 'two or more races', 'multi-racial'],
-            ['', 'unknown race'],
+            ['unknown', 'unknown race'],
         ])
+        # can't have empty sequence in standardize_from_lookup_table
+        df.loc[:, col] = df[col].str.replace(r'^unknown$', '', regex=True)
     return df
 
 
