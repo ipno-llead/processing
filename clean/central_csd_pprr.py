@@ -4,7 +4,7 @@ import pandas as pd
 from lib.path import data_file_path
 from lib.columns import clean_column_names, set_values
 from lib.uid import gen_uid
-from lib.clean import clean_salaries, clean_dates
+from lib.clean import clean_salaries
 from lib import salary
 
 
