@@ -17,8 +17,8 @@ def clean_employment_status(df):
 def clean_rank(df):
     df.loc[:, 'rank_desc'] = df.ranks.str.lower().str.strip()\
         .str.replace(r'(assistant)? ?po[jl]?i?i[co]e ?', '', regex=True)\
-        .str.replace('sergeant/dispatcher', 'dispatch sergeant', regex=False)\
-        .str.replace(r'(\w+)/officer', r'officer; \1', regex=True)
+        .str.replace('sergeant/dispatcher', 'sergeant', regex=False)\
+        .str.replace(r'(\w+)/officer', r'officer', regex=True)
     return df.drop(columns='ranks')
 
 
@@ -54,8 +54,8 @@ def clean():
         .pipe(assign_agency)\
         .pipe(clean_salaries, ['salary'])\
         .pipe(set_values, {'salary_freq': salary.YEARLY})\
-        .pipe(clean_dates, ['hire_date', 'termination_date'])\
-        .pipe(gen_uid, ['last_name', 'first_name', 'agency'])
+        .pipe(gen_uid, ['last_name', 'first_name', 'middle_initial', 'agency'])\
+        .drop_duplicates(subset=['hire_date', 'uid'], keep='first')
     return df
 
 
