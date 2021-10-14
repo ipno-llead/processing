@@ -174,14 +174,14 @@ EVENT_COLUMNS = [
     "sworn",
     "officer_inactive",
     "employee_type",
-    "years_employed", # i've created a new column named "time_active" to factor in months employed as well. Thoughts?
+    "years_employed",
     "salary",
     "salary_freq",
     "award",
     "award_comments",
     "left_reason",
-    "officer_contract_status",
-    "time_active"
+    "officer_contract_status",  # full time, part time, or volunteer
+    "time_employed",  # duration of employment
 ]
 
 

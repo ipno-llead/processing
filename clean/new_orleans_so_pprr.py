@@ -127,7 +127,7 @@ def clean():
         .pipe(clean_column_names)\
         .rename(columns={
             'location_description': 'department_desc',
-            'adjusted_service': 'time_active',
+            'adjusted_service': 'time_employed',
             'regular_pay_rate_amount': 'salary'
         })\
         .pipe(clean_division_desc)\
