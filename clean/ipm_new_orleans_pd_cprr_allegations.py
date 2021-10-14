@@ -208,7 +208,20 @@ def clean_investigation_complete_date(df):
 
 
 def drop_duplicate_complaint_uids(df):
-    return df.drop([9086, 15663])
+    disposition_cat = pd.CategoricalDtype(categories=[
+        'sustained',
+        'not sustained',
+        'exonerated',
+        'unfounded',
+        'counseling',
+        'mediation',
+        'illegitimate outcome',
+        'no investigation merited',
+        'pending',
+    ], ordered=True)
+    df.loc[:, 'disposition'] = df.disposition.astype(disposition_cat)
+    return df.sort_values(['disposition', 'complaint_uid'])\
+        .drop_duplicates(subset=['complaint_uid'], keep='first')
 
 
 def clean_investigating_department(df):
