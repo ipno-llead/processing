@@ -114,7 +114,7 @@ if __name__ == "__main__":
         'match/lprr_new_orleans_csc_2000_2016.csv'
     ))
     complaints = fuse_cprr(cprr, actions, officer_number_dict)
-    ensure_uid_unique(complaints, 'complaint_uid')
+    ensure_uid_unique(complaints, 'complaint_uid', output_csv=True)
     use_of_force = fuse_use_of_force(uof, officer_number_dict)
     personnel = fuse_personnel(pprr, lprr)
     events_df = fuse_events(pprr, cprr, uof, award, lprr)
