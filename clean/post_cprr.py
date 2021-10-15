@@ -1,3 +1,4 @@
+from os import rename
 import sys
 sys.path.append('../')
 import pandas as pd
@@ -35,6 +36,14 @@ def assign_action(df):
     return df
 
 
+def rename_agency(df):
+    df.loc[:, 'agency'] = df.agency\
+        .str.replace('Caddo SO', 'Caddo Parish SO')\
+        .str.replace(r'(Orleans PD|NOPD)', 'New Orleans PD', regex=True)\
+        .str.replace('Harbor PD', 'New Orleans Harbor PD', regex=False)
+    return df
+
+
 def clean():
     df = pd.read_csv(data_file_path('raw/post_council/post_decertifications_2016_2019.csv'))\
         .pipe(clean_column_names)\
@@ -44,6 +53,7 @@ def clean():
         .pipe(split_name)\
         .pipe(clean_charges)\
         .pipe(assign_action)\
+        .pipe(rename_agency)\
         .pipe(gen_uid, ['first_name', 'last_name', 'agency'])
     return df
 
