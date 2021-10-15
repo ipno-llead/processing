@@ -1,4 +1,3 @@
-from os import rename
 import sys
 sys.path.append('../')
 import pandas as pd
@@ -26,8 +25,9 @@ def split_name(df):
 
 def clean_charges(df):
     df.loc[:, 'charges'] = df.reason\
+        .str.replace(r'^(\w+)-(\w+)', r'\1 \2', regex=True)\
         .str.replace(r'\/', '|', regex=True)\
-        .str.replace('-', ':', regex=False)
+        .str.replace('-', ': ', regex=False)
     return df.drop(columns='reason')
 
 
@@ -38,9 +38,11 @@ def assign_action(df):
 
 def rename_agency(df):
     df.loc[:, 'agency'] = df.agency\
-        .str.replace('Caddo SO', 'Caddo Parish SO')\
+        .str.replace(r'(\w+) SO', r'\1 Parish SO', regex=True)\
         .str.replace(r'(Orleans PD|NOPD)', 'New Orleans PD', regex=True)\
-        .str.replace('Harbor PD', 'New Orleans Harbor PD', regex=False)
+        .str.replace('Harbor PD', 'New Orleans Harbor PD', regex=False)\
+        .str.replace('LSP', 'LA State Police', regex=False)\
+        .str.replace('EBRSO', 'E. Baton Rouge Parish SO', regex=False)
     return df
 
 
@@ -54,7 +56,8 @@ def clean():
         .pipe(clean_charges)\
         .pipe(assign_action)\
         .pipe(rename_agency)\
-        .pipe(gen_uid, ['first_name', 'last_name', 'agency'])
+        .pipe(gen_uid, ['first_name', 'last_name', 'agency'])\
+        .pipe(gen_uid, ['uid', 'charges', 'decertification_date'], 'complaint_uid')
     return df
 
 
