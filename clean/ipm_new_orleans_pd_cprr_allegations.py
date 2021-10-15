@@ -207,6 +207,35 @@ def clean_investigation_complete_date(df):
     return df.drop(columns='completed_date')
 
 
+def drop_duplicate_complaint_uids(df):
+    disposition_cat = pd.CategoricalDtype(categories=[
+        'sustained',
+        'not sustained',
+        'exonerated',
+        'unfounded',
+        'counseling',
+        'mediation',
+        'illegitimate outcome',
+        'no investigation merited',
+        'pending',
+    ], ordered=True)
+    df.loc[:, 'disposition'] = df.disposition.astype(disposition_cat)
+    return df.sort_values(['disposition', 'complaint_uid'])\
+        .drop_duplicates(subset=['complaint_uid'], keep='first')
+
+
+def clean_investigating_department(df):
+    df.loc[:, 'investigating_department'] = df.assigned_department.str.lower().str.strip()\
+        .str.replace(r'nopd officer|no longer employed| bureau|unkno?wo?n ?(bureau)?', '', regex=True)\
+        .str.replace(r'^(\w+) - ', '', regex=True)\
+        .str.replace(r'^field$', 'field operations', regex=True)\
+        .str.replace(r'^public integrity$', 'public integrity/internal affairs', regex=True)\
+        .str.replace(r'\bsuppo\b', 'support', regex=True)\
+        .str.replace(r'\bservice\b ?(burea)?', 'services', regex=True)\
+        .str.replace('superintendant', 'superintendent', regex=False)
+    return df
+
+
 def clean():
     df = initial_processing()
     return df\
@@ -233,7 +262,6 @@ def clean():
             'disposition_oipm_by_officer': 'disposition',
             'received_date': 'receive_date',
             'allegation_created_on': 'charges_create_date',
-            'assigned_department': 'investigating_department',
             'assigned_divison': 'investigating_division',
             'assigned_sub_division_a': 'investigating_sub_divison_a',
             'assigned_sub_division_b': 'investigating_sub_division_b'
@@ -261,10 +289,11 @@ def clean():
         .pipe(clean_investigating_unit)\
         .pipe(assign_agency)\
         .pipe(gen_uid, [
-            'agency', 'tracking_number', 'officer_primary_key', 'charges'
-        ], 'complaint_uid')\
+            'agency', 'tracking_number', 'officer_primary_key', 'charges'], 'complaint_uid')\
         .pipe(replace_disposition)\
-        .pipe(remove_future_dates, '2020-12-31', ['receive', 'charges_create', 'occur'])
+        .pipe(remove_future_dates, '2020-12-31', ['receive', 'charges_create', 'occur'])\
+        .pipe(drop_duplicate_complaint_uids)\
+        .pipe(clean_investigating_department)
 
 
 if __name__ == '__main__':
