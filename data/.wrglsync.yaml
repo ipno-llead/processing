@@ -316,6 +316,10 @@ repos:
     fileName: fuse/per_carencro_pd.csv
     primaryKey:
       - uid
+  per-central-csd:
+    fileName: fuse/per_central_csd.csv
+    primaryKey:
+      - uid
   event-new-orleans-pd:
     fileName: fuse/event_new_orleans_pd.csv
     primaryKey:
@@ -442,6 +446,10 @@ repos:
       - event_uid
   event-carencro-pd:
     fileName: fuse/event_carencro_pd.csv
+    primaryKey:
+      - event_uid
+  event-central-csd:
+    fileName: fuse/event_central_csd.csv
     primaryKey:
       - event_uid
   personnel:
