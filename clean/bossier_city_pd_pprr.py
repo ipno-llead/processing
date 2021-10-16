@@ -3,7 +3,8 @@ sys.path.append('../')
 import pandas as pd
 from lib.path import data_file_path
 from lib.columns import clean_column_names
-from lib.clean import clean_dates
+from lib.clean import clean_dates, clean_salaries, float_to_int_str
+from lib import salary
 from lib.uid import gen_uid
 
 
@@ -34,24 +35,79 @@ def clean_rank_desc(df):
     return df.drop(columns='actual_position_title')
 
 
+def fix_salary_column_name(df):
+    []
+
+
 def split_name(df):
-    df.loc[:, 'employee_name'] = df.employee_name.str.lower().str.strip()
-    names = df.employee_name.str.extract(r'(\w+-\w+) ?(iii|jr)?, (\w+) (.+)')
-    df.loc[:, 'last_name'] = names[0]
-    df.loc[:, 'suffix'] = names[1]
-    df.loc[:, 'first_name'] = names[2]
-    df.loc[:, 'middle_initial'] = names[3]
-    return df 
+    df.loc[:, 'employee_name'] = df.employee_name.str.lower().str.strip().fillna('')\
+        .str.replace(r'(\w+),? (\w+)\.?,', r'\1 \2,', regex=True)\
+        .str.replace(r'^mc gee', 'mcgee', regex=True)\
+        .str.replace(r'christopherc$', 'christopher c', regex=True)\
+        .str.replace(r'(\w+), (\w{1})\.? (\w+)', r'\1, \3 \2', regex=True)
+    names = df.employee_name.str.extract(r'(\w+-?\w+?) ?(iii?|jr|iv)?, (\w+\'?\w+) ?(.+)?')
+    df.loc[:, 'last_name'] = names[0].fillna('')
+    df.loc[:, 'suffix'] = names[1].fillna('')
+    df.loc[:, 'first_name'] = names[2].fillna('')
+    df.loc[:, 'middle_initial'] = names[3].fillna('')
+    df.loc[:, 'last_name'] = df.last_name.str.cat(df.suffix, sep=' ')
+    return df.drop(columns=['employee_name', 'suffix'])
+
+# drop missing row 450:500
+
+
+def drop_rows_with_missing__firt_and_last_name(df):
+    return df[~((df.first_name == '') & (df.last_name == '') & (df.middle_initial == '') & (df.suffix == ''))]
 
 
 def clean():
     df = pd.read_csv(data_file_path('raw/bossier_city_pd/bossiercity_pd_pprr_2019.csv'))\
         .pipe(clean_column_names)\
         .rename(columns={
-            'employee_number': 'employee_id'
+            'employee_number': 'employee_id',
+            '2000': 'salary_2000',
+            '2001': 'salary_2001',
+            '2002': 'salary_2002',
+            '2003': 'salary_2003',
+            '2004': 'salary_2004',
+            '2005': 'salary_2005',
+            '2006': 'salary_2006',
+            '2007': 'salary_2007',
+            '2008': 'salary_2008',
+            '2009': 'salary_2009',
+            '2010': 'salary_2010',
+            '2011': 'salary_2011',
+            '2012': 'salary_2012',
+            '2013': 'salary_2013',
+            '2014': 'salary_2014',
+            '2015': 'salary_2015',
+            '2016': 'salary_2016',
+            '2017': 'salary_2017',
+            '2018': 'salary_2018',
+            '2019': 'salary_2019'
         })\
         .pipe(extract_department_desc)\
         .pipe(clean_rank_desc)\
         .pipe(split_name)\
         .pipe(clean_dates, ['birth_date', 'hire_date'])
+        # .pipe(float_to_int_str, [
+        #     'salary_2000', 'salary_2001', 'salary_2002', 'salary_2003',
+        #     'salary_2004', 'salary_2005', 'salary_2006', 'salary_2007',
+        #     'salary_2008', 'salary_2009', 'salary_2010', 'salary_2011',
+        #     'salary_2012', 'salary_2013', 'salary_2014', 'salary_2015',
+        #     'salary_2016', 'salary_2017', 'salary_2018', 'salary_2019',
+        # ])\
+        # .pipe(clean_salaries, [
+        #     'salary_2000', 'salary_2001', 'salary_2002', 'salary_2003',
+        #     'salary_2004', 'salary_2005', 'salary_2006', 'salary_2007',
+        #     'salary_2008', 'salary_2009', 'salary_2010', 'salary_2011',
+        #     'salary_2012', 'salary_2013', 'salary_2014', 'salary_2015',
+        #     'salary_2016', 'salary_2017', 'salary_2018', 'salary_2019',
+        # ])\
     return df
+
+
+if __name__ == '__main__':
+    df = clean()
+    df.to_csv(data_file_path(
+        'clean/pprr_bossier_city_pd_2000_2019.csv'), index=False)
