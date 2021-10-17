@@ -150,7 +150,8 @@ def merge():
             'birth_year_x', 'birth_month', 'birth_day', 'department_desc_y',
             'rank_code', 'rank_desc_y', 'hire_year_y', 'hire_month_y', 'hire_day_y', 
             'term_year', 'term_month', 'term_day', 'data_production_year_y', 'agency_y',
-            'data_production_year_x', 'first_name_y', 'last_name_y'
+            'data_production_year_x', 'first_name_y', 'last_name_y', 'first_name_x', 
+            'last_name_x'
         ])\
         .rename(columns={
             'rank_desc_x': 'rank_desc',
