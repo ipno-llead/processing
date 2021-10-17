@@ -44,10 +44,11 @@ def fuse_events(pprr, cprr, uof, award, lprr):
         events.OFFICER_HIRE: {'prefix': 'hire'},
         events.OFFICER_LEFT: {'prefix': 'left'},
         events.OFFICER_DEPT: {'prefix': 'dept'},
+        events.OFFICER_PAY_PROG_START: {'prefix': 'pay_prog_start'}
     }, ['uid'])
     builder.extract_events(cprr, {
         events.COMPLAINT_RECEIVE: {'prefix': 'receive'},
-        events.ALLEGATION_CREATE: {'prefix': 'allegation_create'},
+        events.CHARGES_CREATE: {'prefix': 'charges_create'},
         events.COMPLAINT_INCIDENT: {'prefix': 'occur'},
     }, ['uid', 'complaint_uid'])
     builder.extract_events(uof, {

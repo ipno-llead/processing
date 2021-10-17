@@ -22,7 +22,8 @@ def clean_employee_type(df):
 
 def strip_time_from_dates(df, cols):
     for col in cols:
-        df.loc[:, col] = df[col].str.replace(r' \d+:\d+$', '', regex=True)
+        df.loc[:, col] = df[col].str.replace(r' \d+:.+', '', regex=True)\
+            .str.replace(r'(\d{4})-(\d{2})-(\d{2})', r'\2/\3/\1', regex=True)
     return df
 
 
@@ -98,7 +99,7 @@ def clean_rank_desc(df):
 
 def clean():
     df = pd.read_csv(data_file_path(
-        "raw/ipm/new_orleans_iapro_pprr_1946-2018.csv"), sep='\t')
+        "raw/ipm/new_orleans_iapro_pprr_1946-2018.csv"))
     df = df.dropna(axis=1, how="all")
     df = clean_column_names(df)
     df = df.drop(columns=[
@@ -140,8 +141,35 @@ def clean():
         .pipe(clean_current_supervisor)
 
 
+def merge():
+    dfa = pd.read_csv(data_file_path('clean/pprr_new_orleans_pd_1946_2018_pre_merge.csv'))
+    dfb = pd.read_csv(data_file_path('match/pprr_new_orleans_csd_matched_to_pprr_ipm.csv'))
+
+    df = pd.merge(dfa, dfb, on=['uid'], how='outer')\
+        .drop(columns=[
+            'birth_year_x', 'birth_month', 'birth_day', 'department_desc_y',
+            'rank_code', 'rank_desc_y', 'hire_year_y', 'hire_month_y', 'hire_day_y', 
+            'term_year', 'term_month', 'term_day', 'data_production_year_y', 'agency_y',
+            'data_production_year_x', 'first_name_y', 'last_name_y'
+        ])\
+        .rename(columns={
+            'rank_desc_x': 'rank_desc',
+            'department_desc_x': 'department_desc',
+            'agency_x': 'agency',
+            'hire_year_x': 'hire_year',
+            'hire_month_x': 'hire_month',
+            'hire_day_x': 'hire_day',
+            'birth_year_y': 'birth_year'
+        })\
+        .drop_duplicates(subset=['left_year', 'left_month', 'left_day', 'uid'])
+    return df
+
+
 if __name__ == '__main__':
-    df = clean()
+    pre_merge_df = clean()
+    df = merge()
     ensure_data_dir('clean')
+    pre_merge_df.to_csv(data_file_path(
+        'clean/pprr_new_orleans_pd_1946_2018_pre_merge.csv'), index=False)
     df.to_csv(data_file_path(
         'clean/pprr_new_orleans_pd_1946_2018.csv'), index=False)
