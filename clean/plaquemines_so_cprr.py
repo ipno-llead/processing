@@ -21,7 +21,17 @@ def assign_agency(df):
     return df
 
 
-def clean():
+def split_name(df):
+    df.loc[:, 'against'] = df.against.str.lower().str.strip()\
+        .str.replace('smith tam', 'smith/tam', regex=False)\
+        .str.replace(r'^robin thomas grant solis gerald cormier jennifer daigle$',
+                     'robin thomas/grant solis/gerald cormier/jennifer daigle', regex=True)\
+        .str.replace(r'^danny rees brandon leblanc anthony dugas$',
+                     'danny rees/brandon leblanc/anthony dugas', regex=True)
+    return df
+
+
+def clean19():
     df = pd.read_csv(data_file_path(
         'raw/plaquemines_so/plaquemines_so_cprr_2019.csv'
     ))
@@ -37,7 +47,15 @@ def clean():
         .pipe(gen_uid, ['agency', 'tracking_number'], 'complaint_uid')
 
 
+def clean20():
+    df = pd.read_csv(data_file_path('raw/plaquemines_so/plaquemines_so_cprr_2016_2020.csv'))\
+        .pipe(clean_column_names)\
+        .drop(columns=['complainant'])\
+        .pipe(split_name)
+    return df
+
+
 if __name__ == '__main__':
-    df = clean()
+    df = clean19()
     ensure_data_dir('clean')
     df.to_csv(data_file_path('clean/cprr_plaquemines_so_2019.csv'), index=False)
