@@ -96,6 +96,9 @@ if __name__ == "__main__":
     pprr = pd.read_csv(data_file_path(
         'clean/pprr_new_orleans_pd_1946_2018.csv'
     ))
+    pprr_csd = pd.read_csv(data_file_path(
+        'clean/pprr_new_orleans_csd_2014.csv'
+    ))
     officer_number_dict = create_officer_number_dict(pprr)
     cprr = pd.read_csv(data_file_path(
         'clean/cprr_new_orleans_pd_1931_2020.csv'
@@ -117,7 +120,7 @@ if __name__ == "__main__":
     complaints = fuse_cprr(cprr, actions, officer_number_dict)
     ensure_uid_unique(complaints, 'complaint_uid', output_csv=True)
     use_of_force = fuse_use_of_force(uof, officer_number_dict)
-    personnel = fuse_personnel(pprr, lprr)
+    personnel = fuse_personnel(pprr, lprr, pprr_csd)
     events_df = fuse_events(pprr, cprr, uof, award, lprr)
     events_df = rearrange_event_columns(pd.concat([
         post_event,

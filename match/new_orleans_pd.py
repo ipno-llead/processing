@@ -114,7 +114,7 @@ def match_pprr_csd_to_pprr_ipm(pprr_csd, pprr_ipm):
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
     match_dict = dict(matches)
 
-    pprr_csd.loc[:, 'uid'] = pprr_csd.uid.map(lambda x: match_dict.get(x))
+    pprr_csd.loc[:, 'uid'] = pprr_csd.uid.map(lambda x: match_dict.get(x, x))
     return pprr_csd
 
 
