@@ -45,9 +45,13 @@ if __name__ == '__main__':
     post_event = pd.read_csv(data_file_path(
         'match/post_event_ponchatoula_pd_2020.csv'
     ))
+    cprr_post_events = pd.read_csv(data_file_path(
+        'match/cprr_post_events_ponchatoula_pd_2020.csv'
+    ))
     event_df = rearrange_event_columns(pd.concat([
         fuse_events(pprr, cprr),
         post_event,
+        cprr_post_events
     ]))
     ensure_uid_unique(event_df, 'event_uid')
     rearrange_personnel_columns(pprr).to_csv(data_file_path(

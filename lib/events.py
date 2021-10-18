@@ -18,6 +18,7 @@ OFFICER_HIRE = "officer_hire"
 OFFICER_PAY_PROG_START = "officer_pay_prog_start"
 OFFICER_PAY_EFFECTIVE = "officer_pay_effective"
 OFFICER_LEFT = "officer_left"
+OFFICER_POST_DECERTIFICATION = "officer_post_decertification"  # officer decertified by POST
 
 COMPLAINT_INCIDENT = "complaint_incident"
 COMPLAINT_RECEIVE = "complaint_receive"
@@ -72,6 +73,7 @@ cat_type = CategoricalDtype(categories=[
     UOF_DUE,
     AWARD_RECEIVE,
     AWARD_RECOMMENDED,
+    OFFICER_POST_DECERTIFICATION,
 ], ordered=True)
 
 
