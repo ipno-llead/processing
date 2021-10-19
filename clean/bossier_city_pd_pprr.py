@@ -19,7 +19,7 @@ def extract_department_desc(df):
         .str.replace(r'communication$', 'communications', regex=True)\
         .str.replace('office', 'administration', regex=False)\
         .str.replace('information tech', 'it')
-    return df 
+    return df
 
 
 def clean_rank_desc(df):
@@ -43,15 +43,13 @@ def split_name(df):
         .str.replace(r'christopherl$', 'christopher l', regex=True)\
         .str.replace(r'(\w+), (\w{1})\.? (\w+)', r'\1, \3 \2', regex=True)\
         .str.replace(r'  +', ' ', regex=True)
-    names = df.employee_name.str.extract(r'(\w+-?\w+?) ?(iii?|jr|iv)?, (\w+\'?\w+) ?(.+)?')
+    names = df.employee_name.str.extract(r'^(\w+-?\w+?) ?(iii?|jr|iv)?, (\w+\'?\w+) ?(.+)?')
     df.loc[:, 'last_name'] = names[0]
     df.loc[:, 'suffix'] = names[1].fillna('')
-    df.loc[:, 'first_name'] = names[2]
-    df.loc[:, 'middle_initial'] = names[3]
-    df.loc[:, 'last_name'] = df.last_name + ' ' + df.suffix
-    return df.drop(columns=['employee_name', 'suffix'])
-
-# drop missing row 450:500
+    df.loc[:, 'first_name'] = names[2].fillna('')
+    df.loc[:, 'middle_initial'] = names[3].fillna('')
+    df.loc[:, 'last_name'] = df.last_name.str.cat(df.suffix, sep=' ').fillna('')
+    return df
 
 
 def drop_rows_with_missing__firt_and_last_name(df):
@@ -68,7 +66,7 @@ def clean_employee_id(df):
     return df.drop(columns='employee_number')
 
 
-def clean19():
+def clean():
     df = pd.read_csv(data_file_path('raw/bossier_city_pd/bossiercity_pd_pprr_2019.csv'))\
         .pipe(clean_column_names)\
         .rename(columns={
@@ -114,26 +112,12 @@ def clean19():
         .pipe(set_values, {'salary_freq': salary.YEARLY})\
         .pipe(clean_dates, ['birth_date', 'hire_date'])\
         .pipe(assign_agency)\
-        .pipe(gen_uid, ['first_name', 'last_name', 'agency'])
-    return df
-
-# review names for 18
-
-def clean18():
-    df = pd.read_csv(data_file_path('raw/bossier_city_pd/bossier_city_pd_pprr_2018.csv'))\
-        .pipe(clean_column_names)\
-        .rename(columns={
-            'annual_salary': 'salary'
-        })\
-        .pipe(set_values, {'salary_freq': salary.YEARLY})\
-        .pipe(clean_employee_id)\
-        .pipe(extract_department_desc)\
-        .pipe(clean_rank_desc)\
-        .pipe(split_name)
+        .pipe(drop_rows_with_missing__firt_and_last_name)\
+        .pipe(gen_uid, ['first_name', 'last_name', 'middle_initial', 'agency'])
     return df
 
 
 if __name__ == '__main__':
-    df = clean19()
+    df = clean()
     df.to_csv(data_file_path(
         'clean/pprr_bossier_city_pd_2000_2019.csv'), index=False)
