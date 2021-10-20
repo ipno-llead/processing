@@ -56,3 +56,34 @@ def extract_events_from_post(post: pd.DataFrame, uid_matches: list[tuple[str, st
                     agency=agency,
                     uid=pprr_uid)
     return builder.to_frame()
+
+
+def extract_events_from_cprr_post(cprr_post: pd.DataFrame, uid_matches: list[tuple[str, str]], agency: str) -> pd.DataFrame:
+    """Extract events from POST data.
+
+    Only extract events.OFFICER_POST_DECERTIFICATION
+
+    Args:
+        post (pd.DataFrame):
+            the subset of POST data already filtered for a specific agency
+        uid_matches (list of tuple of str):
+            list of (pprr_uid, post_uid) tuples. Only rows with uid==post_uid
+            would be consider for event extraction. uid will be set to pprr_uid
+            in event records.
+        agency (str):
+            agency name as it should appear in event records.
+
+    Returns:
+        the events frame
+    """
+    builder = events.Builder()
+    for pprr_uid, cprr_post_uid in uid_matches:
+        for _, row in cprr_post[cprr_post.uid == cprr_post_uid].iterrows():
+            if pd.notnull(row.decertification_date):
+                builder.append_record(
+                    events.OFFICER_POST_DECERTIFICATION,
+                    ['uid'],
+                    raw_date_str=row.decertification_date,
+                    agency=agency,
+                    uid=pprr_uid)
+    return builder.to_frame()
