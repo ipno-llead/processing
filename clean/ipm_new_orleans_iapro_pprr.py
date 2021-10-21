@@ -1,4 +1,4 @@
-from lib.path import data_file_path, ensure_data_dir
+from lib.path import data_file_path
 from lib.columns import clean_column_names
 from lib.clean import (
     clean_races, float_to_int_str, standardize_desc_cols, clean_sexes, clean_names, clean_dates
@@ -99,9 +99,11 @@ def clean_rank_desc(df):
 
 def clean():
     df = pd.read_csv(data_file_path(
-        "raw/ipm/new_orleans_iapro_pprr_1946-2018.csv"))
+        "raw/ipm/new_orleans_iapro_pprr_1946-2018.csv"
+    ))
     df = df.dropna(axis=1, how="all")
     df = clean_column_names(df)
+    print(df.columns.tolist())
     df = df.drop(columns=[
         'employment_number', 'working_status', 'shift_hours', 'exclude_reason'
     ])
@@ -141,35 +143,12 @@ def clean():
         .pipe(clean_current_supervisor)
 
 
-def merge():
-    dfa = pd.read_csv(data_file_path('clean/pprr_new_orleans_pd_1946_2018_pre_merge.csv'))
-    dfb = pd.read_csv(data_file_path('match/pprr_new_orleans_csd_matched_to_pprr_ipm.csv'))
-
-    df = pd.merge(dfa, dfb, on=['uid'], how='outer')\
-        .drop(columns=[
-            'birth_year_x', 'birth_month', 'birth_day', 'department_desc_y',
-            'rank_code', 'rank_desc_y', 'hire_year_y', 'hire_month_y', 'hire_day_y', 
-            'term_year', 'term_month', 'term_day', 'data_production_year_y', 'agency_y',
-            'data_production_year_x', 'first_name_y', 'last_name_y'
-        ])\
-        .rename(columns={
-            'rank_desc_x': 'rank_desc',
-            'department_desc_x': 'department_desc',
-            'agency_x': 'agency',
-            'hire_year_x': 'hire_year',
-            'hire_month_x': 'hire_month',
-            'hire_day_x': 'hire_day',
-            'birth_year_y': 'birth_year'
-        })\
-        .drop_duplicates(subset=['left_year', 'left_month', 'left_day', 'uid'])
-    return df
-
-
 if __name__ == '__main__':
-    pre_merge_df = clean()
-    df = merge()
-    ensure_data_dir('clean')
-    pre_merge_df.to_csv(data_file_path(
-        'clean/pprr_new_orleans_pd_1946_2018_pre_merge.csv'), index=False)
+    df = clean()
     df.to_csv(data_file_path(
-        'clean/pprr_new_orleans_pd_1946_2018.csv'), index=False)
+        'clean/pprr_new_orleans_ipm_iapro_1946_2018.csv'
+    ), index=False)
+    # pre_merge_df.to_csv(data_file_path(
+    #     'clean/pprr_new_orleans_pd_1946_2018_pre_merge.csv'), index=False)
+    # df.to_csv(data_file_path(
+    #     'clean/pprr_new_orleans_pd_1946_2018.csv'), index=False)
