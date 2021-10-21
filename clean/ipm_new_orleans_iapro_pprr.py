@@ -148,7 +148,3 @@ if __name__ == '__main__':
     df.to_csv(data_file_path(
         'clean/pprr_new_orleans_ipm_iapro_1946_2018.csv'
     ), index=False)
-    # pre_merge_df.to_csv(data_file_path(
-    #     'clean/pprr_new_orleans_pd_1946_2018_pre_merge.csv'), index=False)
-    # df.to_csv(data_file_path(
-    #     'clean/pprr_new_orleans_pd_1946_2018.csv'), index=False)
