@@ -9,40 +9,44 @@ import sys
 sys.path.append('../')
 
 
-def fuse_events(cprr, pprr):
+def fuse_events(cprr20, cprr19, pprr):
     builder = events.Builder()
-    builder.extract_events(cprr, {
+    builder.extract_events(cprr19, {
         events.COMPLAINT_RECEIVE: {
             'prefix': 'receive', 'keep': ['uid', 'agency', 'complaint_uid']
         }
     }, ['uid', 'complaint_uid'])
+    builder.extract_events(cprr20, {
+        events.COMPLAINT_RECEIVE: {
+            'prefix': 'receive','keep': ['uid, agency', 'complaint_uid']
+        }
+    }, ['uid', 'complaint_uid'])
     builder.extract_events(pprr, {
         events.OFFICER_HIRE: {
-            'prefix': 'hire',
-            'keep': ['uid', 'agency', 'department_desc', 'sub_department_desc']
+            'prefix': 'hire', 'keep': ['uid', 'agency', 'department_desc', 'sub_department_desc']
         }
     }, ['uid'])
     return builder.to_frame()
 
 
 if __name__ == '__main__':
-    cprr = pd.read_csv(data_file_path(
+    cprr19 = pd.read_csv(data_file_path(
         'match/cprr_plaquemines_so_2019.csv'
+    ))
+    cprr20 = pd.read_csv(data_file_path(
+        'match/cprr_plaquemines_so_2016_2020.csv'
     ))
     pprr = pd.read_csv(data_file_path(
         'clean/pprr_plaquemines_so_2018.csv'
     ))
     post_event = pd.read_csv(data_file_path(
         'match/event_plaquemines_so_2018.csv'))
-    events_df = rearrange_event_columns(pd.concat([
-        fuse_events(cprr, pprr),
-        post_event
-    ]))
-    fuse_personnel(pprr, cprr).to_csv(data_file_path(
+    events_df = fuse_events(cprr20, cprr19, pprr)
+    fuse_personnel(pprr, cprr19, cprr20).to_csv(data_file_path(
         'fuse/per_plaquemines_so.csv'
     ), index=False)
-    rearrange_complaint_columns(cprr).to_csv(data_file_path(
+    rearrange_complaint_columns(pd.concat([cprr19, cprr20])).to_csv(data_file_path(
         'fuse/com_plaquemines_so.csv'
     ), index=False)
-    events_df.to_csv(data_file_path(
+    rearrange_event_columns(pd.concat([events_df, post_event])).to_csv(data_file_path(
         'fuse/event_plaquemines_so.csv'), index=False)

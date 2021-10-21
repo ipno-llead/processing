@@ -18,7 +18,6 @@ def gen_middle_initial(df):
 
 
 def assign_agency(df):
-    df.loc[:, 'data_production_year'] = 2019
     df.loc[:, 'agency'] = 'Plaquemines SO'
     return df
 
@@ -87,7 +86,7 @@ def clean_and_split_rows_with_multiple_charges(df):
             df.loc[idx + i + j, 'charges'] = name
         i += len(parts) - 1
 
-    return df
+    return df.drop(columns='policy')
 
 
 def extract_actions(df):
@@ -97,7 +96,8 @@ def extract_actions(df):
     actions = df.conclusion.str.extract(r'(30 day suspension|verbal counsel| ?suspended|arrested; suspended|terminated)')
     
     df.loc[:, 'action'] = actions[0]\
-        .str.replace(r'^ (\w+)$', r'\1', regex=True)
+        .str.replace(r'^ (\w+)$', r'\1', regex=True)\
+        .str.replace('counsel', 'counseling', regex=False)
     return df
 
 
@@ -141,10 +141,14 @@ def clean20():
         .pipe(clean_and_split_rows_with_multiple_charges)\
         .pipe(extract_actions)\
         .pipe(clean_disposition)\
-        .pipe(drop_rows_missing_names)
+        .pipe(drop_rows_missing_names)\
+        .pipe(assign_agency)\
+        .pipe(gen_uid, ['first_name', 'last_name', 'agency'])
     return df
 
 
 if __name__ == '__main__':
-    df = clean19()
-    df.to_csv(data_file_path('clean/cprr_plaquemines_so_2019.csv'), index=False)
+    df19 = clean19()
+    df20 = clean20()
+    df19.to_csv(data_file_path('clean/cprr_plaquemines_so_2019.csv'), index=False)
+    df20.to_csv(data_file_path('clean/cprr_plaquemines_so_2016_2020.csv'), index=False)
