@@ -51,7 +51,7 @@ def download_doc(build_dir, doc_url):
         progress_bar.close()
 
 
-def split_pdf_into_batches(build_dir, filename, batch_size=10):
+def split_pdf_into_batches(build_dir, filename, batch_size=10, end_page=math.inf):
     batches_dir = get_batches_dir(build_dir, filename)
     if not batches_dir.exists():
         os.makedirs(batches_dir)
@@ -64,7 +64,7 @@ def split_pdf_into_batches(build_dir, filename, batch_size=10):
         for batch_idx, start_page in enumerate(range(0, total, batch_size)):
             writer = PdfFileWriter()
             for page in range(start_page, start_page + batch_size):
-                if page >= total:
+                if page >= total or page >= end_page:
                     break
                 writer.addPage(reader.getPage(page))
             batch_name = ('%03d.pdf' % batch_idx)
@@ -81,12 +81,12 @@ def pdf_batches(build_dir, filename, start_batch):
             yield (batch_idx + start_batch, f)
 
 
-def get_doc_content_as_batches(build_dir, doc_url, batch_size=10, start_batch=0):
+def get_doc_content_as_batches(build_dir, doc_url, batch_size=10, start_batch=0, end_page=math.inf):
     filename = filename_from_url(doc_url)
     batches_dir = get_batches_dir(build_dir, filename)
     if not batches_dir.exists():
         download_doc(build_dir, doc_url)
-        split_pdf_into_batches(build_dir, filename, batch_size)
+        split_pdf_into_batches(build_dir, filename, batch_size, end_page)
     with open(batches_dir / 'pageCount', 'r') as cf:
         page_count = int(cf.read().strip())
     return page_count, pdf_batches(build_dir, filename, start_batch)
@@ -134,6 +134,9 @@ if __name__ == '__main__':
         help='remove ":selected:" and ":unselected:" sequences from cell values'
     )
     parser.add_argument(
+        '--model-id', type=str, default='prebuilt-layout', help='ID of model to use'
+    )
+    parser.add_argument(
         '--build-dir', type=pathlib.Path, metavar='BUILD_DIR', default=pathlib.Path.cwd() / 'build',
         help=(
             'Build directory which will contain temporary files that is necessary for document extraction. '
@@ -143,6 +146,10 @@ if __name__ == '__main__':
     parser.add_argument(
         '--batch-size', type=int, metavar='BATCH_SIZE', default=10,
         help='PDF batch size (number of pages) that get sent to FormRecognizer in a single request.'
+    )
+    parser.add_argument(
+        '-e', '--end-page', type=int, metavar='END_PAGE', default=math.inf,
+        help='only analyze until this page (non-inclusive)'
     )
     args = parser.parse_args()
 
@@ -157,16 +164,18 @@ if __name__ == '__main__':
             start_batch = int(f.read().strip())
             print('resume at batch %d' % start_batch)
 
-    page_count, generator = get_doc_content_as_batches(args.build_dir, args.doc_url, args.batch_size, start_batch)
+    page_count, generator = get_doc_content_as_batches(
+        args.build_dir, args.doc_url, args.batch_size, start_batch, args.end_page)
     with tqdm(total=page_count, desc='analyzing PDF pages {batch_size=%d}' % (args.batch_size)) as pbar:
         tbl_idx = start_batch * args.batch_size
         pbar.update(tbl_idx)
         for batch_idx, batch_file in generator:
-            poller = document_analysis_client.begin_analyze_document("prebuilt-layout", batch_file)
+            poller = document_analysis_client.begin_analyze_document(args.model_id, batch_file)
             result = poller.result()
             tbl_idx = extract_tables(args.csv_path, tbl_idx, result, args.trim_selection_marks)
             pbar.update(args.batch_size)
             with open(batch_progress_fp, 'w') as f:
                 f.write('%d' % (batch_idx + 1))
-    batch_progress_fp.unlink()
+    if batch_progress_fp.exists():
+        batch_progress_fp.unlink()
     print("extracted tables written to %s_XXX.csv" % args.csv_path)
