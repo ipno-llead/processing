@@ -66,7 +66,7 @@ def drop_rows_missing_names(df):
 
 
 def clean_receive_dates(df):
-    df.loc[:, 'receive_date'] = df.date\
+    df.loc[:, 'receive_date'] = df.date.fillna('')\
         .str.replace('11/16/2 0', '11/16/20', regex=False)
     return df.drop(columns='date')
 
@@ -143,7 +143,8 @@ def clean20():
         .pipe(clean_disposition)\
         .pipe(drop_rows_missing_names)\
         .pipe(assign_agency)\
-        .pipe(gen_uid, ['first_name', 'last_name', 'agency'])
+        .pipe(gen_uid, ['first_name', 'last_name', 'middle_name', 'middle_initial', 'agency'])\
+        .pipe(gen_uid, ['uid', 'charges', 'receive_year', 'receive_day', 'receive_month'], 'complaint_uid')
     return df
 
 

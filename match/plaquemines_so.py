@@ -1,5 +1,5 @@
 from datamatch import ThresholdMatcher, JaroWinklerSimilarity, ColumnsIndex
-from lib.path import data_file_path, ensure_data_dir
+from lib.path import data_file_path
 from lib.post import extract_events_from_post
 import pandas as pd
 import sys

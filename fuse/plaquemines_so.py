@@ -9,7 +9,7 @@ import sys
 sys.path.append('../')
 
 
-def fuse_events(cprr20, cprr19, pprr):
+def fuse_events(cprr19, cprr20, pprr):
     builder = events.Builder()
     builder.extract_events(cprr19, {
         events.COMPLAINT_RECEIVE: {
@@ -18,7 +18,7 @@ def fuse_events(cprr20, cprr19, pprr):
     }, ['uid', 'complaint_uid'])
     builder.extract_events(cprr20, {
         events.COMPLAINT_RECEIVE: {
-            'prefix': 'receive','keep': ['uid, agency', 'complaint_uid']
+            'prefix': 'receive', 'keep': ['uid', 'agency', 'complaint_uid']
         }
     }, ['uid', 'complaint_uid'])
     builder.extract_events(pprr, {
@@ -31,17 +31,17 @@ def fuse_events(cprr20, cprr19, pprr):
 
 if __name__ == '__main__':
     cprr19 = pd.read_csv(data_file_path(
-        'match/cprr_plaquemines_so_2019.csv'
+        'clean/cprr_plaquemines_so_2019.csv'
     ))
     cprr20 = pd.read_csv(data_file_path(
-        'match/cprr_plaquemines_so_2016_2020.csv'
+        'clean/cprr_plaquemines_so_2016_2020.csv'
     ))
     pprr = pd.read_csv(data_file_path(
         'clean/pprr_plaquemines_so_2018.csv'
     ))
     post_event = pd.read_csv(data_file_path(
         'match/event_plaquemines_so_2018.csv'))
-    events_df = fuse_events(cprr20, cprr19, pprr)
+    events_df = fuse_events(cprr19, cprr20, pprr)
     fuse_personnel(pprr, cprr19, cprr20).to_csv(data_file_path(
         'fuse/per_plaquemines_so.csv'
     ), index=False)
