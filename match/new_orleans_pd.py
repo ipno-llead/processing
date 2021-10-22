@@ -118,8 +118,29 @@ def match_pprr_csd_to_pprr_ipm(pprr_csd, pprr_ipm):
     return pprr_csd
 
 
+# def merge(pprr_ipm, pprr_csd):
+#     df = pd.merge(pprr_ipm, pprr_csd, on=['uid'], how='outer')\
+#         .drop(columns=[
+#             'birth_year_x', 'birth_month', 'birth_day', 'department_desc_y',
+#             'rank_code', 'rank_desc_y', 'hire_year_y', 'hire_month_y', 'hire_day_y',
+#             'term_year', 'term_month', 'term_day', 'data_production_year_y', 'agency_y',
+#             'data_production_year_x', 'first_name_y', 'last_name_y'
+#         ])\
+#         .rename(columns={
+#             'rank_desc_x': 'rank_desc',
+#             'department_desc_x': 'department_desc',
+#             'agency_x': 'agency',
+#             'hire_year_x': 'hire_year',
+#             'hire_month_x': 'hire_month',
+#             'hire_day_x': 'hire_day',
+#             'birth_year_y': 'birth_year'
+#         })\
+#         .drop_duplicates(subset=['left_year', 'left_month', 'left_day', 'uid'])
+#     return df
+
+
 if __name__ == '__main__':
-    pprr_ipm = pd.read_csv(data_file_path('clean/pprr_new_orleans_pd_1946_2018_pre_merge.csv'))
+    pprr_ipm = pd.read_csv(data_file_path('clean/pprr_new_orleans_ipm_iapro_1946_2018.csv'))
     pprr_csd = pd.read_csv(data_file_path('clean/pprr_new_orleans_csd_2014.csv'))
     post = pd.read_csv(data_file_path('clean/pprr_post_2020_11_06.csv'))
     award = pd.read_csv(data_file_path('clean/award_new_orleans_pd_2016_2021.csv'))
@@ -137,4 +158,4 @@ if __name__ == '__main__':
     lprr.to_csv(data_file_path(
         'match/lprr_new_orleans_csc_2000_2016.csv'), index=False)
     pprr_csd.to_csv(data_file_path(
-        'match/pprr_new_orleans_csd_matched_to_pprr_ipm.csv'), index=False)
+        'match/pprr_new_orleans_csd_2014.csv'), index=False)

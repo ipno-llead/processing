@@ -82,6 +82,7 @@ def ensure_uid_unique(df: pd.DataFrame, uid_cols: list[str] or str, output_csv: 
         .dropna(axis=1, how='all').sort_values(uid_cols)
     if output_csv:
         dup_df.to_csv(data_file_path('duplicates.csv'), index=False)
+        print('duplications written to data/duplicates.csv')
     raise NonUniqueUIDException(
-        'DataFrame is not unique:\n%s'
+        'rows are not unique:\n%s'
         % dup_df)
