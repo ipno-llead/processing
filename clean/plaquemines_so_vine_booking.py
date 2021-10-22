@@ -31,7 +31,6 @@ def scrape(url):
 def clean():
     df = pd.read_csv(data_file_path('scraped/plaquemines_so_booking_log_10_21_2021_to_10_26_2021.csv'))\
         .pipe(clean_column_names)\
-        .drop(columns=['name', 'birth_date'])\
         .pipe(standardize_desc_cols, ['race', 'sex', 'arrest_date'])
     return df
 
