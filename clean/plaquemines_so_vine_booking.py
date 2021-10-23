@@ -3,7 +3,6 @@ from bs4 import BeautifulSoup
 import pandas as pd
 from lib.columns import clean_column_names
 from lib.clean import standardize_desc_cols
-from lib.path import data_file_path
 
 
 def scrape(url):
@@ -24,19 +23,12 @@ def scrape(url):
     except Exception as e:
         return e
 
-    df = pd.DataFrame.from_records(inmates)
-    df.to_csv(data_file_path('scraped/plaquemines_so_booking_log_10_21_2021_to_10_26_2021.csv'), index=False)
-
-
-def clean():
-    df = pd.read_csv(data_file_path('scraped/plaquemines_so_booking_log_10_21_2021_to_10_26_2021.csv'))\
+    df = pd.DataFrame.from_records(inmates)\
         .pipe(clean_column_names)\
-        .pipe(standardize_desc_cols, ['race', 'sex', 'arrest_date'])
+        .pipe(standardize_desc_cols, ['name', 'race', 'sex', 'arrest_date'])
     return df
 
 
 if __name__ == '__main__':
     url = 'http://www.plaquemines.lavns.org/roster.aspx'
     df = scrape(url)
-    df = clean()
-    df.to_csv(data_file_path('clean/plaquemines_so_booking_log_10_21_2021_to_10_26_2021.csv'), index=False)
