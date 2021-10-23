@@ -3,12 +3,13 @@ sys.path.append('../')
 from lib.path import data_file_path
 import pandas as pd
 from lib.columns import clean_column_names
+from lib.clean import clean_dates
 from lib.rows import duplicate_row
 import re
 from lib.uid import gen_uid
 
 
-def extract_investigation_start_date(df):
+def extract_receive_date(df):
     dates = df.atic_n_date_iad_numbes\
         .str.extract(r'(\d+\/\d+\/\d+)')
     df.loc[:, 'receive_date'] = dates[0]
@@ -97,6 +98,9 @@ def split_officer_name(df):
         .str.replace(r'delectives/officer \$', '', regex=True)\
         .str.replace(r'( \$|0|unknawn)', '', regex=True)\
         .str.replace(r'\.', ',', regex=True)
+    names = df.officer.str.extract(r'(\w+),? ?(\w+)?')
+    df.loc[:, 'last_name'] = names[0]
+    df.loc[:, 'first_name'] = names[1]
     return df
 
 
@@ -118,11 +122,11 @@ def split_rows_with_multiple_other_officers(df):
     return df
 
 
-def consolidate_other_officer_column_and_split_rows_with_multiple_officers(df):
-    
-# drop rows where officer and other officer is 
- 
- 
+def assign_agency(df):
+    df.loc[:, 'agency'] = 'Bossier City PD'
+    return df
+
+
 def clean():
     df = pd.read_csv(data_file_path('raw/bossier_city_pd/bossier_city_pd_cprr_2020.csv'))\
         .pipe(clean_column_names)\
@@ -130,7 +134,7 @@ def clean():
             'assigned': 'investigation_start_date',
             'date_returned': 'investigation_complete_date'
         })\
-        .pipe(extract_investigation_start_date)\
+        .pipe(extract_receive_date)\
         .pipe(clean_tracking_number)\
         .pipe(clean_complaint_type)\
         .pipe(clean_charges)\
@@ -139,6 +143,14 @@ def clean():
         .pipe(clean_actions)\
         .pipe(clean_investigating_supervisor)\
         .pipe(split_officer_name)\
-        .pipe(split_rows_with_multiple_other_officers)
+        .pipe(assign_agency)\
+        .pipe(clean_dates, ['receive_date', 'investigation_start_date', 'investigation_complete_date'])\
+        .pipe(gen_uid, ['first_name', 'last_name', 'agency'])\
+        .pipe(gen_uid, ['uid', 'charges', 'disposition', 'action'], 'complaint_uid')
     return df
 
+
+if __name__ == '__main__':
+    df = clean()
+    df.to_csv(data_file_path(
+        'clean/cprr_bossier_city_pd_2020.csv'), index=False)
