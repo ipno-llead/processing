@@ -237,19 +237,15 @@ def clean_races(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
             .str.replace(r'^w$', 'white', regex=True)\
             .str.replace(r'^h$', 'hispanic', regex=True)\
             .str.replace(r'^b$', 'black', regex=True)\
-            .str.replace(r'\bislande\b', 'islander', regex=True)\
-            .str.replace(r'^a$', 'asian', regex=True)
+            .str.replace(r'\bislande\b', 'islander', regex=True)
         df = standardize_from_lookup_table(df, col, [
             ['black', 'african american', 'black / african american', 'black or african american'],
             ['white'],
             ['hispanic', 'latino'],
             ['native american', 'american indian', 'american indian or alaskan native'],
-            ['asian / pacific islander', 'asian', 'native hawaiian or other pacific islander', 'islander'],
+            ['asian / pacific islander', 'asian', 'native hawaiian or other pacific islander'],
             ['mixed', 'two or more races', 'multi-racial'],
-            ['unknown', 'unknown race'],
         ])
-        # can't have empty sequence in standardize_from_lookup_table
-        df.loc[:, col] = df[col].str.replace(r'^unknown$', '', regex=True)
     return df
 
 
@@ -496,9 +492,9 @@ def standardize_desc_cols(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
 def float_to_int_str(df: pd.DataFrame, cols: list[str], cast_as_str: bool = False) -> pd.DataFrame:
     """Turns float values in column into strings without trailing ".0"
 
-    Data loaded with pd.read_csv tend to turn integer columns into
-    float columns if there are even just one value missing. This
-    reverse that effect by converting everything to string and strip
+    Data loaded with pd.read_csv tends to turn integer columns into
+    float columns even if one value is missing. This
+    reverses that effect by converting everything to a string and striping
     trailing ".0"s.
 
     Examples:
