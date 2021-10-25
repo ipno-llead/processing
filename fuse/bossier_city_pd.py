@@ -28,6 +28,7 @@ def fuse_events(pprr, cprr):
             'keep': ['uid', 'charges', 'disposition', 'action']
         }
     }, ['uid', 'complaint_uid'])
+    return builder.to_frame()
 
 
 if __name__ == '__main__':
@@ -35,11 +36,11 @@ if __name__ == '__main__':
     post_event = pd.read_csv(data_file_path('match/post_event_bossier_city_pd.csv'))
     cprr = pd.read_csv(data_file_path('clean/cprr_bossier_city_pd_2020.csv'))
     per_df = fuse_personnel(pprr, cprr)
-    events_df = fuse_events(pprr, cprr)
     com_df = rearrange_complaint_columns(cprr)
+    events_df = fuse_events(pprr, cprr)
     events_df = rearrange_event_columns(pd.concat([
+        events_df,
         post_event,
-        events_df
     ]))
     per_df.to_csv(data_file_path(
         'fuse/per_bossier_city_pd.csv'), index=False)

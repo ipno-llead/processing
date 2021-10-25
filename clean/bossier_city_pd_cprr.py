@@ -18,7 +18,8 @@ def extract_receive_date(df):
 
 def clean_tracking_number(df):
     df.loc[:, 'tracking_number'] = df.atic_n_date_iad_numbes\
-        .str.replace(r'(.+) (20-.+) ', r'\2', regex=True)
+        .str.replace(r'(.+) (20-.+) ', r'\2', regex=True)\
+        .str.replace('1A', 'IA', regex=False)
     return df.drop(columns='atic_n_date_iad_numbes')
 
 
@@ -66,8 +67,6 @@ def clean_disposition(df):
         .str.replace(r'(\, |\/)', '|', regex=True)
     return df
 
-# dispositions seem to be contradictory. do I drop the least final? probably. like ipm_nopd
-
 
 def clean_actions(df):
     df.loc[:, 'action'] = df.action_taken.str.lower().str.strip()\
@@ -93,32 +92,87 @@ def clean_investigating_supervisor(df):
     return df.drop(columns='investigatodate')
 
 
-def split_officer_name(df):
-    df.loc[:, 'officer'] = df.officer.str.lower().str.strip()\
+def combine_officer_and_other_officer_columns(df):
+    df.loc[:, 'officer'] = df.officer.str.lower().str.strip().fillna('')\
+        .str.cat(df.other_officers.str.lower().str.strip().fillna(''))\
+        .str.replace('burr /jeter, fanning. achanfer, gallon, estess, willams',
+                     'burr/jeter, fanning/achanfer, gallon/estess, willams', regex=False)\
+        .str.replace('; ', '/', regex=False)\
         .str.replace(r'delectives/officer \$', '', regex=True)\
         .str.replace(r'( \$|0|unknawn)', '', regex=True)\
-        .str.replace(r'\.', ',', regex=True)
-    names = df.officer.str.extract(r'(\w+),? ?(\w+)?')
-    df.loc[:, 'last_name'] = names[0]
-    df.loc[:, 'first_name'] = names[1]
+        .str.replace(r'\.', ',', regex=True)\
+        .str.replace(r'^jahnson', 'johnson', regex=True)\
+        .str.replace(r'(\w+) /(\w+)', r'\1/\2', regex=True)\
+        .str.replace(r'\/$', '', regex=True)\
+        .str.replace('benjamin, deaveon', 'benjamin/deaveon', regex=False)
     return df
 
 
-def split_rows_with_multiple_other_officers(df):
-    df.loc[:, 'other_officers'] = df.other_officers.str.lower().str.strip().fillna('')\
-        .str.replace('; ', '/', regex=False)\
-        .str.replace(r'\.', ',', regex=True)\
-        .str.replace('jeter, fanning, achanfer, gallon, estess, willams',
-                     'jeter, fanning/achanfer, gallon/estess, willams', regex=False)
-    
+def split_rows_with_multiple_officers_and_split_names(df):
     i = 0
-    for idx in df[df.other_officers.str.contains(r'/')].index:
-        s = df.loc[idx + i, 'other_officers']
+    for idx in df[df.officer.fillna('').str.contains(r'/')].index:
+        s = df.loc[idx + i, 'officer']
         parts = re.split(r'\s*(?:\/)\s*', s)
         df = duplicate_row(df, idx + i, len(parts))
         for j, name in enumerate(parts):
-            df.loc[idx + i + j, 'other_officers'] = name
+            df.loc[idx + i + j, 'officer'] = name
         i += len(parts) - 1
+
+    names = df.officer.str.lower().str.strip().str.extract(r'(\w+),? ?(\w+)?')
+    df.loc[:, 'last_name'] = names[0].fillna('')
+    df.loc[:, 'first_name'] = names[1].fillna('')
+    return df
+
+
+def clean_summary(df):
+    df.loc[:, 'summary'] = df.synopsis.str.lower().str.strip()\
+        .str.replace('bcpd', 'bossier city police department', regex=False)\
+        .str.replace(r'all[ae]g[ae][sn]', 'alleges', regex=True)\
+        .str.replace('sicla', 'stole', regex=False).str.replace(r'[oa]ffic[ae]rs\b', 'officers', regex=True)\
+        .str.replace(r'[oa]ffic[ae]r\b', 'officer', regex=True).str.replace('juvenila', 'juvenile', regex=False)\
+        .str.replace(r'sg[tl].', 'sergeant', regex=True).str.replace(r'cpl\.', 'corporal', regex=True)\
+        .str.replace('palicy', 'policy', regex=False).str.replace('det.', 'detective', regex=False)\
+        .str.replace('mot', 'not', regex=False).str.replace('apices', 'spices', regex=False)\
+        .str.replace('spois', 'spots', regex=False).str.replace('tickeled', 'ticketed', regex=False)\
+        .str.replace('trattic', 'traffic', regex=False).str.replace('purauit', 'pursuit', regex=False)\
+        .str.replace('invalving', 'involving', regex=False).str.replace('rudaness', 'rudeness', regex=False)\
+        .str.replace('accused him of was rude and threaten jail.',
+                     'accused him of drinking, was rude and threaten jail.', regex=False)\
+        .str.replace('rekused', 'refused', regex=False)\
+        .str.replace('disrespectivi', 'disrespectful', regex=False).str.replace('lo', 'to', regex=False)\
+        .str.replace('binandon', 'brandon', regex=False).str.replace('taka', 'take', regex=False)\
+        .str.replace('inapproapiala facabock', 'inappropriate faceboook', regex=False)\
+        .str.replace('calis', 'calls', regex=False).str.replace('conduci', 'conduct', regex=False)\
+        .str.replace('avicion', 'eviction', regex=False).str.replace('injurtes', 'injuries', regex=False)\
+        .str.replace('lis', 'his', regex=False).str.replace('off-cury', 'off-duty', regex=False)\
+        .str.replace('quirty', 'guilty', regex=False).str.replace(r'[ln]is', 'his', regex=True)\
+        .str.replace('recaive', 'receive', regex=False).str.replace('jaid', 'jail', regex=False)\
+        .str.replace('suspecis', 'suspects', regex=False).str.replace('shat', 'shut', regex=False)\
+        .str.replace('spesding', 'spreading', regex=False).str.replace('sicohol', 'alcohol', regex=False)\
+        .str.replace(r'fa[il]ted', 'failed', regex=True).str.replace('unprofessionel', 'unprofessional', regex=False)\
+        .str.replace('merked', 'marked', regex=False)
+    return df.drop(columns='synopsis')
+
+
+def assign_dispositions(df):
+    df.loc[(df.tracking_number == '20-IA-53') & (df.last_name == 'morton'), 'disposition'] = 'sustained'
+    df.loc[(df.tracking_number == '20-IA-53') & (df.last_name == 'levy'), 'disposition'] = 'unfounded'
+    df.loc[(df.tracking_number == '20-IA-53') & (df.last_name == 'holmes'), 'disposition'] = 'exonerated'
+    df.loc[(df.tracking_number == '20-IA-58') & (df.last_name == 'sproles'), 'disposition'] = ''
+    df.loc[(df.tracking_number == '20-IA-58') & (df.last_name == 'bridges'), 'disposition'] = ''
+    df.loc[(df.tracking_number == '20-IA-38') & (df.last_name == 'benjamin'), 'disposition'] = 'sustained'
+    df.loc[(df.tracking_number == '20-IA-38') & (df.last_name == 'deaveon'), 'disposition'] = 'unfounded'
+    return df
+
+
+def assign_action(df):
+    df.loc[(df.tracking_number == '20-IA-53'), 'action'] = ''
+    df.loc[
+        (df.tracking_number == '20-IA-38') & (df.last_name == 'benjamin'),
+        'action'] = '5 day suspension|loss of senority|loss of pay'
+    df.loc[
+        (df.tracking_number == '20-IA-38') & (df.last_name == 'deaveon'),
+        'action'] = ''
     return df
 
 
@@ -139,14 +193,18 @@ def clean():
         .pipe(clean_complaint_type)\
         .pipe(clean_charges)\
         .pipe(split_rows_with_multiple_charges)\
+        .pipe(combine_officer_and_other_officer_columns)\
+        .pipe(split_rows_with_multiple_officers_and_split_names)\
         .pipe(clean_disposition)\
         .pipe(clean_actions)\
         .pipe(clean_investigating_supervisor)\
-        .pipe(split_officer_name)\
+        .pipe(clean_summary)\
+        .pipe(assign_dispositions)\
+        .pipe(assign_action)\
         .pipe(assign_agency)\
-        .pipe(clean_dates, ['receive_date', 'investigation_start_date', 'investigation_complete_date'])\
         .pipe(gen_uid, ['first_name', 'last_name', 'agency'])\
-        .pipe(gen_uid, ['uid', 'charges', 'disposition', 'action'], 'complaint_uid')
+        .pipe(gen_uid, ['uid', 'charges', 'disposition', 'tracking_number'], 'complaint_uid')\
+        .pipe(clean_dates, ['receive_date', 'investigation_complete_date', 'investigation_start_date'])
     return df
 
 
