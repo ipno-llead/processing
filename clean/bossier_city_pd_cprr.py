@@ -55,17 +55,22 @@ def split_rows_with_multiple_charges(df):
     return df
 
 
-def clean_disposition(df):
+def extract_and_clean_disposition(df):
+    extracted_dispositions = df.action_taken.str.lower().str.strip()\
+        .str.extract(r'(unfounded|not sustained|exonderated)')
+    df.loc[:, 'dispositions_extracted'] = extracted_dispositions[0]\
+        .str.replace('exonderated', 'exonerated')
     df.loc[:, 'disposition'] = df.disposition.str.lower().str.strip()\
         .str.replace(r'sus[ti]m?i?a?l?ned', 'sustained', regex=True)\
         .str.replace(r'(\w+)- ?sustained', 'not sustained', regex=True)\
         .str.replace(r'(none|n\/a)', '', regex=True)\
         .str.replace(r'unf ?oun[dt][ea]d', 'unfounded', regex=True)\
         .str.replace(r'syst ?em fai?tur[ea]', 'system failure', regex=True)\
-        .str.replace('misconduel', 'misconduct', regex=False)\
-        .str.replace('exortersted', 'exonerated', regex=False)\
-        .str.replace(r'(\, |\/)', '|', regex=True)
-    return df
+        .str.replace(r'( ?miscondue?l?c?t?| ?x?2x?)', '', regex=True)\
+        .str.replace(r'\,$', '', regex=True)\
+        .str.replace(r'(\/|\,\, )', '|', regex=True)
+    df.loc[:, 'disposition'] = df.disposition.fillna('').str.cat(df.dispositions_extracted.fillna(''), sep='')
+    return df.drop(columns='dispositions_extracted')
 
 
 def clean_actions(df):
@@ -94,11 +99,11 @@ def clean_investigating_supervisor(df):
 
 def combine_officer_and_other_officer_columns(df):
     df.loc[:, 'officer'] = df.officer.str.lower().str.strip().fillna('')\
-        .str.cat(df.other_officers.str.lower().str.strip().fillna(''))\
-        .str.replace('burr /jeter, fanning. achanfer, gallon, estess, willams',
+        .str.cat(df.other_officers.str.lower().str.strip().fillna(''), sep='/')\
+        .str.replace('jeter, fanning. achanfer, gallon, estess, willams',
                      'burr/jeter, fanning/achanfer, gallon/estess, willams', regex=False)\
         .str.replace('; ', '/', regex=False)\
-        .str.replace(r'delectives/officer \$', '', regex=True)\
+        .str.replace(r'delectives/officer \$', 'detectives', regex=True)\
         .str.replace(r'( \$|0|unknawn)', '', regex=True)\
         .str.replace(r'\.', ',', regex=True)\
         .str.replace(r'^jahnson', 'johnson', regex=True)\
@@ -121,7 +126,7 @@ def split_rows_with_multiple_officers_and_split_names(df):
     names = df.officer.str.lower().str.strip().str.extract(r'(\w+),? ?(\w+)?')
     df.loc[:, 'last_name'] = names[0].fillna('')
     df.loc[:, 'first_name'] = names[1].fillna('')
-    return df
+    return df.drop(columns=['officer', 'other_officers'])
 
 
 def clean_summary(df):
@@ -195,7 +200,7 @@ def clean():
         .pipe(split_rows_with_multiple_charges)\
         .pipe(combine_officer_and_other_officer_columns)\
         .pipe(split_rows_with_multiple_officers_and_split_names)\
-        .pipe(clean_disposition)\
+        .pipe(extract_and_clean_disposition)\
         .pipe(clean_actions)\
         .pipe(clean_investigating_supervisor)\
         .pipe(clean_summary)\
@@ -203,7 +208,7 @@ def clean():
         .pipe(assign_action)\
         .pipe(assign_agency)\
         .pipe(gen_uid, ['first_name', 'last_name', 'agency'])\
-        .pipe(gen_uid, ['uid', 'charges', 'disposition', 'tracking_number'], 'complaint_uid')\
+        .pipe(gen_uid, ['uid', 'charges', 'disposition', 'tracking_number', 'action'], 'complaint_uid')\
         .pipe(clean_dates, ['receive_date', 'investigation_complete_date', 'investigation_start_date'])
     return df
 
