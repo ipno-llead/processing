@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+import json
 
 import pandas as pd
 from pandas.api.types import CategoricalDtype
@@ -22,7 +23,7 @@ OFFICER_POST_DECERTIFICATION = "officer_post_decertification"  # officer decerti
 
 COMPLAINT_INCIDENT = "complaint_incident"
 COMPLAINT_RECEIVE = "complaint_receive"
-ALLEGATION_CREATE = "allegation_create"
+CHARGES_CREATE = "charges_create"
 INVESTIGATION_START = "investigation_start"
 INVESTIGATION_COMPLETE = "investigation_complete"
 SUSPENSION_START = "suspension_start"
@@ -44,7 +45,7 @@ UOF_DUE = "uof_due"
 AWARD_RECEIVE = "award_receive"
 AWARD_RECOMMENDED = "award_recommended"
 
-cat_type = CategoricalDtype(categories=[
+event_cat_type = CategoricalDtype(categories=[
     OFFICER_LEVEL_1_CERT,
     OFFICER_PC_12_QUALIFICATION,
     OFFICER_RANK,
@@ -55,7 +56,7 @@ cat_type = CategoricalDtype(categories=[
     OFFICER_PAY_EFFECTIVE,
     COMPLAINT_INCIDENT,
     COMPLAINT_RECEIVE,
-    ALLEGATION_CREATE,
+    CHARGES_CREATE,
     INVESTIGATION_START,
     INVESTIGATION_COMPLETE,
     SUSPENSION_START,
@@ -83,6 +84,26 @@ class Builder(object):
 
     def __init__(self):
         self._records = []
+        self._record_dict = dict()
+        self._merge_cols = dict()
+
+    def set_merge_cols(self, event_kind: str, merge_cols: list[str]):
+        """Set merge columns to eliminate duplicated events.
+
+        At the end of `to_frame`, for each group of rows sharing the same event_uid,
+        merge down to a single row if each column in merge_cols only have one
+        non-empty value. Otherwise let ensure_uid_unique raise an error.
+
+        Args:
+            event_kind (str):
+                kind of event to merge
+            merge_cols (list of str):
+                list of columns to merge
+
+        Returns:
+            no value
+        """
+        self._merge_cols[event_kind] = merge_cols
 
     def _extract_date(self, fields, raw_date, strptime_format=None):
         if strptime_format is not None:
@@ -116,6 +137,7 @@ class Builder(object):
         raw_datetime_str: str or None = None,
         strptime_format: str or None = None,
         ignore_bad_date: bool = False,
+        warn_duplications: bool = False,
         **kwargs
     ) -> None:
         """Append an event and optionally parse datetime of the event.
@@ -127,7 +149,7 @@ class Builder(object):
         raised. If `ignore_bad_date` is True then an error isn't raised and the event is simply ignored. Any other
         keyword arguments passed to this method will become a column in the final DataFrame.
 
-        Args
+        Args:
             event_kind (str):
                 kind of event
             id_cols (list of str):
@@ -140,6 +162,8 @@ class Builder(object):
                 format string to extract datetime with.
             ignore_bad_date (bool):
                 if True then ignore events with bad date instead of raising error
+            warn_duplications (bool):
+                if even duplications are detected, print a warning but don't add the event.
 
         Returns:
             no value
@@ -152,7 +176,7 @@ class Builder(object):
             InvalidEventDateException:
                 `year` isn't passed in or can't be extracted from raw date string.
         """
-        if event_kind not in cat_type.categories:
+        if event_kind not in event_cat_type.categories:
             raise InvalidEventKindException(event_kind)
         if 'salary_freq' in kwargs:
             if 'salary' not in kwargs or pd.isnull(kwargs['salary']) or kwargs['salary'] == '':
@@ -176,7 +200,18 @@ class Builder(object):
                 "year column cannot be empty:\n\t%s" % kwargs)
         kwargs["event_uid"] = gen_uid_from_dict(
             kwargs, ['kind', 'year', 'month', 'day', 'time'] + id_cols)
-        self._records.append(kwargs)
+        if warn_duplications and kwargs['event_uid'] in self._record_dict:
+            old_rec = self._record_dict[kwargs['event_uid']]
+            for k, v in old_rec.items():
+                if v != kwargs[k]:
+                    print('WARNING: ignoring duplicated event:\n    old: %s\n    new: %s' % (
+                        json.dumps(old_rec),
+                        json.dumps(kwargs)
+                    ))
+                    break
+        else:
+            self._records.append(kwargs)
+            self._record_dict[kwargs['event_uid']] = kwargs
 
     def _assign_kwargs_func(self, cols, kwargs_funcs, flatten_date_cols, kind, obj):
         if "parse_date" in obj:
@@ -207,7 +242,7 @@ class Builder(object):
                 (event_col, row[col]) for col, event_col in col_pairs
             ]
 
-    def extract_events(self, df: pd.DataFrame, event_dict: dict, id_cols: list[str]) -> None:
+    def extract_events(self, df: pd.DataFrame, event_dict: dict, id_cols: list[str], warn_duplications=False) -> None:
         """Extract event records from a DataFrame.
 
         Multiple kinds of event can be extracted. Each defined as a single key in `event_dict`.
@@ -222,6 +257,7 @@ class Builder(object):
           is also extracted.
         - ignore_bad_date: If set to True then ignore events with bad date instead of raising error
         - id_cols: Overwrite `id_cols` for this event kind.
+        - merge_cols: list of columns to merge duplicated events. See `set_merge_cols` to learn more.
 
         Args:
             df (pd.DataFrame):
@@ -235,6 +271,8 @@ class Builder(object):
                 }
             id_cols (list of str):
                 list of columns to generate event_uid from (in addition to ['kind', 'year', 'month', 'day', 'time'])
+            warn_duplications (bool):
+                if even duplications are detected, print a warning but don't add the event.
 
         Returns:
             no value
@@ -245,6 +283,8 @@ class Builder(object):
         for kind, obj in event_dict.items():
             self._assign_kwargs_func(
                 cols, kwargs_funcs, flatten_date_cols, kind, obj)
+            if 'merge_cols' in obj:
+                self.set_merge_cols(kind, obj['merge_cols'])
 
         for _, row in df.iterrows():
             common_fields = row.drop(flatten_date_cols).to_dict()
@@ -271,8 +311,20 @@ class Builder(object):
                     kind,
                     id_cols if 'id_cols' not in obj else obj['id_cols'],
                     ignore_bad_date=obj.get('ignore_bad_date', False),
+                    warn_duplications=warn_duplications,
                     **fields,
                 )
+
+    def _deduplicate_events_with_merge_cols(self, df: pd.DataFrame) -> pd.DataFrame:
+        for kind, cols in self._merge_cols.items():
+            for eid, rows in df.loc[df.kind == kind].groupby('event_uid'):
+                if not isinstance(rows, pd.DataFrame) or len(rows) < 2:
+                    continue
+                non_empty_vals = rows.sort_values(cols, ascending=False, na_position='last')\
+                    .reset_index(drop=True).loc[0, cols].to_list()
+                for i, col in enumerate(cols):
+                    df.loc[(df.event_uid == eid) & (df[col].isna() | (df[col] == '')), col] = non_empty_vals[i]
+        return df.drop_duplicates()
 
     def to_frame(self, output_duplicated_events: bool = False) -> pd.DataFrame:
         """Create a DataFrame out of collected events.
@@ -288,15 +340,16 @@ class Builder(object):
             collected events as a data frame
 
         Raises:
-            NonUniqueEventIDException:
+            NonUniqueUIDException:
                 event_uid is not unique.
         """
         df = pd.DataFrame.from_records(self._records)\
             .pipe(float_to_int_str, ["year", "month", "day"], True)
-        df.loc[:, 'kind'] = df.kind.astype(cat_type)
+        df.loc[:, 'kind'] = df.kind.astype(event_cat_type)
         if 'salary_freq' in df.columns:
             df.loc[:, 'salary_freq'] = df.salary_freq.astype(salary.cat_type)
         df = rearrange_event_columns(df)
+        df = self._deduplicate_events_with_merge_cols(df)
         ensure_uid_unique(df, 'event_uid', output_duplicated_events)
         return df
 
