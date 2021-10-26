@@ -22,7 +22,7 @@ def extract_post_events(pprr, post):
     decision = 0.95
     matcher.save_pairs_to_excel(data_file_path(
         "match/pprr_bossier_city_pd_v_post_2016_2019.xlsx"), decision)
-    matches = matcher.get_index_clusters_within_thresholds(lower_bound=decision)
+    matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
     return extract_events_from_post(post, matches, 'Bossier City PD')
 
 
