@@ -8,13 +8,15 @@ import pandas as pd
 def match_cprr_with_post(cprr, post):
     dfa = cprr[['first_name', 'last_name', 'uid', 'agency']]
     dfa.loc[:, 'fc'] = dfa.first_name.map(lambda x: x[:1])
+    dfa.loc[:, 'lc'] = dfa.last_name.fillna('').map(lambda x: x[:1])
     dfa = dfa.drop_duplicates(subset=['uid']).set_index('uid')
 
     dfb = post[['first_name', 'last_name', 'uid', 'agency']]
     dfb.loc[:, 'fc'] = dfb.first_name.map(lambda x: x[:1])
+    dfb.loc[:, 'lc'] = dfb.last_name.fillna('').map(lambda x: x[:1])
     dfb = dfb.drop_duplicates(subset=['uid']).set_index('uid')
 
-    matcher = ThresholdMatcher(ColumnsIndex(['fc']), {
+    matcher = ThresholdMatcher(ColumnsIndex(['fc', 'lc']), {
         'first_name': JaroWinklerSimilarity(),
         'last_name': JaroWinklerSimilarity(),
     }, dfa, dfb)
