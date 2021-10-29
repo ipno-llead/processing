@@ -94,7 +94,7 @@ def clean_charges(df):
     return df
 
 
-def split_rows_with_multiple_charges(df):
+def split_rows_with_multiple_charges_20(df):
     i = 0
     for idx in df[df.charges.str.contains(' | ')].index:
         s = df.loc[idx + i, 'charges']
@@ -163,6 +163,105 @@ def clean_action_09(df):
     return df.drop(columns='recommended_action')
 
 
+def extract_rank_from_name(df):
+    ranks = df.name.str.lower().str.strip().str.extract(r'(sgt)')
+    df.loc[:, 'rank_desc'] = ranks[0]\
+        .str.replace('sgt', 'sergeant', regex=False)
+    return df
+
+
+def split_name_08(df):
+    df.loc[:, 'name'] = df.name.str.lower().str.strip()\
+        .str.replace('.', ',', regex=False)\
+        .str.replace('sgt ', '', regex=False)\
+        .str.replace('thad gautier', 'gauthier, thaddeus', regex=False)\
+        .str.replace('michael damato', 'damato, michael', regex=False)\
+        .str.replace(r'(\w+) (\w+)', r'\1, \2', regex=True)
+    
+    names = df.name.str.extract(r'(\w+), (\w+)')
+    df.loc[:, 'last_name'] = names[0]
+    df.loc[:, 'first_name'] = names[1]
+    return df.drop(columns='name')
+
+
+def extract_complaint_type(df):
+    types = df.nature_of_incident.str.lower().str.strip()\
+        .str.extract(r'(citizen complaint)')
+    df.loc[:, 'complaint_type'] = types[0]\
+        .str.replace('complaint', '', regex=False)
+    return df
+
+
+def clean_charges_08(df):
+    df.loc[:, 'charges'] = df.nature_of_incident.str.lower().str.strip()\
+        .str.replace('citizen complaint', '', regex=False)\
+        .str.replace(r'(\w+)[\,\;] (\w+)', r'\1/\2', regex=True)\
+        .str.replace(r'ia-? ?(threatening|alleged)? ', '', regex=True)\
+        .str.replace('&', 'and', regex=False)\
+        .str.replace('invest', 'investigation', regex=False)\
+        .str.replace('complaint ', '', regex=False)\
+        .str.replace(r'^conduct unbecoi?ming', 'conduct unbecoming an officer', regex=True)
+    return df.drop(columns='nature_of_incident')
+
+
+def extract_and_clean_action(df):
+    df.loc[:, 'suspension_hrs'] = df.suspension_hrs.str.lower().str.strip()\
+        .str.replace(r'(\d+) days? ?(susp)?', r'\1 day suspension', regex=True)
+    
+    df.loc[:, 'letter_of_rep'] = df.letter_of_rep.str.lower().str.strip()\
+        .str.replace('x', 'letter of reprimand')
+
+    df.loc[:, 'action'] = df.no_action.str.lower().str.strip()\
+        .str.replace('x', '', regex=False)\
+        .str.replace('no action', '', regex=False)\
+        .str.replace('suspension - 1 day per gen order 107',
+                     '1 day suspension per gen order 107', regex=False)\
+        .str.replace(r'(\w+) - (\w+)', r'\1|\2', regex=True)
+    
+    df.loc[:, 'action'] = df.action.fillna('') + '' + df.letter_of_rep.fillna('')
+    df.loc[:, 'action'] = df.action + '' + df.suspension_hrs.fillna('')
+
+    df.loc[:, 'action'] = df.action.str.replace('reprimand2', 'reprimand|2', regex=False)
+    return df.drop(columns=['no_action', 'letter_of_rep', 'suspension_hrs'])
+
+
+def extract_and_clean_dispositions_08(df):
+    df.loc[:, 'dismiss'] = df.dismiss.str.lower().str.strip()\
+        .str.replace('x', 'dismissed', regex=False)
+
+    df.loc[:, 'disposition'] = df.founded_un.str.lower().str.strip()\
+        .str.replace(r'^u$', 'unfounded', regex=True)\
+        .str.replace('x', 'founded', regex=False)
+
+    df.loc[:, 'disposition'] = df.disposition.fillna('') + '' + df.dismiss.fillna('')
+    return df.drop(columns=['founded_un', 'dismiss'])
+
+
+def split_rows_with_multiple_charges_08(df):
+    i = 0
+    for idx in df[df.charges.str.contains('/')].index:
+        s = df.loc[idx + i, 'charges']
+        parts = re.split(r"\s*(?:\/)\s*", s)
+        df = duplicate_row(df, idx + i, len(parts))
+        for j, name in enumerate(parts):
+            df.loc[idx + i + j, 'charges'] = name
+        i += len(parts) - 1
+    return df
+
+
+def clean_incident_date_08(df):
+    df.loc[:, 'incident_date'] = df.date_of_incident\
+        .str.replace('5/8/8/04', '5/08/2004', regex=False)
+    return df.drop(columns='date_of_incident')
+
+
+def clean_action_date_08(df):
+    df.loc[:, 'action_date'] = df.date_of_action\
+        .str.replace('010/7/04', '10/7/04', regex=False)\
+        .str.replace('23/05', '2/3/05', regex=False)
+    return df.drop(columns='date_of_action')
+
+
 def clean_20():
     df = pd.read_csv(data_file_path('raw/hammond_pd/hammond_pd_cprr_2015_2020.csv'))\
         .pipe(clean_column_names)
@@ -174,7 +273,7 @@ def clean_20():
         .pipe(clean_action)\
         .pipe(combine_charge_columns)\
         .pipe(clean_charges)\
-        .pipe(split_rows_with_multiple_charges)\
+        .pipe(split_rows_with_multiple_charges_20)\
         .pipe(clean_department_desc)\
         .pipe(clean_dates, ['incident_date', 'investigation_start_date'])\
         .pipe(realign_action_column)\
@@ -182,7 +281,6 @@ def clean_20():
         .pipe(standardize_desc_cols, ['department_desc', 'action', 'charges'])\
         .pipe(set_values, {
             'agency': 'Hammond PD',
-            'data_production_year': '2021'
         })\
         .pipe(gen_uid, ['first_name', 'last_name', 'agency'])\
         .pipe(gen_uid,
@@ -205,16 +303,41 @@ def clean_14():
         .pipe(clean_action_09)\
         .pipe(set_values, {
             'agency': 'Hammond PD',
-            'data_production_year': '2021'
         })\
         .pipe(gen_uid, ['first_name', 'last_name', 'agency'])\
         .pipe(gen_uid, ['uid', 'charges', 'tracking_number', 'disposition'], 'complaint_uid')
     return df
 
 
+def clean_08():
+    df = pd.read_csv(data_file_path('raw/hammond_pd/hammond_pd_cprr_2004_2008.csv'))\
+        .pipe(clean_column_names)\
+        .drop(columns=['letter_of_instruction'])\
+        .rename(columns={
+            'ia_no': 'tracking_number',
+        })\
+        .pipe(extract_rank_from_name)\
+        .pipe(split_name_08)\
+        .pipe(extract_complaint_type)\
+        .pipe(clean_charges_08)\
+        .pipe(extract_and_clean_action)\
+        .pipe(extract_and_clean_dispositions_08)\
+        .pipe(clean_incident_date_08)\
+        .pipe(clean_action_date_08)\
+        .pipe(clean_dates, ['action_date'])\
+        .pipe(set_values, {
+            'agency': 'Hammond PD'
+        })\
+        .pipe(gen_uid, ['first_name', 'last_name', 'agency'])\
+        .pipe(gen_uid, ['uid', 'charges', 'disposition', 'action'])
+    return df
+
+
 if __name__ == '__main__':
     df20 = clean_20()
     df14 = clean_14()
+    df08 = clean_08()
     ensure_data_dir('clean')
     df20.to_csv(data_file_path('clean/cprr_hammond_pd_2015_2020.csv'), index=False)
     df14.to_csv(data_file_path('clean/cprr_hammond_pd_2009_2014.csv'), index=False)
+    df08.to_csv(data_file_path('clean/cprr_hammond_pd_2004_2008.csv'), index=False)

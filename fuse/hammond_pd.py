@@ -1,9 +1,8 @@
 import sys
 sys.path.append('../')
 import pandas as pd
-from lib.path import data_file_path, ensure_data_dir
+from lib.path import data_file_path
 from lib import events
-from lib.uid import ensure_uid_unique
 from lib.personnel import fuse_personnel
 from lib.columns import rearrange_complaint_columns
 
@@ -13,7 +12,7 @@ def prepare_post_data():
     return post[post.agency == 'hammond pd']
 
 
-def fuse_events(cprr_20, cprr_14, post):
+def fuse_events(cprr_20, cprr_14, cprr_08, post):
     builder = events.Builder()
     builder.extract_events(cprr_20, {
         events.INVESTIGATION_START: {
@@ -30,6 +29,15 @@ def fuse_events(cprr_20, cprr_14, post):
     builder.extract_events(cprr_14, {
         events.INVESTIGATION_START: {
             'prefix': 'investigation_start',
+            'keep': ['uid', 'agency', 'complaint_uid']
+        },
+    },
+        ['uid', 'complaint_uid'],
+    )
+    builder.extract_events(cprr_08, {
+        events.COMPLAINT_INCIDENT: {
+            'prefix': 'incident',
+            'parse_date': True,
             'keep': ['uid', 'agency', 'complaint_uid']
         },
     },
@@ -58,13 +66,11 @@ def fuse_events(cprr_20, cprr_14, post):
 if __name__ == '__main__':
     cprr_20 = pd.read_csv(data_file_path('match/cprr_hammond_pd_2015_2020.csv'))
     cprr_14 = pd.read_csv(data_file_path('match/cprr_hammond_pd_2009_2014.csv'))
+    cprr_08 = pd.read_csv(data_file_path('clean/cprr_hammond_pd_2004_2008.csv'))
     post = prepare_post_data() 
-    personnel_df = fuse_personnel(cprr_20, cprr_14, post)
-    complaints_df = rearrange_complaint_columns(pd.concat([cprr_20, cprr_14]))
-    ensure_uid_unique(complaints_df, 'complaint_uid', True)
-    event_df = fuse_events(cprr_20, cprr_14, post)
-    ensure_uid_unique(event_df, 'event_uid')
-    ensure_data_dir('fuse')
+    personnel_df = fuse_personnel(cprr_20, cprr_14, post, cprr_08)
+    complaints_df = rearrange_complaint_columns(pd.concat([cprr_20, cprr_14, cprr_08]))
+    event_df = fuse_events(cprr_20, cprr_14, post, cprr_08)
     event_df.to_csv(data_file_path('fuse/event_hammond_pd.csv'))
     personnel_df.to_csv(data_file_path('fuse/per_hammond_pd.csv'))
     complaints_df.to_csv(data_file_path('fuse/com_hammond_pd.csv'))
