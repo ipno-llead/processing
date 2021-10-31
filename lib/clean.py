@@ -280,6 +280,7 @@ def clean_salary(series: pd.Series) -> pd.Series:
     return series.str.strip().str.lower()\
         .str.replace('k', '000', regex=False)\
         .str.replace(r"[^\d\.]", "", regex=True)\
+        .str.replace(r'^$', '0', regex=True)\
         .astype("float64")
 
 
