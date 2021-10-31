@@ -200,13 +200,13 @@ def parse_dates_with_known_format(df: pd.DataFrame, cols: list[str], format: str
 
 
 def clean_sexes(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
-    """Cleans and standardizes gender columns
+    """Cleans and standardizes sex columns
 
     Args:
         df (pd.DataFrame):
             the frame to process
         cols (list of str):
-            gender columns
+            sex columns
 
     Returns:
         the updated frame

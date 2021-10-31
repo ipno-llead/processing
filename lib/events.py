@@ -142,8 +142,8 @@ class Builder(object):
     ) -> None:
         """Append an event and optionally parse datetime of the event.
 
-        If `raw_date_str` is passed then Builder try to extract `year`, `month`, `day` from it. If `raw_datetime_str`
-        is passed instead then Builder try to extract `year`, `month`, `day` and `time` from it. If `strptime_format`
+        If `raw_date_str` is passed then Builder tries to extract `year`, `month`, `day` from it. If `raw_datetime_str`
+        is passed instead then Builder tries to extract `year`, `month`, `day` and `time` from it. If `strptime_format`
         is passed along with `raw_date_str` or `raw_datetime_str` then the date is parsed with that format. By default
         if `year` isn't passed-in or can't be extracted from `raw_date_str` or `raw_datetime_str` then an error is
         raised. If `ignore_bad_date` is True then an error isn't raised and the event is simply ignored. Any other
@@ -247,7 +247,7 @@ class Builder(object):
 
         Multiple kinds of event can be extracted. Each defined as a single key in `event_dict`.
         Each value in `event_dict` is a dictionary with following keys:
-        - prefix: Prefix of columns to extract date from .E.g. if prefix = "hire" then hire_year, hire_month
+        - prefix: Prefix of columns to extract date from .e.g. if prefix = "hire" then hire_year, hire_month
           hire_day, hire_time, hire_date, hire_datetime, hire_raw_date are looked up depending on other keys.
         - keep: List of columns to keep in each event.
         - drop: Alternatively use "drop" to specify which columns to drop from each event.

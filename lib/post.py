@@ -28,7 +28,7 @@ def extract_events_from_post(post: pd.DataFrame, uid_matches: list[tuple[str, st
             the subset of POST data already filtered for a specific agency
         uid_matches (list of tuple of str):
             list of (pprr_uid, post_uid) tuples. Only rows with uid==post_uid
-            would be consider for event extraction. uid will be set to pprr_uid
+            are considered for event extraction. uid will be set to pprr_uid
             in event records.
         agency (str):
             agency name as it should appear in event records.
@@ -68,7 +68,7 @@ def extract_events_from_cprr_post(cprr_post: pd.DataFrame, uid_matches: list[tup
             the subset of POST data already filtered for a specific agency
         uid_matches (list of tuple of str):
             list of (pprr_uid, post_uid) tuples. Only rows with uid==post_uid
-            would be consider for event extraction. uid will be set to pprr_uid
+            are considered for event extraction. uid will be set to pprr_uid
             in event records.
         agency (str):
             agency name as it should appear in event records.

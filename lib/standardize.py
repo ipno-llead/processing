@@ -6,7 +6,7 @@ def standardize_from_lookup_table(
 ) -> pd.DataFrame:
     """Standardize a column with a lookup table.
 
-    Each entry in lookup table contain all variations of a string that need to be standardize.
+    Each entry in lookup table contains all variations of a string that need to be standardize.
     The first string in an entry is considered canonical and all variations will be replaced
     with it.
 
@@ -18,7 +18,7 @@ def standardize_from_lookup_table(
     ]
     The strings "sydney uni", "university sydney" will be replaced with "the university of sydney"
 
-    This function also print unmatched strings after a successful run
+    This function also prints unmatched strings after a successful run
 
     Args:
         df (pd.DataFrame):
