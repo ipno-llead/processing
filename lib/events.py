@@ -28,7 +28,7 @@ INVESTIGATION_START = "investigation_start"
 INVESTIGATION_COMPLETE = "investigation_complete"
 SUSPENSION_START = "suspension_start"
 SUSPENSION_END = "suspension_end"
-ACTION = 'action'  # date on which the action was allocated
+INITIAL_ACTION = 'initial_action'  # date on which the initial action was allocated
 
 APPEAL_FILE = "appeal_file"
 APPEAL_HEARING = "appeal_hearing"
@@ -76,7 +76,7 @@ event_cat_type = CategoricalDtype(categories=[
     AWARD_RECEIVE,
     AWARD_RECOMMENDED,
     OFFICER_POST_DECERTIFICATION,
-    ACTION,
+    INITIAL_ACTION,
 ], ordered=True)
 
 

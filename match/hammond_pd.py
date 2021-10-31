@@ -3,7 +3,6 @@ sys.path.append('../')
 import pandas as pd
 from lib.path import data_file_path, ensure_data_dir
 from datamatch import JaroWinklerSimilarity, ThresholdMatcher, ColumnsIndex
-from lib.post import extract_events_from_post
 
 
 def prepare_post_data():
@@ -83,7 +82,7 @@ def match_cprr_14_and_post(cprr, post):
     matcher = ThresholdMatcher(ColumnsIndex('fc'), {
         'first_name': JaroWinklerSimilarity(),
         'last_name': JaroWinklerSimilarity(),
-        }, dfa, dfb)
+    }, dfa, dfb)
     decision = .9
     matcher.save_pairs_to_excel(
         data_file_path('match/hammond_pd_cprr_2009_2014_v_post_pprr_2020_11_06.xlsx'), decision)

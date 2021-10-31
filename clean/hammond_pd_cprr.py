@@ -1,7 +1,7 @@
 import sys
 sys.path.append('../')
 import pandas as pd
-from lib.path import data_file_path, ensure_data_dir
+from lib.path import data_file_path
 from lib.columns import clean_column_names, set_values
 from lib.clean import clean_dates, standardize_desc_cols
 from lib.uid import gen_uid
@@ -174,11 +174,22 @@ def split_name_08(df):
     df.loc[:, 'name'] = df.name.str.lower().str.strip()\
         .str.replace('.', ',', regex=False)\
         .str.replace('sgt ', '', regex=False)\
-        .str.replace('thad gautier', 'gauthier, thaddeus', regex=False)\
-        .str.replace('michael damato', 'damato, michael', regex=False)\
-        .str.replace(r'(\w+) (\w+)', r'\1, \2', regex=True)
-    
-    names = df.name.str.extract(r'(\w+), (\w+)')
+        .str.replace(r'(thad)? ?gauth?ier', 'gautier thaddeus', regex=True)\
+        .str.replace('michael damato', 'damato michael', regex=False)\
+        .str.replace('eric watson', 'watson eric', regex=False)\
+        .str.replace('corey stewart', 'stewart corey', regex=False)\
+        .str.replace('patrick peterman', 'peterman patrick', regex=False)\
+        .str.replace('john alexander', 'alexander john', regex=False)\
+        .str.replace('daniel boudreaux', 'boudreaux daniel', regex=False)\
+        .str.replace('jeannine cruz', 'cruz jeannine', regex=False)\
+        .str.replace('vicki corkern', 'corkern vicki', regex=False)\
+        .str.replace('terry zaffuto', 'zaffuto terry', regex=False)\
+        .str.replace('james king', 'king james', regex=False)\
+        .str.replace('thomas miller', 'miller thomas', regex=False)\
+        .str.replace('derrick foster', 'foster derrick', regex=False)\
+        .str.replace(r'jo(seph|ey) drago', 'drago joseph', regex=True)
+
+    names = df.name.str.extract(r'(\w+),? (\w+)')
     df.loc[:, 'last_name'] = names[0]
     df.loc[:, 'first_name'] = names[1]
     return df.drop(columns='name')
@@ -187,7 +198,7 @@ def split_name_08(df):
 def extract_complaint_type(df):
     types = df.nature_of_incident.str.lower().str.strip()\
         .str.extract(r'(citizen complaint)')
-    df.loc[:, 'complaint_type'] = types[0]\
+    df.loc[:, 'complaint_classification'] = types[0]\
         .str.replace('complaint', '', regex=False)
     return df
 
@@ -207,7 +218,7 @@ def clean_charges_08(df):
 def extract_and_clean_action(df):
     df.loc[:, 'suspension_hrs'] = df.suspension_hrs.str.lower().str.strip()\
         .str.replace(r'(\d+) days? ?(susp)?', r'\1 day suspension', regex=True)
-    
+
     df.loc[:, 'letter_of_rep'] = df.letter_of_rep.str.lower().str.strip()\
         .str.replace('x', 'letter of reprimand')
 
@@ -217,7 +228,7 @@ def extract_and_clean_action(df):
         .str.replace('suspension - 1 day per gen order 107',
                      '1 day suspension per gen order 107', regex=False)\
         .str.replace(r'(\w+) - (\w+)', r'\1|\2', regex=True)
-    
+
     df.loc[:, 'action'] = df.action.fillna('') + '' + df.letter_of_rep.fillna('')
     df.loc[:, 'action'] = df.action + '' + df.suspension_hrs.fillna('')
 
@@ -250,16 +261,23 @@ def split_rows_with_multiple_charges_08(df):
 
 
 def clean_incident_date_08(df):
-    df.loc[:, 'incident_date'] = df.date_of_incident\
+    df.loc[:, 'incident_date'] = df.date_of_incident.fillna('')\
         .str.replace('5/8/8/04', '5/08/2004', regex=False)
     return df.drop(columns='date_of_incident')
 
 
 def clean_action_date_08(df):
-    df.loc[:, 'action_date'] = df.date_of_action\
+    df.loc[:, 'initial_action_date'] = df.date_of_action\
         .str.replace('010/7/04', '10/7/04', regex=False)\
         .str.replace('23/05', '2/3/05', regex=False)
     return df.drop(columns='date_of_action')
+
+
+def clean_tracking_number_08(df):
+    df.loc[:, 'tracking_number'] = df.ia_no.str.lower().str.strip()\
+        .str.replace(r'(\d+) (\w+)?(\d+)?(\w{1})', r'\1-\2\3', regex=True)\
+        .str.replace(r'(\d+)-apr', r'04-\1', regex=True)
+    return df.drop(columns='ia_no')
 
 
 def clean_20():
@@ -313,9 +331,6 @@ def clean_08():
     df = pd.read_csv(data_file_path('raw/hammond_pd/hammond_pd_cprr_2004_2008.csv'))\
         .pipe(clean_column_names)\
         .drop(columns=['letter_of_instruction'])\
-        .rename(columns={
-            'ia_no': 'tracking_number',
-        })\
         .pipe(extract_rank_from_name)\
         .pipe(split_name_08)\
         .pipe(extract_complaint_type)\
@@ -324,12 +339,13 @@ def clean_08():
         .pipe(extract_and_clean_dispositions_08)\
         .pipe(clean_incident_date_08)\
         .pipe(clean_action_date_08)\
-        .pipe(clean_dates, ['action_date'])\
+        .pipe(clean_tracking_number_08)\
+        .pipe(clean_dates, ['initial_action_date', 'incident_date'])\
         .pipe(set_values, {
             'agency': 'Hammond PD'
         })\
         .pipe(gen_uid, ['first_name', 'last_name', 'agency'])\
-        .pipe(gen_uid, ['uid', 'charges', 'disposition', 'action'])
+        .pipe(gen_uid, ['uid', 'charges', 'action', 'tracking_number'], 'complaint_uid')
     return df
 
 
@@ -337,7 +353,6 @@ if __name__ == '__main__':
     df20 = clean_20()
     df14 = clean_14()
     df08 = clean_08()
-    ensure_data_dir('clean')
     df20.to_csv(data_file_path('clean/cprr_hammond_pd_2015_2020.csv'), index=False)
     df14.to_csv(data_file_path('clean/cprr_hammond_pd_2009_2014.csv'), index=False)
     df08.to_csv(data_file_path('clean/cprr_hammond_pd_2004_2008.csv'), index=False)
