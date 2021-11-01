@@ -244,7 +244,7 @@ def extract_and_clean_dispositions_08(df):
         .str.replace(r'^u$', 'unfounded', regex=True)\
         .str.replace('x', 'founded', regex=False)
 
-    df.loc[:, 'disposition'] = df.disposition.fillna('') + '' + df.dismiss.fillna('')
+    df.loc[:, 'disposition'] = df.disposition.fillna('').str.cat(df.dismiss.fillna(''))
     return df.drop(columns=['founded_un', 'dismiss'])
 
 
