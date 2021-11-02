@@ -1,5 +1,5 @@
 from lib.date import combine_date_columns
-from lib.path import data_file_path, ensure_data_dir
+from lib.path import data_file_path
 from datamatch import (
     ThresholdMatcher, JaroWinklerSimilarity, DateSimilarity, ColumnsIndex
 )
@@ -118,27 +118,6 @@ def match_pprr_csd_to_pprr_ipm(pprr_csd, pprr_ipm):
     return pprr_csd
 
 
-# def merge(pprr_ipm, pprr_csd):
-#     df = pd.merge(pprr_ipm, pprr_csd, on=['uid'], how='outer')\
-#         .drop(columns=[
-#             'birth_year_x', 'birth_month', 'birth_day', 'department_desc_y',
-#             'rank_code', 'rank_desc_y', 'hire_year_y', 'hire_month_y', 'hire_day_y',
-#             'term_year', 'term_month', 'term_day', 'data_production_year_y', 'agency_y',
-#             'data_production_year_x', 'first_name_y', 'last_name_y'
-#         ])\
-#         .rename(columns={
-#             'rank_desc_x': 'rank_desc',
-#             'department_desc_x': 'department_desc',
-#             'agency_x': 'agency',
-#             'hire_year_x': 'hire_year',
-#             'hire_month_x': 'hire_month',
-#             'hire_day_x': 'hire_day',
-#             'birth_year_y': 'birth_year'
-#         })\
-#         .drop_duplicates(subset=['left_year', 'left_month', 'left_day', 'uid'])
-#     return df
-
-
 if __name__ == '__main__':
     pprr_ipm = pd.read_csv(data_file_path('clean/pprr_new_orleans_ipm_iapro_1946_2018.csv'))
     pprr_csd = pd.read_csv(data_file_path('clean/pprr_new_orleans_csd_2014.csv'))
@@ -149,13 +128,12 @@ if __name__ == '__main__':
     event_df = match_pprr_against_post(pprr_ipm, post)
     award = match_award_to_pprr_ipm(award, pprr_ipm)
     lprr = match_lprr_to_pprr_ipm(lprr, pprr_ipm)
-    pprr_csd = match_pprr_csd_to_pprr_ipm(pprr_csd, pprr_ipm)
-    ensure_data_dir('match')
+    pprr_csd_matched_with_ipm = match_pprr_csd_to_pprr_ipm(pprr_csd, pprr_ipm)
     award.to_csv(data_file_path(
         'match/award_new_orleans_pd_2016_2021.csv'), index=False)
     event_df.to_csv(data_file_path(
         'match/post_event_new_orleans_pd.csv'), index=False)
     lprr.to_csv(data_file_path(
         'match/lprr_new_orleans_csc_2000_2016.csv'), index=False)
-    pprr_csd.to_csv(data_file_path(
+    pprr_csd_matched_with_ipm.to_csv(data_file_path(
         'match/pprr_new_orleans_csd_2014.csv'), index=False)
