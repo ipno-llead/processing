@@ -162,7 +162,7 @@ def clean():
             'sentence_dys': 'sentence_days',
             'sentence_oth': 'sentence_other',
             'sex': 'citizen_sex',
-            'folder_no': 'tracking_no'
+            'folder_no': 'tracking_number'
         })\
         .pipe(clean_disposition)\
         .pipe(clean_court_time)\
