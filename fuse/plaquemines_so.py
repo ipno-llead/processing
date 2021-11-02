@@ -4,6 +4,7 @@ from lib.columns import (
 )
 from lib.personnel import fuse_personnel
 from lib import events
+from lib.uid import ensure_uid_unique
 import pandas as pd
 import sys
 sys.path.append('../')
@@ -45,7 +46,9 @@ if __name__ == '__main__':
     fuse_personnel(pprr, cprr19, cprr20).to_csv(data_file_path(
         'fuse/per_plaquemines_so.csv'
     ), index=False)
-    rearrange_complaint_columns(pd.concat([cprr19, cprr20])).to_csv(data_file_path(
+    com = rearrange_complaint_columns(pd.concat([cprr19, cprr20]))
+    ensure_uid_unique(com, 'complaint_uid')
+    com.to_csv(data_file_path(
         'fuse/com_plaquemines_so.csv'
     ), index=False)
     rearrange_event_columns(pd.concat([events_df, post_event])).to_csv(data_file_path(
