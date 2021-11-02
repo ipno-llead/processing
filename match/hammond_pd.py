@@ -82,7 +82,7 @@ def match_cprr_14_and_post(cprr, post):
     matcher = ThresholdMatcher(ColumnsIndex('fc'), {
         'first_name': JaroWinklerSimilarity(),
         'last_name': JaroWinklerSimilarity(),
-        }, dfa, dfb)
+    }, dfa, dfb)
     decision = .9
     matcher.save_pairs_to_excel(
         data_file_path('match/hammond_pd_cprr_2009_2014_v_post_pprr_2020_11_06.xlsx'), decision)
@@ -116,14 +116,39 @@ def match_cprr_20_and_post(cprr, post):
     return cprr
 
 
+def match_cprr_08_and_post(cprr, post):
+    dfa = cprr[['uid', 'first_name', 'last_name']]
+    dfa = dfa.drop_duplicates(subset=['uid']).set_index('uid')
+    dfa.loc[:, 'fc'] = dfa.first_name.fillna('').map(lambda x: x[:1])
+
+    dfb = post[['uid', 'first_name', 'last_name']]
+    dfb = dfb.drop_duplicates(subset=['uid']).set_index(['uid'])
+    dfb.loc[:, 'fc'] = dfb.first_name.fillna('').map(lambda x: x[:1])
+
+    matcher = ThresholdMatcher(ColumnsIndex('fc'), {
+        'first_name': JaroWinklerSimilarity(),
+        'last_name': JaroWinklerSimilarity(),
+    }, dfa, dfb)
+    decision = .95
+    matcher.save_pairs_to_excel(
+        data_file_path('match/hammond_pd_cprr_2004_2008_v_post_pprr_2020_11_06.xlsx'), decision)
+    matches = matcher.get_index_pairs_within_thresholds(decision)
+    match_dict = dict(matches)
+
+    cprr.loc[:, 'uid'] = cprr.uid.map(lambda x: match_dict.get(x, x))
+    return cprr
+
+
 if __name__ == '__main__':
     cprr_20 = pd.read_csv(data_file_path('clean/cprr_hammond_pd_2015_2020.csv'))
     cprr_14 = pd.read_csv(data_file_path('clean/cprr_hammond_pd_2009_2014.csv'))
+    cprr_08 = pd.read_csv(data_file_path('clean/cprr_hammond_pd_2004_2008.csv'))
     post = prepare_post_data()
     cprr_14 = deduplicate_cprr_14_officers(cprr_14)
     cprr_20 = deduplicate_cprr_20_officers(cprr_20)
     cprr_20 = match_cprr_20_and_post(cprr_20, post)
     cprr_14 = match_cprr_14_and_post(cprr_14, post)
+    cprr_08 = match_cprr_08_and_post(cprr_08, post)
     ensure_data_dir('match')
-    cprr_20.to_csv(data_file_path('match/cprr_hammond_pd_2015_2020.csv'))
-    cprr_14.to_csv(data_file_path('match/cprr_hammond_pd_2009_2014.csv'))
+    cprr_20.to_csv(data_file_path('match/cprr_hammond_pd_2015_2020.csv'), index=False)
+    cprr_14.to_csv(data_file_path('match/cprr_hammond_pd_2009_2014.csv'), index=False)
