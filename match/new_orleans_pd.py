@@ -1,5 +1,5 @@
 from lib.date import combine_date_columns
-from lib.path import data_file_path, ensure_data_dir
+from lib.path import data_file_path
 from datamatch import (
     ThresholdMatcher, JaroWinklerSimilarity, DateSimilarity, ColumnsIndex
 )
