@@ -38,9 +38,9 @@ def fuse_use_of_force(uof, officer_number_dict):
     return rearrange_use_of_force(uof)
 
 
-def fuse_events(pprr_merged, pprr_csd, cprr, uof, award, lprr):
+def fuse_events(pprr_ipm, pprr_csd, cprr, uof, award, lprr):
     builder = events.Builder()
-    builder.extract_events(pprr_merged, {
+    builder.extract_events(pprr_ipm, {
         events.OFFICER_HIRE: {
             'prefix': 'hire',
             'keep': ['uid', 'agency', 'rank_code', 'rank_desc', 'salary', 'salary_freq']
@@ -103,13 +103,13 @@ def fuse_events(pprr_merged, pprr_csd, cprr, uof, award, lprr):
 
 
 if __name__ == "__main__":
-    pprr_merged = pd.read_csv(data_file_path(
-        'match/pprr_new_orleans_1946_2018.csv'
+    pprr_ipm = pd.read_csv(data_file_path(
+        'clean/pprr_new_orleans_ipm_iapro_1946_2018.csv'
     ))
     pprr_csd = pd.read_csv(data_file_path(
-        'clean/pprr_new_orleans_csd_2014.csv'
+        'match/pprr_new_orleans_csd_2014.csv'
     ))
-    officer_number_dict = create_officer_number_dict(pprr_merged)
+    officer_number_dict = create_officer_number_dict(pprr_ipm)
     cprr = pd.read_csv(data_file_path(
         'clean/cprr_new_orleans_pd_1931_2020.csv'
     ))
@@ -130,8 +130,8 @@ if __name__ == "__main__":
     complaints = fuse_cprr(cprr, actions, officer_number_dict)
     ensure_uid_unique(complaints, 'complaint_uid', output_csv=True)
     use_of_force = fuse_use_of_force(uof, officer_number_dict)
-    personnel = fuse_personnel(pprr_merged, lprr, pprr_csd)
-    events_df = fuse_events(pprr_merged, pprr_csd, cprr, uof, award, lprr)
+    personnel = fuse_personnel(pprr_ipm, lprr, pprr_csd)
+    events_df = fuse_events(pprr_ipm, pprr_csd, cprr, uof, award, lprr)
     events_df = rearrange_event_columns(pd.concat([
         post_event,
         events_df
