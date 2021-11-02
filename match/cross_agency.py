@@ -59,7 +59,7 @@ def read_constraints():
     return pd.DataFrame.from_records(records)
 
 
-def cross_match_officers_between_agencies(per, events, constraints):
+def cross_match_officers_between_agencies(personnel, events, constraints):
     events = discard_rows(
         events, events.uid.notna(), 'events with empty uid column', reset_index=True
     )
@@ -81,7 +81,7 @@ def cross_match_officers_between_agencies(per, events, constraints):
         lambda x: x.timestamp()
     )
 
-    per = per[['uid', 'first_name', 'last_name']]
+    per = personnel[['uid', 'first_name', 'last_name']]
     per = discard_rows(
         per, per.first_name.notna() & per.last_name.notna(),
         'officers without either first name or last name', reset_index=True,
@@ -132,13 +132,44 @@ def cross_match_officers_between_agencies(per, events, constraints):
     decision = 0.98
     with Spinner('saving matched clusters to Excel file'):
         matcher.save_clusters_to_excel(excel_path, decision, lower_bound=decision)
-    print('saved pairs to %s' % excel_path.relative_to(pathlib.Path.cwd()))
+    clusters = matcher.get_index_clusters_within_thresholds(decision)
+    print('saved %d clusters to %s' % (len(clusters), excel_path.relative_to(pathlib.Path.cwd())))
+
+    return clusters, per[['max_timestamp', 'agency']]
+
+
+def create_person_table(clusters, personnel, personnel_event):
+    # add back unmatched officers into clusters list
+    matched_uids = frozenset().union(*[
+        s for s in clusters
+    ])
+    clusters = [sorted(list(cluster)) for cluster in clusters] \
+        + [[uid] for uid in personnel.loc[~personnel.uid.isin(matched_uids), 'uid'].tolist()]
+    print('added back unmatched officers into list of clusters (now total %d)' % len(clusters))
+
+    # clusters are sorted by the smallest uid
+    clusters = sorted(clusters, key=lambda x: x[0])
+
+    # assign canonical_uid and person_id
+    person_df = pd.DataFrame.from_records([
+        {'canonical_uid': uid, 'uids': cluster, 'person_id': idx + 1}
+        for idx, cluster in enumerate(clusters) for uid in cluster
+    ]).merge(personnel_event, how='left', left_on='canonical_uid', right_index=True)\
+        .sort_values(['person_id', 'max_timestamp', 'agency'], ascending=[True, False, True])\
+        .drop_duplicates(subset=['person_id'], keep='first')
+
+    # join uids with comma
+    person_df.loc[:, 'uids'] = person_df.uids.str.join(',')
+
+    return person_df[['person_id', 'canonical_uid', 'uids']]
 
 
 if __name__ == '__main__':
-    per = pd.read_csv(data_file_path('fuse/personnel.csv'))
-    print('read personnel file (%d x %d)' % per.shape)
+    personnel = pd.read_csv(data_file_path('fuse/personnel.csv'))
+    print('read personnel file (%d x %d)' % personnel.shape)
     events = pd.read_csv(data_file_path('fuse/event.csv'))
     print('read events file (%d x %d)' % events.shape)
     constraints = read_constraints()
-    cross_match_officers_between_agencies(per, events, constraints)
+    clusters, personnel_event = cross_match_officers_between_agencies(personnel, events, constraints)
+    person_df = create_person_table(clusters, personnel, personnel_event)
+    person_df.to_csv(data_file_path('match/person.csv'), index=False)
