@@ -1,11 +1,13 @@
 import pathlib
 import sys
+from datamatch.indices import MultiIndex
+from datamatch.scorers import AbsoluteScorer
 
 import numpy as np
 import pandas as pd
 from datamatch import (
     ThresholdMatcher, DissimilarFilter, NonOverlappingFilter, ColumnsIndex,
-    JaroWinklerSimilarity
+    JaroWinklerSimilarity, MaxScorer, SimSumScorer
 )
 from datavalid.spinner import Spinner
 
@@ -42,12 +44,30 @@ def assign_max_col(events: pd.DataFrame, per: pd.DataFrame, col: str):
     )
 
 
-def cross_match_officers_between_agencies(per, events):
+def read_constraints():
+    # TODO: replace this line with the real constraints data
+    constraints = pd.DataFrame([], columns=['type', 'uids'])
+    print('read constraints (%d rows)' % constraints.shape[0])
+    records = dict()
+    for idx, row in constraints.iterrows():
+        uids = row.uids.split(',')
+        for uid in uids:
+            if row.kind == 'attract':
+                records.setdefault(uid, dict())['attract_id'] = idx
+            elif row.kind == 'repell':
+                records.setdefault(uid, dict())['repell_id'] = idx
+    return pd.DataFrame.from_records(records)
+
+
+def cross_match_officers_between_agencies(personnel, events, constraints):
     events = discard_rows(
         events, events.uid.notna(), 'events with empty uid column', reset_index=True
     )
     events = discard_rows(
         events, events.day.notna(), 'events with empty day column', reset_index=True
+    )
+    events = discard_rows(
+        events, events.day <= 31, 'events with impossible day column', reset_index=True
     )
     for col in ['year', 'month', 'day']:
         events.loc[:, col] = events[col].astype(int)
@@ -61,7 +81,7 @@ def cross_match_officers_between_agencies(per, events):
         lambda x: x.timestamp()
     )
 
-    per = per[['uid', 'first_name', 'last_name']]
+    per = personnel[['uid', 'first_name', 'last_name']]
     per = discard_rows(
         per, per.first_name.notna() & per.last_name.notna(),
         'officers without either first name or last name', reset_index=True,
@@ -74,6 +94,7 @@ def cross_match_officers_between_agencies(per, events):
         per, per.agency != '', 'officers not linked to any event', reset_index=True
     )
     per = per.set_index('uid')
+    per = per.join(constraints)
 
     # aggregating min/max date
     events = events.set_index(['uid', 'event_uid'])
@@ -88,22 +109,67 @@ def cross_match_officers_between_agencies(per, events):
     excel_path = data_file_path(
         "match/cross_agency_officers.xlsx"
     )
-    matcher = ThresholdMatcher(ColumnsIndex('fc'), {
-        'first_name': JaroWinklerSimilarity(),
-        'last_name': JaroWinklerSimilarity(),
-    }, per, filters=[
-        DissimilarFilter('agency'),
-        NonOverlappingFilter('min_timestamp', 'max_timestamp')
-    ], show_progress=True)
+    matcher = ThresholdMatcher(
+        MultiIndex([
+            ColumnsIndex('fc'),
+            ColumnsIndex('attract_id', ignore_key_error=True),
+        ]),
+        MaxScorer([
+            SimSumScorer({
+                'first_name': JaroWinklerSimilarity(),
+                'last_name': JaroWinklerSimilarity(),
+            }),
+            AbsoluteScorer('attract_id', 1, ignore_key_error=True),
+        ]),
+        per,
+        filters=[
+            DissimilarFilter('agency'),
+            DissimilarFilter('repell_id', ignore_key_error=True),
+            NonOverlappingFilter('min_timestamp', 'max_timestamp')
+        ],
+        show_progress=True,
+    )
     decision = 0.98
     with Spinner('saving matched clusters to Excel file'):
         matcher.save_clusters_to_excel(excel_path, decision, lower_bound=decision)
-    print('saved pairs to %s' % excel_path.relative_to(pathlib.Path.cwd()))
+    clusters = matcher.get_index_clusters_within_thresholds(decision)
+    print('saved %d clusters to %s' % (len(clusters), excel_path.relative_to(pathlib.Path.cwd())))
+
+    return clusters, per[['max_timestamp', 'agency']]
+
+
+def create_person_table(clusters, personnel, personnel_event):
+    # add back unmatched officers into clusters list
+    matched_uids = frozenset().union(*[
+        s for s in clusters
+    ])
+    clusters = [sorted(list(cluster)) for cluster in clusters] \
+        + [[uid] for uid in personnel.loc[~personnel.uid.isin(matched_uids), 'uid'].tolist()]
+    print('added back unmatched officers into list of clusters (now total %d)' % len(clusters))
+
+    # clusters are sorted by the smallest uid
+    clusters = sorted(clusters, key=lambda x: x[0])
+
+    # assign canonical_uid and person_id
+    person_df = pd.DataFrame.from_records([
+        {'canonical_uid': uid, 'uids': cluster, 'person_id': idx + 1}
+        for idx, cluster in enumerate(clusters) for uid in cluster
+    ]).merge(personnel_event, how='left', left_on='canonical_uid', right_index=True)\
+        .sort_values(['person_id', 'max_timestamp', 'agency'], ascending=[True, False, True])\
+        .drop_duplicates(subset=['person_id'], keep='first')
+
+    # join uids with comma
+    person_df.loc[:, 'uids'] = person_df.uids.str.join(',')
+
+    return person_df[['person_id', 'canonical_uid', 'uids']]
 
 
 if __name__ == '__main__':
-    per = pd.read_csv(data_file_path('fuse/personnel.csv'))
-    print('read personnel file (%d x %d)' % per.shape)
+    personnel = pd.read_csv(data_file_path('fuse/personnel.csv'))
+    print('read personnel file (%d x %d)' % personnel.shape)
     events = pd.read_csv(data_file_path('fuse/event.csv'))
     print('read events file (%d x %d)' % events.shape)
-    cross_match_officers_between_agencies(per, events)
+    constraints = read_constraints()
+    clusters, personnel_event = cross_match_officers_between_agencies(personnel, events, constraints)
+    person_df = create_person_table(clusters, personnel, personnel_event)
+    person_df.to_csv(data_file_path('match/person.csv'), index=False)

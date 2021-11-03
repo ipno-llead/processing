@@ -1,6 +1,6 @@
 from lib.columns import clean_column_names
 from lib.path import data_file_path
-from lib.uid import gen_uid
+from lib.uid import gen_uid, ensure_uid_unique
 from lib.clean import clean_names, standardize_desc_cols, clean_dates
 from lib.rows import duplicate_row
 import pandas as pd
@@ -62,7 +62,10 @@ def clean_and_split_names(df):
 
 
 def drop_rows_missing_names(df):
-    return df[~((df.first_name == '') & (df.last_name == ''))]
+    return df[~(
+        ((df.first_name == '') & (df.last_name == ''))
+        | (df.first_name == "plaquemines parish sheriff's office")
+    )]
 
 
 def clean_receive_dates(df):
@@ -92,9 +95,10 @@ def clean_and_split_rows_with_multiple_charges(df):
 def extract_actions(df):
     df.loc[:, 'conclusion'] = df.conclusion.str.lower().str.strip()\
         .str.replace(r'(\w+) / (\w+)', r'\1; \2', regex=True)
-    
-    actions = df.conclusion.str.extract(r'(30 day suspension|verbal counsel| ?suspended|arrested; suspended|terminated)')
-    
+
+    actions = df.conclusion.str.extract(
+        r'(30 day suspension|verbal counsel| ?suspended|arrested; suspended|terminated)')
+
     df.loc[:, 'action'] = actions[0]\
         .str.replace(r'^ (\w+)$', r'\1', regex=True)\
         .str.replace('counsel', 'counseling', regex=False)
@@ -144,12 +148,14 @@ def clean20():
         .pipe(drop_rows_missing_names)\
         .pipe(assign_agency)\
         .pipe(gen_uid, ['first_name', 'last_name', 'middle_name', 'middle_initial', 'agency'])\
-        .pipe(gen_uid, ['uid', 'charges', 'receive_year', 'receive_day', 'receive_month'], 'complaint_uid')
+        .pipe(gen_uid, ['uid', 'tracking_number', 'charges'], 'complaint_uid')
     return df
 
 
 if __name__ == '__main__':
     df19 = clean19()
+    ensure_uid_unique(df19, 'complaint_uid')
     df20 = clean20()
+    ensure_uid_unique(df20, 'complaint_uid')
     df19.to_csv(data_file_path('clean/cprr_plaquemines_so_2019.csv'), index=False)
     df20.to_csv(data_file_path('clean/cprr_plaquemines_so_2016_2020.csv'), index=False)
