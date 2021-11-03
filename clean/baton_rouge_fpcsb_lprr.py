@@ -274,6 +274,38 @@ def split_appellant_names(df):
     return df
 
 
+def extract_resolution_date(df):
+    resolution_date_lookup_table = [
+        ['9/21/2000', 'Appeal Withdrawn 9/21'],
+        ['12/19/2000', 'Replaced with Letter of Caution 12/19'],
+        ['10/13/2011', 'Settled w/ Chief 10-13'],
+        ['2/21/1999', 'Appeal Dropped 2/21'],
+        ['9/30/1999', 'Appeal Dropped 9/30'],
+        ['12/18/2009', 'Judge Trudy White Reinstated Termination on 12-18'],
+        ['11/01/2009', 'Leamer resigned 11-01', 'Pate resigned 11-01'],
+        ['6/16/2003', 'Appeal Dropped 6/16'],
+        ['3/2/2009', 'Dropped 1-Day Suspension. Board upheld Termination 3-2'],
+        ['12/18/2009', 'Judge Trudy White Reinstated Termination on 12-18'],
+        ['12/15/2011', 'Reduced by Board to 3 days (12-15-11) Reduced by Board to 30'],
+        ['12/28/1999', 'Appeal Withdrawn 12/28/99'],
+        ['1/19/2012', 'Overturned by Board (01-19-12)'],
+        ['12/20/2012', 'Overturned by Board (12-20-2012)'],
+        ['3/13/04', 'Employee Retired 3/13/04'],
+        ['2/5/2000', 'Appeal Withdrawn 2/5/2000'],
+        ['11/22/2000', 'Appeal Dropped 11/22/2000'],
+        ['05/17/2012', 'Board approved Continuance to May 17, 2012 per Ms. LaFleur'],
+        ['07/19/2012', 'Overturned by Board (7/19/2012)'],
+        ['01/19/2012', 'Overturned by Board (01-19-2012)'],
+        ['04/06/2001', 'Letter of Caution 4/6/01'], 
+        ['1/06/2000', 'Appeal Withdrawn 1/6/2000'], 
+        ['1/13/2000', 'Appeal Withdrawn 1/13/2000']]
+    dates = df.resolution.str.extract(r'((.+)(\d+)(.+))')
+    df.loc[:, 'resolution_date'] = dates[0]\
+        .str.replace(r' $', '', regex=True)
+    df = standardize_from_lookup_table(df, 'resolution_date', resolution_date_lookup_table)
+    return df
+
+
 def clean_resolution(df):
     df.loc[:, "resolution"] = df.resolution.str.replace(r"[ \/]+$", "")\
         .str.lower().str.strip()
@@ -402,6 +434,7 @@ def clean():
         .pipe(split_appellant_names)\
         .pipe(assign_agency)\
         .pipe(clean_names, ["first_name", "last_name", "counsel"])\
+        .pipe(extract_resolution_date)\
         .pipe(clean_resolution)\
         .pipe(remove_invalid_rows)\
         .pipe(assign_counsel_for_empty_rows)\
