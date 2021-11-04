@@ -42,7 +42,12 @@ def fuse_events(csd_pprr_17, csd_pprr_19, cprr_18, cprr_21, lprr):
         events.COMPLAINT_INCIDENT: {'prefix': 'occur', 'keep': ['uid', 'agency', 'complaint_uid']},
     }, ['uid', 'complaint_uid'])
     builder.extract_events(lprr, {
-        events.APPEAL_HEARING: {'prefix': 'appeal_hearing', 'keep': ['uid', 'agency', 'appeal_uid']},
+        events.APPEAL_HEARING: {
+            'prefix': 'appeal_hearing', 
+            'keep': ['uid', 'agency', 'appeal_uid']},
+        events.APPEAL_DISPOSITION: {
+            'prefix': 'appeal_disposition',
+            'keep': ['uid', 'agency', 'appeal_uid', 'disposition_uid']},
     }, ['uid', 'appeal_uid'])
     return builder.to_frame()
 

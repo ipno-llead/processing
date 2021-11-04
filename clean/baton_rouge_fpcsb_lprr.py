@@ -1,7 +1,8 @@
 from lib.path import data_file_path, ensure_data_dir
 from lib.rows import duplicate_row
-from lib.clean import clean_names
+from lib.clean import clean_names, standardize_desc_cols
 from lib.standardize import standardize_from_lookup_table
+from lib.clean import clean_dates
 from lib.uid import gen_uid
 import pandas as pd
 import io
@@ -274,8 +275,8 @@ def split_appellant_names(df):
     return df
 
 
-def extract_resolution_date(df):
-    resolution_date_lookup_table = [
+def extract_appeal_disposition_date(df):
+    appeal_disposition_date_lookup_table = [
         ['9/21/2000', 'Appeal Withdrawn 9/21'],
         ['12/19/2000', 'Replaced with Letter of Caution 12/19'],
         ['10/13/2011', 'Settled w/ Chief 10-13'],
@@ -296,20 +297,54 @@ def extract_resolution_date(df):
         ['05/17/2012', 'Board approved Continuance to May 17, 2012 per Ms. LaFleur'],
         ['07/19/2012', 'Overturned by Board (7/19/2012)'],
         ['01/19/2012', 'Overturned by Board (01-19-2012)'],
-        ['04/06/2001', 'Letter of Caution 4/6/01'], 
-        ['1/06/2000', 'Appeal Withdrawn 1/6/2000'], 
+        ['04/06/2001', 'Letter of Caution 4/6/01'],
+        ['1/06/2000', 'Appeal Withdrawn 1/6/2000'],
         ['1/13/2000', 'Appeal Withdrawn 1/13/2000']]
     dates = df.resolution.str.extract(r'((.+)(\d+)(.+))')
-    df.loc[:, 'resolution_date'] = dates[0]\
+    df.loc[:, 'appeal_disposition_date'] = dates[0]\
         .str.replace(r' $', '', regex=True)
-    df = standardize_from_lookup_table(df, 'resolution_date', resolution_date_lookup_table)
+    df = standardize_from_lookup_table(df, 'appeal_disposition_date', appeal_disposition_date_lookup_table)
     return df
 
 
-def clean_resolution(df):
-    df.loc[:, "resolution"] = df.resolution.str.replace(r"[ \/]+$", "")\
-        .str.lower().str.strip()
-    return df
+def clean_appeal_disposition(df):
+    df.loc[:, "appeal_disposition"] = df.resolution.str.lower().str.strip()\
+        .str.replace(r"[ \/]+$", "")\
+        .str.replace(r'\b(\d+)\-?\/?(\d+)\b', '', regex=True)\
+        .str.replace(r'(\w+)-(\w+)', ' ', regex=True)\
+        .str.replace(r' +', ' ', regex=True)\
+        .str.replace(r"cont'd", 'continuance', regex=True)\
+        .str.replace(r'(.+) ?withdrew ?(.+)', 'withdrawn', regex=True)\
+        .str.replace(r'\bbd\b', 'board', regex=True)\
+        .str.replace('feb', 'february', regex=False)\
+        .str.replace(r'(\d+)day', r'\1-day', regex=True)\
+        .str.replace(r'^(\w+) resigned$', 'resigned', regex=True)\
+        .str.replace(r'w/(\w+)', r'with \1', regex=True)\
+        .str.replace('w/', 'with', regex=False)\
+        .str.replace(r'(^\:|\/|\-|\.|\(|\)|\\|\,|^\?$)', '', regex=True)\
+        .str.replace('deciison', 'decision', regex=False)\
+        .str.replace(r'\bch\b', 'chief', regex=True)\
+        .str.replace(r'\bsusp\b', 'suspension', regex=True)\
+        .str.replace(r'cancelled(\w+)', r'cancelled \1', regex=True)\
+        .str.replace(r'continued(\w+)', r'continued \1', regex=True)\
+        .str.replace(r'\brep\b', 'reprimand', regex=True)\
+        .str.replace('mf&pcs', 'municipal fire and police civil service', regex=False)\
+        .str.replace("recv'd", 'received', regex=False)\
+        .str.replace('appelent', 'appellant', regex=False)\
+        .str.replace('ltr', 'letter', regex=False)\
+        .str.replace('lt', 'lieutenant', regex=False)\
+        .str.replace(r'day(\w+)', r'day \1', regex=True)\
+        .str.replace('hrs', 'hours', regex=False)\
+        .str.replace('prev', 'previous', regex=False)\
+        .str.replace('indef', 'indefinitely', regex=False)\
+        .str.replace(r'\bdist\b', 'district', regex=True)\
+        .str.replace(r'\bct\b', 'court', regex=True)\
+        .str.replace(r'dirks(\w+)', r'dirks \1', regex=True)\
+        .str.replace(r'\bdec\b', 'december', regex=True)\
+        .str.replace(r'\bdept\b', 'department', regex=True)\
+        .str.replace(r'continued(\w+)', r'continued \1', regex=True)\
+        .str.replace(r'  +', ' ', regex=True)
+    return df.drop(columns='resolution')
 
 
 def remove_invalid_rows(df):
@@ -391,7 +426,7 @@ def clean_action(df):
 
 
 def condense_rows_with_same_docket_no(df):
-    for idx1, row1 in df[df.resolution.isna()].iterrows():
+    for idx1, row1 in df[df.appeal_disposition.isna()].iterrows():
         for idx2, row2 in df[df.docket_no == row1.docket_no].iterrows():
             if (
                 idx1 == idx2 or
@@ -405,8 +440,8 @@ def condense_rows_with_same_docket_no(df):
                 (row1.appeal_hearing_year != '' and row2.appeal_hearing_year != row1.appeal_hearing_year)
             ):
                 continue
-            if pd.notnull(row2.resolution):
-                df.loc[idx1, 'resolution'] = row2.resolution
+            if pd.notnull(row2.appeal_disposition):
+                df.loc[idx1, 'appeal_disposition'] = row2.appeal_disposition
             if row2.appeal_hearing_year != '':
                 df.loc[idx1, 'appeal_hearing_year'] = row2.appeal_hearing_year
                 df.loc[idx1, 'appeal_hearing_month'] = row2.appeal_hearing_month
@@ -434,16 +469,18 @@ def clean():
         .pipe(split_appellant_names)\
         .pipe(assign_agency)\
         .pipe(clean_names, ["first_name", "last_name", "counsel"])\
-        .pipe(extract_resolution_date)\
-        .pipe(clean_resolution)\
+        .pipe(extract_appeal_disposition_date)\
+        .pipe(clean_appeal_disposition)\
         .pipe(remove_invalid_rows)\
         .pipe(assign_counsel_for_empty_rows)\
         .pipe(clean_action)\
         .pipe(condense_rows_with_same_docket_no)\
+        .pipe(standardize_desc_cols, ['appeal_disposition'])\
+        .pipe(clean_dates, ['appeal_disposition_date'])\
         .pipe(gen_uid, ["agency", "first_name", "last_name", "middle_name", "middle_initial"])\
         .pipe(gen_uid, ['uid', 'docket_no'], 'appeal_uid')\
-        .pipe(gen_uid, ['appeal_uid', 'appeal_hearing_year', 'appeal_hearing_month', 
-                        'appeal_hearing_day', 'resolution'], 'resolution_uid')
+        .pipe(gen_uid, ['appeal_uid', 'appeal_hearing_year', 'appeal_hearing_month',
+                        'appeal_hearing_day', 'appeal_disposition'], 'appeal_disposition_uid')
     return df.drop_duplicates().reset_index(drop=True)
 
 
