@@ -104,7 +104,7 @@ You need to train a custom model and use that model to extract data. Follow thes
    scripts/edit_fr_table.py st-tammany-booking-log-2020/0009.pdf charges insertRow 1 2
    ```
 4. Test and provide more training data until the model perform sufficiently well.
-5. Extract tables with the model using `scripts/extract_tables_from_doc.py`. E.g.
+5. Extract tables with the custom model using `scripts/extract_tables_from_doc.py`. E.g.
    ```bash
    scripts/extract_tables_from_doc.py https://www.dropbox.com/s/9zmpmhrhtashq2o/st_tammany_booking_log_2020.pdf\?dl\=1 tables/st_tammany_booking_log_2020 --end-page 839 --model-id labeled_11 --batch-size 1
    ```
