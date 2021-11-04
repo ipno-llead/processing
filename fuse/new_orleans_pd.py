@@ -38,16 +38,27 @@ def fuse_use_of_force(uof, officer_number_dict):
     return rearrange_use_of_force(uof)
 
 
-def fuse_events(pprr, cprr, uof, award, lprr):
+def fuse_events(pprr_ipm, pprr_csd, cprr, uof, award, lprr):
     builder = events.Builder()
-    builder.extract_events(pprr, {
-        events.OFFICER_HIRE: {'prefix': 'hire'},
+    builder.extract_events(pprr_ipm, {
+        events.OFFICER_HIRE: {
+            'prefix': 'hire',
+            'keep': ['uid', 'agency', 'rank_code', 'rank_desc', 'salary', 'salary_freq']
+        },
         events.OFFICER_LEFT: {'prefix': 'left'},
         events.OFFICER_DEPT: {'prefix': 'dept'},
     }, ['uid'])
+    builder.extract_events(pprr_csd, {
+        events.OFFICER_HIRE: {
+            'prefix': 'hire',
+            'keep': ['uid', 'agency', 'rank_code', 'rank_desc', 'salary', 'salary_freq']
+        },
+        events.OFFICER_LEFT: {'prefix': 'term'},
+        events.OFFICER_PAY_PROG_START: {'prefix': 'pay_prog_start'}
+    }, ['uid'], warn_duplications=True)
     builder.extract_events(cprr, {
         events.COMPLAINT_RECEIVE: {'prefix': 'receive'},
-        events.ALLEGATION_CREATE: {'prefix': 'allegation_create'},
+        events.CHARGES_CREATE: {'prefix': 'charges_create'},
         events.COMPLAINT_INCIDENT: {'prefix': 'occur'},
     }, ['uid', 'complaint_uid'])
     builder.extract_events(uof, {
@@ -88,14 +99,17 @@ def fuse_events(pprr, cprr, uof, award, lprr):
             'keep': ['uid', 'agency', 'appeal_uid']
         }
     }, ['uid', 'appeal_uid'])
-    return builder.to_frame()
+    return builder.to_frame(True)
 
 
 if __name__ == "__main__":
-    pprr = pd.read_csv(data_file_path(
-        'clean/pprr_new_orleans_pd_1946_2018.csv'
+    pprr_ipm = pd.read_csv(data_file_path(
+        'clean/pprr_new_orleans_ipm_iapro_1946_2018.csv'
     ))
-    officer_number_dict = create_officer_number_dict(pprr)
+    pprr_csd = pd.read_csv(data_file_path(
+        'match/pprr_new_orleans_csd_2014.csv'
+    ))
+    officer_number_dict = create_officer_number_dict(pprr_ipm)
     cprr = pd.read_csv(data_file_path(
         'clean/cprr_new_orleans_pd_1931_2020.csv'
     ))
@@ -116,8 +130,8 @@ if __name__ == "__main__":
     complaints = fuse_cprr(cprr, actions, officer_number_dict)
     ensure_uid_unique(complaints, 'complaint_uid', output_csv=True)
     use_of_force = fuse_use_of_force(uof, officer_number_dict)
-    personnel = fuse_personnel(pprr, lprr)
-    events_df = fuse_events(pprr, cprr, uof, award, lprr)
+    personnel = fuse_personnel(pprr_ipm, lprr, pprr_csd)
+    events_df = fuse_events(pprr_ipm, pprr_csd, cprr, uof, award, lprr)
     events_df = rearrange_event_columns(pd.concat([
         post_event,
         events_df

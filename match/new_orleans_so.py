@@ -1,10 +1,9 @@
 import sys
-
 import pandas as pd
-from datamatch import ThresholdMatcher, JaroWinklerSimilarity, ColumnsIndex, Swap
-
+from datamatch import ThresholdMatcher, JaroWinklerSimilarity, ColumnsIndex, Swap, DateSimilarity
 from lib.path import data_file_path, ensure_data_dir
-
+from lib.post import extract_events_from_post
+from lib.date import combine_date_columns
 sys.path.append('../')
 
 
@@ -74,12 +73,12 @@ def deduplicate_cprr_20_personnel(cprr):
     return cprr
 
 
-def assign_uid_19_from_post(cprr, post):
+def assign_uid_19_from_pprr(cprr, pprr):
     dfa = cprr.loc[cprr.uid.notna(), ['uid', 'first_name', 'last_name']].drop_duplicates(subset=['uid'])\
         .set_index('uid', drop=True)
     dfa.loc[:, 'fc'] = dfa.first_name.map(lambda x: x[:1])
 
-    dfb = post[['uid', 'first_name', 'last_name']].drop_duplicates()\
+    dfb = pprr[['uid', 'first_name', 'last_name']].drop_duplicates()\
         .set_index('uid', drop=True)
     dfb.loc[:, 'fc'] = dfb.first_name.map(lambda x: x[:1])
 
@@ -87,9 +86,9 @@ def assign_uid_19_from_post(cprr, post):
         'first_name': JaroWinklerSimilarity(),
         'last_name': JaroWinklerSimilarity(),
     }, dfa, dfb)
-    decision = 0.97
+    decision = 0.921
     matcher.save_pairs_to_excel(data_file_path(
-        "match/new_orleans_so_cprr_19_officer_v_post_pprr_2020_11_06.xlsx"), decision)
+        "match/new_orleans_so_cprr_19_officer_v_noso_pprr_2021.xlsx"), decision)
     matches = matcher.get_index_pairs_within_thresholds(decision)
     match_dict = dict(matches)
 
@@ -97,12 +96,12 @@ def assign_uid_19_from_post(cprr, post):
     return cprr
 
 
-def assign_uid_20_from_post(cprr, post):
+def assign_uid_20_from_pprr(cprr, pprr):
     dfa = cprr.loc[cprr.uid.notna(), ['uid', 'first_name', 'last_name']].drop_duplicates(subset=['uid'])\
         .set_index('uid', drop=True)
     dfa.loc[:, 'fc'] = dfa.first_name.fillna('').map(lambda x: x[:1])
 
-    dfb = post[['uid', 'first_name', 'last_name']].drop_duplicates()\
+    dfb = pprr[['uid', 'first_name', 'last_name']].drop_duplicates()\
         .set_index('uid', drop=True)
     dfb.loc[:, 'fc'] = dfb.first_name.map(lambda x: x[:1])
 
@@ -110,9 +109,9 @@ def assign_uid_20_from_post(cprr, post):
         'first_name': JaroWinklerSimilarity(),
         'last_name': JaroWinklerSimilarity(),
     }, dfa, dfb)
-    decision = 0.93
+    decision = 0.953
     matcher.save_pairs_to_excel(data_file_path(
-        "match/new_orleans_so_cprr_20_officer_v_post_pprr_2020_11_06.xlsx"), decision)
+        "match/new_orleans_so_cprr_20_officer_v_noso_pprr_2021.xlsx"), decision)
     matches = matcher.get_index_pairs_within_thresholds(decision)
     match_dict = dict(matches)
 
@@ -120,7 +119,7 @@ def assign_uid_20_from_post(cprr, post):
     return cprr
 
 
-def assign_supervisor_19_uid_from_post(cprr, post):
+def assign_supervisor_19_uid_from_pprr(cprr, pprr):
     dfa = cprr.loc[cprr.supervisor_first_name.notna(), ['supervisor_first_name', 'supervisor_last_name']]\
         .drop_duplicates()
     dfa = dfa.rename(columns={
@@ -129,7 +128,7 @@ def assign_supervisor_19_uid_from_post(cprr, post):
     })
     dfa.loc[:, 'fc'] = dfa.first_name.map(lambda x: x[:1])
 
-    dfb = post[['uid', 'first_name', 'last_name']].drop_duplicates()\
+    dfb = pprr[['uid', 'first_name', 'last_name']].drop_duplicates()\
         .set_index('uid', drop=True)
     dfb.loc[:, 'fc'] = dfb.first_name.map(lambda x: x[:1])
 
@@ -137,9 +136,9 @@ def assign_supervisor_19_uid_from_post(cprr, post):
         'first_name': JaroWinklerSimilarity(),
         'last_name': JaroWinklerSimilarity(),
     }, dfa, dfb)
-    decision = 0.95
+    decision = 0.958
     matcher.save_pairs_to_excel(data_file_path(
-        "match/new_orleans_so_cprr_19_supervisor_v_post_pprr_2020_11_06.xlsx"), decision)
+        "match/new_orleans_so_cprr_19_supervisor_v_noso_pprr_2021.xlsx"), decision)
     matches = matcher.get_index_pairs_within_thresholds(decision)
     match_dict = dict(matches)
 
@@ -148,7 +147,7 @@ def assign_supervisor_19_uid_from_post(cprr, post):
     return cprr
 
 
-def assign_supervisor_20_uid_from_post(cprr, post):
+def assign_supervisor_20_uid_from_pprr(cprr, pprr):
     dfa = cprr.loc[cprr.supervisor_first_name.notna(), ['supervisor_first_name', 'supervisor_last_name']]\
         .drop_duplicates()
     dfa = dfa.rename(columns={
@@ -157,7 +156,7 @@ def assign_supervisor_20_uid_from_post(cprr, post):
     })
     dfa.loc[:, 'fc'] = dfa.first_name.map(lambda x: x[:1])
 
-    dfb = post[['uid', 'first_name', 'last_name']].drop_duplicates()\
+    dfb = pprr[['uid', 'first_name', 'last_name']].drop_duplicates()\
         .set_index('uid', drop=True)
     dfb.loc[:, 'fc'] = dfb.first_name.map(lambda x: x[:1])
 
@@ -165,15 +164,43 @@ def assign_supervisor_20_uid_from_post(cprr, post):
         'first_name': JaroWinklerSimilarity(),
         'last_name': JaroWinklerSimilarity(),
     }, dfa, dfb)
-    decision = 0.95
+    decision = 0.948
     matcher.save_pairs_to_excel(data_file_path(
-        "match/new_orleans_so_cprr_20_supervisor_v_post_pprr_2020_11_06.xlsx"), decision)
+        "match/new_orleans_so_cprr_20_supervisor_v_noso_pprr_2021.xlsx"), decision)
     matches = matcher.get_index_pairs_within_thresholds(decision)
     match_dict = dict(matches)
 
     cprr.loc[:, 'supervisor_uid'] = cprr.index.map(
         lambda x: match_dict.get(x, ''))
     return cprr
+
+
+def match_pprr_against_post(pprr, post):
+    dfa = pprr[['uid', 'first_name', 'last_name']]
+    dfa.loc[:, 'hire_date'] = combine_date_columns(
+        pprr, 'hire_year', 'hire_month', 'hire_day')
+    dfa.loc[:, 'fc'] = dfa.first_name.fillna('').map(lambda x: x[:1])
+    dfa.loc[:, 'lc'] = dfa.last_name.fillna('').map(lambda x: x[:1])
+    dfa = dfa.drop_duplicates(subset=['uid']).set_index('uid')
+
+    dfb = post[['uid', 'first_name', 'last_name']]
+    dfb.loc[:, 'hire_date'] = combine_date_columns(
+        post, 'hire_year', 'hire_month', 'hire_day')
+    dfb.loc[:, 'fc'] = dfb.first_name.fillna('').map(lambda x: x[:1])
+    dfb.loc[:, 'lc'] = dfb.last_name.fillna('').map(lambda x: x[:1])
+    dfb = dfb.drop_duplicates(subset=['uid']).set_index('uid')
+
+    matcher = ThresholdMatcher(ColumnsIndex(['fc', 'lc']), {
+        'first_name': JaroWinklerSimilarity(),
+        'last_name': JaroWinklerSimilarity(),
+        'hire_date': DateSimilarity()
+    }, dfa, dfb, show_progress=True)
+    decision = 0.894
+    matcher.save_pairs_to_excel(data_file_path(
+        "match/new_orleans_so_pprr_2021_v_post_pprr_2020_11_06.xlsx"), decision)
+
+    matches = matcher.get_index_pairs_within_thresholds(decision)
+    return extract_events_from_post(post, matches, 'New Orleans SO')
 
 
 if __name__ == '__main__':
@@ -181,14 +208,18 @@ if __name__ == '__main__':
     cprr20 = pd.read_csv(data_file_path('clean/cprr_new_orleans_so_2020.csv'))
     post = pd.read_csv(data_file_path('clean/pprr_post_2020_11_06.csv'))
     post = post[post.agency == 'orleans parish so']
+    pprr = pd.read_csv(data_file_path('clean/pprr_new_orleans_so_2021.csv'))
     ensure_data_dir('match')
     cprr19 = deduplicate_cprr_19_personnel(cprr19)
     cprr20 = deduplicate_cprr_20_personnel(cprr20)
-    cprr19 = assign_uid_19_from_post(cprr19, post)
-    cprr20 = assign_uid_20_from_post(cprr20, post)
-    cprr19 = assign_supervisor_19_uid_from_post(cprr19, post)
-    cprr20 = assign_supervisor_20_uid_from_post(cprr20, post)
+    cprr19 = assign_uid_19_from_pprr(cprr19, pprr)
+    cprr20 = assign_uid_20_from_pprr(cprr20, pprr)
+    cprr19 = assign_supervisor_19_uid_from_pprr(cprr19, pprr)
+    cprr20 = assign_supervisor_20_uid_from_pprr(cprr20, pprr)
+    post_events = match_pprr_against_post(pprr, post)
     cprr19.to_csv(data_file_path(
         'match/cprr_new_orleans_so_2019.csv'), index=False)
     cprr20.to_csv(data_file_path(
         'match/cprr_new_orleans_so_2020.csv'), index=False)
+    post_events.to_csv(data_file_path(
+        'match/post_event_new_orleans_so.csv'), index=False)

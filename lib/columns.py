@@ -68,7 +68,7 @@ COMPLAINT_COLUMNS = [
     "investigator_uid",
     "investigator_rank",
     "shift_supervisor",
-    # "Complaint Classification",  # ?
+    "complaint_classificaiton",  # description of who filed the complaint(s)
     # "Bureau of Complainant",  # ?
     # "Division of Complainant",  # ?
     # "Unit of Complainant",  # ?
@@ -170,16 +170,18 @@ EVENT_COLUMNS = [
     "employee_class",
     "rank_code",  # rank code
     "rank_desc",  # rank title or description
-    "employment_status",
+    "officer_employment_status",
     "sworn",
     "officer_inactive",
     "employee_type",
-    "years_employed",
+    "years_employed",  # deprecated, use "time_active" field instead
     "salary",
     "salary_freq",
     "award",
     "award_comments",
     "left_reason",
+    "officer_contract_status",
+    "time_active"
 ]
 
 

@@ -21,10 +21,13 @@ if __name__ == '__main__':
     pprr = pd.read_csv(data_file_path('clean/pprr_caddo_parish_so_2020.csv'))
     post_event = pd.read_csv(data_file_path(
         'match/post_event_caddo_parish_so.csv'))
+    cprr_post_event = pd.read_csv(data_file_path(
+        'match/cprr_post_event_caddo_parish_so.csv'))
     event_df = fuse_events(pprr)
     event_df = rearrange_event_columns(pd.concat([
         post_event,
-        event_df
+        event_df, 
+        cprr_post_event
     ]))
     ensure_uid_unique(event_df, 'event_uid', True)
     ensure_data_dir('fuse')

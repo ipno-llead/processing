@@ -176,6 +176,10 @@ repos:
     fileName: fuse/com_ponchatoula_pd.csv
     primaryKey:
       - complaint_uid
+  com-bossier-city-pd:
+    fileName: fuse/com_bossier_city_pd.csv
+    primaryKey:
+      - complaint_uid
   uof-new-orleans-pd:
     fileName: fuse/uof_new_orleans_pd.csv
     primaryKey:
@@ -316,6 +320,14 @@ repos:
     fileName: fuse/per_carencro_pd.csv
     primaryKey:
       - uid
+  per-central-csd:
+    fileName: fuse/per_central_csd.csv
+    primaryKey:
+      - uid
+  per-bossier-city-pd:
+    fileName: fuse/per_bossier_city_pd.csv
+    primaryKey:
+      - uid
   event-new-orleans-pd:
     fileName: fuse/event_new_orleans_pd.csv
     primaryKey:
@@ -444,6 +456,14 @@ repos:
     fileName: fuse/event_carencro_pd.csv
     primaryKey:
       - event_uid
+  event-central-csd:
+    fileName: fuse/event_central_csd.csv
+    primaryKey:
+      - event_uid
+  event-bossier-city-pd:
+    fileName: fuse/event_bossier_city_pd.csv
+    primaryKey:
+      - event_uid
   personnel:
     fileName: fuse/personnel.csv
     primaryKey:
@@ -464,6 +484,10 @@ repos:
     fileName: match/cprr_baton_rouge_da_2021.csv
   new-orleans-da-brady-list:
     fileName: match/cprr_new_orleans_da_2021.csv
+  person:
+    fileName: match/person.csv
+    primaryKey:
+      - person_id
 commit:
   messageTemplate: |-
     {{.GitCommit.Link}}

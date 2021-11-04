@@ -378,7 +378,8 @@ def clean_investigation_start_date_19(df):
         .str.replace('Apr', '04', regex=False)\
         .str.replace('5/417', '5/04/2017', regex=False)\
         .str.replace('10/24116', '10/24/2016', regex=False)\
-        .str.replace('04/17', '', regex=False)
+        .str.replace('04/17', '', regex=False)\
+        .str.replace('4/62/18', '4/26/2018', regex=False)
     return df.drop(columns='date')
 
 

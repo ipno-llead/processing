@@ -1,4 +1,4 @@
-from lib.path import data_file_path, ensure_data_dir
+from lib.path import data_file_path
 from lib.columns import clean_column_names
 from lib.clean import (
     clean_races, float_to_int_str, standardize_desc_cols, clean_sexes, clean_names, clean_dates
@@ -22,7 +22,8 @@ def clean_employee_type(df):
 
 def strip_time_from_dates(df, cols):
     for col in cols:
-        df.loc[:, col] = df[col].str.replace(r' \d+:\d+$', '', regex=True)
+        df.loc[:, col] = df[col].str.replace(r' \d+:.+', '', regex=True)\
+            .str.replace(r'(\d{4})-(\d{2})-(\d{2})', r'\2/\3/\1', regex=True)
     return df
 
 
@@ -98,9 +99,11 @@ def clean_rank_desc(df):
 
 def clean():
     df = pd.read_csv(data_file_path(
-        "raw/ipm/new_orleans_iapro_pprr_1946-2018.csv"), sep='\t')
+        "raw/ipm/new_orleans_iapro_pprr_1946-2018.csv"
+    ))
     df = df.dropna(axis=1, how="all")
     df = clean_column_names(df)
+    print(df.columns.tolist())
     df = df.drop(columns=[
         'employment_number', 'working_status', 'shift_hours', 'exclude_reason'
     ])
@@ -142,6 +145,6 @@ def clean():
 
 if __name__ == '__main__':
     df = clean()
-    ensure_data_dir('clean')
     df.to_csv(data_file_path(
-        'clean/pprr_new_orleans_pd_1946_2018.csv'), index=False)
+        'clean/pprr_new_orleans_ipm_iapro_1946_2018.csv'
+    ), index=False)

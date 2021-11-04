@@ -1,5 +1,5 @@
 from datamatch import ThresholdMatcher, JaroWinklerSimilarity, ColumnsIndex
-from lib.path import data_file_path, ensure_data_dir
+from lib.path import data_file_path
 from lib.post import extract_events_from_post
 import pandas as pd
 import sys
@@ -11,7 +11,7 @@ def prepare_post_data():
     return post[post.agency == 'plaquemines par so']
 
 
-def match_cprr_and_pprr(cprr, pprr):
+def match_cprr_19_and_pprr(cprr, pprr):
     dfa = cprr[['uid', 'first_name', 'last_name']].drop_duplicates(subset=['uid'])\
         .set_index('uid', drop=True)
     dfa.loc[:, 'fc'] = dfa.first_name.fillna('').map(lambda x: x[:1])
@@ -54,14 +54,41 @@ def match_pprr_and_post(pprr, post):
     return extract_events_from_post(post, matches, 'Plaquemines SO')
 
 
+def match_cprr_2016_2020_and_pprr(cprr, pprr):
+    dfa = cprr[['uid', 'first_name', 'last_name']]
+    dfa.loc[:, 'fc'] = dfa.first_name.map(lambda x: x[:1])
+    dfa = dfa.drop_duplicates(subset=['uid']).set_index('uid')
+
+    dfb = pprr[['uid', 'first_name', 'last_name']]
+    dfb.loc[:, 'fc'] = dfb.first_name.map(lambda x: x[:1])
+    dfb = dfb.drop_duplicates(subset=['uid']).set_index('uid')
+
+    matcher = ThresholdMatcher(ColumnsIndex(['fc']), {
+        'first_name': JaroWinklerSimilarity(),
+        'last_name': JaroWinklerSimilarity(),
+    }, dfa, dfb)
+    decision = .94
+    matches = matcher.save_pairs_to_excel(data_file_path(
+        'match/cprr_plaquemines_so_2016_2019_v_pprr_plaqumines_so_2018.xlsx'), decision)
+
+    matches = matcher.get_index_pairs_within_thresholds(decision)
+    match_dict = dict(matches)
+
+    cprr.loc[:, 'uid'] = cprr.uid.map(lambda x: match_dict.get(x, x))
+    return cprr
+
+
 if __name__ == '__main__':
-    cprr = pd.read_csv(data_file_path('clean/cprr_plaquemines_so_2019.csv'))
+    cprr19 = pd.read_csv(data_file_path('clean/cprr_plaquemines_so_2019.csv'))
+    cprr20 = pd.read_csv(data_file_path('clean/cprr_plaquemines_so_2016_2020.csv'))
     pprr = pd.read_csv(data_file_path('clean/pprr_plaquemines_so_2018.csv'))
     post = prepare_post_data()
-    cprr = match_cprr_and_pprr(cprr, post)
+    cprr19 = match_cprr_19_and_pprr(cprr19, pprr)
+    cprr20 = match_cprr_2016_2020_and_pprr(cprr20, pprr)
     post_event = match_pprr_and_post(pprr, post)
-    ensure_data_dir('match')
-    cprr.to_csv(data_file_path(
+    cprr19.to_csv(data_file_path(
         'match/cprr_plaquemines_so_2019.csv'), index=False)
+    cprr20.to_csv(data_file_path(
+        'match/cprr_plaquemines_so_2016_2020.csv'), index=False)
     post_event.to_csv(data_file_path(
         'match/event_plaquemines_so_2018.csv'), index=False)

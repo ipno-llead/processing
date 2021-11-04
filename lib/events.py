@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+import json
 
 import pandas as pd
 from pandas.api.types import CategoricalDtype
@@ -18,14 +19,16 @@ OFFICER_HIRE = "officer_hire"
 OFFICER_PAY_PROG_START = "officer_pay_prog_start"
 OFFICER_PAY_EFFECTIVE = "officer_pay_effective"
 OFFICER_LEFT = "officer_left"
+OFFICER_POST_DECERTIFICATION = "officer_post_decertification"  # officer decertified by POST
 
 COMPLAINT_INCIDENT = "complaint_incident"
 COMPLAINT_RECEIVE = "complaint_receive"
-ALLEGATION_CREATE = "allegation_create"
+CHARGES_CREATE = "charges_create"
 INVESTIGATION_START = "investigation_start"
 INVESTIGATION_COMPLETE = "investigation_complete"
 SUSPENSION_START = "suspension_start"
 SUSPENSION_END = "suspension_end"
+INITIAL_ACTION = 'initial_action'  # date on which the initial action was allocated
 
 APPEAL_FILE = "appeal_file"
 APPEAL_HEARING = "appeal_hearing"
@@ -43,7 +46,7 @@ UOF_DUE = "uof_due"
 AWARD_RECEIVE = "award_receive"
 AWARD_RECOMMENDED = "award_recommended"
 
-cat_type = CategoricalDtype(categories=[
+event_cat_type = CategoricalDtype(categories=[
     OFFICER_LEVEL_1_CERT,
     OFFICER_PC_12_QUALIFICATION,
     OFFICER_RANK,
@@ -54,7 +57,7 @@ cat_type = CategoricalDtype(categories=[
     OFFICER_PAY_EFFECTIVE,
     COMPLAINT_INCIDENT,
     COMPLAINT_RECEIVE,
-    ALLEGATION_CREATE,
+    CHARGES_CREATE,
     INVESTIGATION_START,
     INVESTIGATION_COMPLETE,
     SUSPENSION_START,
@@ -72,6 +75,8 @@ cat_type = CategoricalDtype(categories=[
     UOF_DUE,
     AWARD_RECEIVE,
     AWARD_RECOMMENDED,
+    OFFICER_POST_DECERTIFICATION,
+    INITIAL_ACTION,
 ], ordered=True)
 
 
@@ -81,6 +86,7 @@ class Builder(object):
 
     def __init__(self):
         self._records = []
+        self._record_dict = dict()
         self._merge_cols = dict()
 
     def set_merge_cols(self, event_kind: str, merge_cols: list[str]):
@@ -133,13 +139,13 @@ class Builder(object):
         raw_datetime_str: str or None = None,
         strptime_format: str or None = None,
         ignore_bad_date: bool = False,
-        merge_cols: list[str] = None,
+        warn_duplications: bool = False,
         **kwargs
     ) -> None:
         """Append an event and optionally parse datetime of the event.
 
-        If `raw_date_str` is passed then Builder try to extract `year`, `month`, `day` from it. If `raw_datetime_str`
-        is passed instead then Builder try to extract `year`, `month`, `day` and `time` from it. If `strptime_format`
+        If `raw_date_str` is passed then Builder tries to extract `year`, `month`, `day` from it. If `raw_datetime_str`
+        is passed instead then Builder tries to extract `year`, `month`, `day` and `time` from it. If `strptime_format`
         is passed along with `raw_date_str` or `raw_datetime_str` then the date is parsed with that format. By default
         if `year` isn't passed-in or can't be extracted from `raw_date_str` or `raw_datetime_str` then an error is
         raised. If `ignore_bad_date` is True then an error isn't raised and the event is simply ignored. Any other
@@ -158,6 +164,8 @@ class Builder(object):
                 format string to extract datetime with.
             ignore_bad_date (bool):
                 if True then ignore events with bad date instead of raising error
+            warn_duplications (bool):
+                if even duplications are detected, print a warning but don't add the event.
 
         Returns:
             no value
@@ -170,7 +178,7 @@ class Builder(object):
             InvalidEventDateException:
                 `year` isn't passed in or can't be extracted from raw date string.
         """
-        if event_kind not in cat_type.categories:
+        if event_kind not in event_cat_type.categories:
             raise InvalidEventKindException(event_kind)
         if 'salary_freq' in kwargs:
             if 'salary' not in kwargs or pd.isnull(kwargs['salary']) or kwargs['salary'] == '':
@@ -194,7 +202,18 @@ class Builder(object):
                 "year column cannot be empty:\n\t%s" % kwargs)
         kwargs["event_uid"] = gen_uid_from_dict(
             kwargs, ['kind', 'year', 'month', 'day', 'time'] + id_cols)
-        self._records.append(kwargs)
+        if warn_duplications and kwargs['event_uid'] in self._record_dict:
+            old_rec = self._record_dict[kwargs['event_uid']]
+            for k, v in old_rec.items():
+                if v != kwargs[k]:
+                    print('WARNING: ignoring duplicated event:\n    old: %s\n    new: %s' % (
+                        json.dumps(old_rec),
+                        json.dumps(kwargs)
+                    ))
+                    break
+        else:
+            self._records.append(kwargs)
+            self._record_dict[kwargs['event_uid']] = kwargs
 
     def _assign_kwargs_func(self, cols, kwargs_funcs, flatten_date_cols, kind, obj):
         if "parse_date" in obj:
@@ -225,12 +244,12 @@ class Builder(object):
                 (event_col, row[col]) for col, event_col in col_pairs
             ]
 
-    def extract_events(self, df: pd.DataFrame, event_dict: dict, id_cols: list[str]) -> None:
+    def extract_events(self, df: pd.DataFrame, event_dict: dict, id_cols: list[str], warn_duplications=False) -> None:
         """Extract event records from a DataFrame.
 
         Multiple kinds of event can be extracted. Each defined as a single key in `event_dict`.
         Each value in `event_dict` is a dictionary with following keys:
-        - prefix: Prefix of columns to extract date from .E.g. if prefix = "hire" then hire_year, hire_month
+        - prefix: Prefix of columns to extract date from .e.g. if prefix = "hire" then hire_year, hire_month
           hire_day, hire_time, hire_date, hire_datetime, hire_raw_date are looked up depending on other keys.
         - keep: List of columns to keep in each event.
         - drop: Alternatively use "drop" to specify which columns to drop from each event.
@@ -254,6 +273,8 @@ class Builder(object):
                 }
             id_cols (list of str):
                 list of columns to generate event_uid from (in addition to ['kind', 'year', 'month', 'day', 'time'])
+            warn_duplications (bool):
+                if even duplications are detected, print a warning but don't add the event.
 
         Returns:
             no value
@@ -292,6 +313,7 @@ class Builder(object):
                     kind,
                     id_cols if 'id_cols' not in obj else obj['id_cols'],
                     ignore_bad_date=obj.get('ignore_bad_date', False),
+                    warn_duplications=warn_duplications,
                     **fields,
                 )
 
@@ -325,7 +347,7 @@ class Builder(object):
         """
         df = pd.DataFrame.from_records(self._records)\
             .pipe(float_to_int_str, ["year", "month", "day"], True)
-        df.loc[:, 'kind'] = df.kind.astype(cat_type)
+        df.loc[:, 'kind'] = df.kind.astype(event_cat_type)
         if 'salary_freq' in df.columns:
             df.loc[:, 'salary_freq'] = df.salary_freq.astype(salary.cat_type)
         df = rearrange_event_columns(df)

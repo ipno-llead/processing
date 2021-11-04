@@ -28,5 +28,5 @@ class UIDTestCase(unittest.TestCase):
         dfa = pd.DataFrame([[1, 2, 3], [4, 5, 6]], columns=['a', 'b', 'c'])
         dfb = pd.DataFrame([[1, 2, 3], [1, 5, 6]], columns=['a', 'b', 'c'])
         ensure_uid_unique(dfa, ['a'])
-        with self.assertRaisesRegex(Exception, r"DataFrame is not unique:"):
+        with self.assertRaisesRegex(Exception, r"rows are not unique:"):
             ensure_uid_unique(dfb, ['a'])

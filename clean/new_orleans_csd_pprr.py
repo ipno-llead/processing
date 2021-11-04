@@ -28,7 +28,7 @@ def match_schema_2014(df):
 
 def parse_salary_2014(df):
     df.loc[:, "salary"] = df.salary.str.replace(
-        ",", "").astype("float64")
+        ",", "", regex=False).astype("float64")
     return df
 
 
@@ -48,7 +48,7 @@ def standardize_rank_2014(df):
 
 def assign_cols_2014(df):
     df.loc[:, "data_production_year"] = "2014"
-    df.loc[:, "agency"] = "New Orleans CSD"
+    df.loc[:, "agency"] = "New Orleans PD"
     return df
 
 
@@ -63,11 +63,10 @@ def clean_2014():
         .pipe(parse_salary_2014)\
         .pipe(standardize_rank_2014)\
         .pipe(standardize_desc_cols, ["department_desc"])\
+        .pipe(assign_cols_2014)\
         .pipe(
-            gen_uid,  # "mid" is match id, used to match against 2009 data
-            ["first_name", "last_name", "hire_year", "hire_month", "hire_day"],
-            "mid")\
-        .pipe(assign_cols_2014)
+            gen_uid, 
+            ["first_name", "last_name", "hire_year", "hire_month", "hire_day"])
     return df
 
 
@@ -86,7 +85,7 @@ def match_schema_2009(df):
 
 def parse_salary_2009(df):
     df.loc[:, "salary"] = df.salary.str.replace(
-        r",|\$", "").astype("float64")
+        r",|\$", "", regex=True).astype("float64")
     return df
 
 

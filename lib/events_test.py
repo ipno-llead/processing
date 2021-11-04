@@ -1,11 +1,13 @@
+from io import StringIO
 import unittest
+from contextlib import redirect_stdout
 
 import numpy as np
 import pandas as pd
 from pandas.testing import assert_frame_equal
 
 from events import (
-    Builder, cat_type, OFFICER_HIRE, OFFICER_LEFT, COMPLAINT_INCIDENT, COMPLAINT_RECEIVE,
+    Builder, event_cat_type, OFFICER_HIRE, OFFICER_LEFT, COMPLAINT_INCIDENT, COMPLAINT_RECEIVE,
     OFFICER_PAY_EFFECTIVE, OFFICER_RANK, discard_events_occur_more_than_once_every_30_days
 )
 import salary
@@ -16,7 +18,7 @@ sys.path.append('./')
 class EventsBuilderTestCase(unittest.TestCase):
     def assert_events_frame_equal(self, builder, data, columns):
         df = pd.DataFrame(data, columns=columns)
-        df.loc[:, 'kind'] = df.kind.astype(cat_type)
+        df.loc[:, 'kind'] = df.kind.astype(event_cat_type)
         if 'salary_freq' in columns:
             df.loc[:, 'salary_freq'] = df.salary_freq.astype(salary.cat_type)
         frame = builder.to_frame()
@@ -163,6 +165,57 @@ class EventsBuilderTestCase(unittest.TestCase):
             '2  ee9b823279d8f0a9595567012a81a7f1  officer_hire  2019    10  12  1235  Brusly PD      445',
             '3  ee9b823279d8f0a9595567012a81a7f1  officer_hire  2019    10  12  1235  Brusly PD      442',
         ]))
+
+    def test_warn_duplications(self):
+        self.maxDiff = None
+        builder = Builder()
+
+        df = pd.DataFrame([
+            ['1234', 'Brusly PD', 2020, 5, 3, '321'],
+            ['1234', 'Brusly PD', 2020, 5, 3, ''],
+            ['1235', 'Brusly PD', 2019, 10, 12, '445'],
+            ['1235', 'Brusly PD', 2019, 10, 12, '442'],
+        ], columns=['uid', 'agency', 'hire_year', 'hire_month', 'hire_day', 'badge_no'])
+        with redirect_stdout(StringIO()) as f:
+            builder.extract_events(df, {
+                OFFICER_HIRE: {
+                    'prefix': 'hire',
+                    'keep': ['uid', 'agency', 'badge_no']
+                }
+            }, ['uid', 'agency'], warn_duplications=True)
+            self.assertEqual(f.getvalue(), '\n'.join([
+                'WARNING: ignoring duplicated event:',
+                (
+                    '    old: {"uid": "1234", "agency": "Brusly PD", "badge_no": "321", "year": 2020, "month": 5, '
+                    '"day": 3, "kind": "officer_hire", "event_uid": "b731096b58cfd4d6f113bb85aeb3eaa9"}'
+                ),
+                (
+                    '    new: {"uid": "1234", "agency": "Brusly PD", "badge_no": "", "year": 2020, '
+                    '"month": 5, "day": 3, "kind": "officer_hire", "event_uid": "b731096b58cfd4d6f113bb85aeb3eaa9"}'
+                ),
+                'WARNING: ignoring duplicated event:',
+                (
+                    '    old: {"uid": "1235", "agency": "Brusly PD", "badge_no": "445", "year": 2019, '
+                    '"month": 10, "day": 12, "kind": "officer_hire", "event_uid": "ee9b823279d8f0a9595567012a81a7f1"}'
+                ),
+                (
+                    '    new: {"uid": "1235", "agency": "Brusly PD", "badge_no": "442", "year": 2019, '
+                    '"month": 10, "day": 12, "kind": "officer_hire", "event_uid": "ee9b823279d8f0a9595567012a81a7f1"}'
+                ),
+                '',
+            ]))
+        df2 = pd.DataFrame(
+            [
+                ['b731096b58cfd4d6f113bb85aeb3eaa9', 'officer_hire', '2020', '5', '3', '1234', 'Brusly PD', '321'],
+                ['ee9b823279d8f0a9595567012a81a7f1', 'officer_hire', '2019', '10', '12', '1235', 'Brusly PD', '445'],
+            ],
+            columns=['event_uid', 'kind', 'year', 'month', 'day', 'uid', 'agency', 'badge_no'],
+        )
+        df2.loc[:, 'kind'] = df2['kind'].astype(event_cat_type)
+        assert_frame_equal(
+            builder.to_frame(), df2,
+            check_dtype=False, check_column_type=False, check_categorical=False
+        )
 
 
 class DiscardEventsOccurMoreThanOnceEvery30DaysTestCase(unittest.TestCase):

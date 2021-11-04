@@ -162,7 +162,7 @@ def clean():
             'sentence_dys': 'sentence_days',
             'sentence_oth': 'sentence_other',
             'sex': 'citizen_sex',
-            'folder_no': 'tracking_no'
+            'folder_no': 'tracking_number'
         })\
         .pipe(clean_disposition)\
         .pipe(clean_court_time)\
@@ -178,3 +178,9 @@ def clean():
         .pipe(clean_arresting_department)\
         .pipe(clean_race)
     return df
+
+
+if __name__ == '__main__':
+    df = clean()
+    df.to_csv(data_file_path(
+        'clean/booking_new_orleans_so_2015_2021.csv'), index=False)
