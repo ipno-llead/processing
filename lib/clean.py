@@ -200,13 +200,13 @@ def parse_dates_with_known_format(df: pd.DataFrame, cols: list[str], format: str
 
 
 def clean_sexes(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
-    """Cleans and standardizes gender columns
+    """Cleans and standardizes sex columns
 
     Args:
         df (pd.DataFrame):
             the frame to process
         cols (list of str):
-            gender columns
+            sex columns
 
     Returns:
         the updated frame
@@ -237,8 +237,7 @@ def clean_races(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
             .str.replace(r'^w$', 'white', regex=True)\
             .str.replace(r'^h$', 'hispanic', regex=True)\
             .str.replace(r'^b$', 'black', regex=True)\
-            .str.replace(r'\bislande\b', 'islander', regex=True)\
-            .str.replace(r'^a$', 'asian', regex=True)
+            .str.replace(r'\bislande\b', 'islander', regex=True)
         df = standardize_from_lookup_table(df, col, [
             ['black', 'african american', 'black / african american', 'black or african american'],
             ['white'],
@@ -246,10 +245,7 @@ def clean_races(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
             ['native american', 'american indian', 'american indian or alaskan native'],
             ['asian / pacific islander', 'asian', 'native hawaiian or other pacific islander', 'islander'],
             ['mixed', 'two or more races', 'multi-racial'],
-            ['unknown', 'unknown race'],
         ])
-        # can't have empty sequence in standardize_from_lookup_table
-        df.loc[:, col] = df[col].str.replace(r'^unknown$', '', regex=True)
     return df
 
 
@@ -284,6 +280,7 @@ def clean_salary(series: pd.Series) -> pd.Series:
     return series.str.strip().str.lower()\
         .str.replace('k', '000', regex=False)\
         .str.replace(r"[^\d\.]", "", regex=True)\
+        .str.replace(r'^$', '0', regex=True)\
         .astype("float64")
 
 
@@ -496,9 +493,9 @@ def standardize_desc_cols(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
 def float_to_int_str(df: pd.DataFrame, cols: list[str], cast_as_str: bool = False) -> pd.DataFrame:
     """Turns float values in column into strings without trailing ".0"
 
-    Data loaded with pd.read_csv tend to turn integer columns into
-    float columns if there are even just one value missing. This
-    reverse that effect by converting everything to string and strip
+    Data loaded with pd.read_csv tends to turn integer columns into
+    float columns even if one value is missing. This
+    reverses that effect by converting everything to a string and striping
     trailing ".0"s.
 
     Examples:

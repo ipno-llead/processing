@@ -25,7 +25,8 @@
   ],
   "baton_rouge_so": [
     "https://www.dropbox.com/s/aa8gwwebqfcmbp9/Baton_Rouge_SO_CPRR_2018.csv?dl=1",
-    "https://www.dropbox.com/s/ntxarlgwzlqoms9/baton_rouge_so_cprr_2016-2020.csv?dl=1"
+    "https://www.dropbox.com/s/ntxarlgwzlqoms9/baton_rouge_so_cprr_2016-2020.csv?dl=1",
+    "https://www.dropbox.com/s/ceayy4p7ne1egew/east_baton_rouge_booking_log_2020.csv?dl=1"
   ],
   "louisiana_state_csc": [
     "https://www.dropbox.com/sh/9zndy2dz3w60etq/AAAqcTxDk8GVj3uvQbUto3XBa/Log%20Records/LouisianaState_CSC_LPRR_1991-2020.csv?dl=1",
@@ -41,7 +42,8 @@
     "https://www.dropbox.com/sh/rfvtxt3dw204mu0/AAAPRhyKNsN6k0T7khmtxhP2a/brusly_pd_awards_2015-2020_byhand.csv?dl=1"
   ],
   "post_council": [
-    "https://www.dropbox.com/s/vzm4ihad72pkw2b/POST_PPRR_11-6-2020.csv?dl=1"
+    "https://www.dropbox.com/s/vzm4ihad72pkw2b/POST_PPRR_11-6-2020.csv?dl=1",
+    "https://www.dropbox.com/s/uodxkhiyhhsmv2r/post_decertifications_2016_2019.csv?dl=1"
   ],
   "port_allen_pd": [
     "https://www.dropbox.com/sh/8zs58ak2rpah9iu/AABUS6JdCHYyvjXWWk--RtGLa/Port_Allen_CPRR_2017-2018_byhand.csv?dl=1",
@@ -68,7 +70,8 @@
   ],
   "new_orleans_so": [
     "https://www.dropbox.com/sh/dsrzc28teybtf4q/AAAq2PQtK_cM5Mt3PpknAoMOa/new_orleans_so_cprr_2019_tabula.csv?dl=1",
-    "https://www.dropbox.com/s/dojgzfdfjw84c0s/new_orleans_so_cprr_2020.csv?dl=1"
+    "https://www.dropbox.com/s/dojgzfdfjw84c0s/new_orleans_so_cprr_2020.csv?dl=1",
+    "https://www.dropbox.com/s/zkm1hch1scxez37/new_orleans_so_pprr_2021.csv?dl=1"
   ],
   "greenwood_pd": [
     "https://www.dropbox.com/sh/9yu4fe2z6xuwnaf/AAALIGMiq95b2ZylzxFcUdqga/greenwood_pd_cprr_2015-2020_byhand.csv?dl=1"
@@ -82,7 +85,8 @@
   ],
   "plaquemines_so": [
     "https://www.dropbox.com/s/g1b98kn4e4k1dtr/plaquemines_so_cprr_2019.csv?dl=1",
-    "https://www.dropbox.com/s/0blyx05qcb0lbyw/plaqumines_so_pprr_2018.csv?dl=1"
+    "https://www.dropbox.com/s/0blyx05qcb0lbyw/plaqumines_so_pprr_2018.csv?dl=1",
+    "https://www.dropbox.com/s/8sepx73e2lxh53a/plaquemines_so_cprr_2016_2020.csv?dl=1"
   ],
   "caddo_parish_so": [
     "https://www.dropbox.com/sh/8w4uff2emzbhcvr/AAC4YdwWdPudXeH4pdDvl-Fpa/Caddo%20Parish_SO_PPRR_2020.csv?dl=1"
@@ -170,7 +174,8 @@
   ],
   "hammond_pd": [
     "https://www.dropbox.com/sh/2a1aoihf1fu1hgh/AABMEwlLwef0YR-VkQNt-o1ka/Hammond%20Police%20Department/hammond_pd_cprr_2015_2020.csv?dl=1",
-    "https://www.dropbox.com/s/6vtokmaqb2bn9ar/hammond_pd_cprr_2009_2014.csv?dl=1"
+    "https://www.dropbox.com/s/6vtokmaqb2bn9ar/hammond_pd_cprr_2009_2014.csv?dl=1",
+    "https://www.dropbox.com/s/lkwid7x4jc1vjnr/hammond_pd_cprr_2004_2008.csv?dl=1"
   ],
   "lake_charles_pd": [
     "https://www.dropbox.com/s/xzd2pr1nozb01ux/lake_charles_pd_cprr_2020.csv?dl=1",
@@ -201,5 +206,16 @@
   ],
   "district_attorney": [
     "https://www.dropbox.com/s/f0m3ym4vvk66134/pprr_post_2020_11_06.csv?dl=1"
+  ],
+  "central_csd": [
+    "https://www.dropbox.com/s/fpjb9bwwtrmqiwa/central_csd_pprr_2014_2019.csv?dl=1"
+  ],
+  "tangipahoa_da": [
+    "https://www.dropbox.com/s/mdq1erm4fve4j2u/tangipahoa_da_brady_2021.csv?dl=1"
+  ],
+  "bossier_city_pd": [
+    "https://www.dropbox.com/s/d7b8qyuny4k6b19/BossierCity_PD_PPRR_2019.csv?dl=1",
+    "https://www.dropbox.com/s/tr4vscidvngthql/bossier_city_pd_pprr_2018.csv?dl=1",
+    "https://www.dropbox.com/s/fu2sjq8ssjhpq0j/bossier_city_pd_cprr_2020.csv?dl=1"
   ]
 }

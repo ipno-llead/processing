@@ -71,27 +71,27 @@ files:
       body_worn_camera_available:
       app_used:
       citizen_arrested:
-      allegation_finding:
-        description: >
-          finding of an individual allegation
-        options:
-          - sustained
-          - exonerated
-          - illegitimate outcome
-          - counseling
-          - mediation
-          - not sustained
-          - unfounded
-          - no investigation merited
-          - pending
+      # allegation_finding:
+      #   description: >
+      #     finding of an individual allegation
+      #   options:
+      #     - sustained
+      #     - exonerated
+      #     - illegitimate outcome
+      #     - counseling
+      #     - mediation
+      #     - not sustained
+      #     - unfounded
+      #     - no investigation merited
+      #     - pending
       allegation:
         description: >
           the same data that can be found in `paragraph_code` and `paragraph_violation`.
           In fact this column should be merged with the paragraph_ columns.
-      allegation_class:
-        description: >
-          the same data that can be found in `rule_code` and `rule_violation`. This should
-          eventually be merged with the code_ columns.
+      # allegation_class:
+      #   description: >
+      #     the same data that can be found in `rule_code` and `rule_violation`. This should
+      #     eventually be merged with the code_ columns.
       citizen:
         description: >
           demographic info of the involved citizen
@@ -177,16 +177,16 @@ files:
         description: >
           whether the accused was fulltime or reserve during incident.
     validation_tasks:
-      - name: if `allegation_finding` is "sustained" then `disposition` should also be "sustained"
-        warn_only: true
-        empty:
-          and:
-            - column: allegation_finding
-              op: equal
-              value: sustained
-            - column: disposition
-              op: not_equal
-              value: sustained
+      # - name: if `allegation_finding` is "sustained" then `disposition` should also be "sustained"
+      #   warn_only: true
+      #   empty:
+      #     and:
+      #       - column: allegation_finding
+      #         op: equal
+      #         value: sustained
+      #       - column: disposition
+      #         op: not_equal
+      #         value: sustained
   fuse/event.csv:
     schema:
       event_uid:
@@ -204,9 +204,11 @@ files:
           - officer_left
           - officer_pay_prog_start
           - officer_pay_effective
+          - officer_post_decertification
           - complaint_incident
           - complaint_receive
           - allegation_create
+          - charges_create
           - investigation_start
           - investigation_complete
           - suspension_start
@@ -215,6 +217,7 @@ files:
           - appeal_hearing
           - appeal_hearing_2
           - appeal_receive
+          - appeal_render
           - appeal_disposition
           - uof_incident
           - uof_receive
@@ -283,9 +286,9 @@ files:
       employee_class:
         description: >
           classification of job titles
-      employment_status:
-        description: >
-          whether the officer is full time, part time, reserve, ... etc
+      # employment_status:
+      #   description: >
+      #     whether the officer is full time, part time, reserve, ... etc
       sworn:
         description: >
           whether the officer is sworn or not
