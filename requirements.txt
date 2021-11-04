@@ -2,7 +2,7 @@ numpy==1.18.5
 pandas==1.2.4
 python-Levenshtein==0.12.0
 Unidecode==1.1.2
-datamatch==0.1.8
+datamatch==0.1.13
 datavalid==0.2.3
 tqdm==4.61.1
 openpyxl==3.0.7

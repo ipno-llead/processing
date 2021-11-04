@@ -68,7 +68,7 @@ COMPLAINT_COLUMNS = [
     "investigator_uid",
     "investigator_rank",
     "shift_supervisor",
-    # "Complaint Classification",  # ?
+    "complaint_classificaiton",  # description of who filed the complaint(s)
     # "Bureau of Complainant",  # ?
     # "Division of Complainant",  # ?
     # "Unit of Complainant",  # ?

@@ -107,7 +107,7 @@ if __name__ == "__main__":
         'clean/pprr_new_orleans_ipm_iapro_1946_2018.csv'
     ))
     pprr_csd = pd.read_csv(data_file_path(
-        'clean/pprr_new_orleans_csd_2014.csv'
+        'match/pprr_new_orleans_csd_2014.csv'
     ))
     officer_number_dict = create_officer_number_dict(pprr_ipm)
     cprr = pd.read_csv(data_file_path(
