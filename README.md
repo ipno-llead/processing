@@ -88,10 +88,10 @@ This repository proposes a workflow and some utilty scripts to help extracting t
 - _For simple table extraction_: you can simply use one of FR's prebuilt model, specifically the [Layout model](https://docs.microsoft.com/en-us/azure/applied-ai-services/form-recognizer/concept-layout). Just use the web-based FormRecognizerStudio to upload documents and extract data. If there are too many pages to extract manually, we can add the ability to automate extraction from prebuilt models to `scripts/extract_tables_from_doc.py`.
 - _For complex table extraction_: you need to train a custom model and use that model to extract data. Follow these steps:
   1. Create a `.env` file (see [python-dotenv](https://pypi.org/project/python-dotenv/) to learn the syntax) at the root directory of this repository with the following environment variable:
-  - `FORM_RECOGNIZER_ENDPOINT`: follow [these instruction](https://docs.microsoft.com/en-us/azure/applied-ai-services/form-recognizer/quickstarts/try-v3-python-sdk#prerequisites) to get endpoint and key for a Form Recognizer resource.
-  - `FORM_RECOGNIZER_KEY`: see above.
-  - `BLOB_STORAGE_CONNECTION_STRING`: create an Azure storage account to store training data and follow this [guide](https://docs.microsoft.com/en-us/azure/storage/common/storage-configure-connection-string) to get the connection string.
-  - `FORM_RECOGNIZER_CONTAINER`: create a container in the same storage account and put the name here. It will contain all training data.
+     - `FORM_RECOGNIZER_ENDPOINT`: follow [these instruction](https://docs.microsoft.com/en-us/azure/applied-ai-services/form-recognizer/quickstarts/try-v3-python-sdk#prerequisites) to get endpoint and key for a Form Recognizer resource.
+     - `FORM_RECOGNIZER_KEY`: see above.
+     - `BLOB_STORAGE_CONNECTION_STRING`: create an Azure storage account to store training data and follow this [guide](https://docs.microsoft.com/en-us/azure/storage/common/storage-configure-connection-string) to get the connection string.
+     - `FORM_RECOGNIZER_CONTAINER`: create a container in the same storage account and put the name here. It will contain all training data.
   2. Split the source PDF into individual pages with `scripts/split_pdf.py`. Upload those pages to a folder (preferably with the same name as the original PDF file) in the training container. Learn more [here](https://docs.microsoft.com/en-us/azure/applied-ai-services/form-recognizer/quickstarts/try-v3-form-recognizer-studio#additional-steps-for-custom-projects).
   3. Log-in to FormRecognizerStudio (FRS) and follow this [guide](https://docs.microsoft.com/en-us/azure/applied-ai-services/form-recognizer/supervised-table-tags) to tag tables. FRS does not have any way to insert or remove arbitrary row so if you make a mistake while tagging, you might have to start from scratch. Luckily we have the script `scripts/edit_fr_table.py` to remove and insert rows. E.g.
      ```bash
