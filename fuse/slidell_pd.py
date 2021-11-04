@@ -35,18 +35,16 @@ def fuse_events(pprr):
 
 
 if __name__ == '__main__':
-    pprr_09 = pd.read_csv(data_file_path('clean/pprr_slidell_pd_2009.csv'))
-    pprr_19 = pd.read_csv(data_file_path('clean/pprr_slidell_pd_2019.csv'))
     pprr_csd = pd.read_csv(data_file_path('clean/pprr_slidell_csd_2010_2019.csv'))
     post_event = pd.read_csv(data_file_path(
         'match/post_event_slidell_pd_2020.csv'
     ))
     events_df = rearrange_event_columns(pd.concat([
         post_event,
-        fuse_events(pd.concat([pprr_09, pprr_19, pprr_csd]))
+        fuse_events(pprr_csd)
     ]))
     ensure_uid_unique(events_df, 'event_uid', True)
-    fuse_personnel(pprr_csd, pprr_09, pprr_19).to_csv(data_file_path(
+    fuse_personnel(pprr_csd).to_csv(data_file_path(
         "fuse/per_slidell_pd.csv"), index=False)
     events_df.to_csv(data_file_path(
         "fuse/event_slidell_pd.csv"), index=False)

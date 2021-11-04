@@ -224,15 +224,15 @@ def clean_csd_pprr():
 
 
 if __name__ == '__main__':
-    df09 = clean_pprr_09()
-    df19 = clean_pprr_19()
+    # df09 = clean_pprr_09()
+    # df19 = clean_pprr_19()
     df_csd = clean_csd_pprr()
-    df09.to_csv(data_file_path(
-        'clean/pprr_slidell_pd_2009.csv'
-    ), index=False)
-    df19.to_csv(data_file_path(
-        'clean/pprr_slidell_pd_2019.csv'
-    ), index=False)
+    # df09.to_csv(data_file_path(
+    #     'clean/pprr_slidell_pd_2009.csv'
+    # ), index=False)
+    # df19.to_csv(data_file_path(
+    #     'clean/pprr_slidell_pd_2019.csv'
+    # ), index=False)
     df_csd.to_csv(data_file_path(
         'clean/pprr_slidell_csd_2010_2019.csv'
     ), index=False)
