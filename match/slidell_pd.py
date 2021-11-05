@@ -26,16 +26,16 @@ def extract_post_events(pprr, post):
     }, dfa, dfb)
     decision = 0.95
     matcher.save_pairs_to_excel(data_file_path(
-        "match/slidell_pd_pprr_2019_v_post_pprr_2020_11_06.xlsx"), decision)
+        "match/slidell_csd_pprr_2010_2019_v_post_pprr_2020_11_06.xlsx"), decision)
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
 
     return extract_events_from_post(post, matches, "Slidell PD")
 
 
 if __name__ == '__main__':
-    pprr = pd.read_csv(data_file_path('clean/pprr_slidell_pd_2019.csv'))
+    pprr_csd = pd.read_csv(data_file_path('clean/pprr_slidell_csd_2010_2019.csv'))
     post = pd.read_csv(data_file_path('clean/pprr_post_2020_11_06.csv'))
-    post_events = extract_post_events(pprr, post)
+    post_events = extract_post_events(pprr_csd, post)
     ensure_data_dir("match")
     post_events.to_csv(data_file_path(
         "match/post_event_slidell_pd_2020.csv"), index=False)
