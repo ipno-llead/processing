@@ -5,6 +5,8 @@ from lib.path import data_file_path
 from lib.columns import clean_column_names, set_values
 from lib.clean import clean_dates, standardize_desc_cols
 from lib.uid import gen_uid
+from lib.rows import duplicate_row
+import re
 
 
 def clean_and_split_names(df):
@@ -16,6 +18,8 @@ def clean_and_split_names(df):
         .str.replace('st.cyrneil', 'st.cyr neil', regex=False)\
         .str.replace('anceletjordan', 'ancelet jordan', regex=False)\
         .str.replace('suarezrichard', 'suarez richard')\
+        .str.replace('martin, justin c', 'martin, c justin', regex=False)\
+        .str.replace(r'\'', '', regex=True)\
         .str.replace(r'(unknown|records for file|file for records only|'
                      r'intake booking|corrections intake)', 'file for records', regex=True)\
         .str.replace(r'(\w+)[,\.] ?(\w+)', r'\1, \2', regex=True)
@@ -28,11 +32,10 @@ def clean_and_split_names(df):
 
 
 def clean_charges(df):
-    df.loc[:, 'charges'] = df.complaint.str.lower().str.strip()\
+    df.loc[:, 'charges'] = df.complaint.str.lower().str.strip().fillna('')\
         .str.replace(',', '', regex=False)\
-        .str.replace(r'(^file for records ?(only)?)', '', regex=True)\
         .str.replace('unable to locate', '', regex=False)\
-        .str.replace('with drew complaint', '', regex=False)\
+        .str.replace(r'with ?drew complaint', '', regex=True)\
         .str.replace(r'^courtesy/ identification$', 'courtesy/identification', regex=True)\
         .str.replace(r'(\w+) ?/ ?(\w+)', r'\1/\2', regex=True)\
         .str.replace('report writing', 'departmental reports', regex=False)\
@@ -40,8 +43,12 @@ def clean_charges(df):
         .str.replace('citizen complaint', '', regex=False)\
         .str.replace('biased biased', 'bias-based', regex=False)\
         .str.replace('fire arm', 'firearm', regex=False)\
-        .str.replace(r'(\w+)/performance of duty', r'performance of duty/\1', regex=True)\
-        .str.replace(r'(\w+)/unsatisfactory performance', r'unsatisfactory performance/\1', regex=True)
+        .str.replace(r'\/force$', '/use of force', regex=True)\
+        .str.replace(r'^use of unsatisfactory', 'unsatisfactory', regex=True)\
+        .str.replace(r'(file)? ?(for)? ?records? ?(only)?$', '', regex=True)\
+        .str.replace(r' \bjob\b ', ' ', regex=True)\
+        .str.replace(r'\/performance\/', '/performance of duty/', regex=True)\
+        .str.replace(r'\/ conduct$', '/conduct unbecoming', regex=True)
     return df.drop(columns='complaint')
 
 
@@ -60,8 +67,6 @@ def clean_action(df):
         .str.replace(r' ?\.? ?rep', 'reprimand', regex=True)\
         .str.replace('verbalreprimand', 'verbal reprimand', regex=False)\
         .str.replace(r'^rem\.?(edial)? ?(train)?', 'remedial training', regex=True)\
-        .str.replace('suspension', 'suspended', regex=False)\
-        .str.replace('termination', 'terminated', regex=False)\
         .str.replace(r'^ ?counsel\b', 'counseling', regex=True)\
         .str.replace('unit use', 'unit privileges', regex=False)
     return df.drop(columns='leave')
@@ -73,7 +78,8 @@ def drop_rows_undefined_charges_and_disposition(df):
 
 def clean_complete(df):
     df.loc[:, 'investigation_status'] = df.complete.str.lower().str.strip()\
-        .str.replace('x', 'complete', regex=False)
+        .str.replace('x', 'complete', regex=False)\
+        .str.replace('n/a', '', regex=False)
     return df.drop(columns='complete')
 
 
@@ -96,15 +102,48 @@ def clean_tracking_number_14(df):
 
 def clean_level(df):
     df.loc[:, 'level'] = df.level.astype(str)\
-        .str.replace(r'\.', '', regex=True)
-    return df
+        .str.replace(r'\.', '', regex=True)\
+        .str.replace(r'(\d{1})(\d{1})', r'\1', regex=True)
+    return df.drop(columns='level')
 
 
 def clean_department_desc(df):
     df.loc[:, 'department_desc'] = df.emp_assign.str.lower().str.strip()\
         .str.replace('off duty', 'off-duty', regex=False)\
-        .str.replace(r'\bcorrection\b', 'corrections', regex=True)
+        .str.replace(r'\bcorrect(ion)?\b', 'corrections', regex=True)
     return df.drop(columns='emp_assign')
+
+
+def clean_tracking_number_08(df):
+    df.loc[:, 'tracking_number'] = df.case.str.lower().str.strip()\
+        .str.replace(r'(\d+)?-?aug-?(\d+)?', r'12-\1', regex=True)
+    return df.drop(columns='case')
+
+
+def split_rows_with_multiple_charges(df):
+    i = 0
+    for idx in df[df.charges.fillna('').str.contains('/')].index:
+        s = df.loc[idx + i, 'charges']
+        parts = re.split(r"\s*(?:\/)\s*", s)
+        df = duplicate_row(df, idx + i, len(parts))
+        for j, name in enumerate(parts):
+            df.loc[idx + i + j, 'charges'] = name
+        i += len(parts) - 1
+    return df
+
+
+def clean_action_08(df):
+    df.loc[:, 'action'] = df.leave.str.lower().str.strip().fillna('')\
+        .str.replace(r'lt\.(\w+)', r'letter of \1', regex=True)\
+        .str.replace(r'ltr?\.?', 'letter of', regex=True)\
+        .str.replace(r'\brep\b', 'reprimand', regex=True)\
+        .str.replace(r'\bcou?ns?\b', 'counseling', regex=True)\
+        .str.replace(r'\bsusp?\b', 'suspension', regex=True)\
+        .str.replace(r'\bterm\b', 'termination', regex=True)\
+        .str.replace('n/a', '', regex=False)\
+        .str.replace(r'\/', '|', regex=True)\
+        .str.replace(r'^remid$', 'remedial', regex=True)
+    return df.drop(columns='leave')
 
 
 def clean20():
@@ -157,12 +196,39 @@ def clean14():
     return df
 
 
+def clean08():
+    df = pd.read_csv(data_file_path('raw/lafayette_so/lafayette_so_cprr_2006_2008.csv'))\
+        .pipe(clean_column_names)\
+        .drop(columns=['emp'])\
+        .rename(columns={
+            'date': 'receive_date'
+        })\
+        .pipe(clean_and_split_names)\
+        .pipe(clean_tracking_number_08)\
+        .pipe(clean_department_desc)\
+        .pipe(clean_charges)\
+        .pipe(split_rows_with_multiple_charges)\
+        .pipe(clean_complete)\
+        .pipe(clean_level)\
+        .pipe(clean_action_08)\
+        .pipe(set_values, {
+            'agency': 'Lafayette SO'
+        })\
+        .pipe(gen_uid, ['agency', 'first_name', 'last_name'])\
+        .pipe(gen_uid, ['uid', 'charges', 'action', 'tracking_number', 'receive_date'], 'complaint_uid')
+    return df
+
+
 if __name__ == "__main__":
     df20 = clean20()
     df14 = clean14()
+    df08 = clean08()
     df20.to_csv(
         data_file_path('clean/cprr_lafayette_so_2015_2020.csv'),
         index=False)
     df14.to_csv(
         data_file_path('clean/cprr_lafayette_so_2009_2014.csv'),
+        index=False)
+    df08.to_csv(
+        data_file_path('clean/cprr_lafayette_so_2006_2008.csv'),
         index=False)
