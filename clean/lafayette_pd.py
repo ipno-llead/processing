@@ -425,7 +425,8 @@ def clean_cprr_20():
 def clean_tracking_number_14(df):
     df.loc[:, 'tracking_number'] = df.cc_number.str.lower().str.strip()\
         .str.replace(r'^-', '', regex=True)\
-        .str.replace(r'^(ad)(\d+)-', r'\1 \2-', regex=True)
+        .str.replace(r'^(ad)(\d+)-', r'\1 \2-', regex=True)\
+        .str.replace(r'sl(\d{2})', r'sl \1', regex=True)
     return df.drop(columns='cc_number')
 
 
@@ -505,7 +506,7 @@ def extract_action_from_disposition_14(df):
     actions = df.action.str.extract(r'((.+)suspension(.+)|(.+)terminated(.+)|(.+)resigned(.+)|'
                                     r'(.+)letter of counseling(.+)|(.+)letter of reprimand(.+))')
 
-    df.loc[:, 'action'] = actions[0]\
+    df.loc[:, 'action'] = actions[0].fillna('')\
         .str.replace(r'(.+)letter of counseling(.+)', 'letter of counseling', regex=True)\
         .str.replace(r'(\w+)3', '3', regex=True)\
         .str.replace(r' \((\w+)\)$', '', regex=True)\
@@ -515,7 +516,7 @@ def extract_action_from_disposition_14(df):
 
 disposition_14_lookup = [
     ['sustained; resigned', 'sustained/ nboc/resigned',
-     'sustained/resigned prior to termination','sustained/resigned',
+     'sustained/resigned prior to termination', 'sustained/resigned',
      'sustained/ resigned under invest.', 'terminated sust. resigned/', 'resigned sts.'],
     ['unfounded', '/loc/sta rling- unfounded- crozier'],
     ['exonerated', 'exonorated'],
@@ -632,6 +633,7 @@ def split_names_14(df):
         .str.replace(r'\bsro\b', 'school resources', regex=True)\
         .str.replace(r'traffic\)$', '', regex=True)\
         .str.replace(r'^4[db]$', '', regex=True)\
+        .str.replace(r'^2b$', '', regex=True)\
         .str.replace('lpd- eeoc complain', '', regex=True)\
         .str.replace(r'metro narc\)', 'metro narcotics', regex=True)\
         .str.replace(r'^officer\)$', '', regex=True)\
@@ -643,7 +645,8 @@ def split_names_14(df):
                                  r'?(?:(\w+) )? ?(\w+) ?(.+)?')
     df.loc[:, 'rank_desc'] = names[0].fillna('')
     df.loc[:, 'first_name'] = names[1].fillna('')
-    df.loc[:, 'last_name'] = names[2].fillna('')
+    df.loc[:, 'last_name'] = names[2].fillna('')\
+        .str.replace(r'bertr$', 'bertrand', regex=True)
     df.loc[:, 'department_desc'] = names[3].fillna('')\
         .str.replace(r'\,', '', regex=True)\
         .str.replace(r'\(\(?|\)\)?', '', regex=True)\
@@ -651,9 +654,74 @@ def split_names_14(df):
     return df.drop(columns=['focus_officer_s'])
 
 
+def drop_rows_missing_first_and_last_name_14(df):
+    return df[~((df.first_name == '') & (df.last_name == ''))]
+
+
+def drop_rows_missing_charges_disposition_and_action_14(df):
+    return df[~((df.charges == '') & (df.action == '') & (df.disposition == ''))]
+
+
 def assign_correct_actions_14(df):
     df.loc[((df.first_name == 'brent') & (df.tracking_number == '2012-008')), 'action'] = '3-day suspension'
     df.loc[((df.first_name == 'devin') & (df.tracking_number == '2012-008')), 'action'] = '1-day suspension'
+    df.loc[((df.last_name == 'firmin') & (df.tracking_number == '2009-002')), 'action'] = 'resigned'
+    df.loc[((df.last_name == 'starling') & (df.tracking_number == 'sl 13-006')), 'action'] = 'letter of counseling'
+    df.loc[((df.last_name == 'hebert') & (df.tracking_number == '2011-012')), 'action'] = 'resigned'
+    df.loc[((df.last_name == 'roberts') & (df.tracking_number == '2011-006')), 'action'] = 'resigned'
+    df.loc[((df.last_name == 'hackworth') & (df.tracking_number == '2012-022')), 'action'] = 'resigned'
+    df.loc[((df.last_name == 'taylor') & (df.tracking_number == 'ad 13-001')), 'action'] = 'resigned'
+    df.loc[((df.last_name == 'taylor') & (df.tracking_number == 'ad 13-002')), 'action'] = 'resigned'
+    df.loc[((df.last_name == 'baumgardner') & (df.tracking_number == '2012-015')), 'action'] = 'resigned'
+    df.loc[((df.last_name == 'baumgardner') & (df.tracking_number == '2012-013')), 'action'] = 'resigned'
+    df.loc[((df.last_name == 'dangerfield') & (df.tracking_number == '2012-001')), 'action'] = 'resigned'
+    df.loc[((df.last_name == 'thompson') & (df.tracking_number == '2012-010')), 'action'] = 'resigned'
+    df.loc[((df.last_name == 'poiencot') & (df.tracking_number == '2012-010')), 'action'] = 'terminated'
+    df.loc[((df.last_name == 'roberts') & (df.tracking_number == '2011-004')), 'action'] = 'resigned'
+    df.loc[((df.last_name == 'bricker') & (df.tracking_number == '2011-007')), 'action'] = 'resigned'
+    df.loc[((df.last_name == 'carter') & (df.tracking_number == '2010-011')), 'action'] = 'resigned'
+    df.loc[((df.last_name == 'dartez') & (df.tracking_number == '2010-012')), 'action'] = 'resigned'
+    df.loc[((df.last_name == 'howard') & (df.tracking_number == '2009-008')), 'action'] = 'resigned'
+    df.loc[((df.last_name == 'winjum') & (df.tracking_number == '2010-014')), 'action'] = 'resigned'
+    df.loc[(
+           (df.last_name == 'bertrand') &
+           (df.tracking_number == '2012-003') &
+           (df.charges == 'insubordination')),
+           'action'] = ''
+    return df
+
+
+def assign_correct_disposition_14(df):
+    df.loc[((df.last_name == 'crozier') & (df.tracking_number == 'sl 13-006')), 'disposition'] = 'unfounded'
+    df.loc[((df.last_name == 'starling') & (df.tracking_number == 'sl 13-006')), 'disposition'] = 'sustained'
+    df.loc[((df.last_name == 'sonnier') & (df.tracking_number == 'sl 13-006')), 'disposition'] = ''
+    df.loc[((df.last_name == 'firmin') & (df.tracking_number == '2009-002')), 'disposition'] = 'sustained'
+    df.loc[((df.last_name == 'hebert') & (df.tracking_number == '2011-012')), 'disposition'] = 'sustained'
+    df.loc[((df.last_name == 'roberts') & (df.tracking_number == '2011-006')), 'disposition'] = 'sustained'
+    df.loc[((df.last_name == 'hackworth') & (df.tracking_number == '2012-022')), 'disposition'] = 'sustained'
+    df.loc[((df.last_name == 'taylor') & (df.tracking_number == 'ad 13-001')), 'disposition'] = 'sustained'
+    df.loc[((df.last_name == 'taylor') & (df.tracking_number == 'ad 13-002')), 'disposition'] = 'sustained'
+    df.loc[((df.last_name == 'baumgardner') & (df.tracking_number == '2012-015')), 'disposition'] = 'sustained'
+    df.loc[((df.last_name == 'baumgardner') & (df.tracking_number == '2012-013')), 'disposition'] = 'not sustained'
+    df.loc[((df.last_name == 'dangerfield') & (df.tracking_number == '2012-001')), 'disposition'] = 'sustained'
+    df.loc[((df.last_name == 'thompson') & (df.tracking_number == '2012-010')), 'disposition'] = ''
+    df.loc[((df.last_name == 'poiencot') & (df.tracking_number == '2012-010')), 'disposition'] = ''
+    df.loc[((df.last_name == 'roberts') & (df.tracking_number == '2011-004')), 'disposition'] = 'sustained'
+    df.loc[((df.last_name == 'bricker') & (df.tracking_number == '2011-007')), 'disposition'] = 'sustained'
+    df.loc[((df.last_name == 'carter') & (df.tracking_number == '2010-011')), 'disposition'] = 'sustained'
+    df.loc[((df.last_name == 'dartez') & (df.tracking_number == '2010-012')), 'disposition'] = 'sustained'
+    df.loc[((df.last_name == 'howard') & (df.tracking_number == '2009-008')), 'disposition'] = 'sustained'
+    df.loc[((df.last_name == 'winjum') & (df.tracking_number == '2010-014')), 'disposition'] = 'sustained'
+    df.loc[(
+        (df.last_name == 'bertrand') &
+        (df.tracking_number == '2012-003') &
+        (df.charges == 'insubordination')),
+        'disposition'] = 'unfounded'
+    df.loc[(
+           (df.last_name == 'bertrand') &
+           (df.tracking_number == '2012-003') &
+           (df.charges == 'rude and unprofessional')),
+           'disposition'] = 'sustained'
     return df
 
 
@@ -672,7 +740,10 @@ def clean_cprr_14():
         .pipe(split_rows_with_multiple_charges_14)\
         .pipe(split_rows_with_multiple_names_14)\
         .pipe(split_names_14)\
+        .pipe(drop_rows_missing_first_and_last_name_14)\
         .pipe(assign_correct_actions_14)\
+        .pipe(assign_correct_disposition_14)\
+        .pipe(drop_rows_missing_charges_disposition_and_action_14)\
         .pipe(set_values, {
             'agency': 'Lafayette PD'
         })\
