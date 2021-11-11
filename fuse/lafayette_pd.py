@@ -13,19 +13,29 @@ from lib import events
 sys.path.append('../')
 
 
-def fuse_events(cprr, pprr):
+def fuse_events(cprr_20, cprr_14, pprr):
     builder = events.Builder()
-    builder.extract_events(cprr, {
+    builder.extract_events(cprr_20, {
         events.COMPLAINT_RECEIVE: {
             'prefix': 'receive',
             'parse_date': True,
-            'keep': ['agency', 'complaint_uid', 'uid', 'invetigator_uid']
+            'keep': ['agency', 'complaint_uid', 'uid', 'investigator_uid']
         },
         events.INVESTIGATION_COMPLETE: {
             'prefix': 'complete',
             'parse_date': True,
             'ignore_bad_date': True,
-            'keep': ['agency', 'complaint_uid', 'uid', 'invetigator_uid'],
+            'keep': ['agency', 'complaint_uid', 'uid', 'investigator_uid'],
+        },
+    }, ['complaint_uid'])
+    builder.extract_events(cprr_14, {
+        events.COMPLAINT_RECEIVE: {
+            'prefix': 'receive',
+            'keep': ['agency', 'complaint_uid', 'uid', 'investigator_uid']
+        },
+        events.INVESTIGATION_COMPLETE: {
+            'prefix': 'complete',
+            'keep': ['agency', 'complaint_uid', 'uid', 'investigator_uid'],
         },
     }, ['complaint_uid'])
     builder.extract_events(pprr, {
@@ -44,8 +54,11 @@ def fuse_events(cprr, pprr):
 
 
 if __name__ == '__main__':
-    cprr = pd.read_csv(data_file_path(
+    cprr_20 = pd.read_csv(data_file_path(
         'match/cprr_lafayette_pd_2015_2020.csv'
+    ))
+    cprr_14 = pd.read_csv(data_file_path(
+        'match/cprr_lafayette_pd_2009_2014.csv'
     ))
     pprr = pd.read_csv(data_file_path(
         'clean/pprr_lafayette_pd_2010_2021.csv'
@@ -53,7 +66,7 @@ if __name__ == '__main__':
     post_events = pd.read_csv(data_file_path(
         'match/post_event_lafayette_pd_2020.csv'
     ))
-    events_df = fuse_events(cprr, pprr)
+    events_df = fuse_events(cprr_20, cprr_14, pprr)
     events_df = rearrange_event_columns(pd.concat([
         post_events,
         events_df
@@ -61,14 +74,20 @@ if __name__ == '__main__':
     ensure_uid_unique(events_df, 'event_uid', True)
     per = fuse_personnel(
         pprr,
-        cprr[['uid', 'first_name', 'last_name']],
-        cprr[['investigator_uid', 'investigator_first_name', 'investigator_last_name']].rename(columns={
+        cprr_20[['uid', 'first_name', 'last_name']],
+        cprr_20[['investigator_uid', 'investigator_first_name', 'investigator_last_name']].rename(columns={
+            'investigator_uid': 'uid',
+            'investigator_first_name': 'first_name',
+            'investigator_last_name': 'last_name',
+        }),
+        cprr_14[['uid', 'first_name', 'last_name']],
+        cprr_14[['investigator_uid', 'investigator_first_name', 'investigator_last_name']].rename(columns={
             'investigator_uid': 'uid',
             'investigator_first_name': 'first_name',
             'investigator_last_name': 'last_name',
         })
     )
-    com = rearrange_complaint_columns(cprr)
+    com = rearrange_complaint_columns(pd.concat([cprr_20, cprr_14]))
 
     ensure_data_dir('fuse')
     per.to_csv(data_file_path(
