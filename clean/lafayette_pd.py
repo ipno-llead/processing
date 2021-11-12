@@ -515,21 +515,21 @@ def extract_action_from_disposition_14(df):
 
 
 disposition_14_lookup = [
-    ['sustained; resigned', 'sustained/ nboc/resigned',
+    ['sustained; resigned', 'sustained/nboc/resigned',
      'sustained/resigned prior to termination', 'sustained/resigned',
-     'sustained/ resigned under invest.', 'terminated sust. resigned/', 'resigned sts.'],
+     'sustained/resigned under invest.', 'terminated sust. resigned/', 'resigned sts.'],
     ['unfounded', '/loc/sta rling- unfounded- crozier'],
     ['exonerated', 'exonorated'],
     ['justified', 'justified use of force', 'justified use of', 'justified/use of force'],
     ['not sustained; sustained', 'not sustained/anboc- sustained deficiency'],
     ['not sustained', '; not sustained- deroussel',
      'not sustained/ds- counseling form (ryan beard) unprofessional conduct'],
-    ['not sustained; resigned', 'not sustained/ resigned'],
-    ['sustained', 'sustained/ lor', 'sustained/loc', 'sustained/ training',
-     'ned fowler- sustained- cubo/ letter of repremaind gabe thompson- sustained- cubo/ counseling form'],
+    ['not sustained; resigned', 'not sustained/resigned'],
+    ['sustained', 'sustained/lor', 'sustained/loc', 'sustained/training',
+     'ned fowler- sustained- cubo/letter of repremaind gabe thompson- sustained- cubo/counseling form'],
     ['withdrawn'],
     ['no violation', 'no violation et', 'noviolation/close'],
-    ['resigned', '/ resigned'],
+    ['resigned', '/resigned'],
     ['retired', 'retired under investigation']]
 
 
@@ -537,6 +537,7 @@ def clean_disposition_14(df):
     df.loc[:, 'disposition'] = df.disposition.str.lower().str.strip().fillna('')\
         .str.replace(r'sus?tained ?\/? ?((.+)(\d+)(.+)| ?letter(.+)| ?coun(.+)| ?training(.+)|'
                      r' ?(.+)lor(.+)|performance(.+))', 'sustained', regex=True)\
+        .str.replace(r'\/ (\w+)', r'/\1', regex=True)\
         .str.replace('officer ', '', regex=False)
     return standardize_from_lookup_table(df, 'disposition', disposition_14_lookup)
 
@@ -678,6 +679,7 @@ def assign_correct_actions_14(df):
     df.loc[((df.last_name == 'thompson') & (df.tracking_number == '2012-010')), 'action'] = 'resigned'
     df.loc[((df.last_name == 'poiencot') & (df.tracking_number == '2012-010')), 'action'] = 'terminated'
     df.loc[((df.last_name == 'roberts') & (df.tracking_number == '2011-004')), 'action'] = 'resigned'
+    df.loc[((df.last_name == 'roberts') & (df.tracking_number == '2011-001')), 'action'] = 'resigned'
     df.loc[((df.last_name == 'bricker') & (df.tracking_number == '2011-007')), 'action'] = 'resigned'
     df.loc[((df.last_name == 'carter') & (df.tracking_number == '2010-011')), 'action'] = 'resigned'
     df.loc[((df.last_name == 'dartez') & (df.tracking_number == '2010-012')), 'action'] = 'resigned'
@@ -707,6 +709,7 @@ def assign_correct_disposition_14(df):
     df.loc[((df.last_name == 'thompson') & (df.tracking_number == '2012-010')), 'disposition'] = ''
     df.loc[((df.last_name == 'poiencot') & (df.tracking_number == '2012-010')), 'disposition'] = ''
     df.loc[((df.last_name == 'roberts') & (df.tracking_number == '2011-004')), 'disposition'] = 'sustained'
+    df.loc[((df.last_name == 'roberts') & (df.tracking_number == '2011-001')), 'disposition'] = 'sustained'
     df.loc[((df.last_name == 'bricker') & (df.tracking_number == '2011-007')), 'disposition'] = 'sustained'
     df.loc[((df.last_name == 'carter') & (df.tracking_number == '2010-011')), 'disposition'] = 'sustained'
     df.loc[((df.last_name == 'dartez') & (df.tracking_number == '2010-012')), 'disposition'] = 'sustained'
