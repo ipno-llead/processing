@@ -73,36 +73,15 @@ schemas:
         no_na: true
       - name: charge_uid
       - name: investigation_status
-      - name: assigned_unit
       - name: assigned_department
       - name: assigned_division
-      - name: assigned_sub_division_a
-      - name: assigned_sub_division_b
-      - name: traffic_stop
       - name: body_worn_camera_available
       - name: app_used
       - name: citizen_arrested
-      - name: allegation_finding
-        description: >
-          finding of an individual allegation
-        options:
-          - sustained
-          - exonerated
-          - illegitimate outcome
-          - counseling
-          - mediation
-          - not sustained
-          - unfounded
-          - no investigation merited
-          - pending
       - name: allegation
         description: >
           the same data that can be found in `paragraph_code` and `paragraph_violation`.
           In fact this column should be merged with the paragraph_ columns.
-      - name: allegation_class
-        description: >
-          the same data that can be found in `rule_code` and `rule_violation`. This should
-          eventually be merged with the code_ columns.
       - name: citizen
         description: >
           demographic info of the involved citizen
@@ -129,7 +108,6 @@ schemas:
         description: >
           `rule_*` and `paragraph_*` columns combined. Inputs that are too hard to parse and
           split into rule and paragraph will end up here.
-      - name: officer_years_of_service
       - name: complainant_name
         description: >
           redacted if the complainant isn't a police officer.
@@ -148,17 +126,9 @@ schemas:
           - native american
           - asian / pacific islander
           - mixed
-      - name: complainant_age
       - name: action
         description: >
           what (disciplinary) actions were taken regarding this complaint
-      # - name: data_production_year
-      #   description: >
-      #     the year of the original data. Usually it is the year number appear
-      #     in the original data file. Perhaps we don't need this column anymore (now
-      #     that there is the event tables).
-      #   integer: true
-      #   range: [1900, 2021]
       - name: agency
         description: >
           the police department the accused belong to.
@@ -173,7 +143,6 @@ schemas:
           be matched against one of the officers in the same department then this
           references the row with the same `uid` in personnel table.
       - name: supervisor_rank
-      - name: supervisor_name
       - name: badge_no
         description: accused's badge number during incident
       - name: department_code
@@ -183,7 +152,6 @@ schemas:
       - name: department_desc
         description: >
           text description of the department the accused belonged to during the incident.
-      - name: rank_code
       - name: rank_desc
         description: >
           text description of the accused's rank during the incident.
@@ -194,18 +162,6 @@ schemas:
       - name: investigator_uid
       - name: investigator_rank
       - name: shift_supervisor
-      - name: complaint_classificaiton
-    validation_tasks:
-      - name: if `allegation_finding` is "sustained" then `disposition` should also be "sustained"
-        warn_only: true
-        empty:
-          and:
-            - column: allegation_finding
-              op: equal
-              value: sustained
-            - column: disposition
-              op: not_equal
-              value: sustained
   event:
     columns:
       - name: event_uid
@@ -246,6 +202,7 @@ schemas:
           - uof_due
           - award_receive
           - award_recommended
+          - initial_action
         no_na: true
       - name: year
         integer: true
@@ -269,7 +226,6 @@ schemas:
         description: >
           appeal hearing unique identifier, references the `appeal_uid` column in
           app_*.csv files.
-      - name: resolution_uid
       - name: uof_uid
         description: >
           unique identifier for a use of force report, references the `uof_uid` column
@@ -337,8 +293,6 @@ schemas:
         description: >
           further description of the award
       - name: left_reason
-      - name: officer_contract_status
-      - name: time_active
     validation_tasks:
       - name: event dates should be valid
         valid_date:
@@ -434,15 +388,23 @@ schemas:
       - name: officer_division
       - name: officer_sub_division_a
       - name: officer_sub_division_b
-      # - name: data_production_year
-      #   description: >
-      #     the year of the original data. Usually it is the year number appear
-      #     in the original data file. Perhaps we don't need this column anymore (now
-      #     that there is the event tables).
-      #   integer: true
-      #   range: [1900, 2021]
       - name: agency
         description: >
           the police department this report originate from.
+  appeal_hearing:
+    columns:
+      - name: appeal_uid
+        description: unique per docket_no and uid
+      - name: resolution_uid
+        description: unique per appeal_uid, hearing_date and resolution
+      - name: docket_no
+      - name: uid
+      - name: counsel
+      - name: charging_supervisor
+      - name: resolution
+      - name: action
+      - name: delay
+      - name: appealed
+      - name: agency
 
 save_bad_rows_to: invalid_rows.csv
