@@ -1,4 +1,5 @@
 import pandas as pd
+from pandas.io.parsers import read_csv
 from lib.clean import clean_datetimes, float_to_int_str, standardize_desc_cols, clean_races
 from lib.path import data_file_path
 from lib.columns import clean_column_names
@@ -146,42 +147,27 @@ def clean_assigned_department(df):
 
 
 def consolidate_name_and_badge_columns(df):
-    df.loc[:, 'officer1badgenumber'] = df.officer1badgenumber.astype(str)\
+    df.loc[:, 'officer1badgenumber'] = df.officer1badgenumber.fillna('').astype(str)\
         .str.replace(r'^(\w+)$', r'(\1)', regex=True)
-    df.loc[:, 'officer2badgenumber'] = df.officer2badgenumber.astype(str)\
+    df.loc[:, 'officer2badgenumber'] = df.officer2badgenumber.fillna('').astype(str)\
         .str.replace(r'^(\w+)\.(\w+)$', r'(\1)', regex=True)
 
     df.loc[:, 'officer1name'] = df.officer1name.str.cat(df.officer1badgenumber, sep=' ')
-    df.loc[:, 'officer2name'] = df.officer2name.str.cat(df.officer2badgenumber, sep=' ')
+    df.loc[:, 'officer2name'] = df.officer2name.fillna('').str.cat(df.officer2badgenumber, sep=' ')
 
-    df.loc[:, 'officer_names_and_badges'] = df.officer1name.str.cat(df.officer2name, sep='/')
-    return df
+    df.loc[:, 'officer_names_and_badges'] = df.officer1name + '/' + df.officer2name
+    df.loc[:, 'officer_names_and_badges'] = df.officer_names_and_badges.str.lower().str.strip()\
+        .str.replace(r'\/$', '', regex=True)\
+        .str.replace(r'(\w+)\/(\w+) ', r'\1.\2', regex=True)
+    return df.drop(columns=['officer1badgenumber', 'officer2badgenumber', 'officer1name', 'officer2name'])
 
 
 def split_rows_with_multiple_officers(df):
-    i = 0
-    for idx in df[df.officer_names_and_badges.fillna('').str.contains('/')].index:
-        s = df.loc[idx + i, 'officer_names_and_badges']
-        parts = re.split(r"\s*(?:\/)\s*", s)
-        df = duplicate_row(df, idx + i, len(parts))
-        for j, name in enumerate(parts):
-            df.loc[idx + i + j, 'officer_names_and_badges'] = name
-        i += len(parts) - 1
-    return df
-
-
-def extract_badge_number(df):
-    badges = df.officer_names_and_badges.str.extract(r'\(\w+)\)')
-    df.loc[:, 'badge_number'] = badges[0]\
-        .str.replace(r'\(|\)', '', regex=True)
-    return df
-
-
-def extract_rank_desc(df):
-    return df
-
-
-def split_names(df):
+    df = df.drop('officer_names_and_badges', axis=1).join(df['officer_names_and_badges']\
+        .str.split('/', expand=True)\
+        .stack()\
+        .reset_index(level=1, drop=True).rename('officer_names_and_badges'))\
+        .reset_index(drop=True)
     return df
 
 
@@ -212,8 +198,6 @@ def clean():
         .pipe(clean_races, [
             'citizen_race'
         ])\
-        .pipe(consolidate_name_and_badge_columns)\
-        .pipe(split_rows_with_multiple_officers)\
         .pipe(clean_citizen_gender)\
         .pipe(clean_citizen_eye_color)\
         .pipe(clean_citizen_driver_license_state)\
@@ -230,6 +214,8 @@ def clean():
         .pipe(extract_consent_form_column)\
         .pipe(extract_search_types_column)\
         .pipe(extract_exit_vehicle_column)\
+        .pipe(consolidate_name_and_badge_columns)\
+        .pipe(split_rows_with_multiple_officers)\
         .pipe(clean_datetimes, [
             'stop_and_search_datetime'
         ])\
