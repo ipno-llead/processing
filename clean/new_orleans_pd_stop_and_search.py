@@ -163,11 +163,11 @@ def consolidate_name_and_badge_columns(df):
 
 
 def split_rows_with_multiple_officers(df):
-    df = df.drop('officer_names_and_badges', axis=1).join(df['officer_names_and_badges']\
-        .str.split('/', expand=True)\
-        .stack()\
-        .reset_index(level=1, drop=True).rename('officer_names_and_badges'))\
-        .reset_index(drop=True)
+    df = df.drop('officer_names_and_badges', axis=1)\
+        .join(df['officer_names_and_badges']
+              .str.split('/', expand=True).stack()
+              .reset_index(level=1, drop=True)
+              .rename('officer_names_and_badges'), how='outer').reset_index(drop=True)
     return df
 
 
