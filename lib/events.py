@@ -46,6 +46,8 @@ UOF_DUE = "uof_due"
 AWARD_RECEIVE = "award_receive"
 AWARD_RECOMMENDED = "award_recommended"
 
+STOP_AND_SEARCH = 'stop_and_search'  # date on which stop and search occured
+
 event_cat_type = CategoricalDtype(categories=[
     OFFICER_LEVEL_1_CERT,
     OFFICER_PC_12_QUALIFICATION,
@@ -77,6 +79,7 @@ event_cat_type = CategoricalDtype(categories=[
     AWARD_RECOMMENDED,
     OFFICER_POST_DECERTIFICATION,
     INITIAL_ACTION,
+    STOP_AND_SEARCH,
 ], ordered=True)
 
 

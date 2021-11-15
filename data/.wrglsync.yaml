@@ -184,6 +184,10 @@ repos:
     fileName: fuse/uof_new_orleans_pd.csv
     primaryKey:
       - uof_uid
+  sas-new-orleans-pd:
+    fileName: fuse/sas_new_orleans_pd.csv
+    primaryKey:
+      - stop_and_search_uid
   app-baton-rouge-pd:
     fileName: fuse/app_baton_rouge_pd.csv
     primaryKey:
@@ -480,6 +484,10 @@ repos:
     fileName: fuse/use_of_force.csv
     primaryKey:
       - uof_uid
+  stop-and-search:
+    fileName: fuse/stop_and_search.csv
+    primaryKey:
+      - stop_and_search_uid
   baton-rouge-da-brady-list:
     fileName: match/cprr_baton_rouge_da_2021.csv
   new-orleans-da-brady-list:

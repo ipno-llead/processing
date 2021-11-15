@@ -1,11 +1,8 @@
 import pandas as pd
-from pandas.io.parsers import read_csv
 from lib.clean import clean_datetimes, float_to_int_str, standardize_desc_cols, clean_races
 from lib.path import data_file_path
-from lib.columns import clean_column_names
-from lib.path import data_file_path
-from lib.rows import duplicate_row
-import re
+from lib.columns import clean_column_names, set_values
+from lib.uid import gen_uid
 
 
 def clean_citizen_gender(df):
@@ -155,10 +152,10 @@ def consolidate_name_and_badge_columns(df):
     df.loc[:, 'officer1name'] = df.officer1name.str.cat(df.officer1badgenumber, sep=' ')
     df.loc[:, 'officer2name'] = df.officer2name.fillna('').str.cat(df.officer2badgenumber, sep=' ')
 
-    df.loc[:, 'officer_names_and_badges'] = df.officer1name + '/' + df.officer2name
+    df.loc[:, 'officer_names_and_badges'] = df.officer1name.str.cat(df.officer2name, sep='/')
     df.loc[:, 'officer_names_and_badges'] = df.officer_names_and_badges.str.lower().str.strip()\
         .str.replace(r'\/$', '', regex=True)\
-        .str.replace(r'(\w+)\/(\w+) ', r'\1.\2', regex=True)
+        .str.replace(r'(\w+) \/ ?(.+)', r'\1/\2', regex=True)
     return df.drop(columns=['officer1badgenumber', 'officer2badgenumber', 'officer1name', 'officer2name'])
 
 
@@ -169,6 +166,42 @@ def split_rows_with_multiple_officers(df):
               .reset_index(level=1, drop=True)
               .rename('officer_names_and_badges'), how='outer').reset_index(drop=True)
     return df
+
+
+def split_names_and_extract_rank_badge(df):
+    df.loc[:, 'officer_names_and_badges'] = df.officer_names_and_badges\
+        .str.replace(r'^p\.o\.?(\w+)', r'p.o \1', regex=True)\
+        .str.replace(r'^(\w+)\, (\w+) \((\w+)\)$', r'\2 \1 (\3)', regex=True)\
+        .str.replace(r'(\w+)\,(\w+)', r'\2 \1', regex=True)\
+        .str.replace(r'\.', '', regex=True)\
+        .str.replace(r'^\((\w+)\)$', '', regex=True)\
+        .str.replace(r'  +', ' ', regex=True)\
+        .str.replace(r'cmdr\.?', 'commander', regex=True).str.replace(r'sgt\.?', 'sergeant', regex=True)\
+        .str.replace(r'det\.?', 'detective', regex=True).str.replace(r'capt\.?', 'captain', regex=True)\
+        .str.replace(r'^po ?(i|iii|iv|1|2|3)? ', 'officer ', regex=True).str.replace(r'lt\.?', 'lieutenant', regex=True)\
+        .str.replace(r'^tperez \((\w+)\)$', r't perez (\1)', regex=True)\
+        .str.replace(r'^mgennaro \((\w+)\)$', r'm gennaro (\1)', regex=True)\
+        .str.replace(r'^kdoucette \((\w+)\)$', r'k doucette (\1)', regex=True)\
+        .str.replace(r'^tmurray \((\w+)\)$', r't murray (\1)', regex=True)\
+        .str.replace(r'(\w+)\,? (\w{2}) \((\w+)\)$', r'\1 (\3) \2', regex=True)\
+        .str.replace(r'\]', '', regex=True)\
+        .str.replace('reginaldcook', 'reginald cook', regex=False)\
+        .str.replace('simmons751', 'simmons', regex=False)\
+        .str.replace(r'^ghill', r'g hill', regex=True)\
+        .str.replace(r'kdunnaway \((\w+)\)$', r'k dunnaway (\1)', regex=True)\
+        .str.replace(r'jwalker \((\w+)\)$', r'j walker (\1)', regex=True)
+
+    names = df.officer_names_and_badges.str.extract(r'^(?:(commander|officer|sergeant|captain|detective|lieutenant))? '
+                                                    r'?(?:(\w+) )?(?:(\w+) )?(?:(\w+\-?\w+?) )\((\w+)\) ?(.+)?$')
+    df.loc[:, 'rank_desc'] = names[0].fillna('')
+    df.loc[:, 'first_name'] = names[1].fillna('')
+    df.loc[:, 'middle_name'] = names[2].fillna('')
+    df.loc[:, 'last_name'] = names[3].fillna('')
+    df.loc[:, 'suffix'] = names[5].fillna('')
+    df.loc[:, 'badge_number'] = names[4]\
+        .str.replace(r'\(|\)', '', regex=True)
+    df.loc[:, 'last_name'] = df.last_name.str.cat(df.suffix, sep=' ')
+    return df.drop(columns=['suffix', 'officer_names_and_badges'])
 
 
 def clean():
@@ -216,6 +249,7 @@ def clean():
         .pipe(extract_exit_vehicle_column)\
         .pipe(consolidate_name_and_badge_columns)\
         .pipe(split_rows_with_multiple_officers)\
+        .pipe(split_names_and_extract_rank_badge)\
         .pipe(clean_datetimes, [
             'stop_and_search_datetime'
         ])\
@@ -227,10 +261,15 @@ def clean():
         .pipe(float_to_int_str, [
             'citizen_height', 'citizen_weight', 'citizen_hair_color',
             'vehicle_year', 'zip_code'
-        ])
+        ])\
+        .pipe(set_values, {
+            'agency': 'New Orleans PD'
+        })\
+        .pipe(gen_uid, ['agency', 'first_name', 'middle_name', 'last_name'])\
+        .pipe(gen_uid, ['uid', 'stop_and_search_interview_id', 'citizen_id', 'stop_reason'], 'stop_and_search_uid')
     return df
 
 
 if __name__ == '__main__':
     df = clean()
-    df.to_csv(data_file_path('clean/stop_and_search_new_orleans_pd_2007_2021.csv'), index=False)
+    df.to_csv(data_file_path('clean/sas_new_orleans_pd_2017_2021.csv'), index=False)

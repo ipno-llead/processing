@@ -1,7 +1,7 @@
 import pandas as pd
 from lib.path import data_file_path
 from lib.columns import (
-    rearrange_personnel_columns, rearrange_event_columns, rearrange_complaint_columns, rearrange_use_of_force
+    rearrange_personnel_columns, rearrange_event_columns, rearrange_complaint_columns, rearrange_stop_and_search_columns, rearrange_use_of_force
 )
 from lib.uid import ensure_uid_unique
 import sys
@@ -122,6 +122,12 @@ def fuse_use_of_force():
     ])).sort_values(['agency', 'data_production_year', 'uof_tracking_number'])
 
 
+def fuse_stop_and_search():
+    return rearrange_stop_and_search_columns(pd.concat([
+        pd.read_csv(data_file_path("fuse/sas_new_orleans_pd.csv"),)
+    ])).sort_values(['agency', 'stop_and_search_uid'])
+
+
 if __name__ == "__main__":
     per_df = fuse_personnel()
     ensure_uid_unique(per_df, 'uid')
@@ -132,7 +138,9 @@ if __name__ == "__main__":
     com_df.loc[:, 'allegation_uid'] = ''
     uof_df = fuse_use_of_force()
     ensure_uid_unique(uof_df, 'uof_uid')
+    sas_df = fuse_stop_and_search()
     per_df.to_csv(data_file_path("fuse/personnel.csv"), index=False)
     event_df.to_csv(data_file_path("fuse/event.csv"), index=False)
     com_df.to_csv(data_file_path("fuse/complaint.csv"), index=False)
     uof_df.to_csv(data_file_path('fuse/use_of_force.csv'), index=False)
+    sas_df.to_csv(data_file_path('fuse/stop_and_search.csv'), index=False)
