@@ -118,16 +118,44 @@ def match_pprr_csd_to_pprr_ipm(pprr_csd, pprr_ipm):
     return pprr_csd
 
 
+def match_stop_and_search_to_pprr(sas, pprr_ipm):
+    dfa = sas[['uid', 'first_name', 'last_name']]
+    dfa.loc[:, 'fc'] = dfa.first_name.fillna('').map(lambda x: x[:1])
+    dfa.loc[:, 'lc'] = dfa.last_name.fillna('').map(lambda x: x[:1])
+    dfa = dfa.drop_duplicates(subset=['uid']).set_index('uid')
+
+    dfb = pprr_ipm[['uid', 'first_name', 'last_name']]
+    dfb.loc[:, 'fc'] = dfb.first_name.fillna('').map(lambda x: x[:1])
+    dfb.loc[:, 'lc'] = dfb.last_name.fillna('').map(lambda x: x[:1])
+    dfb = dfb.drop_duplicates(subset=['uid']).set_index('uid')
+
+    matcher = ThresholdMatcher(ColumnsIndex(['fc', 'lc']), {
+        'first_name': JaroWinklerSimilarity(),
+        'last_name': JaroWinklerSimilarity(),
+    }, dfa, dfb, show_progress=True)
+    decision = .95
+
+    matcher.save_pairs_to_excel(data_file_path(
+        'match/stop_and_search_new_orleans_pd_v_pprr_new_orleans_pd_1946_2018.xlsx'), decision)
+    matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
+    match_dict = dict(matches)
+
+    sas.loc[:, 'uid'] = sas.uid.map(lambda x: match_dict.get(x, x))
+    return sas
+
+
 if __name__ == '__main__':
     pprr_ipm = pd.read_csv(data_file_path('clean/pprr_new_orleans_ipm_iapro_1946_2018.csv'))
     pprr_csd = pd.read_csv(data_file_path('clean/pprr_new_orleans_csd_2014.csv'))
     post = pd.read_csv(data_file_path('clean/pprr_post_2020_11_06.csv'))
     award = pd.read_csv(data_file_path('clean/award_new_orleans_pd_2016_2021.csv'))
     lprr = pd.read_csv(data_file_path('clean/lprr_new_orleans_csc_2000_2016.csv'))
+    sas = pd.read_csv(data_file_path('clean/sas_new_orleans_pd_2017_2021.csv'))
     post = post[post.agency == 'new orleans pd'].reset_index(drop=True)
     event_df = match_pprr_against_post(pprr_ipm, post)
     award = match_award_to_pprr_ipm(award, pprr_ipm)
     lprr = match_lprr_to_pprr_ipm(lprr, pprr_ipm)
+    sas = match_stop_and_search_to_pprr(sas, pprr_ipm)
     pprr_csd_matched_with_ipm = match_pprr_csd_to_pprr_ipm(pprr_csd, pprr_ipm)
     award.to_csv(data_file_path(
         'match/award_new_orleans_pd_2016_2021.csv'), index=False)
@@ -137,3 +165,5 @@ if __name__ == '__main__':
         'match/lprr_new_orleans_csc_2000_2016.csv'), index=False)
     pprr_csd_matched_with_ipm.to_csv(data_file_path(
         'match/pprr_new_orleans_csd_2014.csv'), index=False)
+    sas.to_csv(data_file_path(
+        'match/sas_new_orleans_pd_2017_2021.csv'), index=False)

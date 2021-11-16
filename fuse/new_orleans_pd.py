@@ -1,7 +1,9 @@
 import pandas as pd
 from lib.path import data_file_path
 from lib.columns import (
-    rearrange_appeal_hearing_columns, rearrange_complaint_columns,
+    rearrange_appeal_hearing_columns,
+    rearrange_complaint_columns,
+    rearrange_stop_and_search_columns,
     rearrange_use_of_force, rearrange_event_columns)
 from lib.clean import float_to_int_str
 from lib.personnel import fuse_personnel
@@ -38,7 +40,7 @@ def fuse_use_of_force(uof, officer_number_dict):
     return rearrange_use_of_force(uof)
 
 
-def fuse_events(pprr_ipm, pprr_csd, cprr, uof, award, lprr):
+def fuse_events(pprr_ipm, pprr_csd, cprr, uof, award, lprr, sas):
     builder = events.Builder()
     builder.extract_events(pprr_ipm, {
         events.OFFICER_HIRE: {
@@ -99,6 +101,12 @@ def fuse_events(pprr_ipm, pprr_csd, cprr, uof, award, lprr):
             'keep': ['uid', 'agency', 'appeal_uid']
         }
     }, ['uid', 'appeal_uid'])
+    builder.extract_events(sas, {
+        events.STOP_AND_SEARCH: {
+            'prefix': 'stop_and_search',
+            'keep': ['uid', 'agency', 'stop_and_search_uid']
+        }
+    }, ['uid', 'stop_and_search_uid'])
     return builder.to_frame(True)
 
 
@@ -127,15 +135,19 @@ if __name__ == "__main__":
     lprr = pd.read_csv(data_file_path(
         'match/lprr_new_orleans_csc_2000_2016.csv'
     ))
+    sas = pd.read_csv(data_file_path(
+        'match/sas_new_orleans_pd_2017_2021.csv'
+    ))
     complaints = fuse_cprr(cprr, actions, officer_number_dict)
     ensure_uid_unique(complaints, 'complaint_uid', output_csv=True)
     use_of_force = fuse_use_of_force(uof, officer_number_dict)
-    personnel = fuse_personnel(pprr_ipm, lprr, pprr_csd)
-    events_df = fuse_events(pprr_ipm, pprr_csd, cprr, uof, award, lprr)
+    personnel = fuse_personnel(pprr_ipm, lprr, pprr_csd, sas)
+    events_df = fuse_events(pprr_ipm, pprr_csd, cprr, uof, award, lprr, sas)
     events_df = rearrange_event_columns(pd.concat([
         post_event,
         events_df
     ]))
+    sas_df = rearrange_stop_and_search_columns(sas)
     lprr_df = rearrange_appeal_hearing_columns(lprr)
     complaints.to_csv(data_file_path(
         'fuse/com_new_orleans_pd.csv'), index=False)
@@ -147,3 +159,5 @@ if __name__ == "__main__":
         'fuse/event_new_orleans_pd.csv'), index=False)
     lprr_df.to_csv(data_file_path(
         'fuse/app_new_orleans_csc.csv'), index=False)
+    sas_df.to_csv(data_file_path(
+        'fuse/sas_new_orleans_pd.csv'), index=False)

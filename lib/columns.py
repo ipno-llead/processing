@@ -184,6 +184,56 @@ EVENT_COLUMNS = [
     "time_active"
 ]
 
+STOP_AND_SEARCH_COLUMNS = [
+    'stop_and_search_uid',
+    'stop_and_search_interview_id',
+    'stop_and_search_interview_id_2',
+    'item_number',
+    'id',
+    'district',
+    'zone',
+    'stop_reason',
+    'vehicle_year',
+    'vehicle_make',
+    'vehicle_model',
+    'vehicle_style',
+    'vehicle_color',
+    'vehicle_number',
+    'citizen_id',
+    'citizen_race',
+    'citizen_height',
+    'citizen_weight',
+    'citizen_hair_color',
+    'citizen_gender',
+    'citizen_eye_color',
+    'citizen_driver_license_state',
+    'zip_code',
+    'stop_and_search_location',
+    'assigned_district',
+    'assigned_department',
+    'stop_results',
+    'subject_type',
+    'search_occurred',
+    'evidence_seized',
+    'evidence_types',
+    'strip_body_cavity_search',
+    'legal_basis',
+    'consent_to_search',
+    'consent_form_completed',
+    'search_types', 'exit_vehicle',
+    'rank_desc',
+    'first_name',
+    'middle_name',
+    'last_name',
+    'badge_number',
+    'stop_and_search_year',
+    'stop_and_search_month',
+    'stop_and_search_day',
+    'stop_and_search_time',
+    'agency',
+    'uid'
+]
+
 
 def clean_column_names(df: pd.DataFrame) -> pd.DataFrame:
     """Removes unnamed columns and convert column names to snake case
@@ -359,3 +409,28 @@ def rearrange_use_of_force(df):
             'citizen_age', 'citizen_age_1', 'officer_current_supervisor', 'officer_age',
             'officer_years_exp', 'officer_years_with_unit'
         ]).sort_values(['agency', 'uof_uid'])
+
+
+def rearrange_stop_and_search_columns(df):
+    """Performs final processing step for a stop and search table
+
+    This performs the following tasks:
+    - discard columns not present in STOP_AND_SEARCH_COLUMNS
+    - drop row duplicates
+    - convert numeric columns to int or str
+
+    Args:
+        df (pd.DataFrame):
+            the frame to process
+
+    Returns:
+        the updated frame
+    """
+    existing_cols = set(df.columns)
+    df = df[df.uid.notna() & (df.uid != '')]
+    df = df[[col for col in STOP_AND_SEARCH_COLUMNS if col in existing_cols]]\
+        .drop_duplicates(ignore_index=True)
+    return df\
+        .pipe(names_to_title_case, ["first_name", "last_name", "middle_name"])\
+        .pipe(float_to_int_str, ["stop_and_search_year", "stop_and_search_month", "stop_and_search_day"])\
+        .sort_values(['agency', 'stop_and_search_uid'])
