@@ -5,6 +5,7 @@ from lib.clean import (
 )
 from lib.uid import gen_uid
 import pandas as pd
+import numpy as np
 import sys
 sys.path.append('../')
 
@@ -31,6 +32,12 @@ def add_occur_time(df):
 def assign_agency(df):
     df.loc[:, 'data_production_year'] = 2019
     df.loc[:, 'agency'] = 'New Orleans PD'
+    return df
+
+
+def discard_negative_officer_years_exp(df):
+    df.loc[df.officer_years_exp < 0, 'officer_years_exp'] = np.NaN
+    df.loc[df.officer_years_with_unit < 0, 'officer_years_with_unit'] = np.NaN
     return df
 
 
@@ -71,6 +78,7 @@ def clean():
         'officer_sex', 'officer_race', 'incident_type'
     ])
     return df\
+        .pipe(discard_negative_officer_years_exp)\
         .pipe(float_to_int_str, [
             'officer_primary_key', 'occur_hour', 'citizen_primary_key', 'citizen_age', 'citizen_age_1',
             'officer_current_supervisor', 'officer_age', 'officer_years_exp', 'officer_years_with_unit'
