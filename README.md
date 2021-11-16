@@ -81,6 +81,34 @@ Each major step above should output CSV files which can then be saved in a versi
   - **csd**: Civil Service Department
   - **csc**: Civil Service Commission
 
+## Extract tables from PDFs with Form Recognizer
+
+This repository proposes a workflow and some utilty scripts to help extracting tables with [Azure From Recognizer](https://azure.microsoft.com/en-us/services/form-recognizer/). There are 2 workflows:
+
+### For simple table extraction
+
+You can simply use one of FR's prebuilt model, specifically the [Layout model](https://docs.microsoft.com/en-us/azure/applied-ai-services/form-recognizer/concept-layout). Just use the web-based FormRecognizerStudio to upload documents and extract data. If there are too many pages to extract manually, we can add the ability to automate extraction from prebuilt models to `scripts/extract_tables_from_doc.py`.
+
+### For complex table extraction
+
+You need to train a custom model and use that model to extract data. Follow these steps:
+
+1. Create a `.env` file (see [python-dotenv](https://pypi.org/project/python-dotenv/) to learn the syntax) at the root directory of this repository with the following environment variable:
+   - `FORM_RECOGNIZER_ENDPOINT`: follow [these instruction](https://docs.microsoft.com/en-us/azure/applied-ai-services/form-recognizer/quickstarts/try-v3-python-sdk#prerequisites) to get endpoint and key for a Form Recognizer resource.
+   - `FORM_RECOGNIZER_KEY`: see above.
+   - `BLOB_STORAGE_CONNECTION_STRING`: create an Azure storage account to store training data and follow this [guide](https://docs.microsoft.com/en-us/azure/storage/common/storage-configure-connection-string) to get the connection string.
+   - `FORM_RECOGNIZER_CONTAINER`: create a container in the same storage account and put the name here. It will contain all training data.
+2. Split the source PDF into individual pages with `scripts/split_pdf.py`. Upload those pages to a folder (preferably with the same name as the original PDF file) in the training container. Learn more [here](https://docs.microsoft.com/en-us/azure/applied-ai-services/form-recognizer/quickstarts/try-v3-form-recognizer-studio#additional-steps-for-custom-projects).
+3. Log-in to FormRecognizerStudio (FRS) and follow this [guide](https://docs.microsoft.com/en-us/azure/applied-ai-services/form-recognizer/supervised-table-tags) to tag tables. FRS does not have any way to insert or remove arbitrary row so if you make a mistake while tagging, you might have to start from scratch. Luckily we have the script `scripts/edit_fr_table.py` to remove and insert rows. E.g.
+   ```bash
+   scripts/edit_fr_table.py st-tammany-booking-log-2020/0009.pdf charges insertRow 1 2
+   ```
+4. Test and provide more training data until the model perform sufficiently well.
+5. Extract tables with the custom model using `scripts/extract_tables_from_doc.py`. E.g.
+   ```bash
+   scripts/extract_tables_from_doc.py https://www.dropbox.com/s/9zmpmhrhtashq2o/st_tammany_booking_log_2020.pdf\?dl\=1 tables/st_tammany_booking_log_2020 --end-page 839 --model-id labeled_11 --batch-size 1
+   ```
+
 ## Run tests
 
 ```bash

@@ -146,4 +146,4 @@ if __name__ == "__main__":
     events_df.to_csv(data_file_path(
         'fuse/event_new_orleans_pd.csv'), index=False)
     lprr_df.to_csv(data_file_path(
-        'fuse/lprr_new_orleans_csc.csv'), index=False)
+        'fuse/app_new_orleans_csc.csv'), index=False)
