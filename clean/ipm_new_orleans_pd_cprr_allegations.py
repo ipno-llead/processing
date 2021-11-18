@@ -62,35 +62,35 @@ def clean_complainant_type(df):
     return df.drop(columns='source')
 
 
-def clean_charges(df):
-    df.loc[:, 'charges'] = df.allegation.str.lower().str.strip()\
+def clean_allegation(df):
+    df.loc[:, 'allegation'] = df.allegation.str.lower().str.strip()\
         .str.replace('no violation was observed to have been committed by officer/employee',
                      '', regex=False)\
         .str.replace(r'social networking(.+)', 'social networking', regex=True)\
-        .str.replace(r'(\d+)-(\w+)', r'\1 - \2', regex=True)\
+        .str.replace(r'(\d+) ?\- ?(\w+)', r'\1: \2', regex=True)\
         .str.replace(r'(\w+) / (\w+)', r'\1/\2', regex=True)\
         .str.replace(r'n\.o\.', 'new orleans', regex=True)\
         .str.replace(r'para\.', 'paragraph', regex=True)\
         .str.replace('equipment', 'property', regex=False)\
-        .str.replace('paragraph 03 - cleanliness of department property',
-                     'paragraph 03 - cleanliness of department vehicles', regex=False)\
+        .str.replace('paragraph 03: cleanliness of department property',
+                     'paragraph 03: cleanliness of department vehicles', regex=False)\
         .str.replace('paragraph 02 - authorized operator of department property',
-                     'paragraph 02 - authorized operator of department vehicle', regex=False)\
+                     'paragraph 02: authorized operator of department vehicle', regex=False)\
         .str.replace('paragraph 14 - social networking',
-                     'paragraph 13 - social networking', regex=False)\
+                     'paragraph 13: social networking', regex=False)\
         .str.replace('paragraph 04,05 - accepting, giving anything of value',
-                     'paragraph 04 - accepting, giving anything of value', regex=False)\
+                     'paragraph 04: accepting, giving anything of value', regex=False)\
         .str.replace('paragraph 11 - interfering with investigations',
-                     'paragraph 13 - interfering with investigations', regex=False)\
+                     'paragraph 13: interfering with investigations', regex=False)\
         .str.replace('no violation was observed to have been committed by officer/employee',
                      '', regex=False)\
         .str.replace('from authoritative', 'from an authoritative', regex=False)\
         .str.replace(r'paragraph 09 - use of alcohol/(drugs)? ?on-?duty',
-                     'paragraph 08 - use of alcohol/drugs on duty', regex=True)\
+                     'paragraph 08: use of alcohol/drugs on duty', regex=True)\
         .str.replace(r'(paragraph 10 - use of alcohol/drugs offduty|paragraph 10 - use of alcohol/off-duty)',
-                     'paragraph 09 - use of alcohol/drugs off duty', regex=True)\
+                     'paragraph 09: use of alcohol/drugs off duty', regex=True)\
         .str.replace('paragraph 08 - use of drugs/substance abuse testing',
-                     'paragraph 07 - use of drugs/substance abuse testing', regex=False)\
+                     'paragraph 07: use of drugs/substance abuse testing', regex=False)\
         .str.replace('defendent', 'defendant', regex=False)\
         .str.replace(r'\b(\d{1})\b', r'0\1', regex=True)\
         .str.replace(r'end of shift$', 'end of period of duty', regex=True)\
@@ -98,50 +98,50 @@ def clean_charges(df):
         .str.replace(r'(\w+)-duty', r'\1 duty', regex=True)\
         .str.replace('to wit paragraph 01 and paragraph 08',
                      'to wit paragraph 01; paragraph 08', regex=False)\
-        .str.replace(r'paragraph (\d+) (\w+)', r'paragraph \1 - \2', regex=True)\
-        .str.replace(r'paragraph 12,?1?3? - use of t[oa]bacco', 'paragraph 11 - use of tobacco', regex=True)\
-        .str.replace(r'(^paragraph 02 - abuse of position$|^paragraph 01 - professionalism$|'
-                     r'paragraph 09 - use of alcohol/drugs off duty| paragraph 01 - professionalism|'
-                     r'paragraph 03 - neatness and attire|paragraph 04 - accepting, giving anything of value|'
-                     r'paragraph 05 - referrals|paragraph 06 - commercial endorsement|'
-                     r'paragraph 07 - use of drugs/substance abuse testing|'
-                     r'paragraph 08 - use of alcohol/drugs on duty|paragraph 10 - alcohol/drugs influence test|'
-                     r'paragraph 11 - use of t[ao]bacco|paragraph 12 - retaliation|paragraph 13 - social networking)',
+        .str.replace(r'paragraph (\d+) (\w+)', r'paragraph \1: \2', regex=True)\
+        .str.replace(r'paragraph 12,?1?3? - use of t[oa]bacco', 'paragraph 11: use of tobacco', regex=True)\
+        .str.replace(r'(^paragraph 02: abuse of position$|^paragraph 01: professionalism$|'
+                     r'paragraph 09: use of alcohol/drugs off duty| paragraph 01: professionalism|'
+                     r'paragraph 03: neatness and attire|paragraph 04: accepting, giving anything of value|'
+                     r'paragraph 05: referrals|paragraph 06: commercial endorsement|'
+                     r'paragraph 07: use of drugs/substance abuse testing|'
+                     r'paragraph 08: use of alcohol/drugs on duty|paragraph 10: alcohol/drugs influence test|'
+                     r'paragraph 11: use of t[ao]bacco|paragraph 12: retaliation|paragraph 13: social networking)',
                      r'rule 03: moral conduct; \1', regex=True)\
-        .str.replace(r'(paragraph 01 - adherence to law|paragraph 02 - courtesy|'
-                     r'paragraph 03 - honesty and truthfulness|paragraph 04 - discrimination|'
-                     r'paragraph 05 - verbal intimidation|paragraph 06 - u?n?authorized force|'
-                     r'paragraph 07 - courage|paragraph 08 - failure to report misconduct|'
-                     r'paragraph 09 - failure to cooperate/withholding information)',
+        .str.replace(r'(paragraph 01: adherence to law|paragraph 02: courtesy|'
+                     r'paragraph 03: honesty and truthfulness|paragraph 04: discrimination|'
+                     r'paragraph 05: verbal intimidation|paragraph 06: u?n?authorized force|'
+                     r'paragraph 07: courage|paragraph 08: failure to report misconduct|'
+                     r'paragraph 09: failure to cooperate/withholding information)',
                      r'rule 02: moral conduct; \1', regex=True)\
-        .str.replace(r'(paragraph 01 - reporting for duty|paragraph 02 - instructions from an authoritative source|'
-                     r'paragraph 03 - devoting entire time to duty|paragraph 04 - neglect of duty|'
-                     r'paragraph 05 - ceasing to perform before end of period of duty|'
-                     r'paragraph 06 - leaving assigned area|paragraph 07 - leaving city on duty|'
-                     r'paragraph 08 - hours of duty|paragraph 09 - safekeeping of valuables by police department|'
-                     r'paragraph 10 - escort for valuables or money)',
+        .str.replace(r'(paragraph 01: reporting for duty|paragraph 02: instructions from an authoritative source|'
+                     r'paragraph 03: devoting entire time to duty|paragraph 04: neglect of duty|'
+                     r'paragraph 05: ceasing to perform before end of period of duty|'
+                     r'paragraph 06: leaving assigned area|paragraph 07: leaving city on duty|'
+                     r'paragraph 08: hours of duty|paragraph 09: safekeeping of valuables by police department|'
+                     r'paragraph 10: escort for valuables or money)',
                      r'rule 04: performance of duty; \1', regex=True)\
-        .str.replace(r'(paragraph 01 - fictitious illness or injury|paragraph 02 - associations|'
-                     r'paragraph 03 - visiting prohibited establishments|paragraph 04 - subversive activities|'
+        .str.replace(r'(paragraph 01: fictitious illness or injury|paragraph 02: associations|'
+                     r'paragraph 03: visiting prohibited establishments|paragraph 04: subversive activities|'
                      r'paragraph 05 - labor activity|paragraph 06 - acting in civil matters|'
-                     r'paragraph 07 - acting impartially|paragraph 08 - civil actions involving members|'
-                     r'paragraph 09 - criminal proceeding against member|'
-                     r'paragraph 10 - testifying on behalf of defendant\(s\)|'
-                     r'paragraph 11 - tracking of actions by pib|paragraph 12 - disposition documentation|'
-                     r'paragraph 13 - interfering with investigations|paragraph 14 - undercover investigations|'
-                     r'paragraph 15 - rewards)', r'rule 05: restricted activities; \1', regex=True)\
-        .str.replace(r'(paragraph 01 - security of records|paragraph 02 - false or inaccurate reports|'
-                     r'paragraph 03 - public statement and appearances|paragraph 04 - citizens report complaint|'
-                     r'paragraph 05 - informants|paragraph 06 - confidentiality of internal investigations)',
+                     r'paragraph 07: acting impartially|paragraph 08: civil actions involving members|'
+                     r'paragraph 09: criminal proceeding against member|'
+                     r'paragraph 10: testifying on behalf of defendant\(s\)|'
+                     r'paragraph 11: tracking of actions by pib|paragraph 12: disposition documentation|'
+                     r'paragraph 13: interfering with investigations|paragraph 14: undercover investigations|'
+                     r'paragraph 15: rewards)', r'rule 05: restricted activities; \1', regex=True)\
+        .str.replace(r'(paragraph 01: security of records|paragraph 02: false or inaccurate reports|'
+                     r'paragraph 03: public statement and appearances|paragraph 04: citizens report complaint|'
+                     r'paragraph 05: informants|paragraph 06: confidentiality of internal investigations)',
                      r'rule 06: offical information; \1', regex=True)\
-        .str.replace(r'(paragraph 01 - use of department property|'
-                     r'paragraph 02 - authorized operator of department vehicle|'
-                     r'paragraph 03 - cleanliness of department vehicles|paragraph 04 - use of emergency equipment|'
-                     r'paragraph 05 - statement of responsibility|paragraph 06 - operation manuals|'
-                     r'paragrpah 07 - surrending department property)', r'rule 07: department property; \1', regex=True)\
-        .str.replace(r'(paragraph 01 - rules of procedures|paragraph 0?2 - effective|'
-                     r'paragraph 03 - violations)', r'rule 01: operation manuals; \1', regex=True)
-    return df.drop(columns='allegation')
+        .str.replace(r'(paragraph 01: use of department property|'
+                     r'paragraph 02: authorized operator of department vehicle|'
+                     r'paragraph 03: cleanliness of department vehicles|paragraph 04: use of emergency equipment|'
+                     r'paragraph 05: statement of responsibility|paragraph 06: operation manuals|'
+                     r'paragrpah 07: surrending department property)', r'rule 07: department property; \1', regex=True)\
+        .str.replace(r'(paragraph 01: rules of procedures|paragraph 0?2: effective|'
+                     r'paragraph 03: violations)', r'rule 01: operation manuals; \1', regex=True)
+    return df
 
 
 def assign_agency(df):
@@ -180,7 +180,7 @@ def clean_tracking_number(df):
     df.loc[:, 'tracking_number'] = df.tracking_number\
         .str.replace(r'^Rule9-', '', regex=True)
     for idx, row in df.loc[df.tracking_number.str.match(r'^\d{3}-')].iterrows():
-        df.loc[idx, 'tracking_number'] = row.charges_create_year + row.tracking_number[3:]
+        df.loc[idx, 'tracking_number'] = row.allegation_create_year + row.tracking_number[3:]
     return df
 
 
@@ -261,12 +261,12 @@ def clean():
             'occurred_date': 'occur_date',
             'disposition_oipm_by_officer': 'disposition',
             'received_date': 'receive_date',
-            'allegation_created_on': 'charges_create_date',
+            'allegation_created_on': 'allegation_create_date',
             'assigned_divison': 'investigating_division',
             'assigned_sub_division_a': 'investigating_sub_divison_a',
             'assigned_sub_division_b': 'investigating_sub_division_b'
         })\
-        .pipe(clean_charges)\
+        .pipe(clean_allegation)\
         .pipe(drop_rows_without_tracking_number)\
         .pipe(clean_sexes, ['citizen_sex'])\
         .pipe(clean_races, ['citizen_race'])\
@@ -278,10 +278,10 @@ def clean():
         .pipe(float_to_int_str, [
             'officer_primary_key', 'allegation_primary_key'
         ])\
-        .pipe(clean_trailing_empty_time, ['receive_date', 'charges_create_date'])\
+        .pipe(clean_trailing_empty_time, ['receive_date', 'allegation_create_date'])\
         .pipe(clean_investigation_complete_date)\
         .pipe(clean_dates, [
-            'receive_date', 'charges_create_date', 'occur_date',
+            'receive_date', 'allegation_create_date', 'occur_date',
             'investigation_complete_date'
         ])\
         .pipe(clean_tracking_number)\
@@ -289,9 +289,9 @@ def clean():
         .pipe(clean_investigating_unit)\
         .pipe(assign_agency)\
         .pipe(gen_uid, [
-            'agency', 'tracking_number', 'officer_primary_key', 'charges'], 'complaint_uid')\
+            'agency', 'tracking_number', 'officer_primary_key', 'allegation'], 'complaint_uid')\
         .pipe(replace_disposition)\
-        .pipe(remove_future_dates, '2020-12-31', ['receive', 'charges_create', 'occur'])\
+        .pipe(remove_future_dates, '2020-12-31', ['receive', 'allegation_create', 'occur'])\
         .pipe(drop_duplicate_complaint_uids)\
         .pipe(clean_investigating_department)
 
