@@ -20,14 +20,14 @@ def clean_and_split_names(df):
         .str.replace('suarezrichard', 'suarez richard')\
         .str.replace('martin, justin c', 'martin, c justin', regex=False)\
         .str.replace(r'\'', '', regex=True)\
-        .str.replace(r'(unknown|records for file|file for records only|'
-                     r'intake booking|corrections intake)', 'file for records', regex=True)\
+        .str.replace(r'(unknown|records for file|(file)? ?for records? ?(only)?|'
+                     r'intake booking|corrections intake)|metro narcotics', '', regex=True)\
         .str.replace(r'(\w+)[,\.] ?(\w+)', r'\1, \2', regex=True)
     names = df.name.str.extract(r'(?:(\w+,?|\w+\.?-?\w+,?) )?(?:(\w+) )?(.+)')
     df.loc[:, 'last_name'] = names[0]\
         .str.replace(',', '', regex=False).fillna('')
     df.loc[:, 'middle_name'] = names[1].fillna('')
-    df.loc[:, 'first_name'] = names[2]
+    df.loc[:, 'first_name'] = names[2].fillna('')
     return df.drop(columns='name')
 
 

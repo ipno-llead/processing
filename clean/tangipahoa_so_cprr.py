@@ -21,7 +21,7 @@ def split_rows_with_name(df):
 
 def split_full_name(df):
     df.loc[:, 'full_name'] = df.full_name.str.lower().str.strip()\
-        .str.replace(r'^(unknown|unk|tpso|tp715|facebook comments)$', '', regex=True)\
+        .str.replace(r'(unknown|unk|tpso|tp715|facebook comments|^deputy$)', '', regex=True)\
         .str.replace('.', '', regex=False)\
         .str.replace(r'(\w+), (\w+)', r'\2 \1', regex=True)\
         .str.replace("d'amatto", "d'amato", regex=False)\

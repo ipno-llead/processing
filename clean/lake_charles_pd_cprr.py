@@ -352,7 +352,7 @@ def split_names_19(df):
     names = df.officer_s_accused.fillna('').str.extract(r'(?:(\w+) )? ?(.+)')
     df.loc[:, 'first_name'] = names[0].fillna('')
     df.loc[:, 'last_name'] = names[1].fillna('')
-    return df
+    return df.drop(columns='officer_s_accused')
 
 
 def drop_rows_missing_name_19(df):
