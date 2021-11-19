@@ -139,8 +139,8 @@ def clean():
         .pipe(gen_uid, ['agency', 'first_name', 'last_name'])\
         .pipe(gen_uid, [
             'agency', 'uid', 'receive_year', 'directive', 'tracking_number',
-            'finding', 'disposition', 'allegation'], "complaint_uid")\
-        .drop_duplicates(subset=['complaint_uid'])
+            'finding', 'disposition', 'allegation'], "allegation_uid")\
+        .drop_duplicates(subset=['allegation_uid'])
     return df
 
 

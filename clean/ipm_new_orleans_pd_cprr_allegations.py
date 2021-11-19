@@ -166,8 +166,8 @@ def discard_allegations_with_same_description(df):
         'di-2': 'counseling',
         'nfim': 'no investigation merited'
     }).astype(finding_cat)
-    return df.sort_values(['tracking_number', 'complaint_uid', 'allegation_finding'])\
-        .drop_duplicates(subset=['complaint_uid'], keep='first')\
+    return df.sort_values(['tracking_number', 'allegation_uid', 'allegation_finding'])\
+        .drop_duplicates(subset=['allegation_uid'], keep='first')\
         .reset_index(drop=True)
 
 
@@ -207,7 +207,7 @@ def clean_investigation_complete_date(df):
     return df.drop(columns='completed_date')
 
 
-def drop_duplicate_complaint_uids(df):
+def drop_duplicate_allegation_uids(df):
     disposition_cat = pd.CategoricalDtype(categories=[
         'sustained',
         'not sustained',
@@ -220,8 +220,8 @@ def drop_duplicate_complaint_uids(df):
         'pending',
     ], ordered=True)
     df.loc[:, 'disposition'] = df.disposition.astype(disposition_cat)
-    return df.sort_values(['disposition', 'complaint_uid'])\
-        .drop_duplicates(subset=['complaint_uid'], keep='first')
+    return df.sort_values(['disposition', 'allegation_uid'])\
+        .drop_duplicates(subset=['allegation_uid'], keep='first')
 
 
 def clean_investigating_department(df):
@@ -289,10 +289,10 @@ def clean():
         .pipe(clean_investigating_unit)\
         .pipe(assign_agency)\
         .pipe(gen_uid, [
-            'agency', 'tracking_number', 'officer_primary_key', 'allegation'], 'complaint_uid')\
+            'agency', 'tracking_number', 'officer_primary_key', 'allegation'], 'allegation_uid')\
         .pipe(replace_disposition)\
         .pipe(remove_future_dates, '2020-12-31', ['receive', 'allegation_create', 'occur'])\
-        .pipe(drop_duplicate_complaint_uids)\
+        .pipe(drop_duplicate_allegation_uids)\
         .pipe(clean_investigating_department)
 
 

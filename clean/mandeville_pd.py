@@ -62,7 +62,7 @@ def clean_cprr_19():
         .pipe(assign_agency, 2020)\
         .pipe(clean_names, ['last_name'])\
         .pipe(gen_uid, ['agency', 'rank_desc', 'last_name'])\
-        .pipe(gen_uid, ['agency', 'tracking_number'], 'complaint_uid')
+        .pipe(gen_uid, ['agency', 'tracking_number'], 'allegation_uid')
 
 
 if __name__ == '__main__':

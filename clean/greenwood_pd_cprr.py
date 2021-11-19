@@ -30,7 +30,7 @@ def clean():
         .pipe(float_to_int_str, ['comission_number'])\
         .pipe(gen_uid, ['first_name', 'last_name'], 'mid')\
         .pipe(assign_allegations)\
-        .pipe(gen_uid, ['first_name', 'last_name', 'occur_year', 'occur_month', 'occur_day'], 'complaint_uid')
+        .pipe(gen_uid, ['first_name', 'last_name', 'occur_year', 'occur_month', 'occur_day'], 'allegation_uid')
 
 
 if __name__ == '__main__':

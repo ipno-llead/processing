@@ -44,7 +44,7 @@ def clean():
         .pipe(standardize_desc_cols, ["rank_desc"])\
         .pipe(assign_agency)\
         .pipe(clean_names, ["first_name", "last_name", "complainant_name"])\
-        .pipe(gen_uid, ['agency', 'tracking_number'], 'complaint_uid')
+        .pipe(gen_uid, ['agency', 'tracking_number'], 'allegation_uid')
     return df
 
 

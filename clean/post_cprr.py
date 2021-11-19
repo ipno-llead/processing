@@ -57,7 +57,7 @@ def clean():
         .pipe(assign_action)\
         .pipe(rename_agency)\
         .pipe(gen_uid, ['first_name', 'last_name', 'agency'])\
-        .pipe(gen_uid, ['uid', 'allegation', 'decertification_date'], 'complaint_uid')
+        .pipe(gen_uid, ['uid', 'allegation', 'decertification_date'], 'allegation_uid')
     return df
 
 

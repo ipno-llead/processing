@@ -168,7 +168,7 @@ def clean20():
             'agency': 'Lafayette SO',
         })\
         .pipe(gen_uid, ['first_name', 'last_name', 'agency'])\
-        .pipe(gen_uid, ['uid', 'allegation', 'action', 'tracking_number'], 'complaint_uid')
+        .pipe(gen_uid, ['uid', 'allegation', 'action', 'tracking_number'], 'allegation_uid')
     return df
 
 
@@ -192,7 +192,7 @@ def clean14():
         })\
         .pipe(gen_uid, ['first_name', 'last_name', 'agency'])\
         .pipe(gen_uid, ['uid', 'allegation', 'action',
-                        'tracking_number', 'receive_date'], 'complaint_uid')
+                        'tracking_number', 'receive_date'], 'allegation_uid')
     return df
 
 
@@ -215,7 +215,7 @@ def clean08():
             'agency': 'Lafayette SO'
         })\
         .pipe(gen_uid, ['agency', 'first_name', 'last_name'])\
-        .pipe(gen_uid, ['uid', 'allegation', 'action', 'tracking_number', 'receive_date'], 'complaint_uid')
+        .pipe(gen_uid, ['uid', 'allegation', 'action', 'tracking_number', 'receive_date'], 'allegation_uid')
     return df
 
 

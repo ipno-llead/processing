@@ -78,7 +78,7 @@ def clean19():
         .pipe(clean_names, ['first_name', 'last_name'])\
         .pipe(standardize_desc_cols, ['employment_status', 'disposition', 'action', 'complainant_type'])\
         .pipe(assign_uid)\
-        .pipe(gen_uid, ['agency', 'tracking_number'], 'complaint_uid')\
+        .pipe(gen_uid, ['agency', 'tracking_number'], 'allegation_uid')\
         .pipe(remove_NA_values, ['occur_date', 'receive_date', 'shift_supervisor', 'employment_status', 'action'])
 
 
@@ -108,7 +108,7 @@ def clean20():
         .pipe(clean_names, ['first_name', 'last_name'])\
         .pipe(standardize_desc_cols, ['employment_status', 'disposition', 'action', 'complainant_type'])\
         .pipe(assign_uid)\
-        .pipe(gen_uid, ['agency', 'tracking_number'], 'complaint_uid')\
+        .pipe(gen_uid, ['agency', 'tracking_number'], 'allegation_uid')\
         .pipe(remove_NA_values, ['shift_supervisor', 'action'])
 
 

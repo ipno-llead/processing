@@ -115,7 +115,7 @@ def clean19():
         .pipe(clean_names, ["first_name", "last_name"])\
         .pipe(gen_uid, ["agency", "first_name", "last_name", "badge_no"])\
         .pipe(gen_uid, ["agency", "tracking_number", "uid", "rule_code", "rule_violation"], "charge_uid")\
-        .pipe(gen_uid, ["charge_uid"], "complaint_uid")
+        .pipe(gen_uid, ["charge_uid"], "allegation_uid")
     return df
 
 
@@ -158,7 +158,7 @@ def clean18():
         .pipe(clean_names, ["first_name", "last_name"])\
         .pipe(gen_uid, ["agency", "first_name", "last_name"])\
         .pipe(gen_uid, ["agency", "tracking_number", "uid", "rule_code", "rule_violation"], "charge_uid")\
-        .pipe(gen_uid, ["charge_uid"], "complaint_uid")\
+        .pipe(gen_uid, ["charge_uid"], "allegation_uid")\
         .dropna(subset=['tracking_number'])
 
 
@@ -188,7 +188,7 @@ def clean16():
             "rank_desc", "department_desc", "complainant_type", "paragraph_violation", "rule_violation", "disposition"
         ])\
         .pipe(gen_uid, ["agency", "tracking_number", "uid", "rule_code", "rule_violation"], "charge_uid")\
-        .pipe(gen_uid, ["charge_uid"], "complaint_uid")
+        .pipe(gen_uid, ["charge_uid"], "allegation_uid")
 
 
 if __name__ == "__main__":

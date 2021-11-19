@@ -617,9 +617,9 @@ def clean19():
         .pipe(fix_date_typos, ['receive_date', 'investigation_start_date', 'investigation_complete_date'])\
         .pipe(gen_uid, ['agency', 'employee_id', 'first_name', 'last_name', 'middle_initial'])\
         .pipe(set_empty_uid_for_anonymous_officers)\
-        .pipe(gen_uid, ['agency', 'tracking_number', 'uid'], 'complaint_uid')\
+        .pipe(gen_uid, ['agency', 'tracking_number', 'uid'], 'allegation_uid')\
         .sort_values(['tracking_number', 'investigation_complete_date'])\
-        .drop_duplicates(subset=['complaint_uid'], keep='last', ignore_index=True)\
+        .drop_duplicates(subset=['allegation_uid'], keep='last', ignore_index=True)\
         .pipe(split_investigating_supervisor)\
         .pipe(clean_summary)\
         .pipe(extract_arrest_date)\
@@ -680,7 +680,7 @@ def clean20():
             'data_production_year': '2020'})\
         .pipe(float_to_int_str, ['employee_id'])\
         .pipe(gen_uid, ['agency', 'first_name', 'middle_name', 'last_name', 'employee_id'])\
-        .pipe(gen_uid, ['tracking_number', 'action', 'employee_id'], 'complaint_uid')\
+        .pipe(gen_uid, ['tracking_number', 'action', 'employee_id'], 'allegation_uid')\
         .pipe(add_left_reason_column)
     return df
 

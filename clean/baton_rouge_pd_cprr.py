@@ -191,7 +191,7 @@ def combine_rule_and_paragraph(df):
         paragraph = ' '.join(
             filter(None, [row.paragraph_code, row.paragraph_violation]))
         return ' - '.join(filter(None, [rule, paragraph]))
-    df.loc[:, 'charges'] = df.apply(combine, axis=1, result_type='reduce')
+    df.loc[:, 'allegation'] = df.apply(combine, axis=1, result_type='reduce')
     df = df.drop(columns=['rule_code', 'rule_violation',
                           'paragraph_code', 'paragraph_violation'])
     return df
@@ -240,8 +240,8 @@ def clean_complainant_21(df):
     return df
 
 
-def clean_charges_21(df):
-    df.loc[:, 'charges'] = df.complaint.str.lower().str.strip().fillna('')\
+def clean_allegations_21(df):
+    df.loc[:, 'allegation'] = df.complaint.str.lower().str.strip().fillna('')\
         .str.replace(r' >i? ', ' - ', regex=True)\
         .str.replace('.', '', regex=False)\
         .str.replace(',', '', regex=False)\
@@ -539,8 +539,8 @@ def clean_action_21(df):
     return df
 
 
-def drop_rows_with_charges_disposition_action_all_empty_21(df):
-    return df[~((df.charges == '') & (df.disposition == '') & (df.action == ''))]
+def drop_rows_with_allegations_disposition_action_all_empty_21(df):
+    return df[~((df.allegation == '') & (df.disposition == '') & (df.action == ''))]
 
 
 def assign_prod_year(df, year):
@@ -575,7 +575,7 @@ def clean_18():
         .pipe(assign_agency)\
         .pipe(assign_prod_year, '2020')\
         .pipe(gen_uid, ["agency", "first_name", "middle_initial", "last_name"])\
-        .pipe(gen_uid, ['agency', 'tracking_number', 'uid', 'action', 'charges'], 'complaint_uid')
+        .pipe(gen_uid, ['agency', 'tracking_number', 'uid', 'action', 'allegation'], 'allegation_uid')
     return df
 
 
@@ -590,22 +590,22 @@ def clean_21():
         .pipe(clean_receive_and_occur_dates_21)\
         .pipe(clean_complainant_21)\
         .pipe(clean_dates, ['receive_date', 'occur_date'])\
-        .pipe(clean_charges_21)\
+        .pipe(clean_allegations_21)\
         .pipe(clean_action_21)\
         .pipe(parse_officer_name_21)\
         .pipe(split_name_21)\
         .pipe(split_department_and_division_desc_21)\
         .pipe(clean_disposition_21)\
         .pipe(consolidate_action_and_disposition_21)\
-        .pipe(standardize_desc_cols, ['charges', 'action', 'disposition',
+        .pipe(standardize_desc_cols, ['allegation', 'action', 'disposition',
                                       'department_code', 'department_desc'])\
-        .pipe(drop_rows_with_charges_disposition_action_all_empty_21)\
+        .pipe(drop_rows_with_allegations_disposition_action_all_empty_21)\
         .pipe(assign_agency)\
         .pipe(assign_prod_year, '2021')\
         .pipe(gen_uid, ["agency", "first_name", "middle_initial", "last_name"])\
-        .drop_duplicates(subset=['uid', 'tracking_number', 'charges', 'disposition', 'action'], keep='first')\
-        .pipe(gen_uid, ['agency', 'uid', 'charges', 'tracking_number', 'action'], 'complaint_uid')\
-        .pipe(standardize_from_lookup_table, 'charges', [
+        .drop_duplicates(subset=['uid', 'tracking_number', 'allegation', 'disposition', 'action'], keep='first')\
+        .pipe(gen_uid, ['agency', 'uid', 'allegation', 'tracking_number', 'action'], 'allegation_uid')\
+        .pipe(standardize_from_lookup_table, 'allegation', [
             ['1:5 punctuality - 6'],
             ['1:7 failure to submit required forms'],
             ['1:8 wearing of uniforms / uniforms - 9'],

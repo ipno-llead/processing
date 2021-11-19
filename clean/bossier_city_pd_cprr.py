@@ -208,7 +208,7 @@ def clean():
         .pipe(assign_action)\
         .pipe(assign_agency)\
         .pipe(gen_uid, ['first_name', 'last_name', 'agency'])\
-        .pipe(gen_uid, ['uid', 'allegation', 'disposition', 'tracking_number', 'action'], 'complaint_uid')\
+        .pipe(gen_uid, ['uid', 'allegation', 'disposition', 'tracking_number', 'action'], 'allegation_uid')\
         .pipe(clean_dates, ['receive_date', 'investigation_complete_date', 'investigation_start_date'])
     return df
 

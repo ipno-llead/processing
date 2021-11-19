@@ -51,8 +51,8 @@ def clean_rank(df):
     return df
 
 
-def clean_charges(df):
-    df.loc[:, "charges"] = df.rule_violation.str.lower().str.strip() \
+def clean_allegations(df):
+    df.loc[:, "allegation"] = df.rule_violation.str.lower().str.strip() \
         .str.replace("conduct unbecoming/ rude behavior", "conduct unbecoming (rude behavior)", regex=False)\
         .str.replace("conduct unbecoming/lying", "conduct unbecoming (lying)", regex=False)\
         .str.replace("conduct unbecoming/rudeness", "conduct unbecoming (rudeness)", regex=False)
@@ -70,7 +70,7 @@ def clean20():
         .pipe(
             standardize_desc_cols,
             ["rank_desc", "disposition_action"])\
-        .pipe(clean_charges)\
+        .pipe(clean_allegations)\
         .pipe(clean_rank)\
         .pipe(set_values, {
             'agency': 'Scott PD'})\
@@ -82,7 +82,7 @@ def clean20():
             'notification_day': 'receive_day'})\
         .pipe(clean_names, ["first_name", "last_name"])\
         .pipe(gen_uid, ["agency", "first_name", "last_name"])\
-        .pipe(gen_uid, ["agency", "uid", "receive_year", "receive_month", "receive_day"], "complaint_uid")
+        .pipe(gen_uid, ["agency", "uid", "receive_year", "receive_month", "receive_day"], "allegation_uid")
     return df
 
 
@@ -92,17 +92,17 @@ def clean14():
         .drop(columns=['appeal'])\
         .rename(columns={
             'date': 'receive_date',
-            'offense': 'charges'})\
+            'offense': 'allegation'})\
         .pipe(split_names_14)\
         .pipe(clean_rank)\
         .pipe(clean_names, ['first_name', 'last_name'])\
         .pipe(split_disposition_action_14)\
-        .pipe(standardize_desc_cols, ['charges'])\
+        .pipe(standardize_desc_cols, ['allegation'])\
         .pipe(clean_dates, ['receive_date'])\
         .pipe(set_values, {
             'agency': 'Scott PD'})\
         .pipe(gen_uid, ['first_name', 'last_name', 'agency'])\
-        .pipe(gen_uid, ['uid', 'charges', 'disposition', 'action'], 'complaint_uid')
+        .pipe(gen_uid, ['uid', 'allegation', 'disposition', 'action'], 'allegation_uid')
     return df
 
 

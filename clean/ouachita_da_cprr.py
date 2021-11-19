@@ -66,7 +66,7 @@ def clean():
         .pipe(clean_action)\
         .pipe(assign_agency)\
         .pipe(gen_uid, ['first_name', 'last_name', 'agency'])\
-        .pipe(gen_uid, ['uid', 'allegation', 'action', 'disposition'], 'complaint_uid')
+        .pipe(gen_uid, ['uid', 'allegation', 'action', 'disposition'], 'allegation_uid')
     return df
 
 

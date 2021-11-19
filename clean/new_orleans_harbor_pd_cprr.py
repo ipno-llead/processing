@@ -91,7 +91,7 @@ def clean():
         .pipe(clean_races, ["complainant_race"])\
         .pipe(clean_dates, ["hire_date", "occur_date", "receive_date", "investigation_complete_date"])\
         .pipe(assign_agency)\
-        .pipe(gen_uid, ['agency', 'tracking_number'], 'complaint_uid')
+        .pipe(gen_uid, ['agency', 'tracking_number'], 'allegation_uid')
     return df
 
 

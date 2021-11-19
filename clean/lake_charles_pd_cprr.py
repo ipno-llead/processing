@@ -470,7 +470,7 @@ def clean_20():
         .pipe(assign_agency)\
         .pipe(float_to_int_str, ['investigation_start_date'])\
         .pipe(gen_uid, ['first_name', 'last_name', 'agency'])\
-        .pipe(gen_uid, ['first_name', 'last_name', 'investigation_start_date', 'allegation', 'action'], 'complaint_uid')
+        .pipe(gen_uid, ['first_name', 'last_name', 'investigation_start_date', 'allegation', 'action'], 'allegation_uid')
     return df
 
 
@@ -496,7 +496,7 @@ def clean_19():
         .pipe(assign_agency)\
         .pipe(gen_uid, ['first_name', 'last_name', 'agency'])\
         .pipe(gen_uid, ['first_name', 'last_name', 'tracking_number',
-                        'investigation_start_date', 'allegation', 'action'], 'complaint_uid')
+                        'investigation_start_date', 'allegation', 'action'], 'allegation_uid')
     return df
 
 

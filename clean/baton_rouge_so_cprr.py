@@ -226,7 +226,7 @@ def clean18():
         .pipe(assign_prod_year, '2018')\
         .pipe(clean_names, ['first_name', 'last_name', 'middle_initial'])\
         .pipe(gen_uid, ["agency", "first_name", "last_name", "birth_year", "badge_no"])\
-        .pipe(gen_uid, ['agency', 'uid', 'occur_year', 'occur_month', 'occur_day'], 'complaint_uid')
+        .pipe(gen_uid, ['agency', 'uid', 'occur_year', 'occur_month', 'occur_day'], 'allegation_uid')
     return df
 
 
@@ -260,7 +260,7 @@ def clean20():
         .pipe(assign_prod_year, '2020')\
         .pipe(clean_names, ['first_name', 'last_name', 'middle_initial'])\
         .pipe(gen_uid, ["agency", "first_name", "last_name", "birth_year", "badge_no"])\
-        .pipe(gen_uid, ['agency', 'uid', 'occur_year', 'occur_month', 'occur_day'], 'complaint_uid')
+        .pipe(gen_uid, ['agency', 'uid', 'occur_year', 'occur_month', 'occur_day'], 'allegation_uid')
     return df
 
 

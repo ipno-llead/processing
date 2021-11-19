@@ -416,7 +416,7 @@ def clean_cprr():
         }).pipe(clean_names, ['first_name', 'last_name', 'investigator_first_name', 'investigator_last_name'])\
         .pipe(gen_uid, ['agency', 'first_name', 'last_name'])\
         .pipe(gen_uid, ['agency', 'investigator_first_name', 'investigator_last_name'], 'investigator_uid')\
-        .pipe(gen_uid, ['agency', 'tracking_number', 'allegation', 'uid'], 'complaint_uid')
+        .pipe(gen_uid, ['agency', 'tracking_number', 'allegation', 'uid'], 'allegation_uid')
 
 
 if __name__ == '__main__':

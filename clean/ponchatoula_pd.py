@@ -70,7 +70,7 @@ def clean_cprr():
         .pipe(clean_names, ['first_name', 'last_name'])\
         .pipe(replace_names)\
         .pipe(gen_uid, ['agency', 'first_name', 'last_name'])\
-        .pipe(gen_uid, ['agency', 'uid', 'receive_date', 'allegation'], 'complaint_uid')
+        .pipe(gen_uid, ['agency', 'uid', 'receive_date', 'allegation'], 'allegation_uid')
 
 
 if __name__ == '__main__':

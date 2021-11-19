@@ -213,7 +213,7 @@ def clean():
         .pipe(set_values, {'agency': 'Tangipahoa SO', 'data_production_year': '2021'})\
         .pipe(gen_uid, ['first_name', 'last_name', 'agency'])\
         .drop_duplicates(subset=['receive_date', 'uid', 'allegation'], keep='first')\
-        .pipe(gen_uid, ['receive_date', 'uid', 'allegation'], 'complaint_uid')\
+        .pipe(gen_uid, ['receive_date', 'uid', 'allegation'], 'allegation_uid')\
         .pipe(gen_uid,
               ['supervisor_rank', 'supervisor_first_name', 'supervisor_last_name', 'agency'], 'supervisor_uid')
     return df

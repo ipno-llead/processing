@@ -188,12 +188,12 @@ def clean_cprr(disposition_file, name_file, year):
 
     return df.pipe(clean_allegation)\
         .drop_duplicates()\
-        .pipe(gen_uid, ['agency', 'tracking_number', 'allegation'], 'complaint_uid')\
+        .pipe(gen_uid, ['agency', 'tracking_number', 'allegation'], 'allegation_uid')\
         .pipe(make_disposition_categorical)\
         .sort_values([
             'receive_date', 'tracking_number', 'disposition'
         ], ascending=[True, True, False], na_position='first')\
-        .drop_duplicates(['complaint_uid'], keep='last')\
+        .drop_duplicates(['allegation_uid'], keep='last')\
         .reset_index(drop=True)
 
 

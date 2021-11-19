@@ -127,7 +127,7 @@ def clean19():
         .pipe(assign_agency)\
         .pipe(clean_names, ['first_name', 'last_name', 'middle_name', 'middle_initial'])\
         .pipe(gen_uid, ['agency', 'first_name', 'last_name', 'middle_name', 'middle_initial'])\
-        .pipe(gen_uid, ['agency', 'tracking_number'], 'complaint_uid')
+        .pipe(gen_uid, ['agency', 'tracking_number'], 'allegation_uid')
 
 
 def clean20():
@@ -148,14 +148,12 @@ def clean20():
         .pipe(drop_rows_missing_names)\
         .pipe(assign_agency)\
         .pipe(gen_uid, ['first_name', 'last_name', 'middle_name', 'middle_initial', 'agency'])\
-        .pipe(gen_uid, ['uid', 'tracking_number', 'allegation'], 'complaint_uid')
+        .pipe(gen_uid, ['uid', 'tracking_number', 'allegation'], 'allegation_uid')
     return df
 
 
 if __name__ == '__main__':
     df19 = clean19()
-    ensure_uid_unique(df19, 'complaint_uid')
     df20 = clean20()
-    ensure_uid_unique(df20, 'complaint_uid')
     df19.to_csv(data_file_path('clean/cprr_plaquemines_so_2019.csv'), index=False)
     df20.to_csv(data_file_path('clean/cprr_plaquemines_so_2016_2020.csv'), index=False)
