@@ -557,7 +557,7 @@ def clean_charges_14(df):
         .str.replace('topatrol', 'to patrol', regex=False)\
         .str.replace('speeding', 'safe speed violation', regex=False)\
         .str.replace(r'^complete report$', 'failure to complete report', regex=True)\
-        .str.replace(r'^rude and$', 'rude and unprofssional', regex=True)\
+        .str.replace(r'^rude and$', 'rude and unprofessional', regex=True)\
         .str.replace(r'duites', 'duties', regex=False)\
         .str.replace('onapplication', 'on application', regex=False)
     return df.drop(columns='complaint')
