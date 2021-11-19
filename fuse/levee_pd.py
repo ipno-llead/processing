@@ -1,7 +1,6 @@
 from lib.columns import rearrange_complaint_columns
 from lib.personnel import fuse_personnel
-from lib.path import data_file_path, ensure_data_dir
-from lib.uid import ensure_uid_unique
+from lib.path import data_file_path
 from lib import events
 import pandas as pd
 import sys
@@ -12,18 +11,18 @@ def fuse_events(cprr, post):
     builder = events.Builder()
     builder.extract_events(cprr, {
         events.COMPLAINT_INCIDENT: {
-            'prefix': 'occur', 'parse_date': True, 'keep': ['agency', 'uid', 'complaint_uid']
+            'prefix': 'occur', 'parse_date': True, 'keep': ['agency', 'uid', 'allegation_uid']
         },
         events.COMPLAINT_RECEIVE: {
-            'prefix': 'receive', 'parse_date': True, 'keep': ['agency', 'uid', 'complaint_uid']
+            'prefix': 'receive', 'parse_date': True, 'keep': ['agency', 'uid', 'allegation_uid']
         },
         events.INVESTIGATION_COMPLETE: {
-            'prefix': 'investigation_complete', 'parse_date': True, 'keep': ['agency', 'uid', 'complaint_uid']
+            'prefix': 'investigation_complete', 'parse_date': True, 'keep': ['agency', 'uid', 'allegation_uid']
         },
         events.INVESTIGATION_START: {
-            'prefix': 'investigation_start', 'parse_date': True, 'keep': ['agency', 'uid', 'complaint_uid']
+            'prefix': 'investigation_start', 'parse_date': True, 'keep': ['agency', 'uid', 'allegation_uid']
         },
-    }, ['uid', 'complaint_uid'])
+    }, ['uid', 'allegation_uid'])
     builder.extract_events(post, {
         events.OFFICER_HIRE: {
             'prefix': 'hire', 'keep': ['agency', 'uid', 'employment_status'],
@@ -52,10 +51,8 @@ if __name__ == '__main__':
     }
     event_df.loc[:, 'agency'] = event_df.agency.map(
         lambda x: agency_dict.get(x, x))
-    ensure_data_dir('fuse')
     event_df.to_csv(data_file_path('fuse/event_levee_pd.csv'), index=False)
     complaint_df = rearrange_complaint_columns(cprr)
-    ensure_uid_unique(complaint_df, 'complaint_uid')
     complaint_df.to_csv(
         data_file_path('fuse/com_levee_pd.csv'), index=False)
     fuse_personnel(post, cprr).to_csv(

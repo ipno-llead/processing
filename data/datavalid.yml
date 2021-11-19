@@ -68,7 +68,7 @@ schemas:
       - name: tracking_number
         description: >
           complaint tracking number from the agency the data originate from
-      - name: complaint_uid
+      - name: allegation_uid
         description: >
           complaint unique identifier
         unique: true
@@ -233,9 +233,9 @@ schemas:
       - name: uid
         description: >
           officer unique identifer, references the `uid` column in personnel.csv
-      - name: complaint_uid
+      - name: allegation_uid
         description: >
-          complaint unique identifier, refernces the `complaint_uid` column in complaint.csv
+          complaint unique identifier, refernces the `allegation_uid` column in complaint.csv
       - name: appeal_uid
         description: >
           appeal hearing unique identifier, references the `appeal_uid` column in

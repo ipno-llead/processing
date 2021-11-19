@@ -1,11 +1,10 @@
 import pandas as pd
-from lib.path import data_file_path, ensure_data_dir
+from lib.path import data_file_path
 from lib.columns import (
     rearrange_personnel_columns, rearrange_event_columns,
     rearrange_complaint_columns
 )
 from lib import events
-from lib.uid import ensure_uid_unique
 import sys
 sys.path.append("../")
 
@@ -29,15 +28,15 @@ def fuse_events(pprr08, pprr20, cprr):
             'prefix': 'hire', 'keep': ['uid', 'agency'], 'id_cols': ['uid']
         },
         events.COMPLAINT_INCIDENT: {
-            'prefix': 'occur', 'keep': ['uid', 'agency', 'complaint_uid']
+            'prefix': 'occur', 'keep': ['uid', 'agency', 'allegation_uid']
         },
         events.COMPLAINT_RECEIVE: {
-            'prefix': 'receive', 'keep': ['uid', 'agency', 'complaint_uid']
+            'prefix': 'receive', 'keep': ['uid', 'agency', 'allegation_uid']
         },
         events.INVESTIGATION_COMPLETE: {
-            'prefix': 'investigation_complete', 'keep': ['uid', 'agency', 'complaint_uid']
+            'prefix': 'investigation_complete', 'keep': ['uid', 'agency', 'allegation_uid']
         }
-    }, ['uid', 'complaint_uid'])
+    }, ['uid', 'allegation_uid'])
     return events.discard_events_occur_more_than_once_every_30_days(builder.to_frame(), events.OFFICER_LEFT, ['uid'])
 
 
@@ -55,14 +54,11 @@ if __name__ == "__main__":
         'match/post_event_new_orleans_harbor_pd_2020.csv'))
     personnel_df = rearrange_personnel_columns(pd.concat([pprr08, pprr20]))
     complaint_df = rearrange_complaint_columns(cprr)
-    ensure_uid_unique(complaint_df, 'complaint_uid')
     event_df = fuse_events(pprr08, pprr20, cprr)
     event_df = rearrange_event_columns(pd.concat([
         post_event,
         event_df
     ]))
-    ensure_uid_unique(event_df, 'event_uid', True)
-    ensure_data_dir("fuse")
     personnel_df.to_csv(data_file_path(
         "fuse/per_new_orleans_harbor_pd.csv"), index=False)
     event_df.to_csv(data_file_path(

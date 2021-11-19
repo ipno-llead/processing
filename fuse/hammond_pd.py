@@ -17,32 +17,32 @@ def fuse_events(cprr_20, cprr_14, cprr_08, post):
     builder.extract_events(cprr_20, {
         events.INVESTIGATION_START: {
             'prefix': 'investigation_start',
-            'keep': ['uid', 'agency', 'complaint_uid']
+            'keep': ['uid', 'agency', 'allegation_uid']
         },
         events.COMPLAINT_INCIDENT: {
             'prefix': 'incident',
-            'keep': ['uid', 'agency', 'complaint_uid']
+            'keep': ['uid', 'agency', 'allegation_uid']
         },
     },
-        ['uid', 'complaint_uid'])
+        ['uid', 'allegation_uid'])
     builder.extract_events(cprr_14, {
         events.INVESTIGATION_START: {
             'prefix': 'investigation_start',
-            'keep': ['uid', 'agency', 'complaint_uid']
+            'keep': ['uid', 'agency', 'allegation_uid']
         },
     },
-        ['uid', 'complaint_uid'])
+        ['uid', 'allegation_uid'])
     builder.extract_events(cprr_08, {
         events.COMPLAINT_INCIDENT: {
             'prefix': 'incident',
-            'keep': ['uid', 'agency', 'complaint_uid']
+            'keep': ['uid', 'agency', 'allegation_uid']
         },
         events.INITIAL_ACTION: {
             'prefix': 'initial_action',
-            'keep': ['uid', 'agency', 'complaint_uid']
+            'keep': ['uid', 'agency', 'allegation_uid']
         },
     },
-        ['uid', 'complaint_uid'])
+        ['uid', 'allegation_uid'])
     builder.extract_events(post, {
         events.OFFICER_LEVEL_1_CERT: {
             'prefix': 'level_1_cert',

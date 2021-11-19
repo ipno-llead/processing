@@ -7,7 +7,6 @@ from lib.columns import (
     rearrange_use_of_force, rearrange_event_columns)
 from lib.clean import float_to_int_str
 from lib.personnel import fuse_personnel
-from lib.uid import ensure_uid_unique
 from lib import events
 
 import sys
@@ -60,9 +59,9 @@ def fuse_events(pprr_ipm, pprr_csd, cprr, uof, award, lprr, sas):
     }, ['uid'], warn_duplications=True)
     builder.extract_events(cprr, {
         events.COMPLAINT_RECEIVE: {'prefix': 'receive'},
-        events.CHARGES_CREATE: {'prefix': 'charges_create'},
+        events.ALLEGATION_CREATE: {'prefix': 'allegation_create'},
         events.COMPLAINT_INCIDENT: {'prefix': 'occur'},
-    }, ['uid', 'complaint_uid'])
+    }, ['uid', 'allegation_uid'])
     builder.extract_events(uof, {
         events.UOF_INCIDENT: {'prefix': 'occur'},
         events.UOF_RECEIVE: {'prefix': 'receive', 'parse_date': True},
@@ -139,7 +138,6 @@ if __name__ == "__main__":
         'match/sas_new_orleans_pd_2017_2021.csv'
     ))
     complaints = fuse_cprr(cprr, actions, officer_number_dict)
-    ensure_uid_unique(complaints, 'complaint_uid', output_csv=True)
     use_of_force = fuse_use_of_force(uof, officer_number_dict)
     personnel = fuse_personnel(pprr_ipm, lprr, pprr_csd, sas)
     events_df = fuse_events(pprr_ipm, pprr_csd, cprr, uof, award, lprr, sas)

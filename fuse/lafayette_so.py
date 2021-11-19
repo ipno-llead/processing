@@ -5,7 +5,6 @@ from lib.columns import (
     rearrange_complaint_columns,
 )
 from lib import events
-from lib.uid import ensure_uid_unique
 from lib.personnel import fuse_personnel
 import pandas as pd
 
@@ -20,26 +19,26 @@ def fuse_events(cprr20, cprr14, cprr08, post):
     builder.extract_events(cprr20, {
         events.COMPLAINT_RECEIVE: {
             'prefix': 'receive',
-            'keep': ['uid', 'agency', 'complaint_uid']
+            'keep': ['uid', 'agency', 'allegation_uid']
         },
     },
-        ['uid', 'complaint_uid'])
+        ['uid', 'allegation_uid'])
     builder.extract_events(cprr14, {
         events.COMPLAINT_RECEIVE: {
             'prefix': 'receive',
             'parse_date': True,
-            'keep': ['uid', 'agency', 'complaint_uid']
+            'keep': ['uid', 'agency', 'allegation_uid']
         },
     },
-        ['uid', 'complaint_uid'])
+        ['uid', 'allegation_uid'])
     builder.extract_events(cprr08, {
         events.COMPLAINT_RECEIVE: {
             'prefix': 'receive',
             'parse_date': True,
-            'keep': ['uid', 'agency', 'complaint_uid']
+            'keep': ['uid', 'agency', 'allegation_uid']
         },
     },
-        ['uid', 'complaint_uid'])
+        ['uid', 'allegation_uid'])
     builder.extract_events(post, {
         events.OFFICER_LEVEL_1_CERT: {
             'prefix': 'level_1_cert',
@@ -65,7 +64,6 @@ if __name__ == '__main__':
     cprr08 = pd.read_csv(data_file_path('clean/cprr_lafayette_so_2006_2008.csv'))
     post = prepare_post()
     complaints = rearrange_complaint_columns(pd.concat([cprr20, cprr14, cprr08]))
-    ensure_uid_unique(complaints, 'complaint_uid')
     event = fuse_events(cprr20, cprr14, cprr08, post)
     personnel_df = fuse_personnel(cprr20, cprr14, cprr08, post)
     personnel_df.to_csv(data_file_path('fuse/per_lafayette_so.csv'), index=False)
