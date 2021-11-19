@@ -7,6 +7,8 @@ files:
     schema: event
   fuse/use_of_force.csv:
     schema: use_of_force
+  fuse/stop_and_search.csv:
+    schema: stop_and_search
 
 schemas:
   personnel:
@@ -214,6 +216,7 @@ schemas:
           - award_receive
           - award_recommended
           - initial_action
+          - stop_and_search
         no_na: true
       - name: year
         integer: true
@@ -420,5 +423,59 @@ schemas:
       - name: delay
       - name: appealed
       - name: agency
+  stop_and_search:
+    columns:
+      - name: stop_and_search_uid
+        description: >
+          unique identifier of stop and search report.
+        unique: true
+        no_na: true
+      - name: stop_and_search_interview_id
+      - name: stop_and_search_interview_id_2
+      - name: item_number
+      - name: id
+      - name: district 
+      - name: zone
+      - name: stop_reason
+      - name: vehicle_year
+      - name: vehicle_make
+      - name: vehicle_model
+      - name: vehicle_style
+      - name: vehicle_color
+      - name: vehicle_number
+      - name: citizen_id
+      - name: citizen_race
+      - name: citizen_height
+      - name: citizen_weight
+      - name: citizen_hair_color
+      - name: citizen_gender
+      - name: citizen_eye_color
+      - name: citizen_driver_license_state
+      - name: zip_code
+      - name: stop_and_search_location
+      - name: assigned_district
+      - name: assigned_department
+      - name: stop_results
+      - name: subject_type
+      - name: search_occurred
+      - name: evidence_seized
+      - name: evidence_types
+      - name: strip_body_cavity_search
+      - name: legal_basis
+      - name: consent_to_search
+      - name: consent_form_completed
+      - name: search_types
+      - name: exit_vehicle
+      - name: rank_desc
+      - name: first_name
+      - name: middle_name
+      - name: last_name
+      - name: badge_number
+      - name: stop_and_search_year
+      - name: stop_and_search_month
+      - name: stop_and_search_day
+      - name: stop_and_search_time
+      - name: agency
+      - name: uid
 
 save_bad_rows_to: invalid_rows.csv

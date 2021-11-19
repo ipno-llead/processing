@@ -182,3 +182,29 @@ def rearrange_use_of_force(df):
         ])
         .sort_values(['agency', 'uof_uid'])
     )
+
+
+def rearrange_stop_and_search_columns(df):
+    """Performs final processing step for a stop and search table
+
+    This performs the following tasks:
+    - discard columns not present in STOP_AND_SEARCH_COLUMNS
+    - drop row duplicates
+    - convert numeric columns to int or str
+
+    Args:
+        df (pd.DataFrame):
+            the frame to process
+
+    Returns:
+        the updated frame
+    """
+    return datavalid_config.rearrange_columns(
+        'stop_and_search',
+        df
+        .pipe(float_to_int_str, [
+            "stop_and_search_year", "stop_and_search_month", "stop_and_search_day"
+        ])
+        .pipe(names_to_title_case, ["first_name", "last_name", "middle_name"])
+        .sort_values(['agency', 'stop_and_search_uid'])
+    )
