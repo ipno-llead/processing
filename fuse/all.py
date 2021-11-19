@@ -112,14 +112,14 @@ def fuse_complaint():
         pd.read_csv(data_file_path("fuse/com_ponchatoula_pd.csv")),
         pd.read_csv(data_file_path("fuse/com_lake_charles_pd.csv")),
         pd.read_csv(data_file_path("fuse/com_bossier_city_pd.csv")),
-    ])).sort_values(['agency', 'data_production_year', 'tracking_number'], ignore_index=True)
+    ])).sort_values(['agency', 'tracking_number'], ignore_index=True)
 
 
 def fuse_use_of_force():
     return rearrange_use_of_force(pd.concat([
         pd.read_csv(data_file_path("fuse/uof_new_orleans_pd.csv")),
         pd.read_csv(data_file_path("fuse/uof_kenner_pd.csv")),
-    ])).sort_values(['agency', 'data_production_year', 'uof_tracking_number'])
+    ])).sort_values(['agency', 'uof_tracking_number'])
 
 
 def fuse_stop_and_search():
