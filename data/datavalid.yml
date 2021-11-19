@@ -421,4 +421,62 @@ files:
       agency:
         description: >
           the police department this report originate from.
+  fuse/stop_and_search.csv:
+    schema:
+      stop_and_search_uid:
+        description: >
+          unique identifier of stop and search incident.
+        unique: true
+        no_na: true
+      stop_and_search_interview_id:
+      stop_and_search_interview_id_2:
+      item_number:
+      id:
+      district: 
+      zone:
+      stop_reason:
+      vehicle_year:
+      vehicle_make:
+      vehicle_model:
+      vehicle_style:
+      vehicle_color:
+      vehicle_number:
+      citizen_id:
+      citizen_race:
+      citizen_height:
+      citizen_weight:
+      citizen_hair_color:
+      citizen_gender:
+      citizen_eye_color:
+      citizen_driver_license_state:
+      zip_code:
+      stop_and_search_location:
+      assigned_district:
+      assigned_department:
+      stop_results:
+      subject_type:
+      search_occurred:
+      evidence_seized:
+      evidence_types:
+      strip_body_cavity_search:
+      legal_basis:
+      consent_to_search:
+      consent_form_completed:
+      search_types:
+      exit_vehicle:
+      rank_desc:
+      first_name:
+      middle_name:
+      last_name:
+      badge_number:
+      stop_and_search_year:
+      stop_and_search_month:
+      stop_and_search_day:
+      stop_and_search_time:
+      agency:
+        description: >
+          the police department this report originate from.
+      uid:
+        description: >
+          officer unique identifier, this references the `uid` column from personnel.csv
 save_bad_rows_to: invalid_rows.csv
