@@ -680,7 +680,7 @@ def clean20():
             'data_production_year': '2020'})\
         .pipe(float_to_int_str, ['employee_id'])\
         .pipe(gen_uid, ['agency', 'first_name', 'middle_name', 'last_name', 'employee_id'])\
-        .pipe(gen_uid, ['tracking_number', 'action', 'employee_id'], 'allegation_uid')\
+        .pipe(gen_uid, ['tracking_number', 'allegation', 'action', 'employee_id'], 'allegation_uid')\
         .pipe(add_left_reason_column)
     return df
 
