@@ -18,8 +18,8 @@ def extract_charging_agency(df):
     return df
 
 
-def clean_charges(df):
-    df.loc[:, 'charges'] = df.charges\
+def clean_allegations(df):
+    df.loc[:, 'allegation'] = df.charges\
         .str.replace('pled guilty to ', '', regex=False)\
         .str.replace('indicted by federal department of justice for ', '', regex=False)\
         .str.replace(r'\bbatter\b', 'battery', regex=True)\
@@ -28,7 +28,7 @@ def clean_charges(df):
                      '1 count of simple battery; excessive use of force',
                      regex=False)\
         .str.replace(r'(\w+)\)? and (\d+)', r'\1; \2', regex=True)
-    return df
+    return df.drop(columns='charges')
 
 
 def extract_agency_and_department_desc(df):
@@ -61,12 +61,12 @@ def clean():
         .pipe(clean_column_names)\
         .pipe(extract_disposition)\
         .pipe(extract_charging_agency)\
-        .pipe(clean_charges)\
+        .pipe(clean_allegations)\
         .pipe(extract_agency_and_department_desc)\
         .pipe(clean_action)\
         .pipe(assign_agency)\
         .pipe(gen_uid, ['first_name', 'last_name', 'agency'])\
-        .pipe(gen_uid, ['uid', 'charges', 'action', 'disposition'], 'complaint_uid')
+        .pipe(gen_uid, ['uid', 'allegation', 'action', 'disposition'], 'complaint_uid')
     return df
 
 

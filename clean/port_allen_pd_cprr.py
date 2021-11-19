@@ -48,15 +48,15 @@ def clean_occur_date(df):
     return df
 
 
-def split_rows_by_charges(df):
+def split_rows_by_allegations(df):
     i = 0
     for idx, row in df.iterrows():
-        if pd.isna(row.charge):
+        if pd.isna(row.allegation):
             continue
-        parts = row.charge.split("#")[1:]
+        parts = row.allegation.split("#")[1:]
         df = duplicate_row(df, idx + i, len(parts))
         for j, p in enumerate(parts):
-            df.loc[idx + i + j, "charge"] = re.sub(
+            df.loc[idx + i + j, "allegation"] = re.sub(
                 r" \(.+\)$", "",
                 p.lower().strip().replace(": ", " ").replace("n/a", "")
             )
@@ -74,12 +74,12 @@ def extract_rule_violation(df):
             '122 departmental vehicle accident', 'departmental motor vehicle accident'],
         ['2:21 use of alcohol and controlled substance'],
     ]
-    df.loc[:, "charge"] = df.charge.fillna("").str.replace(r"\s*(;|and)$", "")
-    df = standardize_from_lookup_table(df, "charge", lookup_table)
-    rules = df.charge.str.split(" ", n=1, expand=True)
+    df.loc[:, "allegation"] = df.allegation.fillna("").str.replace(r"\s*(;|and)$", "")
+    df = standardize_from_lookup_table(df, "allegation", lookup_table)
+    rules = df.allegation.str.split(" ", n=1, expand=True)
     df.loc[:, "rule_code"] = rules.loc[:, 0].fillna("")
     df.loc[:, "rule_violation"] = rules.loc[:, 1].fillna("")
-    df = df.drop(columns="charge")
+    df = df.drop(columns="allegation")
     return df
 
 
@@ -97,7 +97,7 @@ def clean19():
     df = pd.read_csv(data_file_path("raw/port_allen_pd/port_allen_cprr_2019.csv"))
     df = clean_column_names(df)
     df.columns = [
-        'receive_date', 'rank_desc', 'first_name', 'last_name', 'badge_no', 'charge',
+        'receive_date', 'rank_desc', 'first_name', 'last_name', 'badge_no', 'allegation',
         'disposition', 'occur_date', 'occur_time', 'tracking_number']
     df = df.drop(index=df[df.tracking_number.isna()
                           ].index).reset_index(drop=True)
@@ -107,7 +107,7 @@ def clean19():
         .pipe(clean_occur_time)\
         .pipe(clean_occur_date)\
         .pipe(clean_dates, ["receive_date", "occur_date"])\
-        .pipe(split_rows_by_charges)\
+        .pipe(split_rows_by_allegations)\
         .pipe(clean_badge_no)\
         .pipe(extract_rule_violation)\
         .pipe(assign_agency)\

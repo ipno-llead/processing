@@ -74,19 +74,19 @@ def clean_receive_dates(df):
     return df.drop(columns='date')
 
 
-def clean_and_split_rows_with_multiple_charges(df):
-    df.loc[:, 'charges'] = df.policy.str.lower().str.strip().fillna('')\
+def clean_and_split_rows_with_multiple_allegations(df):
+    df.loc[:, 'allegation'] = df.policy.str.lower().str.strip().fillna('')\
         .str.replace('ppdc', 'plaquemines parish detention center', regex=False)\
         .str.replace('info', 'information', regex=False)\
         .str.replace(r'domestic issue-off duty', 'off duty domestic issue', regex=False)
 
     i = 0
-    for idx in df[df.charges.str.contains(',')].index:
-        s = df.loc[idx + i, 'charges']
+    for idx in df[df.allegation.str.contains(',')].index:
+        s = df.loc[idx + i, 'allegation']
         parts = re.split(r"\s*(?:\,)\s*", s)
         df = duplicate_row(df, idx + i, len(parts))
         for j, name in enumerate(parts):
-            df.loc[idx + i + j, 'charges'] = name
+            df.loc[idx + i + j, 'allegation'] = name
         i += len(parts) - 1
 
     return df.drop(columns='policy')
@@ -120,7 +120,7 @@ def clean19():
     ))
     df = clean_column_names(df)
     df = df.rename(columns={
-        'rule_violation': 'charges'
+        'rule_violation': 'allegation'
     })
     return df\
         .pipe(gen_middle_initial)\
@@ -142,13 +142,13 @@ def clean20():
         .pipe(standardize_desc_cols, ['tracking_number'])\
         .pipe(clean_receive_dates)\
         .pipe(clean_dates, ['receive_date'])\
-        .pipe(clean_and_split_rows_with_multiple_charges)\
+        .pipe(clean_and_split_rows_with_multiple_allegations)\
         .pipe(extract_actions)\
         .pipe(clean_disposition)\
         .pipe(drop_rows_missing_names)\
         .pipe(assign_agency)\
         .pipe(gen_uid, ['first_name', 'last_name', 'middle_name', 'middle_initial', 'agency'])\
-        .pipe(gen_uid, ['uid', 'tracking_number', 'charges'], 'complaint_uid')
+        .pipe(gen_uid, ['uid', 'tracking_number', 'allegation'], 'complaint_uid')
     return df
 
 

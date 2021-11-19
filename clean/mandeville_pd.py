@@ -52,12 +52,13 @@ def clean_cprr_19():
     return pd.read_csv(data_file_path('raw/mandeville_pd/mandeville_pd_cprr_2019_byhand.csv'))\
         .pipe(clean_column_names)\
         .rename(columns={
-            'title': 'rank_desc'
+            'title': 'rank_desc',
+            'charges': 'allegation'
         })\
         .dropna(axis=1, how='all')\
         .pipe(clean_names, ['last_name'])\
         .pipe(float_to_int_str, ['occur_year', 'occur_month', 'occur_day'])\
-        .pipe(standardize_desc_cols, ['rank_desc', 'charges', 'disposition'])\
+        .pipe(standardize_desc_cols, ['rank_desc', 'allegation', 'disposition'])\
         .pipe(assign_agency, 2020)\
         .pipe(clean_names, ['last_name'])\
         .pipe(gen_uid, ['agency', 'rank_desc', 'last_name'])\

@@ -7,8 +7,8 @@ import sys
 sys.path.append("../")
 
 
-def assign_charges(df):
-    df.loc[:, 'charges'] = df.rule_violation.str.cat(
+def assign_allegations(df):
+    df.loc[:, 'allegation'] = df.rule_violation.str.cat(
         df.paragraph_violation, sep=' - paragraph ')
     df = df.drop(columns=['rule_violation', 'paragraph_violation'])
     return df
@@ -29,7 +29,7 @@ def clean():
         .pipe(clean_dates, ['occur_date', 'receive_date'])\
         .pipe(float_to_int_str, ['comission_number'])\
         .pipe(gen_uid, ['first_name', 'last_name'], 'mid')\
-        .pipe(assign_charges)\
+        .pipe(assign_allegations)\
         .pipe(gen_uid, ['first_name', 'last_name', 'occur_year', 'occur_month', 'occur_day'], 'complaint_uid')
 
 
