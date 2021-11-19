@@ -266,7 +266,9 @@ def clean():
             'agency': 'New Orleans PD'
         })\
         .pipe(gen_uid, ['agency', 'first_name', 'middle_name', 'last_name'])\
-        .pipe(gen_uid, ['uid', 'stop_and_search_interview_id', 'citizen_id', 'stop_reason'], 'stop_and_search_uid')
+        .pipe(gen_uid, [
+            'uid', 'stop_and_search_interview_id', 'citizen_id',
+            'stop_reason', 'evidence_seized'], 'stop_and_search_uid')
     return df
 
 
