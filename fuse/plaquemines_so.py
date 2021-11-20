@@ -4,7 +4,6 @@ from lib.columns import (
 )
 from lib.personnel import fuse_personnel
 from lib import events
-from lib.uid import ensure_uid_unique
 import pandas as pd
 import sys
 sys.path.append('../')
@@ -14,14 +13,14 @@ def fuse_events(cprr19, cprr20, pprr):
     builder = events.Builder()
     builder.extract_events(cprr19, {
         events.COMPLAINT_RECEIVE: {
-            'prefix': 'receive', 'keep': ['uid', 'agency', 'complaint_uid']
+            'prefix': 'receive', 'keep': ['uid', 'agency', 'allegation_uid']
         }
-    }, ['uid', 'complaint_uid'])
+    }, ['uid', 'allegation_uid'])
     builder.extract_events(cprr20, {
         events.COMPLAINT_RECEIVE: {
-            'prefix': 'receive', 'keep': ['uid', 'agency', 'complaint_uid']
+            'prefix': 'receive', 'keep': ['uid', 'agency', 'allegation_uid']
         }
-    }, ['uid', 'complaint_uid'])
+    }, ['uid', 'allegation_uid'])
     builder.extract_events(pprr, {
         events.OFFICER_HIRE: {
             'prefix': 'hire', 'keep': ['uid', 'agency', 'department_desc', 'sub_department_desc']
@@ -47,7 +46,6 @@ if __name__ == '__main__':
         'fuse/per_plaquemines_so.csv'
     ), index=False)
     com = rearrange_complaint_columns(pd.concat([cprr19, cprr20]))
-    ensure_uid_unique(com, 'complaint_uid')
     com.to_csv(data_file_path(
         'fuse/com_plaquemines_so.csv'
     ), index=False)

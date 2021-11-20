@@ -2,7 +2,7 @@ from lib.columns import clean_column_names
 from lib.clean import clean_dates, standardize_desc_cols, float_to_int_str
 from lib.uid import gen_uid
 from lib.standardize import standardize_from_lookup_table
-from lib.path import data_file_path, ensure_data_dir
+from lib.path import data_file_path
 import pandas as pd
 import re
 import sys
@@ -681,7 +681,6 @@ def clean_21():
 if __name__ == "__main__":
     df18 = clean_18()
     df21 = clean_21()
-    ensure_data_dir("clean")
     df18.to_csv(
         data_file_path("clean/cprr_baton_rouge_pd_2018.csv"),
         index=False)

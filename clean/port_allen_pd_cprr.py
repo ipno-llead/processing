@@ -1,5 +1,5 @@
 from lib.columns import clean_column_names
-from lib.path import data_file_path, ensure_data_dir
+from lib.path import data_file_path
 from lib.uid import gen_uid
 from lib.clean import (
     clean_names, clean_dates, standardize_desc_cols, float_to_int_str
@@ -195,7 +195,6 @@ if __name__ == "__main__":
     df19 = clean19()
     df18 = clean18()
     df16 = clean16()
-    ensure_data_dir("clean")
     df19.to_csv(
         data_file_path("clean/cprr_port_allen_pd_2019.csv"),
         index=False)

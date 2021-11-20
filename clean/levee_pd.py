@@ -1,5 +1,5 @@
 from lib.columns import clean_column_names
-from lib.path import data_file_path, ensure_data_dir
+from lib.path import data_file_path
 from lib.clean import clean_names, standardize_desc_cols
 from lib.uid import gen_uid
 import pandas as pd
@@ -115,7 +115,6 @@ def clean20():
 if __name__ == '__main__':
     df20 = clean20()
     df19 = clean19()
-    ensure_data_dir('clean')
     pd.concat([df19, df20]).to_csv(data_file_path(
         'clean/cprr_levee_pd.csv'
     ), index=False)

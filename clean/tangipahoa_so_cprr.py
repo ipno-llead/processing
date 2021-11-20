@@ -1,6 +1,6 @@
 import sys
 sys.path.append('../')
-from lib.path import data_file_path, ensure_data_dir
+from lib.path import data_file_path
 from lib.columns import set_values
 from lib.uid import gen_uid
 from lib.clean import (
@@ -221,7 +221,6 @@ def clean():
 
 if __name__ == '__main__':
     df = clean()
-    ensure_data_dir('clean')
     df.to_csv(
         data_file_path('clean/cprr_tangipahoa_so_2015_2021.csv'),
         index=False)

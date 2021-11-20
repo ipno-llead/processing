@@ -1,4 +1,4 @@
-from lib.path import data_file_path, ensure_data_dir
+from lib.path import data_file_path
 from lib.columns import clean_column_names, set_values
 from lib.clean import (
     clean_dates, clean_races, clean_sexes, float_to_int_str, clean_names, standardize_desc_cols, clean_salaries
@@ -68,7 +68,6 @@ def clean_cprr_19():
 if __name__ == '__main__':
     pprr = clean_pprr_20()
     cprr = clean_cprr_19()
-    ensure_data_dir("clean")
     pprr.to_csv(data_file_path(
         "clean/pprr_mandeville_csd_2020.csv"), index=False)
     cprr.to_csv(data_file_path(

@@ -3,7 +3,7 @@ import sys
 import pandas as pd
 
 from lib.columns import clean_column_names, set_values
-from lib.path import data_file_path, ensure_data_dir
+from lib.path import data_file_path
 from lib.clean import clean_names
 from lib.uid import gen_uid
 
@@ -221,7 +221,6 @@ if __name__ == '__main__':
         ),
     ])
     cb_df = clean_codebook()
-    ensure_data_dir('clean')
     df.to_csv(data_file_path(
         'clean/cprr_shreveport_pd_2018_2019.csv'
     ), index=False)

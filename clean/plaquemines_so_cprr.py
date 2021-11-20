@@ -1,6 +1,6 @@
 from lib.columns import clean_column_names
 from lib.path import data_file_path
-from lib.uid import gen_uid, ensure_uid_unique
+from lib.uid import gen_uid
 from lib.clean import clean_names, standardize_desc_cols, clean_dates
 from lib.rows import duplicate_row
 import pandas as pd

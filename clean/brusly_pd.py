@@ -1,4 +1,4 @@
-from lib.path import data_file_path, ensure_data_dir
+from lib.path import data_file_path
 from lib.columns import clean_column_names, set_values
 from lib.clean import clean_names, clean_dates, standardize_desc_cols, clean_salaries, clean_races, clean_sexes
 from lib.uid import gen_uid
@@ -105,7 +105,6 @@ if __name__ == "__main__":
     cprr = clean_cprr()
     pprr = clean_pprr()
     award = clean_award()
-    ensure_data_dir("clean")
     cprr.to_csv(data_file_path("clean/cprr_brusly_pd_2020.csv"), index=False)
     pprr.to_csv(data_file_path("clean/pprr_brusly_pd_2020.csv"), index=False)
     award.to_csv(data_file_path("clean/award_brusly_pd_2021.csv"), index=False)

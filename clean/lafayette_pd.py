@@ -3,7 +3,7 @@ import sys
 import pandas as pd
 
 from lib.columns import clean_column_names, set_values
-from lib.path import data_file_path, ensure_data_dir
+from lib.path import data_file_path
 from lib.clean import (
     clean_names, clean_salaries, clean_sexes, clean_races, float_to_int_str
 )
@@ -422,7 +422,6 @@ def clean_cprr():
 if __name__ == '__main__':
     pprr = clean_pprr()
     cprr = clean_cprr()
-    ensure_data_dir('clean')
     cprr.to_csv(data_file_path(
         'clean/cprr_lafayette_pd_2015_2020.csv'
     ), index=False)

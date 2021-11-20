@@ -1,6 +1,6 @@
 from lib.columns import clean_column_names, set_values
 from lib.uid import gen_uid
-from lib.path import data_file_path, ensure_data_dir
+from lib.path import data_file_path
 from lib.clean import (
     clean_names, standardize_desc_cols, clean_dates
 )
@@ -146,7 +146,6 @@ def clean():
 
 if __name__ == '__main__':
     df = clean()
-    ensure_data_dir('clean')
     df.to_csv(
         data_file_path('clean/cprr_new_orleans_da_2021.csv'),
         index=False)

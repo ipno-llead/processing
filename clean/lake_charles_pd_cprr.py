@@ -1,7 +1,7 @@
 import sys
 sys.path.append('../')
 import pandas as pd
-from lib.path import data_file_path, ensure_data_dir
+from lib.path import data_file_path
 from lib.clean import float_to_int_str
 from lib.columns import clean_column_names
 from lib.rows import duplicate_row
@@ -503,6 +503,5 @@ def clean_19():
 if __name__ == '__main__':
     df20 = clean_20()
     df19 = clean_19()
-    ensure_data_dir('clean')
     df20.to_csv(data_file_path('clean/cprr_lake_charles_pd_2020.csv'), index=False)
     df19.to_csv(data_file_path('clean/cprr_lake_charles_pd_2014_2019.csv'), index=False)

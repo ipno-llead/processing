@@ -1,4 +1,4 @@
-from lib.path import data_file_path, ensure_data_dir
+from lib.path import data_file_path
 from lib.columns import clean_column_names
 from lib.clean import (
     float_to_int_str, clean_sexes, clean_races, remove_future_dates, standardize_desc_cols, clean_dates
@@ -298,6 +298,5 @@ def clean():
 
 if __name__ == '__main__':
     df = clean()
-    ensure_data_dir('clean')
     df.to_csv(data_file_path(
         'clean/cprr_new_orleans_pd_1931_2020.csv'), index=False)

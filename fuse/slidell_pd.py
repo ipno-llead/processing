@@ -5,7 +5,6 @@ import pandas as pd
 from lib.path import data_file_path
 from lib.columns import rearrange_event_columns
 from lib.personnel import fuse_personnel
-from lib.uid import ensure_uid_unique
 from lib import events
 
 sys.path.append('../')
@@ -43,7 +42,6 @@ if __name__ == '__main__':
         post_event,
         fuse_events(pprr_csd)
     ]))
-    ensure_uid_unique(events_df, 'event_uid', True)
     fuse_personnel(pprr_csd).to_csv(data_file_path(
         "fuse/per_slidell_pd.csv"), index=False)
     events_df.to_csv(data_file_path(
