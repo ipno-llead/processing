@@ -242,7 +242,7 @@ def clean_races(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
             ['black', 'african american', 'black / african american', 'black or african american'],
             ['white'],
             ['hispanic', 'latino'],
-            ['native american', 'american indian', 'american indian or alaskan native'],
+            ['native american', 'american indian', 'american indian or alaskan native', 'amer. ind.'],
             ['asian / pacific islander', 'asian', 'native hawaiian or other pacific islander', 'islander'],
             ['mixed', 'two or more races', 'multi-racial'],
         ])
