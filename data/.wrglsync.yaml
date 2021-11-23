@@ -180,6 +180,10 @@ repos:
     fileName: fuse/com_bossier_city_pd.csv
     primaryKey:
       - complaint_uid
+  com-houma-pd:
+    fileName: fuse/com_houma_pd.csv
+    primaryKey:
+      - complaint_uid
   uof-new-orleans-pd:
     fileName: fuse/uof_new_orleans_pd.csv
     primaryKey:
@@ -332,6 +336,11 @@ repos:
     fileName: fuse/per_bossier_city_pd.csv
     primaryKey:
       - uid
+      - uid
+  per-houma-pd:
+    fileName: fuse/per_houma_pd.csv
+    primaryKey:
+      - uid
   event-new-orleans-pd:
     fileName: fuse/event_new_orleans_pd.csv
     primaryKey:
@@ -466,6 +475,10 @@ repos:
       - event_uid
   event-bossier-city-pd:
     fileName: fuse/event_bossier_city_pd.csv
+    primaryKey:
+      - event_uid
+  event-houma-pd:
+    fileName: fuse/event_houma_pd.csv
     primaryKey:
       - event_uid
   personnel:
