@@ -567,34 +567,3 @@ def remove_future_dates(df: pd.DataFrame, max_date: str, prefixes: List[str]) ->
             for col in cols:
                 df.loc[idx, col] = ''
     return df
-
-
-def strip_birth_day_and_month(series: pd.Series) -> pd.Series:
-    """Strips birth day from birth date column containing birth day, birth month, and birth year
-
-    Args:
-        series (pd.Series):
-            the series to process
-
-    Returns:
-        the updated series
-    """
-    return series.str.strip().str.lower()\
-        .str.replace(r'(\w{2})\/(\w{2})\/(\w{4})', r'\3', regex=True)
-
-
-def strip_birth_date(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
-    """Strips birth day from birth date column containing birth day, birth month, and birth year
-
-    Args:
-        df (pd.DataFrame):
-            the frame to process
-        cols (list of str):
-            birth date columns
-
-    Returns:
-        the updated frame
-    """
-    for col in cols:
-        df.loc[:, col] = strip_birth_day_and_month(df[col])
-    return df
