@@ -51,21 +51,17 @@ def clean_and_split_names(df):
         .str.replace('daniel scott lott', 'daniel lott scott', regex=False)\
         .str.replace('natalie d. fitzgerald', ' natalie fitzgerald d', regex=False)
     names = df.against.str.extract(r'(\w+) ?(\w+)? ?(.+)?')
-    df.loc[:, 'first_name'] = names[0]\
-        .str.replace('ppso', "plaquemines parish sheriff's office", regex=False)
-    df.loc[:, 'last_name'] = names[1]
+    df.loc[:, 'first_name'] = names[0].fillna('')
+    df.loc[:, 'last_name'] = names[1].fillna('')
     df.loc[:, 'middle_name'] = names.loc[:, 2].str.strip().fillna('')\
         .map(lambda s: '' if len(s) < 2 else s)
     df.loc[:, 'middle_initial'] = names.loc[:, 2].str.strip().fillna('')\
         .map(lambda s: '' if len(s) > 2 else s)
-    return df.fillna('').drop(columns='against')
+    return df
 
 
 def drop_rows_missing_names(df):
-    return df[~(
-        ((df.first_name == '') & (df.last_name == ''))
-        | (df.first_name == "plaquemines parish sheriff's office")
-    )]
+    return df[~(((df.first_name == '') & (df.last_name == '')))]
 
 
 def clean_receive_dates(df):
