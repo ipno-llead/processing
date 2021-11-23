@@ -1,6 +1,6 @@
 from lib.columns import clean_column_names
 from lib.path import data_file_path
-from lib.uid import gen_uid, ensure_uid_unique
+from lib.uid import gen_uid
 from lib.clean import clean_names, standardize_desc_cols, clean_dates
 from lib.rows import duplicate_row
 import pandas as pd
@@ -74,19 +74,19 @@ def clean_receive_dates(df):
     return df.drop(columns='date')
 
 
-def clean_and_split_rows_with_multiple_charges(df):
-    df.loc[:, 'charges'] = df.policy.str.lower().str.strip().fillna('')\
+def clean_and_split_rows_with_multiple_allegations(df):
+    df.loc[:, 'allegation'] = df.policy.str.lower().str.strip().fillna('')\
         .str.replace('ppdc', 'plaquemines parish detention center', regex=False)\
         .str.replace('info', 'information', regex=False)\
         .str.replace(r'domestic issue-off duty', 'off duty domestic issue', regex=False)
 
     i = 0
-    for idx in df[df.charges.str.contains(',')].index:
-        s = df.loc[idx + i, 'charges']
+    for idx in df[df.allegation.str.contains(',')].index:
+        s = df.loc[idx + i, 'allegation']
         parts = re.split(r"\s*(?:\,)\s*", s)
         df = duplicate_row(df, idx + i, len(parts))
         for j, name in enumerate(parts):
-            df.loc[idx + i + j, 'charges'] = name
+            df.loc[idx + i + j, 'allegation'] = name
         i += len(parts) - 1
 
     return df.drop(columns='policy')
@@ -120,14 +120,14 @@ def clean19():
     ))
     df = clean_column_names(df)
     df = df.rename(columns={
-        'rule_violation': 'charges'
+        'rule_violation': 'allegation'
     })
     return df\
         .pipe(gen_middle_initial)\
         .pipe(assign_agency)\
         .pipe(clean_names, ['first_name', 'last_name', 'middle_name', 'middle_initial'])\
         .pipe(gen_uid, ['agency', 'first_name', 'last_name', 'middle_name', 'middle_initial'])\
-        .pipe(gen_uid, ['agency', 'tracking_number'], 'complaint_uid')
+        .pipe(gen_uid, ['agency', 'tracking_number'], 'allegation_uid')
 
 
 def clean20():
@@ -142,20 +142,18 @@ def clean20():
         .pipe(standardize_desc_cols, ['tracking_number'])\
         .pipe(clean_receive_dates)\
         .pipe(clean_dates, ['receive_date'])\
-        .pipe(clean_and_split_rows_with_multiple_charges)\
+        .pipe(clean_and_split_rows_with_multiple_allegations)\
         .pipe(extract_actions)\
         .pipe(clean_disposition)\
         .pipe(drop_rows_missing_names)\
         .pipe(assign_agency)\
         .pipe(gen_uid, ['first_name', 'last_name', 'middle_name', 'middle_initial', 'agency'])\
-        .pipe(gen_uid, ['uid', 'tracking_number', 'charges'], 'complaint_uid')
+        .pipe(gen_uid, ['uid', 'tracking_number', 'allegation'], 'allegation_uid')
     return df
 
 
 if __name__ == '__main__':
     df19 = clean19()
-    ensure_uid_unique(df19, 'complaint_uid')
     df20 = clean20()
-    ensure_uid_unique(df20, 'complaint_uid')
     df19.to_csv(data_file_path('clean/cprr_plaquemines_so_2019.csv'), index=False)
     df20.to_csv(data_file_path('clean/cprr_plaquemines_so_2016_2020.csv'), index=False)

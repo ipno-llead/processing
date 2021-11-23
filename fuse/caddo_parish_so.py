@@ -1,7 +1,6 @@
 import pandas as pd
-from lib.path import data_file_path, ensure_data_dir
+from lib.path import data_file_path
 from lib.columns import rearrange_event_columns, rearrange_personnel_columns
-from lib.uid import ensure_uid_unique
 from lib import events
 import sys
 sys.path.append('../')
@@ -29,8 +28,6 @@ if __name__ == '__main__':
         event_df, 
         cprr_post_event
     ]))
-    ensure_uid_unique(event_df, 'event_uid', True)
-    ensure_data_dir('fuse')
     rearrange_personnel_columns(pprr).to_csv(
         data_file_path('fuse/per_caddo_parish_so.csv'), index=False)
     event_df.to_csv(data_file_path(

@@ -131,7 +131,7 @@ def rearrange_complaint_columns(df):
         'complaint',
         df
         .pipe(float_to_int_str, ["paragraph_code"])
-        .sort_values(['agency', 'complaint_uid'])
+        .sort_values(['agency', 'allegation_uid'])
     )
 
 

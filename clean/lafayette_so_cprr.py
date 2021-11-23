@@ -20,19 +20,19 @@ def clean_and_split_names(df):
         .str.replace('suarezrichard', 'suarez richard')\
         .str.replace('martin, justin c', 'martin, c justin', regex=False)\
         .str.replace(r'\'', '', regex=True)\
-        .str.replace(r'(unknown|records for file|file for records only|'
-                     r'intake booking|corrections intake)', 'file for records', regex=True)\
+        .str.replace(r'(unknown|records for file|(file)? ?for records? ?(only)?|'
+                     r'intake booking|corrections intake)|metro narcotics', '', regex=True)\
         .str.replace(r'(\w+)[,\.] ?(\w+)', r'\1, \2', regex=True)
     names = df.name.str.extract(r'(?:(\w+,?|\w+\.?-?\w+,?) )?(?:(\w+) )?(.+)')
     df.loc[:, 'last_name'] = names[0]\
         .str.replace(',', '', regex=False).fillna('')
     df.loc[:, 'middle_name'] = names[1].fillna('')
-    df.loc[:, 'first_name'] = names[2]
+    df.loc[:, 'first_name'] = names[2].fillna('')
     return df.drop(columns='name')
 
 
-def clean_charges(df):
-    df.loc[:, 'charges'] = df.complaint.str.lower().str.strip().fillna('')\
+def clean_allegations(df):
+    df.loc[:, 'allegation'] = df.complaint.str.lower().str.strip().fillna('')\
         .str.replace(',', '', regex=False)\
         .str.replace('unable to locate', '', regex=False)\
         .str.replace(r'with ?drew complaint', '', regex=True)\
@@ -72,8 +72,8 @@ def clean_action(df):
     return df.drop(columns='leave')
 
 
-def drop_rows_undefined_charges_and_disposition(df):
-    return df[~((df.charges == '') & (df.disposition == ''))]
+def drop_rows_undefined_allegations_and_disposition(df):
+    return df[~((df.allegation == '') & (df.disposition == ''))]
 
 
 def clean_complete(df):
@@ -120,14 +120,14 @@ def clean_tracking_number_08(df):
     return df.drop(columns='case')
 
 
-def split_rows_with_multiple_charges(df):
+def split_rows_with_multiple_allegations(df):
     i = 0
-    for idx in df[df.charges.fillna('').str.contains('/')].index:
-        s = df.loc[idx + i, 'charges']
+    for idx in df[df.allegation.fillna('').str.contains('/')].index:
+        s = df.loc[idx + i, 'allegation']
         parts = re.split(r"\s*(?:\/)\s*", s)
         df = duplicate_row(df, idx + i, len(parts))
         for j, name in enumerate(parts):
-            df.loc[idx + i + j, 'charges'] = name
+            df.loc[idx + i + j, 'allegation'] = name
         i += len(parts) - 1
     return df
 
@@ -156,11 +156,11 @@ def clean20():
             'emp_assign': 'department_desc',
         })\
         .pipe(clean_and_split_names)\
-        .pipe(clean_charges)\
+        .pipe(clean_allegations)\
         .pipe(clean_dates, ['receive_date'])\
         .pipe(standardize_desc_cols, ['department_desc'])\
         .pipe(clean_disposition)\
-        .pipe(drop_rows_undefined_charges_and_disposition)\
+        .pipe(drop_rows_undefined_allegations_and_disposition)\
         .pipe(clean_action)\
         .pipe(clean_complete)\
         .pipe(clean_days)\
@@ -168,7 +168,7 @@ def clean20():
             'agency': 'Lafayette SO',
         })\
         .pipe(gen_uid, ['first_name', 'last_name', 'agency'])\
-        .pipe(gen_uid, ['uid', 'charges', 'action', 'tracking_number'], 'complaint_uid')
+        .pipe(gen_uid, ['uid', 'allegation', 'action', 'tracking_number'], 'allegation_uid')
     return df
 
 
@@ -182,7 +182,7 @@ def clean14():
         .pipe(clean_and_split_names)\
         .pipe(clean_tracking_number_14)\
         .pipe(clean_level)\
-        .pipe(clean_charges)\
+        .pipe(clean_allegations)\
         .pipe(clean_complete)\
         .pipe(clean_disposition)\
         .pipe(clean_action)\
@@ -191,8 +191,8 @@ def clean14():
             'agency': 'Lafayette SO'
         })\
         .pipe(gen_uid, ['first_name', 'last_name', 'agency'])\
-        .pipe(gen_uid, ['uid', 'charges', 'action',
-                        'tracking_number', 'receive_date'], 'complaint_uid')
+        .pipe(gen_uid, ['uid', 'allegation', 'action',
+                        'tracking_number', 'receive_date'], 'allegation_uid')
     return df
 
 
@@ -206,8 +206,8 @@ def clean08():
         .pipe(clean_and_split_names)\
         .pipe(clean_tracking_number_08)\
         .pipe(clean_department_desc)\
-        .pipe(clean_charges)\
-        .pipe(split_rows_with_multiple_charges)\
+        .pipe(clean_allegations)\
+        .pipe(split_rows_with_multiple_allegations)\
         .pipe(clean_complete)\
         .pipe(clean_level)\
         .pipe(clean_action_08)\
@@ -215,7 +215,7 @@ def clean08():
             'agency': 'Lafayette SO'
         })\
         .pipe(gen_uid, ['agency', 'first_name', 'last_name'])\
-        .pipe(gen_uid, ['uid', 'charges', 'action', 'tracking_number', 'receive_date'], 'complaint_uid')
+        .pipe(gen_uid, ['uid', 'allegation', 'action', 'tracking_number', 'receive_date'], 'allegation_uid')
     return df
 
 

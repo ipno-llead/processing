@@ -1,5 +1,5 @@
 from lib.columns import clean_column_names
-from lib.path import data_file_path, ensure_data_dir
+from lib.path import data_file_path
 from lib.clean import split_names, float_to_int_str, clean_names
 from lib.uid import gen_uid
 import pandas as pd
@@ -8,7 +8,7 @@ sys.path.append('../')
 
 
 def remove_newlines(df):
-    for col in ['full_name', 'occur_raw_date', 'charges']:
+    for col in ['full_name', 'occur_raw_date', 'allegation']:
         df.loc[:, col] = df[col].str.replace(r'(\d)\r\n(\d)', r'\1\2')\
             .str.replace(r'\r\n', ' ')
     return df
@@ -56,8 +56,8 @@ def gen_middle_initial(df):
     return df
 
 
-def remove_new_lines_from_charges(df):
-    df.loc[:, 'charges'] = df.charges.str.replace(r'(\n|\r)\s*', ' ')
+def remove_new_lines_from_allegations(df):
+    df.loc[:, 'allegation'] = df.allegation.str.replace(r'(\n|\r)\s*', ' ')
     return df
 
 
@@ -72,7 +72,7 @@ def clean():
     df = df.rename(columns={
         'dept': 'department_code',
         'date_of_incident': 'occur_raw_date',
-        'discipline_action_outcome': 'charges'
+        'discipline_action_outcome': 'allegation'
     })
     df = df\
         .pipe(split_names, "name")\
@@ -84,15 +84,13 @@ def clean():
         .pipe(clean_names, ['first_name', 'last_name', 'middle_name'])\
         .pipe(gen_middle_initial)\
         .pipe(gen_uid, ['first_name', 'last_name', 'agency'])\
-        .pipe(gen_uid, ['agency', 'occur_year', 'occur_month', 'occur_day', 'uid', 'charges'], 'charge_uid')\
-        .pipe(gen_uid, ['charge_uid'], 'complaint_uid')\
-        .pipe(remove_new_lines_from_charges)
+        .pipe(gen_uid, ['agency', 'occur_year', 'occur_month', 'occur_day', 'uid', 'allegation'], 'allegation_uid')\
+        .pipe(remove_new_lines_from_allegations)
     df = df.drop(columns=['name'])
     return df
 
 
 if __name__ == '__main__':
     df = clean()
-    ensure_data_dir('clean')
     df.to_csv(data_file_path(
         'clean/cprr_st_tammany_so_2011_2021.csv'), index=False)

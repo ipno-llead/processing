@@ -1,4 +1,4 @@
-from lib.path import data_file_path, ensure_data_dir
+from lib.path import data_file_path
 from lib.columns import clean_column_names
 from lib.clean import clean_names, clean_dates, standardize_desc_cols
 from lib.uid import gen_uid
@@ -44,12 +44,11 @@ def clean():
         .pipe(standardize_desc_cols, ["rank_desc"])\
         .pipe(assign_agency)\
         .pipe(clean_names, ["first_name", "last_name", "complainant_name"])\
-        .pipe(gen_uid, ['agency', 'tracking_number'], 'complaint_uid')
+        .pipe(gen_uid, ['agency', 'tracking_number'], 'allegation_uid')
     return df
 
 
 if __name__ == "__main__":
     df = clean()
-    ensure_data_dir("clean")
     df.to_csv(data_file_path(
         "clean/cprr_madisonville_pd_2010_2020.csv"), index=False)

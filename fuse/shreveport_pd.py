@@ -5,7 +5,6 @@ import pandas as pd
 from lib.path import data_file_path, ensure_data_dir
 from lib.personnel import fuse_personnel
 from lib.columns import rearrange_complaint_columns
-from lib.uid import ensure_uid_unique
 from lib import events
 
 sys.path.append('../')
@@ -16,10 +15,10 @@ def fuse_events(cprr, post):
     builder.extract_events(cprr, {
         events.COMPLAINT_RECEIVE: {
             'prefix': 'receive', 'parse_date': True, 'keep': [
-                'agency', 'complaint_uid', 'uid'
+                'agency', 'allegation_uid', 'uid'
             ]
         }
-    }, ['complaint_uid'])
+    }, ['allegation_uid'])
     builder.extract_events(post, {
         events.OFFICER_LEVEL_1_CERT: {'prefix': 'level_1_cert', 'parse_date': '%Y-%m-%d', 'keep': [
             'uid', 'agency'
@@ -42,11 +41,7 @@ if __name__ == '__main__':
     post = post[post.agency == 'shreveport pd']
     event_df = fuse_events(cprr, post)
     per = fuse_personnel(cprr, post)
-    ensure_uid_unique(per, ['uid'])
     com = rearrange_complaint_columns(cprr)
-    ensure_uid_unique(com, ['complaint_uid'])
-
-    ensure_data_dir('fuse')
     per.to_csv(data_file_path(
         'fuse/per_shreveport_pd.csv'
     ), index=False)

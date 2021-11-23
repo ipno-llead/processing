@@ -68,12 +68,12 @@ schemas:
       - name: tracking_number
         description: >
           complaint tracking number from the agency the data originate from
-      - name: complaint_uid
+      - name: allegation_uid
         description: >
           complaint unique identifier
         unique: true
         no_na: true
-      - name: charge_uid
+      - name: allegation_uid
       - name: investigation_status
       - name: assigned_unit
       - name: assigned_department
@@ -98,21 +98,21 @@ schemas:
           the final disposition for the complaint
       - name: rule_code
         description: >
-          a charge is usually consist of a rule and paragraph that was violated. This is
+          an allegation is usually consist of a rule and paragraph that was violated. This is
           the code of the violated rule.
       - name: rule_violation
         description: >
-          a charge is usually consist of a rule and paragraph that was violated. This is
+          an allegation is usually consist of a rule and paragraph that was violated. This is
           the text of the violated rule.
       - name: paragraph_code
         description: >
-          a charge is usually consist of a rule and paragraph that was violated. This is
+          an allegation is usually consist of a rule and paragraph that was violated. This is
           the paragraph number.
       - name: paragraph_violation
         description: >
-          a charge is usually consist of a rule and paragraph that was violated. This is
+          an allegation is usually consist of a rule and paragraph that was violated. This is
           the text of the violated paragraph.
-      - name: charges
+      - name: allegation
         description: >
           `rule_*` and `paragraph_*` columns combined. Inputs that are too hard to parse and
           split into rule and paragraph will end up here.
@@ -196,7 +196,6 @@ schemas:
           - complaint_incident
           - complaint_receive
           - allegation_create
-          - charges_create
           - investigation_start
           - investigation_complete
           - suspension_start
@@ -233,9 +232,9 @@ schemas:
       - name: uid
         description: >
           officer unique identifer, references the `uid` column in personnel.csv
-      - name: complaint_uid
+      - name: allegation_uid
         description: >
-          complaint unique identifier, refernces the `complaint_uid` column in complaint.csv
+          complaint unique identifier, refernces the `allegation_uid` column in complaint.csv
       - name: appeal_uid
         description: >
           appeal hearing unique identifier, references the `appeal_uid` column in

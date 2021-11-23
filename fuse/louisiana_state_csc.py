@@ -1,9 +1,8 @@
-from lib.path import data_file_path, ensure_data_dir
+from lib.path import data_file_path
 from lib.columns import (
     rearrange_appeal_hearing_columns, rearrange_event_columns
 )
 from lib.personnel import fuse_personnel
-from lib.uid import ensure_uid_unique
 from lib import events
 import pandas as pd
 import sys
@@ -51,8 +50,6 @@ if __name__ == '__main__':
         post_event,
         fuse_events(lprr, pprr, pprr_term)
     ]))
-    ensure_uid_unique(event_df, 'event_uid', True)
-    ensure_data_dir('fuse')
     per_df.to_csv(data_file_path(
         'fuse/per_louisiana_state_police.csv'
     ), index=False)

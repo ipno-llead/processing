@@ -1,6 +1,6 @@
 from lib.columns import clean_column_names
 from lib.uid import gen_uid
-from lib.path import data_file_path, ensure_data_dir
+from lib.path import data_file_path
 from lib.clean import (
     clean_names, standardize_desc_cols, clean_dates, clean_sexes, clean_races, clean_datetimes
 )
@@ -129,18 +129,18 @@ def clean_complainant(df):
 
 def split_infraction(df):
     infractions = df.infraction.str.extract(r"^([A-Za-z ,]+)(\d.+)?$")
-    df.loc[:, 'charges'] = infractions.iloc[:, 1].fillna('').str.strip()\
+    df.loc[:, 'allegation'] = infractions.iloc[:, 1].fillna('').str.strip()\
         .str.replace(r"-(\d+)$", r".\1", regex=False)\
         .str.cat(
             infractions.iloc[:, 0].str.strip(),
-            sep=' - ')\
+            sep=': ')\
         .str.replace(r'^ - ', '', regex=False)
     df = df.drop(columns=["infraction"])
     return df
 
 
-def clean_charges(df):
-    df.loc[:, 'charges'] = df.charges.str.lower().str.strip() \
+def clean_allegations(df):
+    df.loc[:, 'allegation'] = df.allegation.str.lower().str.strip() \
         .str.replace(r'^([^\s]*)\s+', "", regex=False)\
         .str.replace(r'^(\d+)- (\d+)', r'\1-\2', regex=True)\
         .str.replace(r'^1', '01', regex=True)\
@@ -153,7 +153,8 @@ def clean_charges(df):
         .str.replace('offorce', 'of force', regex=False)\
         .str.replace('informationid', 'information', regex=False)\
         .str.replace(r'^- ', '', regex=True)\
-        .str.replace(r'(\d+)-(\d+)-(\d+)', r'\1-\2.\3', regex=True)
+        .str.replace(r'(\d+)-(\d+)-(\d+)', r'\1-\2.\3', regex=True)\
+        .str.replace(r'^: ', '', regex=True)
     return df
 
 
@@ -161,7 +162,7 @@ def clean_rank_desc_20(df):
     df.loc[:, 'rank_desc'] = df.rank_desc\
         .str.replace('reserves', 'reserve', regex=False)\
         .str.replace(' 1', '', regex=False)
-    return df 
+    return df
 
 
 def clean_department_desc(df):
@@ -173,7 +174,7 @@ def clean_department_desc(df):
         .str.replace('detectives', 'criminal investigations', regex=False)\
         .str.replace('uniform ', '', regex=False)\
         .str.replace(r'\(|\)', '', regex=True)
-    return df 
+    return df
 
 
 def clean_disposition_20(df):
@@ -212,7 +213,7 @@ def clean18():
         .pipe(split_infraction)\
         .pipe(
             standardize_desc_cols,
-            ["rank_desc", "disposition", "complainant_type", "department_desc", "charges"])\
+            ["rank_desc", "disposition", "complainant_type", "department_desc", "allegation"])\
         .pipe(clean_dates, ["rank_date"])\
         .pipe(clean_races, ["race"])\
         .pipe(clean_sexes, ["sex"])\
@@ -220,12 +221,12 @@ def clean18():
         .pipe(clean_action)\
         .pipe(clean_complainant)\
         .pipe(clean_department_desc)\
-        .pipe(clean_charges)\
+        .pipe(clean_allegations)\
         .pipe(assign_agency)\
         .pipe(assign_prod_year, '2018')\
         .pipe(clean_names, ['first_name', 'last_name', 'middle_initial'])\
         .pipe(gen_uid, ["agency", "first_name", "last_name", "birth_year", "badge_no"])\
-        .pipe(gen_uid, ['agency', 'uid', 'occur_year', 'occur_month', 'occur_day'], 'complaint_uid')
+        .pipe(gen_uid, ['agency', 'uid', 'occur_year', 'occur_month', 'occur_day'], 'allegation_uid')
     return df
 
 
@@ -243,13 +244,13 @@ def clean20():
         .pipe(split_infraction)\
         .pipe(
             standardize_desc_cols,
-            ['rank_desc', 'disposition', 'complainant_type', 'department_desc', 'charges'])\
+            ['rank_desc', 'disposition', 'complainant_type', 'department_desc', 'allegation'])\
         .pipe(clean_dates, ['rank_date'])\
         .pipe(clean_races, ['race'])\
         .pipe(clean_sexes, ['sex'])\
         .pipe(clean_datetimes, ['occur_datetime'])\
         .pipe(clean_action)\
-        .pipe(clean_charges)\
+        .pipe(clean_allegations)\
         .pipe(clean_rank_desc_20)\
         .pipe(clean_birth_year_20)\
         .pipe(clean_department_desc)\
@@ -259,14 +260,13 @@ def clean20():
         .pipe(assign_prod_year, '2020')\
         .pipe(clean_names, ['first_name', 'last_name', 'middle_initial'])\
         .pipe(gen_uid, ["agency", "first_name", "last_name", "birth_year", "badge_no"])\
-        .pipe(gen_uid, ['agency', 'uid', 'occur_year', 'occur_month', 'occur_day'], 'complaint_uid')
+        .pipe(gen_uid, ['agency', 'uid', 'occur_year', 'occur_month', 'occur_day'], 'allegation_uid')
     return df
 
 
 if __name__ == "__main__":
     df18 = clean18()
     df20 = clean20()
-    ensure_data_dir("clean")
     df18.to_csv(
         data_file_path("clean/cprr_baton_rouge_so_2018.csv"),
         index=False)

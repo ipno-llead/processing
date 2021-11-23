@@ -1,4 +1,4 @@
-from lib.path import data_file_path, ensure_data_dir
+from lib.path import data_file_path
 from lib.columns import clean_column_names, set_values
 from lib.clean import (
     clean_dates, clean_races, clean_sexes, float_to_int_str, clean_names, standardize_desc_cols, clean_salaries
@@ -52,22 +52,22 @@ def clean_cprr_19():
     return pd.read_csv(data_file_path('raw/mandeville_pd/mandeville_pd_cprr_2019_byhand.csv'))\
         .pipe(clean_column_names)\
         .rename(columns={
-            'title': 'rank_desc'
+            'title': 'rank_desc',
+            'charges': 'allegation'
         })\
         .dropna(axis=1, how='all')\
         .pipe(clean_names, ['last_name'])\
         .pipe(float_to_int_str, ['occur_year', 'occur_month', 'occur_day'])\
-        .pipe(standardize_desc_cols, ['rank_desc', 'charges', 'disposition'])\
+        .pipe(standardize_desc_cols, ['rank_desc', 'allegation', 'disposition'])\
         .pipe(assign_agency, 2020)\
         .pipe(clean_names, ['last_name'])\
         .pipe(gen_uid, ['agency', 'rank_desc', 'last_name'])\
-        .pipe(gen_uid, ['agency', 'tracking_number'], 'complaint_uid')
+        .pipe(gen_uid, ['agency', 'tracking_number'], 'allegation_uid')
 
 
 if __name__ == '__main__':
     pprr = clean_pprr_20()
     cprr = clean_cprr_19()
-    ensure_data_dir("clean")
     pprr.to_csv(data_file_path(
         "clean/pprr_mandeville_csd_2020.csv"), index=False)
     cprr.to_csv(data_file_path(

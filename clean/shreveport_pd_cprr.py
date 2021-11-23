@@ -3,7 +3,7 @@ import sys
 import pandas as pd
 
 from lib.columns import clean_column_names, set_values
-from lib.path import data_file_path, ensure_data_dir
+from lib.path import data_file_path
 from lib.clean import clean_names
 from lib.uid import gen_uid
 
@@ -188,12 +188,12 @@ def clean_cprr(disposition_file, name_file, year):
 
     return df.pipe(clean_allegation)\
         .drop_duplicates()\
-        .pipe(gen_uid, ['agency', 'tracking_number', 'allegation'], 'complaint_uid')\
+        .pipe(gen_uid, ['agency', 'tracking_number', 'allegation'], 'allegation_uid')\
         .pipe(make_disposition_categorical)\
         .sort_values([
             'receive_date', 'tracking_number', 'disposition'
         ], ascending=[True, True, False], na_position='first')\
-        .drop_duplicates(['complaint_uid'], keep='last')\
+        .drop_duplicates(['allegation_uid'], keep='last')\
         .reset_index(drop=True)
 
 
@@ -221,7 +221,6 @@ if __name__ == '__main__':
         ),
     ])
     cb_df = clean_codebook()
-    ensure_data_dir('clean')
     df.to_csv(data_file_path(
         'clean/cprr_shreveport_pd_2018_2019.csv'
     ), index=False)

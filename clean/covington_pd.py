@@ -3,7 +3,7 @@ import sys
 import pandas as pd
 
 from lib.columns import clean_column_names, set_values
-from lib.path import data_file_path, ensure_data_dir
+from lib.path import data_file_path
 from lib.uid import gen_uid
 from lib import salary
 from lib.clean import clean_names, standardize_desc_cols, clean_salaries
@@ -132,7 +132,6 @@ def clean_pprr():
 if __name__ == '__main__':
     actions_history = clean_actions_history()
     pprr = clean_pprr()
-    ensure_data_dir('clean')
     actions_history.to_csv(data_file_path(
         'clean/actions_history_covington_pd_2021.csv'
     ), index=False)

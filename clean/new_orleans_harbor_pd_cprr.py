@@ -1,5 +1,5 @@
 from lib.columns import clean_column_names
-from lib.path import data_file_path, ensure_data_dir
+from lib.path import data_file_path
 from lib.clean import (
     clean_dates, clean_names, standardize_desc_cols, clean_sexes, clean_races
 )
@@ -43,6 +43,19 @@ def assign_agency(df):
     return df
 
 
+def assign_allegations(df):
+    df.loc[:, 'b_rule_violation'] = df.b_rule_violation.str.lower().str.strip()\
+        .str.replace(r'(.+)', r'rule: \1')
+    df.loc[:, 'c_paragraph_violation'] = df.c_paragraph_violation.str.lower().str.strip()\
+        .str.replace(r'(.+)', r'paragraph: \1')
+    
+    df.loc[:, 'allegation'] = df.c_paragraph_violation.str.cat(df.b_rule_violation, sep='; ')
+    df.loc[:, 'allegation'] = df.allegation\
+        .str.cat(df.a_the_complaint_category_classification.str.lower(), sep=' ')
+    return df.drop(columns=['a_the_complaint_category_classification', 'b_rule_violation', 
+                            'c_paragraph_violation'])
+
+
 def clean():
     df = realign()\
         .drop(columns=["e_the_recommended_discipline"])\
@@ -53,8 +66,6 @@ def clean():
             "6_unit_assignment_on_the_date_of_the_complaint_incident": "department_desc",
             "7_rank_on_the_date_of_the_complaint_incident": "rank_desc",
             "8_date_of_appointment": "hire_date",
-            "b_rule_violation": "rule_code",
-            "c_paragraph_violation": "paragraph_code",
             "e_the_final_discipline_imposed": "action",
             "a_the_incident_type": "incident_type",
             "b_the_complaint_tracking_number": "tracking_number",
@@ -66,6 +77,9 @@ def clean():
             "1_gender": "complainant_sex",
             "2_race": "complainant_race",
         })\
+        .drop(columns=['d_disposition', '5_age_or_year_of_birth',
+                       '3_age_or_year_of_birth', '4_race'])\
+        .pipe(assign_allegations)\
         .pipe(split_name)\
         .pipe(clean_names, ["first_name", "last_name"])\
         .pipe(strip_badge)\
@@ -77,11 +91,10 @@ def clean():
         .pipe(clean_races, ["complainant_race"])\
         .pipe(clean_dates, ["hire_date", "occur_date", "receive_date", "investigation_complete_date"])\
         .pipe(assign_agency)\
-        .pipe(gen_uid, ['agency', 'tracking_number'], 'complaint_uid')
+        .pipe(gen_uid, ['agency', 'tracking_number'], 'allegation_uid')
     return df
 
 
 if __name__ == "__main__":
     df = clean()
-    ensure_data_dir("clean")
     df.to_csv(data_file_path("clean/cprr_new_orleans_harbor_pd_2020.csv"))

@@ -27,7 +27,7 @@ def fuse_events(pprr, cprr):
             'prefix': 'investigation_complete',
             'keep': ['uid', 'charges', 'disposition', 'action']
         }
-    }, ['uid', 'complaint_uid'])
+    }, ['uid', 'allegation_uid'])
     return builder.to_frame()
 
 

@@ -2,10 +2,12 @@ import sys
 sys.path.append("../")
 import pandas as pd
 from lib.columns import clean_column_names, set_values
-from lib.path import data_file_path, ensure_data_dir
+from lib.path import data_file_path
 from lib.clean import clean_names, float_to_int_str, standardize_desc_cols
 from lib.uid import gen_uid
 from lib.standardize import standardize_from_lookup_table
+from lib.rows import duplicate_row
+import re
 
 
 action_lookup = [
@@ -200,14 +202,14 @@ def clean_action_19(df):
 
 def process_disposition(df):
     df.loc[:, 'disposition'] = df.disposition.str.strip()
-    df.loc[:, 'charges'] = df.charges.str.strip()\
+    df.loc[:, 'allegation'] = df.allegation.str.strip()\
         .str.replace(r',$', r'', regex=True)
     for _, row in df.iterrows():
-        if pd.isnull(row.disposition) or pd.isnull(row.charges):
+        if pd.isnull(row.disposition) or pd.isnull(row.allegation):
             continue
-        charges = row.charges.lower()
-        if row.disposition.lower().startswith(charges):
-            row.disposition = row.disposition[len(charges):]
+        allegation = row.allegation.lower()
+        if row.disposition.lower().startswith(allegation):
+            row.disposition = row.disposition[len(allegation):]
     df.loc[:, 'disposition'] = df.disposition.str.strip()\
         .str.replace(r'^[- ]+', '', regex=True)
     return df
@@ -336,8 +338,8 @@ def clean_rank_desc_20(df):
     return df
 
 
-def clean_charges_20(df):
-    df.loc[:, 'charges'] = df.charges.str.strip()\
+def clean_allegations_20(df):
+    df.loc[:, 'allegation'] = df.charges.str.strip()\
         .str.replace('and', '', regex=False)\
         .str.replace(r', ?', '/', regex=True)\
         .str.replace('dtuy', 'duty', regex=False)\
@@ -357,7 +359,7 @@ def clean_charges_20(df):
         .str.replace('tyour', 'tour', regex=False)\
         .str.replace(r'poli?ciy', 'policy', regex=True)\
         .str.replace(r'cease?s?ing', 'ceasing', regex=True)\
-        .str.replace('nege?le?c?e?t', 'neglect', regex=False)\
+        .str.replace(r'nege?le?c?e?t', 'neglect', regex=True)\
         .str.replace('procudures', 'procedures', regex=False)\
         .str.replace('higer', 'higher', regex=False)\
         .str.replace('; ', '/', regex=False)\
@@ -433,7 +435,17 @@ def clean_charges_20(df):
         .str.replace(r'(\w+) physical', r'\1/physical', regex=True)\
         .str.replace('courtesy intimidation', 'courtesy/intimidation', regex=False)\
         .str.replace('unfounded', '', regex=False)\
-        .str.replace(r'/$', '', regex=True)
+        .str.replace(r'/$', '', regex=True)\
+        .str.replace(r'  +', '', regex=True)
+    return df.drop(columns=['charges'])
+
+
+def split_rows_with_multiple_allegations_20(df):
+    df = df.drop('allegation', axis=1)\
+        .join(df['allegation']
+              .str.split('/', expand=True).stack()
+              .reset_index(level=1, drop=True)
+              .rename('allegation'), how='outer').reset_index(drop=True)
     return df
 
 
@@ -585,10 +597,11 @@ def clean19():
             'emp_no': 'employee_id',
             'date_started': 'investigation_start_date',
             'date_completed': 'investigation_complete_date',
-            'terminated_resigned': 'action'
+            'terminated_resigned': 'action',
+            'charges': 'allegation'
         })\
         .pipe(remove_carriage_return, [
-            'name_of_accused', 'disposition', 'charges', 'summary', 'investigating_supervisor',
+            'name_of_accused', 'disposition', 'allegation', 'summary', 'investigating_supervisor',
             'action', 'department_desc', 'rank_desc'
         ])\
         .pipe(clean_department_desc)\
@@ -604,9 +617,9 @@ def clean19():
         .pipe(fix_date_typos, ['receive_date', 'investigation_start_date', 'investigation_complete_date'])\
         .pipe(gen_uid, ['agency', 'employee_id', 'first_name', 'last_name', 'middle_initial'])\
         .pipe(set_empty_uid_for_anonymous_officers)\
-        .pipe(gen_uid, ['agency', 'tracking_number', 'uid'], 'complaint_uid')\
+        .pipe(gen_uid, ['agency', 'tracking_number', 'uid'], 'allegation_uid')\
         .sort_values(['tracking_number', 'investigation_complete_date'])\
-        .drop_duplicates(subset=['complaint_uid'], keep='last', ignore_index=True)\
+        .drop_duplicates(subset=['allegation_uid'], keep='last', ignore_index=True)\
         .pipe(split_investigating_supervisor)\
         .pipe(clean_summary)\
         .pipe(extract_arrest_date)\
@@ -644,7 +657,8 @@ def clean20():
         .pipe(clean_action_20)\
         .pipe(standardize_action_20)\
         .pipe(clean_rank_desc_20)\
-        .pipe(clean_charges_20)\
+        .pipe(clean_allegations_20)\
+        .pipe(split_rows_with_multiple_allegations_20)\
         .pipe(split_name_20)\
         .pipe(drop_rows_missing_name_20)\
         .pipe(clean_employee_id_20)\
@@ -666,7 +680,7 @@ def clean20():
             'data_production_year': '2020'})\
         .pipe(float_to_int_str, ['employee_id'])\
         .pipe(gen_uid, ['agency', 'first_name', 'middle_name', 'last_name', 'employee_id'])\
-        .pipe(gen_uid, ['tracking_number', 'action', 'employee_id'], 'complaint_uid')\
+        .pipe(gen_uid, ['tracking_number', 'allegation', 'action', 'employee_id'], 'allegation_uid')\
         .pipe(add_left_reason_column)
     return df
 
@@ -674,6 +688,5 @@ def clean20():
 if __name__ == '__main__':
     df19 = clean19()
     df20 = clean20()
-    ensure_data_dir('clean')
     df19.to_csv(data_file_path('clean/cprr_new_orleans_so_2019.csv'), index=False)
     df20.to_csv(data_file_path('clean/cprr_new_orleans_so_2020.csv'), index=False)

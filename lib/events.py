@@ -23,7 +23,7 @@ OFFICER_POST_DECERTIFICATION = "officer_post_decertification"  # officer decerti
 
 COMPLAINT_INCIDENT = "complaint_incident"
 COMPLAINT_RECEIVE = "complaint_receive"
-CHARGES_CREATE = "charges_create"
+ALLEGATION_CREATE = "allegation_create"
 INVESTIGATION_START = "investigation_start"
 INVESTIGATION_COMPLETE = "investigation_complete"
 SUSPENSION_START = "suspension_start"
@@ -59,7 +59,7 @@ event_cat_type = CategoricalDtype(categories=[
     OFFICER_PAY_EFFECTIVE,
     COMPLAINT_INCIDENT,
     COMPLAINT_RECEIVE,
-    CHARGES_CREATE,
+    ALLEGATION_CREATE,
     INVESTIGATION_START,
     INVESTIGATION_COMPLETE,
     SUSPENSION_START,

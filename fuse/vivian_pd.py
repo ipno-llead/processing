@@ -4,9 +4,8 @@ import pandas as pd
 
 from lib.path import data_file_path, ensure_data_dir
 from lib.columns import (
-    rearrange_personnel_columns, rearrange_complaint_columns, rearrange_event_columns
+    rearrange_personnel_columns, rearrange_event_columns
 )
-from lib.uid import ensure_uid_unique
 from lib import events
 
 sys.path.append('../')
@@ -33,7 +32,6 @@ if __name__ == '__main__':
         post_event,
         fuse_events(pprr)
     ]))
-    ensure_uid_unique(events_df, 'event_uid', True)
     ensure_data_dir('fuse')
     rearrange_personnel_columns(pprr).to_csv(data_file_path(
         "fuse/per_vivian_pd.csv"), index=False)

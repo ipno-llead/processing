@@ -1,4 +1,4 @@
-from lib.path import data_file_path, ensure_data_dir
+from lib.path import data_file_path
 from lib.columns import clean_column_names, set_values
 from lib.clean import clean_names, clean_dates, standardize_desc_cols, clean_salaries, clean_races, clean_sexes
 from lib.uid import gen_uid
@@ -33,13 +33,13 @@ def clean_cprr():
     df = pd.read_csv(data_file_path("raw/brusly_pd/brusly_pd_cprr_2020.csv"))
     df = clean_column_names(df)
     df.columns = ['receive_date', 'occur_date', 'officer_name', 'supervisor',
-                  'charges', 'action', 'suspension_start_date', 'suspension_end_date']
+                  'allegation', 'action', 'suspension_start_date', 'suspension_end_date']
     df = df\
         .pipe(split_cprr_name)\
         .pipe(clean_names, ["last_name", "first_name"])\
         .pipe(split_supervisor)\
         .pipe(clean_dates, ['receive_date', 'occur_date', 'suspension_start_date', 'suspension_end_date'])\
-        .pipe(standardize_desc_cols, ['charges', 'action'])\
+        .pipe(standardize_desc_cols, ['allegation', 'action'])\
         .pipe(set_values, {
             'data_production_year': 2020,
             'agency': 'Brusly PD'
@@ -105,7 +105,6 @@ if __name__ == "__main__":
     cprr = clean_cprr()
     pprr = clean_pprr()
     award = clean_award()
-    ensure_data_dir("clean")
     cprr.to_csv(data_file_path("clean/cprr_brusly_pd_2020.csv"), index=False)
     pprr.to_csv(data_file_path("clean/pprr_brusly_pd_2020.csv"), index=False)
     award.to_csv(data_file_path("clean/award_brusly_pd_2021.csv"), index=False)
