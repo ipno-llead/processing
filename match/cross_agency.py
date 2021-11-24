@@ -1,6 +1,7 @@
+from datetime import datetime
 import pathlib
 import sys
-from datamatch.indices import MultiIndex
+from datamatch.indices import MultiIndex, NoopIndex
 from datamatch.scorers import AbsoluteScorer
 
 import numpy as np
@@ -110,21 +111,28 @@ def cross_match_officers_between_agencies(personnel, events, constraints):
         "match/cross_agency_officers.xlsx"
     )
     matcher = ThresholdMatcher(
-        MultiIndex([
+        index=MultiIndex([
+            # only officers who have the same first letter in their first name would be matched
             ColumnsIndex('fc'),
+            # or if they are in the same attract constraint
             ColumnsIndex('attract_id', ignore_key_error=True),
         ]),
-        MaxScorer([
+        scorer=MaxScorer([
+            # calculate similarity score (0-1) based on how similar the names are
             SimSumScorer({
                 'first_name': JaroWinklerSimilarity(),
                 'last_name': JaroWinklerSimilarity(),
             }),
+            # but if two officers belong to the same attract constraint then give them the highest score regardless
             AbsoluteScorer('attract_id', 1, ignore_key_error=True),
         ]),
-        per,
+        dfa=per,
         filters=[
+            # don't match officers who belong in the same agency
             DissimilarFilter('agency'),
+            # don't match officers who are in the same repell constraint
             DissimilarFilter('repell_id', ignore_key_error=True),
+            # don't match officers who appear in overlapping time ranges
             NonOverlappingFilter('min_timestamp', 'max_timestamp')
         ],
         show_progress=True,
@@ -162,6 +170,52 @@ def create_person_table(clusters, personnel, personnel_event):
     person_df.loc[:, 'uids'] = person_df.uids.str.join(',')
 
     return person_df[['person_id', 'canonical_uid', 'uids']]
+
+
+def entity_resolution(old_person: pd.DataFrame, new_person: pd.DataFrame) -> pd.DataFrame:
+    dfa = new_person.set_index('person_id', drop=True)
+    dfa.loc[:, 'uids'] = dfa.uids.str.split(pat=',')\
+        .map(lambda x: set(x))
+
+    dfb = old_person.set_index('person_id', drop=True)
+    dfb.loc[:, 'uids'] = dfb.uids.str.split(pat=',')\
+        .map(lambda x: set(x))
+
+    def person_scorer(a: pd.Series, b: pd.Series) -> float:
+        if a.uid == b.uid:
+            return 1
+        x_len = len(a.uids & b.uids)
+        return x_len * 2 / (len(a.uids) + len(b.uids))
+
+    matcher = ThresholdMatcher(
+        # TODO: upgrade datamatch version to have index_elements available
+        index=ColumnsIndex('uids', index_elements=True),
+        scorer=person_scorer,
+        dfa=dfa,
+        dfb=dfb,
+        show_progress=True,
+    )
+    decision = 0.001
+    matcher.save_pairs_to_excel(
+        name=data_file_path(
+            "match/person_entity_resolution_%s.xlsx" % datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
+        ),
+        match_threshold=decision,
+        lower_bound=0
+    )
+    pairs = matcher.get_index_pairs_within_thresholds(decision)
+    pairs_dict = dict(pairs)
+
+    def new_person_ids():
+        per_id = old_person.person_id.max()
+        while True:
+            per_id += 1
+            yield per_id
+
+    # get person_id from the old table, if not found, assign a completely new id
+    gen = new_person_ids()
+    new_person.loc[:, 'person_id'] = new_person.uid.map(lambda x: pairs_dict.get(x, next(gen)))
+    return new_person
 
 
 if __name__ == '__main__':
