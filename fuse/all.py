@@ -45,6 +45,7 @@ def fuse_personnel():
         pd.read_csv(data_file_path("fuse/per_carencro_pd.csv")),
         pd.read_csv(data_file_path("fuse/per_central_csd.csv")),
         pd.read_csv(data_file_path("fuse/per_bossier_city_pd.csv")),
+        pd.read_csv(data_file_path("fuse/per_baker_pd.csv")),
     ])).sort_values('uid', ignore_index=True)
 
 
@@ -85,6 +86,7 @@ def fuse_event():
         pd.read_csv(data_file_path("fuse/event_carencro_pd.csv")),
         pd.read_csv(data_file_path("fuse/event_central_csd.csv")),
         pd.read_csv(data_file_path("fuse/event_bossier_city_pd.csv")),
+        pd.read_csv(data_file_path("fuse/event_baker_pd.csv")),
     ])).sort_values(['agency', 'event_uid'], ignore_index=True)
 
 
@@ -112,6 +114,7 @@ def fuse_complaint():
         pd.read_csv(data_file_path("fuse/com_ponchatoula_pd.csv")),
         pd.read_csv(data_file_path("fuse/com_lake_charles_pd.csv")),
         pd.read_csv(data_file_path("fuse/com_bossier_city_pd.csv")),
+        pd.read_csv(data_file_path("fuse/com_baker_pd.csv")),
     ])).sort_values(['agency', 'tracking_number'], ignore_index=True)
 
 
