@@ -2,7 +2,7 @@ import pandas as pd
 from lib.path import data_file_path
 from lib.personnel import fuse_personnel
 from lib.columns import (
-    rearrange_event_columns, rearrange_complaint_columns,
+    rearrange_event_columns, rearrange_allegation_columns,
     rearrange_appeal_hearing_columns
 )
 from lib import events
@@ -99,7 +99,7 @@ if __name__ == "__main__":
         post_event,
         events_df
     ]))
-    complaint_df = rearrange_complaint_columns(
+    complaint_df = rearrange_allegation_columns(
         pd.concat([cprr_18, cprr_21]))
     lprr_df = rearrange_appeal_hearing_columns(lprr)
 
