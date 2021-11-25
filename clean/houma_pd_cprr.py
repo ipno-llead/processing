@@ -126,7 +126,7 @@ def clean():
         .pipe(standardize_desc_cols, ['tracking_number', 'action'])\
         .pipe(set_values, ({'agency': 'Houma PD'}))\
         .pipe(gen_uid, ['agency', 'first_name', 'last_name'])\
-        .pipe(gen_uid, ['uid', 'tracking_number', 'external_tracking_number', 'allegation', 'action'], 'complaint_uid')
+        .pipe(gen_uid, ['uid', 'tracking_number', 'external_tracking_number', 'allegation', 'action'], 'allegation_uid')
     return df
 
 
