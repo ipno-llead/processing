@@ -2,7 +2,7 @@ import sys
 sys.path.append('../')
 from lib.path import data_file_path
 from lib.columns import (
-    rearrange_allegation_columns,
+    rearrange_complaint_columns,
 )
 from lib import events
 from lib.personnel import fuse_personnel
@@ -46,7 +46,7 @@ if __name__ == '__main__':
         'match/cprr_tangipahoa_so_2015_2021.csv'))
     post = prepare_post_data()
     per = fuse_personnel(cprr, post)
-    complaints = rearrange_allegation_columns(cprr)
+    complaints = rearrange_complaint_columns(cprr)
     event = fuse_events(cprr, post)
     event.to_csv(
         data_file_path('fuse/event_tangipahoa_so.csv'),

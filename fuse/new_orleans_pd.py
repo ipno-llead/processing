@@ -2,7 +2,7 @@ import pandas as pd
 from lib.path import data_file_path
 from lib.columns import (
     rearrange_appeal_hearing_columns,
-    rearrange_allegation_columns,
+    rearrange_complaint_columns,
     rearrange_stop_and_search_columns,
     rearrange_use_of_force, rearrange_event_columns)
 from lib.clean import float_to_int_str
@@ -29,7 +29,7 @@ def fuse_cprr(cprr, actions, officer_number_dict):
         lambda x: officer_number_dict.get(x, ''))
     # cprr.loc[:, 'action'] = cprr.allegation_primary_key.map(
     #     lambda x: actions_dict.get(x, ''))
-    return rearrange_allegation_columns(cprr)
+    return rearrange_complaint_columns(cprr)
 
 
 def fuse_use_of_force(uof, officer_number_dict):

@@ -1,6 +1,6 @@
 import pandas as pd
 from lib.path import data_file_path
-from lib.columns import rearrange_allegation_columns
+from lib.columns import rearrange_complaint_columns
 from lib.personnel import fuse_personnel
 from lib import events
 
@@ -47,7 +47,7 @@ if __name__ == "__main__":
     post = prepare_post_data()
     personnel_df = fuse_personnel(cprr_18, cprr_20, post)
     event_df = fuse_events(cprr_18, cprr_20, post)
-    complaint_df = rearrange_allegation_columns(
+    complaint_df = rearrange_complaint_columns(
         pd.concat([cprr_18, cprr_20]))
     personnel_df.to_csv(data_file_path(
         "fuse/per_baton_rouge_so.csv"), index=False)

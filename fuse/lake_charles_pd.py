@@ -3,7 +3,7 @@ sys.path.append("../")
 import pandas as pd
 from lib.path import data_file_path
 from lib import events
-from lib.columns import rearrange_allegation_columns
+from lib.columns import rearrange_complaint_columns
 from lib.personnel import fuse_personnel
 
 
@@ -52,7 +52,7 @@ if __name__ == '__main__':
     cprr19 = pd.read_csv(data_file_path('match/cprr_lake_charles_pd_2014_2019.csv'))
     post = prepare_post_data()
     per = fuse_personnel(cprr20, cprr19, post)
-    com = rearrange_allegation_columns(pd.concat([cprr20, cprr19]))
+    com = rearrange_complaint_columns(pd.concat([cprr20, cprr19]))
     event = fuse_events(cprr20, cprr19, post)
     event.to_csv(
         data_file_path('fuse/event_lake_charles_pd.csv'), index=False)

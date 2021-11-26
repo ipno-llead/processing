@@ -31,7 +31,7 @@ $(MD5_DIR)/%.md5: % | $(MD5_DIR)
 	$(if $(filter-out $(shell cat $@ 2>/dev/null),$(shell $(MD5) $<)),$(MD5) $< > $@)
 
 %/data.d: %/*.py
-	scripts/write_deps.py $* $(if $(findstring fuse,$*),--all --dependency build/md5/data/datavalid.yml.md5 ,)$(patsubst %,-e %,$(EXCLUDED_SCRIPTS))
+	scripts/write_deps.py $* $(if $(findstring fuse,$*),--all ,)$(patsubst %,-e %,$(EXCLUDED_SCRIPTS))
 
 $(BUILD_DIR) $(DATA_DIR): ; @-mkdir $@ 2>/dev/null
 $(MD5_DIR): | $(BUILD_DIR) ; @-mkdir $@ 2>/dev/null

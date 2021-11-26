@@ -1,8 +1,7 @@
 import pandas as pd
 from lib.path import data_file_path
 from lib.columns import (
-    rearrange_personnel_columns, rearrange_event_columns, rearrange_allegation_columns,
-    rearrange_stop_and_search_columns, rearrange_use_of_force
+    rearrange_personnel_columns, rearrange_event_columns, rearrange_complaint_columns, rearrange_stop_and_search_columns, rearrange_use_of_force
 )
 from lib.uid import ensure_uid_unique
 import sys
@@ -47,7 +46,6 @@ def fuse_personnel():
         pd.read_csv(data_file_path("fuse/per_central_csd.csv")),
         pd.read_csv(data_file_path("fuse/per_bossier_city_pd.csv")),
         pd.read_csv(data_file_path("fuse/per_houma_pd.csv")),
-        pd.read_csv(data_file_path("fuse/per_baker_pd.csv")),
     ])).sort_values('uid', ignore_index=True)
 
 
@@ -89,12 +87,11 @@ def fuse_event():
         pd.read_csv(data_file_path("fuse/event_central_csd.csv")),
         pd.read_csv(data_file_path("fuse/event_bossier_city_pd.csv")),
         pd.read_csv(data_file_path("fuse/event_houma_pd.csv")),
-        pd.read_csv(data_file_path("fuse/event_baker_pd.csv")),
     ])).sort_values(['agency', 'event_uid'], ignore_index=True)
 
 
-def fuse_allegation():
-    return rearrange_allegation_columns(pd.concat([
+def fuse_complaint():
+    return rearrange_complaint_columns(pd.concat([
         pd.read_csv(data_file_path("fuse/com_baton_rouge_pd.csv")),
         pd.read_csv(data_file_path("fuse/com_baton_rouge_so.csv")),
         pd.read_csv(data_file_path("fuse/com_new_orleans_harbor_pd.csv")),
@@ -117,8 +114,7 @@ def fuse_allegation():
         pd.read_csv(data_file_path("fuse/com_ponchatoula_pd.csv")),
         pd.read_csv(data_file_path("fuse/com_lake_charles_pd.csv")),
         pd.read_csv(data_file_path("fuse/com_bossier_city_pd.csv")),
-        pd.read_csv(data_file_path("fuse/com_houma_pd.csv")),
-        pd.read_csv(data_file_path("fuse/com_baker_pd.csv")),
+        pd.read_csv(data_file_path("fuse/com_houma_pd.csv"))
     ])).sort_values(['agency', 'tracking_number'], ignore_index=True)
 
 
@@ -140,13 +136,14 @@ if __name__ == "__main__":
     ensure_uid_unique(per_df, 'uid')
     event_df = fuse_event()
     ensure_uid_unique(event_df, 'event_uid')
-    allegation_df = fuse_allegation()
-    ensure_uid_unique(allegation_df, 'allegation_uid')
+    com_df = fuse_complaint()
+    ensure_uid_unique(com_df, 'complaint_uid')
+    com_df.loc[:, 'allegation_uid'] = ''
     uof_df = fuse_use_of_force()
     ensure_uid_unique(uof_df, 'uof_uid')
     sas_df = fuse_stop_and_search()
     per_df.to_csv(data_file_path("fuse/personnel.csv"), index=False)
     event_df.to_csv(data_file_path("fuse/event.csv"), index=False)
-    allegation_df.to_csv(data_file_path("fuse/allegation.csv"), index=False)
+    com_df.to_csv(data_file_path("fuse/complaint.csv"), index=False)
     uof_df.to_csv(data_file_path('fuse/use_of_force.csv'), index=False)
     sas_df.to_csv(data_file_path('fuse/stop_and_search.csv'), index=False)

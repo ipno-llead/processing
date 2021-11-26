@@ -184,10 +184,6 @@ repos:
     fileName: fuse/com_houma_pd.csv
     primaryKey:
       - complaint_uid
-  com-baker-pd:
-    fileName: fuse/com_baker_pd.csv
-    primaryKey:
-      - allegation_uid
   uof-new-orleans-pd:
     fileName: fuse/uof_new_orleans_pd.csv
     primaryKey:
@@ -340,11 +336,9 @@ repos:
     fileName: fuse/per_bossier_city_pd.csv
     primaryKey:
       - uid
+      - uid
   per-houma-pd:
     fileName: fuse/per_houma_pd.csv
-        - uid
-  per-baker-pd:
-    fileName: fuse/per_baker_pd.csv
     primaryKey:
       - uid
   event-new-orleans-pd:
@@ -485,9 +479,6 @@ repos:
       - event_uid
   event-houma-pd:
     fileName: fuse/event_houma_pd.csv
-      - event_uid
-  event-baker-pd:
-    fileName: fuse/event_baker_pd.csv
     primaryKey:
       - event_uid
   personnel:

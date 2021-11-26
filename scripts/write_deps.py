@@ -110,9 +110,7 @@ def detect_script_input_output(q: pathlib.Path, debug: bool) -> Tuple[List[str],
     return sorted(inputs), sorted([name.split('/')[1] for name in outputs])
 
 
-def write_make_rules(
-        all: bool, dir: pathlib.Path, scripts: List[Tuple[str, List[str], List[str]]],
-        dependencies: List[pathlib.Path] = []):
+def write_make_rules(all: bool, dir: pathlib.Path, scripts: List[Tuple[str, List[str], List[str]]]):
     scripts.sort(key=lambda x: x[0])
     dir_var = 'DATA_%s_DIR' % dir.name.upper()
     with open(dir / 'data.d', 'w') as f:
@@ -123,8 +121,7 @@ def write_make_rules(
             f.write('%s: %s %s | $(%s)\n\tpython %s\n\n' % (
                 targets,
                 '$(MD5_DIR)/%s.md5' % (dir / script),
-                ' '.join(['data/%s' % name for name in inputs] +
-                         [str(p) for p in dependencies]),
+                ' '.join(['data/%s' % name for name in inputs]),
                 dir_var,
                 dir / script,
             ))
@@ -152,10 +149,6 @@ if __name__ == '__main__':
     )
     parser.add_argument(
         '-d', '--debug', action='store_true', help='print debug information'
-    )
-    parser.add_argument(
-        '--dependency', action='append', type=pathlib.Path, default=[],
-        help='include this dependency in each rule'
     )
     args = parser.parse_args()
     if not args.scripts_dir.exists():
@@ -185,4 +178,4 @@ if __name__ == '__main__':
             raise
         scripts.append((q.name, inputs, outputs))
 
-    write_make_rules(args.all, args.scripts_dir, scripts, args.dependency)
+    write_make_rules(args.all, args.scripts_dir, scripts)
