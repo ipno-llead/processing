@@ -5,7 +5,7 @@ import pandas as pd
 
 from lib.path import data_file_path
 from lib.columns import (
-    rearrange_complaint_columns, rearrange_event_columns
+    rearrange_allegation_columns, rearrange_event_columns
 )
 from lib import events
 
@@ -66,7 +66,7 @@ if __name__ == '__main__':
             'investigator_last_name': 'last_name',
         })
     )
-    com = rearrange_complaint_columns(cprr)
+    com = rearrange_allegation_columns(cprr)
     per.to_csv(data_file_path(
         'fuse/per_lafayette_pd.csv'
     ), index=False)

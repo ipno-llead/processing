@@ -4,7 +4,7 @@ import pandas as pd
 from lib.path import data_file_path
 from lib import events
 from lib.personnel import fuse_personnel
-from lib.columns import rearrange_complaint_columns
+from lib.columns import rearrange_allegation_columns
 
 
 def prepare_post_data():
@@ -68,7 +68,7 @@ if __name__ == '__main__':
     cprr_08 = pd.read_csv(data_file_path('clean/cprr_hammond_pd_2004_2008.csv'))
     post = prepare_post_data()
     personnel_df = fuse_personnel(cprr_20, cprr_14, cprr_08, post)
-    complaints_df = rearrange_complaint_columns(pd.concat([cprr_20, cprr_14, cprr_08]))
+    complaints_df = rearrange_allegation_columns(pd.concat([cprr_20, cprr_14, cprr_08]))
     event_df = fuse_events(cprr_20, cprr_14, cprr_08, post)
     event_df.to_csv(data_file_path('fuse/event_hammond_pd.csv'))
     personnel_df.to_csv(data_file_path('fuse/per_hammond_pd.csv'))
