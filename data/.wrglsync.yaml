@@ -99,87 +99,87 @@ repos:
   com-baton-rouge-pd:
     fileName: fuse/com_baton_rouge_pd.csv
     primaryKey:
-      - complaint_uid
+      - allegation_uid
   com-baton-rouge-so:
     fileName: fuse/com_baton_rouge_so.csv
     primaryKey:
-      - complaint_uid
+      - allegation_uid
   com-new-orleans-harbor-pd:
     fileName: fuse/com_new_orleans_harbor_pd.csv
     primaryKey:
-      - complaint_uid
+      - allegation_uid
   com-brusly-pd:
     fileName: fuse/com_brusly_pd.csv
     primaryKey:
-      - complaint_uid
+      - allegation_uid
   com-port-allen-pd:
     fileName: fuse/com_port_allen_pd.csv
     primaryKey:
-      - complaint_uid
+      - allegation_uid
   com-madisonville-pd:
     fileName: fuse/com_madisonville_pd.csv
     primaryKey:
-      - complaint_uid
+      - allegation_uid
   com-greenwood-pd:
     fileName: fuse/com_greenwood_pd.csv
     primaryKey:
-      - complaint_uid
+      - allegation_uid
   com-new-orleans-pd:
     fileName: fuse/com_new_orleans_pd.csv
     primaryKey:
-      - complaint_uid
+      - allegation_uid
   com-st-tammany-so:
     fileName: fuse/com_st_tammany_so.csv
     primaryKey:
-      - complaint_uid
+      - allegation_uid
   com-plaquemines-pd:
     fileName: fuse/com_plaquemines_so.csv
     primaryKey:
-      - complaint_uid
+      - allegation_uid
   com-mandeville-pd:
     fileName: fuse/com_mandeville_pd.csv
     primaryKey:
-      - complaint_uid
+      - allegation_uid
   com-levee-pd:
     fileName: fuse/com_levee_pd.csv
     primaryKey:
-      - complaint_uid
+      - allegation_uid
   com-scott-pd:
     fileName: fuse/com_scott_pd.csv
     primaryKey:
-      - complaint_uid
+      - allegation_uid
   com-tangipahoa-so:
     fileName: fuse/com_tangipahoa_so.csv
     primaryKey:
-      - complaint_uid
+      - allegation_uid
   com-new-orleans-so:
     fileName: fuse/com_new_orleans_so.csv
     primaryKey:
-      - complaint_uid
+      - allegation_uid
   com-shreveport-pd:
     fileName: fuse/com_shreveport_pd.csv
     primaryKey:
-      - complaint_uid
+      - allegation_uid
   com-lafayette-so:
     fileName: fuse/com_lafayette_so.csv
     primaryKey:
-      - complaint_uid
+      - allegation_uid
   com-lafayette-pd:
     fileName: fuse/com_lafayette_pd.csv
     primaryKey:
-      - complaint_uid
+      - allegation_uid
   com-hammond-pd:
     fileName: fuse/com_hammond_pd.csv
     primaryKey:
-      - complaint_uid
+      - allegation_uid
   com-ponchatoula-pd:
     fileName: fuse/com_ponchatoula_pd.csv
     primaryKey:
-      - complaint_uid
+      - allegation_uid
   com-bossier-city-pd:
     fileName: fuse/com_bossier_city_pd.csv
     primaryKey:
-      - complaint_uid
+      - allegation_uid
   com-baker-pd:
     fileName: fuse/com_baker_pd.csv
     primaryKey:
@@ -488,10 +488,10 @@ repos:
     fileName: fuse/event.csv
     primaryKey:
       - event_uid
-  complaint:
-    fileName: fuse/complaint.csv
+  allegation:
+    fileName: fuse/allegation.csv
     primaryKey:
-      - complaint_uid
+      - allegation_uid
   use-of-force:
     fileName: fuse/use_of_force.csv
     primaryKey:
