@@ -3,7 +3,7 @@ import sys
 import pandas as pd
 
 from lib.path import data_file_path
-from lib.columns import rearrange_allegation_columns, rearrange_event_columns
+from lib.columns import rearrange_complaint_columns, rearrange_event_columns
 from lib.personnel import fuse_personnel
 from lib import events
 
@@ -123,7 +123,7 @@ if __name__ == '__main__':
         post_events,
         events_df
     ]))
-    complaint_df = rearrange_allegation_columns(
+    complaint_df = rearrange_complaint_columns(
         pd.concat([cprr19, cprr20]))
     personnel_df.to_csv(data_file_path('fuse/per_new_orleans_so.csv'), index=False)
     events_df.to_csv(data_file_path('fuse/event_new_orleans_so.csv'), index=False)

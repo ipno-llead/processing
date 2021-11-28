@@ -1,7 +1,7 @@
 import pandas as pd
 from lib.path import data_file_path
 from lib.columns import (
-    rearrange_personnel_columns, rearrange_event_columns, rearrange_allegation_columns
+    rearrange_personnel_columns, rearrange_event_columns, rearrange_complaint_columns
 )
 from lib import events
 import sys
@@ -41,7 +41,7 @@ if __name__ == "__main__":
     pprr = pd.read_csv(data_file_path('match/pprr_port_allen_csd_2020.csv'))
     pprr.loc[:, 'agency'] = 'Port Allen PD'
     personnel_df = rearrange_personnel_columns(pprr)
-    complaint_df = rearrange_allegation_columns(
+    complaint_df = rearrange_complaint_columns(
         pd.concat([cprr16, cprr18, cprr19]))
     events_df = fuse_events(pprr, cprr16, cprr18, cprr19)
     events_df = rearrange_event_columns(pd.concat([

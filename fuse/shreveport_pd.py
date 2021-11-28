@@ -4,7 +4,7 @@ import pandas as pd
 
 from lib.path import data_file_path, ensure_data_dir
 from lib.personnel import fuse_personnel
-from lib.columns import rearrange_allegation_columns
+from lib.columns import rearrange_complaint_columns
 from lib import events
 
 sys.path.append('../')
@@ -41,7 +41,7 @@ if __name__ == '__main__':
     post = post[post.agency == 'shreveport pd']
     event_df = fuse_events(cprr, post)
     per = fuse_personnel(cprr, post)
-    com = rearrange_allegation_columns(cprr)
+    com = rearrange_complaint_columns(cprr)
     per.to_csv(data_file_path(
         'fuse/per_shreveport_pd.csv'
     ), index=False)

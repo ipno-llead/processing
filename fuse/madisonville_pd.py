@@ -1,7 +1,7 @@
 import pandas as pd
 from lib.path import data_file_path
 from lib.columns import (
-    rearrange_allegation_columns, rearrange_personnel_columns, rearrange_event_columns
+    rearrange_complaint_columns, rearrange_personnel_columns, rearrange_event_columns
 )
 from lib import events
 import sys
@@ -33,7 +33,7 @@ if __name__ == "__main__":
     post_event = pd.read_csv(data_file_path(
         "match/post_event_madisonville_csd_2019.csv"))
     per = rearrange_personnel_columns(pprr)
-    com = rearrange_allegation_columns(cprr)
+    com = rearrange_complaint_columns(cprr)
     event = fuse_events(pprr, cprr)
     event = rearrange_event_columns(pd.concat([
         post_event,
