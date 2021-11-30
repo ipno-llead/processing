@@ -1,8 +1,8 @@
 files:
   fuse/personnel.csv:
     schema: personnel
-  fuse/complaint.csv:
-    schema: complaint
+  fuse/allegation.csv:
+    schema: allegation
   fuse/event.csv:
     schema: event
   fuse/use_of_force.csv:
@@ -60,7 +60,7 @@ schemas:
             month_column: birth_month
             day_column: birth_day
           min_date: "1900-01-01"
-  complaint:
+  allegation:
     columns:
       - name: uid
         description: >
@@ -73,23 +73,17 @@ schemas:
           complaint unique identifier
         unique: true
         no_na: true
-      - name: allegation_uid
       - name: investigation_status
-      - name: assigned_unit
       - name: assigned_department
       - name: assigned_division
-      - name: assigned_sub_division_a
-      - name: assigned_sub_division_b
       - name: traffic_stop
       - name: body_worn_camera_available
       - name: app_used
       - name: citizen_arrested
-      - name: allegation_finding
       - name: allegation
         description: >
           the same data that can be found in `paragraph_code` and `paragraph_violation`.
           In fact this column should be merged with the paragraph_ columns.
-      - name: allegation_class
       - name: citizen
         description: >
           demographic info of the involved citizen
@@ -112,11 +106,6 @@ schemas:
         description: >
           an allegation is usually consist of a rule and paragraph that was violated. This is
           the text of the violated paragraph.
-      - name: allegation
-        description: >
-          `rule_*` and `paragraph_*` columns combined. Inputs that are too hard to parse and
-          split into rule and paragraph will end up here.
-      - name: officer_years_of_service
       - name: complainant_name
         description: >
           redacted if the complainant isn't a police officer.
@@ -135,7 +124,6 @@ schemas:
           - native american
           - asian / pacific islander
           - mixed
-      - name: complainant_age
       - name: action
         description: >
           what (disciplinary) actions were taken regarding this complaint
@@ -153,7 +141,6 @@ schemas:
           be matched against one of the officers in the same department then this
           references the row with the same `uid` in personnel table.
       - name: supervisor_rank
-      - name: supervisor_name
       - name: badge_no
         description: accused's badge number during incident
       - name: department_code
@@ -163,7 +150,6 @@ schemas:
       - name: department_desc
         description: >
           text description of the department the accused belonged to during the incident.
-      - name: rank_code
       - name: rank_desc
         description: >
           text description of the accused's rank during the incident.
@@ -174,7 +160,6 @@ schemas:
       - name: investigator_uid
       - name: investigator_rank
       - name: shift_supervisor
-      - name: complaint_classificaiton
   event:
     columns:
       - name: event_uid
@@ -239,7 +224,6 @@ schemas:
         description: >
           appeal hearing unique identifier, references the `appeal_uid` column in
           app_*.csv files.
-      - name: resolution_uid
       - name: uof_uid
         description: >
           unique identifier for a use of force report, references the `uof_uid` column
@@ -307,8 +291,6 @@ schemas:
         description: >
           further description of the award
       - name: left_reason
-      - name: officer_contract_status
-      - name: time_active
     validation_tasks:
       - name: event dates should be valid
         valid_date:
@@ -411,8 +393,6 @@ schemas:
     columns:
       - name: appeal_uid
         description: unique per docket_no and uid
-      - name: resolution_uid
-        description: unique per appeal_uid, hearing_date and resolution
       - name: docket_no
       - name: uid
       - name: counsel
@@ -433,7 +413,7 @@ schemas:
       - name: stop_and_search_interview_id_2
       - name: item_number
       - name: id
-      - name: district 
+      - name: district
       - name: zone
       - name: stop_reason
       - name: vehicle_year

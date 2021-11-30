@@ -4,7 +4,7 @@ import pandas as pd
 
 from lib.path import data_file_path
 from lib.columns import (
-    rearrange_complaint_columns, rearrange_personnel_columns, rearrange_event_columns
+    rearrange_allegation_columns, rearrange_personnel_columns, rearrange_event_columns
 )
 from lib import events
 
@@ -55,7 +55,7 @@ if __name__ == '__main__':
     rearrange_personnel_columns(pprr).to_csv(data_file_path(
         'fuse/per_ponchatoula_pd.csv'
     ), index=False)
-    rearrange_complaint_columns(cprr).to_csv(data_file_path(
+    rearrange_allegation_columns(cprr).to_csv(data_file_path(
         'fuse/com_ponchatoula_pd.csv'
     ), index=False)
     event_df.to_csv(data_file_path(

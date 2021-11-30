@@ -2,7 +2,7 @@ import sys
 sys.path.append('../')
 import pandas as pd
 from lib.personnel import fuse_personnel
-from lib.columns import rearrange_complaint_columns, rearrange_event_columns
+from lib.columns import rearrange_allegation_columns, rearrange_event_columns
 from lib.path import data_file_path
 from lib import events
 
@@ -36,7 +36,7 @@ if __name__ == '__main__':
     post_event = pd.read_csv(data_file_path('match/post_event_bossier_city_pd.csv'))
     cprr = pd.read_csv(data_file_path('clean/cprr_bossier_city_pd_2020.csv'))
     per_df = fuse_personnel(pprr, cprr)
-    com_df = rearrange_complaint_columns(cprr)
+    com_df = rearrange_allegation_columns(cprr)
     events_df = fuse_events(pprr, cprr)
     events_df = rearrange_event_columns(pd.concat([
         events_df,

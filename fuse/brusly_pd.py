@@ -1,7 +1,7 @@
 import pandas as pd
 from lib.path import data_file_path
 from lib.columns import (
-    rearrange_personnel_columns, rearrange_complaint_columns, rearrange_event_columns
+    rearrange_personnel_columns, rearrange_allegation_columns, rearrange_event_columns
 )
 from lib.uid import gen_uid
 from lib import events
@@ -43,7 +43,7 @@ if __name__ == "__main__":
         post_event,
         events_df
     ]))
-    com_df = rearrange_complaint_columns(cprr)
+    com_df = rearrange_allegation_columns(cprr)
     rearrange_personnel_columns(pprr).to_csv(data_file_path(
         "fuse/per_brusly_pd.csv"), index=False)
     events_df.to_csv(data_file_path(

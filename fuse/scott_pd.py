@@ -1,6 +1,6 @@
 from lib.path import data_file_path
 from lib.columns import (
-    rearrange_complaint_columns, rearrange_event_columns
+    rearrange_allegation_columns, rearrange_event_columns
 )
 from lib.personnel import fuse_personnel
 from lib import events
@@ -48,7 +48,7 @@ if __name__ == '__main__':
     post_event = pd.read_csv(data_file_path(
         'match/post_event_scott_pd_2021.csv'))
     personnels = fuse_personnel(pprr, cprr20, cprr14)
-    complaints = rearrange_complaint_columns(pd.concat([cprr20, cprr14]))
+    complaints = rearrange_allegation_columns(pd.concat([cprr20, cprr14]))
     events_df = fuse_events(pprr, cprr20, cprr14)
     events_df = rearrange_event_columns(pd.concat([
         post_event,
