@@ -112,7 +112,7 @@ def rearrange_event_columns(df):
     )
 
 
-def rearrange_complaint_columns(df):
+def rearrange_allegation_columns(df):
     """Performs final processing step for a complaint table
 
     This performs the following tasks:
@@ -128,10 +128,10 @@ def rearrange_complaint_columns(df):
         the updated frame
     """
     return datavalid_config.rearrange_columns(
-        'complaint',
+        'allegation',
         df
         .pipe(float_to_int_str, ["paragraph_code"])
-        .sort_values(['agency', 'complaint_uid'])
+        .sort_values(['agency', 'allegation_uid'])
     )
 
 

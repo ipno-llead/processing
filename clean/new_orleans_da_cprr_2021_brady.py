@@ -1,6 +1,6 @@
 from lib.columns import clean_column_names, set_values
 from lib.uid import gen_uid
-from lib.path import data_file_path, ensure_data_dir
+from lib.path import data_file_path
 from lib.clean import (
     clean_names, standardize_desc_cols, clean_dates
 )
@@ -20,14 +20,14 @@ def extract_date_from_pib(df):
 
 
 def combine_rule_and_paragraph(df):
-    df.loc[:, 'charges'] = df['allegation_classification'].str.cat(df.allegation, sep=';')\
+    df.loc[:, 'allegation'] = df.allegation_classification.str.cat(df.allegation, sep=';')\
         .str.replace(r'^;', '', regex=True).str.replace(r';$', '', regex=True)
-    df = df.drop(columns=['allegation_classification', 'allegation'])
+    df = df.drop(columns=['allegation_classification'])
     return df
 
 
-def clean_charges(df):
-    df.loc[:, 'charges'] = df.charges.str.lower().str.strip()\
+def clean_allegations(df):
+    df.loc[:, 'allegation'] = df.allegation.str.lower().str.strip()\
         .str.replace(r'ral[-: ]?condu', r'ral condu', regex=True)\
         .str.replace(r'conduc(?:i|t)?', r'conduct', regex=True)\
         .str.replace(r'(?:m|1)?o?ral', r'moral', regex=True)\
@@ -127,10 +127,10 @@ def clean():
         .pipe(combine_rule_and_paragraph)\
         .pipe(clean_disposition)\
         .pipe(clean_allegation_class)\
-        .pipe(clean_charges)\
+        .pipe(clean_allegations)\
         .pipe(drop_rows_without_last_name)\
         .pipe(clean_dates, ['receive_date'])\
-        .pipe(standardize_desc_cols, ['finding', 'disposition', 'charges', 'directive'])\
+        .pipe(standardize_desc_cols, ['finding', 'disposition', 'allegation', 'directive'])\
         .pipe(clean_names, ['first_name', 'last_name'])\
         .pipe(set_values, {
             'data_production_year': 2021,
@@ -138,15 +138,14 @@ def clean():
         })\
         .pipe(gen_uid, ['agency', 'first_name', 'last_name'])\
         .pipe(gen_uid, [
-            'agency', 'uid', 'receive_year', 'directive', 'tracking_number', 'finding', 'disposition', 'charges'
-        ], "complaint_uid")\
-        .drop_duplicates(subset=['complaint_uid'])
+            'agency', 'uid', 'receive_year', 'directive', 'tracking_number',
+            'finding', 'disposition', 'allegation'], "allegation_uid")\
+        .drop_duplicates(subset=['allegation_uid'])
     return df
 
 
 if __name__ == '__main__':
     df = clean()
-    ensure_data_dir('clean')
     df.to_csv(
         data_file_path('clean/cprr_new_orleans_da_2021.csv'),
         index=False)

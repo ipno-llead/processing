@@ -1,8 +1,7 @@
 import pandas as pd
-from lib.path import data_file_path, ensure_data_dir
-from lib.columns import rearrange_complaint_columns
+from lib.path import data_file_path
+from lib.columns import rearrange_allegation_columns
 from lib.personnel import fuse_personnel
-from lib.uid import ensure_uid_unique
 from lib import events
 
 import sys
@@ -21,13 +20,13 @@ def fuse_events(cprr_18, cprr_21, post):
     builder.extract_events(cprr_18, {
         events.OFFICER_RANK: {
             'prefix': 'rank', 'keep': ['uid', 'agency', 'badge_no', 'rank_desc'], 'id_cols': ['uid']},
-        events.COMPLAINT_INCIDENT: {'prefix': 'occur', 'keep': ['uid', 'agency', 'complaint_uid']},
-    }, ['uid', 'complaint_uid'])
+        events.COMPLAINT_INCIDENT: {'prefix': 'occur', 'keep': ['uid', 'agency', 'allegation_uid']},
+    }, ['uid', 'allegation_uid'])
     builder.extract_events(cprr_21, {
         events.OFFICER_RANK: {
             'prefix': 'rank', 'keep': ['uid', 'agency', 'badge_no', 'rank_desc'], 'id_cols': ['uid']},
-        events.COMPLAINT_INCIDENT: {'prefix': 'occur', 'keep': ['uid', 'agency', 'complaint_uid']},
-    }, ['uid', 'complaint_uid'])
+        events.COMPLAINT_INCIDENT: {'prefix': 'occur', 'keep': ['uid', 'agency', 'allegation_uid']},
+    }, ['uid', 'allegation_uid'])
     builder.extract_events(post, {
         events.OFFICER_LEVEL_1_CERT: {'prefix': 'level_1_cert', 'parse_date': '%Y-%m-%d', 'keep': [
             'uid', 'agency'
@@ -48,10 +47,8 @@ if __name__ == "__main__":
     post = prepare_post_data()
     personnel_df = fuse_personnel(cprr_18, cprr_20, post)
     event_df = fuse_events(cprr_18, cprr_20, post)
-    complaint_df = rearrange_complaint_columns(
+    complaint_df = rearrange_allegation_columns(
         pd.concat([cprr_18, cprr_20]))
-    ensure_uid_unique(complaint_df, 'complaint_uid')
-    ensure_data_dir("fuse")
     personnel_df.to_csv(data_file_path(
         "fuse/per_baton_rouge_so.csv"), index=False)
     event_df.to_csv(data_file_path(

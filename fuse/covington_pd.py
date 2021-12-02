@@ -2,10 +2,9 @@ import sys
 
 import pandas as pd
 
-from lib.path import data_file_path, ensure_data_dir
+from lib.path import data_file_path
 from lib.columns import rearrange_event_columns
 from lib.personnel import fuse_personnel
-from lib.uid import ensure_uid_unique
 from lib import events
 
 sys.path.append('../')
@@ -60,8 +59,6 @@ if __name__ == '__main__':
         post_event,
         fuse_events(ah, pprr)
     ]))
-    ensure_uid_unique(events_df, 'event_uid', True)
-    ensure_data_dir('fuse')
     events_df.to_csv(data_file_path(
         "fuse/event_covington_pd.csv"), index=False)
     fuse_personnel(ah, pprr).to_csv(data_file_path(

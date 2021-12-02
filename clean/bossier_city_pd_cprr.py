@@ -30,8 +30,8 @@ def clean_complaint_type(df):
     return df.drop(columns='chassification')
 
 
-def clean_charges(df):
-    df.loc[:, 'charges'] = df.type_complaint.str.lower().str.strip()\
+def clean_allegations(df):
+    df.loc[:, 'allegation'] = df.type_complaint.str.lower().str.strip()\
         .str.replace(r'^coda', 'code', regex=True)\
         .str.replace(r'^derefiction', 'dereliction', regex=True)\
         .str.replace('pursuit policy violation', 'vehicle pursuit', regex=False)\
@@ -43,14 +43,14 @@ def clean_charges(df):
     return df.drop(columns='type_complaint')
 
 
-def split_rows_with_multiple_charges(df):
+def split_rows_with_multiple_allegations(df):
     i = 0
-    for idx in df[df.charges.str.contains(r'/')].index:
-        s = df.loc[idx + i, 'charges']
+    for idx in df[df.allegation.str.contains(r'/')].index:
+        s = df.loc[idx + i, 'allegation']
         parts = re.split(r'\s*(?:\/)\s*', s)
         df = duplicate_row(df, idx + i, len(parts))
         for j, name in enumerate(parts):
-            df.loc[idx + i + j, 'charges'] = name
+            df.loc[idx + i + j, 'allegation'] = name
         i += len(parts) - 1
     return df
 
@@ -196,8 +196,8 @@ def clean():
         .pipe(extract_receive_date)\
         .pipe(clean_tracking_number)\
         .pipe(clean_complaint_type)\
-        .pipe(clean_charges)\
-        .pipe(split_rows_with_multiple_charges)\
+        .pipe(clean_allegations)\
+        .pipe(split_rows_with_multiple_allegations)\
         .pipe(combine_officer_and_other_officer_columns)\
         .pipe(split_rows_with_multiple_officers_and_split_names)\
         .pipe(extract_and_clean_disposition)\
@@ -208,7 +208,7 @@ def clean():
         .pipe(assign_action)\
         .pipe(assign_agency)\
         .pipe(gen_uid, ['first_name', 'last_name', 'agency'])\
-        .pipe(gen_uid, ['uid', 'charges', 'disposition', 'tracking_number', 'action'], 'complaint_uid')\
+        .pipe(gen_uid, ['uid', 'allegation', 'disposition', 'tracking_number', 'action'], 'allegation_uid')\
         .pipe(clean_dates, ['receive_date', 'investigation_complete_date', 'investigation_start_date'])
     return df
 

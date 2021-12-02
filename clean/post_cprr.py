@@ -23,8 +23,8 @@ def split_name(df):
     return df.drop(columns=['name', 'suffix'])
 
 
-def clean_charges(df):
-    df.loc[:, 'charges'] = df.reason\
+def clean_allegations(df):
+    df.loc[:, 'allegation'] = df.reason\
         .str.replace(r'^(\w+)-(\w+)', r'\1 \2', regex=True)\
         .str.replace(r'\/', '|', regex=True)\
         .str.replace('-', ': ', regex=False)
@@ -53,11 +53,11 @@ def clean():
             'date': 'decertification_date'
         })\
         .pipe(split_name)\
-        .pipe(clean_charges)\
+        .pipe(clean_allegations)\
         .pipe(assign_action)\
         .pipe(rename_agency)\
         .pipe(gen_uid, ['first_name', 'last_name', 'agency'])\
-        .pipe(gen_uid, ['uid', 'charges', 'decertification_date'], 'complaint_uid')
+        .pipe(gen_uid, ['uid', 'allegation', 'decertification_date'], 'allegation_uid')
     return df
 
 

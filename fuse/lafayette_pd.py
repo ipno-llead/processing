@@ -3,11 +3,10 @@ import sys
 
 import pandas as pd
 
-from lib.path import data_file_path, ensure_data_dir
+from lib.path import data_file_path
 from lib.columns import (
-    rearrange_complaint_columns, rearrange_event_columns
+    rearrange_allegation_columns, rearrange_event_columns
 )
-from lib.uid import ensure_uid_unique
 from lib import events
 
 sys.path.append('../')
@@ -19,25 +18,15 @@ def fuse_events(cprr_20, cprr_14, pprr):
         events.COMPLAINT_RECEIVE: {
             'prefix': 'receive',
             'parse_date': True,
-            'keep': ['agency', 'complaint_uid', 'uid', 'investigator_uid']
+            'keep': ['agency', 'allegation_uid', 'uid', 'invetigator_uid']
         },
         events.INVESTIGATION_COMPLETE: {
             'prefix': 'complete',
             'parse_date': True,
             'ignore_bad_date': True,
-            'keep': ['agency', 'complaint_uid', 'uid', 'investigator_uid'],
+            'keep': ['agency', 'allegation_uid', 'uid', 'invetigator_uid'],
         },
-    }, ['complaint_uid'])
-    builder.extract_events(cprr_14, {
-        events.COMPLAINT_RECEIVE: {
-            'prefix': 'receive',
-            'keep': ['agency', 'complaint_uid', 'uid', 'investigator_uid']
-        },
-        events.INVESTIGATION_COMPLETE: {
-            'prefix': 'complete',
-            'keep': ['agency', 'complaint_uid', 'uid', 'investigator_uid'],
-        },
-    }, ['complaint_uid'])
+    }, ['allegation_uid'])
     builder.extract_events(pprr, {
         events.OFFICER_HIRE: {
             'prefix': 'hire',
@@ -71,7 +60,6 @@ if __name__ == '__main__':
         post_events,
         events_df
     ]))
-    ensure_uid_unique(events_df, 'event_uid', True)
     per = fuse_personnel(
         pprr,
         cprr_20[['uid', 'first_name', 'last_name']],
@@ -87,9 +75,7 @@ if __name__ == '__main__':
             'investigator_last_name': 'last_name',
         })
     )
-    com = rearrange_complaint_columns(pd.concat([cprr_20, cprr_14]))
-
-    ensure_data_dir('fuse')
+    com = rearrange_allegation_columns(cprr)
     per.to_csv(data_file_path(
         'fuse/per_lafayette_pd.csv'
     ), index=False)

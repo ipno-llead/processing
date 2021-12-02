@@ -1,5 +1,5 @@
 from lib.columns import clean_column_names
-from lib.path import data_file_path, ensure_data_dir
+from lib.path import data_file_path
 from lib.clean import clean_names
 from lib.uid import gen_uid
 import pandas as pd
@@ -18,5 +18,4 @@ def clean():
 
 if __name__ == '__main__':
     df = clean()
-    ensure_data_dir('clean')
     df.to_csv(data_file_path('clean/cprr_baton_rouge_da_2021.csv'), index=False)

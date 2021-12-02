@@ -1,11 +1,10 @@
 import pandas as pd
-from lib.path import data_file_path, ensure_data_dir
+from lib.path import data_file_path
 from lib.personnel import fuse_personnel
 from lib.columns import (
-    rearrange_event_columns, rearrange_complaint_columns,
+    rearrange_event_columns, rearrange_allegation_columns,
     rearrange_appeal_hearing_columns
 )
-from lib.uid import ensure_uid_unique
 from lib import events
 import sys
 sys.path.append("../")
@@ -34,16 +33,16 @@ def fuse_events(csd_pprr_17, csd_pprr_19, cprr_18, cprr_21, lprr):
             'id_cols': ['uid', 'department_code']},
     }, ['uid'])
     builder.extract_events(cprr_18, {
-        events.COMPLAINT_RECEIVE: {'prefix': 'receive', 'keep': ['uid', 'agency', 'complaint_uid']},
-        events.COMPLAINT_INCIDENT: {'prefix': 'occur', 'keep': ['uid', 'agency', 'complaint_uid']},
-    }, ['uid', 'complaint_uid'])
+        events.COMPLAINT_RECEIVE: {'prefix': 'receive', 'keep': ['uid', 'agency', 'allegation_uid']},
+        events.COMPLAINT_INCIDENT: {'prefix': 'occur', 'keep': ['uid', 'agency', 'allegation_uid']},
+    }, ['uid', 'allegation_uid'])
     builder.extract_events(cprr_21, {
-        events.COMPLAINT_RECEIVE: {'prefix': 'receive', 'keep': ['uid', 'agency', 'complaint_uid']},
-        events.COMPLAINT_INCIDENT: {'prefix': 'occur', 'keep': ['uid', 'agency', 'complaint_uid']},
-    }, ['uid', 'complaint_uid'])
+        events.COMPLAINT_RECEIVE: {'prefix': 'receive', 'keep': ['uid', 'agency', 'allegation_uid']},
+        events.COMPLAINT_INCIDENT: {'prefix': 'occur', 'keep': ['uid', 'agency', 'allegation_uid']},
+    }, ['uid', 'allegation_uid'])
     builder.extract_events(lprr, {
         events.APPEAL_HEARING: {
-            'prefix': 'appeal_hearing', 
+            'prefix': 'appeal_hearing',
             'keep': ['uid', 'agency', 'appeal_uid']},
         events.APPEAL_DISPOSITION: {
             'prefix': 'appeal_disposition',
@@ -100,14 +99,10 @@ if __name__ == "__main__":
         post_event,
         events_df
     ]))
-    ensure_uid_unique(events_df, 'event_uid', True)
-
-    complaint_df = rearrange_complaint_columns(
+    complaint_df = rearrange_allegation_columns(
         pd.concat([cprr_18, cprr_21]))
-    ensure_uid_unique(complaint_df, 'complaint_uid')
     lprr_df = rearrange_appeal_hearing_columns(lprr)
 
-    ensure_data_dir("fuse")
     personnel_df.to_csv(data_file_path(
         "fuse/per_baton_rouge_pd.csv"), index=False)
     events_df.to_csv(data_file_path(

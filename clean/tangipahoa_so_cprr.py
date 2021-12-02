@@ -1,6 +1,6 @@
 import sys
 sys.path.append('../')
-from lib.path import data_file_path, ensure_data_dir
+from lib.path import data_file_path
 from lib.columns import set_values
 from lib.uid import gen_uid
 from lib.clean import (
@@ -21,7 +21,7 @@ def split_rows_with_name(df):
 
 def split_full_name(df):
     df.loc[:, 'full_name'] = df.full_name.str.lower().str.strip()\
-        .str.replace(r'^(unknown|unk|tpso|tp715|facebook comments)$', '', regex=True)\
+        .str.replace(r'(unknown|unk|tpso|tp715|facebook comments|^deputy$)', '', regex=True)\
         .str.replace('.', '', regex=False)\
         .str.replace(r'(\w+), (\w+)', r'\2 \1', regex=True)\
         .str.replace("d'amatto", "d'amato", regex=False)\
@@ -213,7 +213,7 @@ def clean():
         .pipe(set_values, {'agency': 'Tangipahoa SO', 'data_production_year': '2021'})\
         .pipe(gen_uid, ['first_name', 'last_name', 'agency'])\
         .drop_duplicates(subset=['receive_date', 'uid', 'allegation'], keep='first')\
-        .pipe(gen_uid, ['receive_date', 'uid', 'allegation'], 'complaint_uid')\
+        .pipe(gen_uid, ['receive_date', 'uid', 'allegation'], 'allegation_uid')\
         .pipe(gen_uid,
               ['supervisor_rank', 'supervisor_first_name', 'supervisor_last_name', 'agency'], 'supervisor_uid')
     return df
@@ -221,7 +221,6 @@ def clean():
 
 if __name__ == '__main__':
     df = clean()
-    ensure_data_dir('clean')
     df.to_csv(
         data_file_path('clean/cprr_tangipahoa_so_2015_2021.csv'),
         index=False)

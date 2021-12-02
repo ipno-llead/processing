@@ -1,8 +1,7 @@
 from lib import events
 from lib.columns import (
-    rearrange_complaint_columns, rearrange_event_columns)
-from lib.path import data_file_path, ensure_data_dir
-from lib.uid import ensure_uid_unique
+    rearrange_allegation_columns, rearrange_event_columns)
+from lib.path import data_file_path
 from lib.personnel import fuse_personnel
 import pandas as pd
 import sys
@@ -12,12 +11,12 @@ sys.path.append('../')
 def fuse_events(cprr, pprr):
     builder = events.Builder()
     builder.extract_events(cprr, {
-        events.COMPLAINT_RECEIVE: {'prefix': 'receive', 'keep': ['uid', 'complaint_uid', 'agency']},
+        events.COMPLAINT_RECEIVE: {'prefix': 'receive', 'keep': ['uid', 'allegation_uid', 'agency']},
         events.COMPLAINT_INCIDENT: {
-            'prefix': 'occur', 'keep': ['uid', 'complaint_uid', 'agency']},
+            'prefix': 'occur', 'keep': ['uid', 'allegation_uid', 'agency']},
         events.INVESTIGATION_COMPLETE: {
-            'prefix': 'investigation_complete', 'keep': ['uid', 'complaint_uid', 'agency']}
-    }, ['uid', 'complaint_uid'])
+            'prefix': 'investigation_complete', 'keep': ['uid', 'allegation_uid', 'agency']}
+    }, ['uid', 'allegation_uid'])
     builder.extract_events(pprr, {
         events.OFFICER_HIRE: {
             'prefix': 'hire', 'keep': ['uid', 'badge_no', 'rank_desc', 'salary', 'salary_freq', 'agency']},
@@ -37,12 +36,8 @@ if __name__ == '__main__':
         post_event,
         events_df
     ]))
-    ensure_uid_unique(events_df, 'event_uid', True)
     per_df = fuse_personnel(pprr, cprr)
-    ensure_uid_unique(per_df, 'uid', True)
-    com_df = rearrange_complaint_columns(cprr)
-    ensure_uid_unique(com_df, 'complaint_uid')
-    ensure_data_dir('fuse')
+    com_df = rearrange_allegation_columns(cprr)
     events_df.to_csv(data_file_path(
         'fuse/event_mandeville_pd.csv'), index=False)
     com_df.to_csv(

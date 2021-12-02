@@ -6,7 +6,6 @@ from lib.columns import (
     rearrange_event_columns, rearrange_use_of_force
 )
 from lib.personnel import fuse_personnel
-from lib.uid import ensure_uid_unique
 from lib import events
 
 sys.path.append('../')
@@ -49,7 +48,6 @@ if __name__ == '__main__':
         post_event,
         cprr_post_events,
         fuse_events(pprr, uof)]))
-    ensure_uid_unique(events_df, 'event_uid', True)
     per.to_csv(data_file_path(
         "fuse/per_kenner_pd.csv"), index=False)
     events_df.to_csv(data_file_path(

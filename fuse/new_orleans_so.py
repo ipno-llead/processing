@@ -3,7 +3,7 @@ import sys
 import pandas as pd
 
 from lib.path import data_file_path
-from lib.columns import rearrange_complaint_columns, rearrange_event_columns
+from lib.columns import rearrange_allegation_columns, rearrange_event_columns
 from lib.personnel import fuse_personnel
 from lib import events
 
@@ -16,86 +16,86 @@ def fuse_events(cprr19, cprr20, pprr):
         events.COMPLAINT_RECEIVE: {
             'prefix': 'receive',
             'parse_date': True,
-            'keep': ['uid', 'agency', 'complaint_uid'],
+            'keep': ['uid', 'agency', 'allegation_uid'],
         },
         events.INVESTIGATION_START: {
             'prefix': 'investigation_start',
             'parse_date': True,
-            'keep': ['uid', 'agency', 'complaint_uid'],
+            'keep': ['uid', 'agency', 'allegation_uid'],
         },
         events.INVESTIGATION_COMPLETE: {
             'prefix': 'investigation_complete',
             'parse_date': True,
-            'keep': ['uid', 'agency', 'complaint_uid'],
+            'keep': ['uid', 'agency', 'allegation_uid'],
         },
         events.SUSPENSION_START: {
             'prefix': 'suspension_start',
             'parse_date': True,
-            'keep': ['uid', 'agency', 'complaint_uid'],
+            'keep': ['uid', 'agency', 'allegation_uid'],
         },
         events.SUSPENSION_END: {
             'prefix': 'suspension_end',
             'parse_date': True,
-            'keep': ['uid', 'agency', 'complaint_uid'],
+            'keep': ['uid', 'agency', 'allegation_uid'],
         },
         events.OFFICER_LEFT: {
             'prefix': 'resignation',
             'parse_date': True,
-            'keep': ['uid', 'agency', 'complaint_uid', 'left_reason'],
+            'keep': ['uid', 'agency', 'allegation_uid', 'left_reason'],
         },
         events.OFFICER_LEFT: {
             'prefix': 'arrest',
             'parse_date': True,
-            'keep': ['uid', 'agency', 'complaint_uid', 'left_reason'],
+            'keep': ['uid', 'agency', 'allegation_uid', 'left_reason'],
         },
         events.OFFICER_LEFT: {
             'prefix': 'termination',
             'parse_date': True,
-            'keep': ['uid', 'agency', 'complaint_uid', 'left_reason'],
+            'keep': ['uid', 'agency', 'allegation_uid', 'left_reason'],
         }
-    }, ['uid', 'complaint_uid'])
+    }, ['uid', 'allegation_uid'])
     builder.extract_events(cprr20, {
         events.COMPLAINT_RECEIVE: {
             'prefix': 'receive',
             'parse_date': True,
-            'keep': ['uid', 'agency', 'complaint_uid'],
+            'keep': ['uid', 'agency', 'allegation_uid'],
         },
         events.INVESTIGATION_START: {
             'prefix': 'investigation_start',
             'parse_date': True,
-            'keep': ['uid', 'agency', 'complaint_uid'],
+            'keep': ['uid', 'agency', 'allegation_uid'],
         },
         events.INVESTIGATION_COMPLETE: {
             'prefix': 'investigation_complete',
             'parse_date': True,
-            'keep': ['uid', 'agency', 'complaint_uid'],
+            'keep': ['uid', 'agency', 'allegation_uid'],
         },
         events.SUSPENSION_START: {
             'prefix': 'suspension_start',
             'parse_date': True,
-            'keep': ['uid', 'agency', 'complaint_uid'],
+            'keep': ['uid', 'agency', 'allegation_uid'],
         },
         events.SUSPENSION_END: {
             'prefix': 'suspension_end',
             'parse_date': True,
-            'keep': ['uid', 'agency', 'complaint_uid'],
+            'keep': ['uid', 'agency', 'allegation_uid'],
         },
         events.OFFICER_LEFT: {
             'prefix': 'resignation',
             'parse_date': True,
-            'keep': ['uid', 'agency', 'complaint_uid', 'left_reason'],
+            'keep': ['uid', 'agency', 'allegation_uid', 'left_reason'],
         },
         events.OFFICER_LEFT: {
             'prefix': 'arrest',
             'parse_date': True,
-            'keep': ['uid', 'agency', 'complaint_uid', 'left_reason'],
+            'keep': ['uid', 'agency', 'allegation_uid', 'left_reason'],
         },
         events.OFFICER_LEFT: {
             'prefix': 'termination',
             'parse_date': True,
-            'keep': ['uid', 'agency', 'complaint_uid', 'left_reason'],
+            'keep': ['uid', 'agency', 'allegation_uid', 'left_reason'],
         }
-    }, ['uid', 'complaint_uid'])
+    }, ['uid', 'allegation_uid'])
     builder.extract_events(pprr, {
         events.OFFICER_HIRE: {
             'prefix': 'hire',
@@ -123,7 +123,7 @@ if __name__ == '__main__':
         post_events,
         events_df
     ]))
-    complaint_df = rearrange_complaint_columns(
+    complaint_df = rearrange_allegation_columns(
         pd.concat([cprr19, cprr20]))
     personnel_df.to_csv(data_file_path('fuse/per_new_orleans_so.csv'), index=False)
     events_df.to_csv(data_file_path('fuse/event_new_orleans_so.csv'), index=False)

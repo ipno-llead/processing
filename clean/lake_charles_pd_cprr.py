@@ -1,7 +1,7 @@
 import sys
 sys.path.append('../')
 import pandas as pd
-from lib.path import data_file_path, ensure_data_dir
+from lib.path import data_file_path
 from lib.clean import float_to_int_str
 from lib.columns import clean_column_names
 from lib.rows import duplicate_row
@@ -39,7 +39,7 @@ disposition_lookup = [
     ['not sustained', 'not sust', 'not sast']]
 
 
-charges_lookup = [
+allegations_lookup = [
     ['fleet crash', 'fleet crash crash', 'fleet crash gash',
      'gash', 'fleet crash cash', 'fleet crash mash', 'crash',
      'fileet ', '/gast', ' cigsh'],
@@ -81,8 +81,8 @@ charges_lookup = [
     ['employee harrassment', 'employee contact']]
 
 
-def clean_charges_20(df):
-    df.loc[:, 'charges'] = df.nature_of_complaint.str.lower().str.strip()\
+def clean_allegations_20(df):
+    df.loc[:, 'allegation'] = df.nature_of_complaint.str.lower().str.strip()\
         .str.replace(r'\. ?', ' ', regex=True)\
         .str.replace(',', '', regex=False)\
         .str.replace(r'(\d+) ', '', regex=True)\
@@ -95,14 +95,14 @@ def clean_charges_20(df):
     return df.drop(columns='nature_of_complaint')
 
 
-def split_rows_with_multiple_charges_20(df):
+def split_rows_with_multiple_allegations_20(df):
     i = 0
-    for idx in df[df.charges.str.contains(r'/')].index:
-        s = df.loc[idx + i, 'charges']
+    for idx in df[df.allegation.str.contains(r'/')].index:
+        s = df.loc[idx + i, 'allegation']
         parts = re.split(r'\s*(?:/)\s*', s)
         df = duplicate_row(df, idx + i, len(parts))
         for j, name in enumerate(parts):
-            df.loc[idx + i + j, 'charges'] = name
+            df.loc[idx + i + j, 'allegation'] = name
         i += len(parts) - 1
     return df
 
@@ -141,8 +141,8 @@ def split_rows_with_multiple_officers_20(df):
     return df
 
 
-def drop_rows_missing_disp_charges_and_action_20(df):
-    return df[~((df.disposition == '') & (df.charges == '') & (df.action == ''))]
+def drop_rows_missing_disp_allegations_and_action_20(df):
+    return df[~((df.disposition == '') & (df.allegation == '') & (df.action == ''))]
 
 
 def assign_empty_first_name_column_20(df):
@@ -352,16 +352,16 @@ def split_names_19(df):
     names = df.officer_s_accused.fillna('').str.extract(r'(?:(\w+) )? ?(.+)')
     df.loc[:, 'first_name'] = names[0].fillna('')
     df.loc[:, 'last_name'] = names[1].fillna('')
-    return df
+    return df.drop(columns='officer_s_accused')
 
 
 def drop_rows_missing_name_19(df):
     return df[~((df.first_name == '') & (df.last_name == ''))]
 
 
-def assign_charges_19(df):
-    df.loc[(df.tracking_number == '19-2'), 'charges'] = 'fleet crash'
-    df.loc[(df.tracking_number == '17-14'), 'charges'] = 'unauthorized force/unsatisfactory performance'
+def assign_allegations_19(df):
+    df.loc[(df.tracking_number == '19-2'), 'allegation'] = 'fleet crash'
+    df.loc[(df.tracking_number == '17-14'), 'allegation'] = 'unauthorized force/unsatisfactory performance'
     return df
 
 
@@ -383,8 +383,8 @@ def clean_investigation_start_date_19(df):
     return df.drop(columns='date')
 
 
-def clean_charges_19(df):
-    df.loc[:, 'charges'] = df.complaint.str.lower().str.strip().fillna('')\
+def clean_allegations_19(df):
+    df.loc[:, 'allegation'] = df.complaint.str.lower().str.strip().fillna('')\
         .str.replace('  ', ' ', regex=False)\
         .str.replace('if', 'of', regex=False)\
         .str.replace(r'\.', '', regex=True)\
@@ -404,7 +404,7 @@ def clean_charges_19(df):
         .str.replace(r'^co(.+)', 'conduct unbecoming', regex=True)\
         .str.replace(r'^fl(\w+)', 'fleet crash', regex=True)\
         .str.replace(r'^n(\w+)', 'neglect of duty', regex=True)
-    return standardize_from_lookup_table(df, 'charges', charges_lookup).drop(columns='complaint')
+    return standardize_from_lookup_table(df, 'allegation', allegations_lookup).drop(columns='complaint')
 
 
 def extract_actions_from_disposition_19(df):
@@ -458,19 +458,19 @@ def clean_20():
         .rename(columns={
             'date_of_investigation': 'investigation_start_date'
         })\
-        .pipe(clean_charges_20)\
-        .pipe(split_rows_with_multiple_charges_20)\
+        .pipe(clean_allegations_20)\
+        .pipe(split_rows_with_multiple_allegations_20)\
         .pipe(clean_action_20)\
         .pipe(consolidate_action_and_disposition_20)\
         .pipe(clean_disposition_20)\
         .pipe(split_rows_with_multiple_officers_20)\
-        .pipe(drop_rows_missing_disp_charges_and_action_20)\
+        .pipe(drop_rows_missing_disp_allegations_and_action_20)\
         .pipe(assign_empty_first_name_column_20)\
         .pipe(assign_first_names_from_post_20)\
         .pipe(assign_agency)\
         .pipe(float_to_int_str, ['investigation_start_date'])\
         .pipe(gen_uid, ['first_name', 'last_name', 'agency'])\
-        .pipe(gen_uid, ['first_name', 'last_name', 'investigation_start_date', 'charges', 'action'], 'complaint_uid')
+        .pipe(gen_uid, ['first_name', 'last_name', 'investigation_start_date', 'allegation', 'action'], 'allegation_uid')
     return df
 
 
@@ -488,21 +488,20 @@ def clean_19():
         .pipe(assign_first_names_from_post_19)\
         .pipe(split_names_19)\
         .pipe(drop_rows_missing_name_19)\
-        .pipe(assign_charges_19)\
-        .pipe(clean_charges_19)\
+        .pipe(assign_allegations_19)\
+        .pipe(clean_allegations_19)\
         .pipe(extract_actions_from_disposition_19)\
         .pipe(clean_disposition_19)\
         .pipe(clean_and_split_investigator_19)\
         .pipe(assign_agency)\
         .pipe(gen_uid, ['first_name', 'last_name', 'agency'])\
         .pipe(gen_uid, ['first_name', 'last_name', 'tracking_number',
-                        'investigation_start_date', 'charges', 'action'], 'complaint_uid')
+                        'investigation_start_date', 'allegation', 'action'], 'allegation_uid')
     return df
 
 
 if __name__ == '__main__':
     df20 = clean_20()
     df19 = clean_19()
-    ensure_data_dir('clean')
     df20.to_csv(data_file_path('clean/cprr_lake_charles_pd_2020.csv'), index=False)
     df19.to_csv(data_file_path('clean/cprr_lake_charles_pd_2014_2019.csv'), index=False)

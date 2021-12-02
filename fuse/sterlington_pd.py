@@ -6,7 +6,6 @@ from lib.path import data_file_path
 from lib.columns import (
     rearrange_personnel_columns, rearrange_event_columns
 )
-from lib.uid import ensure_uid_unique
 from lib import events
 
 sys.path.append('../')
@@ -36,7 +35,6 @@ if __name__ == '__main__':
         fuse_events(pprr),
         post_event
     ]))
-    ensure_uid_unique(events_df, 'event_uid', True)
     per_df = rearrange_personnel_columns(pprr)
     per_df.to_csv(data_file_path(
         'fuse/per_sterlington_pd.csv'
