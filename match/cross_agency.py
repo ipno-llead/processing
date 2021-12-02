@@ -1,14 +1,13 @@
 from datetime import datetime
 import pathlib
 import sys
-from datamatch.indices import MultiIndex, NoopIndex
-from datamatch.scorers import AbsoluteScorer
 
 import numpy as np
 import pandas as pd
 from datamatch import (
     ThresholdMatcher, DissimilarFilter, NonOverlappingFilter, ColumnsIndex,
-    JaroWinklerSimilarity, MaxScorer, SimSumScorer
+    JaroWinklerSimilarity, MaxScorer, SimSumScorer, AlterScorer, MultiIndex,
+    AbsoluteScorer
 )
 from datavalid.spinner import Spinner
 
@@ -16,6 +15,10 @@ from lib.path import data_file_path
 from lib.date import combine_date_columns
 
 sys.path.append('../')
+
+common_names = [
+    'Michael Smith',
+]
 
 
 def discard_rows(events: pd.DataFrame, bool_index: pd.Series, desc: str, reset_index: bool = False) -> pd.DataFrame:
@@ -107,6 +110,11 @@ def cross_match_officers_between_agencies(personnel, events, constraints):
         per, per.min_date.notna(), 'officers with no event'
     )
 
+    # concatenate first name and last name to get a series of full names
+    full_names = per.first_name.str.cat(per.last_name, sep=' ')
+    # filter down the full names to only those that are common
+    common_names_sr = full_names[full_names.isin(common_names)]
+
     excel_path = data_file_path(
         "match/cross_agency_officers.xlsx"
     )
@@ -118,11 +126,17 @@ def cross_match_officers_between_agencies(personnel, events, constraints):
             ColumnsIndex('attract_id', ignore_key_error=True),
         ]),
         scorer=MaxScorer([
-            # calculate similarity score (0-1) based on how similar the names are
-            SimSumScorer({
-                'first_name': JaroWinklerSimilarity(),
-                'last_name': JaroWinklerSimilarity(),
-            }),
+            AlterScorer(
+                # calculate similarity score (0-1) based on name similarity
+                scorer=SimSumScorer({
+                    'first_name': JaroWinklerSimilarity(),
+                    'last_name': JaroWinklerSimilarity(),
+                }),
+                # but for pairs that have the same name and their name is common
+                values=common_names_sr,
+                # give a penalty of -.2 which is enough to eliminate them
+                alter=lambda score: score - .2,
+            ),
             # but if two officers belong to the same attract constraint then give them the highest score regardless
             AbsoluteScorer('attract_id', 1, ignore_key_error=True),
         ]),
