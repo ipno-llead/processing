@@ -1,6 +1,6 @@
 from lib.path import data_file_path
 from lib.columns import (
-    rearrange_complaint_columns, rearrange_event_columns
+    rearrange_allegation_columns, rearrange_event_columns
 )
 from lib.personnel import fuse_personnel
 from lib import events
@@ -45,7 +45,7 @@ if __name__ == '__main__':
     fuse_personnel(pprr, cprr19, cprr20).to_csv(data_file_path(
         'fuse/per_plaquemines_so.csv'
     ), index=False)
-    com = rearrange_complaint_columns(pd.concat([cprr19, cprr20]))
+    com = rearrange_allegation_columns(pd.concat([cprr19, cprr20]))
     com.to_csv(data_file_path(
         'fuse/com_plaquemines_so.csv'
     ), index=False)

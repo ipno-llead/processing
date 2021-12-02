@@ -1,5 +1,5 @@
 from lib.columns import (
-    rearrange_complaint_columns, rearrange_personnel_columns
+    rearrange_allegation_columns, rearrange_personnel_columns
 )
 from lib.path import data_file_path
 from lib import events
@@ -55,7 +55,7 @@ if __name__ == '__main__':
     cprr = prepare_cprr()
     post = prepare_post()
     per = rearrange_personnel_columns(post)
-    com = rearrange_complaint_columns(cprr)
+    com = rearrange_allegation_columns(cprr)
     event = fuse_events(cprr, post)
     per.to_csv(
         data_file_path('fuse/per_greenwood_pd.csv'),
