@@ -80,10 +80,8 @@ schemas:
       - name: body_worn_camera_available
       - name: app_used
       - name: citizen_arrested
-      - name: allegation
-        description: >
-          the same data that can be found in `paragraph_code` and `paragraph_violation`.
-          In fact this column should be merged with the paragraph_ columns.
+      - name: allegation_finding
+      - name: allegation_class
       - name: citizen
         description: >
           demographic info of the involved citizen
