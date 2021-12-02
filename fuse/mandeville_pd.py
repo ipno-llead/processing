@@ -1,6 +1,6 @@
 from lib import events
 from lib.columns import (
-    rearrange_complaint_columns, rearrange_event_columns)
+    rearrange_allegation_columns, rearrange_event_columns)
 from lib.path import data_file_path
 from lib.personnel import fuse_personnel
 import pandas as pd
@@ -37,7 +37,7 @@ if __name__ == '__main__':
         events_df
     ]))
     per_df = fuse_personnel(pprr, cprr)
-    com_df = rearrange_complaint_columns(cprr)
+    com_df = rearrange_allegation_columns(cprr)
     events_df.to_csv(data_file_path(
         'fuse/event_mandeville_pd.csv'), index=False)
     com_df.to_csv(
