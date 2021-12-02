@@ -268,7 +268,8 @@ def clean():
         .pipe(gen_uid, ['agency', 'first_name', 'middle_name', 'last_name'])\
         .pipe(gen_uid, [
             'uid', 'stop_and_search_interview_id', 'citizen_id',
-            'stop_reason', 'evidence_seized'], 'stop_and_search_uid')
+            'stop_reason', 'evidence_seized'], 'stop_and_search_uid')\
+        .drop_duplicates(subset='stop_and_search_uid')
     return df
 
 

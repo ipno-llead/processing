@@ -73,7 +73,6 @@ schemas:
           complaint unique identifier
         unique: true
         no_na: true
-      - name: allegation_uid
       - name: investigation_status
       - name: assigned_unit
       - name: assigned_department
@@ -85,10 +84,6 @@ schemas:
       - name: app_used
       - name: citizen_arrested
       - name: allegation_finding
-      - name: allegation
-        description: >
-          the same data that can be found in `paragraph_code` and `paragraph_violation`.
-          In fact this column should be merged with the paragraph_ columns.
       - name: allegation_class
       - name: citizen
         description: >
@@ -433,7 +428,7 @@ schemas:
       - name: stop_and_search_interview_id_2
       - name: item_number
       - name: id
-      - name: district 
+      - name: district
       - name: zone
       - name: stop_reason
       - name: vehicle_year
