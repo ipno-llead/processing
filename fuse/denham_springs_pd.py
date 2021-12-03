@@ -12,8 +12,14 @@ def prepare_post_data():
     return post[post.agency == 'denham springs pd']
 
 
-def fuse_events(post):
+def fuse_events(cprr, post):
     builder = events.Builder()
+    builder.extract_events(cprr, {
+        events.COMPLAINT_INCIDENT: {
+            'prefix': 'incident',
+            'keep': ['uid', 'agency', 'allegation_uid']
+        }
+    }, ['uid', 'allegation_uid'])
     builder.extract_events(post, {
         events.OFFICER_LEVEL_1_CERT: {
             'prefix': 'level_1_cert',
@@ -38,7 +44,7 @@ if __name__ == '__main__':
     post = prepare_post_data()
     per = fuse_personnel(cprr, post)
     com = rearrange_allegation_columns(cprr)
-    event = fuse_events(post)
+    event = fuse_events(cprr, post)
     event.to_csv(
         data_file_path('fuse/event_denham_springs_pd.csv'), index=False)
     com.to_csv(
