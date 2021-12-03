@@ -158,6 +158,9 @@ schemas:
       - name: investigator_uid
       - name: investigator_rank
       - name: shift_supervisor
+      - name: allegation_desc
+        description: >
+          text description of the allegation
   event:
     columns:
       - name: event_uid

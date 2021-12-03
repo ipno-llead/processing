@@ -184,6 +184,10 @@ repos:
     fileName: fuse/com_baker_pd.csv
     primaryKey:
       - allegation_uid
+  com-denham-springs-pd:
+    fileName: fuse/com_denham_springs_pd.csv
+    primaryKey:
+      - allegation_uid
   uof-new-orleans-pd:
     fileName: fuse/uof_new_orleans_pd.csv
     primaryKey:
@@ -340,6 +344,10 @@ repos:
     fileName: fuse/per_baker_pd.csv
     primaryKey:
       - uid
+  per-denham-springs-pd:
+    fileName: fuse/per_denham_springs_pd.csv
+    primaryKey:
+      - uid
   event-new-orleans-pd:
     fileName: fuse/event_new_orleans_pd.csv
     primaryKey:
@@ -478,6 +486,10 @@ repos:
       - event_uid
   event-baker-pd:
     fileName: fuse/event_baker_pd.csv
+    primaryKey:
+      - event_uid
+  event-denham-springs-pd:
+    fileName: fuse/event_denham_springs_pd.csv
     primaryKey:
       - event_uid
   personnel:
