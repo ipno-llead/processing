@@ -1,3 +1,4 @@
+import argparse
 from datetime import datetime
 import pathlib
 import sys
@@ -196,11 +197,12 @@ def entity_resolution(old_person: pd.DataFrame, new_person: pd.DataFrame) -> pd.
         .map(lambda x: set(x))
 
     def person_scorer(a: pd.Series, b: pd.Series) -> float:
-        if a.uid == b.uid:
+        if a.canonical_uid == b.canonical_uid:
             return 1
         x_len = len(a.uids & b.uids)
         return x_len * 2 / (len(a.uids) + len(b.uids))
 
+    print('matching old and new person table...')
     matcher = ThresholdMatcher(
         # TODO: upgrade datamatch version to have index_elements available
         index=ColumnsIndex('uids', index_elements=True),
@@ -210,13 +212,14 @@ def entity_resolution(old_person: pd.DataFrame, new_person: pd.DataFrame) -> pd.
         show_progress=True,
     )
     decision = 0.001
-    matcher.save_pairs_to_excel(
-        name=data_file_path(
-            "match/person_entity_resolution_%s.xlsx" % datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
-        ),
-        match_threshold=decision,
-        lower_bound=0
-    )
+    with Spinner('saving person entity resolution to Excel file'):
+        matcher.save_pairs_to_excel(
+            name=data_file_path(
+                "match/person_entity_resolution_%s.xlsx" % datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
+            ),
+            match_threshold=decision,
+            lower_bound=0
+        )
     pairs = matcher.get_index_pairs_within_thresholds(decision)
     pairs_dict = dict(pairs)
 
@@ -228,16 +231,37 @@ def entity_resolution(old_person: pd.DataFrame, new_person: pd.DataFrame) -> pd.
 
     # get person_id from the old table, if not found, assign a completely new id
     gen = new_person_ids()
-    new_person.loc[:, 'person_id'] = new_person.uid.map(lambda x: pairs_dict.get(x, next(gen)))
+    new_person.loc[:, 'person_id'] = new_person.person_id.map(lambda x: pairs_dict.get(x, next(gen)))
     return new_person
 
 
 if __name__ == '__main__':
-    personnel = pd.read_csv(data_file_path('fuse/personnel.csv'))
-    print('read personnel file (%d x %d)' % personnel.shape)
-    events = pd.read_csv(data_file_path('fuse/event.csv'))
-    print('read events file (%d x %d)' % events.shape)
-    constraints = read_constraints()
-    clusters, personnel_event = cross_match_officers_between_agencies(personnel, events, constraints)
-    person_df = create_person_table(clusters, personnel, personnel_event)
+    parser = argparse.ArgumentParser(description='Match officer profiles cross-agency to produce person table')
+    parser.add_argument(
+        'person_csv', type=pathlib.Path, metavar='PERSON_CSV',
+        help='The previous person data',
+    )
+    parser.add_argument(
+        '--new-person-csv', type=pathlib.Path, metavar='NEW_PERSON_CSV', default=None,
+        help='The current person data (specifying this skip the clustering)',
+    )
+    args = parser.parse_args()
+
+    old_person_df = pd.read_csv(args.person_csv)
+    if args.new_person_csv is not None:
+        new_person_df = pd.read_csv(args.new_person_csv)
+    else:
+        personnel = pd.read_csv(data_file_path('fuse/personnel.csv'))
+        print('read personnel file (%d x %d)' % personnel.shape)
+        events = pd.read_csv(data_file_path('fuse/event.csv'))
+        print('read events file (%d x %d)' % events.shape)
+        constraints = read_constraints()
+        clusters, personnel_event = cross_match_officers_between_agencies(personnel, events, constraints)
+        new_person_df = create_person_table(clusters, personnel, personnel_event)
+        new_person_df.to_csv(data_file_path('match/person.csv'), index=False)
+
+    person_df = entity_resolution(
+        old_person=old_person_df,
+        new_person=new_person_df
+    )
     person_df.to_csv(data_file_path('match/person.csv'), index=False)
