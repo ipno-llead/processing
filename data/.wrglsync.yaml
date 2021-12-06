@@ -188,6 +188,22 @@ repos:
     fileName: fuse/com_abbeville_pd.csv
     primaryKey:
       - allegation_uid
+  com-washington-so:
+    fileName: fuse/com_washington_so.csv
+    primaryKey:
+      - allegation_uid
+  com-cameron-so:
+    fileName: fuse/com_cameron_so.csv
+    primaryKey:
+      - allegation_uid
+  com-maurice-pd:
+    fileName: fuse/com_maurice_pd.csv
+    primaryKey:
+      - allegation_uid
+  com-terrebonne-so:
+    fileName: fuse/com_terrebonne_so.csv
+    primaryKey:
+      - allegation_uid
   uof-new-orleans-pd:
     fileName: fuse/uof_new_orleans_pd.csv
     primaryKey:
@@ -348,6 +364,22 @@ repos:
     fileName: fuse/per_abbeville_pd.csv
     primaryKey:
       - uid
+  per-washington-so:
+    fileName: fuse/per_washington_so.csv
+    primaryKey:
+      - uid
+  per-cameron_so:
+    fileName: fuse/per_cameron_so.csv
+    primaryKey:
+      - uid
+  per-maurice-pd:
+    fileName: fuse/per_maurice_pd.csv
+    primaryKey:
+      - uid
+  per-terrebonne-so:
+    fileName: fuse/per_terrebonne_so.csv
+    primaryKey:
+      - uid
   event-new-orleans-pd:
     fileName: fuse/event_new_orleans_pd.csv
     primaryKey:
@@ -490,6 +522,22 @@ repos:
       - event_uid
   event-abbeville-pd:
     fileName: fuse/event_abbeville_pd.csv
+    primaryKey:
+      - event_uid
+  event-washington-so:
+    fileName: fuse/event_washington_so.csv
+      primaryKey:
+      - event_uid
+  event-cameron-so:
+    fileName: fuse/event_cameron_so.csv
+    primaryKey:
+      - event_uid
+  event-maurice-pd:
+    fileName: fuse/event_maurice_pd.csv
+    primaryKey:
+      - event_uid
+  event-terrebonne-so:
+    fileName: fuse/event_terrebonne_so.csv
     primaryKey:
       - event_uid
   personnel:
