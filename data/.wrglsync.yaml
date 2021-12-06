@@ -184,6 +184,10 @@ repos:
     fileName: fuse/com_baker_pd.csv
     primaryKey:
       - allegation_uid
+  com-abbeville-pd:
+    fileName: fuse/com_abbeville_pd.csv
+    primaryKey:
+      - allegation_uid
   com-washington-so:
     fileName: fuse/com_washington_so.csv
     primaryKey:
@@ -356,6 +360,10 @@ repos:
     fileName: fuse/per_baker_pd.csv
     primaryKey:
       - uid
+  per-abbeville-pd:
+    fileName: fuse/per_abbeville_pd.csv
+    primaryKey:
+      - uid
   per-washington-so:
     fileName: fuse/per_washington_so.csv
     primaryKey:
@@ -510,6 +518,10 @@ repos:
       - event_uid
   event-baker-pd:
     fileName: fuse/event_baker_pd.csv
+    primaryKey:
+      - event_uid
+  event-abbeville-pd:
+    fileName: fuse/event_abbeville_pd.csv
     primaryKey:
       - event_uid
   event-washington-so:
