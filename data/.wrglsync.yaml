@@ -184,6 +184,10 @@ repos:
     fileName: fuse/com_baker_pd.csv
     primaryKey:
       - allegation_uid
+  com-cameron-so:
+    fileName: fuse/com_cameron_so.csv
+    primaryKey:
+      - allegation_uid
   com-maurice-pd:
     fileName: fuse/com_maurice_pd.csv
     primaryKey:
@@ -348,6 +352,10 @@ repos:
     fileName: fuse/per_baker_pd.csv
     primaryKey:
       - uid
+  per-cameron_so:
+    fileName: fuse/per_cameron_so.csv
+    primaryKey:
+      - uid
   per-maurice-pd:
     fileName: fuse/per_maurice_pd.csv
     primaryKey:
@@ -494,6 +502,10 @@ repos:
       - event_uid
   event-baker-pd:
     fileName: fuse/event_baker_pd.csv
+    primaryKey:
+      - event_uid
+  event-cameron-so:
+    fileName: fuse/event_cameron_so.csv
     primaryKey:
       - event_uid
   event-maurice-pd:
