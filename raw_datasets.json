@@ -226,5 +226,20 @@
   ],
   "denham_springs_pd": [
     "https://www.dropbox.com/s/s0tir00eb6a2oxb/denham_springs_pd_cprr_2016_2021.csv?dl=1"
+  ],
+  "abbeville_pd": [
+    "https://www.dropbox.com/s/uqytp67ghkz9teg/abbeville_pd_cprr_2019_2021.csv?dl=1"
+  ],
+  "washington_so": [
+    "https://www.dropbox.com/s/4vjjbainf1bqzo8/washington_so_cprr_2015_2020.csv?dl=1"
+  ],
+  "cameron_so": [
+    "https://www.dropbox.com/s/0go0mcak9blucmz/cameron_so_cprr_2020.csv?dl=1"
+  ],
+  "maurice_pd": [
+    "https://www.dropbox.com/s/62jpkscghtd2w1q/maurice_cprr_2020_2021_byhand.csv?dl=1"
+  ],
+  "terrebonne_so": [
+    "https://www.dropbox.com/s/7bewi8vdhl8tzu9/terrebonne_so_cprr_2019_2021_byhand.csv?dl=1"
   ]
 }
