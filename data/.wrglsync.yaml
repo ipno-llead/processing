@@ -184,8 +184,8 @@ repos:
     fileName: fuse/com_baker_pd.csv
     primaryKey:
       - allegation_uid
-  com-terrebonne-so:
-    fileName: fuse/com_terrebonne_so.csv
+  com-maurice-pd:
+    fileName: fuse/com_maurice_pd.csv
     primaryKey:
       - allegation_uid
   uof-new-orleans-pd:
@@ -344,8 +344,8 @@ repos:
     fileName: fuse/per_baker_pd.csv
     primaryKey:
       - uid
-  per-terrebonne-so:
-    fileName: fuse/per_terrebonne_so.csv
+  per-maurice-pd:
+    fileName: fuse/per_maurice_pd.csv
     primaryKey:
       - uid
   event-new-orleans-pd:
@@ -488,8 +488,8 @@ repos:
     fileName: fuse/event_baker_pd.csv
     primaryKey:
       - event_uid
-  event-terrebonne-so:
-    fileName: fuse/event_terrebonne_so.csv
+  event-maurice-pd:
+    fileName: fuse/event_maurice_pd.csv
     primaryKey:
       - event_uid
   personnel:
