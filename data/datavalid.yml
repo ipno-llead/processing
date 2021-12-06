@@ -125,6 +125,9 @@ schemas:
       - name: action
         description: >
           what (disciplinary) actions were taken regarding this complaint
+      - name: final_action
+        description: >
+          what action was taken after the appeal process
       - name: agency
         description: >
           the police department the accused belong to.
@@ -158,6 +161,9 @@ schemas:
       - name: investigator_uid
       - name: investigator_rank
       - name: shift_supervisor
+      - name: allegation_desc
+        description: >
+          text description of the allegation
   event:
     columns:
       - name: event_uid
