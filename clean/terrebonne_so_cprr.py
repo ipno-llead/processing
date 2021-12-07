@@ -17,7 +17,7 @@ def clean():
     df = pd.read_csv(data_file_path('raw/terrebonne_so/terrebonne_so_cprr_2019_2021_byhand.csv'))\
         .rename(columns={
             'diposition_date': 'disposition_date',
-            'initial_action': 'action',
+            'final_action': 'action',
             'investigation_end_date': 'investigation_complete_date'
         })\
         .pipe(clean_allegation)\
@@ -27,7 +27,7 @@ def clean():
             'agency': 'Terrebonne Parish SO'
         })\
         .pipe(gen_uid, ['agency', 'first_name', 'last_name'])\
-        .pipe(gen_uid, ['uid', 'allegation', 'disposition', 'action', 'final_action'], 'allegation_uid')
+        .pipe(gen_uid, ['uid', 'allegation', 'disposition', 'initial_action', 'action'], 'allegation_uid')
     return df
 
 

@@ -127,10 +127,10 @@ schemas:
           - mixed
       - name: action
         description: >
-          what (disciplinary) actions were taken regarding this complaint
-      - name: final_action
+          what final (disciplinary) actions were taken regarding this complaint
+      - name: initial_action
         description: >
-          what action was taken after the appeal process
+          what initial disciplinary action was taken regarding this complaint
       - name: agency
         description: >
           the police department the accused belong to.

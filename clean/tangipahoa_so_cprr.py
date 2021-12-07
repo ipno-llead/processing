@@ -40,14 +40,14 @@ def split_full_name(df):
 
 
 def clean_dept_desc(df):
-    df.dept_desc = df.dept_desc.str.lower().str.strip()\
+    df.loc[:, 'department_desc'] = df.dept_desc.str.lower().str.strip()\
         .str.replace('sro', 'school resource department', regex=False)\
         .str.replace(r'^res$', 'reserve', regex=True)\
         .str.replace('cid', 'criminal investigations division', regex=False)\
         .str.replace(r'pat(?:roll?)?', r'patrol', regex=True)\
         .str.replace('comm', 'communications', regex=False)\
         .str.replace('admin', 'administration', regex=False)
-    return df.fillna('')
+    return df.fillna('').drop(columns='dept_desc')
 
 
 def clean_complaint_type(df):
