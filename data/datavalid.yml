@@ -85,6 +85,9 @@ schemas:
       - name: citizen
         description: >
           demographic info of the involved citizen
+      - name: initial_disposition
+        description: >
+          the initial disposition for the complaint
       - name: disposition
         description: >
           the final disposition for the complaint
