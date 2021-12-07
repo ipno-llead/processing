@@ -129,8 +129,8 @@ def split_rows_with_multiple_officers_and_split_names(df):
     return df.drop(columns=['officer', 'other_officers'])
 
 
-def clean_summary(df):
-    df.loc[:, 'summary'] = df.synopsis.str.lower().str.strip()\
+def clean_allegation_desc(df):
+    df.loc[:, 'allegation_desc'] = df.synopsis.str.lower().str.strip()\
         .str.replace('bcpd', 'bossier city police department', regex=False)\
         .str.replace(r'all[ae]g[ae][sn]', 'alleges', regex=True)\
         .str.replace('sicla', 'stole', regex=False).str.replace(r'[oa]ffic[ae]rs\b', 'officers', regex=True)\
@@ -203,7 +203,7 @@ def clean():
         .pipe(extract_and_clean_disposition)\
         .pipe(clean_actions)\
         .pipe(clean_investigating_supervisor)\
-        .pipe(clean_summary)\
+        .pipe(clean_allegation_desc)\
         .pipe(assign_dispositions)\
         .pipe(assign_action)\
         .pipe(assign_agency)\
