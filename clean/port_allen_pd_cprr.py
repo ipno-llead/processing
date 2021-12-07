@@ -64,23 +64,48 @@ def split_rows_by_allegations(df):
     return df
 
 
-def extract_rule_violation(df):
-    lookup_table = [
-        ['2:15 conduct unbecoming of an officer', '2:15 conduct unbecoming an officer',
-            '2:15 conduer unbecoming of an officer'],
-        ['112/2 command of temper'],
-        ['3:11 carrying out orders'],
-        ['122 departmental motor vehicle accident', '123 departmental motor vehicle accident',
-            '122 departmental vehicle accident', 'departmental motor vehicle accident'],
-        ['2:21 use of alcohol and controlled substance'],
-    ]
-    df.loc[:, "allegation"] = df.allegation.fillna("").str.replace(r"\s*(;|and)$", "")
-    df = standardize_from_lookup_table(df, "allegation", lookup_table)
-    rules = df.allegation.str.split(" ", n=1, expand=True)
-    df.loc[:, "rule_code"] = rules.loc[:, 0].fillna("")
-    df.loc[:, "rule_violation"] = rules.loc[:, 1].fillna("")
-    df = df.drop(columns="allegation")
+def clean_allegations(df):
+    df.loc[:, "allegation"] = df.allegation.fillna("")\
+        .str.replace(r"\s*(;|and)$", "")\
+        .str.replace(r'^(\w{1})\:(\w{1})(\w{1})', r'\1:\2\3:', regex=True)\
+        .str.replace(r'12[23]', '122:', regex=True)\
+        .str.replace(r'(122\:)? ?departmental motor vehicle accident$', '122: departmental vehicle accident', regex=True)\
+        .str.replace(r'112\/2', '112/2:', regex=True)\
+        .str.replace('conduer', 'conduct', regex=False)\
+        .str.replace('of ', '', regex=False)
     return df
+
+
+def combine_rule_code_and_violation_18(df):
+    df.loc[:, 'allegation'] = df.rule_code.str.cat(df.rule_violation, sep=' ')\
+        .str.replace('112/1:7; 113 completion and submission of required forms; appearance/facial hair',
+                     '112|1:7: completion and submission of required forms/113: appearance/facial hair', regex=False)\
+        .str.replace('3:11', '3:11:', regex=False)\
+        .str.replace('112', '112:', regex=False)\
+        .str.replace(r'appearance\/facial hair', 'appearance or facial hair', regex=True)
+    return df.fillna('').drop(columns=['rule_code', 'rule_violation'])
+
+
+def split_rows_with_multiple_allegations_18(df):
+    df = df.drop('allegation', axis=1)\
+        .join(df['allegation']
+              .str.split('/', expand=True).stack()
+              .reset_index(level=1, drop=True)
+              .rename('allegation'), how='outer').reset_index(drop=True)
+    return df
+
+
+def combine_allegation_code_and_violation(df):
+    df.loc[:, 'allegation_rule'] = df.rule_code.str.cat(df.rule_violation, sep=' ')
+
+    df.loc[:, 'allegation_paragraph'] = df.paragraph_code.str.cat(df.paragraph_violation, sep=' ')
+
+    df.loc[:, 'allegation'] = df.allegation_rule.fillna('').str.cat(df.allegation_paragraph.fillna(''), sep='')\
+        .str.replace(r'^(\w{1})\:(\w{1})(\w{1})', r'\1:\2\3:', regex=True)\
+        .str.replace(r'^(\w{1})(\w{1})(\w{1}) ', r'\1\2\3: ', regex=True)
+    return df.drop(columns=[
+        'rule_code', 'rule_violation', 'paragraph_code', 'paragraph_violation', 'allegation_rule',
+        'allegation_paragraph'])
 
 
 def assign_agency(df):
@@ -109,13 +134,12 @@ def clean19():
         .pipe(clean_dates, ["receive_date", "occur_date"])\
         .pipe(split_rows_by_allegations)\
         .pipe(clean_badge_no)\
-        .pipe(extract_rule_violation)\
+        .pipe(clean_allegations)\
         .pipe(assign_agency)\
         .pipe(assign_prod_year, '2019')\
         .pipe(clean_names, ["first_name", "last_name"])\
         .pipe(gen_uid, ["agency", "first_name", "last_name", "badge_no"])\
-        .pipe(gen_uid, ["agency", "tracking_number", "uid", "rule_code", "rule_violation"], "charge_uid")\
-        .pipe(gen_uid, ["charge_uid"], "allegation_uid")
+        .pipe(gen_uid, ["agency", "tracking_number", "uid", "allegation"], "allegation_uid")
     return df
 
 
@@ -153,12 +177,13 @@ def clean18():
         .pipe(clean_dates, ["receive_date", "occur_date"])\
         .pipe(clean_occur_time)\
         .pipe(combine_appeal_and_action_columns)\
+        .pipe(combine_rule_code_and_violation_18)\
+        .pipe(split_rows_with_multiple_allegations_18)\
         .pipe(assign_agency)\
         .pipe(assign_prod_year, '2018')\
         .pipe(clean_names, ["first_name", "last_name"])\
         .pipe(gen_uid, ["agency", "first_name", "last_name"])\
-        .pipe(gen_uid, ["agency", "tracking_number", "uid", "rule_code", "rule_violation"], "charge_uid")\
-        .pipe(gen_uid, ["charge_uid"], "allegation_uid")\
+        .pipe(gen_uid, ["agency", "tracking_number", "uid"], "allegation_uid")\
         .dropna(subset=['tracking_number'])
 
 
@@ -178,6 +203,7 @@ def clean16():
         })\
         .drop(columns=["department", "shift"])\
         .pipe(float_to_int_str, ['paragraph_code'])\
+        .pipe(combine_allegation_code_and_violation)\
         .pipe(clean_dates, ["receive_date", "occur_date", "investigation_complete_date"])\
         .pipe(clean_occur_time)\
         .pipe(assign_agency)\
@@ -185,10 +211,9 @@ def clean16():
         .pipe(clean_names, ["first_name", "last_name"])\
         .pipe(gen_uid, ["agency", "first_name", "last_name"])\
         .pipe(standardize_desc_cols, [
-            "rank_desc", "department_desc", "complainant_type", "paragraph_violation", "rule_violation", "disposition"
+            "rank_desc", "department_desc", "complainant_type", "disposition"
         ])\
-        .pipe(gen_uid, ["agency", "tracking_number", "uid", "rule_code", "rule_violation"], "charge_uid")\
-        .pipe(gen_uid, ["charge_uid"], "allegation_uid")
+        .pipe(gen_uid, ["agency", "tracking_number", "uid", "allegation"], "allegation_uid")
 
 
 if __name__ == "__main__":
