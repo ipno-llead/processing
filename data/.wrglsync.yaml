@@ -184,6 +184,10 @@ repos:
     fileName: fuse/com_baker_pd.csv
     primaryKey:
       - allegation_uid
+  com-houma-pd:
+    fileName: fuse/com_houma_pd.csv
+    primaryKey:
+      - allegation_uid
   com-denham-springs-pd:
     fileName: fuse/com_denham_springs_pd.csv
     primaryKey:
@@ -364,6 +368,10 @@ repos:
     fileName: fuse/per_baker_pd.csv
     primaryKey:
       - uid
+  per-houma-pd:
+    fileName: fuse/per_houma_pd.csv
+    primaryKey:
+      - uid
   per-gonzales-pd:
     fileName: fuse/per_gonzales_pd.csv
     primaryKey:
@@ -530,6 +538,10 @@ repos:
       - event_uid
   event-baker-pd:
     fileName: fuse/event_baker_pd.csv
+    primaryKey:
+      - event_uid
+  event-houma-pd:
+    fileName: fuse/event_houma_pd.csv
     primaryKey:
       - event_uid
   event-gonzales-pd:
