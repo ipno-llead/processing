@@ -5,11 +5,13 @@ import pandas as pd
 from lib.columns import clean_column_names, set_values
 from lib.path import data_file_path
 from lib.clean import (
-    clean_names, clean_salaries, clean_sexes, clean_races, float_to_int_str
+    clean_names, clean_salaries, clean_sexes, clean_races, float_to_int_str, clean_dates
 )
 from lib.uid import gen_uid
 from lib import salary
 from lib.standardize import standardize_from_lookup_table
+from lib.rows import duplicate_row
+import re
 
 sys.path.append('../')
 
@@ -71,7 +73,8 @@ def clean_pprr():
 
 def clean_tracking_number(df):
     df.loc[:, 'tracking_number'] = df.tracking_number.str.strip()\
-        .str.replace(' ', '', regex=False)
+        .str.replace(' ', '', regex=False)\
+        .str.replace(r'(\w+)(\d+)', r'\1 \2', regex=True)
     return df[df.tracking_number != '\x1a'].reset_index(drop=True)
 
 
@@ -289,7 +292,7 @@ def split_action_from_disposition(df):
     return df
 
 
-def clean_cprr():
+def clean_cprr_20():
     return pd.read_csv(data_file_path(
         'raw/lafayette_pd/lafayette_pd_cprr_2015_2020.csv'
     )).pipe(clean_column_names)\
@@ -419,11 +422,348 @@ def clean_cprr():
         .pipe(gen_uid, ['agency', 'tracking_number', 'allegation', 'uid'], 'allegation_uid')
 
 
+def clean_tracking_number_14(df):
+    df.loc[:, 'tracking_number'] = df.cc_number.str.lower().str.strip()\
+        .str.replace(r'^-', '', regex=True)\
+        .str.replace(r'^(ad)(\d+)-', r'\1 \2-', regex=True)\
+        .str.replace(r'sl(\d{2})', r'sl \1', regex=True)
+    return df.drop(columns='cc_number')
+
+
+def clean_complainant(df):
+    df.loc[:, 'complainant'] = df.complainant.str.lower().str.strip()\
+        .str.replace(r'(\/\/|ry|lt\.)', '', regex=True)
+    return df
+
+
+def clean_receive_date_14(df):
+    df.loc[:, 'receive_date'] = df.date_received\
+        .str.replace('0517/2010', '05/17/2010', regex=False)\
+        .str.replace(r' \$', '', regex=True)\
+        .str.replace('20100', '2010', regex=False)
+    return df.drop(columns='date_received')
+
+
+def clean_complete_date_14(df):
+    df.loc[:, 'complete_date'] = df.date_completed\
+        .str.replace('Arwood', '', regex=False)\
+        .str.replace(r' \-', '', regex=True)\
+        .str.replace(r' as', '', regex=True)
+    return df.drop(columns='date_completed')
+
+
+def clean_and_split_investigator_14(df):
+    df.loc[:, 'investigator'] = df.assigned_investigator.str.lower().str.strip().fillna('')\
+        .str.replace(r'^det\. ?', 'detective ', regex=True)\
+        .str.replace(r'^lt\. ?', 'lieutenant ', regex=True)\
+        .str.replace(r'^sgt\. ?', 'sergeant ', regex=True)\
+        .str.replace(r'^capt\. ?', 'captain ', regex=True)\
+        .str.replace(r'^cpl\.? ?', 'corporal ', regex=True)\
+        .str.replace(r'(.+) terro', 'detective shawn terro', regex=True)\
+        .str.replace(r'(.+) pattum$', 'detective patrick pattum', regex=True)\
+        .str.replace(r'(.+)? ?(arm?wood|chastity)$', 'detective chastity armwood', regex=True)\
+        .str.replace(r'det\. (.+) prevost', 'detective joey prevost', regex=True)\
+        .str.replace(r'cpl\. (.+) prevost', 'detective joey prevost', regex=True)\
+        .str.replace(r'(.+) gremillion', 'sergeant keith gremillion', regex=True)\
+        .str.replace('none assigned', '', regex=False)\
+        .str.replace(r'p\. fontenot', 'phil fontenot', regex=True)\
+        .str.replace(r'b\. bejsovec', 'bert bejsovex', regex=True)\
+        .str.replace(r'(r\.)? czajkowski', ' ron czajkowski', regex=True)\
+        .str.replace(r'l\. firmin', 'levy firmin', regex=True)\
+        .str.replace(r'r\. miller', 'randy miller', regex=True)\
+        .str.replace(r'l\. richard', 'luranie richard', regex=True)\
+        .str.replace(r'd\. prejean', 'dwayne prejean', regex=True)\
+        .str.replace('n/a', '', regex=False)\
+        .str.replace('force', '', regex=False)\
+        .str.replace(r' 3$', '', regex=True)
+
+    ranks = [
+        'detective', 'lieutenant', 'sergeant', 'captain', 'major', 'corporal'
+    ]
+    parts = df.investigator.str.extract(r'^(?:(%s) )?(?:([^ ]+) )?([^ ]+)$' % '|'.join(ranks))
+    df.loc[:, 'investigator_rank'] = parts[0].fillna('')
+    df.loc[:, 'investigator_first_name'] = parts[1].fillna('')\
+        .str.replace(r'\.', '', regex=True)
+    df.loc[:, 'investigator_last_name'] = parts[2].fillna('')
+    return df.drop(columns=['investigator', 'assigned_investigator'])
+
+
+def extract_action_from_disposition_14(df):
+    df.loc[:, 'action'] = df.disposition.str.lower().str.strip().fillna('')\
+        .str.replace(r'^sus?tained ?\/ ?(.+) ?', r'\1', regex=True)\
+        .str.replace(r'\.', '', regex=True)\
+        .str.replace(r'lor', 'letter of reprimand', regex=False)\
+        .str.replace(r'(not sustained|unfounded|withdrawn|unfounded on all officers|'
+                     r'\bsust\b|complaint|exonorated|sent to hr)', '', regex=True)\
+        .str.replace(r'(officer resigned ?(prior)? ?(to)? ?(termination)?|resigned sts|'
+                     r'resigned under invest)', 'resigned', regex=True)\
+        .str.replace(r'(all focus officers listed received counseling forms|'
+                     r'counseli ?ng form)|loc', 'letter of counseling', regex=True)\
+        .str.replace('(retired under investigation)', 'retired', regex=True)\
+        .str.replace(r' ?(\d+) days? ?(suspension)? ?', r'\1-day suspension ', regex=True)\
+        .str.replace(r'excessive force/ failure to complete report/sustained (2days)|^2days$',
+                     '2-day suspension', regex=True)
+    actions = df.action.str.extract(r'((.+)suspension(.+)|(.+)terminated(.+)|(.+)resigned(.+)|'
+                                    r'(.+)letter of counseling(.+)|(.+)letter of reprimand(.+))')
+
+    df.loc[:, 'action'] = actions[0].fillna('')\
+        .str.replace(r'(.+)letter of counseling(.+)', 'letter of counseling', regex=True)\
+        .str.replace(r'(\w+)3', '3', regex=True)\
+        .str.replace(r' \((\w+)\)$', '', regex=True)\
+        .str.replace('terminated  resigned/', 'terminated; resigned', regex=False)
+    return df
+
+
+disposition_14_lookup = [
+    ['sustained; resigned', 'sustained/nboc/resigned',
+     'sustained/resigned prior to termination', 'sustained/resigned',
+     'sustained/resigned under invest.', 'terminated sust. resigned/', 'resigned sts.'],
+    ['unfounded', '/loc/sta rling- unfounded- crozier'],
+    ['exonerated', 'exonorated'],
+    ['justified', 'justified use of force', 'justified use of', 'justified/use of force'],
+    ['not sustained; sustained', 'not sustained/anboc- sustained deficiency'],
+    ['not sustained', '; not sustained- deroussel',
+     'not sustained/ds- counseling form (ryan beard) unprofessional conduct'],
+    ['not sustained; resigned', 'not sustained/resigned'],
+    ['sustained', 'sustained/lor', 'sustained/loc', 'sustained/training',
+     'ned fowler- sustained- cubo/letter of repremaind gabe thompson- sustained- cubo/counseling form'],
+    ['withdrawn'],
+    ['no violation', 'no violation et', 'noviolation/close'],
+    ['resigned', '/resigned'],
+    ['retired', 'retired under investigation']]
+
+
+def clean_disposition_14(df):
+    df.loc[:, 'disposition'] = df.disposition.str.lower().str.strip().fillna('')\
+        .str.replace(r'sus?tained ?\/? ?((.+)(\d+)(.+)| ?letter(.+)| ?coun(.+)| ?training(.+)|'
+                     r' ?(.+)lor(.+)|performance(.+))', 'sustained', regex=True)\
+        .str.replace(r'\/ (\w+)', r'/\1', regex=True)\
+        .str.replace('officer ', '', regex=False)
+    return standardize_from_lookup_table(df, 'disposition', disposition_14_lookup)
+
+
+def clean_charges_14(df):
+    df.loc[:, 'charges'] = df.complaint.str.lower().str.strip().fillna('')\
+        .str.replace(r'\(?(\w+)\)?\/ (\w+)', r'\1/\2', regex=True)\
+        .str.replace(r'unpo?r?o?fesso?i?o?nal', 'unprofessional', regex=True)\
+        .str.replace(r'^officer involved ?\.? shooting', 'officer involved shooting', regex=True)\
+        .str.replace('failed', 'failure', regex=False)\
+        .str.replace(r'\((\w+)$', r'(\1)', regex=True)\
+        .str.replace('pd', 'police department', regex=False)\
+        .str.replace('rude/unprofessional', 'rude and unprofessional', regex=False)\
+        .str.replace(r' \b(her|his)\b ', '', regex=True)\
+        .str.replace(r'^ffde$', '', regex=True)\
+        .str.replace(r'\((\w+)\/(\w+)\)', r'(\1|\2)', regex=True)\
+        .str.replace('topatrol', 'to patrol', regex=False)\
+        .str.replace('speeding', 'safe speed violation', regex=False)\
+        .str.replace(r'^complete report$', 'failure to complete report', regex=True)\
+        .str.replace(r'^rude and$', 'rude and unprofessional', regex=True)\
+        .str.replace(r'duites', 'duties', regex=False)\
+        .str.replace('onapplication', 'on application', regex=False)
+    return df.drop(columns='complaint')
+
+
+def split_rows_with_multiple_charges_14(df):
+    i = 0
+    for idx in df[df.charges.str.contains(r'/')].index:
+        s = df.loc[idx + i, 'charges']
+        parts = re.split(r'\s*(?:/)\s*', s)
+        df = duplicate_row(df, idx + i, len(parts))
+        for j, name in enumerate(parts):
+            df.loc[idx + i + j, 'charges'] = name
+        i += len(parts) - 1
+    return df
+
+
+def split_rows_with_multiple_names_14(df):
+    df.loc[:, 'focus_officer_s'] = df.focus_officer_s.str.lower().str.strip().fillna('')\
+        .str.replace(r'\, ', '/', regex=True)\
+        .str.replace(r'\.', '', regex=True)\
+        .str.replace('unknown', '', regex=False)\
+        .str.replace(r'\((\w+)\/(\w+)\)', r'(\1|\2)', regex=True)\
+        .str.replace(r'\(?(\w+)\)? ?\/ (\w+)', r'\1/\2', regex=True)\
+        .str.replace(r'sgt\.?', 'sergeant', regex=True)\
+        .str.replace(r'det\.?', 'detective', regex=True)\
+        .str.replace(r'cpl\.?', 'corporal', regex=True)\
+        .str.replace(r'capt\.?', 'captain', regex=True)\
+        .str.replace(r'^lt\.?', 'lieutenant', regex=True)\
+        .str.replace(r'officer \- (\w+)', r'officer \1', regex=True)\
+        .str.replace(r'\/and ', '/', regex=True)\
+        .str.replace('officers jeremy dupuis (csu) and ross sonnier (1a)',
+                     'officer jeremy dupuis (csu)/officer ross sonnier (1a)', regex=False)\
+        .str.replace(r"detective will white\/detective brian baumgardner\/captain ned fowler\/detective michael boutte\/"
+                     r"sergeant gabe thompson, \(all metro narcotics agents\) pat elliot \(da's office\)",
+                     "detective will white (metro narcotics)/detective brian baumgardner (metro narcotics)/"
+                     "captain ned fowler (metro narcotics)/detective michael boutte (metro narcotics)/"
+                     "sergeant gabe thompson (metro narcotics)/pat elliot (da's office)", regex=True)\
+        .str.replace(r'officer calvin parker\(1d\) officer ross sonnier \(1d\)',
+                     'officer calvin parker 1d/officer ross sonnier 1d', regex=True)\
+        .str.replace('officers', 'officer', regex=False)\
+        .str.replace(r'(\w+)\((\w+)\)$', r'\1 \2', regex=True)\
+        .str.replace('1c', '1c', regex=False)\
+        .str.replace(r'\(k\- (\w+)\)?', r'(k-\1)', regex=True)\
+        .str.replace(r'(\w+) officer', r'\1/officer', regex=True)\
+        .str.replace(r'\b(\w{1})c$', r'(\1c)', regex=True)\
+        .str.replace(r'\b(\w{1})d$', r'(\1d)', regex=True)\
+        .str.replace(r'^lpd ', '', regex=True)\
+        .str.replace(r'and ?', '', regex=True)\
+        .str.replace('morvant 1c', 'officer morvant (1c)')\
+        .str.replace('detectiveail', 'detective', regex=False)\
+        .str.replace(r'(\((\w{2})\)) (.+)', r'\1/\2', regex=True)\
+        .str.replace(r'^greg cormier scott poiencot$', 'greg cormier/scott poiencot', regex=True)
+
+    i = 0
+    for idx in df[df.focus_officer_s.str.contains(r'/')].index:
+        s = df.loc[idx + i, 'focus_officer_s']
+        parts = re.split(r'\s*(?:/)\s*', s)
+        df = duplicate_row(df, idx + i, len(parts))
+        for j, name in enumerate(parts):
+            df.loc[idx + i + j, 'focus_officer_s'] = name
+        i += len(parts) - 1
+    return df
+
+
+def split_names_14(df):
+    df.loc[:, 'focus_officer_s'] = df.focus_officer_s\
+        .str.replace(r'^res lor$', 'detective res lor (metro narcotics)', regex=True)\
+        .str.replace(r'^allred$', 'sergeant walter allred', regex=True)\
+        .str.replace(r'^lange$', 'lieutenant joseph lange (4b)', regex=True)\
+        .str.replace(r'action\)$', '', regex=True)\
+        .str.replace(r'^reserve$', '', regex=True)\
+        .str.replace(r'^\(k-9\)$', '', regex=True)\
+        .str.replace(r'\bsro\b', 'school resources', regex=True)\
+        .str.replace(r'traffic\)$', '', regex=True)\
+        .str.replace(r'^4[db]$', '', regex=True)\
+        .str.replace(r'^2b$', '', regex=True)\
+        .str.replace('lpd- eeoc complain', '', regex=True)\
+        .str.replace(r'metro narc\)', 'metro narcotics', regex=True)\
+        .str.replace(r'^officer\)$', '', regex=True)\
+        .str.replace(r'(officer)? ?(uletom) ?(hewitt)? ?(\(?1b\)?)?$', 'officer uletom hewitt (1b)', regex=True)\
+        .str.replace(r"\(all metro narcotics agents\) pat elliot \(da's office\)",
+                     "pat elliot (district attorney's office)", regex=True)
+    names = df.focus_officer_s.str.extract(r'(?:(officer|detective|sergeant|lieutenant|city marshall|major|recruit|'
+                                 r'captain|corporal|reserve captain|dispatcher|drc|chief|park ranger))? '
+                                 r'?(?:(\w+) )? ?(\w+) ?(.+)?')
+    df.loc[:, 'rank_desc'] = names[0].fillna('')
+    df.loc[:, 'first_name'] = names[1].fillna('')
+    df.loc[:, 'last_name'] = names[2].fillna('')\
+        .str.replace(r'bertr$', 'bertrand', regex=True)
+    df.loc[:, 'department_desc'] = names[3].fillna('')\
+        .str.replace(r'\,', '', regex=True)\
+        .str.replace(r'\(\(?|\)\)?', '', regex=True)\
+        .str.replace('cid', 'criminal investigations', regex=False)
+    return df.drop(columns=['focus_officer_s'])
+
+
+def drop_rows_missing_first_and_last_name_14(df):
+    return df[~((df.first_name == '') & (df.last_name == ''))]
+
+
+def drop_rows_missing_charges_disposition_and_action_14(df):
+    return df[~((df.charges == '') & (df.action == '') & (df.disposition == ''))]
+
+
+def assign_correct_actions_14(df):
+    df.loc[((df.first_name == 'brent') & (df.tracking_number == '2012-008')), 'action'] = '3-day suspension'
+    df.loc[((df.first_name == 'devin') & (df.tracking_number == '2012-008')), 'action'] = '1-day suspension'
+    df.loc[((df.last_name == 'firmin') & (df.tracking_number == '2009-002')), 'action'] = 'resigned'
+    df.loc[((df.last_name == 'starling') & (df.tracking_number == 'sl 13-006')), 'action'] = 'letter of counseling'
+    df.loc[((df.last_name == 'hebert') & (df.tracking_number == '2011-012')), 'action'] = 'resigned'
+    df.loc[((df.last_name == 'roberts') & (df.tracking_number == '2011-006')), 'action'] = 'resigned'
+    df.loc[((df.last_name == 'hackworth') & (df.tracking_number == '2012-022')), 'action'] = 'resigned'
+    df.loc[((df.last_name == 'taylor') & (df.tracking_number == 'ad 13-001')), 'action'] = 'resigned'
+    df.loc[((df.last_name == 'taylor') & (df.tracking_number == 'ad 13-002')), 'action'] = 'resigned'
+    df.loc[((df.last_name == 'baumgardner') & (df.tracking_number == '2012-015')), 'action'] = 'resigned'
+    df.loc[((df.last_name == 'baumgardner') & (df.tracking_number == '2012-013')), 'action'] = 'resigned'
+    df.loc[((df.last_name == 'dangerfield') & (df.tracking_number == '2012-001')), 'action'] = 'resigned'
+    df.loc[((df.last_name == 'thompson') & (df.tracking_number == '2012-010')), 'action'] = 'resigned'
+    df.loc[((df.last_name == 'poiencot') & (df.tracking_number == '2012-010')), 'action'] = 'terminated'
+    df.loc[((df.last_name == 'roberts') & (df.tracking_number == '2011-004')), 'action'] = 'resigned'
+    df.loc[((df.last_name == 'roberts') & (df.tracking_number == '2011-001')), 'action'] = 'resigned'
+    df.loc[((df.last_name == 'bricker') & (df.tracking_number == '2011-007')), 'action'] = 'resigned'
+    df.loc[((df.last_name == 'carter') & (df.tracking_number == '2010-011')), 'action'] = 'resigned'
+    df.loc[((df.last_name == 'dartez') & (df.tracking_number == '2010-012')), 'action'] = 'resigned'
+    df.loc[((df.last_name == 'howard') & (df.tracking_number == '2009-008')), 'action'] = 'resigned'
+    df.loc[((df.last_name == 'winjum') & (df.tracking_number == '2010-014')), 'action'] = 'resigned'
+    df.loc[(
+           (df.last_name == 'bertrand') &
+           (df.tracking_number == '2012-003') &
+           (df.charges == 'insubordination')),
+           'action'] = ''
+    return df
+
+
+def assign_correct_disposition_14(df):
+    df.loc[((df.last_name == 'crozier') & (df.tracking_number == 'sl 13-006')), 'disposition'] = 'unfounded'
+    df.loc[((df.last_name == 'starling') & (df.tracking_number == 'sl 13-006')), 'disposition'] = 'sustained'
+    df.loc[((df.last_name == 'sonnier') & (df.tracking_number == 'sl 13-006')), 'disposition'] = ''
+    df.loc[((df.last_name == 'firmin') & (df.tracking_number == '2009-002')), 'disposition'] = 'sustained'
+    df.loc[((df.last_name == 'hebert') & (df.tracking_number == '2011-012')), 'disposition'] = 'sustained'
+    df.loc[((df.last_name == 'roberts') & (df.tracking_number == '2011-006')), 'disposition'] = 'sustained'
+    df.loc[((df.last_name == 'hackworth') & (df.tracking_number == '2012-022')), 'disposition'] = 'sustained'
+    df.loc[((df.last_name == 'taylor') & (df.tracking_number == 'ad 13-001')), 'disposition'] = 'sustained'
+    df.loc[((df.last_name == 'taylor') & (df.tracking_number == 'ad 13-002')), 'disposition'] = 'sustained'
+    df.loc[((df.last_name == 'baumgardner') & (df.tracking_number == '2012-015')), 'disposition'] = 'sustained'
+    df.loc[((df.last_name == 'baumgardner') & (df.tracking_number == '2012-013')), 'disposition'] = 'not sustained'
+    df.loc[((df.last_name == 'dangerfield') & (df.tracking_number == '2012-001')), 'disposition'] = 'sustained'
+    df.loc[((df.last_name == 'thompson') & (df.tracking_number == '2012-010')), 'disposition'] = ''
+    df.loc[((df.last_name == 'poiencot') & (df.tracking_number == '2012-010')), 'disposition'] = ''
+    df.loc[((df.last_name == 'roberts') & (df.tracking_number == '2011-004')), 'disposition'] = 'sustained'
+    df.loc[((df.last_name == 'roberts') & (df.tracking_number == '2011-001')), 'disposition'] = 'sustained'
+    df.loc[((df.last_name == 'bricker') & (df.tracking_number == '2011-007')), 'disposition'] = 'sustained'
+    df.loc[((df.last_name == 'carter') & (df.tracking_number == '2010-011')), 'disposition'] = 'sustained'
+    df.loc[((df.last_name == 'dartez') & (df.tracking_number == '2010-012')), 'disposition'] = 'sustained'
+    df.loc[((df.last_name == 'howard') & (df.tracking_number == '2009-008')), 'disposition'] = 'sustained'
+    df.loc[((df.last_name == 'winjum') & (df.tracking_number == '2010-014')), 'disposition'] = 'sustained'
+    df.loc[(
+        (df.last_name == 'bertrand') &
+        (df.tracking_number == '2012-003') &
+        (df.charges == 'insubordination')),
+        'disposition'] = 'unfounded'
+    df.loc[(
+           (df.last_name == 'bertrand') &
+           (df.tracking_number == '2012-003') &
+           (df.charges == 'rude and unprofessional')),
+           'disposition'] = 'sustained'
+    return df
+
+
+def clean_cprr_14():
+    df = pd.read_csv(data_file_path('raw/lafayette_pd/lafayette_pd_cprr_2009_2014.csv'))\
+        .pipe(clean_column_names)\
+        .pipe(clean_receive_date_14)\
+        .pipe(clean_complete_date_14)\
+        .pipe(clean_dates, ['receive_date', 'complete_date'])\
+        .pipe(clean_tracking_number_14)\
+        .pipe(clean_complainant)\
+        .pipe(clean_and_split_investigator_14)\
+        .pipe(extract_action_from_disposition_14)\
+        .pipe(clean_disposition_14)\
+        .pipe(clean_charges_14)\
+        .pipe(split_rows_with_multiple_charges_14)\
+        .pipe(split_rows_with_multiple_names_14)\
+        .pipe(split_names_14)\
+        .pipe(drop_rows_missing_first_and_last_name_14)\
+        .pipe(assign_correct_actions_14)\
+        .pipe(assign_correct_disposition_14)\
+        .pipe(drop_rows_missing_charges_disposition_and_action_14)\
+        .pipe(set_values, {
+            'agency': 'Lafayette PD'
+        })\
+        .pipe(gen_uid, ['first_name', 'last_name', 'agency'])\
+        .pipe(gen_uid, ['agency', 'investigator_first_name', 'investigator_last_name'], 'investigator_uid')\
+        .pipe(gen_uid, ['uid', 'charges', 'action', 'tracking_number', 'disposition'], 'complaint_uid')
+    return df
+
+
 if __name__ == '__main__':
     pprr = clean_pprr()
     cprr = clean_cprr()
     cprr.to_csv(data_file_path(
         'clean/cprr_lafayette_pd_2015_2020.csv'
+    ), index=False)
+    cprr_14.to_csv(data_file_path(
+        'clean/cprr_lafayette_pd_2009_2014.csv'
     ), index=False)
     pprr.to_csv(data_file_path(
         'clean/pprr_lafayette_pd_2010_2021.csv'

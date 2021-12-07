@@ -173,7 +173,8 @@
   ],
   "lafayette_pd": [
     "https://www.dropbox.com/s/mzanvltddi52lpw/lafayette_pd_cprr_2015_2020.csv?dl=1",
-    "https://www.dropbox.com/s/vea5bh178sn7vpu/lafayette_pd_pprr_2010_2021.csv?dl=1"
+    "https://www.dropbox.com/s/vea5bh178sn7vpu/lafayette_pd_pprr_2010_2021.csv?dl=1",
+    "https://www.dropbox.com/s/wccapsuqdi3gqwo/lafayette_pd_cprr_2009_2014.csv?dl=0"
   ],
   "hammond_pd": [
     "https://www.dropbox.com/s/87adfuzla1rngtt/hammond_pd_cprr_2015_2020.csv?dl=1",
@@ -223,6 +224,9 @@
   ],
   "baker_pd": [
     "https://www.dropbox.com/s/glr8zm8s0jk3lvg/baker_pd_cprr_2018_2020.csv?dl=1"
+  ],
+  "vine": [
+    "https://www.dropbox.com/s/o7i9qx11f5kkz68/vine_urls.csv?dl=1"
   ],
   "houma_pd": [
     "https://www.dropbox.com/s/xtsw70fuqii9zyf/houma_pd_cprr_2019_2021.csv?dl=1"
