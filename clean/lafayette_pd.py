@@ -752,14 +752,15 @@ def clean_cprr_14():
         })\
         .pipe(gen_uid, ['first_name', 'last_name', 'agency'])\
         .pipe(gen_uid, ['agency', 'investigator_first_name', 'investigator_last_name'], 'investigator_uid')\
-        .pipe(gen_uid, ['uid', 'charges', 'action', 'tracking_number', 'disposition'], 'complaint_uid')
+        .pipe(gen_uid, ['uid', 'charges', 'action', 'tracking_number', 'disposition'], 'allegation_uid')
     return df
 
 
 if __name__ == '__main__':
     pprr = clean_pprr()
-    cprr = clean_cprr()
-    cprr.to_csv(data_file_path(
+    cprr_20 = clean_cprr_20()
+    cprr_14 = clean_cprr_14()
+    cprr_20.to_csv(data_file_path(
         'clean/cprr_lafayette_pd_2015_2020.csv'
     ), index=False)
     cprr_14.to_csv(data_file_path(
