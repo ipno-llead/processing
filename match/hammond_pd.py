@@ -3,6 +3,7 @@ sys.path.append('../')
 import pandas as pd
 from lib.path import data_file_path, ensure_data_dir
 from datamatch import JaroWinklerSimilarity, ThresholdMatcher, ColumnsIndex
+from lib.clean import canonicalize_names
 
 
 def prepare_post_data():
@@ -23,20 +24,8 @@ def deduplicate_cprr_14_officers(cprr):
         'match/hammond_pd_cprr_2009_2014_deduplicate.xlsx'
     ), decision, decision)
     clusters = matcher.get_index_clusters_within_thresholds(decision)
-    # canonicalize name and uid
-    for cluster in clusters:
-        uid, first_name, last_name = None, '', ''
-        for idx in cluster:
-            row = df.loc[idx]
-            if (
-                uid is None
-                or len(row.first_name) > len(first_name)
-                or (len(row.first_name) == len(first_name) and len(row.last_name) > len(last_name))
-            ):
-                uid, first_name, last_name = idx, row.first_name, row.last_name
-        cprr.loc[cprr.uid.isin(cluster), 'uid'] = uid
-        cprr.loc[cprr.uid == uid, 'first_name'] = first_name
-        cprr.loc[cprr.uid == uid, 'last_name'] = last_name
+
+    canonicalize_names(cprr, clusters)
     return cprr
 
 
@@ -53,20 +42,8 @@ def deduplicate_cprr_20_officers(cprr):
         'match/hammond_pd_cprr_2015_2020_deduplicate.xlsx'
     ), decision, decision)
     clusters = matcher.get_index_clusters_within_thresholds(decision)
-    # canonicalize name and uid
-    for cluster in clusters:
-        uid, first_name, last_name = None, '', ''
-        for idx in cluster:
-            row = df.loc[idx]
-            if (
-                uid is None
-                or len(row.first_name) > len(first_name)
-                or (len(row.first_name) == len(first_name) and len(row.last_name) > len(last_name))
-            ):
-                uid, first_name, last_name = idx, row.first_name, row.last_name
-        cprr.loc[cprr.uid.isin(cluster), 'uid'] = uid
-        cprr.loc[cprr.uid == uid, 'first_name'] = first_name
-        cprr.loc[cprr.uid == uid, 'last_name'] = last_name
+
+    canonicalize_names(cprr, clusters)
     return cprr
 
 
