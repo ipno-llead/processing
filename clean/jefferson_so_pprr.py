@@ -50,12 +50,18 @@ def split_names(df):
 
 def clean_rank_desc(df): 
     df.loc[:, 'rank_desc'] = df.rank_desc\
+        .str.extract(r'(it|accounting|payroll|purchasing|property|narcotics|baliff|intake|jail|communications|'
+                     r'propert|cib|juvenile|internal affairs|burglary|central records|'
+                     r'crime lab|ems|homicide|robbery|court|'
+                     r'human resources|accounting|academy|mail|database|network)')
         .str.replace(r'\bcommaander\b', 'commander', regex=True)\
         .str.replace(r'\bpropert\b', 'property', regex=True)\
         .str.replace(r'\bcustodia\b', 'custodian', regex=True)\
         .str.replace('&', 'and', regex=True)\
         .str.replace(r'\bcomm\b', 'communications', regex=True)\
-        .str.replace(r'\bdetecti\b', 'detective', regex=True)
+        .str.replace(r'\bdetecti\b', 'detective', regex=True)\
+        .str.replace('booking of', 'booking officer', regex=False)
+    return df
         
 
 def clean():
@@ -64,6 +70,7 @@ def clean():
         .pipe(extract_department_desc)\
         .pipe(clean_district_desc)\
         .pipe(split_names)\
+        .pipe(clean_rank_desc)\
         .pipe(set_values, {
             'agency': 'Jefferson SO'
         })\
