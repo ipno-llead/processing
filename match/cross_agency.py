@@ -1,13 +1,14 @@
+import argparse
+from datetime import datetime
 import pathlib
 import sys
-from datamatch.indices import MultiIndex
-from datamatch.scorers import AbsoluteScorer
 
 import numpy as np
 import pandas as pd
 from datamatch import (
     ThresholdMatcher, DissimilarFilter, NonOverlappingFilter, ColumnsIndex,
-    JaroWinklerSimilarity, MaxScorer, SimSumScorer
+    JaroWinklerSimilarity, MaxScorer, SimSumScorer, AlterScorer, MultiIndex,
+    AbsoluteScorer
 )
 from datavalid.spinner import Spinner
 
@@ -15,6 +16,10 @@ from lib.path import data_file_path
 from lib.date import combine_date_columns
 
 sys.path.append('../')
+
+common_names = [
+    'Michael Smith',
+]
 
 
 def discard_rows(events: pd.DataFrame, bool_index: pd.Series, desc: str, reset_index: bool = False) -> pd.DataFrame:
@@ -106,25 +111,43 @@ def cross_match_officers_between_agencies(personnel, events, constraints):
         per, per.min_date.notna(), 'officers with no event'
     )
 
+    # concatenate first name and last name to get a series of full names
+    full_names = per.first_name.str.cat(per.last_name, sep=' ')
+    # filter down the full names to only those that are common
+    common_names_sr = full_names[full_names.isin(common_names)]
+
     excel_path = data_file_path(
         "match/cross_agency_officers.xlsx"
     )
     matcher = ThresholdMatcher(
-        MultiIndex([
+        index=MultiIndex([
+            # only officers who have the same first letter in their first name would be matched
             ColumnsIndex('fc'),
+            # or if they are in the same attract constraint
             ColumnsIndex('attract_id', ignore_key_error=True),
         ]),
-        MaxScorer([
-            SimSumScorer({
-                'first_name': JaroWinklerSimilarity(),
-                'last_name': JaroWinklerSimilarity(),
-            }),
+        scorer=MaxScorer([
+            AlterScorer(
+                # calculate similarity score (0-1) based on name similarity
+                scorer=SimSumScorer({
+                    'first_name': JaroWinklerSimilarity(),
+                    'last_name': JaroWinklerSimilarity(),
+                }),
+                # but for pairs that have the same name and their name is common
+                values=common_names_sr,
+                # give a penalty of -.2 which is enough to eliminate them
+                alter=lambda score: score - .2,
+            ),
+            # but if two officers belong to the same attract constraint then give them the highest score regardless
             AbsoluteScorer('attract_id', 1, ignore_key_error=True),
         ]),
-        per,
+        dfa=per,
         filters=[
+            # don't match officers who belong in the same agency
             DissimilarFilter('agency'),
+            # don't match officers who are in the same repell constraint
             DissimilarFilter('repell_id', ignore_key_error=True),
+            # don't match officers who appear in overlapping time ranges
             NonOverlappingFilter('min_timestamp', 'max_timestamp')
         ],
         show_progress=True,
@@ -164,12 +187,81 @@ def create_person_table(clusters, personnel, personnel_event):
     return person_df[['person_id', 'canonical_uid', 'uids']]
 
 
+def entity_resolution(old_person: pd.DataFrame, new_person: pd.DataFrame) -> pd.DataFrame:
+    dfa = new_person.set_index('person_id', drop=True)
+    dfa.loc[:, 'uids'] = dfa.uids.str.split(pat=',')\
+        .map(lambda x: set(x))
+
+    dfb = old_person.set_index('person_id', drop=True)
+    dfb.loc[:, 'uids'] = dfb.uids.str.split(pat=',')\
+        .map(lambda x: set(x))
+
+    def person_scorer(a: pd.Series, b: pd.Series) -> float:
+        if a.canonical_uid == b.canonical_uid:
+            return 1
+        x_len = len(a.uids & b.uids)
+        return x_len * 2 / (len(a.uids) + len(b.uids))
+
+    print('matching old and new person table...')
+    matcher = ThresholdMatcher(
+        # TODO: upgrade datamatch version to have index_elements available
+        index=ColumnsIndex('uids', index_elements=True),
+        scorer=person_scorer,
+        dfa=dfa,
+        dfb=dfb,
+        show_progress=True,
+    )
+    decision = 0.001
+    with Spinner('saving person entity resolution to Excel file'):
+        matcher.save_pairs_to_excel(
+            name=data_file_path(
+                "match/person_entity_resolution_%s.xlsx" % datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
+            ),
+            match_threshold=decision,
+            lower_bound=0
+        )
+    pairs = matcher.get_index_pairs_within_thresholds(decision)
+    pairs_dict = dict(pairs)
+
+    def new_person_ids():
+        per_id = old_person.person_id.max()
+        while True:
+            per_id += 1
+            yield per_id
+
+    # get person_id from the old table, if not found, assign a completely new id
+    gen = new_person_ids()
+    new_person.loc[:, 'person_id'] = new_person.person_id.map(lambda x: pairs_dict.get(x, next(gen)))
+    return new_person
+
+
 if __name__ == '__main__':
-    personnel = pd.read_csv(data_file_path('fuse/personnel.csv'))
-    print('read personnel file (%d x %d)' % personnel.shape)
-    events = pd.read_csv(data_file_path('fuse/event.csv'))
-    print('read events file (%d x %d)' % events.shape)
-    constraints = read_constraints()
-    clusters, personnel_event = cross_match_officers_between_agencies(personnel, events, constraints)
-    person_df = create_person_table(clusters, personnel, personnel_event)
+    parser = argparse.ArgumentParser(description='Match officer profiles cross-agency to produce person table')
+    parser.add_argument(
+        'person_csv', type=pathlib.Path, metavar='PERSON_CSV',
+        help='The previous person data',
+    )
+    parser.add_argument(
+        '--new-person-csv', type=pathlib.Path, metavar='NEW_PERSON_CSV', default=None,
+        help='The current person data (specifying this skip the clustering)',
+    )
+    args = parser.parse_args()
+
+    old_person_df = pd.read_csv(args.person_csv)
+    if args.new_person_csv is not None:
+        new_person_df = pd.read_csv(args.new_person_csv)
+    else:
+        personnel = pd.read_csv(data_file_path('fuse/personnel.csv'))
+        print('read personnel file (%d x %d)' % personnel.shape)
+        events = pd.read_csv(data_file_path('fuse/event.csv'))
+        print('read events file (%d x %d)' % events.shape)
+        constraints = read_constraints()
+        clusters, personnel_event = cross_match_officers_between_agencies(personnel, events, constraints)
+        new_person_df = create_person_table(clusters, personnel, personnel_event)
+        new_person_df.to_csv(data_file_path('match/person.csv'), index=False)
+
+    person_df = entity_resolution(
+        old_person=old_person_df,
+        new_person=new_person_df
+    )
     person_df.to_csv(data_file_path('match/person.csv'), index=False)
