@@ -6,8 +6,6 @@ from lib.path import data_file_path
 from lib.clean import clean_names, float_to_int_str, standardize_desc_cols
 from lib.uid import gen_uid
 from lib.standardize import standardize_from_lookup_table
-from lib.rows import duplicate_row
-import re
 
 
 action_lookup = [
@@ -197,6 +195,40 @@ def clean_action_19(df):
         .str.replace('no charges were filed by the nopd', '', regex=False)\
         .str.replace('h.r', 'human resources', regex=False)\
         .str.replace(r'^under investigation$', '', regex=True)
+    return df
+
+
+def split_rows_with_multiple_alllegations_19(df):
+    df.loc[:, 'allegation'] = df.charges.str.lower().str.strip()\
+        .str.replace(r'  +', ' ', regex=True)\
+        .str.replace(r'(\w+)\, ? ?', r'\1/', regex=True)\
+        .str.replace(r' ?and ? ?', '/', regex=True)\
+        .str.replace(r'\/ ? ?\/', '/', regex=True)\
+        .str.replace(r'\"(\w+)\" \/ \"(\w+)\"', r'\1-\2', regex=True)\
+        .str.replace(r'\.', '', regex=True)
+
+    df = df.drop('allegation', axis=1)\
+        .join(df['allegation']
+              .str.split('/', expand=True).stack()
+              .reset_index(level=1, drop=True)
+              .rename('allegation'), how='outer').reset_index(drop=True)
+    return df.drop(columns='charges')
+
+
+def clean_allegations_19(df):
+    df.loc[:, 'allegation'] = df.allegation.fillna('')\
+        .str.replace(r'\"(\w+)\"', '', regex=True)\
+        .str.replace('responsibilities', 'responsibility', regex=False)\
+        .str.replace(r'porfessionalism', 'professionalism', regex=True)\
+        .str.replace(r'duty (\w+)', r'duty-\1', regex=True)\
+        .str.replace(r'\(|\)', '', regex=True)\
+        .str.replace('fo', 'of', regex=False)\
+        .str.replace('proceudres', 'procedures', regex=False)\
+        .str.replace('beofre', 'before', regex=False)\
+        .str.replace('perofrm', 'perform', regex=False)\
+        .str.replace(r'\- (\w+)', r'-\1', regex=True)\
+        .str.replace('neglct', 'neglect', regex=False)\
+        .str.replace('supervisory', 'supervisor', regex=False)
     return df
 
 
@@ -480,8 +512,8 @@ def fix_rank_desc_20(df):
     return df
 
 
-def clean_summary(df):
-    df.loc[:, 'summary'] = df.summary.str.lower().str.strip()\
+def clean_allegation_desc(df):
+    df.loc[:, 'allegation_desc'] = df.allegation_desc.str.lower().str.strip()\
         .str.replace(r'\brui\b', 'resigned under investigation', regex=True)\
         .str.replace('ojc', 'orleans justice center', regex=False)\
         .str.replace(r'lt\.?', 'lieutenant', regex=True)\
@@ -513,7 +545,7 @@ def extract_suspension_start_date(df):
         .str.replace('1-6-21-1/8/21', '1/6/2021', regex=False)
     dates = df.suspension_start_date.str.extract(r'(suspended on (\d+)/(\d+)/(\d+)/)')
     df.loc[:, 'suspension_start_date'] = dates[0]\
-        .str.replace('suspended on ', '').str.replace(r'/$', '')
+        .str.replace('suspended on ', '', regex=False).str.replace(r'/$', '', regex=True)
     return df
 
 
@@ -572,9 +604,9 @@ def add_left_reason_column(df):
     cols = ['resignation_left_reason', 'termination_left_reason', 'arrest_left_reason']
 
     df.loc[:, 'left_reason'] = df[cols].apply(lambda row: '|'.join(row.values.astype(str)), axis=1)\
-        .str.replace('nan', '').str.replace(r'\|+', '|').str.replace(r'\|$', '').str.replace(r'^\|', '')
-    return df.drop(columns={
-        'resignation_left_reason', 'termination_left_reason', 'arrest_left_reason'})
+        .str.replace('nan', '', regex=False).str.replace(r'\|+', '|', regex=True)\
+        .str.replace(r'\|$', '', regex=True).str.replace(r'^\|', '', regex=True)
+    return df.drop(columns={'resignation_left_reason', 'termination_left_reason', 'arrest_left_reason'})
 
 
 def clean19():
@@ -598,10 +630,12 @@ def clean19():
             'date_started': 'investigation_start_date',
             'date_completed': 'investigation_complete_date',
             'terminated_resigned': 'action',
-            'charges': 'allegation'
+            'summary': 'allegation_desc'
         })\
+        .pipe(split_rows_with_multiple_alllegations_19)\
+        .pipe(clean_allegations_19)\
         .pipe(remove_carriage_return, [
-            'name_of_accused', 'disposition', 'allegation', 'summary', 'investigating_supervisor',
+            'name_of_accused', 'disposition', 'allegation', 'allegation_desc', 'investigating_supervisor',
             'action', 'department_desc', 'rank_desc'
         ])\
         .pipe(clean_department_desc)\
@@ -621,7 +655,7 @@ def clean19():
         .sort_values(['tracking_number', 'investigation_complete_date'])\
         .drop_duplicates(subset=['allegation_uid'], keep='last', ignore_index=True)\
         .pipe(split_investigating_supervisor)\
-        .pipe(clean_summary)\
+        .pipe(clean_allegation_desc)\
         .pipe(extract_arrest_date)\
         .pipe(extract_resignation_date)\
         .pipe(extract_suspension_start_date)\
@@ -647,7 +681,8 @@ def clean20():
             'location_or_facility': 'department_desc',
             'assigned_agent': 'investigating_supervisor',
             'terminated_resigned': 'action',
-            'referred_by': 'complainant'})\
+            'referred_by': 'complainant',
+            'summary': 'allegation_desc'})\
         .pipe(clean_names, [
             'investigating_supervisor', 'name_of_accused', 'charges',
             'complainant', 'action'])\
@@ -663,7 +698,7 @@ def clean20():
         .pipe(drop_rows_missing_name_20)\
         .pipe(clean_employee_id_20)\
         .pipe(fix_rank_desc_20)\
-        .pipe(clean_summary)\
+        .pipe(clean_allegation_desc)\
         .pipe(clean_disposition_20)\
         .pipe(extract_suspension_start_date)\
         .pipe(extract_suspension_end_date)\
@@ -671,7 +706,7 @@ def clean20():
         .pipe(extract_arrest_date)\
         .pipe(extract_termination_date)\
         .pipe(standardize_desc_cols, [
-            'action', 'summary'])\
+            'action', 'allegation_desc'])\
         .pipe(split_investigating_supervisor)\
         .pipe(process_disposition)\
         .pipe(clean_department_desc)\

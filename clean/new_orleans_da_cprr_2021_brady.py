@@ -60,8 +60,8 @@ def clean_disposition(df):
     return df
 
 
-def clean_allegation_class(df):
-    df.loc[:, 'directive'] = df.directive.str.lower().str.strip()\
+def clean_allegation_desc(df):
+    df.loc[:, 'allegation_desc'] = df.directive.str.lower().str.strip()\
         .str.replace(r'\r\.\s', 'rs', regex=True)\
         .str.replace(r'\br\.?s\W*', '', regex=True)\
         .str.replace('reltive ', 'relative', regex=False)\
@@ -89,7 +89,7 @@ def clean_allegation_class(df):
         .str.replace(r'32:863.1$',
                      '32:863.1 relative to no proof of liability insurance', regex=True)\
         .str.replace(r'^relative to sexual battery', '14:43.1 relative to sexual battery', regex=True)\
-        .str.replace(r'^relative to theft$', '14:67 relative to theft')\
+        .str.replace(r'^relative to theft$', '14:67 relative to theft', regex=False)\
         .str.replace(r'^relative to aggravated incest', '14:78.1 relative to aggravated incest', regex=True)\
         .str.replace(
             r'^relative to attempt and conspiracy to commit offense',
@@ -102,11 +102,11 @@ def clean_allegation_class(df):
                      '32:863.1 relative to no proof of liability insurance', regex=True)\
         .str.replace(r'^relative to simple battery$', '14:35 relative to simple battery', regex=True)\
         .str.replace(r'^relative to simple assault$', '14:38 relative to simple assault', regex=True)\
-        .str.replace(r'^simple assault', '14:38 relative to simple assault')\
+        .str.replace(r'^simple assault', '14:38 relative to simple assault', regex=True)\
         .str.replace('recklesss', 'reckless', regex=False)\
         .str.replace(r'relative to careless operation of a moveable$',
                      'relative to careless operation of a moveable vehicle', regex=True)
-    return df
+    return df.drop(columns='directive')
 
 
 def drop_rows_without_last_name(df):
@@ -121,16 +121,17 @@ def clean():
     df = df\
         .rename(columns={
             'first name': 'first_name',
-            'last name': 'last_name'
+            'last name': 'last_name',
+            'finding': 'initial_disposition'
         })\
         .pipe(extract_date_from_pib)\
         .pipe(combine_rule_and_paragraph)\
         .pipe(clean_disposition)\
-        .pipe(clean_allegation_class)\
+        .pipe(clean_allegation_desc)\
         .pipe(clean_allegations)\
         .pipe(drop_rows_without_last_name)\
         .pipe(clean_dates, ['receive_date'])\
-        .pipe(standardize_desc_cols, ['finding', 'disposition', 'allegation', 'directive'])\
+        .pipe(standardize_desc_cols, ['initial_disposition', 'disposition', 'allegation', 'allegation_desc'])\
         .pipe(clean_names, ['first_name', 'last_name'])\
         .pipe(set_values, {
             'data_production_year': 2021,
@@ -138,8 +139,8 @@ def clean():
         })\
         .pipe(gen_uid, ['agency', 'first_name', 'last_name'])\
         .pipe(gen_uid, [
-            'agency', 'uid', 'receive_year', 'directive', 'tracking_number',
-            'finding', 'disposition', 'allegation'], "allegation_uid")\
+            'agency', 'uid', 'receive_year', 'allegation_desc', 'tracking_number',
+            'initial_disposition', 'disposition', 'allegation'], "allegation_uid")\
         .drop_duplicates(subset=['allegation_uid'])
     return df
 

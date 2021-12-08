@@ -27,6 +27,16 @@ def fuse_events(cprr_20, cprr_14, pprr):
             'keep': ['agency', 'allegation_uid', 'uid', 'invetigator_uid'],
         },
     }, ['allegation_uid'])
+    builder.extract_events(cprr_14, {
+        events.COMPLAINT_RECEIVE: {
+            'prefix': 'receive',
+            'keep': ['agency', 'allegation_uid', 'uid', 'invetigator_uid']
+        },
+        events.INVESTIGATION_COMPLETE: {
+            'prefix': 'complete',
+            'keep': ['agency', 'allegation_uid', 'uid', 'invetigator_uid'],
+        },
+    }, ['allegation_uid'])
     builder.extract_events(pprr, {
         events.OFFICER_HIRE: {
             'prefix': 'hire',
@@ -75,7 +85,7 @@ if __name__ == '__main__':
             'investigator_last_name': 'last_name',
         })
     )
-    com = rearrange_allegation_columns(cprr)
+    com = rearrange_allegation_columns(pd.concat([cprr_20, cprr_14]))
     per.to_csv(data_file_path(
         'fuse/per_lafayette_pd.csv'
     ), index=False)

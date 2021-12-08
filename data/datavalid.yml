@@ -83,6 +83,9 @@ schemas:
       - name: citizen
         description: >
           demographic info of the involved citizen
+      - name: initial_disposition
+        description: >
+          the initial disposition for the complaint
       - name: disposition
         description: >
           the final disposition for the complaint
@@ -122,10 +125,10 @@ schemas:
           - mixed
       - name: action
         description: >
-          what (disciplinary) actions were taken regarding this complaint
-      - name: final_action
+          what final (disciplinary) actions were taken regarding this complaint
+      - name: initial_action
         description: >
-          what action was taken after the appeal process
+          what initial disciplinary action was taken regarding this complaint
       - name: agency
         description: >
           the police department the accused belong to.
