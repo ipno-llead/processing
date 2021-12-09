@@ -194,8 +194,8 @@ def extract_tables(csv_path, start_idx, result, trim_selection_marks=False):
 
 if __name__ == '__main__':
     load_dotenv()
-    fr_endpoint = os.environ['FORM_RECOGNIZER_ENDPOINT']
-    fr_key = os.environ['FORM_RECOGNIZER_KEY']
+    fr_endpoint = os.getenv('FORM_RECOGNIZER_ENDPOINT')
+    fr_key = os.getenv('FORM_RECOGNIZER_KEY')
 
     parser = argparse.ArgumentParser(
         description='Extract tables from a document using Azure Form Recognizer and save as CSV files.')
