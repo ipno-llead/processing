@@ -39,3 +39,4 @@ $(DATA_CLEAN_DIR) $(DATA_MATCH_DIR) $(DATA_FUSE_DIR): | $(DATA_DIR) ; @-mkdir $@
 
 include raw_datasets.mk
 include $(DATA_DEP_FILES)
+include wrgl.mk

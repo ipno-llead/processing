@@ -83,28 +83,9 @@ schemas:
       - name: citizen
         description: >
           demographic info of the involved citizen
-      - name: initial_disposition
-        description: >
-          the initial disposition for the complaint
       - name: disposition
         description: >
           the final disposition for the complaint
-      - name: rule_code
-        description: >
-          an allegation is usually consist of a rule and paragraph that was violated. This is
-          the code of the violated rule.
-      - name: rule_violation
-        description: >
-          an allegation is usually consist of a rule and paragraph that was violated. This is
-          the text of the violated rule.
-      - name: paragraph_code
-        description: >
-          an allegation is usually consist of a rule and paragraph that was violated. This is
-          the paragraph number.
-      - name: paragraph_violation
-        description: >
-          an allegation is usually consist of a rule and paragraph that was violated. This is
-          the text of the violated paragraph.
       - name: complainant_name
         description: >
           redacted if the complainant isn't a police officer.

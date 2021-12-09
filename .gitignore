@@ -10,7 +10,7 @@ __pycache__
 *.pdf
 
 .wrglmod.yaml
-.wrglsync
+.wrglfleet
 
 build
 data.d
