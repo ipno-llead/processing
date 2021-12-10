@@ -7,8 +7,7 @@ COMBINED_FILE_PATHS := $(foreach name,$(COMBINED_FILE_NAMES),$(DATA_FUSE_DIR)/$(
 .PHONY: pull_all commit_all push_all
 
 define commit
-$(WRGL) branch -d tmp --wrgl-dir $(1)
-scripts/commit.py $(1) tmp
+scripts/wrgl_commit.py $(1) main $(2)
 
 endef
 
@@ -18,42 +17,41 @@ $(WRGL) pull main --wrgl-dir .wrglfleet/$(1)
 endef
 
 define print_diff_cmd
-echo '  wrgl diff --wrgl-dir .wrglfleet/$(1) tmp main'
+@echo '  wrgl diff --wrgl-dir .wrglfleet/$(1) main'
 
 endef
 
 define push
-$(WRGL) push origin refs/heads/tmp:refs/heads/main --wrgl-dir .wrglfleet/$(1)
+$(WRGL) push origin refs/heads/main:refs/heads/main --wrgl-dir .wrglfleet/$(1)
 
 endef
 
 pull_all: $(REPO_DIRS)
 	$(foreach repo,$(REPOS),$(call pull,$(repo)))
 
-$(BUILD_DIR)/person.csv: pull_person
-	wrgl export --wrgl-dir .wrglfleet/person main > $@
+pull_person: | .wrglfleet/person
+	if [[ "$(shell ($(call pull,person)))" != *"Already up to date."* ]]; then \
+		wrgl export --wrgl-dir .wrglfleet/person main > $(BUILD_DIR)/person.csv; \
+	else \
+		echo 'file $(BUILD_DIR)/person.csv is up to date.'; \
+	fi
 
-$(BUILD_DIR)/.fuse-all: all
-	scripts/run.sh fuse/all.py
-	@-python -m datavalid --dir data
-	@touch $@
-
-$(DATA_MATCH_DIR)/person.csv: $(BUILD_DIR)/person.csv match/cross_agency.py $(BUILD_DIR)/.fuse-all pull_person
+$(DATA_MATCH_DIR)/person.csv: $(BUILD_DIR)/person.csv $(MD5_DIR)/match/cross_agency.py.md5 $(BUILD_DIR)/.fuse-all | pull_person
 	scripts/run.sh match/cross_agency.py $<
 
-commit_all: $(DATA_MATCH_DIR)/person.csv pull_all
-	$(foreach repo,$(REPOS),$(call commit,$(repo)))
+commit_all: $(DATA_MATCH_DIR)/person.csv $(BUILD_DIR)/.fuse-all
+	$(foreach repo,$(REPOS),$(call commit,$(repo),$(MESSAGE)))
 	@-echo 'use the following commands to inspect changes:'
 	$(foreach repo,$(REPOS),$(call print_diff_cmd,$(repo)))
 
 push_all:
 	$(foreach repo,$(REPOS),$(call push,$(repo)))
 
-pull_%: .wrglfleet/%
+pull_%: | .wrglfleet/%
 	$(call pull,$*)
 
-commit_%: .wrglfleet/%
-	$(call commit,$*)
+commit_%: | .wrglfleet/%
+	$(call commit,$*,$(MESSAGE))
 
 push_%: commit_%
 	$(call push,$*)
