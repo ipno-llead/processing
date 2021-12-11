@@ -137,3 +137,23 @@ python -m datavalid --dir data
 ```bash
 python -m datavalid --dir data --doc schema.md
 ```
+
+## Pull/push data to wrglhub
+
+### Pull data from wrglhub
+
+```bash
+make pull_all
+```
+
+### Run the entire pipeline and commit new data
+
+```bash
+make commit_all
+```
+
+### Push new data to wrglhub
+
+```bash
+make push_all
+```

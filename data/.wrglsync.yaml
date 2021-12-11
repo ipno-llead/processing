@@ -558,7 +558,7 @@ repos:
       - event_uid
   event-washington-so:
     fileName: fuse/event_washington_so.csv
-      primaryKey:
+    primaryKey:
       - event_uid
   event-cameron-so:
     fileName: fuse/event_cameron_so.csv

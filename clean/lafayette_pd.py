@@ -440,7 +440,8 @@ def clean_receive_date_14(df):
     df.loc[:, 'receive_date'] = df.date_received\
         .str.replace('0517/2010', '05/17/2010', regex=False)\
         .str.replace(r' \$', '', regex=True)\
-        .str.replace('20100', '2010', regex=False)
+        .str.replace('20100', '2010', regex=False)\
+        .str.replace(r'^0/.+', '', regex=True)  # discard dates with empty month
     return df.drop(columns='date_received')
 
 
@@ -642,8 +643,8 @@ def split_names_14(df):
         .str.replace(r"\(all metro narcotics agents\) pat elliot \(da's office\)",
                      "pat elliot (district attorney's office)", regex=True)
     names = df.focus_officer_s.str.extract(r'(?:(officer|detective|sergeant|lieutenant|city marshall|major|recruit|'
-                                 r'captain|corporal|reserve captain|dispatcher|drc|chief|park ranger))? '
-                                 r'?(?:(\w+) )? ?(\w+) ?(.+)?')
+                                           r'captain|corporal|reserve captain|dispatcher|drc|chief|park ranger))? '
+                                           r'?(?:(\w+) )? ?(\w+) ?(.+)?')
     df.loc[:, 'rank_desc'] = names[0].fillna('')
     df.loc[:, 'first_name'] = names[1].fillna('')
     df.loc[:, 'last_name'] = names[2].fillna('')\
