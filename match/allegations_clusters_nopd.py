@@ -2,40 +2,54 @@ import sys
 sys.path.append('../')
 import pandas as pd
 from lib.path import data_file_path
-from datamatch import ThresholdMatcher, ColumnsIndex, StringSimilarity
-import numpy
+from lib.clean import float_to_int_str
 
 
-def cluster_officers_by_tracking_number(cprr):
-    df = cprr[['uid', 'first_name', 'last_name', 'tracking_number']]
-    df = df.drop_duplicates(subset='uid', keep='first').set_index('uid')
-    df.loc[:, 'tn'] = df.tracking_number.fillna('').map(lambda x: x[:])
-    matcher = ThresholdMatcher(ColumnsIndex('tn'), {
-        'tracking_number': StringSimilarity()
-    }, df, show_progress=True)
-    
-    decision = 1
-    matcher.save_clusters_to_excel(data_file_path('match/nopd_allegation_clusters_by_tracking_number.xlsx'), decision)
+def filter_out_non_duplicates(df):
+    #  creates a df in which a given tracking_number must appear more than once
+    df[['uid', 'tracking_number']].groupby("tracking_number").filter(lambda x: len(x) > 1)
 
-    clusters = matcher.get_index_clusters_within_thresholds(lower_bound=decision)
+    #  if a given uid is associated with a given tracking number more than once, drop it
+    df['uids'] = list(zip(df.uid, df.tracking_number))
+    df = df[['uids']]
+    df = df.drop_duplicates(subset=['uids'])
 
-    c = []
-    for cluster in clusters:
-        c.append(cluster)
-        dfa = pd.DataFrame(c)
+    #  creates a df where a given tracking_number is associated with atleast two persons
+    df['uid'], df['tracking_number'] = df.uids.str
 
-        dfa['clusters']= dfa.values.tolist()
-        dfa.loc[:, 'clusters'] = dfa.clusters.astype(str).str.lower().str.strip()\
-            .str.replace(r'(\, none)+', '', regex=True)
-        
-        numpy.sort(dfa.clusters, axis=-1, kind='quicksort')
-        
-        dfa = dfa[['clusters']]
-        dfa.to_excel(data_file_path('match/nopd_allegation_clusters_sorted.xlsx'))
-    return cprr
+    df.loc[:, 'tracking_number'] = df.tracking_number.fillna('')
+    return df[~((df.tracking_number == ''))].drop(columns='uids')
+
+
+def groupby_tracking_number_and_uid(df):
+    df = df.groupby('tracking_number')['uid']
+    df = pd.DataFrame(df).astype(str)
+    df.columns = ['tracking_number', 'uid']
+    df = df.replace(r'\n', ', ', regex=True)
+
+    df.loc[:, 'uid'] = df.uid.str.lower().str.strip()\
+        .str.replace(r'\, (\w+) ', '', regex=True)\
+        .str.replace(r'^(\w+)  +', '', regex=True)\
+        .str.replace(r'\,? name(.+)', '', regex=True)\
+        .str.replace(r'^(\w+)$', '', regex=True)\
+        .str.replace(r'  +', ', ', regex=True)
+    return df[~((df.uid == ''))]
+
+
+def generate_duplicate_df(df):
+    df = df[df.duplicated(subset=['uid'], keep=False)]
+    return df
+
+
+def clean():
+    df = pd.read_csv(data_file_path('raw/ipm/allegations_nopd_merged.csv'))\
+        .pipe(float_to_int_str, ['tracking_number', 'uid', 'uids'])\
+        .pipe(filter_out_non_duplicates)\
+        .pipe(groupby_tracking_number_and_uid)\
+        .pipe(generate_duplicate_df)
+    return df
 
 
 if __name__ == '__main__':
-    cprr = pd.read_csv(data_file_path('raw/ipm/nopd_cprr_pprr_merged.csv'))
-    cprr = cluster_officers_by_tracking_number(cprr)
-    cprr.to_csv(data_file_path('match/nopd_cprr_pprr_merged.csv'))
+    df = clean()
+    df.to_csv(data_file_path('match/clusters_allegations_by_tracking_number_nopd_1931-2020.csv'), index=False)
