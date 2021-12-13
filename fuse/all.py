@@ -48,13 +48,14 @@ def fuse_personnel():
         pd.read_csv(data_file_path("fuse/per_bossier_city_pd.csv")),
         pd.read_csv(data_file_path("fuse/per_baker_pd.csv")),
         pd.read_csv(data_file_path("fuse/per_houma_pd.csv")),
-         pd.read_csv(data_file_path("fuse/per_gonzales_pd.csv")),
+        pd.read_csv(data_file_path("fuse/per_gonzales_pd.csv")),
         pd.read_csv(data_file_path("fuse/per_denham_springs_pd.csv")),
         pd.read_csv(data_file_path("fuse/per_abbeville_pd.csv")),
         pd.read_csv(data_file_path("fuse/per_washington_so.csv")),
         pd.read_csv(data_file_path("fuse/per_cameron_so.csv")),
         pd.read_csv(data_file_path("fuse/per_maurice_pd.csv")),
         pd.read_csv(data_file_path("fuse/per_terrebonne_so.csv")),
+        pd.read_csv(data_file_path("fuse/per_post.csv")),
     ])).sort_values('uid', ignore_index=True)
 
 
@@ -104,6 +105,7 @@ def fuse_event():
         pd.read_csv(data_file_path("fuse/event_cameron_so.csv")),
         pd.read_csv(data_file_path("fuse/event_maurice_pd.csv")),
         pd.read_csv(data_file_path("fuse/event_terrebonne_so.csv")),
+        pd.read_csv(data_file_path("fuse/event_post.csv")),
     ])).sort_values(['agency', 'event_uid'], ignore_index=True)
 
 
