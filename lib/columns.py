@@ -113,10 +113,10 @@ def rearrange_event_columns(df):
 
 
 def rearrange_allegation_columns(df):
-    """Performs final processing step for a complaint table
+    """Performs final processing step for an allegation table
 
     This performs the following tasks:
-    - discard columns not present in COMPLAINT_COLUMNS
+    - discard columns not present in ALLEGATION_COLUMNS
     - drop row duplicates
     - convert numeric columns to int or str
 

@@ -80,30 +80,12 @@ schemas:
       - name: body_worn_camera_available
       - name: app_used
       - name: citizen_arrested
-      - name: allegation_finding
-      - name: allegation_class
       - name: citizen
         description: >
           demographic info of the involved citizen
       - name: disposition
         description: >
           the final disposition for the complaint
-      - name: rule_code
-        description: >
-          an allegation is usually consist of a rule and paragraph that was violated. This is
-          the code of the violated rule.
-      - name: rule_violation
-        description: >
-          an allegation is usually consist of a rule and paragraph that was violated. This is
-          the text of the violated rule.
-      - name: paragraph_code
-        description: >
-          an allegation is usually consist of a rule and paragraph that was violated. This is
-          the paragraph number.
-      - name: paragraph_violation
-        description: >
-          an allegation is usually consist of a rule and paragraph that was violated. This is
-          the text of the violated paragraph.
       - name: complainant_name
         description: >
           redacted if the complainant isn't a police officer.
@@ -124,7 +106,10 @@ schemas:
           - mixed
       - name: action
         description: >
-          what (disciplinary) actions were taken regarding this complaint
+          what final (disciplinary) actions were taken regarding this complaint
+      - name: initial_action
+        description: >
+          what initial disciplinary action was taken regarding this complaint
       - name: agency
         description: >
           the police department the accused belong to.
@@ -158,6 +143,9 @@ schemas:
       - name: investigator_uid
       - name: investigator_rank
       - name: shift_supervisor
+      - name: allegation_desc
+        description: >
+          text description of the allegation
   event:
     columns:
       - name: event_uid

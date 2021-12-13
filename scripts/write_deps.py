@@ -119,7 +119,7 @@ def write_make_rules(
         for script, inputs, outputs in scripts:
             targets = ' '.join(['$(%s)/%s' % (dir_var, name) for name in outputs])
             if all:
-                f.write('all: %s\n\n' % targets)
+                f.write('$(BUILD_DIR)/.fuse-all: %s\n\n' % targets)
             f.write('%s: %s %s | $(%s)\n\tpython %s\n\n' % (
                 targets,
                 '$(MD5_DIR)/%s.md5' % (dir / script),

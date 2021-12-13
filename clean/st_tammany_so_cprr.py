@@ -9,7 +9,7 @@ sys.path.append('../')
 
 def remove_newlines(df):
     for col in ['full_name', 'occur_raw_date', 'allegation']:
-        df.loc[:, col] = df[col].str.replace(r'(\d)\r\n(\d)', r'\1\2')\
+        df.loc[:, col] = df[col].str.replace(r'(\d)\r\n(\d)', r'\1\2', regex=True)\
             .str.replace(r'\r\n', ' ')
     return df
 
@@ -25,7 +25,7 @@ def assign_department_desc(df):
         "raw/st_tammany_so/st_tammany_department_codes_tabula.csv"
     ))
     dept_df = clean_column_names(dept_df)
-    dept_df.loc[:, 'loc'] = dept_df.loc[:, 'loc'].str.replace(r'\*$', '')
+    dept_df.loc[:, 'loc'] = dept_df.loc[:, 'loc'].str.replace(r'\*$', '', regex=True)
     dept_df = dept_df.set_index('loc')
     dept_dict = dept_df.org_code.to_dict()
     dept_dict["20"] = "St. Tammany Parish Jail"
@@ -57,7 +57,7 @@ def gen_middle_initial(df):
 
 
 def remove_new_lines_from_allegations(df):
-    df.loc[:, 'allegation'] = df.allegation.str.replace(r'(\n|\r)\s*', ' ')
+    df.loc[:, 'allegation'] = df.allegation.str.replace(r'(\n|\r)\s*', ' ', regex=True)
     return df
 
 
