@@ -3,48 +3,162 @@ sys.path.append('../')
 from lib.path import data_file_path
 import pandas as pd
 from lib.columns import clean_column_names, set_values
-from lib.clean import standardize_desc_cols
 from lib.uid import gen_uid
+from lib.clean import standardize_from_lookup_table
 
 
-def extract_department_desc(df):
-    departments = df.rank_desc\
-        .str.extract(r'( ?i\.?t\.? ?| ?accounting ?| ?payroll ?| ?purchasing ?| ?property ?| ?narcotics ?| ?baliff ?|'
-                     r' ?intake ?| ?jail ?| ?communications ?| ?propert ?| ?cib ?| ?juvenile ?|'
-                     r' ?internal affairs ?| ?burglary ?| ?central records ?| ?crime lab ?| ?ems ?| ?homicide ?|'
-                     r' ?robbery ?| ?court ?| ?human resources ?| ?accounting ?|'
-                     r' ?academy ?| ?mail ?| ?database ?| ?network ?| ?\, div\. [abc] ?|'
-                     r'\, hear 1|arson ?| ?auto theft ?| ?pawn shop ?| ?management ?|'
-                     r' ?task force ?| ?ncic ?| ?pawn shop ?| ?jttf ?| ?internal management ?|'
-                     r' ?dna lab ?| ?crime scene ?| ?dispatche?r? ?| ?training ?| ?firearms ?|'
-                     r' ?traffic ?| ?economic crime ?| ?shoot squad ?| ?s\.i\.u ?|'
-                     r' ?booking ?| ?jpcc ?| ?transportation ?|'
-                     r'\, ?(.+)?| ?dea ?(.+)?| ?narcoc?e?c?s ?| ?strategic engagement ?|'
-                     r' ?cic ?| ?intelligence ?| ?intensive probation ?|'
-                     r' ?personal violence ?| ?crimes ?| ?missing persons ?|'
-                     r' ?operations ?| ?sales tax ?| ?health insurance ?|'
-                     r' ?grants ?| ?budget ?| ?finance?i?a?l? ?| ?tax (collector|supervisor) ?|'
-                     r' ?public assisgments ?| ?youth programs ?| ?community relations ?|'
-                     r' ?lab services ?|\;? ?technical services| ?prisoner ?|'
-                     r' ?asset forfeure ?| ?strategic engagement ?| ?dlr ?|'
-                     r' ?tech services ?| ?sib ?| ?p\.o\.c\. ?| ?school offense ?|'
-                     r' ?accounts payable ?| ?range ?| ?light shop ?| ?public assignments ?|'
-                     r' ?help desk tech ?| ?print shop ?| ?mang services ?|'
-                     r' ?terminal agency ?| ?handgun perms ?| ?insurance ?| ?vice ?|'
-                     r' ?photo lab ?| ?fingerprint ?| ?polygraph ?| ?evidence ?|'
-                     r' ?digital forensic ?| ?dna ?| ?patrol ?)')
-    df.loc[:, 'department_desc'] = departments[0]\
-        .str.replace(r'^\, ', '', regex=True)\
-        .str.replace(r'^  ?', '', regex=True).str.replace(r'  ?$', '', regex=True)\
-        .str.replace(r'\bpropert\b', 'property', regex=True)\
-        .str.replace(r'(database|network)', 'it', regex=True)\
-        .str.replace('ems', 'emergency medial services', regex=False)\
-        .str.replace(r'\-$', '', regex=True)\
-        .str.replace(r'^dna$', 'dna lab', regex=True)\
-        .str.replace(r'^jpcc$', 'jefferson parish corrections center', regex=True)\
-        .str.replace('financial', 'finance', regex=False)\
-        .str.replace(r' detectiv?e?', '', regex=True)\
-        .str.replace(r'\btech\b', 'technical', regex=True)
+dept_desc_lookup_table = [
+    ['it', 'i.t.'],
+    ['accounting'],
+    ['payroll'],
+    ['purchasing'],
+    ['narcotics'],
+    ['baliff'],
+    ['intake'],
+    ['jail'],
+    ['communications'],
+    ['property', 'propert & evidence'],
+    ['cib'],
+    ['fines'],
+    ['internal affairs'],
+    ['burglary'],
+    ['central records'],
+    ['crime lab'],
+    ['emergency medical services', 'ems'],
+    ['homicide'],
+    ['robbery'],
+    ['internal management'],
+    ['jtff'],
+    ['ncic'],
+    ['task force'],
+    ['management'],
+    ['pawn shop'],
+    ['auto theft'],
+    ['arson'],
+    ['div c'],
+    ['div b'],
+    ['div a'],
+    ['it; network', 'network'],
+    ['it; database', 'database'],
+    ['mail'],
+    ['academy', 'training'],
+    ['accounting'],
+    ['human resources'],
+    ['court'],
+    ['strategic engagement'],
+    ['narcotics', 'narcoces', 'narco', 'narocites', 'narcoitcs'],
+    ['dea'],
+    ['transportation'],
+    ['jefferson parish corrections center', 'jpcc', 'jail management'],
+    ['booking'],
+    ['s.i.u'],
+    ['shoot squaf'],
+    ['economic crime'],
+    ['traffic'],
+    ['firearms'],
+    ['crime scene'],
+    ['dna lab', 'dna'],
+    ['tax supervisor'],
+    ['tax collecor'],
+    ['finance', 'financial'],
+    ['budget'],
+    ['grants'],
+    ['health insurance'],
+    ['sales tax'],
+    ['operations'],
+    ['missing persons'],
+    ['crimes'],
+    ['personal violence'],
+    ['intenstive probation'],
+    ['intelligence'],
+    ['cic'],
+    ['management services', 'manag services'],
+    ['print shop'],
+    ['help desk tech'],
+    ['light shop'],
+    ['range'],
+    ['accounts payable'],
+    ['school offense'],
+    ['p.o.c'],
+    ['sib'],
+    ['technical services', 'tech services'],
+    ['dlr'],
+    ['asset forfeiture', 'asset forfeure'],
+    ['prisoner'],
+    ['technical services'],
+    ['lab services'],
+    ['community relations'],
+    ['youth programs'],
+    ['public assignments'],
+    ['patrol'],
+    ['digital forensic'],
+    ['evidence'],
+    ['polygraph'],
+    ['fingerprint'],
+    ['photo lab'],
+    ['vice'],
+    ['insurance'],
+    ['handgun permits', 'handgun perms'],
+    ['terminal agency'],
+    ['personnel background'],
+    ['forensic chemistry'],
+    ['process server'],
+    ['intensive probation'],
+    ['shoot squad'],
+    ['qa/qc'],
+    ['commisary'],
+    ['canine'],
+    ['paint and body'],
+    ['fbi'],
+    ['24th juidicial - i'],
+    ['24th judicial - e'],
+    ['24th judicial - f'],
+    ['5th circuit app'],
+    ['fbi task force'],
+    ['24th judicial - j'],
+    ['24th judicial - a'],
+    ['24th judicial - n'],
+    ['24th judicial - o'],
+    ['24th judicial - c'],
+    ['24th judicial - l'],
+    ['communications ct. - domestic', 'comm ct. - domestic'],
+    ['24th judicial - g'],
+    ['intake booking'],
+    ['juvenile court division a', 'juvenile court baliff, div. a'],
+    ['fleet management'],
+    ['juvenile court division c', 'juvenile court baliff, div. c'],
+    ['campus police', 'police on campus'],
+    ['jttf'],
+    ['division a', 'div. a'],
+    ['division b', 'div. b'],
+    ['2nd parish ct'],
+    ['codis'],
+    ['ions'],
+    ['it; motor pool', 'motor pool', 'eb motor pool'],
+    ['yenni building'],
+    ['division c', 'div. c'],
+    ['24th juidicial h'],
+    ['24th juidicial - m'],
+    ['inmate security', 'inmate sec.'],
+    ['claims'],
+    ['contracts office', 'contracts manager office'],
+    ['24th judicial - h'],
+    ['prisoner transportation'],
+    ['parish security']]
+
+
+def extract_department_descriptions(df):
+    df.loc[:, 'department_desc'] = df.rank_desc.str.lower().str.strip().fillna('')\
+        .str.replace(r' $', '', regex=True)\
+        .str.replace(r'   +', ' ', regex=True)
+    return standardize_from_lookup_table(df, 'department_desc', dept_desc_lookup_table)
+
+
+def clean_department_descriptions(df):
+    df.loc[:, 'department_desc'] = df.department_desc\
+        .str.replace(r'^it; it$', 'it', regex=True)\
+        .str.replace(r'^patrol; patrol$', 'patrol', regex=True)\
+        .str.replace(r'^it; it; network', 'it; network', regex=True)
     return df
 
 
@@ -73,83 +187,84 @@ def split_names(df):
     return df[~((df.first_name == '') & (df.last_name == ''))].drop(columns=['suffix', 'name'])
 
 
-def clean_rank_desc(df):
+rank_desc_lookup_table = [
+    ['commander', 'commaander', 'enforcement comn', 'comma', 'prisoner transportation com', 
+     'commai', 'commando'],
+    ['custodian', 'custodia'],
+    ['detective', 'detecti', 'detectiv'],
+    ['officer'],
+    ['deputy'],
+    ['deputy field trainee'],
+    ['supervisor', 'supervis', 'super', 'superv'],
+    ['manager'],
+    ['chief officer'],
+    ['chemist'],
+    ['investigator'],
+    ['assistant', 'asst.'],
+    ['systems specialist', 'systspeciali'],
+    ['emrgency computer', 'emergencycomputer'],
+    ['sergeant', 'serge', 'sergeant; sergeant'],
+    ['coordinator'],
+    ['systems manager', 'systmanager'],
+    ['bailiff', 'baliff'],
+    ['field trainee'],
+    ['instructor'],
+    ['clerk'],
+    ['chief pilot'],
+    ['legal liaison'],
+    ['chief'],
+    ['mechanic'],
+    ['enforcement commander', 'enforcement comn'],
+    ['dispatcher'],
+    ["chief's secretary", "chief's secret"],
+    ['administrator', 'admin'],
+    ['sheriff'], 
+    ['chaplain'],
+    ['polygraphist'],
+    ['analyst'],
+    ['technician'],
+    ['director'],
+    ['lieutenant'],
+    ['community liaison'],
+    ['repairman'],
+    ['campus police', 'police campus'],
+    ['grants writer'],
+    ['secretary']]
+
+
+def standardize_rank_descriptions(df):
+    df.loc[:, 'rank_desc'] = df.rank_desc.str.lower().str.strip().fillna('')\
+        .str.replace(r' $', '', regex=True)\
+        .str.replace(r'  +', ' ', regex=True)
+    return standardize_from_lookup_table(df, 'rank_desc', rank_desc_lookup_table)
+
+
+def clean_rank_descriptions(df):
     df.loc[:, 'rank_desc'] = df.rank_desc\
-        .str.replace(r'^prisonercom:$', 'prisoner commander', regex=True)\
-        .str.replace(r'^prisonerserge$', 'prisoner sergeant', regex=True)\
-        .str.replace(r'( ?i\.?t\.? ?| ?accounting ?| ?payroll ?| ?purchasing ?| ?property ?| ?narcotics ?| ?baliff ?|'
-                     r' ?intake ?| ?jail ?| ?communications ?| ?propert ?| ?cib ?| ?juvenile ?|'
-                     r' ?internal affairs ?| ?burglary ?| ?central records ?| ?crime lab ?| ?ems ?| ?homicide ?|'
-                     r' ?robbery ?| ?court ?| ?human resources ?| ?accounting ?|'
-                     r' ?academy ?| ?mail ?| ?database ?| ?network ?| ?\, div\. [abc] ?|'
-                     r'\, hear 1|arson ?| ?auto theft ?| ?pawn shop ?| ?management ?|'
-                     r' ?task force ?| ?ncic ?| ?pawn shop ?| ?jttf ?| ?internal management ?|'
-                     r' ?dna lab ?| ?crime scene ?| ?dispatche?r? ?| ?training ?| ?firearms ?|'
-                     r' ?traffic ?| ?economic crime ?| ?shoot squad ?| ?s\.i\.u ?|'
-                     r' ?booking ?| ?jpcc ?| ?transportation ?|'
-                     r'\, (.+)?| ?dea ?(.+)?| ?narcoc?e?c?s ?| ?strategic engagement ?|'
-                     r' ?cic ?| ?intelligence ?| ?intensive probation ?|'
-                     r' ?personal violence ?| ?crimes ?| ?missing persons ?|'
-                     r' ?operations ?| ?sales tax ?| ?health insurance ?|'
-                     r' ?grants ?| ?budget ?| ?finance?i?a?l? ?| ?tax (collector|supervisor) ?|'
-                     r' ?public assisgments ?| ?youth programs ?| ?community relations ?|'
-                     r' ?lab services ?|\;? ?technical services| ?prisoner ?|'
-                     r' ?asset forfeure ?| ?strategic engagement ?| ?dlr ?|'
-                     r' ?tech services ?| ?sib ?| ?p\.o\.c\. ?| ?school offense ?|'
-                     r' ?accounts payable ?| ?range ?| ?light shop ?| ?public assignments ?|'
-                     r' ?help desk tech ?| ?print shop ?| ?mang services ?|'
-                     r' ?terminal agency ?| ?handgun perms ?| ?insurance ?| ?vice ?|'
-                     r' ?photo lab ?| ?fingerprint ?| ?polygraph | ?evidence ?|'
-                     r' ?digital forensic ?| ?dna ?)', '', regex=True)\
-        .str.replace(r'\bcommaander\b', 'commander', regex=True)\
-        .str.replace(r'\bpropert\b', 'property', regex=True)\
-        .str.replace(r'\bcustodia\b', 'custodian', regex=True)\
-        .str.replace('&', 'and', regex=True)\
-        .str.replace(r'\bcomm\b', 'communications', regex=True)\
-        .str.replace(r'\bdetecti\b', 'detective', regex=True)\
-        .str.replace('booking of', 'booking officer', regex=False)\
-        .str.replace(r'^(patrol)? ?deputy patrol ?(deputy)?$', 'patrol deputy', regex=True)\
-        .str.replace(r' \- ', '; ', regex=True)\
-        .str.replace(r'\bsupe?rv?i?s?o?\:?\b', 'supervisor', regex=True)\
-        .str.replace(r'^r\.f\.manag', 'r.f manager', regex=True)\
-        .str.replace(r'(^of$|^cc$)', '', regex=True)\
-        .str.replace(r'^against$', 'against persons', regex=True)\
-        .str.replace('gretnadetective', 'gretna detective', regex=False)\
-        .str.replace('fbidetective', 'fbi detective', regex=False)\
-        .str.replace(r'\bcomm?a??n?d?e?r?i?o?\b', 'commander', regex=True)\
-        .str.replace('chief officer', 'chief officer', regex=False)\
-        .str.replace(r'^invest$', 'investigator', regex=True)\
-        .str.replace(r'^\.? ?', '', regex=True)\
-        .str.replace(r'asst\.? ?', 'assistant ', regex=True)\
-        .str.replace('systspeciali', 'systems specialist', regex=False)\
-        .str.replace(r'^and ?', '', regex=True)\
-        .str.replace('digal', 'digital', regex=False)\
-        .str.replace('emergencycomputer', 'emergency computer', regex=False)\
-        .str.replace(r'^serge$', 'sergeant', regex=True)\
-        .str.replace(r'^detective detective$', 'detective', regex=True)\
-        .str.replace(r'^sergeant patrol sergeant$', 'patrol sergeant', regex=True)\
-        .str.replace(r'\bpatroi\b', 'patrol', regex=True)\
-        .str.replace(r'\:$', '', regex=True)\
-        .str.replace('commanderssary', 'commander', regex=False)\
-        .str.replace(r' ?\-$', '', regex=True)\
-        .str.replace('coordinato', 'coordinator', regex=False)\
-        .str.replace(r'^repairman repairman$', 'repairman', regex=True)\
-        .str.replace('systmanager', 'systems manager', regex=False)
+        .str.replace(r'^sergeant; sergeant$', 'sergeant', regex=True)\
+        .str.replace(r'^custodian; custodian', 'custodian', regex=True)\
+        .str.replace(r'^detective; detective', 'detective', regex=True)\
+        .str.replace(r'^deputy; deputy; field trainee$', 'deputy; field trainee', regex=False)\
+        .str.replace(r'^deputy; deputy', 'deputy', regex=True)\
+        .str.replace(r'^technician; technician', 'technician', regex=True)\
+        .str.replace(r'^chief; officer$', 'chief', regex=True)\
+        .str.replace(r'repairman; repairman', 'repairman', regex=True)
     return df
 
 
 def clean():
     df = pd.read_csv(data_file_path('raw/jefferson_so/jefferson_parish_so_pprr_2020.csv'))\
         .pipe(clean_column_names)\
-        .pipe(extract_department_desc)\
         .pipe(clean_district_desc)\
         .pipe(split_names)\
-        .pipe(clean_rank_desc)\
-        .pipe(standardize_desc_cols, ['rank_desc', 'department_desc'])\
+        .pipe(extract_department_descriptions)\
+        .pipe(clean_department_descriptions)\
+        .pipe(standardize_rank_descriptions)\
+        .pipe(clean_rank_descriptions)\
         .pipe(set_values, {
             'agency': 'Jefferson SO'
         })\
-        .pipe(gen_uid, ['agency', 'first_name', 'middle_name', 'last_name'])
+        .pipe(gen_uid, ['agency', 'first_name', 'middle_name', 'last_name', 'employee_id'])
     return df
 
 
