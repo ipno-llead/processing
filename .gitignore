@@ -9,7 +9,6 @@ __pycache__
 *.csv
 *.pdf
 
-.wrglmod.yaml
 !.wrgl
 .wrgl/*
 !.wrgl/config.yaml
