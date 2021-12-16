@@ -408,6 +408,10 @@ repos:
     fileName: fuse/per_acadia_so.csv
     primaryKey:
       - uid
+  per-jefferson-so:
+    fileName: fuse/per_jefferson_so.csv
+    primaryKey:
+      - uid
   event-new-orleans-pd:
     fileName: fuse/event_new_orleans_pd.csv
     primaryKey:
@@ -582,6 +586,10 @@ repos:
       - event_uid
   event-acadia-so:
     fileName: fuse/event_acadia_so.csv
+    primaryKey:
+      - event_uid
+  event-jefferson-so:
+    fileName: fuse/event_jefferson_so.csv
     primaryKey:
       - event_uid
   personnel:
