@@ -1,0 +1,1654 @@
+remote:
+  allegation:
+    url: https://hub.wrgl.co/api/users/ipno/repos/allegation
+    fetch:
+      - +refs/heads/*:refs/remotes/allegation/*
+  app-baton-rouge-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/app-baton-rouge-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/app-baton-rouge-pd/*
+  app-louisiana-state-police:
+    url: https://hub.wrgl.co/api/users/ipno/repos/app-louisiana-state-police
+    fetch:
+      - +refs/heads/*:refs/remotes/app-louisiana-state-police/*
+  baton-rouge-da-brady-list:
+    url: https://hub.wrgl.co/api/users/ipno/repos/baton-rouge-da-brady-list
+    fetch:
+      - +refs/heads/*:refs/remotes/baton-rouge-da-brady-list/*
+  clean-cprr-actions-new-orleans-pd-1931-2020:
+    url: https://hub.wrgl.co/api/users/ipno/repos/clean-cprr-actions-new-orleans-pd-1931-2020
+    fetch:
+      - +refs/heads/*:refs/remotes/clean-cprr-actions-new-orleans-pd-1931-2020/*
+  clean-cprr-baton-rouge-pd-2018:
+    url: https://hub.wrgl.co/api/users/ipno/repos/clean-cprr-baton-rouge-pd-2018
+    fetch:
+      - +refs/heads/*:refs/remotes/clean-cprr-baton-rouge-pd-2018/*
+  clean-cprr-baton-rouge-pd-2021:
+    url: https://hub.wrgl.co/api/users/ipno/repos/clean-cprr-baton-rouge-pd-2021
+    fetch:
+      - +refs/heads/*:refs/remotes/clean-cprr-baton-rouge-pd-2021/*
+  clean-cprr-baton-rouge-so-2016-2020:
+    url: https://hub.wrgl.co/api/users/ipno/repos/clean-cprr-baton-rouge-so-2016-2020
+    fetch:
+      - +refs/heads/*:refs/remotes/clean-cprr-baton-rouge-so-2016-2020/*
+  clean-cprr-baton-rouge-so-2018:
+    url: https://hub.wrgl.co/api/users/ipno/repos/clean-cprr-baton-rouge-so-2018
+    fetch:
+      - +refs/heads/*:refs/remotes/clean-cprr-baton-rouge-so-2018/*
+  clean-cprr-brusly-pd-2020:
+    url: https://hub.wrgl.co/api/users/ipno/repos/clean-cprr-brusly-pd-2020
+    fetch:
+      - +refs/heads/*:refs/remotes/clean-cprr-brusly-pd-2020/*
+  clean-cprr-greenwood-pd-2015-2020:
+    url: https://hub.wrgl.co/api/users/ipno/repos/clean-cprr-greenwood-pd-2015-2020
+    fetch:
+      - +refs/heads/*:refs/remotes/clean-cprr-greenwood-pd-2015-2020/*
+  clean-cprr-hammond-pd-2015-2020:
+    url: https://hub.wrgl.co/api/users/ipno/repos/clean-cprr-hammond-pd-2015-2020
+    fetch:
+      - +refs/heads/*:refs/remotes/clean-cprr-hammond-pd-2015-2020/*
+  clean-cprr-lafayette-so-2015-2020:
+    url: https://hub.wrgl.co/api/users/ipno/repos/clean-cprr-lafayette-so-2015-2020
+    fetch:
+      - +refs/heads/*:refs/remotes/clean-cprr-lafayette-so-2015-2020/*
+  clean-cprr-new-orleans-harbor-pd-2020:
+    url: https://hub.wrgl.co/api/users/ipno/repos/clean-cprr-new-orleans-harbor-pd-2020
+    fetch:
+      - +refs/heads/*:refs/remotes/clean-cprr-new-orleans-harbor-pd-2020/*
+  clean-cprr-new-orleans-pd-1931-2020:
+    url: https://hub.wrgl.co/api/users/ipno/repos/clean-cprr-new-orleans-pd-1931-2020
+    fetch:
+      - +refs/heads/*:refs/remotes/clean-cprr-new-orleans-pd-1931-2020/*
+  clean-cprr-plaquemines-so-2019:
+    url: https://hub.wrgl.co/api/users/ipno/repos/clean-cprr-plaquemines-so-2019
+    fetch:
+      - +refs/heads/*:refs/remotes/clean-cprr-plaquemines-so-2019/*
+  clean-cprr-port-allen-pd-2019:
+    url: https://hub.wrgl.co/api/users/ipno/repos/clean-cprr-port-allen-pd-2019
+    fetch:
+      - +refs/heads/*:refs/remotes/clean-cprr-port-allen-pd-2019/*
+  clean-cprr-scott-pd-2020:
+    url: https://hub.wrgl.co/api/users/ipno/repos/clean-cprr-scott-pd-2020
+    fetch:
+      - +refs/heads/*:refs/remotes/clean-cprr-scott-pd-2020/*
+  clean-cprr-tangipahoa-so-2015-2021:
+    url: https://hub.wrgl.co/api/users/ipno/repos/clean-cprr-tangipahoa-so-2015-2021
+    fetch:
+      - +refs/heads/*:refs/remotes/clean-cprr-tangipahoa-so-2015-2021/*
+  clean-lprr-baton-rouge-fpcsb-1992-2012:
+    url: https://hub.wrgl.co/api/users/ipno/repos/clean-lprr-baton-rouge-fpcsb-1992-2012
+    fetch:
+      - +refs/heads/*:refs/remotes/clean-lprr-baton-rouge-fpcsb-1992-2012/*
+  clean-lprr-louisiana-state-csc-1991-2020:
+    url: https://hub.wrgl.co/api/users/ipno/repos/clean-lprr-louisiana-state-csc-1991-2020
+    fetch:
+      - +refs/heads/*:refs/remotes/clean-lprr-louisiana-state-csc-1991-2020/*
+  clean-pprr-baton-rouge-csd-2017:
+    url: https://hub.wrgl.co/api/users/ipno/repos/clean-pprr-baton-rouge-csd-2017
+    fetch:
+      - +refs/heads/*:refs/remotes/clean-pprr-baton-rouge-csd-2017/*
+  clean-pprr-baton-rouge-csd-2019:
+    url: https://hub.wrgl.co/api/users/ipno/repos/clean-pprr-baton-rouge-csd-2019
+    fetch:
+      - +refs/heads/*:refs/remotes/clean-pprr-baton-rouge-csd-2019/*
+  clean-pprr-brusly-pd-2020:
+    url: https://hub.wrgl.co/api/users/ipno/repos/clean-pprr-brusly-pd-2020
+    fetch:
+      - +refs/heads/*:refs/remotes/clean-pprr-brusly-pd-2020/*
+  clean-pprr-madisonville-csd-2019:
+    url: https://hub.wrgl.co/api/users/ipno/repos/clean-pprr-madisonville-csd-2019
+    fetch:
+      - +refs/heads/*:refs/remotes/clean-pprr-madisonville-csd-2019/*
+  clean-pprr-new-orleans-harbor-pd-2020:
+    url: https://hub.wrgl.co/api/users/ipno/repos/clean-pprr-new-orleans-harbor-pd-2020
+    fetch:
+      - +refs/heads/*:refs/remotes/clean-pprr-new-orleans-harbor-pd-2020/*
+  clean-pprr-new-orleans-pd-1946-2018:
+    url: https://hub.wrgl.co/api/users/ipno/repos/clean-pprr-new-orleans-pd-1946-2018
+    fetch:
+      - +refs/heads/*:refs/remotes/clean-pprr-new-orleans-pd-1946-2018/*
+  clean-pprr-port-allen-csd-2020:
+    url: https://hub.wrgl.co/api/users/ipno/repos/clean-pprr-port-allen-csd-2020
+    fetch:
+      - +refs/heads/*:refs/remotes/clean-pprr-port-allen-csd-2020/*
+  clean-pprr-post-2020-11-06:
+    url: https://hub.wrgl.co/api/users/ipno/repos/clean-pprr-post-2020-11-06
+    fetch:
+      - +refs/heads/*:refs/remotes/clean-pprr-post-2020-11-06/*
+  clean-pprr-scott-pd-2021:
+    url: https://hub.wrgl.co/api/users/ipno/repos/clean-pprr-scott-pd-2021
+    fetch:
+      - +refs/heads/*:refs/remotes/clean-pprr-scott-pd-2021/*
+  clean-pprr-st-tammany-so-2020:
+    url: https://hub.wrgl.co/api/users/ipno/repos/clean-pprr-st-tammany-so-2020
+    fetch:
+      - +refs/heads/*:refs/remotes/clean-pprr-st-tammany-so-2020/*
+  clean-uof-new-orleans-pd-2012-2019:
+    url: https://hub.wrgl.co/api/users/ipno/repos/clean-uof-new-orleans-pd-2012-2019
+    fetch:
+      - +refs/heads/*:refs/remotes/clean-uof-new-orleans-pd-2012-2019/*
+  com-abbeville-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/com-abbeville-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/com-abbeville-pd/*
+  com-baker-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/com-baker-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/com-baker-pd/*
+  com-baton-rouge-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/com-baton-rouge-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/com-baton-rouge-pd/*
+  com-baton-rouge-so:
+    url: https://hub.wrgl.co/api/users/ipno/repos/com-baton-rouge-so
+    fetch:
+      - +refs/heads/*:refs/remotes/com-baton-rouge-so/*
+  com-bossier-city-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/com-bossier-city-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/com-bossier-city-pd/*
+  com-brusly-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/com-brusly-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/com-brusly-pd/*
+  com-cameron-so:
+    url: https://hub.wrgl.co/api/users/ipno/repos/com-cameron-so
+    fetch:
+      - +refs/heads/*:refs/remotes/com-cameron-so/*
+  com-denham-springs-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/com-denham-springs-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/com-denham-springs-pd/*
+  com-greenwood-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/com-greenwood-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/com-greenwood-pd/*
+  com-hammond-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/com-hammond-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/com-hammond-pd/*
+  com-houma-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/com-houma-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/com-houma-pd/*
+  com-lafayette-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/com-lafayette-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/com-lafayette-pd/*
+  com-lafayette-so:
+    url: https://hub.wrgl.co/api/users/ipno/repos/com-lafayette-so
+    fetch:
+      - +refs/heads/*:refs/remotes/com-lafayette-so/*
+  com-levee-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/com-levee-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/com-levee-pd/*
+  com-madisonville-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/com-madisonville-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/com-madisonville-pd/*
+  com-mandeville-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/com-mandeville-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/com-mandeville-pd/*
+  com-maurice-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/com-maurice-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/com-maurice-pd/*
+  com-new-orleans-harbor-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/com-new-orleans-harbor-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/com-new-orleans-harbor-pd/*
+  com-new-orleans-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/com-new-orleans-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/com-new-orleans-pd/*
+  com-new-orleans-so:
+    url: https://hub.wrgl.co/api/users/ipno/repos/com-new-orleans-so
+    fetch:
+      - +refs/heads/*:refs/remotes/com-new-orleans-so/*
+  com-plaquemines-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/com-plaquemines-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/com-plaquemines-pd/*
+  com-ponchatoula-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/com-ponchatoula-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/com-ponchatoula-pd/*
+  com-port-allen-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/com-port-allen-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/com-port-allen-pd/*
+  com-scott-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/com-scott-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/com-scott-pd/*
+  com-shreveport-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/com-shreveport-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/com-shreveport-pd/*
+  com-st-tammany-so:
+    url: https://hub.wrgl.co/api/users/ipno/repos/com-st-tammany-so
+    fetch:
+      - +refs/heads/*:refs/remotes/com-st-tammany-so/*
+  com-tangipahoa-so:
+    url: https://hub.wrgl.co/api/users/ipno/repos/com-tangipahoa-so
+    fetch:
+      - +refs/heads/*:refs/remotes/com-tangipahoa-so/*
+  com-terrebonne-so:
+    url: https://hub.wrgl.co/api/users/ipno/repos/com-terrebonne-so
+    fetch:
+      - +refs/heads/*:refs/remotes/com-terrebonne-so/*
+  com-washington-so:
+    url: https://hub.wrgl.co/api/users/ipno/repos/com-washington-so
+    fetch:
+      - +refs/heads/*:refs/remotes/com-washington-so/*
+  event:
+    url: https://hub.wrgl.co/api/users/ipno/repos/event
+    fetch:
+      - +refs/heads/*:refs/remotes/event/*
+  event-abbeville-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/event-abbeville-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/event-abbeville-pd/*
+  event-baker-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/event-baker-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/event-baker-pd/*
+  event-baton-rouge-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/event-baton-rouge-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/event-baton-rouge-pd/*
+  event-baton-rouge-so:
+    url: https://hub.wrgl.co/api/users/ipno/repos/event-baton-rouge-so
+    fetch:
+      - +refs/heads/*:refs/remotes/event-baton-rouge-so/*
+  event-bossier-city-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/event-bossier-city-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/event-bossier-city-pd/*
+  event-brusly-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/event-brusly-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/event-brusly-pd/*
+  event-caddo-parish-so:
+    url: https://hub.wrgl.co/api/users/ipno/repos/event-caddo-parish-so
+    fetch:
+      - +refs/heads/*:refs/remotes/event-caddo-parish-so/*
+  event-cameron-so:
+    url: https://hub.wrgl.co/api/users/ipno/repos/event-cameron-so
+    fetch:
+      - +refs/heads/*:refs/remotes/event-cameron-so/*
+  event-carencro-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/event-carencro-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/event-carencro-pd/*
+  event-central-csd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/event-central-csd
+    fetch:
+      - +refs/heads/*:refs/remotes/event-central-csd/*
+  event-covington-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/event-covington-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/event-covington-pd/*
+  event-denham-springs-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/event-denham-springs-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/event-denham-springs-pd/*
+  event-gonzales-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/event-gonzales-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/event-gonzales-pd/*
+  event-grand-isle-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/event-grand-isle-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/event-grand-isle-pd/*
+  event-greenwood-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/event-greenwood-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/event-greenwood-pd/*
+  event-gretna-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/event-gretna-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/event-gretna-pd/*
+  event-hammond-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/event-hammond-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/event-hammond-pd/*
+  event-houma-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/event-houma-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/event-houma-pd/*
+  event-kenner-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/event-kenner-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/event-kenner-pd/*
+  event-lafayette-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/event-lafayette-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/event-lafayette-pd/*
+  event-lafayette-so:
+    url: https://hub.wrgl.co/api/users/ipno/repos/event-lafayette-so
+    fetch:
+      - +refs/heads/*:refs/remotes/event-lafayette-so/*
+  event-levee-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/event-levee-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/event-levee-pd/*
+  event-louisiana-state-police:
+    url: https://hub.wrgl.co/api/users/ipno/repos/event-louisiana-state-police
+    fetch:
+      - +refs/heads/*:refs/remotes/event-louisiana-state-police/*
+  event-madisonville-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/event-madisonville-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/event-madisonville-pd/*
+  event-mandeville-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/event-mandeville-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/event-mandeville-pd/*
+  event-maurice-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/event-maurice-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/event-maurice-pd/*
+  event-new-orleans-harbor-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/event-new-orleans-harbor-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/event-new-orleans-harbor-pd/*
+  event-new-orleans-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/event-new-orleans-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/event-new-orleans-pd/*
+  event-new-orleans-so:
+    url: https://hub.wrgl.co/api/users/ipno/repos/event-new-orleans-so
+    fetch:
+      - +refs/heads/*:refs/remotes/event-new-orleans-so/*
+  event-plaquemines-so:
+    url: https://hub.wrgl.co/api/users/ipno/repos/event-plaquemines-so
+    fetch:
+      - +refs/heads/*:refs/remotes/event-plaquemines-so/*
+  event-ponchatoula-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/event-ponchatoula-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/event-ponchatoula-pd/*
+  event-port-allen-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/event-port-allen-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/event-port-allen-pd/*
+  event-scott-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/event-scott-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/event-scott-pd/*
+  event-shreveport-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/event-shreveport-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/event-shreveport-pd/*
+  event-slidell-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/event-slidell-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/event-slidell-pd/*
+  event-st-tammany-so:
+    url: https://hub.wrgl.co/api/users/ipno/repos/event-st-tammany-so
+    fetch:
+      - +refs/heads/*:refs/remotes/event-st-tammany-so/*
+  event-sterlington-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/event-sterlington-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/event-sterlington-pd/*
+  event-tangipahoa-so:
+    url: https://hub.wrgl.co/api/users/ipno/repos/event-tangipahoa-so
+    fetch:
+      - +refs/heads/*:refs/remotes/event-tangipahoa-so/*
+  event-terrebonne-so:
+    url: https://hub.wrgl.co/api/users/ipno/repos/event-terrebonne-so
+    fetch:
+      - +refs/heads/*:refs/remotes/event-terrebonne-so/*
+  event-vivian-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/event-vivian-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/event-vivian-pd/*
+  event-washington-so:
+    url: https://hub.wrgl.co/api/users/ipno/repos/event-washington-so
+    fetch:
+      - +refs/heads/*:refs/remotes/event-washington-so/*
+  event-west-monroe-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/event-west-monroe-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/event-west-monroe-pd/*
+  event-youngsville-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/event-youngsville-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/event-youngsville-pd/*
+  match-brusly-pd-2020:
+    url: https://hub.wrgl.co/api/users/ipno/repos/match-brusly-pd-2020
+    fetch:
+      - +refs/heads/*:refs/remotes/match-brusly-pd-2020/*
+  match-cprr-baton-rouge-pd-2018:
+    url: https://hub.wrgl.co/api/users/ipno/repos/match-cprr-baton-rouge-pd-2018
+    fetch:
+      - +refs/heads/*:refs/remotes/match-cprr-baton-rouge-pd-2018/*
+  match-cprr-baton-rouge-pd-2021:
+    url: https://hub.wrgl.co/api/users/ipno/repos/match-cprr-baton-rouge-pd-2021
+    fetch:
+      - +refs/heads/*:refs/remotes/match-cprr-baton-rouge-pd-2021/*
+  match-cprr-baton-rouge-so-2016-2020:
+    url: https://hub.wrgl.co/api/users/ipno/repos/match-cprr-baton-rouge-so-2016-2020
+    fetch:
+      - +refs/heads/*:refs/remotes/match-cprr-baton-rouge-so-2016-2020/*
+  match-cprr-baton-rouge-so-2018:
+    url: https://hub.wrgl.co/api/users/ipno/repos/match-cprr-baton-rouge-so-2018
+    fetch:
+      - +refs/heads/*:refs/remotes/match-cprr-baton-rouge-so-2018/*
+  match-cprr-greenwood-pd-2015-2020:
+    url: https://hub.wrgl.co/api/users/ipno/repos/match-cprr-greenwood-pd-2015-2020
+    fetch:
+      - +refs/heads/*:refs/remotes/match-cprr-greenwood-pd-2015-2020/*
+  match-cprr-hammond-pd-2015-2020:
+    url: https://hub.wrgl.co/api/users/ipno/repos/match-cprr-hammond-pd-2015-2020
+    fetch:
+      - +refs/heads/*:refs/remotes/match-cprr-hammond-pd-2015-2020/*
+  match-cprr-madisonville-pd-2010-2020:
+    url: https://hub.wrgl.co/api/users/ipno/repos/match-cprr-madisonville-pd-2010-2020
+    fetch:
+      - +refs/heads/*:refs/remotes/match-cprr-madisonville-pd-2010-2020/*
+  match-cprr-new-orleans-harbor-pd-2020:
+    url: https://hub.wrgl.co/api/users/ipno/repos/match-cprr-new-orleans-harbor-pd-2020
+    fetch:
+      - +refs/heads/*:refs/remotes/match-cprr-new-orleans-harbor-pd-2020/*
+  match-cprr-plaquemines-so-2019:
+    url: https://hub.wrgl.co/api/users/ipno/repos/match-cprr-plaquemines-so-2019
+    fetch:
+      - +refs/heads/*:refs/remotes/match-cprr-plaquemines-so-2019/*
+  match-cprr-port-allen-pd-2019:
+    url: https://hub.wrgl.co/api/users/ipno/repos/match-cprr-port-allen-pd-2019
+    fetch:
+      - +refs/heads/*:refs/remotes/match-cprr-port-allen-pd-2019/*
+  match-cprr-scott-pd-2020:
+    url: https://hub.wrgl.co/api/users/ipno/repos/match-cprr-scott-pd-2020
+    fetch:
+      - +refs/heads/*:refs/remotes/match-cprr-scott-pd-2020/*
+  match-cprr-tangipahoa-so-2015-2021:
+    url: https://hub.wrgl.co/api/users/ipno/repos/match-cprr-tangipahoa-so-2015-2021
+    fetch:
+      - +refs/heads/*:refs/remotes/match-cprr-tangipahoa-so-2015-2021/*
+  match-lprr-baton-rouge-fpcsb-1992-2012:
+    url: https://hub.wrgl.co/api/users/ipno/repos/match-lprr-baton-rouge-fpcsb-1992-2012
+    fetch:
+      - +refs/heads/*:refs/remotes/match-lprr-baton-rouge-fpcsb-1992-2012/*
+  match-lprr-louisiana-state-csc-1991-2020:
+    url: https://hub.wrgl.co/api/users/ipno/repos/match-lprr-louisiana-state-csc-1991-2020
+    fetch:
+      - +refs/heads/*:refs/remotes/match-lprr-louisiana-state-csc-1991-2020/*
+  match-pprr-baton-rouge-csd-2017:
+    url: https://hub.wrgl.co/api/users/ipno/repos/match-pprr-baton-rouge-csd-2017
+    fetch:
+      - +refs/heads/*:refs/remotes/match-pprr-baton-rouge-csd-2017/*
+  match-pprr-baton-rouge-csd-2019:
+    url: https://hub.wrgl.co/api/users/ipno/repos/match-pprr-baton-rouge-csd-2019
+    fetch:
+      - +refs/heads/*:refs/remotes/match-pprr-baton-rouge-csd-2019/*
+  match-pprr-brusly-pd-2020:
+    url: https://hub.wrgl.co/api/users/ipno/repos/match-pprr-brusly-pd-2020
+    fetch:
+      - +refs/heads/*:refs/remotes/match-pprr-brusly-pd-2020/*
+  match-pprr-port-allen-csd-2020:
+    url: https://hub.wrgl.co/api/users/ipno/repos/match-pprr-port-allen-csd-2020
+    fetch:
+      - +refs/heads/*:refs/remotes/match-pprr-port-allen-csd-2020/*
+  match-pprr-st-tammany-so-2020:
+    url: https://hub.wrgl.co/api/users/ipno/repos/match-pprr-st-tammany-so-2020
+    fetch:
+      - +refs/heads/*:refs/remotes/match-pprr-st-tammany-so-2020/*
+  new-orleans-da-brady-list:
+    url: https://hub.wrgl.co/api/users/ipno/repos/new-orleans-da-brady-list
+    fetch:
+      - +refs/heads/*:refs/remotes/new-orleans-da-brady-list/*
+  per-abbeville-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/per-abbeville-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/per-abbeville-pd/*
+  per-baker-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/per-baker-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/per-baker-pd/*
+  per-baton-rouge-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/per-baton-rouge-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/per-baton-rouge-pd/*
+  per-baton-rouge-so:
+    url: https://hub.wrgl.co/api/users/ipno/repos/per-baton-rouge-so
+    fetch:
+      - +refs/heads/*:refs/remotes/per-baton-rouge-so/*
+  per-bossier-city-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/per-bossier-city-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/per-bossier-city-pd/*
+  per-brusly-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/per-brusly-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/per-brusly-pd/*
+  per-caddo-parish-so:
+    url: https://hub.wrgl.co/api/users/ipno/repos/per-caddo-parish-so
+    fetch:
+      - +refs/heads/*:refs/remotes/per-caddo-parish-so/*
+  per-cameron_so:
+    url: https://hub.wrgl.co/api/users/ipno/repos/per-cameron_so
+    fetch:
+      - +refs/heads/*:refs/remotes/per-cameron_so/*
+  per-carencro-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/per-carencro-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/per-carencro-pd/*
+  per-central-csd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/per-central-csd
+    fetch:
+      - +refs/heads/*:refs/remotes/per-central-csd/*
+  per-covington-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/per-covington-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/per-covington-pd/*
+  per-denham-springs-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/per-denham-springs-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/per-denham-springs-pd/*
+  per-gonzales-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/per-gonzales-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/per-gonzales-pd/*
+  per-grand-isle-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/per-grand-isle-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/per-grand-isle-pd/*
+  per-greenwood-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/per-greenwood-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/per-greenwood-pd/*
+  per-gretna-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/per-gretna-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/per-gretna-pd/*
+  per-hammond-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/per-hammond-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/per-hammond-pd/*
+  per-houma-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/per-houma-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/per-houma-pd/*
+  per-kenner-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/per-kenner-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/per-kenner-pd/*
+  per-lafayette-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/per-lafayette-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/per-lafayette-pd/*
+  per-lafayette-so:
+    url: https://hub.wrgl.co/api/users/ipno/repos/per-lafayette-so
+    fetch:
+      - +refs/heads/*:refs/remotes/per-lafayette-so/*
+  per-levee-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/per-levee-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/per-levee-pd/*
+  per-louisiana-state-police:
+    url: https://hub.wrgl.co/api/users/ipno/repos/per-louisiana-state-police
+    fetch:
+      - +refs/heads/*:refs/remotes/per-louisiana-state-police/*
+  per-madisonville-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/per-madisonville-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/per-madisonville-pd/*
+  per-mandeville-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/per-mandeville-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/per-mandeville-pd/*
+  per-maurice-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/per-maurice-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/per-maurice-pd/*
+  per-new-orleans-harbor-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/per-new-orleans-harbor-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/per-new-orleans-harbor-pd/*
+  per-new-orleans-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/per-new-orleans-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/per-new-orleans-pd/*
+  per-new-orleans-so:
+    url: https://hub.wrgl.co/api/users/ipno/repos/per-new-orleans-so
+    fetch:
+      - +refs/heads/*:refs/remotes/per-new-orleans-so/*
+  per-plaquemines-so:
+    url: https://hub.wrgl.co/api/users/ipno/repos/per-plaquemines-so
+    fetch:
+      - +refs/heads/*:refs/remotes/per-plaquemines-so/*
+  per-ponchatoula-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/per-ponchatoula-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/per-ponchatoula-pd/*
+  per-port-allen-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/per-port-allen-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/per-port-allen-pd/*
+  per-scott-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/per-scott-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/per-scott-pd/*
+  per-shreveport-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/per-shreveport-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/per-shreveport-pd/*
+  per-slidell-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/per-slidell-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/per-slidell-pd/*
+  per-st-tammany-so:
+    url: https://hub.wrgl.co/api/users/ipno/repos/per-st-tammany-so
+    fetch:
+      - +refs/heads/*:refs/remotes/per-st-tammany-so/*
+  per-sterlington-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/per-sterlington-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/per-sterlington-pd/*
+  per-tangipahoa-so:
+    url: https://hub.wrgl.co/api/users/ipno/repos/per-tangipahoa-so
+    fetch:
+      - +refs/heads/*:refs/remotes/per-tangipahoa-so/*
+  per-terrebonne-so:
+    url: https://hub.wrgl.co/api/users/ipno/repos/per-terrebonne-so
+    fetch:
+      - +refs/heads/*:refs/remotes/per-terrebonne-so/*
+  per-vivian-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/per-vivian-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/per-vivian-pd/*
+  per-washington-so:
+    url: https://hub.wrgl.co/api/users/ipno/repos/per-washington-so
+    fetch:
+      - +refs/heads/*:refs/remotes/per-washington-so/*
+  per-west-monroe-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/per-west-monroe-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/per-west-monroe-pd/*
+  per-youngsville-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/per-youngsville-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/per-youngsville-pd/*
+  person:
+    url: https://hub.wrgl.co/api/users/ipno/repos/person
+    fetch:
+      - +refs/heads/*:refs/remotes/person/*
+  personnel:
+    url: https://hub.wrgl.co/api/users/ipno/repos/personnel
+    fetch:
+      - +refs/heads/*:refs/remotes/personnel/*
+  sas-new-orleans-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/sas-new-orleans-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/sas-new-orleans-pd/*
+  stop-and-search:
+    url: https://hub.wrgl.co/api/users/ipno/repos/stop-and-search
+    fetch:
+      - +refs/heads/*:refs/remotes/stop-and-search/*
+  uof-new-orleans-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/uof-new-orleans-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/uof-new-orleans-pd/*
+  use-of-force:
+    url: https://hub.wrgl.co/api/users/ipno/repos/use-of-force
+    fetch:
+      - +refs/heads/*:refs/remotes/use-of-force/*
+branch:
+  allegation:
+    remote: allegation
+    merge: refs/heads/main
+    file: data/fuse/allegation.csv
+    primaryKey:
+      - allegation_uid
+  app-baton-rouge-pd:
+    remote: app-baton-rouge-pd
+    merge: refs/heads/main
+    file: data/fuse/app_baton_rouge_pd.csv
+    primaryKey:
+      - appeal_uid
+  app-louisiana-state-police:
+    remote: app-louisiana-state-police
+    merge: refs/heads/main
+    file: data/fuse/app_louisiana_state_police.csv
+    primaryKey:
+      - appeal_uid
+  baton-rouge-da-brady-list:
+    remote: baton-rouge-da-brady-list
+    merge: refs/heads/main
+    file: data/match/cprr_baton_rouge_da_2021.csv
+  clean-cprr-actions-new-orleans-pd-1931-2020:
+    remote: clean-cprr-actions-new-orleans-pd-1931-2020
+    merge: refs/heads/main
+    file: data/clean/cprr_actions_new_orleans_pd_1931_2020.csv
+  clean-cprr-baton-rouge-pd-2018:
+    remote: clean-cprr-baton-rouge-pd-2018
+    merge: refs/heads/main
+    file: data/clean/cprr_baton_rouge_pd_2018.csv
+  clean-cprr-baton-rouge-pd-2021:
+    remote: clean-cprr-baton-rouge-pd-2021
+    merge: refs/heads/main
+    file: data/clean/cprr_baton_rouge_pd_2021.csv
+  clean-cprr-baton-rouge-so-2016-2020:
+    remote: clean-cprr-baton-rouge-so-2016-2020
+    merge: refs/heads/main
+    file: data/clean/cprr_baton_rouge_so_2016_2020.csv
+  clean-cprr-baton-rouge-so-2018:
+    remote: clean-cprr-baton-rouge-so-2018
+    merge: refs/heads/main
+    file: data/clean/cprr_baton_rouge_so_2018.csv
+  clean-cprr-brusly-pd-2020:
+    remote: clean-cprr-brusly-pd-2020
+    merge: refs/heads/main
+    file: data/clean/cprr_brusly_pd_2020.csv
+  clean-cprr-greenwood-pd-2015-2020:
+    remote: clean-cprr-greenwood-pd-2015-2020
+    merge: refs/heads/main
+    file: data/clean/cprr_greenwood_pd_2015_2020.csv
+  clean-cprr-hammond-pd-2015-2020:
+    remote: clean-cprr-hammond-pd-2015-2020
+    merge: refs/heads/main
+    file: data/clean/cprr_hammond_pd_2015_2020.csv
+  clean-cprr-lafayette-so-2015-2020:
+    remote: clean-cprr-lafayette-so-2015-2020
+    merge: refs/heads/main
+    file: data/clean/cprr_lafayette_so_2015_2020.csv
+  clean-cprr-new-orleans-harbor-pd-2020:
+    remote: clean-cprr-new-orleans-harbor-pd-2020
+    merge: refs/heads/main
+    file: data/clean/cprr_new_orleans_harbor_pd_2020.csv
+  clean-cprr-new-orleans-pd-1931-2020:
+    remote: clean-cprr-new-orleans-pd-1931-2020
+    merge: refs/heads/main
+    file: data/clean/cprr_new_orleans_pd_1931_2020.csv
+  clean-cprr-plaquemines-so-2019:
+    remote: clean-cprr-plaquemines-so-2019
+    merge: refs/heads/main
+    file: data/clean/cprr_plaquemines_so_2019.csv
+  clean-cprr-port-allen-pd-2019:
+    remote: clean-cprr-port-allen-pd-2019
+    merge: refs/heads/main
+    file: data/clean/cprr_port_allen_pd_2019.csv
+  clean-cprr-scott-pd-2020:
+    remote: clean-cprr-scott-pd-2020
+    merge: refs/heads/main
+    file: data/clean/cprr_scott_pd_2020.csv
+  clean-cprr-tangipahoa-so-2015-2021:
+    remote: clean-cprr-tangipahoa-so-2015-2021
+    merge: refs/heads/main
+    file: data/clean/cprr_tangipahoa_so_2015_2021.csv
+  clean-lprr-baton-rouge-fpcsb-1992-2012:
+    remote: clean-lprr-baton-rouge-fpcsb-1992-2012
+    merge: refs/heads/main
+    file: data/clean/lprr_baton_rouge_fpcsb_1992_2012.csv
+  clean-lprr-louisiana-state-csc-1991-2020:
+    remote: clean-lprr-louisiana-state-csc-1991-2020
+    merge: refs/heads/main
+    file: data/clean/lprr_louisiana_state_csc_1991_2020.csv
+  clean-pprr-baton-rouge-csd-2017:
+    remote: clean-pprr-baton-rouge-csd-2017
+    merge: refs/heads/main
+    file: data/clean/pprr_baton_rouge_csd_2017.csv
+  clean-pprr-baton-rouge-csd-2019:
+    remote: clean-pprr-baton-rouge-csd-2019
+    merge: refs/heads/main
+    file: data/clean/pprr_baton_rouge_csd_2019.csv
+  clean-pprr-brusly-pd-2020:
+    remote: clean-pprr-brusly-pd-2020
+    merge: refs/heads/main
+    file: data/clean/pprr_brusly_pd_2020.csv
+  clean-pprr-madisonville-csd-2019:
+    remote: clean-pprr-madisonville-csd-2019
+    merge: refs/heads/main
+    file: data/clean/pprr_madisonville_csd_2019.csv
+  clean-pprr-new-orleans-harbor-pd-2020:
+    remote: clean-pprr-new-orleans-harbor-pd-2020
+    merge: refs/heads/main
+    file: data/clean/pprr_new_orleans_harbor_pd_2020.csv
+  clean-pprr-new-orleans-pd-1946-2018:
+    remote: clean-pprr-new-orleans-pd-1946-2018
+    merge: refs/heads/main
+    file: data/clean/pprr_new_orleans_pd_1946_2018.csv
+  clean-pprr-port-allen-csd-2020:
+    remote: clean-pprr-port-allen-csd-2020
+    merge: refs/heads/main
+    file: data/clean/pprr_port_allen_csd_2020.csv
+  clean-pprr-post-2020-11-06:
+    remote: clean-pprr-post-2020-11-06
+    merge: refs/heads/main
+    file: data/clean/pprr_post_2020_11_06.csv
+  clean-pprr-scott-pd-2021:
+    remote: clean-pprr-scott-pd-2021
+    merge: refs/heads/main
+    file: data/clean/pprr_scott_pd_2021.csv
+  clean-pprr-st-tammany-so-2020:
+    remote: clean-pprr-st-tammany-so-2020
+    merge: refs/heads/main
+    file: data/clean/pprr_st_tammany_so_2020.csv
+  clean-uof-new-orleans-pd-2012-2019:
+    remote: clean-uof-new-orleans-pd-2012-2019
+    merge: refs/heads/main
+    file: data/clean/uof_new_orleans_pd_2012_2019.csv
+  com-abbeville-pd:
+    remote: com-abbeville-pd
+    merge: refs/heads/main
+    file: data/fuse/com_abbeville_pd.csv
+    primaryKey:
+      - allegation_uid
+  com-baker-pd:
+    remote: com-baker-pd
+    merge: refs/heads/main
+    file: data/fuse/com_baker_pd.csv
+    primaryKey:
+      - allegation_uid
+  com-baton-rouge-pd:
+    remote: com-baton-rouge-pd
+    merge: refs/heads/main
+    file: data/fuse/com_baton_rouge_pd.csv
+    primaryKey:
+      - allegation_uid
+  com-baton-rouge-so:
+    remote: com-baton-rouge-so
+    merge: refs/heads/main
+    file: data/fuse/com_baton_rouge_so.csv
+    primaryKey:
+      - allegation_uid
+  com-bossier-city-pd:
+    remote: com-bossier-city-pd
+    merge: refs/heads/main
+    file: data/fuse/com_bossier_city_pd.csv
+    primaryKey:
+      - allegation_uid
+  com-brusly-pd:
+    remote: com-brusly-pd
+    merge: refs/heads/main
+    file: data/fuse/com_brusly_pd.csv
+    primaryKey:
+      - allegation_uid
+  com-cameron-so:
+    remote: com-cameron-so
+    merge: refs/heads/main
+    file: data/fuse/com_cameron_so.csv
+    primaryKey:
+      - allegation_uid
+  com-denham-springs-pd:
+    remote: com-denham-springs-pd
+    merge: refs/heads/main
+    file: data/fuse/com_denham_springs_pd.csv
+    primaryKey:
+      - allegation_uid
+  com-greenwood-pd:
+    remote: com-greenwood-pd
+    merge: refs/heads/main
+    file: data/fuse/com_greenwood_pd.csv
+    primaryKey:
+      - allegation_uid
+  com-hammond-pd:
+    remote: com-hammond-pd
+    merge: refs/heads/main
+    file: data/fuse/com_hammond_pd.csv
+    primaryKey:
+      - allegation_uid
+  com-houma-pd:
+    remote: com-houma-pd
+    merge: refs/heads/main
+    file: data/fuse/com_houma_pd.csv
+    primaryKey:
+      - allegation_uid
+  com-lafayette-pd:
+    remote: com-lafayette-pd
+    merge: refs/heads/main
+    file: data/fuse/com_lafayette_pd.csv
+    primaryKey:
+      - allegation_uid
+  com-lafayette-so:
+    remote: com-lafayette-so
+    merge: refs/heads/main
+    file: data/fuse/com_lafayette_so.csv
+    primaryKey:
+      - allegation_uid
+  com-levee-pd:
+    remote: com-levee-pd
+    merge: refs/heads/main
+    file: data/fuse/com_levee_pd.csv
+    primaryKey:
+      - allegation_uid
+  com-madisonville-pd:
+    remote: com-madisonville-pd
+    merge: refs/heads/main
+    file: data/fuse/com_madisonville_pd.csv
+    primaryKey:
+      - allegation_uid
+  com-mandeville-pd:
+    remote: com-mandeville-pd
+    merge: refs/heads/main
+    file: data/fuse/com_mandeville_pd.csv
+    primaryKey:
+      - allegation_uid
+  com-maurice-pd:
+    remote: com-maurice-pd
+    merge: refs/heads/main
+    file: data/fuse/com_maurice_pd.csv
+    primaryKey:
+      - allegation_uid
+  com-new-orleans-harbor-pd:
+    remote: com-new-orleans-harbor-pd
+    merge: refs/heads/main
+    file: data/fuse/com_new_orleans_harbor_pd.csv
+    primaryKey:
+      - allegation_uid
+  com-new-orleans-pd:
+    remote: com-new-orleans-pd
+    merge: refs/heads/main
+    file: data/fuse/com_new_orleans_pd.csv
+    primaryKey:
+      - allegation_uid
+  com-new-orleans-so:
+    remote: com-new-orleans-so
+    merge: refs/heads/main
+    file: data/fuse/com_new_orleans_so.csv
+    primaryKey:
+      - allegation_uid
+  com-plaquemines-pd:
+    remote: com-plaquemines-pd
+    merge: refs/heads/main
+    file: data/fuse/com_plaquemines_so.csv
+    primaryKey:
+      - allegation_uid
+  com-ponchatoula-pd:
+    remote: com-ponchatoula-pd
+    merge: refs/heads/main
+    file: data/fuse/com_ponchatoula_pd.csv
+    primaryKey:
+      - allegation_uid
+  com-port-allen-pd:
+    remote: com-port-allen-pd
+    merge: refs/heads/main
+    file: data/fuse/com_port_allen_pd.csv
+    primaryKey:
+      - allegation_uid
+  com-scott-pd:
+    remote: com-scott-pd
+    merge: refs/heads/main
+    file: data/fuse/com_scott_pd.csv
+    primaryKey:
+      - allegation_uid
+  com-shreveport-pd:
+    remote: com-shreveport-pd
+    merge: refs/heads/main
+    file: data/fuse/com_shreveport_pd.csv
+    primaryKey:
+      - allegation_uid
+  com-st-tammany-so:
+    remote: com-st-tammany-so
+    merge: refs/heads/main
+    file: data/fuse/com_st_tammany_so.csv
+    primaryKey:
+      - allegation_uid
+  com-tangipahoa-so:
+    remote: com-tangipahoa-so
+    merge: refs/heads/main
+    file: data/fuse/com_tangipahoa_so.csv
+    primaryKey:
+      - allegation_uid
+  com-terrebonne-so:
+    remote: com-terrebonne-so
+    merge: refs/heads/main
+    file: data/fuse/com_terrebonne_so.csv
+    primaryKey:
+      - allegation_uid
+  com-washington-so:
+    remote: com-washington-so
+    merge: refs/heads/main
+    file: data/fuse/com_washington_so.csv
+    primaryKey:
+      - allegation_uid
+  event:
+    remote: event
+    merge: refs/heads/main
+    file: data/fuse/event.csv
+    primaryKey:
+      - event_uid
+  event-abbeville-pd:
+    remote: event-abbeville-pd
+    merge: refs/heads/main
+    file: data/fuse/event_abbeville_pd.csv
+    primaryKey:
+      - event_uid
+  event-baker-pd:
+    remote: event-baker-pd
+    merge: refs/heads/main
+    file: data/fuse/event_baker_pd.csv
+    primaryKey:
+      - event_uid
+  event-baton-rouge-pd:
+    remote: event-baton-rouge-pd
+    merge: refs/heads/main
+    file: data/fuse/event_baton_rouge_pd.csv
+    primaryKey:
+      - event_uid
+  event-baton-rouge-so:
+    remote: event-baton-rouge-so
+    merge: refs/heads/main
+    file: data/fuse/event_baton_rouge_so.csv
+    primaryKey:
+      - event_uid
+  event-bossier-city-pd:
+    remote: event-bossier-city-pd
+    merge: refs/heads/main
+    file: data/fuse/event_bossier_city_pd.csv
+    primaryKey:
+      - event_uid
+  event-brusly-pd:
+    remote: event-brusly-pd
+    merge: refs/heads/main
+    file: data/fuse/event_brusly_pd.csv
+    primaryKey:
+      - event_uid
+  event-caddo-parish-so:
+    remote: event-caddo-parish-so
+    merge: refs/heads/main
+    file: data/fuse/event_caddo_parish_so.csv
+    primaryKey:
+      - event_uid
+  event-cameron-so:
+    remote: event-cameron-so
+    merge: refs/heads/main
+    file: data/fuse/event_cameron_so.csv
+    primaryKey:
+      - event_uid
+  event-carencro-pd:
+    remote: event-carencro-pd
+    merge: refs/heads/main
+    file: data/fuse/event_carencro_pd.csv
+    primaryKey:
+      - event_uid
+  event-central-csd:
+    remote: event-central-csd
+    merge: refs/heads/main
+    file: data/fuse/event_central_csd.csv
+    primaryKey:
+      - event_uid
+  event-covington-pd:
+    remote: event-covington-pd
+    merge: refs/heads/main
+    file: data/fuse/event_covington_pd.csv
+    primaryKey:
+      - event_uid
+  event-denham-springs-pd:
+    remote: event-denham-springs-pd
+    merge: refs/heads/main
+    file: data/fuse/event_denham_springs_pd.csv
+    primaryKey:
+      - event_uid
+  event-gonzales-pd:
+    remote: event-gonzales-pd
+    merge: refs/heads/main
+    file: data/fuse/event_gonzales_pd.csv
+    primaryKey:
+      - event_uid
+  event-grand-isle-pd:
+    remote: event-grand-isle-pd
+    merge: refs/heads/main
+    file: data/fuse/event_grand_isle_pd.csv
+    primaryKey:
+      - event_uid
+  event-greenwood-pd:
+    remote: event-greenwood-pd
+    merge: refs/heads/main
+    file: data/fuse/event_greenwood_pd.csv
+    primaryKey:
+      - event_uid
+  event-gretna-pd:
+    remote: event-gretna-pd
+    merge: refs/heads/main
+    file: data/fuse/event_gretna_pd.csv
+    primaryKey:
+      - event_uid
+  event-hammond-pd:
+    remote: event-hammond-pd
+    merge: refs/heads/main
+    file: data/fuse/event_hammond_pd.csv
+    primaryKey:
+      - event_uid
+  event-houma-pd:
+    remote: event-houma-pd
+    merge: refs/heads/main
+    file: data/fuse/event_houma_pd.csv
+    primaryKey:
+      - event_uid
+  event-kenner-pd:
+    remote: event-kenner-pd
+    merge: refs/heads/main
+    file: data/fuse/event_kenner_pd.csv
+    primaryKey:
+      - event_uid
+  event-lafayette-pd:
+    remote: event-lafayette-pd
+    merge: refs/heads/main
+    file: data/fuse/event_lafayette_pd.csv
+    primaryKey:
+      - event_uid
+  event-lafayette-so:
+    remote: event-lafayette-so
+    merge: refs/heads/main
+    file: data/fuse/event_lafayette_so.csv
+    primaryKey:
+      - event_uid
+  event-levee-pd:
+    remote: event-levee-pd
+    merge: refs/heads/main
+    file: data/fuse/event_levee_pd.csv
+    primaryKey:
+      - event_uid
+  event-louisiana-state-police:
+    remote: event-louisiana-state-police
+    merge: refs/heads/main
+    file: data/fuse/event_louisiana_state_police.csv
+    primaryKey:
+      - event_uid
+  event-madisonville-pd:
+    remote: event-madisonville-pd
+    merge: refs/heads/main
+    file: data/fuse/event_madisonville_pd.csv
+    primaryKey:
+      - event_uid
+  event-mandeville-pd:
+    remote: event-mandeville-pd
+    merge: refs/heads/main
+    file: data/fuse/event_mandeville_pd.csv
+    primaryKey:
+      - event_uid
+  event-maurice-pd:
+    remote: event-maurice-pd
+    merge: refs/heads/main
+    file: data/fuse/event_maurice_pd.csv
+    primaryKey:
+      - event_uid
+  event-new-orleans-harbor-pd:
+    remote: event-new-orleans-harbor-pd
+    merge: refs/heads/main
+    file: data/fuse/event_new_orleans_harbor_pd.csv
+    primaryKey:
+      - event_uid
+  event-new-orleans-pd:
+    remote: event-new-orleans-pd
+    merge: refs/heads/main
+    file: data/fuse/event_new_orleans_pd.csv
+    primaryKey:
+      - event_uid
+  event-new-orleans-so:
+    remote: event-new-orleans-so
+    merge: refs/heads/main
+    file: data/fuse/event_new_orleans_so.csv
+    primaryKey:
+      - event_uid
+  event-plaquemines-so:
+    remote: event-plaquemines-so
+    merge: refs/heads/main
+    file: data/fuse/event_plaquemines_so.csv
+    primaryKey:
+      - event_uid
+  event-ponchatoula-pd:
+    remote: event-ponchatoula-pd
+    merge: refs/heads/main
+    file: data/fuse/event_ponchatoula_pd.csv
+    primaryKey:
+      - event_uid
+  event-port-allen-pd:
+    remote: event-port-allen-pd
+    merge: refs/heads/main
+    file: data/fuse/event_port_allen_pd.csv
+    primaryKey:
+      - event_uid
+  event-scott-pd:
+    remote: event-scott-pd
+    merge: refs/heads/main
+    file: data/fuse/event_scott_pd.csv
+    primaryKey:
+      - event_uid
+  event-shreveport-pd:
+    remote: event-shreveport-pd
+    merge: refs/heads/main
+    file: data/fuse/event_shreveport_pd.csv
+    primaryKey:
+      - event_uid
+  event-slidell-pd:
+    remote: event-slidell-pd
+    merge: refs/heads/main
+    file: data/fuse/event_slidell_pd.csv
+    primaryKey:
+      - event_uid
+  event-st-tammany-so:
+    remote: event-st-tammany-so
+    merge: refs/heads/main
+    file: data/fuse/event_st_tammany_so.csv
+    primaryKey:
+      - event_uid
+  event-sterlington-pd:
+    remote: event-sterlington-pd
+    merge: refs/heads/main
+    file: data/fuse/event_sterlington_pd.csv
+    primaryKey:
+      - event_uid
+  event-tangipahoa-so:
+    remote: event-tangipahoa-so
+    merge: refs/heads/main
+    file: data/fuse/event_tangipahoa_so.csv
+    primaryKey:
+      - event_uid
+  event-terrebonne-so:
+    remote: event-terrebonne-so
+    merge: refs/heads/main
+    file: data/fuse/event_terrebonne_so.csv
+    primaryKey:
+      - event_uid
+  event-vivian-pd:
+    remote: event-vivian-pd
+    merge: refs/heads/main
+    file: data/fuse/event_vivian_pd.csv
+    primaryKey:
+      - event_uid
+  event-washington-so:
+    remote: event-washington-so
+    merge: refs/heads/main
+    file: data/fuse/event_washington_so.csv
+    primaryKey:
+      - event_uid
+  event-west-monroe-pd:
+    remote: event-west-monroe-pd
+    merge: refs/heads/main
+    file: data/fuse/event_west_monroe_pd.csv
+    primaryKey:
+      - event_uid
+  event-youngsville-pd:
+    remote: event-youngsville-pd
+    merge: refs/heads/main
+    file: data/fuse/event_youngsville_pd.csv
+    primaryKey:
+      - event_uid
+  match-brusly-pd-2020:
+    remote: match-brusly-pd-2020
+    merge: refs/heads/main
+    file: data/match/cprr_brusly_pd_2020.csv
+  match-cprr-baton-rouge-pd-2018:
+    remote: match-cprr-baton-rouge-pd-2018
+    merge: refs/heads/main
+    file: data/match/cprr_baton_rouge_pd_2018.csv
+  match-cprr-baton-rouge-pd-2021:
+    remote: match-cprr-baton-rouge-pd-2021
+    merge: refs/heads/main
+    file: data/match/cprr_baton_rouge_pd_2021.csv
+  match-cprr-baton-rouge-so-2016-2020:
+    remote: match-cprr-baton-rouge-so-2016-2020
+    merge: refs/heads/main
+    file: data/match/cprr_baton_rouge_so_2016_2020.csv
+  match-cprr-baton-rouge-so-2018:
+    remote: match-cprr-baton-rouge-so-2018
+    merge: refs/heads/main
+    file: data/match/cprr_baton_rouge_so_2018.csv
+  match-cprr-greenwood-pd-2015-2020:
+    remote: match-cprr-greenwood-pd-2015-2020
+    merge: refs/heads/main
+    file: data/match/cprr_greenwood_pd_2015_2020.csv
+  match-cprr-hammond-pd-2015-2020:
+    remote: match-cprr-hammond-pd-2015-2020
+    merge: refs/heads/main
+    file: data/match/cprr_hammond_pd_2015_2020.csv
+  match-cprr-madisonville-pd-2010-2020:
+    remote: match-cprr-madisonville-pd-2010-2020
+    merge: refs/heads/main
+    file: data/match/cprr_madisonville_pd_2010_2020.csv
+  match-cprr-new-orleans-harbor-pd-2020:
+    remote: match-cprr-new-orleans-harbor-pd-2020
+    merge: refs/heads/main
+    file: data/match/cprr_new_orleans_harbor_pd_2020.csv
+  match-cprr-plaquemines-so-2019:
+    remote: match-cprr-plaquemines-so-2019
+    merge: refs/heads/main
+    file: data/match/cprr_plaquemines_so_2019.csv
+  match-cprr-port-allen-pd-2019:
+    remote: match-cprr-port-allen-pd-2019
+    merge: refs/heads/main
+    file: data/match/cprr_port_allen_pd_2019.csv
+  match-cprr-scott-pd-2020:
+    remote: match-cprr-scott-pd-2020
+    merge: refs/heads/main
+    file: data/match/cprr_scott_pd_2020.csv
+  match-cprr-tangipahoa-so-2015-2021:
+    remote: match-cprr-tangipahoa-so-2015-2021
+    merge: refs/heads/main
+    file: data/match/cprr_tangipahoa_so_2015_2021.csv
+  match-lprr-baton-rouge-fpcsb-1992-2012:
+    remote: match-lprr-baton-rouge-fpcsb-1992-2012
+    merge: refs/heads/main
+    file: data/match/lprr_baton_rouge_fpcsb_1992_2012.csv
+  match-lprr-louisiana-state-csc-1991-2020:
+    remote: match-lprr-louisiana-state-csc-1991-2020
+    merge: refs/heads/main
+    file: data/match/lprr_louisiana_state_csc_1991_2020.csv
+  match-pprr-baton-rouge-csd-2017:
+    remote: match-pprr-baton-rouge-csd-2017
+    merge: refs/heads/main
+    file: data/match/pprr_baton_rouge_csd_2017.csv
+  match-pprr-baton-rouge-csd-2019:
+    remote: match-pprr-baton-rouge-csd-2019
+    merge: refs/heads/main
+    file: data/match/pprr_baton_rouge_csd_2019.csv
+  match-pprr-brusly-pd-2020:
+    remote: match-pprr-brusly-pd-2020
+    merge: refs/heads/main
+    file: data/match/pprr_brusly_pd_2020.csv
+  match-pprr-port-allen-csd-2020:
+    remote: match-pprr-port-allen-csd-2020
+    merge: refs/heads/main
+    file: data/match/pprr_port_allen_csd_2020.csv
+  match-pprr-st-tammany-so-2020:
+    remote: match-pprr-st-tammany-so-2020
+    merge: refs/heads/main
+    file: data/match/pprr_st_tammany_so_2020.csv
+  new-orleans-da-brady-list:
+    remote: new-orleans-da-brady-list
+    merge: refs/heads/main
+    file: data/match/cprr_new_orleans_da_2021.csv
+  per-abbeville-pd:
+    remote: per-abbeville-pd
+    merge: refs/heads/main
+    file: data/fuse/per_abbeville_pd.csv
+    primaryKey:
+      - uid
+  per-baker-pd:
+    remote: per-baker-pd
+    merge: refs/heads/main
+    file: data/fuse/per_baker_pd.csv
+    primaryKey:
+      - uid
+  per-baton-rouge-pd:
+    remote: per-baton-rouge-pd
+    merge: refs/heads/main
+    file: data/fuse/per_baton_rouge_pd.csv
+    primaryKey:
+      - uid
+  per-baton-rouge-so:
+    remote: per-baton-rouge-so
+    merge: refs/heads/main
+    file: data/fuse/per_baton_rouge_so.csv
+    primaryKey:
+      - uid
+  per-bossier-city-pd:
+    remote: per-bossier-city-pd
+    merge: refs/heads/main
+    file: data/fuse/per_bossier_city_pd.csv
+    primaryKey:
+      - uid
+  per-brusly-pd:
+    remote: per-brusly-pd
+    merge: refs/heads/main
+    file: data/fuse/per_brusly_pd.csv
+    primaryKey:
+      - uid
+  per-caddo-parish-so:
+    remote: per-caddo-parish-so
+    merge: refs/heads/main
+    file: data/fuse/per_caddo_parish_so.csv
+    primaryKey:
+      - uid
+  per-cameron_so:
+    remote: per-cameron_so
+    merge: refs/heads/main
+    file: data/fuse/per_cameron_so.csv
+    primaryKey:
+      - uid
+  per-carencro-pd:
+    remote: per-carencro-pd
+    merge: refs/heads/main
+    file: data/fuse/per_carencro_pd.csv
+    primaryKey:
+      - uid
+  per-central-csd:
+    remote: per-central-csd
+    merge: refs/heads/main
+    file: data/fuse/per_central_csd.csv
+    primaryKey:
+      - uid
+  per-covington-pd:
+    remote: per-covington-pd
+    merge: refs/heads/main
+    file: data/fuse/per_covington_pd.csv
+    primaryKey:
+      - uid
+  per-denham-springs-pd:
+    remote: per-denham-springs-pd
+    merge: refs/heads/main
+    file: data/fuse/per_denham_springs_pd.csv
+    primaryKey:
+      - uid
+  per-gonzales-pd:
+    remote: per-gonzales-pd
+    merge: refs/heads/main
+    file: data/fuse/per_gonzales_pd.csv
+    primaryKey:
+      - uid
+  per-grand-isle-pd:
+    remote: per-grand-isle-pd
+    merge: refs/heads/main
+    file: data/fuse/per_grand_isle_pd.csv
+    primaryKey:
+      - uid
+  per-greenwood-pd:
+    remote: per-greenwood-pd
+    merge: refs/heads/main
+    file: data/fuse/per_greenwood_pd.csv
+    primaryKey:
+      - uid
+  per-gretna-pd:
+    remote: per-gretna-pd
+    merge: refs/heads/main
+    file: data/fuse/per_gretna_pd.csv
+    primaryKey:
+      - uid
+  per-hammond-pd:
+    remote: per-hammond-pd
+    merge: refs/heads/main
+    file: data/fuse/per_hammond_pd.csv
+    primaryKey:
+      - uid
+  per-houma-pd:
+    remote: per-houma-pd
+    merge: refs/heads/main
+    file: data/fuse/per_houma_pd.csv
+    primaryKey:
+      - uid
+  per-kenner-pd:
+    remote: per-kenner-pd
+    merge: refs/heads/main
+    file: data/fuse/per_kenner_pd.csv
+    primaryKey:
+      - uid
+  per-lafayette-pd:
+    remote: per-lafayette-pd
+    merge: refs/heads/main
+    file: data/fuse/per_lafayette_pd.csv
+    primaryKey:
+      - uid
+  per-lafayette-so:
+    remote: per-lafayette-so
+    merge: refs/heads/main
+    file: data/fuse/per_lafayette_so.csv
+    primaryKey:
+      - uid
+  per-levee-pd:
+    remote: per-levee-pd
+    merge: refs/heads/main
+    file: data/fuse/per_levee_pd.csv
+    primaryKey:
+      - uid
+  per-louisiana-state-police:
+    remote: per-louisiana-state-police
+    merge: refs/heads/main
+    file: data/fuse/per_louisiana_state_police.csv
+    primaryKey:
+      - uid
+  per-madisonville-pd:
+    remote: per-madisonville-pd
+    merge: refs/heads/main
+    file: data/fuse/per_madisonville_pd.csv
+    primaryKey:
+      - uid
+  per-mandeville-pd:
+    remote: per-mandeville-pd
+    merge: refs/heads/main
+    file: data/fuse/per_mandeville_pd.csv
+    primaryKey:
+      - uid
+  per-maurice-pd:
+    remote: per-maurice-pd
+    merge: refs/heads/main
+    file: data/fuse/per_maurice_pd.csv
+    primaryKey:
+      - uid
+  per-new-orleans-harbor-pd:
+    remote: per-new-orleans-harbor-pd
+    merge: refs/heads/main
+    file: data/fuse/per_new_orleans_harbor_pd.csv
+    primaryKey:
+      - uid
+  per-new-orleans-pd:
+    remote: per-new-orleans-pd
+    merge: refs/heads/main
+    file: data/fuse/per_new_orleans_pd.csv
+    primaryKey:
+      - uid
+  per-new-orleans-so:
+    remote: per-new-orleans-so
+    merge: refs/heads/main
+    file: data/fuse/per_new_orleans_so.csv
+    primaryKey:
+      - uid
+  per-plaquemines-so:
+    remote: per-plaquemines-so
+    merge: refs/heads/main
+    file: data/fuse/per_plaquemines_so.csv
+    primaryKey:
+      - uid
+  per-ponchatoula-pd:
+    remote: per-ponchatoula-pd
+    merge: refs/heads/main
+    file: data/fuse/per_ponchatoula_pd.csv
+    primaryKey:
+      - uid
+  per-port-allen-pd:
+    remote: per-port-allen-pd
+    merge: refs/heads/main
+    file: data/fuse/per_port_allen_pd.csv
+    primaryKey:
+      - uid
+  per-scott-pd:
+    remote: per-scott-pd
+    merge: refs/heads/main
+    file: data/fuse/per_scott_pd.csv
+    primaryKey:
+      - uid
+  per-shreveport-pd:
+    remote: per-shreveport-pd
+    merge: refs/heads/main
+    file: data/fuse/per_shreveport_pd.csv
+    primaryKey:
+      - uid
+  per-slidell-pd:
+    remote: per-slidell-pd
+    merge: refs/heads/main
+    file: data/fuse/per_slidell_pd.csv
+    primaryKey:
+      - uid
+  per-st-tammany-so:
+    remote: per-st-tammany-so
+    merge: refs/heads/main
+    file: data/fuse/per_st_tammany_so.csv
+    primaryKey:
+      - uid
+  per-sterlington-pd:
+    remote: per-sterlington-pd
+    merge: refs/heads/main
+    file: data/fuse/per_sterlington_pd.csv
+    primaryKey:
+      - uid
+  per-tangipahoa-so:
+    remote: per-tangipahoa-so
+    merge: refs/heads/main
+    file: data/fuse/per_tangipahoa_so.csv
+    primaryKey:
+      - uid
+  per-terrebonne-so:
+    remote: per-terrebonne-so
+    merge: refs/heads/main
+    file: data/fuse/per_terrebonne_so.csv
+    primaryKey:
+      - uid
+  per-vivian-pd:
+    remote: per-vivian-pd
+    merge: refs/heads/main
+    file: data/fuse/per_vivian_pd.csv
+    primaryKey:
+      - uid
+  per-washington-so:
+    remote: per-washington-so
+    merge: refs/heads/main
+    file: data/fuse/per_washington_so.csv
+    primaryKey:
+      - uid
+  per-west-monroe-pd:
+    remote: per-west-monroe-pd
+    merge: refs/heads/main
+    file: data/fuse/per_west_monroe_pd.csv
+    primaryKey:
+      - uid
+  per-youngsville-pd:
+    remote: per-youngsville-pd
+    merge: refs/heads/main
+    file: data/fuse/per_youngsville_pd.csv
+    primaryKey:
+      - uid
+  person:
+    remote: person
+    merge: refs/heads/main
+    file: data/match/person.csv
+    primaryKey:
+      - person_id
+  personnel:
+    remote: personnel
+    merge: refs/heads/main
+    file: data/fuse/personnel.csv
+    primaryKey:
+      - uid
+  sas-new-orleans-pd:
+    remote: sas-new-orleans-pd
+    merge: refs/heads/main
+    file: data/fuse/sas_new_orleans_pd.csv
+    primaryKey:
+      - stop_and_search_uid
+  stop-and-search:
+    remote: stop-and-search
+    merge: refs/heads/main
+    file: data/fuse/stop_and_search.csv
+    primaryKey:
+      - stop_and_search_uid
+  uof-new-orleans-pd:
+    remote: uof-new-orleans-pd
+    merge: refs/heads/main
+    file: data/fuse/uof_new_orleans_pd.csv
+    primaryKey:
+      - uof_uid
+  use-of-force:
+    remote: use-of-force
+    merge: refs/heads/main
+    file: data/fuse/use_of_force.csv
+    primaryKey:
+      - uof_uid
+merge:
+  fastForward: only
