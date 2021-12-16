@@ -212,6 +212,10 @@ repos:
     fileName: fuse/com_terrebonne_so.csv
     primaryKey:
       - allegation_uid
+  com-acadia-so:
+    fileName: fuse/com_acadia_so.csv
+    primaryKey:
+      - allegation_uid
   uof-new-orleans-pd:
     fileName: fuse/uof_new_orleans_pd.csv
     primaryKey:
@@ -400,6 +404,10 @@ repos:
     fileName: fuse/per_terrebonne_so.csv
     primaryKey:
       - uid
+  per-acadia-so:
+    fileName: fuse/per_acadia_so.csv
+    primaryKey:
+      - uid
   event-new-orleans-pd:
     fileName: fuse/event_new_orleans_pd.csv
     primaryKey:
@@ -570,6 +578,10 @@ repos:
       - event_uid
   event-terrebonne-so:
     fileName: fuse/event_terrebonne_so.csv
+    primaryKey:
+      - event_uid
+  event-acadia-so:
+    fileName: fuse/event_acadia_so.csv
     primaryKey:
       - event_uid
   personnel:
