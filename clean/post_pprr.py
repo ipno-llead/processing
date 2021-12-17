@@ -11,7 +11,11 @@ sys.path.append("../")
 
 def standardize_agency(df):
     df.loc[:, "agency"] = df.agency.str.strip()\
-        .str.lower().fillna("").str.replace(r"(\w)\.\s*(\w)\.", r"\1\2")
+        .str.lower().fillna("").str.replace(r"(\w)\.\s*(\w)\.", r"\1\2", regex=True)\
+        .str.replace(r'e\. baton rouge so', 'baton rouge so', regex=True)\
+        .str.replace(r'e\. jefferson levee pd', 'east jefferson levee pd', regex=True)\
+        .str.replace(r'^st ', 'st. ', regex=True)\
+        .str.replace(' parish', '', regex=False)
     return df
 
 

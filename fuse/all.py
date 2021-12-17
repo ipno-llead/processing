@@ -157,6 +157,18 @@ def fuse_stop_and_search():
     ])).sort_values(['agency', 'stop_and_search_uid'])
 
 
+def fuse_post_events():
+    return rearrange_event_columns(pd.concat([
+        pd.read_csv(data_file_path("fuse/event_post.csv")),
+    ])).sort_values(['agency', 'event_uid'], ignore_index=True)
+
+
+def fuse_post_personnel():
+    return rearrange_personnel_columns(pd.concat([
+        pd.read_csv(data_file_path("fuse/per_post.csv")),
+    ])).sort_values(['uid'], ignore_index=True)
+
+
 if __name__ == "__main__":
     per_df = fuse_personnel()
     ensure_uid_unique(per_df, 'uid')
@@ -172,3 +184,9 @@ if __name__ == "__main__":
     allegation_df.to_csv(data_file_path("fuse/allegation.csv"), index=False)
     uof_df.to_csv(data_file_path('fuse/use_of_force.csv'), index=False)
     sas_df.to_csv(data_file_path('fuse/stop_and_search.csv'), index=False)
+    post_events_df = fuse_post_events()
+    post_events_df = post_events_df.loc[~post_events_df.agency.isin(event_df.agency.unique())]
+    post_events_df.to_csv(data_file_path('fuse/event_post.csv'), index=False)
+    post_personnel_df = fuse_post_personnel()
+    post_personnel_df = post_personnel_df.loc[~post_personnel_df.uid.isin(per_df.uid.unique())]
+    post_personnel_df.to_csv(data_file_path('fuse/per_post.csv'), index=False)
