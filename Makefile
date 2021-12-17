@@ -31,7 +31,6 @@ endef
 
 $(BUILD_DIR)/.fuse-all: $(MD5_DIR)/fuse/all.py.md5
 	scripts/run.sh fuse/all.py
-	@-python -m datavalid --dir data
 	@touch $@
 
 # calculate md5

@@ -28,6 +28,9 @@ wrgl pull --all
 # rerun processing pipeline as necessary
 make
 
+# check whether the output match schema with datavalid
+python -m datavalid --dir data
+
 # show changes for all
 wrgl diff --all
 
