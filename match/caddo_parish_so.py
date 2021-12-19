@@ -61,7 +61,6 @@ def extract_cprr_post_events(pprr, cprr_post):
 
 if __name__ == '__main__':
     post = pd.read_csv(data_file_path('clean/pprr_post_2020_11_06.csv'))
-    post = post[post.agency == 'Caddo SO'].reset_index(drop=True)
     pprr = pd.read_csv(data_file_path('clean/pprr_caddo_parish_so_2020.csv'))
     cprr_post = pd.read_csv(data_file_path('match/cprr_post_2016_2019.csv'))
     post_event = match_pprr_against_post(pprr, post)

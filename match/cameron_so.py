@@ -31,7 +31,6 @@ def assign_uid_from_post(cprr, post):
 if __name__ == '__main__':
     cprr = pd.read_csv(data_file_path('clean/cprr_cameron_so_2020.csv'))
     post = pd.read_csv(data_file_path('clean/pprr_post_2020_11_06.csv'))
-    post = post[post.agency == 'Cameron SO']
     cprr = assign_uid_from_post(cprr, post)
     cprr.to_csv(data_file_path(
         'match/cprr_cameron_so_2020.csv'), index=False)

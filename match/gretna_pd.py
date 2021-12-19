@@ -11,8 +11,6 @@ sys.path.append('../')
 
 
 def extract_post_events(pprr, post):
-    post = post.loc[post.agency == 'Gretna PD']
-
     dfa = pprr[['first_name', 'last_name', 'uid']]
     dfa.loc[:, 'hire_date'] = combine_date_columns(
         pprr, 'hire_year', 'hire_month', 'hire_day')

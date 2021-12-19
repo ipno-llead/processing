@@ -207,7 +207,6 @@ if __name__ == '__main__':
     cprr19 = pd.read_csv(data_file_path('clean/cprr_new_orleans_so_2019.csv'))
     cprr20 = pd.read_csv(data_file_path('clean/cprr_new_orleans_so_2020.csv'))
     post = pd.read_csv(data_file_path('clean/pprr_post_2020_11_06.csv'))
-    post = post[post.agency == 'New Orleans SO']
     pprr = pd.read_csv(data_file_path('clean/pprr_new_orleans_so_2021.csv'))
     ensure_data_dir('match')
     cprr19 = deduplicate_cprr_19_personnel(cprr19)

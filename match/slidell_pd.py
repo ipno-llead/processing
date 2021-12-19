@@ -10,8 +10,6 @@ sys.path.append('../')
 
 
 def extract_post_events(pprr, post):
-    post = post.loc[post.agency == 'Slidell PD']
-
     dfa = pprr[['first_name', 'last_name', 'uid']]
     dfa.loc[:, 'fc'] = dfa.first_name.fillna('').map(lambda x: x[:1])
     dfa = dfa.drop_duplicates().set_index('uid', drop=True)

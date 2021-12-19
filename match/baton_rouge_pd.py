@@ -86,7 +86,7 @@ def match_pd_cprr_2021_v_pprr(cprr, pprr):
 
 def prepare_post_data():
     post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
-    return post[post.agency == 'Baton Rouge PD'].reset_index(drop=True)
+    return post
 
 
 def match_pprr_against_post(pprr, post):

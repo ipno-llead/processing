@@ -106,7 +106,7 @@ def fuse_event():
         pd.read_csv(data_file_path("fuse/event_maurice_pd.csv")),
         pd.read_csv(data_file_path("fuse/event_terrebonne_so.csv")),
         pd.read_csv(data_file_path("fuse/event_jefferson_so.csv")),
-    ])).sort_values(['agency', 'event_uid'], ignore_index=True)
+    ])).sort_values(['agency', 'event_uid'], ignore_index=True).dropna(subset=['agency'])
 
 
 def fuse_allegation():
@@ -161,8 +161,8 @@ def find_event_agency_if_missing_from_post(event_df, post_event_df):
     missing_event_agency = event_df[~event_df['agency'].isin(post_event_df['agency'])]
     missing_event_agency = missing_event_agency[['agency']].drop_duplicates()
 
-    for agency in missing_event_agency['agency']:
-        print('Error! Agency not in POST! \nAgency name: ', agency)
+    if len(missing_event_agency['agency']) > 0:
+        raise ValueError('Agency not in POST: %s' % missing_event_agency['agency'].tolist())
     return missing_event_agency
 
 
@@ -186,7 +186,6 @@ if __name__ == "__main__":
     post_personnel_df = pd.read_csv(data_file_path('fuse/per_post.csv'))
 
     missing_agency_df = find_event_agency_if_missing_from_post(event_df, post_event_df)
-    missing_agency_df.to_csv(data_file_path('fuse/event_agency_missing_from_post.csv'), index=False)
 
     post_event_df = post_event_df[~post_event_df['agency'].isin(event_df['agency'])]
     post_event_df.to_csv(data_file_path('fuse/event_post.csv'), index=False)

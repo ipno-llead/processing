@@ -41,10 +41,7 @@ def match_cprr_post(cprr, post):
     dfa = dfa.drop_duplicates().set_index('uid')
     dfa.loc[:, 'fc'] = dfa.first_name.fillna('').map(lambda x: x[:1])
 
-    dfb = post.loc[
-        post.agency == 'Shreveport PD',
-        ['uid', 'first_name', 'last_name'],
-    ]
+    dfb = post[['uid', 'first_name', 'last_name']]
     dfb = dfb.drop_duplicates().set_index('uid')
     dfb.loc[:, 'fc'] = dfb.first_name.fillna('').map(lambda x: x[:1])
 
@@ -78,5 +75,4 @@ if __name__ == '__main__':
     cprr = match_cprr_post(cprr, post)
     ensure_data_dir('match')
     cprr.to_csv(data_file_path(
-        'match/cprr_shreveport_pd_2018_2019.csv'
-    ), index=False)
+        'match/cprr_shreveport_pd_2018_2019.csv'), index=False)

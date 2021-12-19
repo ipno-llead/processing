@@ -10,7 +10,7 @@ from lib.post import extract_events_from_post
 
 def prepare_post_data():
     post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
-    return post[post.agency == 'jefferson parish so']
+    return post
 
 
 def extract_post_events(pprr, post):
