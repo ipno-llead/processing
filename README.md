@@ -22,7 +22,7 @@ conda install --file requirements.txt
 # initialize wrgl repo if you haven't
 wrgl init
 
-# pull all repositories
+# pull all branches
 wrgl pull --all
 
 # rerun processing pipeline as necessary
@@ -37,7 +37,7 @@ wrgl diff --all
 # show in-depth changes for a single branch
 wrgl diff event
 
-# commit a single repo
+# commit a single branch
 wrgl commit event
 
 # commit all branches
@@ -49,7 +49,7 @@ wrgl credentials authenticate https://hub.wrgl.co/api
 # push all changes
 wrgl push --all
 
-# push a single repository
+# push a single branch
 wrgl push event
 ```
 
