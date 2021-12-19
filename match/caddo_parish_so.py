@@ -34,7 +34,7 @@ def match_pprr_against_post(pprr, post):
     matcher.save_pairs_to_excel(data_file_path(
         "match/caddo_parish_so_pprr_2020_v_post.xlsx"), decision)
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
-    return extract_events_from_post(post, matches, 'Caddo Parish SO')
+    return extract_events_from_post(post, matches, 'Caddo SO')
 
 
 def extract_cprr_post_events(pprr, cprr_post):
@@ -56,12 +56,12 @@ def extract_cprr_post_events(pprr, cprr_post):
     matcher.save_pairs_to_excel(data_file_path(
         "match/pprr_caddo_parish_so_2020_v_cprr_post_2016_2019.xlsx"), decision)
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
-    return extract_events_from_cprr_post(cprr_post, matches, 'Caddo Parish SO')
+    return extract_events_from_cprr_post(cprr_post, matches, 'Caddo SO')
 
 
 if __name__ == '__main__':
     post = pd.read_csv(data_file_path('clean/pprr_post_2020_11_06.csv'))
-    post = post[post.agency == 'caddo parish so'].reset_index(drop=True)
+    post = post[post.agency == 'Caddo SO'].reset_index(drop=True)
     pprr = pd.read_csv(data_file_path('clean/pprr_caddo_parish_so_2020.csv'))
     cprr_post = pd.read_csv(data_file_path('match/cprr_post_2016_2019.csv'))
     post_event = match_pprr_against_post(pprr, post)

@@ -7,7 +7,7 @@ from lib.path import data_file_path, ensure_data_dir
 
 def prepare_post_data():
     post = pd.read_csv(data_file_path('clean/pprr_post_2020_11_06.csv'))
-    return post[post.agency == 'tangipahoa parish so']
+    return post[post.agency == 'Tangipahoa SO']
 
 
 def deduplicate_cprr_officers(cprr):

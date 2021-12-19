@@ -41,13 +41,13 @@ if __name__ == '__main__':
     cprr = pd.read_csv(data_file_path('match/cprr_levee_pd.csv'))
     post = pd.read_csv(data_file_path('clean/pprr_post_2020_11_06.csv'))
     post = post.loc[
-        (post.agency == 'e. jefferson levee pd') | (
-            post.agency == 'orleans levee pd')
+        (post.agency == 'East Jefferson Levee PD') | (
+            post.agency == 'New Orleans Levee PD')
     ]
     event_df = fuse_events(cprr, post)
     agency_dict = {
         'e. jefferson levee pd': 'East Jefferson Levee PD',
-        'orleans levee pd': 'Orleans Levee PD'
+        'orleans levee pd': 'New Orleans Levee PD'
     }
     event_df.loc[:, 'agency'] = event_df.agency.map(
         lambda x: agency_dict.get(x, x))

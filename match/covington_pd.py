@@ -10,7 +10,7 @@ sys.path.append('../')
 
 
 def extract_post_events(roster, post):
-    post = post.loc[post.agency == 'covington pd']
+    post = post.loc[post.agency == 'Covington PD']
 
     dfa = roster.set_index('uid', drop=True)
     dfa.loc[:, 'fc'] = dfa.first_name.fillna('').map(lambda x: x[:1])

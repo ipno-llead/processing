@@ -9,7 +9,7 @@ sys.path.append("../")
 
 def prepare_post_data():
     post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
-    return post[post.agency == 'e. baton rouge so']
+    return post[post.agency == 'Baton Rouge SO']
 
 
 def match_cprr_18_against_post(cprr, post):

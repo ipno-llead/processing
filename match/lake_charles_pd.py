@@ -55,7 +55,7 @@ if __name__ == '__main__':
     cprr_20 = pd.read_csv(data_file_path('clean/cprr_lake_charles_pd_2020.csv'))
     cprr_19 = pd.read_csv(data_file_path('clean/cprr_lake_charles_pd_2014_2019.csv'))
     post = pd.read_csv(data_file_path('clean/pprr_post_2020_11_06.csv'))
-    post = post[post.agency == 'lake charles pd']
+    post = post[post.agency == 'Lake Charles PD']
     ensure_data_dir('match')
     cprr_20 = assign_uid_from_post_20(cprr_20, post)
     cprr_19 = assign_uid_from_post_19(cprr_19, post)

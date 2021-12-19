@@ -6,8 +6,7 @@ sys.path.append('../')
 
 
 def match(gw_cprr, post_pprr):
-    post_pprr = post_pprr.loc[post_pprr.agency ==
-                              'greenwood pd'].set_index('uid', drop=False)
+    post_pprr = post_pprr.loc[post_pprr.agency == 'Greenwood PD'].set_index('uid', drop=False)
     dfa = gw_cprr[['first_name', 'last_name', 'mid']]\
         .drop_duplicates().set_index('mid')
     dfb = post_pprr[['last_name', 'first_name']].drop_duplicates()

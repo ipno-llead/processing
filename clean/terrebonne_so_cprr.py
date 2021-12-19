@@ -24,7 +24,7 @@ def clean():
         .pipe(standardize_desc_cols, ['allegation'])\
         .pipe(clean_dates, ['investigation_start_date', 'investigation_complete_date', 'disposition_date'])\
         .pipe(set_values, {
-            'agency': 'Terrebonne Parish SO'
+            'agency': 'Terrebonne SO'
         })\
         .pipe(gen_uid, ['agency', 'first_name', 'last_name'])\
         .pipe(gen_uid, ['uid', 'allegation', 'disposition', 'initial_action', 'action'], 'allegation_uid')

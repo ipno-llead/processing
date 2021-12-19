@@ -8,7 +8,7 @@ from lib.post import extract_events_from_post
 
 
 def extract_post_events(pprr, post):
-    post = post.loc[post.agency == 'gonzales pd']
+    post = post.loc[post.agency == 'Gonzales PD']
 
     dfa = pprr[['first_name', 'last_name', 'uid']]
     dfa.loc[:, 'hire_date'] = combine_date_columns(

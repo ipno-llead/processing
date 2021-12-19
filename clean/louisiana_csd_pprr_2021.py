@@ -45,7 +45,7 @@ def clean_demo():
         .pipe(set_values, {
             'salary_freq': salary.YEARLY,
             'data_production_year': 2021,
-            'agency': 'Louisiana State Police',
+            'agency': 'Louisiana State PD',
         })\
         .pipe(clean_salaries, ['salary'])\
         .pipe(split_names)\
@@ -76,7 +76,7 @@ def clean_term():
         .pipe(clean_dates, ['left_date'])\
         .pipe(set_values, {
             'data_production_year': 2021,
-            'agency': 'Louisiana State Police',
+            'agency': 'Louisiana State PD',
         })\
         .pipe(gen_uid, ['agency', 'first_name', 'last_name'])
 

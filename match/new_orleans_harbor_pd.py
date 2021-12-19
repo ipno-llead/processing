@@ -14,7 +14,7 @@ sys.path.append("../")
 
 def prepare_post_data():
     post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
-    return post[post.agency == 'new orleans harbor pd']
+    return post[post.agency == 'New Orleans Harbor PD']
 
 
 def match_uid_with_cprr(cprr, pprr):

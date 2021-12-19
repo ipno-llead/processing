@@ -38,7 +38,7 @@ if __name__ == '__main__':
     post = pd.read_csv(data_file_path(
         'clean/pprr_post_2020_11_06.csv'
     ))
-    post = post[post.agency == 'shreveport pd']
+    post = post[post.agency == 'Shreveport PD']
     event_df = fuse_events(cprr, post)
     per = fuse_personnel(cprr, post)
     com = rearrange_allegation_columns(cprr)

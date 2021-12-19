@@ -9,7 +9,7 @@ from lib.personnel import fuse_personnel
 
 def prepare_post_data():
     post = pd.read_csv(data_file_path('clean/pprr_post_2020_11_06.csv'))
-    return post[post.agency == 'abbeville pd']
+    return post[post.agency == 'Abbeville PD']
 
 
 def fuse_events(cprr, post):

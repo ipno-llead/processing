@@ -42,7 +42,7 @@ def match_cprr_post(cprr, post):
     dfa.loc[:, 'fc'] = dfa.first_name.fillna('').map(lambda x: x[:1])
 
     dfb = post.loc[
-        post.agency == 'shreveport pd',
+        post.agency == 'Shreveport PD',
         ['uid', 'first_name', 'last_name'],
     ]
     dfb = dfb.drop_duplicates().set_index('uid')

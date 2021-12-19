@@ -10,7 +10,7 @@ sys.path.append('../')
 def assign_agency(df, year):
     agency_dict = {
         'EJLD': 'East Jefferson Levee PD',
-        'OLDP': 'Orleans Levee PD'
+        'OLDP': 'New Orleans Levee PD'
     }
     df.loc[:, 'agency'] = df.ejld_oldp.str.strip().map(
         lambda x: agency_dict.get(x, x))

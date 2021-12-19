@@ -7,7 +7,7 @@ sys.path.append('../')
 
 def prepare_lsp_and_opso_post_data():
     post = pd.read_csv(data_file_path('clean/pprr_post_2020_11_06.csv'))
-    return post[post.agency.isin(['la state police', 'ouachita parish so'])]
+    return post[post.agency.isin(['Louisiana State PD', 'Ouachita SO'])]
 
 
 def match_cprr_with_lsp_and_opso_post(cprr, post):

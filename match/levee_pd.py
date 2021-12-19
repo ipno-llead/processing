@@ -34,10 +34,10 @@ if __name__ == '__main__':
     pd.concat([
         match_cprr_post(
             cprr[cprr.agency == 'East Jefferson Levee PD'],
-            post[post.agency == 'e. jefferson levee pd'],
+            post[post.agency == 'East Jefferson levee PD'],
             'east_jefferson', 2020, 0.89),
         match_cprr_post(
-            cprr[cprr.agency == 'Orleans Levee PD'],
-            post[post.agency == 'orleans levee pd'],
+            cprr[cprr.agency == 'New Orleans Levee PD'],
+            post[post.agency == 'New Orleans Levee PD'],
             'orleans', 2020, 0.9)
     ]).to_csv(data_file_path('match/cprr_levee_pd.csv'), index=False)

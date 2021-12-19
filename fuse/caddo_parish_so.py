@@ -25,7 +25,7 @@ if __name__ == '__main__':
     event_df = fuse_events(pprr)
     event_df = rearrange_event_columns(pd.concat([
         post_event,
-        event_df, 
+        event_df,
         cprr_post_event
     ]))
     rearrange_personnel_columns(pprr).to_csv(

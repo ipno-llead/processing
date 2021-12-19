@@ -12,7 +12,7 @@ sys.path.append("../")
 
 def prepare_post_data():
     post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
-    return post[post.agency == 'madisonville pd']
+    return post[post.agency == 'Madisonville PD']
 
 
 def match_cprr_and_pprr(cprr, pprr):

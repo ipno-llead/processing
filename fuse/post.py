@@ -3,6 +3,8 @@ sys.path.append('../')
 import pandas as pd
 from lib.path import data_file_path
 from lib.personnel import fuse_personnel
+from lib.columns import rearrange_personnel_columns
+from lib.columns import rearrange_event_columns
 from lib import events
 
 
@@ -21,14 +23,10 @@ def fuse_events(post):
 
 
 if __name__ == '__main__':
-    post = pd.read_csv(data_file_path(
-        'clean/pprr_post_2020_11_06.csv'
-    ))
+    post = pd.read_csv(data_file_path('clean/pprr_post_2020_11_06.csv'))
     event_df = fuse_events(post)
-    per = fuse_personnel(post)
-    per.to_csv(data_file_path(
-        'fuse/per_post.csv'
-    ), index=False)
-    event_df.to_csv(data_file_path(
-        'fuse/event_post.csv'
-    ), index=False)
+    event_df = rearrange_event_columns(event_df)
+    per_df = fuse_personnel(post)
+    per_df = rearrange_personnel_columns(per_df)
+    event_df.to_csv(data_file_path('fuse/events_post.csv'), index=False)
+    per_df.to_csv(data_file_path('fuse/per_post.csv'), index=False)

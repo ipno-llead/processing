@@ -17,7 +17,7 @@ sys.path.append('../')
 
 def prepare_post_data():
     post = pd.read_csv(data_file_path('clean/pprr_post_2020_11_06.csv'))
-    return post[post.agency == 'la state police']
+    return post[post.agency == 'Louisiana State PD']
 
 
 def match_lprr_and_pprr(lprr, pprr):
@@ -67,7 +67,7 @@ def extract_post_events(pprr, post):
         "match/louisiana_state_csd_pprr_2021_v_post_pprr_2020_11_06.xlsx"), decision)
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
 
-    return extract_events_from_post(post, matches, "Louisiana State Police")
+    return extract_events_from_post(post, matches, "Louisiana State PD")
 
 
 def match_pprr_demo_and_term(demo, term):

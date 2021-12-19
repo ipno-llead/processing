@@ -9,7 +9,7 @@ from lib.columns import rearrange_allegation_columns
 
 def prepare_post_data():
     post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
-    return post[post.agency == 'houma pd']
+    return post[post.agency == 'Houma PD']
 
 
 def fuse_events(post):

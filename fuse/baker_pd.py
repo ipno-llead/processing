@@ -9,12 +9,12 @@ from lib import events
 
 def prepare_post_data():
     post = pd.read_csv(data_file_path('clean/pprr_post_2020_11_06.csv'))
-    return post[post.agency == 'baker pd']
+    return post[post.agency == 'Baker PD']
 
 
-def fuse_events(post_pprr):
+def fuse_events(post):
     builder = events.Builder()
-    builder.extract_events(post_pprr, {
+    builder.extract_events(post, {
         events.OFFICER_LEVEL_1_CERT: {'prefix': 'level_1_cert', 'parse_date': '%Y-%m-%d', 'keep': [
             'uid', 'agency'
         ]},
@@ -39,4 +39,6 @@ if __name__ == '__main__':
     per.to_csv(
         data_file_path('fuse/per_baker_pd.csv'),
         index=False)
-    event.to_csv(data_file_path('fuse/event_baker_pd.csv'))
+    event.to_csv(
+        data_file_path('fuse/event_baker_pd.csv'), 
+        index=False)

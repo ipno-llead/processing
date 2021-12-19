@@ -32,7 +32,7 @@ def extract_name(df):
 
 
 def assign_agency(df):
-    df.loc[:, 'agency'] = 'Caddo Parish SO'
+    df.loc[:, 'agency'] = 'Caddo SO'
     df.loc[:, 'data_production_year'] = 2020
     return df
 

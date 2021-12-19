@@ -151,7 +151,7 @@ if __name__ == '__main__':
     award = pd.read_csv(data_file_path('clean/award_new_orleans_pd_2016_2021.csv'))
     lprr = pd.read_csv(data_file_path('clean/lprr_new_orleans_csc_2000_2016.csv'))
     sas = pd.read_csv(data_file_path('clean/sas_new_orleans_pd_2017_2021.csv'))
-    post = post[post.agency == 'new orleans pd'].reset_index(drop=True)
+    post = post[post.agency == 'New Orleans PD'].reset_index(drop=True)
     event_df = match_pprr_against_post(pprr_ipm, post)
     award = match_award_to_pprr_ipm(award, pprr_ipm)
     lprr = match_lprr_to_pprr_ipm(lprr, pprr_ipm)

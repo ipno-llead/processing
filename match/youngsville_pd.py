@@ -46,7 +46,7 @@ def match_and_concat_pprr(df1, df2, year1, year2, decision):
 
 def prepare_post_data():
     post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
-    return post[post.agency == 'youngsville pd']
+    return post[post.agency == 'Youngsville PD']
 
 
 def match_pprr_and_post(pprr, post):

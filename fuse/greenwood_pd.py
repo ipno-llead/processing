@@ -13,7 +13,7 @@ def prepare_post():
         data_file_path('clean/pprr_post_2020_11_06.csv')
     )
     post_pprr = post_pprr.loc[
-        (post_pprr.agency == 'greenwood pd')
+        (post_pprr.agency == 'Greenwood PD')
     ]
     post_pprr.loc[:, 'data_production_year'] = '2020'
     post_pprr.loc[:, 'agency'] = 'Greenwood PD'

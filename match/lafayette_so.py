@@ -7,7 +7,7 @@ from datamatch import JaroWinklerSimilarity, ThresholdMatcher, ColumnsIndex
 
 def prepare_post():
     post = pd.read_csv(data_file_path('clean/pprr_post_2020_11_06.csv'))
-    return post[post.agency == 'lafayette parish so']
+    return post[post.agency == 'Lafayette SO']
 
 
 def match_cprr_20_and_post(cprr, post):

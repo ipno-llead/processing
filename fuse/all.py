@@ -1,4 +1,5 @@
 import pandas as pd
+from lib import events
 from lib.path import data_file_path
 from lib.columns import (
     rearrange_personnel_columns, rearrange_event_columns, rearrange_allegation_columns,
@@ -55,7 +56,6 @@ def fuse_personnel():
         pd.read_csv(data_file_path("fuse/per_cameron_so.csv")),
         pd.read_csv(data_file_path("fuse/per_maurice_pd.csv")),
         pd.read_csv(data_file_path("fuse/per_terrebonne_so.csv")),
-        pd.read_csv(data_file_path("fuse/per_post.csv")),
     ])).sort_values('uid', ignore_index=True)
 
 
@@ -105,7 +105,6 @@ def fuse_event():
         pd.read_csv(data_file_path("fuse/event_cameron_so.csv")),
         pd.read_csv(data_file_path("fuse/event_maurice_pd.csv")),
         pd.read_csv(data_file_path("fuse/event_terrebonne_so.csv")),
-        pd.read_csv(data_file_path("fuse/event_post.csv")),
     ])).sort_values(['agency', 'event_uid'], ignore_index=True)
 
 
@@ -157,16 +156,13 @@ def fuse_stop_and_search():
     ])).sort_values(['agency', 'stop_and_search_uid'])
 
 
-def fuse_post_events():
-    return rearrange_event_columns(pd.concat([
-        pd.read_csv(data_file_path("fuse/event_post.csv")),
-    ])).sort_values(['agency', 'event_uid'], ignore_index=True)
+def find_event_agency_if_missing_from_post(event_df, post_event_df):
+    missing_event_agency = event_df[~event_df['agency'].isin(post_event_df['agency'])]
+    missing_event_agency = missing_event_agency[['agency']].drop_duplicates()
 
-
-def fuse_post_personnel():
-    return rearrange_personnel_columns(pd.concat([
-        pd.read_csv(data_file_path("fuse/per_post.csv")),
-    ])).sort_values(['uid'], ignore_index=True)
+    for agency in missing_event_agency['agency']:
+        print('Error! Agency not in POST! \nAgency name: ', agency)
+    return missing_event_agency
 
 
 if __name__ == "__main__":
@@ -184,9 +180,15 @@ if __name__ == "__main__":
     allegation_df.to_csv(data_file_path("fuse/allegation.csv"), index=False)
     uof_df.to_csv(data_file_path('fuse/use_of_force.csv'), index=False)
     sas_df.to_csv(data_file_path('fuse/stop_and_search.csv'), index=False)
-    post_events_df = fuse_post_events()
-    post_events_df = post_events_df.loc[~post_events_df.agency.isin(event_df.agency.unique())]
-    post_events_df.to_csv(data_file_path('fuse/event_post.csv'), index=False)
-    post_personnel_df = fuse_post_personnel()
-    post_personnel_df = post_personnel_df.loc[~post_personnel_df.uid.isin(per_df.uid.unique())]
-    post_personnel_df.to_csv(data_file_path('fuse/per_post.csv'), index=False)
+
+    post_event_df = pd.read_csv(data_file_path('fuse/events_post.csv'))
+    post_personnel_df = pd.read_csv(data_file_path('fuse/per_post.csv'))
+
+    missing_agency_df = find_event_agency_if_missing_from_post(event_df, post_event_df)
+    missing_agency_df.to_csv(data_file_path('fuse/event_agency_missing_from_post.csv'), index=False)
+
+    post_event_df = post_event_df[~post_event_df['agency'].isin(event_df['agency'])]
+    post_event_df.to_csv(data_file_path('fuse/event_post.csv'), index=False)
+
+    post_personnel_df = post_personnel_df[~post_personnel_df['uid'].isin(per_df['uid'])]
+    post_personnel_df.to_csv(data_file_path('fuse/personnel_post.csv'), index=False)

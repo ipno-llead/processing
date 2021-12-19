@@ -118,7 +118,7 @@ def drop_rows_with_missing_names(df):
 
 
 def assign_agency(df):
-    df.loc[:, 'agency'] = 'Orleans Parish SO'
+    df.loc[:, 'agency'] = 'New Orleans SO'
     return df
 
 
