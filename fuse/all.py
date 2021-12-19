@@ -1,5 +1,4 @@
 import pandas as pd
-from lib import events
 from lib.path import data_file_path
 from lib.columns import (
     rearrange_personnel_columns, rearrange_event_columns, rearrange_allegation_columns,
