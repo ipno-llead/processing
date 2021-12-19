@@ -2,7 +2,7 @@ numpy==1.18.5
 pandas==1.2.4
 python-Levenshtein==0.12.0
 Unidecode==1.1.2
-datamatch==0.1.14
+datamatch==0.1.15
 datavalid==0.3.6
 tqdm==4.61.1
 openpyxl==3.0.7
@@ -10,4 +10,5 @@ azure-ai-formrecognizer==3.2.0b1
 azure-storage-blob==12.9.0
 python-dotenv==0.19.1
 PyPDF2==1.26.0
-requests==2.25.1
+requests==2.26.0
+wrgl==0.7.3.1

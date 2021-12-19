@@ -19,10 +19,38 @@ conda install --file requirements.txt
 ## Get started
 
 ```bash
-# process all data files, check `data` folder for all generated files.
+# initialize wrgl repo if you haven't
+wrgl init
+
+# pull all branches
+wrgl pull --all
+
+# rerun processing pipeline as necessary
 make
-# combine all data into personnel, personnel_history and complaint data
-scripts/run.sh fuse/all.py
+
+# check whether the output match schema with datavalid
+python -m datavalid --dir data
+
+# show changes for all
+wrgl diff --all
+
+# show in-depth changes for a single branch
+wrgl diff event
+
+# commit a single branch
+wrgl commit event
+
+# commit all branches
+wrgl commit --all "my new commit"
+
+# log-in with your wrglhub credentials
+wrgl credentials authenticate https://hub.wrgl.co/api
+
+# push all changes
+wrgl push --all
+
+# push a single branch
+wrgl push event
 ```
 
 ## Workflow
@@ -136,4 +164,16 @@ python -m datavalid --dir data
 
 ```bash
 python -m datavalid --dir data --doc schema.md
+```
+
+### Run the entire pipeline and commit new data
+
+```bash
+make commit_all
+```
+
+### Push new data to wrglhub
+
+```bash
+make push_all
 ```

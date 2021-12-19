@@ -20,10 +20,18 @@ export PYTHONPATH := $(shell pwd):$(PYTHONPATH)
 .SECONDARY:
 .PHONY: all clean
 
-all: download_links
+all: download_links $(BUILD_DIR)/.fuse-all $(DATA_MATCH_DIR)/person.csv
 clean:
 	rm -f $(DATA_DEP_FILES)
 	rm -rf $(BUILD_DIR)
+
+define check_var
+@[ "$($(1))" ] || ( echo "$(1) is not set"; exit 1 )
+endef
+
+$(BUILD_DIR)/.fuse-all: $(MD5_DIR)/fuse/all.py.md5
+	scripts/run.sh fuse/all.py
+	@touch $@
 
 # calculate md5
 $(MD5_DIR)/%.md5: % | $(MD5_DIR)
@@ -39,3 +47,4 @@ $(DATA_CLEAN_DIR) $(DATA_MATCH_DIR) $(DATA_FUSE_DIR): | $(DATA_DIR) ; @-mkdir $@
 
 include raw_datasets.mk
 include $(DATA_DEP_FILES)
+include wrgl.mk

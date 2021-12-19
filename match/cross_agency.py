@@ -92,6 +92,7 @@ def cross_match_officers_between_agencies(personnel, events, constraints):
         'officers without either first name or last name', reset_index=True,
     )
     per.loc[:, 'fc'] = per.first_name.map(lambda x: x[:1])
+    per.loc[:, 'lc'] = per.last_name.map(lambda x: x[:1])
     agency_dict = events.loc[:, ['uid', 'agency']].drop_duplicates()\
         .set_index('uid').agency.to_dict()
     per.loc[:, 'agency'] = per.uid.map(lambda x: agency_dict.get(x, ''))
@@ -122,7 +123,7 @@ def cross_match_officers_between_agencies(personnel, events, constraints):
     matcher = ThresholdMatcher(
         index=MultiIndex([
             # only officers who have the same first letter in their first name would be matched
-            ColumnsIndex('fc'),
+            ColumnsIndex(['fc', 'lc']),
             # or if they are in the same attract constraint
             ColumnsIndex('attract_id', ignore_key_error=True),
         ]),
@@ -204,7 +205,6 @@ def entity_resolution(old_person: pd.DataFrame, new_person: pd.DataFrame) -> pd.
 
     print('matching old and new person table...')
     matcher = ThresholdMatcher(
-        # TODO: upgrade datamatch version to have index_elements available
         index=ColumnsIndex('uids', index_elements=True),
         scorer=person_scorer,
         dfa=dfa,
@@ -218,7 +218,8 @@ def entity_resolution(old_person: pd.DataFrame, new_person: pd.DataFrame) -> pd.
                 "match/person_entity_resolution_%s.xlsx" % datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
             ),
             match_threshold=decision,
-            lower_bound=0
+            lower_bound=0,
+            include_exact_matches=False
         )
     pairs = matcher.get_index_pairs_within_thresholds(decision)
     pairs_dict = dict(pairs)
