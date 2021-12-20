@@ -38,5 +38,6 @@ if __name__ == "__main__":
     pprr = pd.read_csv(data_file_path("clean/pprr_jefferson_so_2020.csv"))
     post = prepare_post_data()
     post_events = extract_post_events(pprr, post)
-    post_events.to_csv(data_file_path(
-        "match/post_event_jefferson_so_2020.csv"), index=False)
+    post_events.to_csv(
+        data_file_path("match/post_event_jefferson_so_2020.csv"),
+        index=False)

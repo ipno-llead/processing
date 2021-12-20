@@ -39,4 +39,6 @@ if __name__ == '__main__':
     cprr = pd.read_csv(data_file_path('clean/cprr_baker_pd_2018_2020.csv'))
     post = prepare_post()
     cprr = match_cprr_08_with_post(cprr, post)
-    cprr.to_csv(data_file_path('match/cprr_baker_pd_2018_2020.csv'))
+    cprr.to_csv(
+        data_file_path('match/cprr_baker_pd_2018_2020.csv'),
+        index=False)

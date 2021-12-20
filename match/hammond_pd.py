@@ -150,5 +150,9 @@ if __name__ == '__main__':
     cprr_14 = match_cprr_14_and_post(cprr_14, post)
     cprr_08 = match_cprr_08_and_post(cprr_08, post)
     ensure_data_dir('match')
-    cprr_20.to_csv(data_file_path('match/cprr_hammond_pd_2015_2020.csv'), index=False)
-    cprr_14.to_csv(data_file_path('match/cprr_hammond_pd_2009_2014.csv'), index=False)
+    cprr_20.to_csv(
+        data_file_path('match/cprr_hammond_pd_2015_2020.csv'),
+        index=False)
+    cprr_14.to_csv(
+        data_file_path('match/cprr_hammond_pd_2009_2014.csv'),
+        index=False)

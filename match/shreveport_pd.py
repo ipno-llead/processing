@@ -74,5 +74,6 @@ if __name__ == '__main__':
         .pipe(gen_uid, ['agency', 'tracking_number', 'allegation'], 'complaint_uid')
     cprr = match_cprr_post(cprr, post)
     ensure_data_dir('match')
-    cprr.to_csv(data_file_path(
-        'match/cprr_shreveport_pd_2018_2019.csv'), index=False)
+    cprr.to_csv(
+        data_file_path('match/cprr_shreveport_pd_2018_2019.csv'),
+        index=False)

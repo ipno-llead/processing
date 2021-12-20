@@ -38,6 +38,6 @@ if __name__ == '__main__':
     pprr = pd.read_csv(data_file_path('clean/pprr_sterlington_csd_2010_2020.csv'))
     post = prepare_post_data()
     post_event = match_pprr_and_post(pprr, post)
-    post_event.to_csv(data_file_path(
-        'match/post_event_sterlington_pd_2010_2020.csv'
-    ), index=False)
+    post_event.to_csv(
+        data_file_path('match/post_event_sterlington_pd_2010_2020.csv'),
+        index=False)

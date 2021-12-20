@@ -86,9 +86,12 @@ if __name__ == '__main__':
     cprr14 = match_cprr_14_and_pprr(cprr14, pprr)
     post_event = extract_post_events(pprr, post)
     ensure_data_dir('match')
-    cprr20.to_csv(data_file_path(
-        'match/cprr_scott_pd_2020.csv'), index=False)
-    cprr14.to_csv(data_file_path(
-        'match/cprr_scott_pd_2009_2014.csv'), index=False)
-    post_event.to_csv(data_file_path(
-        'match/post_event_scott_pd_2021.csv'), index=False)
+    cprr20.to_csv(
+        data_file_path('match/cprr_scott_pd_2020.csv'),
+        index=False)
+    cprr14.to_csv(
+        data_file_path('match/cprr_scott_pd_2009_2014.csv'),
+        index=False)
+    post_event.to_csv(
+        data_file_path('match/post_event_scott_pd_2021.csv'),
+        index=False)

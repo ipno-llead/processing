@@ -69,5 +69,6 @@ if __name__ == '__main__':
     post_noso = prepare_new_orleans_so_post_data()
     cprr = match_cprr_and_nopd_post(cprr, post_noso)
     ensure_data_dir('match')
-    cprr.to_csv(data_file_path(
-        'match/cprr_new_orleans_da_2021.csv'), index=False)
+    cprr.to_csv(
+        data_file_path('match/cprr_new_orleans_da_2021.csv'),
+        index=False)

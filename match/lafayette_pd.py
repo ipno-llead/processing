@@ -345,12 +345,12 @@ if __name__ == '__main__':
         .pipe(match_cprr_14_investigators_with_pprr, pprr)\
         .pipe(combine_investigator_name)
     post_events = extract_post_events(pprr, post)
-    cprr_20.to_csv(data_file_path(
-        'match/cprr_lafayette_pd_2015_2020.csv'
-    ), index=False)
-    cprr_14.to_csv(data_file_path(
-        'match/cprr_lafayette_pd_2009_2014.csv'
-    ), index=False)
-    post_events.to_csv(data_file_path(
-        "match/post_event_lafayette_pd_2020.csv"
-    ), index=False)
+    cprr_20.to_csv(
+        data_file_path('match/cprr_lafayette_pd_2015_2020.csv'),
+        index=False)
+    cprr_14.to_csv(
+        data_file_path('match/cprr_lafayette_pd_2009_2014.csv'),
+        index=False)
+    post_events.to_csv(
+        data_file_path("match/post_event_lafayette_pd_2020.csv"),
+        index=False)

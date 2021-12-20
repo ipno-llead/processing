@@ -32,5 +32,6 @@ if __name__ == '__main__':
     cprr = pd.read_csv(data_file_path('clean/cprr_terrebonne_so_2019_2021.csv'))
     post = pd.read_csv(data_file_path('clean/pprr_post_2020_11_06.csv'))
     cprr = assign_uid_from_post(cprr, post)
-    cprr.to_csv(data_file_path(
-        'match/cprr_terrebonne_so_2019_2021.csv'), index=False)
+    cprr.to_csv(
+        data_file_path('match/cprr_terrebonne_so_2019_2021.csv'),
+        index=False)

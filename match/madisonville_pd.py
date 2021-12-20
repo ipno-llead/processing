@@ -63,7 +63,9 @@ if __name__ == "__main__":
     cprr = match_cprr_and_pprr(cprr, pprr)
     post_event = match_pprr_and_post(pprr, post)
     ensure_data_dir("match")
-    cprr.to_csv(data_file_path(
-        "match/cprr_madisonville_pd_2010_2020.csv"), index=False)
-    post_event.to_csv(data_file_path(
-        "match/post_event_madisonville_csd_2019.csv"), index=False)
+    cprr.to_csv(
+        data_file_path("match/cprr_madisonville_pd_2010_2020.csv"),
+        index=False)
+    post_event.to_csv(
+        data_file_path("match/post_event_madisonville_csd_2019.csv"),
+        index=False)

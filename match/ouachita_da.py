@@ -37,5 +37,6 @@ if __name__ == '__main__':
     cprr = pd.read_csv(data_file_path('clean/cprr_ouachita_da_2021.csv'))
     post_lsp_and_opso = prepare_lsp_and_opso_post_data()
     cprr = match_cprr_with_lsp_and_opso_post(cprr, post_lsp_and_opso)
-    cprr.to_csv(data_file_path(
-        'match/cprr_ouachita_da_2021.csv'), index=False)
+    cprr.to_csv(
+        data_file_path('match/cprr_ouachita_da_2021.csv'),
+        index=False)

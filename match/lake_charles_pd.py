@@ -58,7 +58,9 @@ if __name__ == '__main__':
     ensure_data_dir('match')
     cprr_20 = assign_uid_from_post_20(cprr_20, post)
     cprr_19 = assign_uid_from_post_19(cprr_19, post)
-    cprr_20.to_csv(data_file_path(
-        'match/cprr_lake_charles_pd_2020.csv'), index=False)
-    cprr_19.to_csv(data_file_path(
-        'match/cprr_lake_charles_pd_2014_2019.csv'), index=False)
+    cprr_20.to_csv(
+        data_file_path('match/cprr_lake_charles_pd_2020.csv'),
+        index=False)
+    cprr_19.to_csv(
+        data_file_path('match/cprr_lake_charles_pd_2014_2019.csv'),
+        index=False)

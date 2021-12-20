@@ -34,5 +34,6 @@ if __name__ == '__main__':
     post = pd.read_csv(data_file_path('clean/pprr_post_2020_11_06.csv'))
     post_event = match_pprr_post(pprr, post)
     ensure_data_dir('match')
-    post_event.to_csv(data_file_path(
-        'match/post_event_grand_isle_pd.csv'), index=False)
+    post_event.to_csv(
+        data_file_path('match/post_event_grand_isle_pd.csv'),
+        index=False)

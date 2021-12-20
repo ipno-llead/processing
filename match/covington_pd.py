@@ -45,5 +45,6 @@ if __name__ == '__main__':
         post
     )
     ensure_data_dir("match")
-    post_events.to_csv(data_file_path(
-        "match/post_event_covington_pd_2020.csv"), index=False)
+    post_events.to_csv(
+        data_file_path("match/post_event_covington_pd_2020.csv"),
+        index=False)

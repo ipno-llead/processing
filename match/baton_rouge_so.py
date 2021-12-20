@@ -63,7 +63,9 @@ if __name__ == '__main__':
     cprr18 = match_cprr_18_against_post(cprr18, post)
     cprr20 = match_cprr_20_against_post(cprr20, post)
     ensure_data_dir('match')
-    cprr18.to_csv(data_file_path(
-        'match/cprr_baton_rouge_so_2018.csv'), index=False)
-    cprr20.to_csv(data_file_path(
-        'match/cprr_baton_rouge_so_2016_2020.csv'), index=False)
+    cprr18.to_csv(
+        data_file_path('match/cprr_baton_rouge_so_2018.csv'),
+        index=False)
+    cprr20.to_csv(
+        data_file_path('match/cprr_baton_rouge_so_2016_2020.csv'),
+        index=False)

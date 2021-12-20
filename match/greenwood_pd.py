@@ -29,4 +29,5 @@ if __name__ == '__main__':
     gw_cprr = match(gw_cprr, post)
     ensure_data_dir("match")
     gw_cprr.to_csv(
-        data_file_path('match/cprr_greenwood_pd_2015_2020.csv'), index=False)
+        data_file_path('match/cprr_greenwood_pd_2015_2020.csv'),
+        index=False)

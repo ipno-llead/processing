@@ -37,5 +37,6 @@ if __name__ == '__main__':
     cprr = pd.read_csv(data_file_path('clean/cprr_houma_pd_2019_2021.csv'))
     post = prepare_post_data()
     cprr = match_cprr_with_post(cprr, post)
-    cprr.to_csv(data_file_path(
-        'match/cprr_houma_pd_2019_2021.csv'), index=False)
+    cprr.to_csv(
+        data_file_path('match/cprr_houma_pd_2019_2021.csv'),
+        index=False)

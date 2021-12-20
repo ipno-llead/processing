@@ -85,7 +85,9 @@ if __name__ == '__main__':
         match_cprr_and_post(cprr, post)
     ]).drop_duplicates(ignore_index=True)
     ensure_data_dir('match')
-    cprr.to_csv(data_file_path(
-        'match/cprr_st_tammany_so_2011_2021.csv'), index=False)
-    post_event.to_csv(data_file_path(
-        'match/post_event_st_tammany_so_2020.csv'), index=False)
+    cprr.to_csv(
+        data_file_path('match/cprr_st_tammany_so_2011_2021.csv'),
+        index=False)
+    post_event.to_csv(
+        data_file_path('match/post_event_st_tammany_so_2020.csv'),
+        index=False)

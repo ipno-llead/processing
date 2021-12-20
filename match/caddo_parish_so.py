@@ -66,7 +66,9 @@ if __name__ == '__main__':
     post_event = match_pprr_against_post(pprr, post)
     cprr_post_event = extract_cprr_post_events(pprr, cprr_post)
     ensure_data_dir('match')
-    post_event.to_csv(data_file_path(
-        'match/post_event_caddo_parish_so.csv'), index=False)
-    cprr_post_event.to_csv(data_file_path(
-        'match/cprr_post_event_caddo_parish_so.csv'), index=False)
+    post_event.to_csv(
+        data_file_path('match/post_event_caddo_parish_so.csv'),
+        index=False)
+    cprr_post_event.to_csv(
+        data_file_path('match/cprr_post_event_caddo_parish_so.csv'),
+        index=False)

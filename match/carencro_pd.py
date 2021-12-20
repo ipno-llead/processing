@@ -38,6 +38,6 @@ if __name__ == '__main__':
     pprr = pd.read_csv(data_file_path('clean/pprr_carencro_pd_2021.csv'))
     post = prepare_post_data()
     post_event = match_pprr_and_post(pprr, post)
-    post_event.to_csv(data_file_path(
-        'match/post_event_carencro_pd_2020_11_06.csv'
-    ), index=False)
+    post_event.to_csv(
+        data_file_path('match/post_event_carencro_pd_2020_11_06.csv'),
+        index=False)

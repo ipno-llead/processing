@@ -216,9 +216,12 @@ if __name__ == '__main__':
     cprr19 = assign_supervisor_19_uid_from_pprr(cprr19, pprr)
     cprr20 = assign_supervisor_20_uid_from_pprr(cprr20, pprr)
     post_events = match_pprr_against_post(pprr, post)
-    cprr19.to_csv(data_file_path(
-        'match/cprr_new_orleans_so_2019.csv'), index=False)
-    cprr20.to_csv(data_file_path(
-        'match/cprr_new_orleans_so_2020.csv'), index=False)
-    post_events.to_csv(data_file_path(
-        'match/post_event_new_orleans_so.csv'), index=False)
+    cprr19.to_csv(
+        data_file_path('match/cprr_new_orleans_so_2019.csv'),
+        index=False)
+    cprr20.to_csv(
+        data_file_path('match/cprr_new_orleans_so_2020.csv'),
+        index=False)
+    post_events.to_csv(
+        data_file_path('match/post_event_new_orleans_so.csv'),
+        index=False)

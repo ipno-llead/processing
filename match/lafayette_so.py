@@ -88,6 +88,12 @@ if __name__ == '__main__':
     cprr20 = match_cprr_20_and_post(cprr20, post)
     cprr14 = match_cprr_14_and_post(cprr14, post)
     cprr18 = match_cprr_08_with_post(cprr08, post)
-    cprr20.to_csv(data_file_path('match/cprr_lafayette_so_2015_2020.csv'), index=False)
-    cprr14.to_csv(data_file_path('match/cprr_lafayette_so_2009_2014.csv'), index=False)
-    cprr08.to_csv(data_file_path('match/cprr_lafayette_so_2006_2008.csv'), index=False)
+    cprr20.to_csv(
+        data_file_path('match/cprr_lafayette_so_2015_2020.csv'),
+        index=False)
+    cprr14.to_csv(
+        data_file_path('match/cprr_lafayette_so_2009_2014.csv'),
+        index=False)
+    cprr08.to_csv(
+        data_file_path('match/cprr_lafayette_so_2006_2008.csv'),
+        index=False)

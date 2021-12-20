@@ -104,7 +104,12 @@ if __name__ == "__main__":
     award = add_uid_to_award(award, pprr)
     post_events = extract_post_events(pprr, post)
     ensure_data_dir("match")
-    award.to_csv(data_file_path('match/award_brusly_pd_2021.csv'), index=False)
-    cprr.to_csv(data_file_path("match/cprr_brusly_pd_2020.csv"), index=False)
-    post_events.to_csv(data_file_path(
-        "match/post_event_brusly_pd_2020.csv"), index=False)
+    award.to_csv(
+        data_file_path('match/award_brusly_pd_2021.csv'),
+        index=False)
+    cprr.to_csv(
+        data_file_path("match/cprr_brusly_pd_2020.csv"),
+        index=False)
+    post_events.to_csv(
+        data_file_path("match/post_event_brusly_pd_2020.csv"),
+        index=False)

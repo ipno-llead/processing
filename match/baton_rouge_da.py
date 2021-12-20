@@ -65,4 +65,6 @@ if __name__ == '__main__':
     df = match_against_baton_rouge_csd_pprr(df, pprr17, 2017, 0.97)
     df = match_against_baton_rouge_csd_pprr(df, pprr19, 2019, 0.97)
     df = match_against_baton_rouge_so_personnel(df, so_per)
-    df.to_csv(data_file_path('match/cprr_baton_rouge_da_2021.csv'), index=False)
+    df.to_csv(
+        data_file_path('match/cprr_baton_rouge_da_2021.csv'),
+        index=False)

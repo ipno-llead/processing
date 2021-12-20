@@ -62,13 +62,18 @@ if __name__ == '__main__':
     cprr18 = match_cprr_against_csd_pprr_2020(cprr18, pprr, 2018, 1)
     cprr16 = match_cprr_against_csd_pprr_2020(cprr16, pprr, 2016, 1)
     ensure_data_dir('match')
-    pprr.to_csv(data_file_path(
-        'match/pprr_port_allen_csd_2020.csv'), index=False)
-    cprr19.to_csv(data_file_path(
-        'match/cprr_port_allen_pd_2019.csv'), index=False)
-    cprr18.to_csv(data_file_path(
-        'match/cprr_port_allen_pd_2017_2018.csv'), index=False)
-    cprr16.to_csv(data_file_path(
-        'match/cprr_port_allen_pd_2015_2016.csv'), index=False)
-    post_event.to_csv(data_file_path(
-        'match/post_event_port_allen_pd.csv'), index=False)
+    pprr.to_csv(
+        data_file_path('match/pprr_port_allen_csd_2020.csv'),
+        index=False)
+    cprr19.to_csv(
+        data_file_path('match/cprr_port_allen_pd_2019.csv'),
+        index=False)
+    cprr18.to_csv(
+        data_file_path('match/cprr_port_allen_pd_2017_2018.csv'),
+        index=False)
+    cprr16.to_csv(
+        data_file_path('match/cprr_port_allen_pd_2015_2016.csv'),
+        index=False)
+    post_event.to_csv(
+        data_file_path('match/post_event_port_allen_pd.csv'),
+        index=False)
