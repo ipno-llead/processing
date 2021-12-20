@@ -67,7 +67,10 @@ schemas:
           accused officer's unique identifier. This references the `uid` column in personnel.csv
       - name: tracking_number
         description: >
-          complaint tracking number from the agency the data originate from
+          internal affairs complaint tracking number from the agency the data originate from
+      - name: case_number
+        description: >
+          administrative complaint tracking number from the agency the data originate from
       - name: allegation_uid
         description: >
           complaint unique identifier
