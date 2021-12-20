@@ -34,10 +34,11 @@ def fuse_events(post):
 
 
 if __name__ == '__main__':
-    cprr = pd.read_csv(data_file_path('match/cprr_houma_pd_2019_2021.csv'))
+    cprr21 = pd.read_csv(data_file_path('match/cprr_houma_pd_2019_2021.csv'))
+    cprr18 = pd.read_csv(data_file_path('match/cprr_houma_pd_2017_2018.csv'))
     post = prepare_post_data()
-    personnel_df = fuse_personnel(cprr, post)
-    allegation_df = rearrange_allegation_columns(cprr)
+    personnel_df = fuse_personnel(cprr21, cprr18, post)
+    allegation_df = rearrange_allegation_columns(pd.concat([cprr21, cprr18]))
     event_df = fuse_events(post)
     event_df.to_csv(data_file_path('fuse/event_houma_pd.csv'))
     personnel_df.to_csv(data_file_path('fuse/per_houma_pd.csv'))
