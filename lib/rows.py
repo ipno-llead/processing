@@ -20,8 +20,7 @@ def duplicate_row(df: pd.DataFrame, idx: any, n: int = 2) -> pd.DataFrame:
     assert isinstance(df.index, pd.RangeIndex)
     row = df.iloc[idx]
     upper_rows = df.iloc[:idx]
-    lower_rows = df.iloc[idx+1:]
-    df = pd.concat(
-        [upper_rows, pd.DataFrame.from_records([row] * n), lower_rows])
+    lower_rows = df.iloc[idx + 1 :]
+    df = pd.concat([upper_rows, pd.DataFrame.from_records([row] * n), lower_rows])
     df.index = pd.RangeIndex(start=0, stop=df.shape[0])
     return df
