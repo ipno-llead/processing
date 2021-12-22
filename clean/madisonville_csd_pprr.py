@@ -7,6 +7,7 @@ from lib import salary
 import pandas as pd
 import numpy as np
 import sys
+
 sys.path.append("../")
 
 
@@ -19,8 +20,7 @@ def split_names(df):
 
 
 def split_rows_by_salary(df):
-    salary_cols = [
-        '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019']
+    salary_cols = ["2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019"]
     df.loc[:, "salary"] = np.nan
     idx = 0
     while idx < df.shape[0]:
@@ -53,27 +53,38 @@ def assign_agency(df):
 
 
 def clean():
-    df = pd.read_csv(data_file_path(
-        "raw/madisonville_pd/madisonville_csd_pprr_2019.csv"))
+    df = pd.read_csv(
+        data_file_path("raw/madisonville_pd/madisonville_csd_pprr_2019.csv")
+    )
     df = clean_column_names(df)
     df.columns = [
-        'name', 'badge_no', 'hire_date', '2012', '2013', '2014', '2015',
-        '2016', '2017', '2018', '2019']
-    df = df\
-        .pipe(float_to_int_str, ["badge_no"])\
-        .pipe(split_names)\
-        .pipe(clean_dates, ["hire_date"])\
-        .pipe(split_rows_by_salary)\
-        .pipe(set_values, {'salary_freq': salary.YEARLY})\
-        .pipe(assign_agency)\
-        .pipe(clean_names, ["first_name", "last_name"])\
-        .pipe(gen_uid, ["agency", "first_name", "last_name", "badge_no"])\
-        .pipe(gen_uid, ['uid', 'pay_effective_year'], 'perhist_uid')
+        "name",
+        "badge_no",
+        "hire_date",
+        "2012",
+        "2013",
+        "2014",
+        "2015",
+        "2016",
+        "2017",
+        "2018",
+        "2019",
+    ]
+    df = (
+        df.pipe(float_to_int_str, ["badge_no"])
+        .pipe(split_names)
+        .pipe(clean_dates, ["hire_date"])
+        .pipe(split_rows_by_salary)
+        .pipe(set_values, {"salary_freq": salary.YEARLY})
+        .pipe(assign_agency)
+        .pipe(clean_names, ["first_name", "last_name"])
+        .pipe(gen_uid, ["agency", "first_name", "last_name", "badge_no"])
+        .pipe(gen_uid, ["uid", "pay_effective_year"], "perhist_uid")
+    )
     return df
 
 
 if __name__ == "__main__":
     df = clean()
     ensure_data_dir("clean")
-    df.to_csv(data_file_path(
-        "clean/pprr_madisonville_csd_2019.csv"), index=False)
+    df.to_csv(data_file_path("clean/pprr_madisonville_csd_2019.csv"), index=False)

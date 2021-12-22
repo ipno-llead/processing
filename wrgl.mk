@@ -8,5 +8,5 @@ pull_person:
 		echo 'file $(BUILD_DIR)/person.csv is up to date.'; \
 	fi
 
-$(DATA_MATCH_DIR)/person.csv: $(BUILD_DIR)/person.csv $(MD5_DIR)/match/cross_agency.py.md5 $(BUILD_DIR)/.fuse-all | pull_person
-	scripts/run.sh match/cross_agency.py $<
+$(DATA_MATCH_DIR)/person.csv: $(MD5_DIR)/match/cross_agency.py.md5 $(BUILD_DIR)/.fuse-all | pull_person
+	scripts/run.sh match/cross_agency.py $(BUILD_DIR)/person.csv

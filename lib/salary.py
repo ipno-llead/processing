@@ -8,11 +8,6 @@ MONTHLY = "monthly"
 YEARLY = "yearly"
 
 
-cat_type = CategoricalDtype(categories=[
-    HOURLY,
-    DAILY,
-    WEEKLY,
-    BIWEEKLY,
-    MONTHLY,
-    YEARLY
-], ordered=True)
+cat_type = CategoricalDtype(
+    categories=[HOURLY, DAILY, WEEKLY, BIWEEKLY, MONTHLY, YEARLY], ordered=True
+)
