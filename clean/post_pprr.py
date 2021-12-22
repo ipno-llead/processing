@@ -11,9 +11,49 @@ sys.path.append("../")
 def standardize_agency(df):
     df.loc[:, "agency"] = (
         df.agency.str.strip()
-        .str.lower()
         .fillna("")
-        .str.replace(r"(\w)\.\s*(\w)\.", r"\1\2")
+        .str.replace(r"(\w)\.\s*(\w)\.", r"\1\2", regex=True)
+        .str.replace(r"E\. Baton Rouge So", "Baton Rouge SO", regex=True)
+        .str.replace(r"E\. Jefferson Levee PD", "East Jefferson Levee PD", regex=True)
+        .str.replace(r"^St ", "St. ", regex=True)
+        .str.replace(r" ?Parish ?", " ", regex=True)
+        .str.replace(r"Pd$", "PD", regex=True)
+        .str.replace(r"So$", "SO", regex=True)
+        .str.replace(r"Dept\.?", "Department", regex=True)
+        .str.replace(r"Univ\. Pd - (.+)", r"\1 University PD", regex=True)
+        .str.replace(r"^Lsu\b", "LSU", regex=True)
+        .str.replace(r"^Lsuhsc", "LSUHSC", regex=True)
+        .str.replace(r"^La\b", "Louisiana", regex=True)
+        .str.replace("Orleans DA Office", "New Orleans DA", regex=False)
+        .str.replace(r"DA Office$", "DA", regex=True)
+        .str.replace(r"^W\.?\b", "West", regex=True)
+        .str.replace(r"\-(\w+)", r"- \1", regex=True)
+        .str.replace(
+            r"^Se La Flood Protection Auth- E$",
+            "Southeast Louisiana Flood Protection Authority",
+            regex=True,
+        )
+        .str.replace(r"Dev\.\,", "Development", regex=True)
+        .str.replace("Red River Par", "Red River", regex=False)
+        .str.replace("Cc", "Community College", regex=False)
+        .str.replace("Constable'S", "Constable's", regex=False)
+        .str.replace(r"^Orleans", "New Orleans", regex=True)
+        .str.replace(r"Rep\.", "Representatives", regex=True)
+        .str.replace(r"Park & Rec\.", "Parks and Recreation", regex=True)
+        .str.replace(
+            "Housing Authority Of NO", "New Orleans Housing Authority", regex=False
+        )
+        .str.replace(r"^Ebr", "East Baton Rouge", regex=False)
+        .str.replace("City Park PD - NO", "New Orleans City Park PD", regex=False)
+        .str.replace("Nd", "nd", regex=False)
+        .str.replace(r"^(\w+)St", r"\1st", regex=True)
+        .str.replace(r"^(\w+)Th", r"\1th", regex=True)
+        .str.replace("Jdc", "Judicial District Court")
+        .str.replace("Police", "PD", regex=False)
+        .str.replace(r"  +", " ", regex=True)
+        .str.replace(r" $", "", regex=True)
+        .str.replace("Plaquemines Par ", "Plaquemines ", regex=False)
+        .str.replace("District Attorney", "DA", regex=False)
     )
     return df
 
