@@ -1,24 +1,27 @@
 from lib import events
 import pandas as pd
 import sys
+
 sys.path.append("../")
 
 
 def keep_latest_row_for_each_post_officer(post: pd.DataFrame) -> pd.DataFrame:
-    """Sort and discard all but the latest rows for each officer in POST data
-    """
-    duplicated_uids = set(post.loc[post.uid.duplicated(), 'uid'].to_list())
-    post = post.set_index('uid', drop=False)
+    """Sort and discard all but the latest rows for each officer in POST data"""
+    duplicated_uids = set(post.loc[post.uid.duplicated(), "uid"].to_list())
+    post = post.set_index("uid", drop=False)
     level_1_cert_dates = post.loc[
         post.uid.isin(duplicated_uids) & (post.level_1_cert_date.notna()),
-        'level_1_cert_date']
+        "level_1_cert_date",
+    ]
     for idx, value in level_1_cert_dates.iteritems():
-        post.loc[idx, 'level_1_cert_date'] = value
-    post = post.sort_values('last_pc_12_qualification_date', ascending=False)
-    return post[~post.index.duplicated(keep='first')]
+        post.loc[idx, "level_1_cert_date"] = value
+    post = post.sort_values("last_pc_12_qualification_date", ascending=False)
+    return post[~post.index.duplicated(keep="first")]
 
 
-def extract_events_from_post(post: pd.DataFrame, uid_matches: list[tuple[str, str]], agency: str) -> pd.DataFrame:
+def extract_events_from_post(
+    post: pd.DataFrame, uid_matches: list[tuple[str, str]], agency: str
+) -> pd.DataFrame:
     """Extract events from POST data.
 
     Only extract events.OFFICER_LEVEL_1_CERT and events.OFFICER_PC_12_QUALIFICATION
@@ -42,23 +45,27 @@ def extract_events_from_post(post: pd.DataFrame, uid_matches: list[tuple[str, st
             if pd.notnull(row.level_1_cert_date):
                 builder.append_record(
                     events.OFFICER_LEVEL_1_CERT,
-                    ['uid'],
+                    ["uid"],
                     raw_date_str=row.level_1_cert_date,
-                    strptime_format='%Y-%m-%d',
+                    strptime_format="%Y-%m-%d",
                     agency=agency,
-                    uid=pprr_uid)
+                    uid=pprr_uid,
+                )
             if pd.notnull(row.last_pc_12_qualification_date):
                 builder.append_record(
                     events.OFFICER_PC_12_QUALIFICATION,
-                    ['uid'],
+                    ["uid"],
                     raw_date_str=row.last_pc_12_qualification_date,
-                    strptime_format='%Y-%m-%d',
+                    strptime_format="%Y-%m-%d",
                     agency=agency,
-                    uid=pprr_uid)
+                    uid=pprr_uid,
+                )
     return builder.to_frame()
 
 
-def extract_events_from_cprr_post(cprr_post: pd.DataFrame, uid_matches: list[tuple[str, str]], agency: str) -> pd.DataFrame:
+def extract_events_from_cprr_post(
+    cprr_post: pd.DataFrame, uid_matches: list[tuple[str, str]], agency: str
+) -> pd.DataFrame:
     """Extract events from POST data.
 
     Only extract events.OFFICER_POST_DECERTIFICATION
@@ -82,8 +89,9 @@ def extract_events_from_cprr_post(cprr_post: pd.DataFrame, uid_matches: list[tup
             if pd.notnull(row.decertification_date):
                 builder.append_record(
                     events.OFFICER_POST_DECERTIFICATION,
-                    ['uid'],
+                    ["uid"],
                     raw_date_str=row.decertification_date,
                     agency=agency,
-                    uid=pprr_uid)
+                    uid=pprr_uid,
+                )
     return builder.to_frame()
