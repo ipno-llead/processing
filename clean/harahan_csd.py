@@ -9,27 +9,52 @@ from lib.path import data_file_path, ensure_data_dir
 from lib.clean import clean_dates, clean_salaries, clean_names
 from lib import salary
 
-sys.path.append('../')
+sys.path.append("../")
 
 
 def realign(df):
     pat = re.compile(r"^([^\d]*)(\d{2}-\d{4})?([^\d]*)$")
     pat2 = re.compile(r"^(.+, \w{2,}(?: \w)?) (\w{2,}.*)$")
-    rank_whitelist = set([
-        'captain', 'police officer', 'i/t coordinator',
-        'assistant chief of police', 'it technician', 'sergeant',
-        'jailer / dispatch provisional', 'police lieutenant',
-        'probational police officer', 'secretary',
-        'jailer / dispatch probational', 'police mechanic', 'police sgt.',
-        'police property manager', 'part time police officer', 'jailer',
-        'jailer/dispatch', 'provisional sergeant',
-        'records clerk', 'police captain', 'police chief secretary',
-        'assist chief of police', 'police dept. agent',
-        'provisional chief secretary', 'assistant police chief',
-        'police records clerk', 'maintenance man', 'police jailer',
-        'police sgt', 'mechanic', 'police m/c mechanic',
-        'dispatch / jailer', 'police sergeant', 'police officer sgt',
-        'police chief', 'secretary - police chief'])
+    rank_whitelist = set(
+        [
+            "captain",
+            "police officer",
+            "i/t coordinator",
+            "assistant chief of police",
+            "it technician",
+            "sergeant",
+            "jailer / dispatch provisional",
+            "police lieutenant",
+            "probational police officer",
+            "secretary",
+            "jailer / dispatch probational",
+            "police mechanic",
+            "police sgt.",
+            "police property manager",
+            "part time police officer",
+            "jailer",
+            "jailer/dispatch",
+            "provisional sergeant",
+            "records clerk",
+            "police captain",
+            "police chief secretary",
+            "assist chief of police",
+            "police dept. agent",
+            "provisional chief secretary",
+            "assistant police chief",
+            "police records clerk",
+            "maintenance man",
+            "police jailer",
+            "police sgt",
+            "mechanic",
+            "police m/c mechanic",
+            "dispatch / jailer",
+            "police sergeant",
+            "police officer sgt",
+            "police chief",
+            "secretary - police chief",
+        ]
+    )
     record = dict()
     records = []
     for _, row in df.iterrows():
@@ -64,67 +89,83 @@ def realign(df):
 
 
 def split_names(df):
-    names = df.name.str.replace(r', (jr\.|iii)(?:,| \.)', r' \1,', regex=True)\
-        .str.extract(r'^([^,]+), (\w+)(?: (\w+))?$')
-    df.loc[:, 'first_name'] = names[1]
-    df.loc[:, 'middle_name'] = names[2].fillna('')
-    df.loc[:, 'middle_initial'] = df.middle_name.map(lambda x: x[:1])
-    df.loc[:, 'last_name'] = names[0]
-    return df.drop(columns=['name'])
+    names = df.name.str.replace(
+        r", (jr\.|iii)(?:,| \.)", r" \1,", regex=True
+    ).str.extract(r"^([^,]+), (\w+)(?: (\w+))?$")
+    df.loc[:, "first_name"] = names[1]
+    df.loc[:, "middle_name"] = names[2].fillna("")
+    df.loc[:, "middle_initial"] = df.middle_name.map(lambda x: x[:1])
+    df.loc[:, "last_name"] = names[0]
+    return df.drop(columns=["name"])
 
 
 def clean_employment_status(df):
-    df.loc[:, 'employment_status'] = df.employment_status.str.lower().str.strip()\
-        .str.replace(r'^(i|t)$', 'inactive', regex=True)\
-        .str.replace(r'^a$', 'active', regex=True)
+    df.loc[:, "employment_status"] = (
+        df.employment_status.str.lower()
+        .str.strip()
+        .str.replace(r"^(i|t)$", "inactive", regex=True)
+        .str.replace(r"^a$", "active", regex=True)
+    )
     return df
 
 
 def assign_agency(df):
-    df.loc[:, 'data_production_year'] = 2020
-    df.loc[:, 'agency'] = 'Harahan CSD'
+    df.loc[:, "data_production_year"] = 2020
+    df.loc[:, "agency"] = "Harahan CSD"
     return df
 
 
 def clean():
-    return pd.read_csv(data_file_path(
-        'raw/harahan_csd/harahan_csd_pprr_roster_by_employment_status_2020.csv'
-    )).pipe(clean_column_names)\
-        .fillna("")\
-        .pipe(realign)\
-        .rename(columns={
-            'annual': 'salary',
-            'emp_no': 'employee_id',
-            'status': 'employment_status'
-        })\
-        .pipe(set_values, {'salary_freq': salary.YEARLY})\
-        .drop(columns=['dept_no'])\
-        .pipe(split_names)\
-        .pipe(clean_employment_status)\
-        .pipe(clean_salaries, ['salary'])\
-        .pipe(clean_names, ['first_name', 'middle_name', 'middle_initial', 'last_name'])\
-        .pipe(join_employment_date)\
-        .pipe(assign_agency)\
-        .pipe(gen_uid, ['agency', 'employee_id'])
+    return (
+        pd.read_csv(
+            data_file_path(
+                "raw/harahan_csd/harahan_csd_pprr_roster_by_employment_status_2020.csv"
+            )
+        )
+        .pipe(clean_column_names)
+        .fillna("")
+        .pipe(realign)
+        .rename(
+            columns={
+                "annual": "salary",
+                "emp_no": "employee_id",
+                "status": "employment_status",
+            }
+        )
+        .pipe(set_values, {"salary_freq": salary.YEARLY})
+        .drop(columns=["dept_no"])
+        .pipe(split_names)
+        .pipe(clean_employment_status)
+        .pipe(clean_salaries, ["salary"])
+        .pipe(clean_names, ["first_name", "middle_name", "middle_initial", "last_name"])
+        .pipe(join_employment_date)
+        .pipe(assign_agency)
+        .pipe(gen_uid, ["agency", "employee_id"])
+    )
 
 
 def join_employment_date(df):
-    emp_dates = pd.read_csv(data_file_path(
-        'raw/harahan_csd/harahan_csd_prrr_roster_by_employment_date_2020.csv'
-    )).pipe(clean_column_names)\
-        .drop(columns=['employee_s_name', 'status', 'p_f_dept'])\
-        .rename(columns={
-            'emp_no': 'employee_id',
-            'hire': 'hire_date',
-            'termination': 'left_date'
-        })\
-        .pipe(clean_dates, ['hire_date'])
-    return df.merge(emp_dates, on='employee_id')
+    emp_dates = (
+        pd.read_csv(
+            data_file_path(
+                "raw/harahan_csd/harahan_csd_prrr_roster_by_employment_date_2020.csv"
+            )
+        )
+        .pipe(clean_column_names)
+        .drop(columns=["employee_s_name", "status", "p_f_dept"])
+        .rename(
+            columns={
+                "emp_no": "employee_id",
+                "hire": "hire_date",
+                "termination": "left_date",
+            }
+        )
+        .pipe(clean_dates, ["hire_date"])
+    )
+    return df.merge(emp_dates, on="employee_id")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     df = clean()
-    ensure_data_dir('clean')
-    df.to_csv(data_file_path(
-        'clean/pprr_harahan_csd_2020.csv'
-    ), index=False)
+    ensure_data_dir("clean")
+    df.to_csv(data_file_path("clean/pprr_harahan_csd_2020.csv"), index=False)
