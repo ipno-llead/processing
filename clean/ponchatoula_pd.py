@@ -86,9 +86,5 @@ def clean_cprr():
 
 
 if __name__ == "__main__":
-    clean_pprr().to_csv(
-        data_file_path("clean/pprr_ponchatoula_pd_2010_2020.csv"), index=False
-    )
-    clean_cprr().to_csv(
-        data_file_path("clean/cprr_ponchatoula_pd_2010_2020.csv"), index=False
-    )
+    clean_pprr().to_csv(data_file_path("clean/pprr_ponchatoula_pd_2010_2020.csv"), index=False)
+    clean_cprr().to_csv(data_file_path("clean/cprr_ponchatoula_pd_2010_2020.csv"), index=False)

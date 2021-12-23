@@ -168,6 +168,4 @@ def clean():
 
 if __name__ == "__main__":
     df = clean()
-    df.to_csv(
-        data_file_path("clean/pprr_new_orleans_ipm_iapro_1946_2018.csv"), index=False
-    )
+    df.to_csv(data_file_path("clean/pprr_new_orleans_ipm_iapro_1946_2018.csv"), index=False)

@@ -46,9 +46,7 @@ def match_cprr_post(cprr, post):
     dfa = dfa.drop_duplicates().set_index("uid")
     dfa.loc[:, "fc"] = dfa.first_name.fillna("").map(lambda x: x[:1])
 
-    dfb = post[
-        ["uid", "first_name", "last_name"],
-    ]
+    dfb = post[["uid", "first_name", "last_name"]]
     dfb = dfb.drop_duplicates().set_index("uid")
     dfb.loc[:, "fc"] = dfb.first_name.fillna("").map(lambda x: x[:1])
 
@@ -77,7 +75,7 @@ if __name__ == "__main__":
     post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
     cb = pd.read_csv(data_file_path("clean/cprr_codebook_shreveport_pd.csv"))
     cprr = match_cprr_codebook(cprr, cb).pipe(
-        gen_uid, ["agency", "tracking_number", "allegation"], "complaint_uid"
+        gen_uid, ["agency", "tracking_number", "allegation"], "allegation_uid"
     )
     cprr = match_cprr_post(cprr, post)
     ensure_data_dir("match")

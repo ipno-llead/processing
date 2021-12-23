@@ -185,7 +185,7 @@ def fuse_stop_and_search():
 
 def find_event_agency_if_missing_from_post(event_df, post_event_df):
     missing_event_agency = event_df[~event_df["agency"].isin(post_event_df["agency"])]
-    missing_event_agency = missing_event_agency[["agency"]].drop_duplicates()
+    missing_event_agency = missing_event_agency[["agency"]].drop_duplicates().dropna()
 
     if len(missing_event_agency["agency"]) > 0:
         raise ValueError(

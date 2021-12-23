@@ -58,7 +58,7 @@ def rename_agency(df):
         .str.replace(r"^Lsu\b", "LSU", regex=True)
         .str.replace(r"^Lsuhsc", "LSUHSC", regex=True)
         .str.replace(r"^La\b", "Louisiana", regex=True)
-        .str.replace("Orleans DA Office", "New Orleans DA", regex=False)
+        .str.replace(r"^Orleans DA Office$", "New Orleans DA", regex=True)
         .str.replace(r"DA Office$", "DA", regex=True)
         .str.replace(r"^W\.?\b", "West", regex=True)
         .str.replace(r"\-(\w+)", r"- \1", regex=True)

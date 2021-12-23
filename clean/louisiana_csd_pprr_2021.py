@@ -92,7 +92,7 @@ def clean_term():
             set_values,
             {
                 "data_production_year": 2021,
-                "agency": "Louisiana PD",
+                "agency": "Louisiana State PD",
             },
         )
         .pipe(gen_uid, ["agency", "first_name", "last_name"])

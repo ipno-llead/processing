@@ -8,11 +8,6 @@ from lib.personnel import fuse_personnel
 from lib.columns import rearrange_allegation_columns
 
 
-def prepare_post_data():
-    post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
-    return post[post.agency == "houma pd"]
-
-
 def fuse_events(post):
     builder = events.Builder()
     builder.extract_events(
@@ -41,7 +36,7 @@ def fuse_events(post):
 if __name__ == "__main__":
     cprr21 = pd.read_csv(data_file_path("match/cprr_houma_pd_2019_2021.csv"))
     cprr18 = pd.read_csv(data_file_path("match/cprr_houma_pd_2017_2018.csv"))
-    post = prepare_post_data()
+    post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
     personnel_df = fuse_personnel(cprr21, cprr18, post)
     allegation_df = rearrange_allegation_columns(pd.concat([cprr21, cprr18]))
     event_df = fuse_events(post)

@@ -28,7 +28,5 @@ if __name__ == "__main__":
     pprr = pd.read_csv(data_file_path("clean/pprr_gretna_pd_2018.csv"))
     post_event = pd.read_csv(data_file_path("match/post_event_gretna_pd_2020.csv"))
     events_df = rearrange_event_columns(pd.concat([post_event, fuse_events(pprr)]))
-    rearrange_personnel_columns(pprr).to_csv(
-        data_file_path("fuse/per_gretna_pd.csv"), index=False
-    )
+    rearrange_personnel_columns(pprr).to_csv(data_file_path("fuse/per_gretna_pd.csv"), index=False)
     events_df.to_csv(data_file_path("fuse/event_gretna_pd.csv"), index=False)

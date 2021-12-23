@@ -141,6 +141,4 @@ def clean20():
 if __name__ == "__main__":
     df20 = clean20()
     df19 = clean19()
-    pd.concat([df19, df20]).to_csv(
-        data_file_path("clean/cprr_levee_pd.csv"), index=False
-    )
+    pd.concat([df19, df20]).to_csv(data_file_path("clean/cprr_levee_pd.csv"), index=False)

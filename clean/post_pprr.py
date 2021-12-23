@@ -1,6 +1,11 @@
 from lib.columns import clean_column_names
 from lib.path import data_file_path, ensure_data_dir
-from lib.clean import clean_names, clean_dates, standardize_desc_cols
+from lib.clean import (
+    clean_names,
+    clean_dates,
+    names_to_title_case,
+    standardize_desc_cols,
+)
 from lib.uid import gen_uid
 import pandas as pd
 import sys
@@ -24,7 +29,7 @@ def standardize_agency(df):
         .str.replace(r"^Lsu\b", "LSU", regex=True)
         .str.replace(r"^Lsuhsc", "LSUHSC", regex=True)
         .str.replace(r"^La\b", "Louisiana", regex=True)
-        .str.replace("Orleans DA Office", "New Orleans DA", regex=False)
+        .str.replace(r"^Orleans DA Office$", "New Orleans DA", regex=True)
         .str.replace(r"DA Office$", "DA", regex=True)
         .str.replace(r"^W\.?\b", "West", regex=True)
         .str.replace(r"\-(\w+)", r"- \1", regex=True)
@@ -53,7 +58,7 @@ def standardize_agency(df):
         .str.replace(r"  +", " ", regex=True)
         .str.replace(r" $", "", regex=True)
         .str.replace("Plaquemines Par ", "Plaquemines ", regex=False)
-        .str.replace("District Attorney", "DA", regex=False)
+        .str.replace(r"\bDistrict Attorney\b", "DA", regex=False)
     )
     return df
 
@@ -80,7 +85,8 @@ def clean():
     df.loc[:, "data_production_year"] = "2020"
     df = df.dropna(0, "all", subset=["first_name"])
     df = (
-        df.pipe(standardize_agency)
+        df.pipe(names_to_title_case, ["agency"])
+        .pipe(standardize_agency)
         .pipe(standardize_desc_cols, ["employment_status"])
         .pipe(clean_dates, ["hire_date"])
         .pipe(replace_impossible_dates)

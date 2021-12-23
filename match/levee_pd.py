@@ -46,14 +46,14 @@ if __name__ == "__main__":
         [
             match_cprr_post(
                 cprr[cprr.agency == "East Jefferson Levee PD"],
-                post[post.agency == "East Jefferson Levee PD"],
+                post,
                 "east_jefferson",
                 2020,
                 0.89,
             ),
             match_cprr_post(
                 cprr[cprr.agency == "New Orleans Levee PD"],
-                post[post.agency == "New Orleans Levee pd"],
+                post,
                 "orleans",
                 2020,
                 0.9,

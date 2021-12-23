@@ -157,15 +157,11 @@ def fuse_events(pprr_ipm, pprr_csd, cprr, uof, award, lprr, sas):
 
 
 if __name__ == "__main__":
-    pprr_ipm = pd.read_csv(
-        data_file_path("clean/pprr_new_orleans_ipm_iapro_1946_2018.csv")
-    )
+    pprr_ipm = pd.read_csv(data_file_path("clean/pprr_new_orleans_ipm_iapro_1946_2018.csv"))
     pprr_csd = pd.read_csv(data_file_path("match/pprr_new_orleans_csd_2014.csv"))
     officer_number_dict = create_officer_number_dict(pprr_ipm)
     cprr = pd.read_csv(data_file_path("clean/cprr_new_orleans_pd_1931_2020.csv"))
-    actions = pd.read_csv(
-        data_file_path("clean/cprr_actions_new_orleans_pd_1931_2020.csv")
-    )
+    actions = pd.read_csv(data_file_path("clean/cprr_actions_new_orleans_pd_1931_2020.csv"))
     uof = pd.read_csv(data_file_path("clean/uof_new_orleans_pd_2012_2019.csv"))
     post_event = pd.read_csv(data_file_path("match/post_event_new_orleans_pd.csv"))
     award = pd.read_csv(data_file_path("match/award_new_orleans_pd_2016_2021.csv"))

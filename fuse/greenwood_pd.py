@@ -7,22 +7,7 @@ import sys
 sys.path.append("../")
 
 
-def prepare_post():
-    post_pprr = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
-    post_pprr = post_pprr.loc[(post_pprr.agency == "greenwood pd")]
-    post_pprr.loc[:, "data_production_year"] = "2020"
-    post_pprr.loc[:, "agency"] = "Greenwood PD"
-    return post_pprr
-
-
-def prepare_cprr():
-    cprr = pd.read_csv(data_file_path("match/cprr_greenwood_pd_2015_2020.csv"))
-    cprr.loc[:, "data_production_year"] = "2020"
-    cprr.loc[:, "agency"] = "Greenwood PD"
-    return cprr
-
-
-def fuse_events(cprr, post_pprr):
+def fuse_events(cprr, post):
     builder = events.Builder()
     builder.extract_events(
         cprr,
@@ -39,7 +24,7 @@ def fuse_events(cprr, post_pprr):
         ["uid", "allegation_uid"],
     )
     builder.extract_events(
-        post_pprr,
+        post,
         {
             events.OFFICER_LEVEL_1_CERT: {
                 "prefix": "level_1_cert",
@@ -59,8 +44,8 @@ def fuse_events(cprr, post_pprr):
 
 
 if __name__ == "__main__":
-    cprr = prepare_cprr()
-    post = prepare_post()
+    cprr = pd.read_csv(data_file_path('clean/cprr_greenwood_pd_2015_2020.csv'))
+    post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
     per = rearrange_personnel_columns(post)
     com = rearrange_allegation_columns(cprr)
     event = fuse_events(cprr, post)

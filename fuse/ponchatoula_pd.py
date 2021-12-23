@@ -62,16 +62,9 @@ if __name__ == "__main__":
     pprr = pd.read_csv(data_file_path("clean/pprr_ponchatoula_pd_2010_2020.csv"))
     cprr = pd.read_csv(data_file_path("match/cprr_ponchatoula_pd_2010_2020.csv"))
     post_event = pd.read_csv(data_file_path("match/post_event_ponchatoula_pd_2020.csv"))
-    cprr_post_events = pd.read_csv(
-        data_file_path("match/cprr_post_events_ponchatoula_pd_2020.csv")
-    )
+    cprr_post_events = pd.read_csv(data_file_path("match/cprr_post_events_ponchatoula_pd_2020.csv"))
     event_df = rearrange_event_columns(
-        pd.concat([fuse_events(pprr, cprr), post_event, cprr_post_events])
-    )
-    rearrange_personnel_columns(pprr).to_csv(
-        data_file_path("fuse/per_ponchatoula_pd.csv"), index=False
-    )
-    rearrange_allegation_columns(cprr).to_csv(
-        data_file_path("fuse/com_ponchatoula_pd.csv"), index=False
-    )
+        pd.concat([fuse_events(pprr, cprr), post_event, cprr_post_events]))
+    rearrange_personnel_columns(pprr).to_csv(data_file_path("fuse/per_ponchatoula_pd.csv"), index=False)
+    rearrange_allegation_columns(cprr).to_csv(data_file_path("fuse/com_ponchatoula_pd.csv"), index=False)
     event_df.to_csv(data_file_path("fuse/event_ponchatoula_pd.csv"), index=False)

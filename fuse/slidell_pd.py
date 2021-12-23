@@ -47,7 +47,5 @@ if __name__ == "__main__":
     pprr_csd = pd.read_csv(data_file_path("clean/pprr_slidell_csd_2010_2019.csv"))
     post_event = pd.read_csv(data_file_path("match/post_event_slidell_pd_2020.csv"))
     events_df = rearrange_event_columns(pd.concat([post_event, fuse_events(pprr_csd)]))
-    fuse_personnel(pprr_csd).to_csv(
-        data_file_path("fuse/per_slidell_pd.csv"), index=False
-    )
+    fuse_personnel(pprr_csd).to_csv(data_file_path("fuse/per_slidell_pd.csv"), index=False)
     events_df.to_csv(data_file_path("fuse/event_slidell_pd.csv"), index=False)

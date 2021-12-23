@@ -137,7 +137,7 @@ def clean_appeal_disposition(df):
 
 
 def assign_agency(df):
-    df.loc[:, "agency"] = "Louisiana PD"
+    df.loc[:, "agency"] = "Louisiana State PD"
     df.loc[:, "data_production_year"] = 2020
     return df
 
@@ -206,6 +206,4 @@ def clean():
 if __name__ == "__main__":
     df = clean()
     ensure_data_dir("clean")
-    df.to_csv(
-        data_file_path("clean/lprr_louisiana_state_csc_1991_2020.csv"), index=False
-    )
+    df.to_csv(data_file_path("clean/lprr_louisiana_state_csc_1991_2020.csv"), index=False)

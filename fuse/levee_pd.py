@@ -62,18 +62,8 @@ def fuse_events(cprr, post):
 if __name__ == "__main__":
     cprr = pd.read_csv(data_file_path("match/cprr_levee_pd.csv"))
     post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
-    post = post.loc[
-        (post.agency == "e. jefferson levee pd") | (post.agency == "orleans levee pd")
-    ]
     event_df = fuse_events(cprr, post)
-    agency_dict = {
-        "e. jefferson levee pd": "East Jefferson Levee PD",
-        "orleans levee pd": "Orleans Levee PD",
-    }
-    event_df.loc[:, "agency"] = event_df.agency.map(lambda x: agency_dict.get(x, x))
     event_df.to_csv(data_file_path("fuse/event_levee_pd.csv"), index=False)
     complaint_df = rearrange_allegation_columns(cprr)
     complaint_df.to_csv(data_file_path("fuse/com_levee_pd.csv"), index=False)
-    fuse_personnel(post, cprr).to_csv(
-        data_file_path("fuse/per_levee_pd.csv"), index=False
-    )
+    fuse_personnel(post, cprr).to_csv(data_file_path("fuse/per_levee_pd.csv"), index=False)
