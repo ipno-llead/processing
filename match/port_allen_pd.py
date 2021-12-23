@@ -9,8 +9,6 @@ sys.path.append("../")
 
 
 def match_csd_pprr_against_post_pprr(pprr, post):
-    post = post[post.agency == "port allen pd"].set_index("uid", drop=False)
-
     dfa = pprr[["uid", "first_name", "last_name"]]
     dfa.loc[:, "hire_date"] = combine_date_columns(
         pprr, "hire_year", "hire_month", "hire_day"

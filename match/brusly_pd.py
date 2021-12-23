@@ -9,11 +9,6 @@ from lib.post import extract_events_from_post
 sys.path.append("../")
 
 
-def prepare_post_data():
-    post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
-    return post[post.agency == "brusly pd"]
-
-
 def add_uid_to_complaint(cprr, pprr):
     dfa = cprr[["first_name", "last_name"]]
     dfb = pprr.set_index("uid", drop=True)[["first_name", "last_name"]]
@@ -114,7 +109,7 @@ if __name__ == "__main__":
     cprr = pd.read_csv(data_file_path("clean/cprr_brusly_pd_2020.csv"))
     pprr = pd.read_csv(data_file_path("clean/pprr_brusly_pd_2020.csv"))
     award = pd.read_csv(data_file_path("clean/award_brusly_pd_2021.csv"))
-    post = prepare_post_data()
+    post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
     cprr = add_uid_to_complaint(cprr, pprr)
     cprr = add_supervisor_uid_to_complaint(cprr, pprr)
     award = add_uid_to_award(award, pprr)
@@ -122,6 +117,4 @@ if __name__ == "__main__":
     ensure_data_dir("match")
     award.to_csv(data_file_path("match/award_brusly_pd_2021.csv"), index=False)
     cprr.to_csv(data_file_path("match/cprr_brusly_pd_2020.csv"), index=False)
-    post_events.to_csv(
-        data_file_path("match/post_event_brusly_pd_2020.csv"), index=False
-    )
+    post_events.to_csv(data_file_path("match/post_event_brusly_pd_2020.csv"), index=False)

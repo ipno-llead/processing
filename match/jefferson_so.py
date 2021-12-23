@@ -3,15 +3,10 @@ import sys
 from datamatch.indices import ColumnsIndex
 
 sys.path.append("../")
-from datamatch import ThresholdMatcher, NoopIndex, JaroWinklerSimilarity
+from datamatch import ThresholdMatcher, JaroWinklerSimilarity
 import pandas as pd
-from lib.path import data_file_path, ensure_data_dir
+from lib.path import data_file_path
 from lib.post import extract_events_from_post
-
-
-def prepare_post_data():
-    post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
-    return post[post.agency == "jefferson parish so"]
 
 
 def extract_post_events(pprr, post):
@@ -41,8 +36,6 @@ def extract_post_events(pprr, post):
 
 if __name__ == "__main__":
     pprr = pd.read_csv(data_file_path("clean/pprr_jefferson_so_2020.csv"))
-    post = prepare_post_data()
+    post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
     post_events = extract_post_events(pprr, post)
-    post_events.to_csv(
-        data_file_path("match/post_event_jefferson_so_2020.csv"), index=False
-    )
+    post_events.to_csv(data_file_path("match/post_event_jefferson_so_2020.csv"), index=False)

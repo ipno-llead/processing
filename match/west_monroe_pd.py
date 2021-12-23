@@ -9,11 +9,6 @@ from lib.post import extract_events_from_post
 sys.path.append("../")
 
 
-def prepare_post_data():
-    post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
-    return post[post.agency == "west monroe pd"]
-
-
 def match_pprr_and_post(pprr, post):
     dfa = pprr[["uid", "first_name", "last_name"]]
     dfa.loc[:, "fc"] = dfa.first_name.map(lambda x: x[:1])
@@ -45,8 +40,6 @@ def match_pprr_and_post(pprr, post):
 
 if __name__ == "__main__":
     pprr = pd.read_csv(data_file_path("clean/pprr_west_monroe_pd_2015_2020.csv"))
-    post = prepare_post_data()
+    post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
     post_event = match_pprr_and_post(pprr, post)
-    post_event.to_csv(
-        data_file_path("match/post_event_west_monroe_pd_2020_11_06.csv"), index=False
-    )
+    post_event.to_csv(data_file_path("match/post_event_west_monroe_pd_2020_11_06.csv"), index=False)

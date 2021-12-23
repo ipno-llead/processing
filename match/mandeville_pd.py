@@ -86,13 +86,10 @@ def match_pprr_against_post(pprr, post):
 
 if __name__ == "__main__":
     post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
-    post = post[post.agency == "mandeville pd"]
     cprr = pd.read_csv(data_file_path("clean/cprr_mandeville_pd_2019.csv"))
     pprr = pd.read_csv(data_file_path("clean/pprr_mandeville_csd_2020.csv"))
     post_event = match_pprr_against_post(pprr, post)
     cprr = match_cprr_with_pprr(cprr, pprr)
     ensure_data_dir("match")
-    post_event.to_csv(
-        data_file_path("match/post_event_mandeville_pd_2019.csv"), index=False
-    )
+    post_event.to_csv(data_file_path("match/post_event_mandeville_pd_2019.csv"), index=False)
     cprr.to_csv(data_file_path("match/cprr_mandeville_pd_2019.csv"), index=False)

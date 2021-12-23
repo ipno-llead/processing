@@ -16,8 +16,6 @@ sys.path.append("../")
 
 
 def extract_post_events(pprr, post):
-    post = post.loc[post.agency == "gretna pd"]
-
     dfa = pprr[["first_name", "last_name", "uid"]]
     dfa.loc[:, "hire_date"] = combine_date_columns(
         pprr, "hire_year", "hire_month", "hire_day"
@@ -57,6 +55,4 @@ if __name__ == "__main__":
     post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
     post_events = extract_post_events(pprr, post)
     ensure_data_dir("match")
-    post_events.to_csv(
-        data_file_path("match/post_event_gretna_pd_2020.csv"), index=False
-    )
+    post_events.to_csv(data_file_path("match/post_event_gretna_pd_2020.csv"), index=False)

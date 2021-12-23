@@ -17,11 +17,6 @@ from lib.date import combine_date_columns
 sys.path.append("../")
 
 
-def prepare_post_data():
-    post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
-    return post[post.agency == "la state police"]
-
-
 def match_lprr_and_pprr(lprr, pprr):
     dfa = (
         lprr[["uid", "first_name", "last_name"]]
@@ -159,18 +154,12 @@ def match_pprr_demo_and_term(demo, term):
 
 if __name__ == "__main__":
     lprr = pd.read_csv(data_file_path("clean/lprr_louisiana_state_csc_1991_2020.csv"))
-    post = prepare_post_data()
+    post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
     pprr_demo = pd.read_csv(data_file_path("clean/pprr_demo_louisiana_csd_2021.csv"))
     pprr_term = pd.read_csv(data_file_path("clean/pprr_term_louisiana_csd_2021.csv"))
     pprr_term = match_pprr_demo_and_term(pprr_demo, pprr_term)
     lprr = match_lprr_and_pprr(lprr, pprr_demo)
     post_events = extract_post_events(pprr_demo, post)
-    lprr.to_csv(
-        data_file_path("match/lprr_louisiana_state_csc_1991_2020.csv"), index=False
-    )
-    post_events.to_csv(
-        data_file_path("match/post_event_louisiana_state_police_2020.csv"), index=False
-    )
-    pprr_term.to_csv(
-        data_file_path("match/pprr_term_louisiana_csd_2021.csv"), index=False
-    )
+    lprr.to_csv(data_file_path("match/lprr_louisiana_state_csc_1991_2020.csv"), index=False)
+    post_events.to_csv(data_file_path("match/post_event_louisiana_state_police_2020.csv"), index=False)
+    pprr_term.to_csv(data_file_path("match/pprr_term_louisiana_csd_2021.csv"), index=False)

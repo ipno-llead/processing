@@ -7,11 +7,6 @@ import sys
 sys.path.append("../")
 
 
-def prepare_post_data():
-    post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
-    return post[post.agency == "plaquemines par so"]
-
-
 def match_cprr_19_and_pprr(cprr, pprr):
     dfa = (
         cprr[["uid", "first_name", "last_name"]]
@@ -111,14 +106,10 @@ if __name__ == "__main__":
     cprr19 = pd.read_csv(data_file_path("clean/cprr_plaquemines_so_2019.csv"))
     cprr20 = pd.read_csv(data_file_path("clean/cprr_plaquemines_so_2016_2020.csv"))
     pprr = pd.read_csv(data_file_path("clean/pprr_plaquemines_so_2018.csv"))
-    post = prepare_post_data()
+    post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
     cprr19 = match_cprr_19_and_pprr(cprr19, pprr)
     cprr20 = match_cprr_2016_2020_and_pprr(cprr20, pprr)
     post_event = match_pprr_and_post(pprr, post)
     cprr19.to_csv(data_file_path("match/cprr_plaquemines_so_2019.csv"), index=False)
-    cprr20.to_csv(
-        data_file_path("match/cprr_plaquemines_so_2016_2020.csv"), index=False
-    )
-    post_event.to_csv(
-        data_file_path("match/event_plaquemines_so_2018.csv"), index=False
-    )
+    cprr20.to_csv(data_file_path("match/cprr_plaquemines_so_2016_2020.csv"), index=False)
+    post_event.to_csv(data_file_path("match/event_plaquemines_so_2018.csv"), index=False)

@@ -8,11 +8,6 @@ from lib.path import data_file_path
 from datamatch import JaroWinklerSimilarity, ThresholdMatcher, ColumnsIndex
 
 
-def prepare_post():
-    post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
-    return post[post.agency == "baker pd"]
-
-
 def match_cprr_and_post(cprr, post):
     dfa = cprr[["uid", "first_name", "last_name"]]
     dfa = dfa.drop_duplicates(subset=["uid"]).set_index("uid")
@@ -44,6 +39,6 @@ def match_cprr_and_post(cprr, post):
 
 if __name__ == "__main__":
     cprr = pd.read_csv(data_file_path("clean/cprr_baker_pd_2018_2020.csv"))
-    post = prepare_post()
+    post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
     cprr = match_cprr_08_with_post(cprr, post)
-    cprr.to_csv(data_file_path("match/cprr_baker_pd_2018_2020.csv"))
+    cprr.to_csv(data_file_path("match/cprr_baker_pd_2018_2020.csv"), index=False)

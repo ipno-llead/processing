@@ -14,8 +14,6 @@ from lib.post import extract_events_from_post
 
 
 def extract_post_events(pprr, post):
-    post = post.loc[post.agency == "gonzales pd"]
-
     dfa = pprr[["first_name", "last_name", "uid"]]
     dfa.loc[:, "hire_date"] = combine_date_columns(
         pprr, "hire_year", "hire_month", "hire_day"
@@ -54,6 +52,4 @@ if __name__ == "__main__":
     pprr = pd.read_csv(data_file_path("clean/pprr_gonzales_pd_2010_2021.csv"))
     post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
     post_events = extract_post_events(pprr, post)
-    post_events.to_csv(
-        data_file_path("match/post_event_gonzales_pd_2010_2021.csv"), index=False
-    )
+    post_events.to_csv(data_file_path("match/post_event_gonzales_pd_2010_2021.csv"), index=False)

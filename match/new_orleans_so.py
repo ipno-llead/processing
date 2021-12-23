@@ -310,7 +310,6 @@ if __name__ == "__main__":
     cprr19 = pd.read_csv(data_file_path("clean/cprr_new_orleans_so_2019.csv"))
     cprr20 = pd.read_csv(data_file_path("clean/cprr_new_orleans_so_2020.csv"))
     post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
-    post = post[post.agency == "orleans parish so"]
     pprr = pd.read_csv(data_file_path("clean/pprr_new_orleans_so_2021.csv"))
     ensure_data_dir("match")
     cprr19 = deduplicate_cprr_19_personnel(cprr19)
@@ -322,6 +321,4 @@ if __name__ == "__main__":
     post_events = match_pprr_against_post(pprr, post)
     cprr19.to_csv(data_file_path("match/cprr_new_orleans_so_2019.csv"), index=False)
     cprr20.to_csv(data_file_path("match/cprr_new_orleans_so_2020.csv"), index=False)
-    post_events.to_csv(
-        data_file_path("match/post_event_new_orleans_so.csv"), index=False
-    )
+    post_events.to_csv(data_file_path("match/post_event_new_orleans_so.csv"), index=False)

@@ -46,8 +46,7 @@ def match_cprr_post(cprr, post):
     dfa = dfa.drop_duplicates().set_index("uid")
     dfa.loc[:, "fc"] = dfa.first_name.fillna("").map(lambda x: x[:1])
 
-    dfb = post.loc[
-        post.agency == "shreveport pd",
+    dfb = post[
         ["uid", "first_name", "last_name"],
     ]
     dfb = dfb.drop_duplicates().set_index("uid")

@@ -4,7 +4,7 @@ import sys
 import pandas as pd
 from datamatch import ThresholdMatcher, JaroWinklerSimilarity, ColumnsIndex, NoopIndex
 
-from lib.path import data_file_path, ensure_data_dir
+from lib.path import data_file_path
 from lib.post import extract_events_from_post
 
 sys.path.append("../")
@@ -466,8 +466,6 @@ def match_cprr_14_investigators_with_pprr(cprr, pprr):
 
 
 def extract_post_events(pprr, post):
-    post = post.loc[post.agency == "lafayette pd"]
-
     dfa = pprr[["first_name", "last_name", "uid"]]
     dfa.loc[:, "fc"] = dfa.first_name.fillna("").map(lambda x: x[:1])
     dfa = dfa.drop_duplicates().set_index("uid", drop=True)
@@ -500,7 +498,6 @@ if __name__ == "__main__":
     cprr_14 = pd.read_csv(data_file_path("clean/cprr_lafayette_pd_2009_2014.csv"))
     pprr = pd.read_csv(data_file_path("clean/pprr_lafayette_pd_2010_2021.csv"))
     post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
-    ensure_data_dir("match")
     cprr_20 = (
         dedup_cprr_uid_20(cprr_20)
         .pipe(dedup_cprr_investigator_uid_20)
@@ -518,6 +515,4 @@ if __name__ == "__main__":
     post_events = extract_post_events(pprr, post)
     cprr_20.to_csv(data_file_path("match/cprr_lafayette_pd_2015_2020.csv"), index=False)
     cprr_14.to_csv(data_file_path("match/cprr_lafayette_pd_2009_2014.csv"), index=False)
-    post_events.to_csv(
-        data_file_path("match/post_event_lafayette_pd_2020.csv"), index=False
-    )
+    post_events.to_csv(data_file_path("match/post_event_lafayette_pd_2020.csv"), index=False)

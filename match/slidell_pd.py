@@ -3,15 +3,13 @@ import sys
 import pandas as pd
 from datamatch import ThresholdMatcher, JaroWinklerSimilarity, ColumnsIndex
 
-from lib.path import data_file_path, ensure_data_dir
+from lib.path import data_file_path
 from lib.post import extract_events_from_post
 
 sys.path.append("../")
 
 
 def extract_post_events(pprr, post):
-    post = post.loc[post.agency == "slidell pd"]
-
     dfa = pprr[["first_name", "last_name", "uid"]]
     dfa.loc[:, "fc"] = dfa.first_name.fillna("").map(lambda x: x[:1])
     dfa = dfa.drop_duplicates().set_index("uid", drop=True)
@@ -43,7 +41,4 @@ if __name__ == "__main__":
     pprr_csd = pd.read_csv(data_file_path("clean/pprr_slidell_csd_2010_2019.csv"))
     post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
     post_events = extract_post_events(pprr_csd, post)
-    ensure_data_dir("match")
-    post_events.to_csv(
-        data_file_path("match/post_event_slidell_pd_2020.csv"), index=False
-    )
+    post_events.to_csv(data_file_path("match/post_event_slidell_pd_2020.csv"), index=False)

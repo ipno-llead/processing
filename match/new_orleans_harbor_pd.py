@@ -10,11 +10,6 @@ from lib.post import extract_events_from_post
 sys.path.append("../")
 
 
-def prepare_post_data():
-    post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
-    return post[post.agency == "new orleans harbor pd"]
-
-
 def match_uid_with_cprr(cprr, pprr):
     """
     match cprr and pprr records to add "uid" column to cprr
@@ -84,13 +79,9 @@ def match_pprr_and_post(pprr, post):
 if __name__ == "__main__":
     cprr = pd.read_csv(data_file_path("clean/cprr_new_orleans_harbor_pd_2020.csv"))
     pprr20 = pd.read_csv(data_file_path("clean/pprr_new_orleans_harbor_pd_2020.csv"))
-    post = prepare_post_data()
+    post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
     cprr = match_uid_with_cprr(cprr, pprr20)
     post_event = match_pprr_and_post(pprr20, post)
     ensure_data_dir("match")
-    cprr.to_csv(
-        data_file_path("match/cprr_new_orleans_harbor_pd_2020.csv"), index=False
-    )
-    post_event.to_csv(
-        data_file_path("match/post_event_new_orleans_harbor_pd_2020.csv"), index=False
-    )
+    cprr.to_csv(data_file_path("match/cprr_new_orleans_harbor_pd_2020.csv"), index=False)
+    post_event.to_csv(data_file_path("match/post_event_new_orleans_harbor_pd_2020.csv"), index=False)

@@ -9,11 +9,6 @@ from lib.post import extract_events_from_post
 sys.path.append("../")
 
 
-def prepare_post_data():
-    post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
-    return post[post.agency == "madisonville pd"]
-
-
 def match_cprr_and_pprr(cprr, pprr):
     dfa = cprr[["last_name", "first_name"]]
     dfb = pprr[["last_name", "first_name", "uid"]].drop_duplicates()
@@ -67,11 +62,9 @@ def match_pprr_and_post(pprr, post):
 if __name__ == "__main__":
     cprr = pd.read_csv(data_file_path("clean/cprr_madisonville_pd_2010_2020.csv"))
     pprr = pd.read_csv(data_file_path("clean/pprr_madisonville_csd_2019.csv"))
-    post = prepare_post_data()
+    post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
     cprr = match_cprr_and_pprr(cprr, pprr)
     post_event = match_pprr_and_post(pprr, post)
     ensure_data_dir("match")
     cprr.to_csv(data_file_path("match/cprr_madisonville_pd_2010_2020.csv"), index=False)
-    post_event.to_csv(
-        data_file_path("match/post_event_madisonville_csd_2019.csv"), index=False
-    )
+    post_event.to_csv(data_file_path("match/post_event_madisonville_csd_2019.csv"), index=False)

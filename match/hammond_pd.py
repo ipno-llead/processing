@@ -6,11 +6,6 @@ from lib.path import data_file_path, ensure_data_dir
 from datamatch import JaroWinklerSimilarity, ThresholdMatcher, ColumnsIndex
 
 
-def prepare_post_data():
-    post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
-    return post[post.agency == "hammond pd"]
-
-
 def deduplicate_cprr_14_officers(cprr):
     df = cprr[["uid", "first_name", "last_name"]]
     df = df.drop_duplicates(subset=["uid"]).set_index("uid")
@@ -183,7 +178,7 @@ if __name__ == "__main__":
     cprr_20 = pd.read_csv(data_file_path("clean/cprr_hammond_pd_2015_2020.csv"))
     cprr_14 = pd.read_csv(data_file_path("clean/cprr_hammond_pd_2009_2014.csv"))
     cprr_08 = pd.read_csv(data_file_path("clean/cprr_hammond_pd_2004_2008.csv"))
-    post = prepare_post_data()
+    post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
     cprr_14 = deduplicate_cprr_14_officers(cprr_14)
     cprr_20 = deduplicate_cprr_20_officers(cprr_20)
     cprr_20 = match_cprr_20_and_post(cprr_20, post)
