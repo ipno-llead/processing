@@ -45,6 +45,9 @@ $(BUILD_DIR) $(DATA_DIR): ; @-mkdir $@ 2>/dev/null
 $(MD5_DIR): | $(BUILD_DIR) ; @-mkdir $@ 2>/dev/null
 $(DATA_CLEAN_DIR) $(DATA_MATCH_DIR) $(DATA_FUSE_DIR): | $(DATA_DIR) ; @-mkdir $@ 2>/dev/null
 
+schema.md: $(MD5_DIR)/data/datavalid.yml.md5
+	python -m datavalid --dir $(DATA_DIR) --doc $@
+
 include raw_datasets.mk
 include $(DATA_DEP_FILES)
 include wrgl.mk
