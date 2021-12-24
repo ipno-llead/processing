@@ -79,7 +79,9 @@ def match_pprr_and_post(pprr, post):
 if __name__ == "__main__":
     cprr = pd.read_csv(data_file_path("clean/cprr_new_orleans_harbor_pd_2020.csv"))
     pprr20 = pd.read_csv(data_file_path("clean/pprr_new_orleans_harbor_pd_2020.csv"))
+    agency = pprr20.agency[0]
     post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
+    post = post.loc[post.agency == agency]
     cprr = match_uid_with_cprr(cprr, pprr20)
     post_event = match_pprr_and_post(pprr20, post)
     ensure_data_dir("match")

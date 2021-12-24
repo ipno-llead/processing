@@ -113,7 +113,9 @@ def extract_cprr_post_events(pprr, cprr_post):
 
 if __name__ == "__main__":
     pprr = pd.read_csv(data_file_path("clean/pprr_kenner_pd_2020.csv"))
+    agency = pprr.agency[0]
     post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
+    post = post.loc[post.agency == agency]
     uof = pd.read_csv(data_file_path("clean/uof_kenner_pd_2005_2021.csv"))
     cprr_post = pd.read_csv(data_file_path("match/cprr_post_2016_2019.csv"))
     post_events = extract_post_events(pprr, post)

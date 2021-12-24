@@ -309,7 +309,9 @@ def match_pprr_against_post(pprr, post):
 if __name__ == "__main__":
     cprr19 = pd.read_csv(data_file_path("clean/cprr_new_orleans_so_2019.csv"))
     cprr20 = pd.read_csv(data_file_path("clean/cprr_new_orleans_so_2020.csv"))
+    agency = cprr20.agency[0]
     post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
+    post = post.loc[post.agency == agency]
     pprr = pd.read_csv(data_file_path("clean/pprr_new_orleans_so_2021.csv"))
     ensure_data_dir("match")
     cprr19 = deduplicate_cprr_19_personnel(cprr19)

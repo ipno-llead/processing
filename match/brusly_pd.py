@@ -109,7 +109,9 @@ if __name__ == "__main__":
     cprr = pd.read_csv(data_file_path("clean/cprr_brusly_pd_2020.csv"))
     pprr = pd.read_csv(data_file_path("clean/pprr_brusly_pd_2020.csv"))
     award = pd.read_csv(data_file_path("clean/award_brusly_pd_2021.csv"))
+    agency = cprr.agency[0]
     post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
+    post = post.loc[post.agency == agency]
     cprr = add_uid_to_complaint(cprr, pprr)
     cprr = add_supervisor_uid_to_complaint(cprr, pprr)
     award = add_uid_to_award(award, pprr)

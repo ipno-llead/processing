@@ -96,7 +96,9 @@ if __name__ == "__main__":
     cprr20 = pd.read_csv(data_file_path("clean/cprr_lafayette_so_2015_2020.csv"))
     cprr14 = pd.read_csv(data_file_path("clean/cprr_lafayette_so_2009_2014.csv"))
     cprr08 = pd.read_csv(data_file_path("clean/cprr_lafayette_so_2006_2008.csv"))
+    agency = cprr08.agency[0]
     post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
+    post = post.loc[post.agency == agency]
     cprr20 = match_cprr_20_and_post(cprr20, post)
     cprr14 = match_cprr_14_and_post(cprr14, post)
     cprr18 = match_cprr_08_with_post(cprr08, post)

@@ -73,8 +73,10 @@ def match_against_new_orleans_pd_personnel(cprr, pprr):
 if __name__ == "__main__":
     pprr = pd.read_csv(data_file_path("clean/pprr_new_orleans_pd_1946_2018.csv"))
     cprr = pd.read_csv(data_file_path("clean/cprr_new_orleans_da_2021.csv"))
-    cprr = match_against_new_orleans_pd_personnel(cprr, pprr)
+    agency = cprr.agency[0]
     post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
+    post = post.loc[post.agency == agency]
+    cprr = match_against_new_orleans_pd_personnel(cprr, pprr)
     cprr = match_cprr_and_post(cprr, post)
     ensure_data_dir("match")
     cprr.to_csv(data_file_path("match/cprr_new_orleans_da_2021.csv"), index=False)

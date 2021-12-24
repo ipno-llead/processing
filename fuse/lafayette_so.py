@@ -71,7 +71,9 @@ if __name__ == "__main__":
     cprr20 = pd.read_csv(data_file_path("clean/cprr_lafayette_so_2015_2020.csv"))
     cprr14 = pd.read_csv(data_file_path("clean/cprr_lafayette_so_2009_2014.csv"))
     cprr08 = pd.read_csv(data_file_path("clean/cprr_lafayette_so_2006_2008.csv"))
+    agency = cprr08.agency[0]
     post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
+    post = post.loc[post.agency == agency]
     complaints = rearrange_allegation_columns(pd.concat([cprr20, cprr14, cprr08]))
     event = fuse_events(cprr20, cprr14, cprr08, post)
     personnel_df = fuse_personnel(cprr20, cprr14, cprr08, post)

@@ -94,7 +94,9 @@ if __name__ == "__main__":
         "2019",
         0.9,
     )
+    agency = pprr17.agency[0]
     post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
+    post = post.loc[post.agency == agency]
     post_event = match_pprr_and_post(pprr, post)
     pprr.to_csv(data_file_path("match/pprr_youngsville_pd_2017_2019.csv"), index=False)
     post_event.to_csv(data_file_path("match/post_event_youngsville_pd_2020.csv"), index=False)

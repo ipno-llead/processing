@@ -67,7 +67,9 @@ def match_cprr_20_against_post(cprr, post):
 if __name__ == "__main__":
     cprr18 = pd.read_csv(data_file_path("clean/cprr_baton_rouge_so_2018.csv"))
     cprr20 = pd.read_csv(data_file_path("clean/cprr_baton_rouge_so_2016_2020.csv"))
+    agency = cprr20.agency[0]
     post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
+    post = post.loc[post.agency == agency]
     cprr18 = match_cprr_18_against_post(cprr18, post)
     cprr20 = match_cprr_20_against_post(cprr20, post)
     ensure_data_dir("match")

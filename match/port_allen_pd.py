@@ -67,10 +67,12 @@ def match_cprr_against_csd_pprr_2020(cprr, pprr, year, decision):
 
 if __name__ == "__main__":
     pprr = pd.read_csv(data_file_path("clean/pprr_port_allen_csd_2020.csv"))
-    post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
     cprr19 = pd.read_csv(data_file_path("clean/cprr_port_allen_pd_2019.csv"))
     cprr18 = pd.read_csv(data_file_path("clean/cprr_port_allen_pd_2017_2018.csv"))
     cprr16 = pd.read_csv(data_file_path("clean/cprr_port_allen_pd_2015_2016.csv"))
+    agency = cprr16.agency[0]
+    post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
+    post = post.loc[post.agency == agency]
     post_event = match_csd_pprr_against_post_pprr(pprr, post)
     cprr19 = match_cprr_against_csd_pprr_2020(cprr19, pprr, 2019, 0.96)
     cprr18 = match_cprr_against_csd_pprr_2020(cprr18, pprr, 2018, 1)

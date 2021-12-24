@@ -83,7 +83,9 @@ def assign_uid_from_post_19(cprr, post):
 if __name__ == "__main__":
     cprr_20 = pd.read_csv(data_file_path("clean/cprr_lake_charles_pd_2020.csv"))
     cprr_19 = pd.read_csv(data_file_path("clean/cprr_lake_charles_pd_2014_2019.csv"))
+    agency = cprr_19.agency[0]
     post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
+    post = post.loc[post.agency == agency]
     cprr_20 = assign_uid_from_post_20(cprr_20, post)
     cprr_19 = assign_uid_from_post_19(cprr_19, post)
     cprr_20.to_csv(data_file_path("match/cprr_lake_charles_pd_2020.csv"), index=False)

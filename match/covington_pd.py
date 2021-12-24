@@ -39,7 +39,9 @@ def extract_post_events(roster, post):
 if __name__ == "__main__":
     ah = pd.read_csv(data_file_path("clean/actions_history_covington_pd_2021.csv"))
     pprr = pd.read_csv(data_file_path("clean/pprr_covington_pd_2020.csv"))
+    agency = pprr.agency[0]
     post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
+    post = post.loc[post.agency == agency]
     post_events = extract_post_events(
         pd.concat(
             [

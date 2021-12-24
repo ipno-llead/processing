@@ -52,6 +52,8 @@ def extract_post_events(pprr, post):
 
 if __name__ == "__main__":
     pprr = pd.read_csv(data_file_path("clean/pprr_vivian_pd_2021.csv"))
+    agency = pprr.agency[0]
     post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
+    post = post.loc[post.agency == agency]
     post_events = extract_post_events(pprr, post)
     post_events.to_csv(data_file_path("match/post_event_vivian_pd_2020.csv"), index=False)

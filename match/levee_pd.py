@@ -39,8 +39,10 @@ def match_cprr_post(cprr, post, agency, year, decision):
 
 
 if __name__ == "__main__":
-    post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
     cprr = pd.read_csv(data_file_path("clean/cprr_levee_pd.csv"))
+    agency = cprr.agency[0]
+    post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
+    post = post.loc[post.agency == agency]
     ensure_data_dir("match")
     pd.concat(
         [

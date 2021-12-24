@@ -40,6 +40,8 @@ def match_pprr_and_post(pprr, post):
 
 if __name__ == "__main__":
     pprr = pd.read_csv(data_file_path("clean/pprr_west_monroe_pd_2015_2020.csv"))
+    agency = pprr.agency[0]
     post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
+    post = post.loc[post.agency == agency]
     post_event = match_pprr_and_post(pprr, post)
     post_event.to_csv(data_file_path("match/post_event_west_monroe_pd_2020_11_06.csv"), index=False)
