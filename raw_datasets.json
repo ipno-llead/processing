@@ -203,7 +203,8 @@
     "https://www.dropbox.com/s/1r90j1ebbzdzhfq/carencro_pd_pprr_2021.csv?dl=1"
   ],
   "new_orleans_csc": [
-    "https://www.dropbox.com/s/p4n5ykrdsg097ur/new_orleans_csc_lprr_2000_2016.csv?dl=1"
+    "https://www.dropbox.com/s/p4n5ykrdsg097ur/new_orleans_csc_lprr_2000_2016.csv?dl=1",
+    "https://www.dropbox.com/s/g7pvxfbd11d2b1d/ayyub.jsonl?dl=1"
   ],
   "ouachita_da": [
     "https://www.dropbox.com/s/as7meor55frymtg/ouachita_da_cprr_2021_by_hand.csv?dl=1"
@@ -255,5 +256,11 @@
   ],
   "terrebonne_so": [
     "https://www.dropbox.com/s/7bewi8vdhl8tzu9/terrebonne_so_cprr_2019_2021_byhand.csv?dl=1"
+  ],
+  "drop_box": [
+    "https://www.dropbox.com/s/rhtao3b4liti8sw/token.csv?dl=1"
+  ],
+  "wrgl": [
+    "https://www.dropbox.com/s/8hkh5uf9r2m6mvo/personnels.csv?dl=1"
   ]
 }
