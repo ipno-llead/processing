@@ -1,11 +1,9 @@
 import sys
-
-from match.lafayette_so import match_cprr_08_with_post
-
 sys.path.append("../")
 import pandas as pd
 from lib.path import data_file_path
 from datamatch import JaroWinklerSimilarity, ThresholdMatcher, ColumnsIndex
+from lib.post import load_for_agency
 
 
 def match_cprr_and_post(cprr, post):
@@ -40,7 +38,6 @@ def match_cprr_and_post(cprr, post):
 if __name__ == "__main__":
     cprr = pd.read_csv(data_file_path("clean/cprr_baker_pd_2018_2020.csv"))
     agency = cprr.agency[0]
-    post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
-    post = post.loc[post.agency == agency]
-    cprr = match_cprr_08_with_post(cprr, post)
+    post = load_for_agency(agency)
+    cprr = match_cprr_and_post(cprr, post)
     cprr.to_csv(data_file_path("match/cprr_baker_pd_2018_2020.csv"), index=False)

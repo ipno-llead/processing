@@ -4,6 +4,7 @@ sys.path.append("../")
 from lib.path import data_file_path
 from lib.columns import rearrange_allegation_columns
 from lib.personnel import fuse_personnel
+from lib.post import load_for_agency
 import pandas as pd
 from lib import events
 
@@ -33,8 +34,7 @@ def fuse_events(post):
 if __name__ == "__main__":
     cprr = pd.read_csv(data_file_path("match/cprr_baker_pd_2018_2020.csv"))
     agency = cprr.agency[0]
-    post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
-    post = post.loc[post.agency == agency]
+    post = load_for_agency(agency)
     per = fuse_personnel(cprr, post)
     complaints = rearrange_allegation_columns(cprr)
     event = fuse_events(post)

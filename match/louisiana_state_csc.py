@@ -11,7 +11,7 @@ from datamatch import (
 import pandas as pd
 
 from lib.path import data_file_path
-from lib.post import extract_events_from_post
+from lib.post import extract_events_from_post, load_for_agency
 from lib.date import combine_date_columns
 
 sys.path.append("../")
@@ -157,8 +157,7 @@ if __name__ == "__main__":
     pprr_demo = pd.read_csv(data_file_path("clean/pprr_demo_louisiana_csd_2021.csv"))
     pprr_term = pd.read_csv(data_file_path("clean/pprr_term_louisiana_csd_2021.csv"))
     agency = pprr_term.agency[0]
-    post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
-    post = post.loc[post.agency == agency]
+    post = load_for_agency(agency)
     pprr_term = match_pprr_demo_and_term(pprr_demo, pprr_term)
     lprr = match_lprr_and_pprr(lprr, pprr_demo)
     post_events = extract_post_events(pprr_demo, post)

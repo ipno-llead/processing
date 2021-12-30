@@ -4,6 +4,7 @@ sys.path.append("../")
 import pandas as pd
 from datamatch import JaroWinklerSimilarity, ThresholdMatcher, ColumnsIndex
 from lib.path import data_file_path
+from lib.post import load_for_agency
 
 
 def assign_uid_from_post(cprr, post):
@@ -47,7 +48,6 @@ def assign_uid_from_post(cprr, post):
 if __name__ == "__main__":
     cprr = pd.read_csv(data_file_path("clean/cprr_washington_so_2015_2020.csv"))
     agency = cprr.agency[0]
-    post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
-    post = post.loc[post.agency == agency]
+    post = load_for_agency(agency)
     cprr = assign_uid_from_post(cprr, post)
     cprr.to_csv(data_file_path("match/cprr_washington_so_2015_2020.csv"), index=False)

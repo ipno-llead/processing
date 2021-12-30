@@ -1,6 +1,6 @@
 from datamatch import ThresholdMatcher, JaroWinklerSimilarity, ColumnsIndex
 from lib.path import data_file_path
-from lib.post import extract_events_from_post
+from lib.post import extract_events_from_post, load_for_agency
 import pandas as pd
 import sys
 
@@ -107,8 +107,7 @@ if __name__ == "__main__":
     cprr20 = pd.read_csv(data_file_path("clean/cprr_plaquemines_so_2016_2020.csv"))
     pprr = pd.read_csv(data_file_path("clean/pprr_plaquemines_so_2018.csv"))
     agency = pprr.agency[0]
-    post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
-    post = post.loc[post.agency == agency]
+    post = load_for_agency(agency)
     cprr19 = match_cprr_19_and_pprr(cprr19, pprr)
     cprr20 = match_cprr_2016_2020_and_pprr(cprr20, pprr)
     post_event = match_pprr_and_post(pprr, post)

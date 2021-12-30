@@ -10,7 +10,7 @@ from datamatch import (
 
 from lib.path import data_file_path, ensure_data_dir
 from lib.date import combine_date_columns
-from lib.post import extract_events_from_post
+from lib.post import extract_events_from_post, load_for_agency
 
 sys.path.append("../")
 
@@ -53,8 +53,7 @@ def extract_post_events(pprr, post):
 if __name__ == "__main__":
     pprr = pd.read_csv(data_file_path("clean/pprr_gretna_pd_2018.csv"))
     agency = pprr.agency[0]
-    post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
-    post = post.loc[post.agency == agency]
+    post = load_for_agency(agency)
     post_events = extract_post_events(pprr, post)
     ensure_data_dir("match")
     post_events.to_csv(data_file_path("match/post_event_gretna_pd_2020.csv"), index=False)

@@ -1,5 +1,6 @@
 from datamatch import ThresholdMatcher, JaroWinklerSimilarity, ColumnsIndex
-from lib.path import data_file_path, ensure_data_dir
+from lib.path import data_file_path
+from lib.post import load_for_agency
 import pandas as pd
 import sys
 
@@ -47,7 +48,6 @@ def match_cprr_and_post(cprr, post):
 if __name__ == "__main__":
     cprr = pd.read_csv(data_file_path("clean/cprr_greenwood_pd_2015_2020.csv"))
     agency = cprr.agency[0]
-    post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
-    post = post.loc[post.agency == agency]
+    post = load_for_agency(agency)
     cprr = match_cprr_and_post(cprr, post)
     cprr.to_csv(data_file_path("match/cprr_greenwood_pd_2015_2020.csv"), index=False)

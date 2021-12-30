@@ -9,7 +9,7 @@ from datamatch import (
 import pandas as pd
 
 from lib.path import data_file_path, ensure_data_dir
-from lib.post import extract_events_from_post
+from lib.post import extract_events_from_post, load_for_agency
 
 sys.path.append("../")
 
@@ -215,8 +215,7 @@ if __name__ == "__main__":
     cprr18 = match_pd_cprr_2018_v_pprr(cprr18, pprr)
     cprr21 = match_pd_cprr_2021_v_pprr(cprr21, pprr)
     agency = cprr21.agency[0]
-    post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
-    post = post.loc[post.agency == agency]
+    post = load_for_agency(agency)
     post_event = match_pprr_against_post(pprr, post)
     assert post_event[post_event.duplicated(subset=["event_uid"])].shape[0] == 0
     ensure_data_dir("match")

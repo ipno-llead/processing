@@ -7,6 +7,7 @@ from lib.columns import (
 )
 from lib import events
 from lib.personnel import fuse_personnel
+from lib.post import load_for_agency
 import pandas as pd
 
 
@@ -72,8 +73,7 @@ if __name__ == "__main__":
     cprr14 = pd.read_csv(data_file_path("clean/cprr_lafayette_so_2009_2014.csv"))
     cprr08 = pd.read_csv(data_file_path("clean/cprr_lafayette_so_2006_2008.csv"))
     agency = cprr08.agency[0]
-    post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
-    post = post.loc[post.agency == agency]
+    post = load_for_agency(agency)
     complaints = rearrange_allegation_columns(pd.concat([cprr20, cprr14, cprr08]))
     event = fuse_events(cprr20, cprr14, cprr08, post)
     personnel_df = fuse_personnel(cprr20, cprr14, cprr08, post)

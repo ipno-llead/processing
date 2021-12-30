@@ -4,7 +4,7 @@ from datamatch import ThresholdMatcher, NoopIndex, JaroWinklerSimilarity, Column
 import pandas as pd
 
 from lib.path import data_file_path, ensure_data_dir
-from lib.post import extract_events_from_post
+from lib.post import extract_events_from_post, load_for_agency
 
 sys.path.append("../")
 
@@ -63,8 +63,7 @@ if __name__ == "__main__":
     cprr = pd.read_csv(data_file_path("clean/cprr_madisonville_pd_2010_2020.csv"))
     pprr = pd.read_csv(data_file_path("clean/pprr_madisonville_csd_2019.csv"))
     agency = cprr.agency[0]
-    post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
-    post = post.loc[post.agency == agency]
+    post = load_for_agency(agency)
     cprr = match_cprr_and_pprr(cprr, pprr)
     post_event = match_pprr_and_post(pprr, post)
     ensure_data_dir("match")

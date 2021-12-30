@@ -10,6 +10,7 @@ from datamatch import (
 
 from lib.path import data_file_path, ensure_data_dir
 from lib.uid import gen_uid
+from lib.post import load_for_agency
 
 sys.path.append("../")
 
@@ -73,8 +74,7 @@ def match_cprr_post(cprr, post):
 if __name__ == "__main__":
     cprr = pd.read_csv(data_file_path("clean/cprr_shreveport_pd_2018_2019.csv"))
     agency = cprr.agency[0]
-    post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
-    post = post.loc[post.agency == agency]
+    post = load_for_agency(agency)
     cb = pd.read_csv(data_file_path("clean/cprr_codebook_shreveport_pd.csv"))
     cprr = match_cprr_codebook(cprr, cb).pipe(
         gen_uid, ["agency", "tracking_number", "allegation"], "allegation_uid"

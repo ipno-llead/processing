@@ -1,5 +1,6 @@
 from lib import events
 import pandas as pd
+from lib.path import data_file_path
 import sys
 
 sys.path.append("../")
@@ -95,3 +96,11 @@ def extract_events_from_cprr_post(
                     uid=pprr_uid,
                 )
     return builder.to_frame()
+
+
+def load_for_agency(agency):
+    post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
+    post = post.loc[post.agency == agency]
+    if len(post) == 0:
+        raise ValueError("agency not found", agency)
+    return post

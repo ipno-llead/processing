@@ -5,7 +5,7 @@ import pandas as pd
 from datamatch import ThresholdMatcher, JaroWinklerSimilarity, ColumnsIndex, NoopIndex
 
 from lib.path import data_file_path
-from lib.post import extract_events_from_post
+from lib.post import extract_events_from_post, load_for_agency
 
 sys.path.append("../")
 
@@ -498,8 +498,7 @@ if __name__ == "__main__":
     cprr_14 = pd.read_csv(data_file_path("clean/cprr_lafayette_pd_2009_2014.csv"))
     pprr = pd.read_csv(data_file_path("clean/pprr_lafayette_pd_2010_2021.csv"))
     agency = pprr.agency[0]
-    post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
-    post = post.loc[post.agency == agency]
+    post = load_for_agency(agency)
     cprr_20 = (
         dedup_cprr_uid_20(cprr_20)
         .pipe(dedup_cprr_investigator_uid_20)
