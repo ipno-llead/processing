@@ -9,10 +9,14 @@ sys.path.append("../")
 
 
 def assign_agency(df, year):
-    agency_dict = {"EJLD": "East Jefferson Levee PD", "OLDP": "Orleans Levee PD"}
-    df.loc[:, "agency"] = df.ejld_oldp.str.strip().map(lambda x: agency_dict.get(x, x))
-    df.loc[:, "data_production_year"] = year
-    return df.drop(columns=["ejld_oldp"])
+    agency_dict = {
+        'EJLD': 'East Jefferson Levee PD',
+        'OLDP': 'New Orleans Levee PD'
+    }
+    df.loc[:, 'agency'] = df.ejld_oldp.str.strip().map(
+        lambda x: agency_dict.get(x, x))
+    df.loc[:, 'data_production_year'] = year
+    return df.drop(columns=['ejld_oldp'])
 
 
 def split_name_19(df):
@@ -137,6 +141,4 @@ def clean20():
 if __name__ == "__main__":
     df20 = clean20()
     df19 = clean19()
-    pd.concat([df19, df20]).to_csv(
-        data_file_path("clean/cprr_levee_pd.csv"), index=False
-    )
+    pd.concat([df19, df20]).to_csv(data_file_path("clean/cprr_levee_pd.csv"), index=False)

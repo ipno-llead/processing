@@ -76,7 +76,7 @@ def clean():
         .pipe(clean_allegation)
         .pipe(join_disposition_columns)
         .pipe(split_names)
-        .pipe(set_values, {"agency": "Brown PD"})
+        .pipe(set_values, {"agency": "Baker PD"})
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(gen_uid, ["uid", "disposition", "allegation"], "allegation_uid")
     )

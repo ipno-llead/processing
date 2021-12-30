@@ -10,6 +10,7 @@ from datamatch import (
 
 from lib.path import data_file_path, ensure_data_dir
 from lib.uid import gen_uid
+from lib.post import load_for_agency
 
 sys.path.append("../")
 
@@ -46,10 +47,7 @@ def match_cprr_post(cprr, post):
     dfa = dfa.drop_duplicates().set_index("uid")
     dfa.loc[:, "fc"] = dfa.first_name.fillna("").map(lambda x: x[:1])
 
-    dfb = post.loc[
-        post.agency == "shreveport pd",
-        ["uid", "first_name", "last_name"],
-    ]
+    dfb = post[["uid", "first_name", "last_name"]]
     dfb = dfb.drop_duplicates().set_index("uid")
     dfb.loc[:, "fc"] = dfb.first_name.fillna("").map(lambda x: x[:1])
 
@@ -75,10 +73,11 @@ def match_cprr_post(cprr, post):
 
 if __name__ == "__main__":
     cprr = pd.read_csv(data_file_path("clean/cprr_shreveport_pd_2018_2019.csv"))
-    post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
+    agency = cprr.agency[0]
+    post = load_for_agency("clean/pprr_post_2020_11_06.csv", agency)
     cb = pd.read_csv(data_file_path("clean/cprr_codebook_shreveport_pd.csv"))
     cprr = match_cprr_codebook(cprr, cb).pipe(
-        gen_uid, ["agency", "tracking_number", "allegation"], "complaint_uid"
+        gen_uid, ["agency", "tracking_number", "allegation"], "allegation_uid"
     )
     cprr = match_cprr_post(cprr, post)
     ensure_data_dir("match")

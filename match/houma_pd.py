@@ -4,11 +4,7 @@ sys.path.append("../")
 from lib.path import data_file_path
 import pandas as pd
 from datamatch import JaroWinklerSimilarity, ThresholdMatcher, ColumnsIndex
-
-
-def prepare_post_data():
-    post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
-    return post[post.agency == "houma pd"]
+from lib.post import load_for_agency
 
 
 def match_cprr_21_with_post(cprr, post):
@@ -74,7 +70,8 @@ def match_cprr_18_with_post(cprr, post):
 if __name__ == "__main__":
     cprr21 = pd.read_csv(data_file_path("clean/cprr_houma_pd_2019_2021.csv"))
     cprr18 = pd.read_csv(data_file_path("clean/cprr_houma_pd_2017_2018.csv"))
-    post = prepare_post_data()
+    agency = cprr18.agency[0]
+    post = load_for_agency("clean/pprr_post_2020_11_06.csv", agency)
     cprr21 = match_cprr_21_with_post(cprr21, post)
     cprr18 = match_cprr_18_with_post(cprr18, post)
     cprr21.to_csv(data_file_path("match/cprr_houma_pd_2019_2021.csv"), index=False)

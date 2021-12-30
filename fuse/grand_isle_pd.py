@@ -44,7 +44,5 @@ if __name__ == "__main__":
     post_event = pd.read_csv(data_file_path("match/post_event_grand_isle_pd.csv"))
     events_df = fuse_events(pprr)
     events_df = rearrange_event_columns(pd.concat([post_event, events_df]))
-    rearrange_personnel_columns(pprr).to_csv(
-        data_file_path("fuse/per_grand_isle_pd.csv"), index=False
-    )
+    rearrange_personnel_columns(pprr).to_csv(data_file_path("fuse/per_grand_isle_pd.csv"), index=False)
     events_df.to_csv(data_file_path("fuse/event_grand_isle_pd.csv"), index=False)

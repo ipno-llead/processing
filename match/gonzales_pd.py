@@ -10,12 +10,10 @@ from datamatch import (
 )
 from lib.path import data_file_path
 from lib.date import combine_date_columns
-from lib.post import extract_events_from_post
+from lib.post import extract_events_from_post, load_for_agency
 
 
 def extract_post_events(pprr, post):
-    post = post.loc[post.agency == "gonzales pd"]
-
     dfa = pprr[["first_name", "last_name", "uid"]]
     dfa.loc[:, "hire_date"] = combine_date_columns(
         pprr, "hire_year", "hire_month", "hire_day"
@@ -52,7 +50,8 @@ def extract_post_events(pprr, post):
 
 if __name__ == "__main__":
     pprr = pd.read_csv(data_file_path("clean/pprr_gonzales_pd_2010_2021.csv"))
-    post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
+    agency = pprr.agency[0]
+    post = load_for_agency("clean/pprr_post_2020_11_06.csv", agency)
     post_events = extract_post_events(pprr, post)
     post_events.to_csv(
         data_file_path("match/post_event_gonzales_pd_2010_2021.csv"), index=False
