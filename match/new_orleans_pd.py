@@ -206,10 +206,12 @@ def match_stop_and_search_to_pprr(sas, pprr_ipm):
 
 
 if __name__ == "__main__":
-    pprr_ipm = pd.read_csv(data_file_path("clean/pprr_new_orleans_ipm_iapro_1946_2018.csv"))
+    pprr_ipm = pd.read_csv(
+        data_file_path("clean/pprr_new_orleans_ipm_iapro_1946_2018.csv")
+    )
     pprr_csd = pd.read_csv(data_file_path("clean/pprr_new_orleans_csd_2014.csv"))
     agency = pprr_ipm.agency[0]
-    post = load_for_agency(agency)
+    post = load_for_agency("clean/pprr_post_2020_11_06.csv", agency)
     award = pd.read_csv(data_file_path("clean/award_new_orleans_pd_2016_2021.csv"))
     lprr = pd.read_csv(data_file_path("clean/lprr_new_orleans_csc_2000_2016.csv"))
     sas = pd.read_csv(data_file_path("clean/sas_new_orleans_pd_2017_2021.csv"))
@@ -218,8 +220,12 @@ if __name__ == "__main__":
     lprr = match_lprr_to_pprr_ipm(lprr, pprr_ipm)
     sas = match_stop_and_search_to_pprr(sas, pprr_ipm)
     pprr_csd_matched_with_ipm = match_pprr_csd_to_pprr_ipm(pprr_csd, pprr_ipm)
-    award.to_csv(data_file_path("match/award_new_orleans_pd_2016_2021.csv"), index=False)
+    award.to_csv(
+        data_file_path("match/award_new_orleans_pd_2016_2021.csv"), index=False
+    )
     event_df.to_csv(data_file_path("match/post_event_new_orleans_pd.csv"), index=False)
     lprr.to_csv(data_file_path("match/lprr_new_orleans_csc_2000_2016.csv"), index=False)
-    pprr_csd_matched_with_ipm.to_csv(data_file_path("match/pprr_new_orleans_csd_2014.csv"), index=False)
+    pprr_csd_matched_with_ipm.to_csv(
+        data_file_path("match/pprr_new_orleans_csd_2014.csv"), index=False
+    )
     sas.to_csv(data_file_path("match/sas_new_orleans_pd_2017_2021.csv"), index=False)

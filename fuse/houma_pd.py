@@ -38,7 +38,7 @@ if __name__ == "__main__":
     cprr21 = pd.read_csv(data_file_path("match/cprr_houma_pd_2019_2021.csv"))
     cprr18 = pd.read_csv(data_file_path("match/cprr_houma_pd_2017_2018.csv"))
     agency = cprr18.agency[0]
-    post = load_for_agency(agency)
+    post = load_for_agency("clean/pprr_post_2020_11_06.csv", agency)
     personnel_df = fuse_personnel(cprr21, cprr18, post)
     allegation_df = rearrange_allegation_columns(pd.concat([cprr21, cprr18]))
     event_df = fuse_events(post)

@@ -10,7 +10,11 @@ import pandas as pd
 
 from lib.path import data_file_path, ensure_data_dir
 from lib.date import combine_date_columns
-from lib.post import extract_events_from_post, extract_events_from_cprr_post, load_for_agency
+from lib.post import (
+    extract_events_from_post,
+    extract_events_from_cprr_post,
+    load_for_agency,
+)
 
 sys.path.append("../")
 
@@ -86,10 +90,14 @@ def extract_cprr_post_events(pprr, cprr_post):
 if __name__ == "__main__":
     pprr = pd.read_csv(data_file_path("clean/pprr_caddo_parish_so_2020.csv"))
     agency = pprr.agency[0]
-    post = load_for_agency(agency)
+    post = load_for_agency("clean/pprr_post_2020_11_06.csv", agency)
     cprr_post = pd.read_csv(data_file_path("match/cprr_post_2016_2019.csv"))
     post_event = match_pprr_against_post(pprr, post)
     cprr_post_event = extract_cprr_post_events(pprr, cprr_post)
     ensure_data_dir("match")
-    post_event.to_csv(data_file_path("match/post_event_caddo_parish_so.csv"), index=False)
-    cprr_post_event.to_csv(data_file_path("match/cprr_post_event_caddo_parish_so.csv"), index=False)
+    post_event.to_csv(
+        data_file_path("match/post_event_caddo_parish_so.csv"), index=False
+    )
+    cprr_post_event.to_csv(
+        data_file_path("match/cprr_post_event_caddo_parish_so.csv"), index=False
+    )

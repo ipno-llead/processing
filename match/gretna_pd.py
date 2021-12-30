@@ -53,7 +53,9 @@ def extract_post_events(pprr, post):
 if __name__ == "__main__":
     pprr = pd.read_csv(data_file_path("clean/pprr_gretna_pd_2018.csv"))
     agency = pprr.agency[0]
-    post = load_for_agency(agency)
+    post = load_for_agency("clean/pprr_post_2020_11_06.csv", agency)
     post_events = extract_post_events(pprr, post)
     ensure_data_dir("match")
-    post_events.to_csv(data_file_path("match/post_event_gretna_pd_2020.csv"), index=False)
+    post_events.to_csv(
+        data_file_path("match/post_event_gretna_pd_2020.csv"), index=False
+    )

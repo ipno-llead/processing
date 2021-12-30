@@ -38,7 +38,7 @@ def match_pprr_post(pprr, post):
 if __name__ == "__main__":
     pprr = pd.read_csv(data_file_path("clean/pprr_grand_isle_pd_2021.csv"))
     agency = pprr.agency[0]
-    post = load_for_agency(agency)
+    post = load_for_agency("clean/pprr_post_2020_11_06.csv", agency)
     post_event = match_pprr_post(pprr, post)
     ensure_data_dir("match")
     post_event.to_csv(data_file_path("match/post_event_grand_isle_pd.csv"), index=False)

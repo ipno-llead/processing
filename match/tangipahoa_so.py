@@ -81,7 +81,7 @@ def match_cprr_post(cprr, post):
 if __name__ == "__main__":
     cprr = pd.read_csv(data_file_path("clean/cprr_tangipahoa_so_2015_2021.csv"))
     agency = cprr.agency[0]
-    post = load_for_agency(agency)
+    post = load_for_agency("clean/pprr_post_2020_11_06.csv", agency)
     cprr = deduplicate_cprr_officers(cprr)
     cprr = match_cprr_post(cprr, post)
     cprr.to_csv(data_file_path("match/cprr_tangipahoa_so_2015_2021.csv"), index=False)

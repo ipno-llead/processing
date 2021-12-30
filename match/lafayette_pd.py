@@ -498,7 +498,7 @@ if __name__ == "__main__":
     cprr_14 = pd.read_csv(data_file_path("clean/cprr_lafayette_pd_2009_2014.csv"))
     pprr = pd.read_csv(data_file_path("clean/pprr_lafayette_pd_2010_2021.csv"))
     agency = pprr.agency[0]
-    post = load_for_agency(agency)
+    post = load_for_agency("clean/pprr_post_2020_11_06.csv", agency)
     cprr_20 = (
         dedup_cprr_uid_20(cprr_20)
         .pipe(dedup_cprr_investigator_uid_20)
@@ -516,4 +516,6 @@ if __name__ == "__main__":
     post_events = extract_post_events(pprr, post)
     cprr_20.to_csv(data_file_path("match/cprr_lafayette_pd_2015_2020.csv"), index=False)
     cprr_14.to_csv(data_file_path("match/cprr_lafayette_pd_2009_2014.csv"), index=False)
-    post_events.to_csv(data_file_path("match/post_event_lafayette_pd_2020.csv"), index=False)
+    post_events.to_csv(
+        data_file_path("match/post_event_lafayette_pd_2020.csv"), index=False
+    )

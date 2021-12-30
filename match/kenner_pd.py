@@ -8,7 +8,11 @@ from datamatch import (
     DateSimilarity,
 )
 
-from lib.post import extract_events_from_post, extract_events_from_cprr_post, load_for_agency
+from lib.post import (
+    extract_events_from_post,
+    extract_events_from_cprr_post,
+    load_for_agency,
+)
 from lib.date import combine_date_columns
 from lib.path import data_file_path
 
@@ -114,12 +118,16 @@ def extract_cprr_post_events(pprr, cprr_post):
 if __name__ == "__main__":
     pprr = pd.read_csv(data_file_path("clean/pprr_kenner_pd_2020.csv"))
     agency = pprr.agency[0]
-    post = load_for_agency(agency)
+    post = load_for_agency("clean/pprr_post_2020_11_06.csv", agency)
     uof = pd.read_csv(data_file_path("clean/uof_kenner_pd_2005_2021.csv"))
     cprr_post = pd.read_csv(data_file_path("match/cprr_post_2016_2019.csv"))
     post_events = extract_post_events(pprr, post)
     cprr_post_events = extract_cprr_post_events(pprr, cprr_post)
     uof = match_uof_pprr(uof, pprr)
-    post_events.to_csv(data_file_path("match/post_event_kenner_pd_2020.csv"), index=False)
+    post_events.to_csv(
+        data_file_path("match/post_event_kenner_pd_2020.csv"), index=False
+    )
     uof.to_csv(data_file_path("match/uof_kenner_pd_2005_2021.csv"), index=False)
-    cprr_post_events.to_csv(data_file_path("match/cprr_post_events_kenner_pd_2020.csv"), index=False)
+    cprr_post_events.to_csv(
+        data_file_path("match/cprr_post_events_kenner_pd_2020.csv"), index=False
+    )

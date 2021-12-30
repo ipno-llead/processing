@@ -47,7 +47,7 @@ def fuse_events(cprr, post):
 if __name__ == "__main__":
     cprr = pd.read_csv(data_file_path("clean/cprr_greenwood_pd_2015_2020.csv"))
     agency = cprr.agency[0]
-    post = load_for_agency(agency)
+    post = load_for_agency("clean/pprr_post_2020_11_06.csv", agency)
     per = rearrange_personnel_columns(post)
     com = rearrange_allegation_columns(cprr)
     event = fuse_events(cprr, post)

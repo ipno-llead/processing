@@ -98,8 +98,8 @@ def extract_events_from_cprr_post(
     return builder.to_frame()
 
 
-def load_for_agency(agency):
-    post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
+def load_for_agency(post_path, agency):
+    post = pd.read_csv(data_file_path(post_path))
     post = post.loc[post.agency == agency]
     if len(post) == 0:
         raise ValueError("agency not found", agency)

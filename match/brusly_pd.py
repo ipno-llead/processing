@@ -110,7 +110,7 @@ if __name__ == "__main__":
     pprr = pd.read_csv(data_file_path("clean/pprr_brusly_pd_2020.csv"))
     award = pd.read_csv(data_file_path("clean/award_brusly_pd_2021.csv"))
     agency = cprr.agency[0]
-    post = load_for_agency(agency)
+    post = load_for_agency("clean/pprr_post_2020_11_06.csv", agency)
     cprr = add_uid_to_complaint(cprr, pprr)
     cprr = add_supervisor_uid_to_complaint(cprr, pprr)
     award = add_uid_to_award(award, pprr)
@@ -118,4 +118,6 @@ if __name__ == "__main__":
     ensure_data_dir("match")
     award.to_csv(data_file_path("match/award_brusly_pd_2021.csv"), index=False)
     cprr.to_csv(data_file_path("match/cprr_brusly_pd_2020.csv"), index=False)
-    post_events.to_csv(data_file_path("match/post_event_brusly_pd_2020.csv"), index=False)
+    post_events.to_csv(
+        data_file_path("match/post_event_brusly_pd_2020.csv"), index=False
+    )

@@ -80,9 +80,13 @@ if __name__ == "__main__":
     cprr = pd.read_csv(data_file_path("clean/cprr_new_orleans_harbor_pd_2020.csv"))
     pprr20 = pd.read_csv(data_file_path("clean/pprr_new_orleans_harbor_pd_2020.csv"))
     agency = pprr20.agency[0]
-    post = load_for_agency(agency)
+    post = load_for_agency("clean/pprr_post_2020_11_06.csv", agency)
     cprr = match_uid_with_cprr(cprr, pprr20)
     post_event = match_pprr_and_post(pprr20, post)
     ensure_data_dir("match")
-    cprr.to_csv(data_file_path("match/cprr_new_orleans_harbor_pd_2020.csv"), index=False)
-    post_event.to_csv(data_file_path("match/post_event_new_orleans_harbor_pd_2020.csv"), index=False)
+    cprr.to_csv(
+        data_file_path("match/cprr_new_orleans_harbor_pd_2020.csv"), index=False
+    )
+    post_event.to_csv(
+        data_file_path("match/post_event_new_orleans_harbor_pd_2020.csv"), index=False
+    )
