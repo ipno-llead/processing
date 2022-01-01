@@ -183,6 +183,17 @@ def fuse_stop_and_search():
     ).sort_values(["agency", "stop_and_search_uid"])
 
 
+def find_event_agency_if_missing_from_post(event_df, post_event_df):
+    missing_event_agency = event_df[~event_df["agency"].isin(post_event_df["agency"])]
+    missing_event_agency = missing_event_agency[["agency"]].drop_duplicates().dropna()
+
+    if len(missing_event_agency["agency"]) > 0:
+        raise ValueError(
+            "Agency not in POST: %s" % missing_event_agency["agency"].tolist()
+        )
+    return missing_event_agency
+
+
 if __name__ == "__main__":
     per_df = fuse_personnel()
     ensure_uid_unique(per_df, "uid")
@@ -198,3 +209,14 @@ if __name__ == "__main__":
     allegation_df.to_csv(data_file_path("fuse/allegation.csv"), index=False)
     uof_df.to_csv(data_file_path("fuse/use_of_force.csv"), index=False)
     sas_df.to_csv(data_file_path("fuse/stop_and_search.csv"), index=False)
+
+    post_event_df = pd.read_csv(data_file_path("fuse/events_post.csv"))
+    post_personnel_df = pd.read_csv(data_file_path("fuse/per_post.csv"))
+
+    missing_agency_df = find_event_agency_if_missing_from_post(event_df, post_event_df)
+
+    post_event_df = post_event_df[~post_event_df["agency"].isin(event_df["agency"])]
+    post_event_df.to_csv(data_file_path("fuse/event_post.csv"), index=False)
+
+    post_personnel_df = post_personnel_df[~post_personnel_df["uid"].isin(per_df["uid"])]
+    post_personnel_df.to_csv(data_file_path("fuse/personnel_post.csv"), index=False)

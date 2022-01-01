@@ -183,6 +183,4 @@ def clean():
 if __name__ == "__main__":
     award = clean()
     ensure_data_dir("clean")
-    award.to_csv(
-        data_file_path("clean/award_new_orleans_pd_2016_2021.csv"), index=False
-    )
+    award.to_csv(data_file_path("clean/award_new_orleans_pd_2016_2021.csv"), index=False)

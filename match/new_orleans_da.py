@@ -1,22 +1,13 @@
 from datamatch import ThresholdMatcher, JaroWinklerSimilarity, ColumnsIndex
 from lib.path import data_file_path, ensure_data_dir
+from lib.post import load_for_agency
 import pandas as pd
 import sys
 
 sys.path.append("../")
 
 
-def prepare_new_orleans_so_post_data():
-    post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
-    return post[post.agency == "orleans parish so"]
-
-
-def prepare_new_orleans_pd_post_data():
-    post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
-    return post[post.agency == "new orleans pd"]
-
-
-def match_cprr_and_nopd_post(cprr, post):
+def match_cprr_and_post(cprr, post):
     dfa = cprr[["uid", "first_name", "last_name"]]
     dfa.loc[:, "fc"] = dfa.first_name.fillna("").map(lambda x: x[:1])
     dfa = dfa.drop_duplicates(subset=["uid"]).set_index("uid")
@@ -83,8 +74,9 @@ def match_against_new_orleans_pd_personnel(cprr, pprr):
 if __name__ == "__main__":
     pprr = pd.read_csv(data_file_path("clean/pprr_new_orleans_pd_1946_2018.csv"))
     cprr = pd.read_csv(data_file_path("clean/cprr_new_orleans_da_2021.csv"))
+    agency = cprr.agency[0]
+    post = load_for_agency("clean/pprr_post_2020_11_06.csv", agency)
     cprr = match_against_new_orleans_pd_personnel(cprr, pprr)
-    post_noso = prepare_new_orleans_so_post_data()
-    cprr = match_cprr_and_nopd_post(cprr, post_noso)
+    cprr = match_cprr_and_post(cprr, post)
     ensure_data_dir("match")
     cprr.to_csv(data_file_path("match/cprr_new_orleans_da_2021.csv"), index=False)

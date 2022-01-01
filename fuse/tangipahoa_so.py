@@ -7,12 +7,8 @@ from lib.columns import (
 )
 from lib import events
 from lib.personnel import fuse_personnel
+from lib.post import load_for_agency
 import pandas as pd
-
-
-def prepare_post_data():
-    post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
-    return post[post.agency == "tangipahoa parish so"]
 
 
 def fuse_events(cprr, post):
@@ -56,7 +52,8 @@ def fuse_events(cprr, post):
 
 if __name__ == "__main__":
     cprr = pd.read_csv(data_file_path("match/cprr_tangipahoa_so_2015_2021.csv"))
-    post = prepare_post_data()
+    agency = cprr.agency[0]
+    post = load_for_agency("clean/pprr_post_2020_11_06.csv", agency)
     per = fuse_personnel(cprr, post)
     complaints = rearrange_allegation_columns(cprr)
     event = fuse_events(cprr, post)

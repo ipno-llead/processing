@@ -49,11 +49,8 @@ if __name__ == "__main__":
     pprr = pd.read_csv(data_file_path("clean/pprr_plaquemines_so_2018.csv"))
     post_event = pd.read_csv(data_file_path("match/event_plaquemines_so_2018.csv"))
     events_df = fuse_events(cprr19, cprr20, pprr)
-    fuse_personnel(pprr, cprr19, cprr20).to_csv(
-        data_file_path("fuse/per_plaquemines_so.csv"), index=False
-    )
+    fuse_personnel(pprr, cprr19, cprr20).to_csv(data_file_path("fuse/per_plaquemines_so.csv"), index=False)
     com = rearrange_allegation_columns(pd.concat([cprr19, cprr20]))
     com.to_csv(data_file_path("fuse/com_plaquemines_so.csv"), index=False)
     rearrange_event_columns(pd.concat([events_df, post_event])).to_csv(
-        data_file_path("fuse/event_plaquemines_so.csv"), index=False
-    )
+        data_file_path("fuse/event_plaquemines_so.csv"), index=False)

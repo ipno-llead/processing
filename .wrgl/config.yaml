@@ -423,6 +423,10 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/event-jefferson-so
     fetch:
       - +refs/heads/*:refs/remotes/event-jefferson-so/*
+  event-post:
+    url: https://hub.wrgl.co/api/users/ipno/repos/event-post
+    fetch:
+      - +refs/heads/*:refs/remotes/event-post/*
   match-brusly-pd-2020:
     url: https://hub.wrgl.co/api/users/ipno/repos/match-brusly-pd-2020
     fetch:
@@ -683,6 +687,10 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/per-jefferson-so
     fetch:
       - +refs/heads/*:refs/remotes/per-jefferson-so/*
+  per-post:
+    url: https://hub.wrgl.co/api/users/ipno/repos/per-post
+    fetch:
+      - +refs/heads/*:refs/remotes/per-post/*
   person:
     url: https://hub.wrgl.co/api/users/ipno/repos/person
     fetch:
@@ -1286,6 +1294,12 @@ branch:
     file: data/fuse/event_jefferson_so.csv
     primaryKey:
       - event_uid
+  event-post:
+    remote: event-post
+    merge: refs/heads/main
+    file: data/fuse/event_post.csv
+    primaryKey:
+      - event_uid
   match-brusly-pd-2020:
     remote: match-brusly-pd-2020
     merge: refs/heads/main
@@ -1632,6 +1646,12 @@ branch:
     remote: per-jefferson-so
     merge: refs/heads/main
     file: data/fuse/per_jefferson_so.csv
+    primaryKey:
+      - uid
+  per-post:
+    remote: per-post
+    merge: refs/heads/main
+    file: data/fuse/personnel_post.csv
     primaryKey:
       - uid
   person:

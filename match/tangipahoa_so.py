@@ -3,12 +3,8 @@ import sys
 sys.path.append("../")
 import pandas as pd
 from datamatch import ThresholdMatcher, JaroWinklerSimilarity, ColumnsIndex
-from lib.path import data_file_path, ensure_data_dir
-
-
-def prepare_post_data():
-    post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
-    return post[post.agency == "tangipahoa parish so"]
+from lib.path import data_file_path
+from lib.post import load_for_agency
 
 
 def deduplicate_cprr_officers(cprr):
@@ -84,8 +80,8 @@ def match_cprr_post(cprr, post):
 
 if __name__ == "__main__":
     cprr = pd.read_csv(data_file_path("clean/cprr_tangipahoa_so_2015_2021.csv"))
+    agency = cprr.agency[0]
+    post = load_for_agency("clean/pprr_post_2020_11_06.csv", agency)
     cprr = deduplicate_cprr_officers(cprr)
-    post = prepare_post_data()
     cprr = match_cprr_post(cprr, post)
-    ensure_data_dir("match")
     cprr.to_csv(data_file_path("match/cprr_tangipahoa_so_2015_2021.csv"), index=False)

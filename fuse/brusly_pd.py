@@ -76,8 +76,6 @@ if __name__ == "__main__":
     events_df = fuse_events(pprr, cprr, award)
     events_df = rearrange_event_columns(pd.concat([post_event, events_df]))
     com_df = rearrange_allegation_columns(cprr)
-    rearrange_personnel_columns(pprr).to_csv(
-        data_file_path("fuse/per_brusly_pd.csv"), index=False
-    )
+    rearrange_personnel_columns(pprr).to_csv(data_file_path("fuse/per_brusly_pd.csv"), index=False)
     events_df.to_csv(data_file_path("fuse/event_brusly_pd.csv"), index=False)
     com_df.to_csv(data_file_path("fuse/com_brusly_pd.csv"), index=False)

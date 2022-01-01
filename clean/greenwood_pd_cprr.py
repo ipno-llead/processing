@@ -1,5 +1,5 @@
 from lib.path import data_file_path
-from lib.columns import clean_column_names
+from lib.columns import clean_column_names, set_values
 from lib.clean import clean_dates, float_to_int_str
 from lib.uid import gen_uid
 import pandas as pd
@@ -33,7 +33,8 @@ def clean():
     return (
         df.pipe(clean_dates, ["occur_date", "receive_date"])
         .pipe(float_to_int_str, ["comission_number"])
-        .pipe(gen_uid, ["first_name", "last_name"], "mid")
+        .pipe(set_values, {"agency": "Greenwood PD"})
+        .pipe(gen_uid, ["first_name", "last_name"], "uid")
         .pipe(assign_allegations)
         .pipe(
             gen_uid,

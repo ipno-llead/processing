@@ -39,7 +39,7 @@ def clean_allegations(df):
 
 def extract_agency_and_department_desc(df):
     agency = df.action.str.extract(r"(lsp)")
-    df.loc[:, "agency"] = agency[0].str.replace("lsp", "la state police", regex=False)
+    df.loc[:, "agency"] = agency[0].str.replace("lsp", "Louisiana State PD", regex=False)
 
     departments = df.action.str.extract(r"(troof f)")
     df.loc[:, "department_desc"] = departments[0].str.replace(
@@ -56,10 +56,10 @@ def clean_action(df):
 
 
 def assign_agency(df):
-    df.loc[(df.last_name == "brown"), "agency"] = "la state police"
-    df.loc[(df.last_name == "smith"), "agency"] = "ouachita parish so"
-    df.loc[(df.last_name == "desadier"), "agency"] = "monroe pd"
-    df.loc[(df.last_name == "dickerson"), "agency"] = "la state police"
+    df.loc[(df.last_name == "brown"), "agency"] = "Louisiana State PD"
+    df.loc[(df.last_name == "smith"), "agency"] = "Ouachita SO"
+    df.loc[(df.last_name == "desadier"), "agency"] = "Monroe PD"
+    df.loc[(df.last_name == "dickerson"), "agency"] = "Louisiana State PD"
     return df
 
 

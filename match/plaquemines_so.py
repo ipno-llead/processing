@@ -1,15 +1,10 @@
 from datamatch import ThresholdMatcher, JaroWinklerSimilarity, ColumnsIndex
 from lib.path import data_file_path
-from lib.post import extract_events_from_post
+from lib.post import extract_events_from_post, load_for_agency
 import pandas as pd
 import sys
 
 sys.path.append("../")
-
-
-def prepare_post_data():
-    post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
-    return post[post.agency == "plaquemines par so"]
 
 
 def match_cprr_19_and_pprr(cprr, pprr):
@@ -111,7 +106,8 @@ if __name__ == "__main__":
     cprr19 = pd.read_csv(data_file_path("clean/cprr_plaquemines_so_2019.csv"))
     cprr20 = pd.read_csv(data_file_path("clean/cprr_plaquemines_so_2016_2020.csv"))
     pprr = pd.read_csv(data_file_path("clean/pprr_plaquemines_so_2018.csv"))
-    post = prepare_post_data()
+    agency = pprr.agency[0]
+    post = load_for_agency("clean/pprr_post_2020_11_06.csv", agency)
     cprr19 = match_cprr_19_and_pprr(cprr19, pprr)
     cprr20 = match_cprr_2016_2020_and_pprr(cprr20, pprr)
     post_event = match_pprr_and_post(pprr, post)

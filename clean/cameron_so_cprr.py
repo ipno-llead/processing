@@ -27,7 +27,7 @@ def clean():
                 "outcome_after_investigation": "disposition",
             }
         )
-        .pipe(set_values, {"agency": "Cameron Parish SO"})
+        .pipe(set_values, {"agency": "Cameron SO"})
         .pipe(standardize_desc_cols, ["allegation", "disposition"])
         .pipe(gen_uid, ["agency", "first_name", "last_name"])
         .pipe(gen_uid, ["uid", "allegation", "disposition"], "allegation_uid")

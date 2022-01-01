@@ -11,15 +11,10 @@ from datamatch import (
 import pandas as pd
 
 from lib.path import data_file_path
-from lib.post import extract_events_from_post
+from lib.post import extract_events_from_post, load_for_agency
 from lib.date import combine_date_columns
 
 sys.path.append("../")
-
-
-def prepare_post_data():
-    post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
-    return post[post.agency == "la state police"]
 
 
 def match_lprr_and_pprr(lprr, pprr):
@@ -102,7 +97,7 @@ def extract_post_events(pprr, post):
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
 
-    return extract_events_from_post(post, matches, "Louisiana State Police")
+    return extract_events_from_post(post, matches, "Louisiana State PD")
 
 
 def match_pprr_demo_and_term(demo, term):
@@ -159,9 +154,10 @@ def match_pprr_demo_and_term(demo, term):
 
 if __name__ == "__main__":
     lprr = pd.read_csv(data_file_path("clean/lprr_louisiana_state_csc_1991_2020.csv"))
-    post = prepare_post_data()
     pprr_demo = pd.read_csv(data_file_path("clean/pprr_demo_louisiana_csd_2021.csv"))
     pprr_term = pd.read_csv(data_file_path("clean/pprr_term_louisiana_csd_2021.csv"))
+    agency = pprr_term.agency[0]
+    post = load_for_agency("clean/pprr_post_2020_11_06.csv", agency)
     pprr_term = match_pprr_demo_and_term(pprr_demo, pprr_term)
     lprr = match_lprr_and_pprr(lprr, pprr_demo)
     post_events = extract_post_events(pprr_demo, post)

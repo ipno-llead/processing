@@ -35,7 +35,7 @@ def clean():
                 "disposition_date",
             ],
         )
-        .pipe(set_values, {"agency": "Terrebonne Parish SO"})
+        .pipe(set_values, {"agency": "Terrebonne SO"})
         .pipe(gen_uid, ["agency", "first_name", "last_name"])
         .pipe(
             gen_uid,

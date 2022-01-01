@@ -4,14 +4,9 @@ from datamatch import ThresholdMatcher, NoopIndex, JaroWinklerSimilarity
 import pandas as pd
 
 from lib.path import data_file_path, ensure_data_dir
-from lib.post import extract_events_from_post
+from lib.post import extract_events_from_post, load_for_agency
 
 sys.path.append("../")
-
-
-def prepare_post_data():
-    post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
-    return post[post.agency == "brusly pd"]
 
 
 def add_uid_to_complaint(cprr, pprr):
@@ -114,7 +109,8 @@ if __name__ == "__main__":
     cprr = pd.read_csv(data_file_path("clean/cprr_brusly_pd_2020.csv"))
     pprr = pd.read_csv(data_file_path("clean/pprr_brusly_pd_2020.csv"))
     award = pd.read_csv(data_file_path("clean/award_brusly_pd_2021.csv"))
-    post = prepare_post_data()
+    agency = cprr.agency[0]
+    post = load_for_agency("clean/pprr_post_2020_11_06.csv", agency)
     cprr = add_uid_to_complaint(cprr, pprr)
     cprr = add_supervisor_uid_to_complaint(cprr, pprr)
     award = add_uid_to_award(award, pprr)

@@ -116,6 +116,4 @@ def clean():
 if __name__ == "__main__":
     df = clean()
     ensure_data_dir("clean")
-    df.to_csv(
-        data_file_path("clean/cprr_actions_new_orleans_pd_1931_2020.csv"), index=False
-    )
+    df.to_csv(data_file_path("clean/cprr_actions_new_orleans_pd_1931_2020.csv"), index=False)
