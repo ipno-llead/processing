@@ -150,7 +150,5 @@ def clean_pprr():
 if __name__ == "__main__":
     actions_history = clean_actions_history()
     pprr = clean_pprr()
-    actions_history.to_csv(
-        data_file_path("clean/actions_history_covington_pd_2021.csv"), index=False
-    )
+    actions_history.to_csv(data_file_path("clean/actions_history_covington_pd_2021.csv"), index=False)
     pprr.to_csv(data_file_path("clean/pprr_covington_pd_2020.csv"), index=False)

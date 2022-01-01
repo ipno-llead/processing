@@ -116,6 +116,11 @@ schemas:
       - name: agency
         description: >
           the police department the accused belong to.
+      - name: source_agency
+        description: >
+          This field describes from where the data was sourced. This column should only be populated
+          if the data was sourced from an agency other than where the accused is/was employed.
+          For example, POST, District Attorney's Office, News, etc. 
       - name: incident_type
         description: >
           This field comes from IPM and seems to contains the same kind of info as

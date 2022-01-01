@@ -9,7 +9,7 @@ from datamatch import (
 import pandas as pd
 
 from lib.path import data_file_path, ensure_data_dir
-from lib.post import extract_events_from_post
+from lib.post import extract_events_from_post, load_for_agency
 
 sys.path.append("../")
 
@@ -124,11 +124,6 @@ def match_pd_cprr_2021_v_pprr(cprr, pprr):
     return cprr
 
 
-def prepare_post_data():
-    post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
-    return post[post.agency == "baton rouge pd"].reset_index(drop=True)
-
-
 def match_pprr_against_post(pprr, post):
     dfa = pprr[["uid", "first_name", "last_name"]]
     dfa.loc[:, "fc"] = dfa.first_name.map(lambda x: x[:1])
@@ -219,7 +214,8 @@ if __name__ == "__main__":
     lprr = match_lprr_against_pprr(lprr, pprr)
     cprr18 = match_pd_cprr_2018_v_pprr(cprr18, pprr)
     cprr21 = match_pd_cprr_2021_v_pprr(cprr21, pprr)
-    post = prepare_post_data()
+    agency = cprr21.agency[0]
+    post = load_for_agency("clean/pprr_post_2020_11_06.csv", agency)
     post_event = match_pprr_against_post(pprr, post)
     assert post_event[post_event.duplicated(subset=["event_uid"])].shape[0] == 0
     ensure_data_dir("match")

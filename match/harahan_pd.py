@@ -3,7 +3,7 @@ import sys
 import pandas as pd
 from datamatch import ThresholdMatcher, JaroWinklerSimilarity, ColumnsIndex
 
-from lib.path import data_file_path, ensure_data_dir
+from lib.path import data_file_path
 
 sys.path.append("../")
 

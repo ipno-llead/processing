@@ -8,7 +8,11 @@ from datamatch import (
     DateSimilarity,
 )
 
-from lib.post import extract_events_from_post, extract_events_from_cprr_post
+from lib.post import (
+    extract_events_from_post,
+    extract_events_from_cprr_post,
+    load_for_agency,
+)
 from lib.date import combine_date_columns
 from lib.path import data_file_path
 
@@ -16,8 +20,6 @@ sys.path.append("../")
 
 
 def extract_post_events(pprr, post):
-    post = post.loc[post.agency == "kenner pd"]
-
     dfa = pprr[["first_name", "last_name", "uid"]]
     dfa.loc[:, "hire_date"] = combine_date_columns(
         pprr, "hire_year", "hire_month", "hire_day"
@@ -115,7 +117,8 @@ def extract_cprr_post_events(pprr, cprr_post):
 
 if __name__ == "__main__":
     pprr = pd.read_csv(data_file_path("clean/pprr_kenner_pd_2020.csv"))
-    post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
+    agency = pprr.agency[0]
+    post = load_for_agency("clean/pprr_post_2020_11_06.csv", agency)
     uof = pd.read_csv(data_file_path("clean/uof_kenner_pd_2005_2021.csv"))
     cprr_post = pd.read_csv(data_file_path("match/cprr_post_2016_2019.csv"))
     post_events = extract_post_events(pprr, post)

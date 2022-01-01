@@ -8,7 +8,7 @@ from datamatch import (
     DateSimilarity,
 )
 from lib.path import data_file_path, ensure_data_dir
-from lib.post import extract_events_from_post
+from lib.post import extract_events_from_post, load_for_agency
 from lib.date import combine_date_columns
 
 sys.path.append("../")
@@ -309,8 +309,8 @@ def match_pprr_against_post(pprr, post):
 if __name__ == "__main__":
     cprr19 = pd.read_csv(data_file_path("clean/cprr_new_orleans_so_2019.csv"))
     cprr20 = pd.read_csv(data_file_path("clean/cprr_new_orleans_so_2020.csv"))
-    post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
-    post = post[post.agency == "orleans parish so"]
+    agency = cprr20.agency[0]
+    post = load_for_agency("clean/pprr_post_2020_11_06.csv", agency)
     pprr = pd.read_csv(data_file_path("clean/pprr_new_orleans_so_2021.csv"))
     ensure_data_dir("match")
     cprr19 = deduplicate_cprr_19_personnel(cprr19)

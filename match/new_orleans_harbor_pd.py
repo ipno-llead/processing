@@ -5,14 +5,9 @@ import pandas as pd
 
 from lib.path import data_file_path, ensure_data_dir
 from lib.uid import gen_uid
-from lib.post import extract_events_from_post
+from lib.post import extract_events_from_post, load_for_agency
 
 sys.path.append("../")
-
-
-def prepare_post_data():
-    post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
-    return post[post.agency == "new orleans harbor pd"]
 
 
 def match_uid_with_cprr(cprr, pprr):
@@ -84,7 +79,8 @@ def match_pprr_and_post(pprr, post):
 if __name__ == "__main__":
     cprr = pd.read_csv(data_file_path("clean/cprr_new_orleans_harbor_pd_2020.csv"))
     pprr20 = pd.read_csv(data_file_path("clean/pprr_new_orleans_harbor_pd_2020.csv"))
-    post = prepare_post_data()
+    agency = pprr20.agency[0]
+    post = load_for_agency("clean/pprr_post_2020_11_06.csv", agency)
     cprr = match_uid_with_cprr(cprr, pprr20)
     post_event = match_pprr_and_post(pprr20, post)
     ensure_data_dir("match")

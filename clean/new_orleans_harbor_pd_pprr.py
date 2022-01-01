@@ -133,9 +133,5 @@ if __name__ == "__main__":
     df20 = clean_personnel_2020()
     df08 = clean_personnel_2008()
     ensure_data_dir("clean")
-    df20.to_csv(
-        data_file_path("clean/pprr_new_orleans_harbor_pd_2020.csv"), index=False
-    )
-    df08.to_csv(
-        data_file_path("clean/pprr_new_orleans_harbor_pd_1991_2008.csv"), index=False
-    )
+    df20.to_csv(data_file_path("clean/pprr_new_orleans_harbor_pd_2020.csv"), index=False)
+    df08.to_csv(data_file_path("clean/pprr_new_orleans_harbor_pd_1991_2008.csv"), index=False)

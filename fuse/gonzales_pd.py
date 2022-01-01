@@ -28,11 +28,7 @@ def fuse_events(pprr):
 
 if __name__ == "__main__":
     pprr = pd.read_csv(data_file_path("clean/pprr_gonzales_pd_2010_2021.csv"))
-    post_event = pd.read_csv(
-        data_file_path("match/post_event_gonzales_pd_2010_2021.csv")
-    )
+    post_event = pd.read_csv(data_file_path("match/post_event_gonzales_pd_2010_2021.csv"))
     events_df = rearrange_event_columns(pd.concat([post_event, fuse_events(pprr)]))
-    rearrange_personnel_columns(pprr).to_csv(
-        data_file_path("fuse/per_gonzales_pd.csv"), index=False
-    )
+    rearrange_personnel_columns(pprr).to_csv(data_file_path("fuse/per_gonzales_pd.csv"), index=False)
     events_df.to_csv(data_file_path("fuse/event_gonzales_pd.csv"), index=False)

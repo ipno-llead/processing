@@ -1,7 +1,7 @@
 from lib.date import combine_date_columns
 from datamatch import ThresholdMatcher, JaroWinklerSimilarity, NoopIndex, DateSimilarity
 from lib.path import data_file_path, ensure_data_dir
-from lib.post import extract_events_from_post
+from lib.post import extract_events_from_post, load_for_agency
 import pandas as pd
 import sys
 
@@ -9,8 +9,6 @@ sys.path.append("../")
 
 
 def match_csd_pprr_against_post_pprr(pprr, post):
-    post = post[post.agency == "port allen pd"].set_index("uid", drop=False)
-
     dfa = pprr[["uid", "first_name", "last_name"]]
     dfa.loc[:, "hire_date"] = combine_date_columns(
         pprr, "hire_year", "hire_month", "hire_day"
@@ -69,10 +67,11 @@ def match_cprr_against_csd_pprr_2020(cprr, pprr, year, decision):
 
 if __name__ == "__main__":
     pprr = pd.read_csv(data_file_path("clean/pprr_port_allen_csd_2020.csv"))
-    post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
     cprr19 = pd.read_csv(data_file_path("clean/cprr_port_allen_pd_2019.csv"))
     cprr18 = pd.read_csv(data_file_path("clean/cprr_port_allen_pd_2017_2018.csv"))
     cprr16 = pd.read_csv(data_file_path("clean/cprr_port_allen_pd_2015_2016.csv"))
+    agency = cprr16.agency[0]
+    post = load_for_agency("clean/pprr_post_2020_11_06.csv", agency)
     post_event = match_csd_pprr_against_post_pprr(pprr, post)
     cprr19 = match_cprr_against_csd_pprr_2020(cprr19, pprr, 2019, 0.96)
     cprr18 = match_cprr_against_csd_pprr_2020(cprr18, pprr, 2018, 1)

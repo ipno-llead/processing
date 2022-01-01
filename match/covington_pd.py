@@ -3,15 +3,13 @@ import sys
 import pandas as pd
 from datamatch import ThresholdMatcher, JaroWinklerSimilarity, ColumnsIndex
 
-from lib.path import data_file_path, ensure_data_dir
-from lib.post import extract_events_from_post
+from lib.path import data_file_path
+from lib.post import extract_events_from_post, load_for_agency
 
 sys.path.append("../")
 
 
 def extract_post_events(roster, post):
-    post = post.loc[post.agency == "covington pd"]
-
     dfa = roster.set_index("uid", drop=True)
     dfa.loc[:, "fc"] = dfa.first_name.fillna("").map(lambda x: x[:1])
 
@@ -41,7 +39,8 @@ def extract_post_events(roster, post):
 if __name__ == "__main__":
     ah = pd.read_csv(data_file_path("clean/actions_history_covington_pd_2021.csv"))
     pprr = pd.read_csv(data_file_path("clean/pprr_covington_pd_2020.csv"))
-    post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
+    agency = pprr.agency[0]
+    post = load_for_agency("clean/pprr_post_2020_11_06.csv", agency)
     post_events = extract_post_events(
         pd.concat(
             [
@@ -51,7 +50,6 @@ if __name__ == "__main__":
         ).drop_duplicates(),
         post,
     )
-    ensure_data_dir("match")
     post_events.to_csv(
         data_file_path("match/post_event_covington_pd_2020.csv"), index=False
     )

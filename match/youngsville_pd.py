@@ -4,7 +4,7 @@ import pandas as pd
 from datamatch import ThresholdMatcher, JaroWinklerSimilarity, ColumnsIndex
 
 from lib.path import data_file_path
-from lib.post import extract_events_from_post
+from lib.post import extract_events_from_post, load_for_agency
 
 sys.path.append("../")
 
@@ -54,11 +54,6 @@ def match_and_concat_pprr(df1, df2, year1, year2, decision):
     return df
 
 
-def prepare_post_data():
-    post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
-    return post[post.agency == "youngsville pd"]
-
-
 def match_pprr_and_post(pprr, post):
     dfa = pprr[["uid", "first_name", "last_name"]]
     dfa.loc[:, "fc"] = dfa.first_name.map(lambda x: x[:1])
@@ -99,7 +94,8 @@ if __name__ == "__main__":
         "2019",
         0.9,
     )
-    post = prepare_post_data()
+    agency = pprr17.agency[0]
+    post = load_for_agency("clean/pprr_post_2020_11_06.csv", agency)
     post_event = match_pprr_and_post(pprr, post)
     pprr.to_csv(data_file_path("match/pprr_youngsville_pd_2017_2019.csv"), index=False)
     post_event.to_csv(
