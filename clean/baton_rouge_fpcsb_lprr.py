@@ -551,6 +551,7 @@ def clean():
         .pipe(condense_rows_with_same_docket_no)
         .pipe(standardize_desc_cols, ["appeal_disposition"])
         .pipe(clean_dates, ["appeal_disposition_date"])
+        .rename(columns={"action": "action_appealed"})
         .pipe(
             gen_uid,
             ["agency", "first_name", "last_name", "middle_name", "middle_initial"],

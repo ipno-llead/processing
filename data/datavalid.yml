@@ -391,8 +391,8 @@ schemas:
       - name: uid
       - name: counsel
       - name: charging_supervisor
-      - name: resolution
-      - name: action
+      - name: appeal_disposition
+      - name: action_appealed
       - name: delay
       - name: appealed
       - name: agency
