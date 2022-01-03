@@ -205,6 +205,42 @@ def match_stop_and_search_to_pprr(sas, pprr_ipm):
     return sas
 
 
+def match_brady_to_cprr(brady, pprr_ipm):
+    dfa = brady[["uid", "first_name", "last_name"]]
+    dfa.loc[:, "fc"] = dfa.first_name.fillna("").map(lambda x: x[:1])
+    dfa.loc[:, "lc"] = dfa.last_name.fillna("").map(lambda x: x[:1])
+    dfa = dfa.drop_duplicates(subset=["uid"]).set_index("uid")
+
+    dfb = pprr_ipm[["uid", "first_name", "last_name"]]
+    dfb.loc[:, "fc"] = dfb.first_name.fillna("").map(lambda x: x[:1])
+    dfb.loc[:, "lc"] = dfb.last_name.fillna("").map(lambda x: x[:1])
+    dfb = dfb.drop_duplicates(subset=["uid"]).set_index("uid")
+
+    matcher = ThresholdMatcher(
+        ColumnsIndex(["fc", "lc"]),
+        {
+            "first_name": JaroWinklerSimilarity(),
+            "last_name": JaroWinklerSimilarity(),
+        },
+        dfa,
+        dfb,
+        show_progress=True,
+    )
+    decision = 1
+
+    matcher.save_pairs_to_excel(
+        data_file_path(
+            "match/nopd_brady_2021_v_pprr_new_orleans_pd_1946_2018.xlsx"
+        ),
+        decision,
+    )
+    matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
+    match_dict = dict(matches)
+
+    sas.loc[:, "uid"] = sas.uid.map(lambda x: match_dict.get(x, x))
+    return sas
+
+
 if __name__ == "__main__":
     pprr_ipm = pd.read_csv(
         data_file_path("clean/pprr_new_orleans_ipm_iapro_1946_2018.csv")
@@ -215,6 +251,8 @@ if __name__ == "__main__":
     award = pd.read_csv(data_file_path("clean/award_new_orleans_pd_2016_2021.csv"))
     lprr = pd.read_csv(data_file_path("clean/lprr_new_orleans_csc_2000_2016.csv"))
     sas = pd.read_csv(data_file_path("clean/sas_new_orleans_pd_2017_2021.csv"))
+    brady = pd.read_csv(data_file_path('clean/cprr_new_orleans_da_2021.csv'))
+    brady_df = match_brady_to_cprr(brady, pprr_ipm)
     event_df = match_pprr_against_post(pprr_ipm, post)
     award = match_award_to_pprr_ipm(award, pprr_ipm)
     lprr = match_lprr_to_pprr_ipm(lprr, pprr_ipm)
@@ -229,3 +267,4 @@ if __name__ == "__main__":
         data_file_path("match/pprr_new_orleans_csd_2014.csv"), index=False
     )
     sas.to_csv(data_file_path("match/sas_new_orleans_pd_2017_2021.csv"), index=False)
+    brady_df.to_csv(data_file_path("match/brady_new_orleans_pd_2021.csv"), index=False)
