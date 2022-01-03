@@ -9,6 +9,8 @@ files:
     schema: use_of_force
   fuse/stop_and_search.csv:
     schema: stop_and_search
+  fuse/appeals.csv:
+    schema: appeal_hearing
 
 schemas:
   personnel:
@@ -386,14 +388,14 @@ schemas:
   appeal_hearing:
     columns:
       - name: appeal_uid
-        description: unique per docket_no and uid
+        description: >
+          unique per docket_no and uid
       - name: docket_no
       - name: uid
       - name: counsel
       - name: charging_supervisor
       - name: appeal_disposition
       - name: action_appealed
-      - name: delay
       - name: appealed
       - name: agency
   stop_and_search:
