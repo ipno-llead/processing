@@ -247,6 +247,10 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/com-washington-so
     fetch:
       - +refs/heads/*:refs/remotes/com-washington-so/*
+  com-acadia-so:
+    url: https://hub.wrgl.co/api/users/ipno/repos/com-acadia-so
+    fetch:
+      - +refs/heads/*:refs/remotes/com-acadia-so/*
   event:
     url: https://hub.wrgl.co/api/users/ipno/repos/event
     fetch:
@@ -431,6 +435,10 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/event-post
     fetch:
       - +refs/heads/*:refs/remotes/event-post/*
+  event-acadia-so:
+    url: https://hub.wrgl.co/api/users/ipno/repos/event-acadia-so
+    fetch:
+      - +refs/heads/*:refs/remotes/event-acadia-so/*
   match-brusly-pd-2020:
     url: https://hub.wrgl.co/api/users/ipno/repos/match-brusly-pd-2020
     fetch:
@@ -695,6 +703,10 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/per-post
     fetch:
       - +refs/heads/*:refs/remotes/per-post/*
+  per-acadia-so:
+    url: https://hub.wrgl.co/api/users/ipno/repos/per-acadia-so
+    fetch:
+      - +refs/heads/*:refs/remotes/per-acadia-so/*
   person:
     url: https://hub.wrgl.co/api/users/ipno/repos/person
     fetch:
@@ -1038,6 +1050,12 @@ branch:
     file: data/fuse/com_washington_so.csv
     primaryKey:
       - allegation_uid
+  com-acadia-so:
+    remote: com-acadia-so
+    merge: refs/heads/main
+    file: data/fuse/com_acadia_so.csv
+    primaryKey:
+      - allegation_uid
   event:
     remote: event
     merge: refs/heads/main
@@ -1312,6 +1330,12 @@ branch:
     remote: event-post
     merge: refs/heads/main
     file: data/fuse/event_post.csv
+    primaryKey:
+      - event_uid
+  event-acadia-so:
+    remote: event-acadia-so
+    merge: refs/heads/main
+    file: data/fuse/event_acadia_so.csv
     primaryKey:
       - event_uid
   match-brusly-pd-2020:
@@ -1658,6 +1682,12 @@ branch:
     remote: per-post
     merge: refs/heads/main
     file: data/fuse/personnel_post.csv
+    primaryKey:
+      - uid
+  per-acadia-so:
+    remote: per-acadia-so
+    merge: refs/heads/main
+    file: data/fuse/per_acadia_so.csv
     primaryKey:
       - uid
   person:
