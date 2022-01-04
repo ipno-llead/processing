@@ -1382,18 +1382,10 @@ branch:
     remote: match-pprr-baton-rouge-csd-2019
     merge: refs/heads/main
     file: data/match/pprr_baton_rouge_csd_2019.csv
-  match-pprr-brusly-pd-2020:
-    remote: match-pprr-brusly-pd-2020
-    merge: refs/heads/main
-    file: data/match/pprr_brusly_pd_2020.csv
   match-pprr-port-allen-csd-2020:
     remote: match-pprr-port-allen-csd-2020
     merge: refs/heads/main
     file: data/match/pprr_port_allen_csd_2020.csv
-  match-pprr-st-tammany-so-2020:
-    remote: match-pprr-st-tammany-so-2020
-    merge: refs/heads/main
-    file: data/match/pprr_st_tammany_so_2020.csv
   new-orleans-da-brady-list:
     remote: new-orleans-da-brady-list
     merge: refs/heads/main
