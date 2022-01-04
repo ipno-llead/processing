@@ -398,6 +398,7 @@ schemas:
       - name: action_appealed
       - name: appealed
       - name: agency
+      - name: motions
   stop_and_search:
     columns:
       - name: stop_and_search_uid
