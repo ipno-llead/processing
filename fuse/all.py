@@ -1,6 +1,7 @@
 import pandas as pd
 from lib.path import data_file_path
 from lib.columns import (
+    rearrange_appeal_hearing_columns,
     rearrange_personnel_columns,
     rearrange_event_columns,
     rearrange_allegation_columns,
@@ -197,6 +198,18 @@ def find_event_agency_if_missing_from_post(event_df, post_event_df):
     return missing_event_agency
 
 
+def fuse_appeal_hearing_logs():
+    return rearrange_appeal_hearing_columns(
+        pd.concat(
+            [
+                pd.read_csv(data_file_path("fuse/app_baton_rouge_pd.csv")),
+                pd.read_csv(data_file_path("fuse/app_new_orleans_csc.csv")),
+                pd.read_csv(data_file_path("fuse/app_louisiana_state_police.csv")),
+            ]
+        )
+    ).sort_values("uid", ignore_index=True)
+
+
 if __name__ == "__main__":
     per_df = fuse_personnel()
     ensure_uid_unique(per_df, "uid")
@@ -207,11 +220,13 @@ if __name__ == "__main__":
     uof_df = fuse_use_of_force()
     ensure_uid_unique(uof_df, "uof_uid")
     sas_df = fuse_stop_and_search()
+    app_df = fuse_appeal_hearing_logs()
     per_df.to_csv(data_file_path("fuse/personnel.csv"), index=False)
     event_df.to_csv(data_file_path("fuse/event.csv"), index=False)
     allegation_df.to_csv(data_file_path("fuse/allegation.csv"), index=False)
     uof_df.to_csv(data_file_path("fuse/use_of_force.csv"), index=False)
     sas_df.to_csv(data_file_path("fuse/stop_and_search.csv"), index=False)
+    app_df.to_csv(data_file_path("fuse/appeals.csv"), index=False)
 
     post_event_df = pd.read_csv(data_file_path("fuse/events_post.csv"))
     post_personnel_df = pd.read_csv(data_file_path("fuse/per_post.csv"))

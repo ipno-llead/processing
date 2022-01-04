@@ -150,6 +150,7 @@ def clean():
                 "transcript_received": "transcript_receive_date",
                 "h_e_report_received": "h_e_report_receive_date",
                 "final_disposition_date": "appeal_disposition_date",
+                "docket_number": "docket_no"
             }
         )
         .pipe(clean_suspension)
@@ -171,7 +172,7 @@ def clean():
         )
         .pipe(clean_names, ["first_name", "last_name"])
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
-        .pipe(gen_uid, ["uid", "docket_number"], "appeal_uid")
+        .pipe(gen_uid, ["uid", "docket_no"], "appeal_uid")
     )
     return df
 
