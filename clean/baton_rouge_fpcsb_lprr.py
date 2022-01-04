@@ -161,7 +161,7 @@ def add_missing_year_to_hearing_date(df):
     df.loc[df.appeal_hearing_date == "Dec", "appeal_hearing_date"] = "2003-12"
     df.loc[df.appeal_hearing_date == "June", "appeal_hearing_date"] = "2007-06"
 
-    return df
+    return df.drop(columns='hearing_date')
 
 
 def split_row_by_appeal_hearing_date(df):
