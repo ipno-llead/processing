@@ -1,5 +1,7 @@
 import sys
 
+from lib.clean import canonicalize_names
+
 sys.path.append("../")
 import pandas as pd
 from datamatch import ThresholdMatcher, JaroWinklerSimilarity, ColumnsIndex
@@ -27,22 +29,7 @@ def deduplicate_cprr_officers(cprr):
     )
     clusters = matcher.get_index_clusters_within_thresholds(decision)
     # canonicalize name and uid
-    for cluster in clusters:
-        uid, first_name, last_name = None, "", ""
-        for idx in cluster:
-            row = df.loc[idx]
-            if (
-                uid is None
-                or len(row.first_name) > len(first_name)
-                or (
-                    len(row.first_name) == len(first_name)
-                    and len(row.last_name) > len(last_name)
-                )
-            ):
-                uid, first_name, last_name = idx, row.first_name, row.last_name
-        cprr.loc[cprr.uid.isin(cluster), "uid"] = uid
-        cprr.loc[cprr.uid == uid, "first_name"] = first_name
-        cprr.loc[cprr.uid == uid, "last_name"] = last_name
+    canonicalize_names(cprr, clusters)
     return cprr
 
 
