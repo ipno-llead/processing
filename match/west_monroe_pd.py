@@ -38,11 +38,47 @@ def match_pprr_and_post(pprr, post):
     return extract_events_from_post(post, matches, "West Monroe PD")
 
 
+def match_cprr_with_pprr(cprr, pprr):
+    dfa = (
+        cprr[["first_name", "last_name", "uid"]]
+        .drop_duplicates(subset=["uid"])
+        .set_index("uid", drop=True)
+    )
+    dfa.loc[:, "fc"] = dfa.first_name.fillna("").map(lambda x: x[:1])
+    dfb = (
+        pprr[["first_name", "last_name", "uid"]]
+        .drop_duplicates(subset=["uid"])
+        .set_index("uid", drop=True)
+    )
+    dfb.loc[:, "fc"] = dfb.first_name.fillna("").map(lambda x: x[:1])
+    matcher = ThresholdMatcher(
+        ColumnsIndex(["fc"]),
+        {
+            "first_name": JaroWinklerSimilarity(),
+            "last_name": JaroWinklerSimilarity(),
+        },
+        dfa,
+        dfb,
+    )
+    decision = 0.82
+    matcher.save_pairs_to_excel(
+        data_file_path(
+            "match/cprr_west_monroe_pd_2020_v_pprr_west_monroe_pd_2015_2020.xlsx"
+        ),
+        decision,
+    )
+    matches = matcher.get_index_pairs_within_thresholds(decision)
+
+    match_dict = dict(matches)
+    cprr.loc[:, "uid"] = cprr["uid"].map(lambda v: match_dict.get(v, v))
+    return cprr
+
+
 if __name__ == "__main__":
     pprr = pd.read_csv(data_file_path("clean/pprr_west_monroe_pd_2015_2020.csv"))
+    cprr = pd.read_csv(data_file_path("clean/cprr_west_monroe_pd_2020.csv"))
     agency = pprr.agency[0]
     post = load_for_agency("clean/pprr_post_2020_11_06.csv", agency)
     post_event = match_pprr_and_post(pprr, post)
-    post_event.to_csv(
-        data_file_path("match/post_event_west_monroe_pd_2020_11_06.csv"), index=False
-    )
+    match_cprr_with_pprr(cprr, pprr)
+    post_event.to_csv(data_file_path("match/post_event_west_monroe_pd_2020_11_06.csv"), index=False)

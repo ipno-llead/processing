@@ -50,10 +50,15 @@ def clean():
             data_file_path("raw/west_monroe_pd/cprr_west_monroe_pd_2020_byhand.csv")
         )
         .drop(columns="allegation_desc")
-        .rename(columns={"investigator_reviewer": "investigator"})
+        .rename(
+            columns={
+                "investigator_reviewer": "investigator",
+                "incident_date": "occur_date",
+            }
+        )
         .pipe(clean_column_names)
         .pipe(fix_review_date)
-        .pipe(clean_dates, ["incident_date", "receive_date", "review_date"])
+        .pipe(clean_dates, ["occur_date", "receive_date", "review_date"])
         .pipe(extract_accused_badge_number)
         .pipe(split_accused_names)
         .pipe(extract_receiver_badge_number)
