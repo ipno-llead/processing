@@ -251,6 +251,10 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/com-acadia-so
     fetch:
       - +refs/heads/*:refs/remotes/com-acadia-so/*
+  com-west-monroe-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/com-west-monroe-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/com-west-monroe-pd/*
   event:
     url: https://hub.wrgl.co/api/users/ipno/repos/event
     fetch:
@@ -1054,6 +1058,12 @@ branch:
     remote: com-acadia-so
     merge: refs/heads/main
     file: data/fuse/com_acadia_so.csv
+    primaryKey:
+      - allegation_uid
+  com-west-monroe-pd:
+    remote: com-west-monroe-pd
+    merge: refs/heads/main
+    file: data/fuse/com_west_monroe_pd.csv
     primaryKey:
       - allegation_uid
   event:
