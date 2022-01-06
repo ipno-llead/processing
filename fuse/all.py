@@ -64,6 +64,7 @@ def fuse_personnel():
                 pd.read_csv(data_file_path("fuse/per_terrebonne_so.csv")),
                 pd.read_csv(data_file_path("fuse/per_jefferson_so.csv")),
                 pd.read_csv(data_file_path("fuse/per_acadia_so.csv")),
+                pd.read_csv(data_file_path("fuse/per_rayne_pd.csv")),
             ]
         )
     ).sort_values("uid", ignore_index=True)
@@ -119,6 +120,7 @@ def fuse_event():
                 pd.read_csv(data_file_path("fuse/event_terrebonne_so.csv")),
                 pd.read_csv(data_file_path("fuse/event_jefferson_so.csv")),
                 pd.read_csv(data_file_path("fuse/event_acadia_so.csv")),
+                pd.read_csv(data_file_path("fuse/event_rayne_pd.csv")),
             ]
         )
     ).sort_values(["agency", "event_uid"], ignore_index=True)
@@ -159,6 +161,7 @@ def fuse_allegation():
                 pd.read_csv(data_file_path("fuse/com_maurice_pd.csv")),
                 pd.read_csv(data_file_path("fuse/com_terrebonne_so.csv")),
                 pd.read_csv(data_file_path("fuse/com_acadia_so.csv")),
+                pd.read_csv(data_file_path("fuse/com_rayne_pd.csv")),
             ]
         )
     ).sort_values(["agency", "tracking_number"], ignore_index=True)

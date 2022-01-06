@@ -61,6 +61,78 @@ def split_investiator_names(df):
     return df.drop(columns="assigned_investigator")
 
 
+def fix_disposition(df):
+    df.loc[
+        (df.last_name == "jonson") & (df.allegation == "vehicle pursuit policy"),
+        "disposition",
+    ] = ""
+
+    df.loc[
+        (df.last_name == "cole") & (df.allegation == "vehicle pursuit policy"),
+        "disposition",
+    ] = ""
+
+    df.loc[
+        (df.last_name == "pellerin") & (df.allegation == "vehicle pursuit policy"),
+        "disposition",
+    ] = ""
+
+    df.loc[
+        (df.last_name == "credeur")
+        & (df.allegation == "conduct unbecoming of officer; vehicle pursuit policy"),
+        "disposition",
+    ] = "sustained, 3-day suspension"
+
+    df.loc[
+        (df.last_name == "trahan")
+        & (df.allegation == "conduct unbecoming of officer; vehicle pursuit policy"),
+        "disposition",
+    ] = "sustained, 14-day suspension and demotion"
+
+    df.loc[
+        (df.last_name == "istre")
+        & (df.allegation == "conduct unbecoming of officer; vehicle pursuit policy"),
+        "disposition",
+    ] = "exonerated"
+
+    return df
+
+
+def extract_action(df):
+    df.loc[:, "action"] = (
+        df.disposition.str.lower()
+        .str.strip()
+        .fillna("")
+        .str.replace(r"sgt\. joseph credeur ", "", regex=True)
+        .str.replace(" on actions", "", regex=False)
+        .str.replace(r"(exonerated|unfounded|sustained\,? ?)", "", regex=True)
+        .str.replace("suspended- 3 days", "3-day suspension", regex=False)
+        .str.replace("suspension and demotion", "suspension; demotion", regex=False)
+    )
+    return df
+
+
+def clean_disposition(df):
+    dispositions = (
+        df.disposition.str.lower()
+        .str.strip()
+        .str.extract(r"(exonerated|sustained\,?|unfounded|resigned)")
+    )
+
+    df.loc[:, "disposition"] = dispositions[0].fillna("")
+    return df
+
+
+def clean_rank(df):
+    df.loc[:, "rank_desc"] = (
+        df.rank_desc.str.replace(r"^ptl$", "patrol officer", regex=True)
+        .str.replace(r"^pfc$", "patrol officer first class", regex=True)
+        .str.replace(r"^sgt$", "sergeant", regex=True)
+        .str.replace(r"^pco$", "patrol communications officer", regex=True)
+    )
+    return df
+
+
 def clean():
     df = (
         pd.read_csv(data_file_path("raw/rayne_pd/rayne_pd_cprr_2019_2020.csv"))
@@ -75,13 +147,32 @@ def clean():
         .pipe(split_rows_with_multiple_officers)
         .pipe(split_officer_names)
         .pipe(split_investiator_names)
+        .pipe(fix_disposition)
+        .pipe(extract_action)
+        .pipe(clean_disposition)
+        .pipe(clean_rank)
+        .pipe(
+            clean_names,
+            [
+                "first_name",
+                "last_name",
+                "investigator_first_name",
+                "investigator_last_name",
+            ],
+        )
         .pipe(clean_dates, ["receive_date", "investigation_complete_date"])
         .pipe(set_values, {"agency": "Rayne PD"})
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
+        .pipe(
+            gen_uid,
+            ["investigator_first_name", "investigator_last_name", "agency"],
+            "investigator_uid",
+        )
+        .pipe(gen_uid, ["uid", "allegation", "disposition", "action"], "allegation_uid")
     )
     return df
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     df = clean()
-    df.to_csv(data_file_path('clean/cprr_rayne_pd_2019_2020.csv'), index=False)
+    df.to_csv(data_file_path("clean/cprr_rayne_pd_2019_2020.csv"), index=False)
