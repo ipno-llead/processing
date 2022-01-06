@@ -161,7 +161,7 @@ def add_missing_year_to_hearing_date(df):
     df.loc[df.appeal_hearing_date == "Dec", "appeal_hearing_date"] = "2003-12"
     df.loc[df.appeal_hearing_date == "June", "appeal_hearing_date"] = "2007-06"
 
-    return df
+    return df.drop(columns='hearing_date')
 
 
 def split_row_by_appeal_hearing_date(df):
@@ -551,6 +551,7 @@ def clean():
         .pipe(condense_rows_with_same_docket_no)
         .pipe(standardize_desc_cols, ["appeal_disposition"])
         .pipe(clean_dates, ["appeal_disposition_date"])
+        .rename(columns={"action": "action_appealed"})
         .pipe(
             gen_uid,
             ["agency", "first_name", "last_name", "middle_name", "middle_initial"],

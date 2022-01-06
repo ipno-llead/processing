@@ -11,6 +11,10 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/app-louisiana-state-police
     fetch:
       - +refs/heads/*:refs/remotes/app-louisiana-state-police/*
+  app-new-orleans-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/app-new-orleans-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/app-new-orleans-pd/*
   baton-rouge-da-brady-list:
     url: https://hub.wrgl.co/api/users/ipno/repos/baton-rouge-da-brady-list
     fetch:
@@ -243,6 +247,10 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/com-washington-so
     fetch:
       - +refs/heads/*:refs/remotes/com-washington-so/*
+  com-acadia-so:
+    url: https://hub.wrgl.co/api/users/ipno/repos/com-acadia-so
+    fetch:
+      - +refs/heads/*:refs/remotes/com-acadia-so/*
   event:
     url: https://hub.wrgl.co/api/users/ipno/repos/event
     fetch:
@@ -427,6 +435,10 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/event-post
     fetch:
       - +refs/heads/*:refs/remotes/event-post/*
+  event-acadia-so:
+    url: https://hub.wrgl.co/api/users/ipno/repos/event-acadia-so
+    fetch:
+      - +refs/heads/*:refs/remotes/event-acadia-so/*
   match-brusly-pd-2020:
     url: https://hub.wrgl.co/api/users/ipno/repos/match-brusly-pd-2020
     fetch:
@@ -691,6 +703,10 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/per-post
     fetch:
       - +refs/heads/*:refs/remotes/per-post/*
+  per-acadia-so:
+    url: https://hub.wrgl.co/api/users/ipno/repos/per-acadia-so
+    fetch:
+      - +refs/heads/*:refs/remotes/per-acadia-so/*
   person:
     url: https://hub.wrgl.co/api/users/ipno/repos/person
     fetch:
@@ -707,6 +723,10 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/stop-and-search
     fetch:
       - +refs/heads/*:refs/remotes/stop-and-search/*
+  appeal-hearing:
+    url: https://hub.wrgl.co/api/users/ipno/repos/appeal-hearing
+    fetch:
+      - +refs/heads/*:refs/remotes/appeal-hearing/*
   uof-new-orleans-pd:
     url: https://hub.wrgl.co/api/users/ipno/repos/uof-new-orleans-pd
     fetch:
@@ -732,6 +752,12 @@ branch:
     remote: app-louisiana-state-police
     merge: refs/heads/main
     file: data/fuse/app_louisiana_state_police.csv
+    primaryKey:
+      - appeal_uid
+  app-new-orleans-pd:
+    remote: app-new-orleans-pd
+    merge: refs/heads/main
+    file: data/fuse/app_new_orleans_csc.csv
     primaryKey:
       - appeal_uid
   baton-rouge-da-brady-list:
@@ -1024,6 +1050,12 @@ branch:
     file: data/fuse/com_washington_so.csv
     primaryKey:
       - allegation_uid
+  com-acadia-so:
+    remote: com-acadia-so
+    merge: refs/heads/main
+    file: data/fuse/com_acadia_so.csv
+    primaryKey:
+      - allegation_uid
   event:
     remote: event
     merge: refs/heads/main
@@ -1300,6 +1332,12 @@ branch:
     file: data/fuse/event_post.csv
     primaryKey:
       - event_uid
+  event-acadia-so:
+    remote: event-acadia-so
+    merge: refs/heads/main
+    file: data/fuse/event_acadia_so.csv
+    primaryKey:
+      - event_uid
   match-brusly-pd-2020:
     remote: match-brusly-pd-2020
     merge: refs/heads/main
@@ -1368,18 +1406,10 @@ branch:
     remote: match-pprr-baton-rouge-csd-2019
     merge: refs/heads/main
     file: data/match/pprr_baton_rouge_csd_2019.csv
-  match-pprr-brusly-pd-2020:
-    remote: match-pprr-brusly-pd-2020
-    merge: refs/heads/main
-    file: data/match/pprr_brusly_pd_2020.csv
   match-pprr-port-allen-csd-2020:
     remote: match-pprr-port-allen-csd-2020
     merge: refs/heads/main
     file: data/match/pprr_port_allen_csd_2020.csv
-  match-pprr-st-tammany-so-2020:
-    remote: match-pprr-st-tammany-so-2020
-    merge: refs/heads/main
-    file: data/match/pprr_st_tammany_so_2020.csv
   new-orleans-da-brady-list:
     remote: new-orleans-da-brady-list
     merge: refs/heads/main
@@ -1654,6 +1684,12 @@ branch:
     file: data/fuse/personnel_post.csv
     primaryKey:
       - uid
+  per-acadia-so:
+    remote: per-acadia-so
+    merge: refs/heads/main
+    file: data/fuse/per_acadia_so.csv
+    primaryKey:
+      - uid
   person:
     remote: person
     merge: refs/heads/main
@@ -1678,6 +1714,12 @@ branch:
     file: data/fuse/stop_and_search.csv
     primaryKey:
       - stop_and_search_uid
+  appeal-hearing:
+    remote: appeal-hearing
+    merge: refs/heads/main
+    file: data/fuse/appeals.csv
+    primaryKey:
+      - appeal_uid
   uof-new-orleans-pd:
     remote: uof-new-orleans-pd
     merge: refs/heads/main
