@@ -3,7 +3,7 @@ import sys
 sys.path.append("../")
 import pandas as pd
 from lib.path import data_file_path
-from lib.columns import clean_column_names
+from lib.columns import clean_column_names, set_values
 from lib.uid import gen_uid
 
 
@@ -73,8 +73,10 @@ def clean():
         .pipe(extract_agency_and_department_desc)
         .pipe(clean_action)
         .pipe(assign_agency)
+        .pipe(set_values, {'source_agency': 'Ouachita DA'})
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
-        .pipe(gen_uid, ["uid", "allegation", "action", "disposition"], "allegation_uid")
+        .pipe(gen_uid, ["uid", "tracking_number", "allegation", "action", "disposition"], "allegation_uid")
+        .pipe(gen_uid, ["uid", "allegation_uid", "source_agency"], "brady_uid")
     )
     return df
 

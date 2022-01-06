@@ -1,4 +1,4 @@
-from lib.columns import clean_column_names
+from lib.columns import clean_column_names, set_values
 from lib.path import data_file_path
 from lib.clean import clean_names, standardize_desc_cols
 from lib.uid import gen_uid
@@ -34,12 +34,22 @@ def clean():
         .pipe(clean_column_names)
         .pipe(clean_allegations)
         .pipe(extract_disposition)
+        .pipe(set_values, {"source_agency": "East Baton Rouge DA"})
+        .rename(
+            columns={
+                "Baton Rouge Police Department": "Baton Rouge PD",
+                "East Baton Rouge Sheriff's Office": "Baton Rouge SO",
+                "Louisiana State Police": "Louisiana State PD",
+                "Louisiana State University Police Department": "LSU PD",
+            }
+        )
     )
     return (
         df.pipe(clean_names, ["first_name", "last_name", "middle_name"])
         .pipe(standardize_desc_cols, ["status"])
         .pipe(gen_uid, ["agency", "first_name", "last_name", "middle_name"])
         .pipe(gen_uid, ["uid", "allegation", "disposition"], "allegation_uid")
+        .pipe(gen_uid, ["uid", "allegation_uid", "source_agency"], "brady_uid")
     )
 
 
