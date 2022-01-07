@@ -5,6 +5,7 @@ import pandas as pd
 from pandas.testing import assert_frame_equal
 
 from clean import remove_future_dates
+from lib.clean import float_to_int_str
 
 sys.path.append("./")
 
@@ -36,3 +37,21 @@ class RemoveFutureDates(unittest.TestCase):
                 columns=columns,
             ),
         )
+
+
+class FltIntStr(unittest.TestCase):
+    def test_float_to_int_str(self):
+        data = {"dates": ["1994", "2005", "2011", "1955"]}
+        df = pd.DataFrame(data)
+
+        df.loc[:, "dates"] = df.dates.astype(float)
+        df = df.pipe(float_to_int_str, ["dates"])
+
+        dfa = pd.DataFrame(data)
+        dfa.loc[:, "dates"] = dfa.dates.astype(str)
+
+        df = df[["dates"]]
+
+        dfa = dfa[["dates"]]
+
+        assert_frame_equal(df, dfa)
