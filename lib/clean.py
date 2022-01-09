@@ -700,24 +700,6 @@ def canonicalize_names(
     first_name_column: str = "first_name",
     last_name_column: str = "last_name",
 ) -> pd.DataFrame:
-
-    """Canonicalizes names
-
-    Args:
-        df (pd.DataFrame):
-            the frame to process
-        clusters (list of tuples):
-            index clusters generated from ThresholdMatcher
-        uid_column (str):
-            uid of given officer
-        first_name_column (str):
-            first_name of given officer
-        last_name_column (str):
-            last_name of given officer
-
-    Returns:
-        the updated frame
-    """
     for cluster in clusters:
         uid, first_name, last_name = None, "", ""
         for idx in cluster:
@@ -735,7 +717,6 @@ def canonicalize_names(
                     row[first_name_column],
                     row[last_name_column],
                 )
-
         df.loc[df[uid_column].isin(cluster), uid_column] = uid
         df.loc[df[uid_column] == uid, first_name_column] = first_name
         df.loc[df[uid_column] == uid, last_name_column] = last_name
