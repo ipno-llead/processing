@@ -9,14 +9,28 @@ from lib.personnel import fuse_personnel
 from lib.post import load_for_agency
 
 
-def fuse_events(cprr, post):
+def fuse_events(cprr21, cprr18, post):
     builder = events.Builder()
     builder.extract_events(
-        cprr,
+        cprr21,
         {
             events.INVESTIGATION_COMPLETE: {
                 "prefix": "investigation_complete",
                 "keep": ["uid", "agency", "allegation_uid"],
+            },
+        },
+        ["uid", "allegation_uid"],
+    )
+    builder.extract_events(
+        cprr21,
+        {
+            events.INVESTIGATION_COMPLETE: {
+                "prefix": "investigation_complete",
+                "keep": ["uid", "agency", "allegation_uid"],
+            },
+            events.COMPLAINT_RECEIVE: {
+                "prefix": "receive",
+                "keep": ["uid", "agency", "allegation_uiid"],
             },
         },
         ["uid", "allegation_uid"],
@@ -45,12 +59,13 @@ def fuse_events(cprr, post):
 
 
 if __name__ == "__main__":
-    cprr = pd.read_csv(data_file_path("match/cprr_abbeville_pd_2019_2021.csv"))
-    agency = cprr.agency[0]
+    cprr21 = pd.read_csv(data_file_path("match/cprr_abbeville_pd_2019_2021.csv"))
+    cprr18 = pd.read_csv(data_file_path("match/cprr_abbeville_pd_2015_2018.csv"))
+    agency = cprr21.agency[0]
     post = load_for_agency("clean/pprr_post_2020_11_06.csv", agency)
-    per = fuse_personnel(cprr, post)
-    com = rearrange_allegation_columns(cprr)
-    event = fuse_events(cprr, post)
+    per = fuse_personnel(cprr21, cprr18, post)
+    com = rearrange_allegation_columns(pd.concat([cprr21, cprr18]))
+    event = fuse_events(cprr21, cprr18, post)
     event.to_csv(data_file_path("fuse/event_abbeville_pd.csv"), index=False)
     com.to_csv(data_file_path("fuse/com_abbeville_pd.csv"), index=False)
     per.to_csv(data_file_path("fuse/per_abbeville_pd.csv"), index=False)
