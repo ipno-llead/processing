@@ -5,12 +5,13 @@ import pandas as pd
 from pandas.testing import assert_frame_equal
 
 from clean import remove_future_dates
-from lib.clean import canonicalize_names, float_to_int_str
+from lib.clean import canonicalize_officers, float_to_int_str
+import numpy as np
 
 sys.path.append("./")
 
 
-class RemoveFutureDates(unittest.TestCase):
+class RemoveFutureDatesTestCase(unittest.TestCase):
     def test_remove_future_dates(self):
         columns = ["name", "birth_year", "birth_month", "birth_day"]
         assert_frame_equal(
@@ -39,56 +40,129 @@ class RemoveFutureDates(unittest.TestCase):
         )
 
 
-class FoatIntStr(unittest.TestCase):
+class FloatToIntStrTestCase(unittest.TestCase):
     def test_float_to_int_str(self):
-        data = {"dates": ["1994", "2005", "2011", "1955"]}
-        df = pd.DataFrame(data)
-
-        df.loc[:, "dates"] = df.dates.astype(float)
-        df = df.pipe(float_to_int_str, ["dates"])
-
-        dfa = pd.DataFrame(data)
-        dfa.loc[:, "dates"] = dfa.dates.astype(str)
-
-        df = df[["dates"]]
-
-        dfa = dfa[["dates"]]
-
-        assert_frame_equal(df, dfa)
-
-
-class CanonicalizeNames(unittest.TestCase):
-    def test_canonicalize_names(self):
-        officers = [
-            ["92d3d9c79a3eb44ece5c83e62e55b91d", "thomas", "paine"],
-            ["gew532429a3eb44ecefwfwffFwq3rqrr", "freddy", "douglass"],
-            ["00453523nasgnasfjof235fndjvasnsf", "john", "brown"],
-            ["1e65c0807675ee3f25f6a6bf25eb121b", "patrick", "peterman"],
-            ["db3d392b404754b2d4a127ca0922d2f8", "patrick", "petermann"],
-            ["db3d392b404754b2d4a127ca0922d2f8", "patrick", "petermann"],
-        ]
-
-        clusters = [
-            frozenset(
-                {"1e65c0807675ee3f25f6a6bf25eb121b", "db3d392b404754b2d4a127ca0922d2f8"}
-            )
-        ]
-
-        dfa = canonicalize_names(
-            pd.DataFrame(officers, columns=["uid", "first_name", "last_name"]), clusters
-        ).fillna("")
-
-        canonicalized_officers = [
-            ["92d3d9c79a3eb44ece5c83e62e55b91d", "thomas", "paine"],
-            ["gew532429a3eb44ecefwfwffFwq3rqrr", "freddy", "douglass"],
-            ["00453523nasgnasfjof235fndjvasnsf", "john", "brown"],
-            ["db3d392b404754b2d4a127ca0922d2f8", "", ""],
-            ["db3d392b404754b2d4a127ca0922d2f8", "patrick", "petermann"],
-            ["db3d392b404754b2d4a127ca0922d2f8", "patrick", "petermann"],
-        ]
-
-        dfb = pd.DataFrame(
-            canonicalized_officers, columns=["uid", "first_name", "last_name"]
+        """
+        This is short but it tests multiple things:
+        - float_to_int_str works on multiple columns
+        - float_to_int_str only works on specified columns
+        - float_to_int_str transforms float columns to integer strs
+        - float_to_int_str leave int64 columns alone
+        - float_to_int_str transforms "mixed" column (dtype object)
+        """
+        columns = ["id", "name", "age", "mixed"]
+        assert_frame_equal(
+            float_to_int_str(
+                pd.DataFrame(
+                    [
+                        [3, "john", 27.0, 1973.0],
+                        [4, "anne", 24.0, np.nan],
+                        [5, "bill", np.nan, "abc"],
+                    ],
+                    columns=columns,
+                ),
+                ["id", "age", "mixed"],
+            ),
+            pd.DataFrame(
+                [
+                    [3, "john", "27", "1973"],
+                    [4, "anne", "24", ""],
+                    [5, "bill", "", "abc"],
+                ],
+                columns=columns,
+            ),
         )
 
-        assert_frame_equal(dfa, dfb)
+
+class CanonicalizeNamesTestCase(unittest.TestCase):
+    def test_canonicalize_names(self):
+        assert_frame_equal(
+            canonicalize_officers(
+                pd.DataFrame(
+                    [
+                        {
+                            "uid": "1e65c0807675ee3f25f6a6bf25eb121b",
+                            "first_name": "patric",
+                            "last_name": "peterman",
+                        },
+                        {
+                            "uid": "db3d392b404754b2d4a127ca0922d2f8",
+                            "first_name": "patrick",
+                            "last_name": "peterman",
+                        },
+                        {
+                            "uid": "92d3d9c79a3eb44ece5c83e62e55b91d",
+                            "first_name": "thomas",
+                            "last_name": "ferguson",
+                        },
+                        {
+                            "uid": "a5f3c016d4c3373aa74dc15c0638362e",
+                            "first_name": "thomas",
+                            "last_name": "ferguso",
+                        },
+                        {
+                            "uid": "233418697784e972144523ad8cc4ed9",
+                            "first_name": "arthur",
+                            "middle_name": "hesse",
+                            "last_name": "schopenhaur",
+                        },
+                        {
+                            "uid": "d59c942cdd7e211bf7c76f20501d657c",
+                            "first_name": "arthur",
+                            "middle_name": "h",
+                            "last_name": "schopenhaur",
+                        },
+                    ]
+                ),
+                clusters=[
+                    (
+                        "db3d392b404754b2d4a127ca0922d2f8",
+                        "1e65c0807675ee3f25f6a6bf25eb121b",
+                    ),
+                    (
+                        "92d3d9c79a3eb44ece5c83e62e55b91d",
+                        "a5f3c016d4c3373aa74dc15c0638362e",
+                    ),
+                    (
+                        "233418697784e972144523ad8cc4ed9",
+                        "d59c942cdd7e211bf7c76f20501d657c",
+                    ),
+                ],
+            ).fillna(""),
+            pd.DataFrame(
+                [
+                    {
+                        "uid": "db3d392b404754b2d4a127ca0922d2f8",
+                        "first_name": "",
+                        "last_name": "",
+                    },
+                    {
+                        "uid": "db3d392b404754b2d4a127ca0922d2f8",
+                        "first_name": "patrick",
+                        "last_name": "peterman",
+                    },
+                    {
+                        "uid": "92d3d9c79a3eb44ece5c83e62e55b91d",
+                        "first_name": "thomas",
+                        "last_name": "ferguson",
+                    },
+                    {
+                        "uid": "92d3d9c79a3eb44ece5c83e62e55b91d",
+                        "first_name": "",
+                        "last_name": "",
+                    },
+                    {
+                        "uid": "233418697784e972144523ad8cc4ed9",
+                        "first_name": "arthur",
+                        "middle_name": "hesse",
+                        "last_name": "schopenhaur",
+                    },
+                    {
+                        "uid": "233418697784e972144523ad8cc4ed9",
+                        "first_name": "",
+                        "middle_name": "",
+                        "last_name": "",
+                    },
+                ]
+            ).fillna(""),
+        )

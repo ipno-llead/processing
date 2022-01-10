@@ -693,31 +693,32 @@ def strip_birth_date(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
     return df
 
 
-def canonicalize_names(
+def canonicalize_officers(
     df: pd.DataFrame,
     clusters: list[tuple],
     uid_column: str = "uid",
     first_name_column: str = "first_name",
+    middle_name_column: str = "middle_name",
     last_name_column: str = "last_name",
 ) -> pd.DataFrame:
     for cluster in clusters:
-        uid, first_name, last_name = None, "", ""
+        uid, first_name, middle_name, last_name = None, "", "", ""
         for idx in cluster:
             row = df.loc[df[uid_column] == idx]
-            if (
-                uid is None
-                or len(row[first_name_column]) > len(first_name)
-                or (
-                    len(row[first_name_column]) == len(first_name)
-                    and len(row[last_name_column]) > len(last_name)
-                )
+            if uid is None or (
+                len(row[first_name_column]) == len(first_name)
+                and len(row[last_name_column]) > len(last_name)
             ):
-                uid, first_name, last_name = (
+
+                uid, first_name, middle_name, last_name = (
                     idx,
                     row[first_name_column],
+                    row[middle_name_column],
                     row[last_name_column],
                 )
         df.loc[df[uid_column].isin(cluster), uid_column] = uid
-        df.loc[df[uid_column] == uid, first_name_column] = first_name
-        df.loc[df[uid_column] == uid, last_name_column] = last_name
+        df.loc[df[uid_column].isin(cluster), first_name_column] = first_name
+        df.loc[df[uid_column].isin(cluster), middle_name_column] = middle_name
+        df.loc[df[uid_column].isin(cluster), last_name_column] = last_name
+
     return df
