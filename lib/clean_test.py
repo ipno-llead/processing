@@ -83,7 +83,7 @@ class CanonicalizeNamesTestCase(unittest.TestCase):
                         {
                             "uid": "1e65c0807675ee3f25f6a6bf25eb121b",
                             "first_name": "patrick",
-                            "last_name": "p",
+                            "last_name": "peterman",
                             "agency": "Baton Rouge PD",
                             "rank_desc": "sergeant",
                             "id": 10,
@@ -91,7 +91,7 @@ class CanonicalizeNamesTestCase(unittest.TestCase):
                         {
                             "uid": "db3d392b404754b2d4a127ca0922d2f8",
                             "first_name": "patrick",
-                            "last_name": "peterman",
+                            "last_name": "petermann",
                             "agency": "Baton Rouge PD",
                             "rank_desc": "sergeant",
                             "id": 9,
@@ -112,47 +112,23 @@ class CanonicalizeNamesTestCase(unittest.TestCase):
                             "rank_desc": "commander",
                             "id": 7,
                         },
-                        {
-                            "uid": "312b4aaff18c2a7677267d4329b300d8",
-                            "first_name": "arthur",
-                            "middle_name": "h",
-                            "last_name": "schopenhauer",
-                            "agency": "Ye PD",
-                            "rank_desc": "chief",
-                            "id": 6,
-                        },
-                        {
-                            "uid": "6e4a0c5d104488f094b3b93475bf2587",
-                            "first_name": "arthur",
-                            "middle_name": "hesse",
-                            "last_name": "schopenhauer",
-                            "agency": "Ye PD",
-                            "rank_desc": "chief",
-                            "id": 5,
-                        },
                     ]
                 ),
                 clusters=[
                     (
-                        "db3d392b404754b2d4a127ca0922d2f8",
                         "1e65c0807675ee3f25f6a6bf25eb121b",
+                        "db3d392b404754b2d4a127ca0922d2f8",
                     ),
                     (
                         "a5f3c016d4c3373aa74dc15c0638362e",
                         "92d3d9c79a3eb44ece5c83e62e55b91d",
-                     
-               
-                    ),
-                    (
-                        "6e4a0c5d104488f094b3b93475bf2587",
-                        "312b4aaff18c2a7677267d4329b300d8",
                     ),
                 ],
             ),
             pd.DataFrame(
                 [
                     {
-                        "uid": "db3d392b404754b2d4a127ca0922d2f8",
+                        "uid": "1e65c0807675ee3f25f6a6bf25eb121b",
                         "first_name": "patrick",
                         "last_name": "peterman",
                         "agency": "Baton Rouge PD",
@@ -160,7 +136,7 @@ class CanonicalizeNamesTestCase(unittest.TestCase):
                         "id": 10,
                     },
                     {
-                        "uid": "db3d392b404754b2d4a127ca0922d2f8",
+                        "uid": "1e65c0807675ee3f25f6a6bf25eb121b",
                         "first_name": "patrick",
                         "last_name": "peterman",
                         "agency": "Baton Rouge PD",
@@ -183,25 +159,6 @@ class CanonicalizeNamesTestCase(unittest.TestCase):
                         "rank_desc": "commander",
                         "id": 7,
                     },
-                    {
-                        "uid": "6e4a0c5d104488f094b3b93475bf2587",
-                        "first_name": "arthur",
-                        "middle_name": "hesse",
-                        "last_name": "schopenhauer",
-                        "agency": "Ye PD",
-                        "rank_desc": "chief",
-                        "id": 6,
-                    },
-                    {
-                        "uid": "6e4a0c5d104488f094b3b93475bf2587",
-                        "first_name": "arthur",
-                        "middle_name": "hesse",
-                        "last_name": "schopenhauer",
-                        "agency": "Ye PD",
-                        "rank_desc": "chief",
-                        "id": 5,
-                    },
                 ]
             ),
         )
-        

@@ -698,52 +698,30 @@ def canonicalize_officers(
     clusters: list[tuple],
     uid_column: str = "uid",
     first_name_column: str = "first_name",
-    middle_name_column: str = "middle_name",
     last_name_column: str = "last_name",
 ) -> pd.DataFrame:
     for cluster in clusters:
-        uid, first_name, middle_name, last_name = None, "", "", ""
+        uid, first_name, last_name = None, "", ""
         for idx in cluster:
             row = df.loc[df[uid_column] == idx]
             first_names = []
             last_names = []
-            if middle_name_column not in row:
-                if (
-                    (len(row[first_name_column]) > len(first_name))
-                    or (len(row[last_name_column]) < len(last_name))
-                    or uid is None
-                ):
+            if (
+                uid is None
+                or len(row[first_name_column]) > len(first_name)
+                or (
+                    len(row[first_name_column]) == len(first_name)
+                    and len(row[last_name_column]) > len(last_name)
+                )
+            ):
+                uid = idx
+                first_name = row[first_name_column]
+                first_names.append(first_name)
 
-                    uid = idx
-                    first_name = row[first_name_column]
-                    first_names.append(first_name)
+                last_name = row[last_name_column]
+                last_names.append(last_name)
 
-                    last_name = row[last_name_column]
-                    last_names.append(last_name)
-            else:
-                first_names = []
-                middle_names = []
-                last_names = []
-                if (
-                     uid is None
-                ):
-                    uid = idx
-                    first_name = row[first_name_column]
-                    first_names.append(first_name)
-
-                    middle_name = row[middle_name_column]
-                    middle_names.append(middle_name)
-
-                    last_name = row[last_name_column]
-                    last_names.append(last_name)
-
-                    df.loc[df[uid_column].isin(cluster), uid_column] = uid
-                    df.loc[
-                        df[uid_column].isin(cluster), first_name_column
-                    ] = first_names
-                    df.loc[
-                        df[uid_column].isin(cluster), middle_name_column
-                    ] = middle_names
-                    df.loc[df[uid_column].isin(cluster), last_name_column] = last_names
-
+                df.loc[df[uid_column].isin(cluster), uid_column] = uid
+                df.loc[df[uid_column].isin(cluster), first_name_column] = first_names
+                df.loc[df[uid_column].isin(cluster), last_name_column] = last_names
     return df
