@@ -83,7 +83,7 @@ class CanonicalizeNamesTestCase(unittest.TestCase):
                         {
                             "uid": "1e65c0807675ee3f25f6a6bf25eb121b",
                             "first_name": "patrick",
-                            "last_name": "peterman",
+                            "last_name": "p",
                             "agency": "Baton Rouge PD",
                             "rank_desc": "sergeant",
                             "id": 10,
@@ -91,14 +91,14 @@ class CanonicalizeNamesTestCase(unittest.TestCase):
                         {
                             "uid": "db3d392b404754b2d4a127ca0922d2f8",
                             "first_name": "patrick",
-                            "last_name": "petermann",
+                            "last_name": "peterman",
                             "agency": "Baton Rouge PD",
                             "rank_desc": "sergeant",
                             "id": 9,
                         },
                         {
                             "uid": "92d3d9c79a3eb44ece5c83e62e55b91d",
-                            "first_name": "thoma",
+                            "first_name": "t",
                             "last_name": "ferguson",
                             "agency": "New Orleans PD",
                             "rank_desc": "commander",
@@ -113,7 +113,7 @@ class CanonicalizeNamesTestCase(unittest.TestCase):
                             "id": 7,
                         },
                         {
-                            "uid": "233418697784e972144523ad8cc4ed9",
+                            "uid": "312b4aaff18c2a7677267d4329b300d8",
                             "first_name": "arthur",
                             "middle_name": "h",
                             "last_name": "schopenhauer",
@@ -122,7 +122,7 @@ class CanonicalizeNamesTestCase(unittest.TestCase):
                             "id": 6,
                         },
                         {
-                            "uid": "d59c942cdd7e211bf7c76f20501d657c",
+                            "uid": "6e4a0c5d104488f094b3b93475bf2587",
                             "first_name": "arthur",
                             "middle_name": "hesse",
                             "last_name": "schopenhauer",
@@ -134,23 +134,25 @@ class CanonicalizeNamesTestCase(unittest.TestCase):
                 ),
                 clusters=[
                     (
-                        "1e65c0807675ee3f25f6a6bf25eb121b",
                         "db3d392b404754b2d4a127ca0922d2f8",
+                        "1e65c0807675ee3f25f6a6bf25eb121b",
                     ),
                     (
                         "a5f3c016d4c3373aa74dc15c0638362e",
                         "92d3d9c79a3eb44ece5c83e62e55b91d",
+                     
+               
                     ),
                     (
-                        "d59c942cdd7e211bf7c76f20501d657c",
-                        "233418697784e972144523ad8cc4ed9",
+                        "6e4a0c5d104488f094b3b93475bf2587",
+                        "312b4aaff18c2a7677267d4329b300d8",
                     ),
                 ],
             ),
             pd.DataFrame(
                 [
                     {
-                        "uid": "1e65c0807675ee3f25f6a6bf25eb121b",
+                        "uid": "db3d392b404754b2d4a127ca0922d2f8",
                         "first_name": "patrick",
                         "last_name": "peterman",
                         "agency": "Baton Rouge PD",
@@ -158,7 +160,7 @@ class CanonicalizeNamesTestCase(unittest.TestCase):
                         "id": 10,
                     },
                     {
-                        "uid": "1e65c0807675ee3f25f6a6bf25eb121b",
+                        "uid": "db3d392b404754b2d4a127ca0922d2f8",
                         "first_name": "patrick",
                         "last_name": "peterman",
                         "agency": "Baton Rouge PD",
@@ -182,7 +184,7 @@ class CanonicalizeNamesTestCase(unittest.TestCase):
                         "id": 7,
                     },
                     {
-                        "uid": "d59c942cdd7e211bf7c76f20501d657c",
+                        "uid": "6e4a0c5d104488f094b3b93475bf2587",
                         "first_name": "arthur",
                         "middle_name": "hesse",
                         "last_name": "schopenhauer",
@@ -191,7 +193,7 @@ class CanonicalizeNamesTestCase(unittest.TestCase):
                         "id": 6,
                     },
                     {
-                        "uid": "d59c942cdd7e211bf7c76f20501d657c",
+                        "uid": "6e4a0c5d104488f094b3b93475bf2587",
                         "first_name": "arthur",
                         "middle_name": "hesse",
                         "last_name": "schopenhauer",
@@ -202,3 +204,4 @@ class CanonicalizeNamesTestCase(unittest.TestCase):
                 ]
             ),
         )
+        
