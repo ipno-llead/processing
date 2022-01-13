@@ -4,7 +4,7 @@ sys.path.append("../")
 from lib.path import data_file_path
 import pandas as pd
 from lib.columns import clean_column_names
-from lib.clean import clean_races, clean_sexes, clean_dates, standardize_desc_cols
+from lib.clean import clean_races, clean_sexes, clean_dates, standardize_desc_cols, clean_names
 from lib.uid import gen_uid
 from lib.columns import set_values
 
@@ -55,6 +55,7 @@ def clean():
         .pipe(clean_races, ["race"])
         .pipe(clean_sexes, ["sex"])
         .pipe(split_names)
+        .pipe(clean_names, ["first_name", "middle_name", "last_name"])
         .pipe(set_values, {"agency": "Baker PD"})
         .pipe(gen_uid, ["first_name", "middle_name", "last_name"])
     )
