@@ -704,21 +704,18 @@ def canonicalize_officers(
         uid, first_name, last_name = None, "", ""
         for idx in cluster:
             row = df.loc[df[uid_column] == idx]
-            if (
-                uid is None
-                or len(row[first_name_column]) > len(first_name)
+            if uid is None or (
+                len(row[first_name_column]) > len(first_name)
                 or (
                     len(row[first_name_column]) == len(first_name)
-                    and len(row[last_name_column]) > len(last_name)
+                    and len(row[last_name_column]) < len(last_name)
                 )
             ):
                 uid = idx
-                first_name = ' '.join(row[first_name_column])
-                last_name = ' '.join(row[last_name_column])
+                first_name = " ".join(row[first_name_column])
+                last_name = " ".join(row[last_name_column])
 
         df.loc[df[uid_column].isin(cluster), uid_column] = uid
         df.loc[df[uid_column].isin(cluster), first_name_column] = first_name
         df.loc[df[uid_column].isin(cluster), last_name_column] = last_name
     return df
-
-
