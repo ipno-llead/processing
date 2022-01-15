@@ -41,8 +41,6 @@ if __name__ == "__main__":
     cprr19 = pd.read_csv(data_file_path("match/cprr_lake_charles_pd_2014_2019.csv"))
     pprr = pd.read_csv(data_file_path("clean/pprr_lake_charles_pd_2017_2021.csv"))
     post_event = pd.read_csv(data_file_path("match/post_event_lake_charles_2020_11_06.csv"))
-    agency = cprr19.agency[0]
-    post = load_for_agency("clean/pprr_post_2020_11_06.csv", agency)
     per_df = fuse_personnel(cprr20, cprr19, pprr)
     com_df = rearrange_allegation_columns(pd.concat([cprr20, cprr19]))
     event_df = rearrange_event_columns(pd.concat([fuse_events(cprr20, cprr19), post_event]))
