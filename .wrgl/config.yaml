@@ -255,6 +255,10 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/com-west-monroe-pd
     fetch:
       - +refs/heads/*:refs/remotes/com-west-monroe-pd/*
+  com-st-landry-so:
+    url: https://hub.wrgl.co/api/users/ipno/repos/com-st-landry-so
+    fetch:
+      - +refs/heads/*:refs/remotes/com-st-landry-so/*
   event:
     url: https://hub.wrgl.co/api/users/ipno/repos/event
     fetch:
@@ -443,6 +447,10 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/event-acadia-so
     fetch:
       - +refs/heads/*:refs/remotes/event-acadia-so/*
+  event-st-landry-so:
+    url: https://hub.wrgl.co/api/users/ipno/repos/st-landry-so
+    fetch:
+      - +refs/heads/*:refs/remotes/event-st-landry-so/*
   match-brusly-pd-2020:
     url: https://hub.wrgl.co/api/users/ipno/repos/match-brusly-pd-2020
     fetch:
@@ -711,6 +719,10 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/per-acadia-so
     fetch:
       - +refs/heads/*:refs/remotes/per-acadia-so/*
+  per-st-landry-so:
+    url: https://hub.wrgl.co/api/users/ipno/repos/per-st-landry-so
+    fetch:
+      - +refs/heads/*:refs/remotes/per-st-landry-so/*
   person:
     url: https://hub.wrgl.co/api/users/ipno/repos/person
     fetch:
@@ -1066,6 +1078,12 @@ branch:
     file: data/fuse/com_west_monroe_pd.csv
     primaryKey:
       - allegation_uid
+  com-st-landry-so:
+    remote: com-st-landry-so
+    merge: refs/heads/main
+    file: data/fuse/com_st_landry_so.csv
+    primaryKey:
+      - allegation_uid
   event:
     remote: event
     merge: refs/heads/main
@@ -1346,6 +1364,12 @@ branch:
     remote: event-acadia-so
     merge: refs/heads/main
     file: data/fuse/event_acadia_so.csv
+    primaryKey:
+      - event_uid
+  event-st-landry-so:
+    remote: event-st-landry-so
+    merge: refs/heads/main
+    file: data/fuse/event_st_landry_so.csv
     primaryKey:
       - event_uid
   match-brusly-pd-2020:
@@ -1698,6 +1722,12 @@ branch:
     remote: per-acadia-so
     merge: refs/heads/main
     file: data/fuse/per_acadia_so.csv
+    primaryKey:
+      - uid
+  per-st-landry-so:
+    remote: per-st-landry-so
+    merge: refs/heads/main
+    file: data/fuse/per_st_landry_so.csv
     primaryKey:
       - uid
   person:
