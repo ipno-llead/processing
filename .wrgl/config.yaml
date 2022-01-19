@@ -259,6 +259,10 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/com-erath-pd
     fetch:
       - +refs/heads/*:refs/remotes/com-erath-pd/*
+  com-st-landry-so:
+    url: https://hub.wrgl.co/api/users/ipno/repos/com-st-landry-so
+    fetch:
+      - +refs/heads/*:refs/remotes/com-st-landry-so/*
   event:
     url: https://hub.wrgl.co/api/users/ipno/repos/event
     fetch:
@@ -451,6 +455,10 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/event-erath-pd
     fetch:
       - +refs/heads/*:refs/remotes/event-erath-pd*
+  event-st-landry-so:
+    url: https://hub.wrgl.co/api/users/ipno/repos/st-landry-so
+    fetch:
+      - +refs/heads/*:refs/remotes/event-st-landry-so/*
   match-brusly-pd-2020:
     url: https://hub.wrgl.co/api/users/ipno/repos/match-brusly-pd-2020
     fetch:
@@ -723,6 +731,10 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/per-erath-pd
     fetch:
       - +refs/heads/*:refs/remotes/per-erath-pd/*
+  per-st-landry-so:
+    url: https://hub.wrgl.co/api/users/ipno/repos/per-st-landry-so
+    fetch:
+      - +refs/heads/*:refs/remotes/per-st-landry-so/*
   person:
     url: https://hub.wrgl.co/api/users/ipno/repos/person
     fetch:
@@ -1082,6 +1094,10 @@ branch:
     remote: com-erath-pd
     merge: refs/heads/main
     file: data/fuse/com_erath_pd.csv
+  com-st-landry-so:
+    remote: com-st-landry-so
+    merge: refs/heads/main
+    file: data/fuse/com_st_landry_so.csv
     primaryKey:
       - allegation_uid
   event:
@@ -1370,6 +1386,10 @@ branch:
     remote: event-erath-pd
     merge: refs/heads/main
     file: data/fuse/event_erath_pd.csv
+  event-st-landry-so:
+    remote: event-st-landry-so
+    merge: refs/heads/main
+    file: data/fuse/event_st_landry_so.csv
     primaryKey:
       - event_uid
   match-brusly-pd-2020:
@@ -1728,6 +1748,10 @@ branch:
     remote: per-erath-pd
     merge: refs/heads/main
     file: data/fuse/per_erath_pd.csv
+  per-st-landry-so:
+    remote: per-st-landry-so
+    merge: refs/heads/main
+    file: data/fuse/per_st_landry_so.csv
     primaryKey:
       - uid
   person:
