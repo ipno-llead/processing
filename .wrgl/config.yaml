@@ -255,6 +255,10 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/com-west-monroe-pd
     fetch:
       - +refs/heads/*:refs/remotes/com-west-monroe-pd/*
+  com-erath-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/com-erath-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/com-erath-pd/*
   event:
     url: https://hub.wrgl.co/api/users/ipno/repos/event
     fetch:
@@ -443,6 +447,10 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/event-acadia-so
     fetch:
       - +refs/heads/*:refs/remotes/event-acadia-so/*
+  event-erath-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/event-erath-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/event-erath-pd*
   match-brusly-pd-2020:
     url: https://hub.wrgl.co/api/users/ipno/repos/match-brusly-pd-2020
     fetch:
@@ -711,6 +719,10 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/per-acadia-so
     fetch:
       - +refs/heads/*:refs/remotes/per-acadia-so/*
+  per-erath-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/per-erath-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/per-erath-pd/*
   person:
     url: https://hub.wrgl.co/api/users/ipno/repos/person
     fetch:
@@ -1066,6 +1078,12 @@ branch:
     file: data/fuse/com_west_monroe_pd.csv
     primaryKey:
       - allegation_uid
+  com-erath-pd:
+    remote: com-erath-pd
+    merge: refs/heads/main
+    file: data/fuse/com_erath_pd.csv
+    primaryKey:
+      - allegation_uid
   event:
     remote: event
     merge: refs/heads/main
@@ -1346,6 +1364,12 @@ branch:
     remote: event-acadia-so
     merge: refs/heads/main
     file: data/fuse/event_acadia_so.csv
+    primaryKey:
+      - event_uid
+  event-erath-pd:
+    remote: event-erath-pd
+    merge: refs/heads/main
+    file: data/fuse/event_erath_pd.csv
     primaryKey:
       - event_uid
   match-brusly-pd-2020:
@@ -1698,6 +1722,12 @@ branch:
     remote: per-acadia-so
     merge: refs/heads/main
     file: data/fuse/per_acadia_so.csv
+    primaryKey:
+      - uid
+  per-erath-pd:
+    remote: per-erath-pd
+    merge: refs/heads/main
+    file: data/fuse/per_erath_pd.csv
     primaryKey:
       - uid
   person:
