@@ -1094,6 +1094,8 @@ branch:
     remote: com-erath-pd
     merge: refs/heads/main
     file: data/fuse/com_erath_pd.csv
+    primaryKey:
+      - allegation_uid
   com-st-landry-so:
     remote: com-st-landry-so
     merge: refs/heads/main
@@ -1386,6 +1388,8 @@ branch:
     remote: event-erath-pd
     merge: refs/heads/main
     file: data/fuse/event_erath_pd.csv
+    primaryKey:
+      - event_uid 
   event-st-landry-so:
     remote: event-st-landry-so
     merge: refs/heads/main
@@ -1748,6 +1752,8 @@ branch:
     remote: per-erath-pd
     merge: refs/heads/main
     file: data/fuse/per_erath_pd.csv
+    primaryKey:
+      - uid
   per-st-landry-so:
     remote: per-st-landry-so
     merge: refs/heads/main
