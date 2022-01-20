@@ -263,6 +263,10 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/com-st-landry-so
     fetch:
       - +refs/heads/*:refs/remotes/com-st-landry-so/*
+  com-benton-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/com-benton-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/com-benton-pd/*
   event:
     url: https://hub.wrgl.co/api/users/ipno/repos/event
     fetch:
@@ -459,6 +463,10 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/st-landry-so
     fetch:
       - +refs/heads/*:refs/remotes/event-st-landry-so/*
+  event-benton-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/benton-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/event-benton-pd/*
   match-brusly-pd-2020:
     url: https://hub.wrgl.co/api/users/ipno/repos/match-brusly-pd-2020
     fetch:
@@ -735,6 +743,10 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/per-st-landry-so
     fetch:
       - +refs/heads/*:refs/remotes/per-st-landry-so/*
+  per-benton-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/per-benton-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/per-benton-pd/*
   person:
     url: https://hub.wrgl.co/api/users/ipno/repos/person
     fetch:
@@ -1102,6 +1114,12 @@ branch:
     file: data/fuse/com_st_landry_so.csv
     primaryKey:
       - allegation_uid
+  com-benton-pd:
+    remote: com-benton-pd
+    merge: refs/heads/main
+    file: data/fuse/com_benton_pd.csv
+    primaryKey:
+      - allegation_uid
   event:
     remote: event
     merge: refs/heads/main
@@ -1394,6 +1412,12 @@ branch:
     remote: event-st-landry-so
     merge: refs/heads/main
     file: data/fuse/event_st_landry_so.csv
+    primaryKey:
+      - event_uid
+ event-benton-pd:
+    remote: event-benton-pd
+    merge: refs/heads/main
+    file: data/fuse/event_benton_pd.csv
     primaryKey:
       - event_uid
   match-brusly-pd-2020:
@@ -1758,6 +1782,12 @@ branch:
     remote: per-st-landry-so
     merge: refs/heads/main
     file: data/fuse/per_st_landry_so.csv
+    primaryKey:
+      - uid
+  per-benton-pd:
+    remote: per-benton-pd
+    merge: refs/heads/main
+    file: data/fuse/per_benton_pd.csv
     primaryKey:
       - uid
   person:
