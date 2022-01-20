@@ -156,6 +156,9 @@ schemas:
       - name: allegation_desc
         description: >
           text description of the allegation
+      - name: investigating_department
+        description: >
+          small departments frequently turnover internal investigations to the sheriff's office 
   event:
     columns:
       - name: event_uid
