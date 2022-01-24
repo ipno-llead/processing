@@ -35,11 +35,12 @@ def fuse_events(post):
 
 
 if __name__ == "__main__":
-    cprr = pd.read_csv(data_file_path("clean/cprr_cameron_so_2020.csv"))
-    agency = cprr.agency[0]
+    cprr_20 = pd.read_csv(data_file_path("match/cprr_cameron_so_2020.csv"))
+    cprr_19 = pd.read_csv(data_file_path("match/cprr_cameron_so_2015_2019.csv"))
+    agency = cprr_20.agency[0]
     post = load_for_agency("clean/pprr_post_2020_11_06.csv", agency)
-    per = fuse_personnel(cprr, post)
-    com = rearrange_allegation_columns(cprr)
+    per = fuse_personnel(cprr_20, cprr_19, post)
+    com = rearrange_allegation_columns(pd.concat([cprr_20, cprr_19]))
     event = fuse_events(post)
     event.to_csv(data_file_path("fuse/event_cameron_so.csv"), index=False)
     com.to_csv(data_file_path("fuse/com_cameron_so.csv"), index=False)
