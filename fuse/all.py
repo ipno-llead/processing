@@ -64,6 +64,10 @@ def fuse_personnel():
                 pd.read_csv(data_file_path("fuse/per_terrebonne_so.csv")),
                 pd.read_csv(data_file_path("fuse/per_jefferson_so.csv")),
                 pd.read_csv(data_file_path("fuse/per_acadia_so.csv")),
+                pd.read_csv(data_file_path("fuse/per_post.csv")),
+                pd.read_csv(data_file_path("fuse/per_erath_pd.csv")),
+                pd.read_csv(data_file_path("fuse/per_st_landry_so.csv")),
+                pd.read_csv(data_file_path("fuse/per_benton_pd.csv")),
             ]
         )
     ).sort_values("uid", ignore_index=True)
@@ -119,6 +123,9 @@ def fuse_event():
                 pd.read_csv(data_file_path("fuse/event_terrebonne_so.csv")),
                 pd.read_csv(data_file_path("fuse/event_jefferson_so.csv")),
                 pd.read_csv(data_file_path("fuse/event_acadia_so.csv")),
+                pd.read_csv(data_file_path("fuse/event_erath_pd.csv")),
+                pd.read_csv(data_file_path("fuse/event_st_landry_so.csv")),
+                pd.read_csv(data_file_path("fuse/event_benton_pd.csv")),
             ]
         )
     ).sort_values(["agency", "event_uid"], ignore_index=True)
@@ -159,6 +166,10 @@ def fuse_allegation():
                 pd.read_csv(data_file_path("fuse/com_maurice_pd.csv")),
                 pd.read_csv(data_file_path("fuse/com_terrebonne_so.csv")),
                 pd.read_csv(data_file_path("fuse/com_acadia_so.csv")),
+                pd.read_csv(data_file_path("fuse/com_west_monroe_pd.csv")),
+                pd.read_csv(data_file_path("fuse/com_erath_pd.csv")),
+                pd.read_csv(data_file_path("fuse/com_st_landry_so.csv")),
+                pd.read_csv(data_file_path("fuse/com_benton_pd.csv")),
             ]
         )
     ).sort_values(["agency", "tracking_number"], ignore_index=True)
@@ -222,19 +233,13 @@ if __name__ == "__main__":
     sas_df = fuse_stop_and_search()
     app_df = fuse_appeal_hearing_logs()
     per_df.to_csv(data_file_path("fuse/personnel.csv"), index=False)
-    event_df.to_csv(data_file_path("fuse/event.csv"), index=False)
     allegation_df.to_csv(data_file_path("fuse/allegation.csv"), index=False)
     uof_df.to_csv(data_file_path("fuse/use_of_force.csv"), index=False)
     sas_df.to_csv(data_file_path("fuse/stop_and_search.csv"), index=False)
     app_df.to_csv(data_file_path("fuse/appeals.csv"), index=False)
 
     post_event_df = pd.read_csv(data_file_path("fuse/events_post.csv"))
-    post_personnel_df = pd.read_csv(data_file_path("fuse/per_post.csv"))
-
     missing_agency_df = find_event_agency_if_missing_from_post(event_df, post_event_df)
-
     post_event_df = post_event_df[~post_event_df["agency"].isin(event_df["agency"])]
-    post_event_df.to_csv(data_file_path("fuse/event_post.csv"), index=False)
-
-    post_personnel_df = post_personnel_df[~post_personnel_df["uid"].isin(per_df["uid"])]
-    post_personnel_df.to_csv(data_file_path("fuse/personnel_post.csv"), index=False)
+    event_df = pd.concat([event_df, post_event_df], ignore_index=True)
+    event_df.to_csv(data_file_path("fuse/event.csv"), index=False)
