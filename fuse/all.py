@@ -179,10 +179,6 @@ def fuse_allegation():
                 pd.read_csv(data_file_path("fuse/com_erath_pd.csv")),
                 pd.read_csv(data_file_path("fuse/com_st_landry_so.csv")),
                 pd.read_csv(data_file_path("fuse/com_benton_pd.csv")),
-                pd.read_csv(data_file_path("fuse/com_baton_rouge_da.csv")),
-                pd.read_csv(data_file_path("fuse/com_new_orleans_da.csv")),
-                pd.read_csv(data_file_path("fuse/com_ouachita_da.csv")),
-                pd.read_csv(data_file_path("fuse/com_tangipahoa_da.csv")),
             ]
         )
     ).sort_values(["agency", "tracking_number"], ignore_index=True)

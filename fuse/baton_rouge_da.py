@@ -2,7 +2,7 @@ import sys
 
 sys.path.append("../")
 from lib.path import data_file_path
-from lib.columns import rearrange_allegation_columns
+from lib.columns import rearrange_allegation_columns, rearrange_brady_list_columns
 from lib.personnel import fuse_personnel
 from lib.post import load_for_agency
 import pandas as pd
@@ -32,13 +32,12 @@ def fuse_events(post):
 
 
 if __name__ == "__main__":
-    brady = pd.read_csv(data_file_path("clean/cprr_baton_rouge_da_2021.csv"))
+    brady = pd.read_csv(data_file_path("match/brady_baton_rouge_da_2021.csv"))
     agency = brady.agency[0]
     post = load_for_agency("clean/pprr_post_2020_11_06.csv", agency)
-    per = fuse_personnel(brady, post)
-    complaints = rearrange_allegation_columns(brady)
-    event = fuse_events(post)
-    complaints.to_csv(data_file_path("fuse/com_baton_rouge_da.csv"), index=False)
-    per.to_csv(data_file_path("fuse/per_baton_rouge_da.csv"), index=False)
-    event.to_csv(data_file_path("fuse/event_baton_rouge_da.csv"), index=False)
-    brady.to_csv(data_file_path("fuse/brady_baton_rouge_da.csv"), index=False)
+    per_df = fuse_personnel(brady)
+    brady_df = rearrange_brady_list_columns(brady)
+    event_df = fuse_events(post)
+    per_df.to_csv(data_file_path("fuse/per_baton_rouge_da.csv"), index=False)
+    event_df.to_csv(data_file_path("fuse/event_baton_rouge_da.csv"), index=False)
+    brady_df.to_csv(data_file_path("fuse/brady_baton_rouge_da.csv"), index=False)

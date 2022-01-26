@@ -11,7 +11,7 @@ files:
     schema: stop_and_search
   fuse/appeals.csv:
     schema: appeal_hearing
-  fuse/brady.csv:
+  fuse/brady_list.csv:
     schema: brady_list
 
 schemas:

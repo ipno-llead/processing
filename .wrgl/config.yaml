@@ -267,22 +267,6 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/com-benton-pd
     fetch:
       - +refs/heads/*:refs/remotes/com-benton-pd/*
-  com-baton-rouge-da:
-    url: https://hub.wrgl.co/api/users/ipno/repos/com-baton-rouge-da
-    fetch:
-      - +refs/heads/*:refs/remotes/com-baton-rouge-da/*
-  com-new-orleans-da:
-    url: https://hub.wrgl.co/api/users/ipno/repos/com-new-orleans-da
-    fetch:
-      - +refs/heads/*:refs/remotes/com-new-orleans-da/*
-  com-ouachita-da:
-    url: https://hub.wrgl.co/api/users/ipno/repos/com-ouachita-da
-    fetch:
-      - +refs/heads/*:refs/remotes/com-ouachita-da/*
-  com-tangipahoa-da:
-    url: https://hub.wrgl.co/api/users/ipno/repos/com-tangipahoa-da
-    fetch:
-      - +refs/heads/*:refs/remotes/com-tangipahoa-da/*
   event:
     url: https://hub.wrgl.co/api/users/ipno/repos/event
     fetch:
@@ -1170,30 +1154,6 @@ branch:
     remote: com-benton-pd
     merge: refs/heads/main
     file: data/fuse/com_benton_pd.csv
-    primaryKey:
-      - allegation_uid
-  com-baton-rouge-da:
-    remote: com-baton-rouge-da
-    merge: refs/heads/main
-    file: data/fuse/com_baton_rouge_da.csv
-    primaryKey:
-      - allegation_uid
-  com-new-orleans-da:
-    remote: com-new-orleans-da
-    merge: refs/heads/main
-    file: data/fuse/com_new_orleans_da.csv
-    primaryKey:
-      - allegation_uid
-  com-ouachita-da:
-    remote: com-ouachita-da
-    merge: refs/heads/main
-    file: data/fuse/com_ouachita_da.csv
-    primaryKey:
-      - allegation_uid
-  com-tangipahoa-da:
-    remote: com-tangipahoa-da
-    merge: refs/heads/main
-    file: data/fuse/com_tangipahoa_da.csv
     primaryKey:
       - allegation_uid
   event:

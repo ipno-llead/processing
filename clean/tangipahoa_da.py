@@ -41,4 +41,4 @@ def clean():
 
 if __name__ == "__main__":
     df = clean()
-    df.to_csv(data_file_path("clean/cprr_tangipahoa_da_2021.csv"), index=False)
+    df.to_csv(data_file_path("clean/brady_tangipahoa_da_2021.csv"), index=False)
