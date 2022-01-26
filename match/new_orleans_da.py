@@ -25,7 +25,7 @@ def match_cprr_and_post(cprr, post):
         dfa,
         dfb,
     )
-    decision = 1
+    decision = 0.94
     matcher.save_pairs_to_excel(
         data_file_path(
             "match/new_orleans_da_cprr_2021_v_post_nopd_pprr_2020_11_06.xlsx"

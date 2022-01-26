@@ -8,12 +8,12 @@ import pandas as pd
 
 
 def match_cprr_with_post(cprr, post):
-    dfa = cprr[["first_name", "last_name", "uid", "agency"]]
+    dfa = cprr[["first_name", "last_name", "uid"]]
     dfa.loc[:, "fc"] = dfa.first_name.map(lambda x: x[:1])
     dfa.loc[:, "lc"] = dfa.last_name.fillna("").map(lambda x: x[:1])
     dfa = dfa.drop_duplicates(subset=["uid"]).set_index("uid")
 
-    dfb = post[["first_name", "last_name", "uid", "agency"]]
+    dfb = post[["first_name", "last_name", "uid"]]
     dfb.loc[:, "fc"] = dfb.first_name.map(lambda x: x[:1])
     dfb.loc[:, "lc"] = dfb.last_name.fillna("").map(lambda x: x[:1])
     dfb = dfb.drop_duplicates(subset=["uid"]).set_index("uid")
@@ -27,7 +27,7 @@ def match_cprr_with_post(cprr, post):
         dfa,
         dfb,
     )
-    decision = 0.96
+    decision = 1
     matcher.save_pairs_to_excel(
         data_file_path("match/cprr_tangipahoa_da_2021_v_post_2020_11_06.xlsx"), decision
     )

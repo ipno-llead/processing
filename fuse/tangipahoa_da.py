@@ -32,13 +32,13 @@ def fuse_events(post):
 
 
 if __name__ == "__main__":
-    brady = pd.read_csv(data_file_path("clean/cprr_baton_rouge_da_2021.csv"))
+    brady = pd.read_csv(data_file_path("match/cprr_tangipahoa_da_2021.csv"))
     agency = brady.agency[0]
     post = load_for_agency("clean/pprr_post_2020_11_06.csv", agency)
     per = fuse_personnel(brady, post)
     complaints = rearrange_allegation_columns(brady)
     event = fuse_events(post)
-    complaints.to_csv(data_file_path("fuse/com_baton_rouge_da.csv"), index=False)
-    per.to_csv(data_file_path("fuse/per_baton_rouge_da.csv"), index=False)
-    event.to_csv(data_file_path("fuse/event_baton_rouge_da.csv"), index=False)
-    brady.to_csv(data_file_path("fuse/brady_baton_rouge_da.csv"), index=False)
+    complaints.to_csv(data_file_path("fuse/com_tangipahoa_da.csv"), index=False)
+    per.to_csv(data_file_path("fuse/per_tangipahoa_da.csv"), index=False)
+    event.to_csv(data_file_path("fuse/event_tangipahoa_da.csv"), index=False)
+    brady.to_csv(data_file_path("fuse/brady_tangipahoa_da.csv"), index=False)

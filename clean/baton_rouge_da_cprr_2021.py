@@ -28,6 +28,22 @@ def extract_disposition(df):
     return df.drop(columns="rule_violaton")
 
 
+def clean_agency(df):
+    df.loc[:, "agency"] = (
+        df.agency.str.strip()
+        .fillna("")
+        .str.replace("Baton Rouge Police Department", "Baton Rouge PD", regex=False)
+        .str.replace("East Baton Rouge Sheriff's Office", "Baton Rouge SO", regex=False)
+        .str.replace("Louisiana State Police", "Louisiana State PD", regex=False)
+        .str.replace(
+            "Louisiana State University Police Department",
+            "LSU University PD",
+            regex=False,
+        )
+    )
+    return df
+
+
 def clean():
     df = (
         pd.read_csv(data_file_path("raw/baton_rouge_da/baton_rouge_da_cprr_2021.csv"))
@@ -35,20 +51,14 @@ def clean():
         .pipe(clean_allegations)
         .pipe(extract_disposition)
         .pipe(set_values, {"source_agency": "East Baton Rouge DA"})
-        .rename(
-            columns={
-                "Baton Rouge Police Department": "Baton Rouge PD",
-                "East Baton Rouge Sheriff's Office": "Baton Rouge SO",
-                "Louisiana State Police": "Louisiana State PD",
-                "Louisiana State University Police Department": "LSU PD",
-            }
-        )
+        .rename(columns={"status": "action"})
     )
     return (
         df.pipe(clean_names, ["first_name", "last_name", "middle_name"])
-        .pipe(standardize_desc_cols, ["status"])
+        .pipe(standardize_desc_cols, ["action"])
+        .pipe(clean_agency)
         .pipe(gen_uid, ["agency", "first_name", "last_name", "middle_name"])
-        .pipe(gen_uid, ["uid", "allegation", "disposition"], "allegation_uid")
+        .pipe(gen_uid, ["uid", "allegation", "disposition", "action"], "allegation_uid")
         .pipe(gen_uid, ["uid", "allegation_uid", "source_agency"], "brady_uid")
     )
 

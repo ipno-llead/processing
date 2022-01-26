@@ -3,7 +3,8 @@ import sys
 sys.path.append("../")
 import pandas as pd
 from lib.path import data_file_path
-from lib.columns import clean_column_names, set_values
+from lib.columns import clean_column_names, set_values, names_to_title_case
+from lib.clean import clean_dates
 from lib.uid import gen_uid
 
 
@@ -39,7 +40,9 @@ def clean_allegations(df):
 
 def extract_agency_and_department_desc(df):
     agency = df.action.str.extract(r"(lsp)")
-    df.loc[:, "agency"] = agency[0].str.replace("lsp", "Louisiana State PD", regex=False)
+    df.loc[:, "agency"] = agency[0].str.replace(
+        "lsp", "Louisiana State PD", regex=False
+    )
 
     departments = df.action.str.extract(r"(troof f)")
     df.loc[:, "department_desc"] = departments[0].str.replace(
@@ -67,15 +70,22 @@ def clean():
     df = (
         pd.read_csv(data_file_path("raw/ouachita_da/ouachita_da_cprr_2021_by_hand.csv"))
         .pipe(clean_column_names)
+        .rename(columns={"investigation_end_date": "investigation_complete_date"})
+        .pipe(clean_dates, ["investigation_complete_date"])
         .pipe(extract_disposition)
         .pipe(extract_charging_agency)
         .pipe(clean_allegations)
         .pipe(extract_agency_and_department_desc)
         .pipe(clean_action)
         .pipe(assign_agency)
-        .pipe(set_values, {'source_agency': 'Ouachita DA'})
+        .pipe(names_to_title_case, ['charging_agency'])
+        .pipe(set_values, {"source_agency": "Ouachita DA"})
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
-        .pipe(gen_uid, ["uid", "tracking_number", "allegation", "action", "disposition"], "allegation_uid")
+        .pipe(
+            gen_uid,
+            ["uid", "tracking_number", "allegation", "action", "disposition"],
+            "allegation_uid",
+        )
         .pipe(gen_uid, ["uid", "allegation_uid", "source_agency"], "brady_uid")
     )
     return df

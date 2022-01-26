@@ -7,6 +7,7 @@ from lib.columns import (
     rearrange_allegation_columns,
     rearrange_stop_and_search_columns,
     rearrange_use_of_force,
+    rearrange_brady_list_columns
 )
 from lib.uid import ensure_uid_unique
 import sys
@@ -68,6 +69,10 @@ def fuse_personnel():
                 pd.read_csv(data_file_path("fuse/per_erath_pd.csv")),
                 pd.read_csv(data_file_path("fuse/per_st_landry_so.csv")),
                 pd.read_csv(data_file_path("fuse/per_benton_pd.csv")),
+                pd.read_csv(data_file_path("fuse/per_baton_rouge_da.csv")),
+                pd.read_csv(data_file_path("fuse/per_new_orleans_da.csv")),
+                pd.read_csv(data_file_path("fuse/per_ouachita_da.csv")),
+                pd.read_csv(data_file_path("fuse/per_tangipahoa_da.csv")),
             ]
         )
     ).sort_values("uid", ignore_index=True)
@@ -126,6 +131,10 @@ def fuse_event():
                 pd.read_csv(data_file_path("fuse/event_erath_pd.csv")),
                 pd.read_csv(data_file_path("fuse/event_st_landry_so.csv")),
                 pd.read_csv(data_file_path("fuse/event_benton_pd.csv")),
+                pd.read_csv(data_file_path("fuse/event_baton_rouge_da.csv")),
+                pd.read_csv(data_file_path("fuse/event_new_orleans_da.csv")),
+                pd.read_csv(data_file_path("fuse/event_ouachita_da.csv")),
+                pd.read_csv(data_file_path("fuse/event_tangipahoa_da.csv")),
             ]
         )
     ).sort_values(["agency", "event_uid"], ignore_index=True)
@@ -170,6 +179,10 @@ def fuse_allegation():
                 pd.read_csv(data_file_path("fuse/com_erath_pd.csv")),
                 pd.read_csv(data_file_path("fuse/com_st_landry_so.csv")),
                 pd.read_csv(data_file_path("fuse/com_benton_pd.csv")),
+                pd.read_csv(data_file_path("fuse/com_baton_rouge_da.csv")),
+                pd.read_csv(data_file_path("fuse/com_new_orleans_da.csv")),
+                pd.read_csv(data_file_path("fuse/com_ouachita_da.csv")),
+                pd.read_csv(data_file_path("fuse/com_tangipahoa_da.csv")),
             ]
         )
     ).sort_values(["agency", "tracking_number"], ignore_index=True)
@@ -221,6 +234,19 @@ def fuse_appeal_hearing_logs():
     ).sort_values("uid", ignore_index=True)
 
 
+def fuse_brady_list():
+    return rearrange_brady_list_columns(
+        pd.concat(
+            [
+                pd.read_csv(data_file_path("fuse/brady_baton_rouge_da.csv")),
+                pd.read_csv(data_file_path("fuse/brady_new_orleans_da.csv")),
+                pd.read_csv(data_file_path("fuse/brady_ouachita_da.csv")),
+                pd.read_csv(data_file_path("fuse/brady_tangipahoa_da.csv")),
+            ]
+        )
+    ).sort_values("brady_uid", ignore_index=True)
+
+
 if __name__ == "__main__":
     per_df = fuse_personnel()
     ensure_uid_unique(per_df, "uid")
@@ -232,11 +258,13 @@ if __name__ == "__main__":
     ensure_uid_unique(uof_df, "uof_uid")
     sas_df = fuse_stop_and_search()
     app_df = fuse_appeal_hearing_logs()
+    brady_df = fuse_brady_list()
     per_df.to_csv(data_file_path("fuse/personnel.csv"), index=False)
     allegation_df.to_csv(data_file_path("fuse/allegation.csv"), index=False)
     uof_df.to_csv(data_file_path("fuse/use_of_force.csv"), index=False)
     sas_df.to_csv(data_file_path("fuse/stop_and_search.csv"), index=False)
     app_df.to_csv(data_file_path("fuse/appeals.csv"), index=False)
+    brady_df.to_csv(data_file_path("fuse/brady_list.csv"), index=False)
 
     post_event_df = pd.read_csv(data_file_path("fuse/events_post.csv"))
     missing_agency_df = find_event_agency_if_missing_from_post(event_df, post_event_df)

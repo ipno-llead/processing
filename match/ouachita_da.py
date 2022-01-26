@@ -8,16 +8,18 @@ sys.path.append("../")
 
 
 def match_cprr_with_post(cprr, post):
-    dfa = cprr[["uid", "first_name", "last_name", "agency"]]
+    dfa = cprr[["uid", "first_name", "last_name"]]
     dfa.loc[:, "fc"] = dfa.first_name.fillna("").map(lambda x: x[:1])
+    dfa.loc[:, "lc"] = dfa.last_name.fillna("").map(lambda x: x[:1])
     dfa = dfa.drop_duplicates(subset=["uid"]).set_index("uid")
 
-    dfb = post[["uid", "first_name", "last_name", "agency"]]
+    dfb = post[["uid", "first_name", "last_name"]]
     dfb.loc[:, "fc"] = dfb.first_name.fillna("").map(lambda x: x[:1])
+    dfb.loc[:, "lc"] = dfb.last_name.fillna("").map(lambda x: x[:1])
     dfb = dfb.drop_duplicates(subset=["uid"]).set_index("uid")
 
     matcher = ThresholdMatcher(
-        ColumnsIndex(["fc", "agency"]),
+        ColumnsIndex(["fc", "lc"]),
         {
             "last_name": JaroWinklerSimilarity(),
             "first_name": JaroWinklerSimilarity(),
@@ -25,11 +27,9 @@ def match_cprr_with_post(cprr, post):
         dfa,
         dfb,
     )
-    decision = 1
+    decision = 0
     matcher.save_pairs_to_excel(
-        data_file_path(
-            "match/ouachita_da_cprr_2021_v_post_lsp_and_opso_2020_11_06.xlsx"
-        ),
+        data_file_path("match/ouachita_da_cprr_2021_v_post_2020_11_06.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)

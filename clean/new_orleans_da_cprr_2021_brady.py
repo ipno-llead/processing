@@ -199,7 +199,9 @@ def clean():
             ["initial_disposition", "disposition", "allegation", "allegation_desc"],
         )
         .pipe(clean_names, ["first_name", "last_name"])
-        .pipe(set_values, {"data_production_year": 2021, "agency": "New Orleans DA"})
+        .pipe(
+            set_values, {"source_agency": "New Orleans DA", "agency": "New Orleans PD"}
+        )
         .pipe(gen_uid, ["agency", "first_name", "last_name"])
         .pipe(
             gen_uid,
