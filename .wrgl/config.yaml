@@ -467,10 +467,6 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/benton-pd
     fetch:
       - +refs/heads/*:refs/remotes/event-benton-pd/*
-  event-baton-rouge-da:
-    url: https://hub.wrgl.co/api/users/ipno/repos/event-baton-rouge-da
-    fetch:
-      - +refs/heads/*:refs/remotes/event-baton-rouge-da/*
   event-new-orleans-da:
     url: https://hub.wrgl.co/api/users/ipno/repos/event-new-orleans-da
     fetch:
@@ -479,10 +475,6 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/event-ouachita-da
     fetch:
       - +refs/heads/*:refs/remotes/event-ouachita-da/*
-  event-tangipahoa-da:
-    url: https://hub.wrgl.co/api/users/ipno/repos/event-tangipahoa-da
-    fetch:
-      - +refs/heads/*:refs/remotes/event-tangipahoa-da/*
   match-brusly-pd-2020:
     url: https://hub.wrgl.co/api/users/ipno/repos/match-brusly-pd-2020
     fetch:
@@ -763,22 +755,6 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/per-benton-pd
     fetch:
       - +refs/heads/*:refs/remotes/per-benton-pd/*
-  per-baton-rouge-da:
-    url: https://hub.wrgl.co/api/users/ipno/repos/per-baton-rouge-da
-    fetch:
-      - +refs/heads/*:refs/remotes/per-baton-rouge-da/*
-  per-new-orleans-da:
-    url: https://hub.wrgl.co/api/users/ipno/repos/per-new-orleans-da
-    fetch:
-      - +refs/heads/*:refs/remotes/per-new-orleans-da/*
-  per-ouachita-da:
-    url: https://hub.wrgl.co/api/users/ipno/repos/per-ouachita-da
-    fetch:
-      - +refs/heads/*:refs/remotes/per-ouachita-da/*
-  per-tangipahoa-da:
-    url: https://hub.wrgl.co/api/users/ipno/repos/per-tangipahoa-da
-    fetch:
-      - +refs/heads/*:refs/remotes/per-tangipahoa-da/*
   person:
     url: https://hub.wrgl.co/api/users/ipno/repos/person
     fetch:
@@ -1456,12 +1432,6 @@ branch:
     file: data/fuse/event_benton_pd.csv
     primaryKey:
       - event_uid
-  event-baton-rouge-da:
-    remote: event-baton-rouge-da
-    merge: refs/heads/main
-    file: data/fuse/event_baton_rouge_da.csv
-    primaryKey:
-      - event_uid
   event-new-orleans-da:
     remote: event-new-orleans-da
     merge: refs/heads/main
@@ -1472,12 +1442,6 @@ branch:
     remote: event-ouachita-da
     merge: refs/heads/main
     file: data/fuse/event_ouachita_da.csv
-    primaryKey:
-      - event_uid
-  event-tangipahoa-da:
-    remote: event-tangipahoa-da
-    merge: refs/heads/main
-    file: data/fuse/event_tangipahoa_da.csv
     primaryKey:
       - event_uid
   match-brusly-pd-2020:
@@ -1848,30 +1812,6 @@ branch:
     remote: per-benton-pd
     merge: refs/heads/main
     file: data/fuse/per_benton_pd.csv
-    primaryKey:
-      - uid
-  per-baton-rouge-da:
-    remote: per-baton-rouge-da
-    merge: refs/heads/main
-    file: data/fuse/per_baton_rouge_da.csv
-    primaryKey:
-      - uid
-  per-new-orleans-da:
-    remote: per-new-orleans-da
-    merge: refs/heads/main
-    file: data/fuse/per_new_orleans_da.csv
-    primaryKey:
-      - uid
-  per-ouachita-da:
-    remote: per-ouachita-da
-    merge: refs/heads/main
-    file: data/fuse/per_ouachita_da.csv
-    primaryKey:
-      - uid
-  per-tangipahoa-da:
-    remote: per-tangipahoa-da
-    merge: refs/heads/main
-    file: data/fuse/per_tangipahoa_da.csv
     primaryKey:
       - uid
   brady-baton-rouge-da:

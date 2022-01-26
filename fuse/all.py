@@ -69,10 +69,6 @@ def fuse_personnel():
                 pd.read_csv(data_file_path("fuse/per_erath_pd.csv")),
                 pd.read_csv(data_file_path("fuse/per_st_landry_so.csv")),
                 pd.read_csv(data_file_path("fuse/per_benton_pd.csv")),
-                pd.read_csv(data_file_path("fuse/per_baton_rouge_da.csv")),
-                pd.read_csv(data_file_path("fuse/per_new_orleans_da.csv")),
-                pd.read_csv(data_file_path("fuse/per_ouachita_da.csv")),
-                pd.read_csv(data_file_path("fuse/per_tangipahoa_da.csv")),
             ]
         )
     ).sort_values("uid", ignore_index=True)
@@ -131,10 +127,8 @@ def fuse_event():
                 pd.read_csv(data_file_path("fuse/event_erath_pd.csv")),
                 pd.read_csv(data_file_path("fuse/event_st_landry_so.csv")),
                 pd.read_csv(data_file_path("fuse/event_benton_pd.csv")),
-                pd.read_csv(data_file_path("fuse/event_baton_rouge_da.csv")),
                 pd.read_csv(data_file_path("fuse/event_new_orleans_da.csv")),
                 pd.read_csv(data_file_path("fuse/event_ouachita_da.csv")),
-                pd.read_csv(data_file_path("fuse/event_tangipahoa_da.csv")),
             ]
         )
     ).sort_values(["agency", "event_uid"], ignore_index=True)
