@@ -475,6 +475,10 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/event-eunice-pd
     fetch:
       - +refs/heads/*:refs/remotes/event-eunice-pd*
+  event-rayne-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/event-rayne-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/event-rayne-pd*
   match-brusly-pd-2020:
     url: https://hub.wrgl.co/api/users/ipno/repos/match-brusly-pd-2020
     fetch:
@@ -759,6 +763,10 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/per-eunice-pd
     fetch:
       - +refs/heads/*:refs/remotes/per-eunice-pd/*
+  per-rayne-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/per-rayne-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/per-rayne-pd/*
   person:
     url: https://hub.wrgl.co/api/users/ipno/repos/person
     fetch:
@@ -1444,6 +1452,12 @@ branch:
     file: data/fuse/event_eunice_pd.csv
     primaryKey:
       - event_uid
+  event-rayne-pd:
+    remote: event-rayne-pd
+    merge: refs/heads/main
+    file: data/fuse/event_rayne_pd.csv
+    primaryKey:
+      - event_uid
   match-brusly-pd-2020:
     remote: match-brusly-pd-2020
     merge: refs/heads/main
@@ -1818,6 +1832,12 @@ branch:
     remote: per-eunice-pd
     merge: refs/heads/main
     file: data/fuse/per_eunice_pd.csv
+    primaryKey:
+      - uid
+  per-rayne-pd:
+    remote: per-rayne-pd
+    merge: refs/heads/main
+    file: data/fuse/per_rayne_pd.csv
     primaryKey:
       - uid
   person:
