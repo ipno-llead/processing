@@ -467,6 +467,10 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/benton-pd
     fetch:
       - +refs/heads/*:refs/remotes/event-benton-pd/*
+  event-rayne-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/event-rayne-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/event-rayne-pd*
   match-brusly-pd-2020:
     url: https://hub.wrgl.co/api/users/ipno/repos/match-brusly-pd-2020
     fetch:
@@ -747,6 +751,10 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/per-benton-pd
     fetch:
       - +refs/heads/*:refs/remotes/per-benton-pd/*
+  per-rayne-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/per-rayne-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/per-rayne-pd/*
   person:
     url: https://hub.wrgl.co/api/users/ipno/repos/person
     fetch:
@@ -1414,10 +1422,16 @@ branch:
     file: data/fuse/event_st_landry_so.csv
     primaryKey:
       - event_uid
- event-benton-pd:
+  event-benton-pd:
     remote: event-benton-pd
     merge: refs/heads/main
     file: data/fuse/event_benton_pd.csv
+    primaryKey:
+      - event_uid
+  event-rayne-pd:
+    remote: event-rayne-pd
+    merge: refs/heads/main
+    file: data/fuse/event_rayne_pd.csv
     primaryKey:
       - event_uid
   match-brusly-pd-2020:
@@ -1788,6 +1802,12 @@ branch:
     remote: per-benton-pd
     merge: refs/heads/main
     file: data/fuse/per_benton_pd.csv
+    primaryKey:
+      - uid
+  per-rayne-pd:
+    remote: per-rayne-pd
+    merge: refs/heads/main
+    file: data/fuse/per_rayne_pd.csv
     primaryKey:
       - uid
   person:
