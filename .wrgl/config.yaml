@@ -267,6 +267,10 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/com-benton-pd
     fetch:
       - +refs/heads/*:refs/remotes/com-benton-pd/*
+  com-eunice-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/com-eunice-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/com-eunice-pd/*
   event:
     url: https://hub.wrgl.co/api/users/ipno/repos/event
     fetch:
@@ -467,6 +471,10 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/benton-pd
     fetch:
       - +refs/heads/*:refs/remotes/event-benton-pd/*
+  event-eunice-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/event-eunice-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/event-eunice-pd*
   event-rayne-pd:
     url: https://hub.wrgl.co/api/users/ipno/repos/event-rayne-pd
     fetch:
@@ -751,6 +759,10 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/per-benton-pd
     fetch:
       - +refs/heads/*:refs/remotes/per-benton-pd/*
+  per-eunice-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/per-eunice-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/per-eunice-pd/*
   per-rayne-pd:
     url: https://hub.wrgl.co/api/users/ipno/repos/per-rayne-pd
     fetch:
@@ -1128,6 +1140,12 @@ branch:
     file: data/fuse/com_benton_pd.csv
     primaryKey:
       - allegation_uid
+  com-eunice-pd:
+    remote: com-eunice-pd
+    merge: refs/heads/main
+    file: data/fuse/com_eunice_pd.csv
+    primaryKey:
+      - allegation_uid
   event:
     remote: event
     merge: refs/heads/main
@@ -1426,6 +1444,12 @@ branch:
     remote: event-benton-pd
     merge: refs/heads/main
     file: data/fuse/event_benton_pd.csv
+    primaryKey:
+      - event_uid
+  event-eunice-pd:
+    remote: event-eunice-pd
+    merge: refs/heads/main
+    file: data/fuse/event_eunice_pd.csv
     primaryKey:
       - event_uid
   event-rayne-pd:
@@ -1802,6 +1826,12 @@ branch:
     remote: per-benton-pd
     merge: refs/heads/main
     file: data/fuse/per_benton_pd.csv
+    primaryKey:
+      - uid
+  per-eunice-pd:
+    remote: per-eunice-pd
+    merge: refs/heads/main
+    file: data/fuse/per_eunice_pd.csv
     primaryKey:
       - uid
   per-rayne-pd:
