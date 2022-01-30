@@ -28,7 +28,7 @@ def clean_rank_desc(df):
         .fillna("")
         .str.replace(r"(conf|pro[vb]) ?p?", "", regex=True)
         .str.replace("sgt", "sergeant", regex=False)
-        .str.replace("lt", "lieutntant", regex=False)
+        .str.replace("lt", "lieutenant", regex=False)
         .str.replace(r"p?co", "communications officer", regex=True)
         .str.replace(r"^of?r?c?l?$", "officer", regex=True)
     )
