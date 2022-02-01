@@ -52,7 +52,7 @@ def fuse_events(cprr_20, cprr_14, cprr_08, pprr):
     builder.extract_events(
         pprr,
         {
-            events.COMPLAINT_INCIDENT: {
+            events.OFFICER_HIRE: {
                 "prefix": "hire",
                 "keep": ["uid", "agency", "rank_desc", "salary", "salary_freq"],
             },
