@@ -255,6 +255,26 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/com-rayne-pd
     fetch:
       - +refs/heads/*:refs/remotes/com-rayne-pd/*
+  com-west-monroe-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/com-west-monroe-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/com-west-monroe-pd/*
+  com-erath-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/com-erath-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/com-erath-pd/*
+  com-st-landry-so:
+    url: https://hub.wrgl.co/api/users/ipno/repos/com-st-landry-so
+    fetch:
+      - +refs/heads/*:refs/remotes/com-st-landry-so/*
+  com-benton-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/com-benton-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/com-benton-pd/*
+  com-eunice-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/com-eunice-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/com-eunice-pd/*
   event:
     url: https://hub.wrgl.co/api/users/ipno/repos/event
     fetch:
@@ -447,6 +467,26 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/event-rayne-pd
     fetch:
       - +refs/heads/*:refs/remotes/event-rayne-pd/*
+  event-erath-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/event-erath-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/event-erath-pd*
+  event-st-landry-so:
+    url: https://hub.wrgl.co/api/users/ipno/repos/st-landry-so
+    fetch:
+      - +refs/heads/*:refs/remotes/event-st-landry-so/*
+  event-benton-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/benton-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/event-benton-pd/*
+  event-eunice-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/event-eunice-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/event-eunice-pd*
+  event-rayne-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/event-rayne-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/event-rayne-pd*
   match-brusly-pd-2020:
     url: https://hub.wrgl.co/api/users/ipno/repos/match-brusly-pd-2020
     fetch:
@@ -715,6 +755,22 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/per-acadia-so
     fetch:
       - +refs/heads/*:refs/remotes/per-acadia-so/*
+  per-erath-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/per-erath-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/per-erath-pd/*
+  per-st-landry-so:
+    url: https://hub.wrgl.co/api/users/ipno/repos/per-st-landry-so
+    fetch:
+      - +refs/heads/*:refs/remotes/per-st-landry-so/*
+  per-benton-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/per-benton-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/per-benton-pd/*
+  per-eunice-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/per-eunice-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/per-eunice-pd/*
   per-rayne-pd:
     url: https://hub.wrgl.co/api/users/ipno/repos/per-rayne-pd
     fetch:
@@ -1072,6 +1128,34 @@ branch:
     remote: com-rayne-pd
     merge: refs/heads/main
     file: data/fuse/com_rayne_pd.csv
+  com-west-monroe-pd:
+    remote: com-west-monroe-pd
+    merge: refs/heads/main
+    file: data/fuse/com_west_monroe_pd.csv
+    primaryKey:
+      - allegation_uid
+  com-erath-pd:
+    remote: com-erath-pd
+    merge: refs/heads/main
+    file: data/fuse/com_erath_pd.csv
+    primaryKey:
+      - allegation_uid
+  com-st-landry-so:
+    remote: com-st-landry-so
+    merge: refs/heads/main
+    file: data/fuse/com_st_landry_so.csv
+    primaryKey:
+      - allegation_uid
+  com-benton-pd:
+    remote: com-benton-pd
+    merge: refs/heads/main
+    file: data/fuse/com_benton_pd.csv
+    primaryKey:
+      - allegation_uid
+  com-eunice-pd:
+    remote: com-eunice-pd
+    merge: refs/heads/main
+    file: data/fuse/com_eunice_pd.csv
     primaryKey:
       - allegation_uid
   event:
@@ -1354,6 +1438,30 @@ branch:
     remote: event-acadia-so
     merge: refs/heads/main
     file: data/fuse/event_acadia_so.csv
+    primaryKey:
+      - event_uid
+  event-erath-pd:
+    remote: event-erath-pd
+    merge: refs/heads/main
+    file: data/fuse/event_erath_pd.csv
+    primaryKey:
+      - event_uid 
+  event-st-landry-so:
+    remote: event-st-landry-so
+    merge: refs/heads/main
+    file: data/fuse/event_st_landry_so.csv
+    primaryKey:
+      - event_uid
+  event-benton-pd:
+    remote: event-benton-pd
+    merge: refs/heads/main
+    file: data/fuse/event_benton_pd.csv
+    primaryKey:
+      - event_uid
+  event-eunice-pd:
+    remote: event-eunice-pd
+    merge: refs/heads/main
+    file: data/fuse/event_eunice_pd.csv
     primaryKey:
       - event_uid
   event-rayne-pd:
@@ -1712,6 +1820,30 @@ branch:
     remote: per-acadia-so
     merge: refs/heads/main
     file: data/fuse/per_acadia_so.csv
+    primaryKey:
+      - uid
+  per-erath-pd:
+    remote: per-erath-pd
+    merge: refs/heads/main
+    file: data/fuse/per_erath_pd.csv
+    primaryKey:
+      - uid
+  per-st-landry-so:
+    remote: per-st-landry-so
+    merge: refs/heads/main
+    file: data/fuse/per_st_landry_so.csv
+    primaryKey:
+      - uid
+  per-benton-pd:
+    remote: per-benton-pd
+    merge: refs/heads/main
+    file: data/fuse/per_benton_pd.csv
+    primaryKey:
+      - uid
+  per-eunice-pd:
+    remote: per-eunice-pd
+    merge: refs/heads/main
+    file: data/fuse/per_eunice_pd.csv
     primaryKey:
       - uid
   per-rayne-pd:

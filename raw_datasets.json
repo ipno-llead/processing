@@ -183,7 +183,8 @@
   ],
   "lake_charles_pd": [
     "https://www.dropbox.com/s/xzd2pr1nozb01ux/lake_charles_pd_cprr_2020.csv?dl=1",
-    "https://www.dropbox.com/s/b2s5rbtz8u2hflb/lake_charles_pd_cprr_2014_2019.csv?dl=1"
+    "https://www.dropbox.com/s/b2s5rbtz8u2hflb/lake_charles_pd_cprr_2014_2019.csv?dl=1",
+    "https://www.dropbox.com/s/03ewu8ytartw0rd/pprr_lake_charles_pd_2017_2021.csv?dl=1"
   ],
   "sterlington_pd": [
     "https://www.dropbox.com/s/wdhdn7g97cid57i/sterlington_csd_ppprr_2010_2020.csv?dl=1"
@@ -194,7 +195,8 @@
     "https://www.dropbox.com/s/sg4bn2irswdr087/youngsville_csd_pprr_2019.csv?dl=1"
   ],
   "west_monroe_pd": [
-    "https://www.dropbox.com/s/tjuwpmcpwpeegvt/west_monroe_pd_pprr_2015_2020.csv?dl=1"
+    "https://www.dropbox.com/s/tjuwpmcpwpeegvt/west_monroe_pd_pprr_2015_2020.csv?dl=1",
+    "https://www.dropbox.com/s/6ornoalkrf0kxzh/cprr_west_monroe_pd_2020_byhand.csv?dl=1"
   ],
   "universities": [
     "https://www.dropbox.com/s/f0m3ym4vvk66134/pprr_post_2020_11_06.csv?dl=1"
@@ -223,7 +225,8 @@
     "https://www.dropbox.com/s/fu2sjq8ssjhpq0j/bossier_city_pd_cprr_2020.csv?dl=1"
   ],
   "baker_pd": [
-    "https://www.dropbox.com/s/glr8zm8s0jk3lvg/baker_pd_cprr_2018_2020.csv?dl=1"
+    "https://www.dropbox.com/s/glr8zm8s0jk3lvg/baker_pd_cprr_2018_2020.csv?dl=1",
+    "https://www.dropbox.com/s/b16n7c14pevrjdz/baker_csd_pprr_2010_2020.csv?dl=1"
   ],
   "jefferson_so": [
     "https://www.dropbox.com/s/pxwqqxxnh0b8zj5/jefferson_parish_so_pprr_2020.csv?dl=1"
@@ -242,13 +245,15 @@
     "https://www.dropbox.com/s/s0tir00eb6a2oxb/denham_springs_pd_cprr_2016_2021.csv?dl=1"
   ],
   "abbeville_pd": [
-    "https://www.dropbox.com/s/uqytp67ghkz9teg/abbeville_pd_cprr_2019_2021.csv?dl=1"
+    "https://www.dropbox.com/s/uqytp67ghkz9teg/abbeville_pd_cprr_2019_2021.csv?dl=1",
+    "https://www.dropbox.com/s/j1jabdejti0hmim/abbeville_pd_2015_2018.csv?dl=1"
   ],
   "washington_so": [
     "https://www.dropbox.com/s/4vjjbainf1bqzo8/washington_so_cprr_2015_2020.csv?dl=1"
   ],
   "cameron_so": [
-    "https://www.dropbox.com/s/0go0mcak9blucmz/cameron_so_cprr_2020.csv?dl=1"
+    "https://www.dropbox.com/s/0go0mcak9blucmz/cameron_so_cprr_2020.csv?dl=1",
+    "https://www.dropbox.com/s/4v24k9oil4xytj8/cameron_so_cprr_2015_2019.csv?dl=1"
   ],
   "maurice_pd": [
     "https://www.dropbox.com/s/62jpkscghtd2w1q/maurice_cprr_2020_2021_byhand.csv?dl=1"
@@ -261,5 +266,17 @@
   ],
   "rayne_pd": [
     "https://www.dropbox.com/s/ag30aiyllpzbxjc/rayne_pd_cprr_2019_2020.csv?dl=1"
+  ],
+  "erath_pd": [
+    "https://www.dropbox.com/s/3rag9yqq1xfciqq/erath_pd_cprr_2018_2020_byhand.csv?dl=1"
+  ],
+  "st_landry_so": [
+    "https://www.dropbox.com/s/fev3d7hycbginbf/st_landry_so_cprr_2019_2020.csv?dl=1"
+  ],
+  "benton_pd": [
+    "https://www.dropbox.com/s/spci5855oyaoamw/benton_pd_cprr_2015_2021_byhand.csv?dl=1"
+  ],
+  "eunice_pd": [
+    "https://www.dropbox.com/s/vogk226khgov0vk/eunice_pd_cprr_2019_2021.csv?dl=1"
   ]
 }

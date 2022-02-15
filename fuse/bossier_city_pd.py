@@ -25,15 +25,15 @@ def fuse_events(pprr, cprr):
         {
             events.COMPLAINT_RECEIVE: {
                 "prefix": "receive",
-                "keep": ["uid", "charges", "disposition", "action"],
+                "keep": ["uid", "allegation_uid", "agency", "charges", "disposition", "action"],
             },
             events.INVESTIGATION_START: {
                 "prefix": "investigation_start",
-                "keep": ["uid", "charges", "disposition", "action"],
+                "keep": ["uid", "allegation_uid", "agency", "charges", "disposition", "action"],
             },
             events.INVESTIGATION_COMPLETE: {
                 "prefix": "investigation_complete",
-                "keep": ["uid", "charges", "disposition", "action"],
+                "keep": ["uid", "allegation_uid", "agency",  "charges", "disposition", "action"],
             },
         },
         ["uid", "allegation_uid"],

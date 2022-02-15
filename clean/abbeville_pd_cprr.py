@@ -32,6 +32,7 @@ def clean_allegation(df):
             "general order 107: misuse of equipment",
             regex=False,
         )
+        .str.replace(r"^unauth\.", "unauthorized", regex=True)
     )
     return df
 
@@ -43,6 +44,7 @@ def clean_disposition(df):
         .fillna("")
         .str.replace(r"non\- ?sustained", "not sustained", regex=True)
         .str.replace("disposition", "", regex=False)
+        .str.replace(r"\?", "unknown", regex=True)
     )
     return df
 
@@ -54,7 +56,10 @@ def clean_action(df):
         .fillna("")
         .str.replace("none", "", regex=False)
         .str.replace("discipline", "", regex=False)
-        .str.replace("2 days", "2-day", regex=False)
+        .str.replace(r"(\w{1}) days?", r"\1-day", regex=True)
+        .str.replace(r"^3-day$", "3-day suspension", regex=True)
+        .str.replace(r"^\?$", "unknown", regex=True)
+        .str.replace(r"^unk$", "unknown", regex=True)
     )
     return df.drop(columns="discipline")
 
@@ -86,7 +91,7 @@ def split_rows_with_multiple_officers(df):
 
 def split_and_clean_names(df):
     names = df.officer_name.str.replace("officer name", "", regex=False).str.extract(
-        r"(\w+) ?(\w+)? (\w+)$"
+        r"(\w+) ?(\w+)?\.? (\w+)$"
     )
 
     df.loc[:, "first_name"] = names[0].fillna("")
@@ -99,7 +104,16 @@ def drop_rows_missing_names(df):
     return df[~((df.first_name == "") & (df.last_name == ""))]
 
 
-def clean():
+def remove_q_marks_from_dates(df):
+    df.loc[:, "receive_date"] = df.receive_date.str.replace(r"\? ", "", regex=True)
+
+    df.loc[
+        :, "investigation_complete_date"
+    ] = df.investigation_complete_date.str.replace(r"\? ", "", regex=True)
+    return df
+
+
+def clean21():
     df = (
         pd.read_csv(data_file_path("raw/abbeville_pd/abbeville_pd_cprr_2019_2021.csv"))
         .pipe(clean_column_names)
@@ -137,6 +151,46 @@ def clean():
     return df
 
 
+def clean18():
+    df = (
+        pd.read_csv(data_file_path("raw/abbeville_pd/abbeville_pd_2015_2018.csv"))
+        .pipe(clean_column_names)
+        .drop(columns=["ia_case_number"])
+        .rename(
+            columns={
+                "date_received": "receive_date",
+                "date_completed": "investigation_complete_date",
+            }
+        )
+        .pipe(split_rows_with_multiple_officers)
+        .pipe(split_and_clean_names)
+        .pipe(clean_allegation)
+        .pipe(clean_allegation_desc)
+        .pipe(clean_disposition)
+        .pipe(clean_action)
+        .pipe(remove_q_marks_from_dates)
+        .pipe(clean_dates, ["receive_date", "investigation_complete_date"])
+        .pipe(set_values, {"agency": "Abbeville PD"})
+        .pipe(gen_uid, ["agency", "first_name", "last_name"])
+        .pipe(
+            gen_uid,
+            [
+                "uid",
+                "allegation",
+                "disposition",
+                "action",
+                "receive_year",
+                "receive_day",
+                "receive_month",
+            ],
+            "allegation_uid",
+        )
+    )
+    return df
+
+
 if __name__ == "__main__":
-    df = clean()
-    df.to_csv(data_file_path("clean/cprr_abbeville_pd_2019_2021.csv"))
+    df21 = clean21()
+    df18 = clean18()
+    df21.to_csv(data_file_path("clean/cprr_abbeville_pd_2019_2021.csv"), index=False)
+    df18.to_csv(data_file_path("clean/cprr_abbeville_pd_2015_2018.csv"), index=False)
