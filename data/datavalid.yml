@@ -159,6 +159,9 @@ schemas:
       - name: investigating_department
         description: >
           small departments frequently turnover internal investigations to the sheriff's office 
+      - name: disposition_recommended
+        description: >
+          description of recommended disposition
   event:
     columns:
       - name: event_uid

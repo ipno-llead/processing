@@ -271,6 +271,10 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/com-eunice-pd
     fetch:
       - +refs/heads/*:refs/remotes/com-eunice-pd/*
+  com-thibodaux-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/com-thibodaux-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/com-thibodaux-pd/*
   event:
     url: https://hub.wrgl.co/api/users/ipno/repos/event
     fetch:
@@ -479,6 +483,10 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/event-rayne-pd
     fetch:
       - +refs/heads/*:refs/remotes/event-rayne-pd*
+  event-thibodaux-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/event-thibodaux-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/event-thibodaux-pd*
   match-brusly-pd-2020:
     url: https://hub.wrgl.co/api/users/ipno/repos/match-brusly-pd-2020
     fetch:
@@ -767,6 +775,10 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/per-rayne-pd
     fetch:
       - +refs/heads/*:refs/remotes/per-rayne-pd/*
+  per-thibodaux-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/per-thibodaux-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/per-thibodaux-pd/*
   person:
     url: https://hub.wrgl.co/api/users/ipno/repos/person
     fetch:
@@ -1145,6 +1157,12 @@ branch:
     merge: refs/heads/main
     file: data/fuse/com_eunice_pd.csv
     primaryKey:
+      - 
+  com-thibodaux-pd:
+    remote: com-thibodaux-pd
+    merge: refs/heads/main
+    file: data/fuse/com_thibodaux_pd.csv
+    primaryKey:
       - allegation_uid
   event:
     remote: event
@@ -1456,6 +1474,12 @@ branch:
     remote: event-rayne-pd
     merge: refs/heads/main
     file: data/fuse/event_rayne_pd.csv
+    primaryKey:
+      - event_uid
+  event-thibodaux-pd:
+    remote: event-thibodaux-pd
+    merge: refs/heads/main
+    file: data/fuse/event_thibodaux_pd.csv
     primaryKey:
       - event_uid
   match-brusly-pd-2020:
@@ -1838,6 +1862,12 @@ branch:
     remote: per-rayne-pd
     merge: refs/heads/main
     file: data/fuse/per_rayne_pd.csv
+    primaryKey:
+      - uid
+  per-thibodaux-pd:
+    remote: per-thibodaux-pd
+    merge: refs/heads/main
+    file: data/fuse/per_thibodaux_pd.csv
     primaryKey:
       - uid
   person:
