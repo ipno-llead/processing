@@ -4,10 +4,6 @@ OS := $(shell uname -s)
 MD5 := $(if $(findstring Darwin,$(OS)),md5,md5sum)
 BUILD_DIR := build
 MD5_DIR := $(BUILD_DIR)/md5
-DATA_DIR := data
-DATA_CLEAN_DIR := $(DATA_DIR)/clean
-DATA_MATCH_DIR := $(DATA_DIR)/match
-DATA_FUSE_DIR := $(DATA_DIR)/fuse
 SCRIPT_DIRS := clean match fuse
 DATA_DEP_FILES := $(patsubst %,%/data.d,$(SCRIPT_DIRS))
 EXCLUDED_SCRIPTS := fuse/all.py match/cross_agency.py match/harahan_pd.py
@@ -41,13 +37,14 @@ $(MD5_DIR)/%.md5: % | $(MD5_DIR)
 %/data.d: %/*.py
 	scripts/write_deps.py $* $(if $(findstring fuse,$*),--all --dependency build/md5/data/datavalid.yml.md5 ,)$(patsubst %,-e %,$(EXCLUDED_SCRIPTS))
 
-$(BUILD_DIR) $(DATA_DIR): ; @-mkdir $@ 2>/dev/null
+$(BUILD_DIR): ; @-mkdir $@ 2>/dev/null
 $(MD5_DIR): | $(BUILD_DIR) ; @-mkdir $@ 2>/dev/null
-$(DATA_CLEAN_DIR) $(DATA_MATCH_DIR) $(DATA_FUSE_DIR): | $(DATA_DIR) ; @-mkdir $@ 2>/dev/null
 
 schema.md: $(MD5_DIR)/data/datavalid.yml.md5
 	python -m datavalid --dir $(DATA_DIR) --doc $@
 
 include raw_datasets.mk
-include $(DATA_DEP_FILES)
+# include $(DATA_DEP_FILES)
 include wrgl.mk
+
+include dirk.mk

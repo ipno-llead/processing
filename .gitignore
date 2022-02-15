@@ -17,3 +17,5 @@ build
 data.d
 
 .env
+
+.dirk
