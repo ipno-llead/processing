@@ -68,6 +68,8 @@ def fuse_personnel():
                 pd.read_csv(data_file_path("fuse/per_erath_pd.csv")),
                 pd.read_csv(data_file_path("fuse/per_st_landry_so.csv")),
                 pd.read_csv(data_file_path("fuse/per_benton_pd.csv")),
+                pd.read_csv(data_file_path("fuse/per_eunice_pd.csv")),
+                pd.read_csv(data_file_path("fuse/per_rayne_pd.csv")),
             ]
         )
     ).sort_values("uid", ignore_index=True)
@@ -126,6 +128,8 @@ def fuse_event():
                 pd.read_csv(data_file_path("fuse/event_erath_pd.csv")),
                 pd.read_csv(data_file_path("fuse/event_st_landry_so.csv")),
                 pd.read_csv(data_file_path("fuse/event_benton_pd.csv")),
+                pd.read_csv(data_file_path("fuse/event_eunice_pd.csv")),
+                pd.read_csv(data_file_path("fuse/event_rayne_pd.csv")),
             ]
         )
     ).sort_values(["agency", "event_uid"], ignore_index=True)
@@ -170,6 +174,7 @@ def fuse_allegation():
                 pd.read_csv(data_file_path("fuse/com_erath_pd.csv")),
                 pd.read_csv(data_file_path("fuse/com_st_landry_so.csv")),
                 pd.read_csv(data_file_path("fuse/com_benton_pd.csv")),
+                pd.read_csv(data_file_path("fuse/com_eunice_pd.csv")),
             ]
         )
     ).sort_values(["agency", "tracking_number"], ignore_index=True)
