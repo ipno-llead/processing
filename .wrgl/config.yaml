@@ -483,10 +483,6 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/event-eunice-pd
     fetch:
       - +refs/heads/*:refs/remotes/event-eunice-pd*
-  event-rayne-pd:
-    url: https://hub.wrgl.co/api/users/ipno/repos/event-rayne-pd
-    fetch:
-      - +refs/heads/*:refs/remotes/event-rayne-pd*
   match-brusly-pd-2020:
     url: https://hub.wrgl.co/api/users/ipno/repos/match-brusly-pd-2020
     fetch:
