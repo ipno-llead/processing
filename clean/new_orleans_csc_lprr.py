@@ -159,17 +159,6 @@ def clean():
         .pipe(extract_middle_name)
         .pipe(clean_last_name)
         .pipe(assign_agency)
-        .pipe(
-            clean_dates,
-            [
-                "appeal_hearing_date",
-                "appeal_receive_date",
-                "appeal_hearing_2_date",
-                "transcript_receive_date",
-                "h_e_report_receive_date",
-                "appeal_disposition_date",
-            ],
-        )
         .pipe(clean_names, ["first_name", "last_name"])
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(gen_uid, ["uid", "docket_no"], "appeal_uid")

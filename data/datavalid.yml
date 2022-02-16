@@ -398,15 +398,9 @@ schemas:
       - name: appealed
       - name: agency
       - name: motions
-      - name: appeal_disposition_year
-      - name: appeal_disposition_month
-      - name: appeal_disposition_day 
-      - name: appeal_hearing_year
-      - name: appeal_hearing_month
-      - name: appeal_hearing_day
-      - name: appeal_hearing_2_year 
-      - name: appeal_hearing_2_month
-      - name: appeal_hearing_2_day
+      - name: appeal_disposition_date
+      - name: appeal_hearing_date
+      - name: appeal_hearing_2_date
   stop_and_search:
     columns:
       - name: stop_and_search_uid
