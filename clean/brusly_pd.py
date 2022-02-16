@@ -78,7 +78,7 @@ def split_pprr_name(df):
     df.loc[:, "last_name"] = names.loc[:, 0].fillna("")
     names = names.loc[:, 1].fillna("").str.split(" ", expand=True)
     df.loc[:, "first_name"] = names.loc[:, 0].fillna("")
-    df.loc[:, "middle_initial"] = names.loc[:, 1].fillna("")
+    df.loc[:, "middle_name"] = names.loc[:, 1].fillna("")
     df = df.drop(columns="full_nme")
     return df
 
@@ -99,7 +99,7 @@ def clean_pprr():
         .pipe(clean_salaries, ["salary"])
         .pipe(set_values, {"salary_freq": salary.YEARLY})
         .pipe(split_pprr_name)
-        .pipe(clean_names, ["first_name", "last_name", "middle_initial"])
+        .pipe(clean_names, ["first_name", "last_name", "middle_name"])
         .pipe(clean_dates, ["hire_date", "birth_date"])
         .pipe(clean_races, ["race"])
         .pipe(clean_sexes, ["sex"])
@@ -111,7 +111,7 @@ def clean_pprr():
                 "agency",
                 "last_name",
                 "first_name",
-                "middle_initial",
+                "middle_name",
                 "birth_year",
                 "birth_month",
                 "birth_day",

@@ -105,11 +105,11 @@ def clean_final_disposition(df):
     return df.drop(columns="final_disposition")
 
 
-def extract_middle_initial(df):
+def extract_middle_name(df):
     df.loc[:, "first_name"] = df.first_name.str.lower().str.strip().fillna("")
     names = df.first_name.str.extract(r"(\w+) ?(\w{1})?")
     df.loc[:, "first_name"] = names[0].fillna("")
-    df.loc[:, "middle_initial"] = names[1].fillna("")
+    df.loc[:, "middle_name"] = names[1].fillna("")
     return df
 
 
@@ -150,13 +150,13 @@ def clean():
                 "transcript_received": "transcript_receive_date",
                 "h_e_report_received": "h_e_report_receive_date",
                 "final_disposition_date": "appeal_disposition_date",
-                "docket_number": "docket_no"
+                "docket_number": "docket_no",
             }
         )
         .pipe(clean_suspension)
         .pipe(clean_on_docket)
         .pipe(clean_final_disposition)
-        .pipe(extract_middle_initial)
+        .pipe(extract_middle_name)
         .pipe(clean_last_name)
         .pipe(assign_agency)
         .pipe(

@@ -37,11 +37,6 @@ def strip_time_from_dates(df, cols):
     return df
 
 
-def generate_middle_initial(df):
-    df.loc[:, "middle_initial"] = df.middle_name.map(lambda x: x[:1])
-    return df
-
-
 def assign_agency(df):
     df.loc[:, "data_production_year"] = "2018"
     df.loc[:, "agency"] = "New Orleans PD"
@@ -161,7 +156,6 @@ def clean():
         .pipe(clean_dates, ["hire_date", "left_date", "dept_date"])
         .pipe(clean_names, ["first_name", "middle_name", "last_name"])
         .pipe(remove_unnamed_officers)
-        .pipe(generate_middle_initial)
         .pipe(clean_current_supervisor)
     )
 

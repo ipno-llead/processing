@@ -34,7 +34,7 @@ def split_names(df):
     )
     df.loc[:, "last_name"] = names[1]
     df.loc[:, "first_name"] = names[0]
-    df.loc[:, "middle_initial"] = names[2]
+    df.loc[:, "middle_name"] = names[2]
     return df[df.name.notna()].drop(columns=["name"])
 
 
@@ -83,8 +83,8 @@ def clean_pprr():
         .pipe(float_to_int_str, ["birth_year"])
         .pipe(standardize_rank)
         .pipe(split_names)
-        .pipe(clean_names, ["first_name", "last_name", "middle_initial"])
-        .pipe(gen_uid, ["agency", "first_name", "last_name", "middle_initial"])
+        .pipe(clean_names, ["first_name", "last_name", "middle_name"])
+        .pipe(gen_uid, ["agency", "first_name", "last_name", "middle_name"])
     )
 
 

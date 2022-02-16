@@ -261,7 +261,7 @@ def split_name_19(df):
     series = df.name_of_accused.fillna("").str.strip()
     for col, pat in [
         ("first_name", r"^([\w'-]+)(.*)$"),
-        ("middle_initial", r"^(\w\.) (.*)$"),
+        ("middle_name", r"^(\w\.) (.*)$"),
     ]:
         names = series[series.str.match(pat)].str.extract(pat)
         df.loc[series.str.match(pat), col] = names[0].str.replace(
@@ -896,7 +896,7 @@ def clean19():
         .pipe(clean_department_desc)
         .pipe(standardize_desc_cols, ["rank_desc"])
         .pipe(split_name_19)
-        .pipe(clean_names, ["first_name", "last_name", "middle_initial"])
+        .pipe(clean_names, ["first_name", "last_name", "middle_name"])
         .pipe(clean_action_19)
         .pipe(set_values, {"agency": "New Orleans SO", "data_production_year": "2019"})
         .pipe(process_disposition)
@@ -906,7 +906,7 @@ def clean19():
         )
         .pipe(
             gen_uid,
-            ["agency", "employee_id", "first_name", "last_name", "middle_initial"],
+            ["agency", "employee_id", "first_name", "last_name", "middle_name"],
         )
         .pipe(set_empty_uid_for_anonymous_officers)
         .pipe(gen_uid, ["agency", "tracking_number", "uid"], "allegation_uid")

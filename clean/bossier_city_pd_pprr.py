@@ -67,7 +67,7 @@ def split_name(df):
     df.loc[:, "last_name"] = names[0]
     df.loc[:, "suffix"] = names[1].fillna("")
     df.loc[:, "first_name"] = names[2].fillna("")
-    df.loc[:, "middle_initial"] = names[3].fillna("")
+    df.loc[:, "middle_name"] = names[3].fillna("")
     df.loc[:, "last_name"] = df.last_name.str.cat(df.suffix, sep=" ").fillna("")
     return df
 
@@ -172,7 +172,7 @@ def clean():
         .pipe(clean_dates, ["birth_date", "hire_date"])
         .pipe(assign_agency)
         .pipe(drop_rows_with_missing__firt_and_last_name)
-        .pipe(gen_uid, ["first_name", "last_name", "middle_initial", "agency"])
+        .pipe(gen_uid, ["first_name", "last_name", "middle_name", "agency"])
     )
     return df
 

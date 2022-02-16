@@ -16,14 +16,14 @@ sys.path.append("../")
 
 def match_csd_and_pd_pprr(csd, pprr, year, decision):
     dfa = (
-        csd[["last_name", "first_name", "middle_initial", "uid"]]
+        csd[["last_name", "first_name", "middle_name", "uid"]]
         .drop_duplicates("uid")
         .set_index("uid", drop=True)
     )
     dfa.loc[:, "fc"] = dfa.first_name.map(lambda x: x[:1])
 
     dfb = (
-        pprr[["last_name", "first_name", "middle_initial", "uid"]]
+        pprr[["last_name", "first_name", "middle_name", "uid"]]
         .drop_duplicates("uid")
         .set_index("uid", drop=True)
     )
@@ -50,14 +50,14 @@ def match_csd_and_pd_pprr(csd, pprr, year, decision):
 
 def match_pd_cprr_2018_v_pprr(cprr, pprr):
     dfa = (
-        cprr[["first_name", "last_name", "middle_initial", "uid"]]
+        cprr[["first_name", "last_name", "middle_name", "uid"]]
         .drop_duplicates("uid")
         .set_index("uid", drop=True)
     )
     dfa.loc[:, "fc"] = dfa.first_name.fillna("").map(lambda x: x[:1])
 
     dfb = (
-        pprr[["first_name", "last_name", "middle_initial", "uid"]]
+        pprr[["first_name", "last_name", "middle_name", "uid"]]
         .drop_duplicates("uid")
         .set_index("uid", drop=True)
     )
@@ -68,7 +68,7 @@ def match_pd_cprr_2018_v_pprr(cprr, pprr):
         {
             "last_name": JaroWinklerSimilarity(),
             "first_name": JaroWinklerSimilarity(),
-            "middle_initial": JaroWinklerSimilarity(),
+            "middle_name": JaroWinklerSimilarity(),
         },
         dfa,
         dfb,
@@ -88,14 +88,14 @@ def match_pd_cprr_2018_v_pprr(cprr, pprr):
 
 def match_pd_cprr_2021_v_pprr(cprr, pprr):
     dfa = (
-        cprr[["first_name", "last_name", "middle_initial", "uid"]]
+        cprr[["first_name", "last_name", "middle_name", "uid"]]
         .drop_duplicates("uid")
         .set_index("uid", drop=True)
     )
     dfa.loc[:, "fc"] = dfa.first_name.fillna("").map(lambda x: x[:1])
 
     dfb = (
-        pprr[["first_name", "last_name", "middle_initial", "uid"]]
+        pprr[["first_name", "last_name", "middle_name", "uid"]]
         .drop_duplicates("uid")
         .set_index("uid", drop=True)
     )
@@ -106,7 +106,7 @@ def match_pd_cprr_2021_v_pprr(cprr, pprr):
         {
             "last_name": JaroWinklerSimilarity(),
             "first_name": JaroWinklerSimilarity(),
-            "middle_initial": JaroWinklerSimilarity(),
+            "middle_name": JaroWinklerSimilarity(),
         },
         dfa,
         dfb,
@@ -152,11 +152,11 @@ def match_pprr_against_post(pprr, post):
 
 
 def match_lprr_against_pprr(lprr, pprr):
-    dfa = lprr[["uid", "first_name", "last_name", "middle_initial"]]
+    dfa = lprr[["uid", "first_name", "last_name", "middle_name"]]
     dfa.loc[:, "fc"] = dfa.first_name.fillna("").map(lambda x: x[:1])
     dfa = dfa.drop_duplicates(subset=["uid"]).set_index("uid")
 
-    dfb = pprr[["uid", "first_name", "last_name", "middle_initial"]]
+    dfb = pprr[["uid", "first_name", "last_name", "middle_name"]]
     dfb.loc[:, "fc"] = dfb.first_name.fillna("").map(lambda x: x[:1])
     dfb = dfb.drop_duplicates(subset=["uid"]).set_index("uid")
 
@@ -165,7 +165,7 @@ def match_lprr_against_pprr(lprr, pprr):
         {
             "first_name": JaroWinklerSimilarity(),
             "last_name": JaroWinklerSimilarity(),
-            "middle_initial": StringSimilarity(),
+            "middle_name": StringSimilarity(),
         },
         dfa,
         dfb,

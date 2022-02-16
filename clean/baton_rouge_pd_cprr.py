@@ -202,17 +202,12 @@ def parse_officer_name_18(df):
         )
         .str.split(" # ", expand=True)
     )
-    names.columns = ["last_name", "first_name", "middle_initial"]
-    names.loc[:, "middle_initial"] = (
-        names["middle_initial"].str.replace("n/a", "", regex=False).fillna("")
+    names.columns = ["last_name", "first_name", "middle_name"]
+    names.loc[:, "middle_name"] = (
+        names["middle_name"].str.replace("n/a", "", regex=False).fillna("")
     )
-    names.loc[:, "middle_name"] = names.middle_initial.map(
-        lambda v: "" if len(v) < 2 else v
-    )
-    names.loc[:, "middle_initial"] = names.middle_initial.map(lambda v: v[:1])
 
     df = pd.concat([df, dep, names], axis=1)
-    df.drop(columns=["officer_name", "name"], inplace=True)
     return df
 
 
@@ -489,6 +484,11 @@ def split_name_21(df):
         .str.replace("-", "", regex=False)
         .str.replace("krumm amy e", "amy e krumm", regex=False)
         .str.replace(r"passman (m|jon) (jon|m)", "jon m passman", regex=True)
+        .str.replace(
+            r"(\w+) (\biii\b|\bii\b|\bjr\b|sr) (\w+)$", r"\1 \3,\2", regex=True
+        )
+        .str.replace(r"(\w+) (jr|\biii\b|\bii\b|sr)", r"\1,\2", regex=True)
+        .str.replace("al mutakabbir", "almutakabbir", regex=False)
     )
     names = (
         df.name.str.lower()
@@ -506,15 +506,12 @@ def split_name_21(df):
             "det": "detective",
         }
     )
-    df.loc[:, "first_name"] = names[1].str.strip()
-    df.loc[:, "last_name"] = names[3].str.strip()
-    df.loc[:, "middle_name"] = (
-        names.loc[:, 2].str.strip().fillna("").map(lambda s: "" if len(s) < 2 else s)
+    df.loc[:, "first_name"] = names[1].str.strip().fillna("")
+    df.loc[:, "last_name"] = (
+        names[3].str.strip().fillna("").str.replace(r"\,", " ", regex=True)
     )
-    df.loc[:, "middle_initial"] = (
-        names.loc[:, 2].str.strip().fillna("").map(lambda s: "" if len(s) > 2 else s)
-    )
-    return df.drop(columns=["name"])
+    df.loc[:, "middle_name"] = names[2]
+    return df[~((df.first_name == "") & (df.last_name == ""))].drop(columns="name")
 
 
 def split_department_and_division_desc_21(df):
@@ -767,7 +764,7 @@ def clean_18():
         .pipe(combine_rule_and_paragraph)
         .pipe(assign_agency)
         .pipe(assign_prod_year, "2020")
-        .pipe(gen_uid, ["agency", "first_name", "middle_initial", "last_name"])
+        .pipe(gen_uid, ["agency", "first_name", "middle_name", "last_name"])
         .pipe(
             gen_uid,
             ["agency", "tracking_number", "uid", "action", "allegation"],
@@ -808,7 +805,7 @@ def clean_21():
         .pipe(drop_rows_with_allegations_disposition_action_all_empty_21)
         .pipe(assign_agency)
         .pipe(assign_prod_year, "2021")
-        .pipe(gen_uid, ["agency", "first_name", "middle_initial", "last_name"])
+        .pipe(gen_uid, ["agency", "first_name", "last_name"])
         .drop_duplicates(
             subset=["uid", "tracking_number", "allegation", "disposition", "action"],
             keep="first",

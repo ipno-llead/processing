@@ -55,11 +55,11 @@ def extract_post_events(pprr, post):
 
 
 def match_uof_pprr(uof, ppprr):
-    dfa = uof[["uid", "first_name", "last_name", "middle_initial"]]
+    dfa = uof[["uid", "first_name", "last_name", "middle_name"]]
     dfa = dfa.drop_duplicates(subset=["uid"]).set_index("uid")
     dfa.loc[:, "fc"] = dfa.first_name.fillna("").map(lambda x: x[:1])
 
-    dfb = pprr[["uid", "first_name", "last_name", "middle_initial"]]
+    dfb = pprr[["uid", "first_name", "last_name", "middle_name"]]
     dfb = dfb.drop_duplicates(subset=["uid"]).set_index("uid")
     dfb.loc[:, "fc"] = dfb.first_name.fillna("").map(lambda x: x[:1])
 

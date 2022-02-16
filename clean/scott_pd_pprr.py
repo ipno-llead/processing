@@ -13,7 +13,7 @@ def split_name(df):
     series = df.full_name.fillna("").str.strip()
     for col, pat in [
         ("first_name", r"^([\w'-]+)(.*)$"),
-        ("middle_initial", r"^(\w\.|\w\s)(.*)$"),
+        ("middle_name", r"^(\w\.|\w\s)(.*)$"),
     ]:
         names = series[series.str.match(pat)].str.extract(pat)
         df.loc[series.str.match(pat), col] = names[0]
@@ -66,7 +66,7 @@ def clean():
         .pipe(clean_dates, ["birth_date", "hire_date", "term_date"])
         .pipe(clean_races, ["race"])
         .pipe(clean_sexes, ["sex"])
-        .pipe(clean_names, ["first_name", "last_name", "middle_initial"])
+        .pipe(clean_names, ["first_name", "last_name", "middle_name"])
         .pipe(set_values, {"data_production_year": 2021, "agency": "Scott PD"})
         .pipe(gen_uid, ["agency", "first_name", "last_name", "birth_year", "badge_no"])
     )

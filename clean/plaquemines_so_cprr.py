@@ -10,14 +10,6 @@ import sys
 sys.path.append("../")
 
 
-def gen_middle_initial(df):
-    df.loc[df.middle_name.isna(), "middle_name"] = df.loc[
-        df.middle_name.isna(), "middle_initial"
-    ]
-    df.loc[:, "middle_initial"] = df.middle_name.fillna("").map(lambda x: x[:1])
-    return df
-
-
 def assign_agency(df):
     df.loc[:, "agency"] = "Plaquemines SO"
     return df
@@ -68,12 +60,7 @@ def clean_and_split_names(df):
     names = df.against.str.extract(r"(\w+) ?(\w+)? ?(.+)?")
     df.loc[:, "first_name"] = names[0].fillna("")
     df.loc[:, "last_name"] = names[1].fillna("")
-    df.loc[:, "middle_name"] = (
-        names.loc[:, 2].str.strip().fillna("").map(lambda s: "" if len(s) < 2 else s)
-    )
-    df.loc[:, "middle_initial"] = (
-        names.loc[:, 2].str.strip().fillna("").map(lambda s: "" if len(s) > 2 else s)
-    )
+    df.loc[:, "middle_name"] = names[2]
     return df
 
 
@@ -148,12 +135,11 @@ def clean19():
     df = clean_column_names(df)
     df = df.rename(columns={"rule_violation": "allegation"})
     return (
-        df.pipe(gen_middle_initial)
-        .pipe(assign_agency)
-        .pipe(clean_names, ["first_name", "last_name", "middle_name", "middle_initial"])
+        df.pipe(assign_agency)
+        .pipe(clean_names, ["first_name", "last_name", "middle_name"])
         .pipe(
             gen_uid,
-            ["agency", "first_name", "last_name", "middle_name", "middle_initial"],
+            ["agency", "first_name", "last_name", "middle_name"],
         )
         .pipe(gen_uid, ["agency", "tracking_number"], "allegation_uid")
     )
@@ -183,7 +169,7 @@ def clean20():
         .pipe(assign_agency)
         .pipe(
             gen_uid,
-            ["first_name", "last_name", "middle_name", "middle_initial", "agency"],
+            ["first_name", "last_name", "middle_name", "agency"],
         )
         .pipe(gen_uid, ["uid", "tracking_number", "allegation"], "allegation_uid")
     )

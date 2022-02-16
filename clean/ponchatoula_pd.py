@@ -35,12 +35,12 @@ def clean_pprr():
         .rename(
             columns={
                 "employee": "employee_id",
-                "middle_init": "middle_initial",
+                "middle_init": "middle_name",
                 "regular_rate": "salary",
                 "work_center": "department_desc",
             }
         )
-        .pipe(clean_names, ["first_name", "middle_initial", "last_name"])
+        .pipe(clean_names, ["first_name", "middle_name", "last_name"])
         .pipe(clean_salaries, ["salary"])
         .pipe(standardize_desc_cols, ["salary_freq"])
         .pipe(clean_department_desc)

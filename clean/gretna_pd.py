@@ -24,7 +24,6 @@ def split_names(df):
     df.loc[:, "first_name"] = names[1]
     df.loc[:, "middle_name"] = names[2]
     df.loc[:, "last_name"] = names[0]
-    df.loc[:, "middle_initial"] = names[2].fillna("").map(lambda x: x[:1])
     return df[df.name.notna()].reset_index(drop=True).drop(columns=["name"])
 
 

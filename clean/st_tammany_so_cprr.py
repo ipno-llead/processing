@@ -57,11 +57,6 @@ def assign_agency(df):
     return df
 
 
-def gen_middle_initial(df):
-    df.loc[:, "middle_initial"] = df.middle_name.fillna("").map(lambda x: x[:1])
-    return df
-
-
 def remove_new_lines_from_allegations(df):
     df.loc[:, "allegation"] = df.allegation.str.replace(r"(\n|\r)\s*", " ", regex=True)
     return df
@@ -98,7 +93,6 @@ def clean():
         .pipe(extract_occur_date)
         .pipe(assign_agency)
         .pipe(clean_names, ["first_name", "last_name", "middle_name"])
-        .pipe(gen_middle_initial)
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(
             gen_uid,
