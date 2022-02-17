@@ -1,0 +1,5 @@
+[core]
+    remote = google-storage
+['remote "google-storage"']
+    url = gs://llead-dvc
+    projectname = excellent-zoo-300106
