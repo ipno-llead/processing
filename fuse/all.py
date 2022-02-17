@@ -170,6 +170,7 @@ def fuse_allegation():
                 pd.read_csv(data_file_path("fuse/com_maurice_pd.csv")),
                 pd.read_csv(data_file_path("fuse/com_terrebonne_so.csv")),
                 pd.read_csv(data_file_path("fuse/com_acadia_so.csv")),
+                pd.read_csv(data_file_path("fuse/com_rayne_pd.csv")),
                 pd.read_csv(data_file_path("fuse/com_west_monroe_pd.csv")),
                 pd.read_csv(data_file_path("fuse/com_erath_pd.csv")),
                 pd.read_csv(data_file_path("fuse/com_st_landry_so.csv")),
