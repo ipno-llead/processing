@@ -1,7 +1,4 @@
-import sys
-
-sys.path.append("../")
-from lib.path import data_file_path
+import dirk
 import pandas as pd
 from lib.columns import set_values
 from lib.clean import standardize_desc_cols, clean_dates
@@ -16,7 +13,7 @@ def clean_allegation(df):
 def clean():
     df = (
         pd.read_csv(
-            data_file_path("raw/terrebonne_so/terrebonne_so_cprr_2019_2021_byhand.csv")
+            dirk.data("raw/terrebonne_so/terrebonne_so_cprr_2019_2021_byhand.csv")
         )
         .rename(
             columns={
@@ -48,4 +45,4 @@ def clean():
 
 if __name__ == "__main__":
     df = clean()
-    df.to_csv(data_file_path("clean/cprr_terrebonne_so_2019_2021.csv"), index=False)
+    df.to_csv(dirk.data("clean/cprr_terrebonne_so_2019_2021.csv"), index=False)

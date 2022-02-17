@@ -1,8 +1,5 @@
-import sys
-
-sys.path.append("../")
 import pandas as pd
-from lib.path import data_file_path
+import dirk
 from lib.columns import clean_column_names
 from lib.clean import clean_sexes, float_to_int_str
 
@@ -194,12 +191,12 @@ def clean_race(df):
 
 
 def clean():
-    dfa = pd.read_csv(
-        data_file_path("raw/ipm/new_orleans_so_charges_2015_2021.csv")
-    ).pipe(clean_column_names)
-    dfb = pd.read_csv(
-        data_file_path("raw/ipm/new_orleans_so_bookings_2015_2021.csv")
-    ).pipe(clean_column_names)
+    dfa = pd.read_csv(dirk.data("raw/ipm/new_orleans_so_charges_2015_2021.csv")).pipe(
+        clean_column_names
+    )
+    dfb = pd.read_csv(dirk.data("raw/ipm/new_orleans_so_bookings_2015_2021.csv")).pipe(
+        clean_column_names
+    )
 
     df = (
         pd.merge(dfa, dfb, on="folder_no", how="outer")
@@ -253,4 +250,4 @@ def clean():
 
 if __name__ == "__main__":
     df = clean()
-    df.to_csv(data_file_path("clean/booking_new_orleans_so_2015_2021.csv"), index=False)
+    df.to_csv(dirk.data("clean/booking_new_orleans_so_2015_2021.csv"), index=False)

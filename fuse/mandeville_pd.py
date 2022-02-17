@@ -1,11 +1,8 @@
 from lib import events
 from lib.columns import rearrange_allegation_columns, rearrange_event_columns
-from lib.path import data_file_path
+import dirk
 from lib.personnel import fuse_personnel
 import pandas as pd
-import sys
-
-sys.path.append("../")
 
 
 def fuse_events(cprr, pprr):
@@ -60,13 +57,13 @@ def fuse_events(cprr, pprr):
 
 
 if __name__ == "__main__":
-    pprr = pd.read_csv(data_file_path("clean/pprr_mandeville_csd_2020.csv"))
-    post_event = pd.read_csv(data_file_path("match/post_event_mandeville_pd_2019.csv"))
-    cprr = pd.read_csv(data_file_path("match/cprr_mandeville_pd_2019.csv"))
+    pprr = pd.read_csv(dirk.data("clean/pprr_mandeville_csd_2020.csv"))
+    post_event = pd.read_csv(dirk.data("match/post_event_mandeville_pd_2019.csv"))
+    cprr = pd.read_csv(dirk.data("match/cprr_mandeville_pd_2019.csv"))
     events_df = fuse_events(cprr, pprr)
     events_df = rearrange_event_columns(pd.concat([post_event, events_df]))
     per_df = fuse_personnel(pprr, cprr)
     com_df = rearrange_allegation_columns(cprr)
-    events_df.to_csv(data_file_path("fuse/event_mandeville_pd.csv"), index=False)
-    com_df.to_csv(data_file_path("fuse/com_mandeville_pd.csv"), index=False)
-    per_df.to_csv(data_file_path("fuse/per_mandeville_pd.csv"), index=False)
+    events_df.to_csv(dirk.data("fuse/event_mandeville_pd.csv"), index=False)
+    com_df.to_csv(dirk.data("fuse/com_mandeville_pd.csv"), index=False)
+    per_df.to_csv(dirk.data("fuse/per_mandeville_pd.csv"), index=False)

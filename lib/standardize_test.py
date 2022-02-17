@@ -1,10 +1,7 @@
 from pandas.testing import assert_series_equal
 import pandas as pd
 import unittest
-import sys
 from standardize import standardize_from_lookup_table
-
-sys.path.append("./")
 
 
 class StandardizeFromLookupTableTestCase(unittest.TestCase):

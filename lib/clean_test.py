@@ -1,12 +1,9 @@
-import sys
 import unittest
 
 import pandas as pd
 from pandas.testing import assert_frame_equal
 
 from lib.clean import remove_future_dates
-
-sys.path.append("./")
 
 
 class RemoveFutureDates(unittest.TestCase):

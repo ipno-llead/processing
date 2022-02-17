@@ -1,13 +1,9 @@
-import sys
-
 from datamatch import ThresholdMatcher, ColumnsIndex, JaroWinklerSimilarity
 import pandas as pd
 
-from lib.path import data_file_path, ensure_data_dir
+import dirk
 from lib.uid import gen_uid
 from lib.post import extract_events_from_post, load_for_agency
-
-sys.path.append("../")
 
 
 def match_uid_with_cprr(cprr, pprr):
@@ -36,7 +32,7 @@ def match_uid_with_cprr(cprr, pprr):
     )
     decision = 0.96
     matcher.save_pairs_to_excel(
-        data_file_path("match/new_orleans_harbor_pd_cprr_2020_v_pprr_2020.xlsx"),
+        dirk.data("match/new_orleans_harbor_pd_cprr_2020_v_pprr_2020.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(decision)
@@ -67,9 +63,7 @@ def match_pprr_and_post(pprr, post):
     )
     decision = 0.96
     matcher.save_pairs_to_excel(
-        data_file_path(
-            "match/new_orleans_harbor_pd_pprr_2020_v_post_pprr_2020_11_06.xlsx"
-        ),
+        dirk.data("match/new_orleans_harbor_pd_pprr_2020_v_post_pprr_2020_11_06.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
@@ -77,16 +71,14 @@ def match_pprr_and_post(pprr, post):
 
 
 if __name__ == "__main__":
-    cprr = pd.read_csv(data_file_path("clean/cprr_new_orleans_harbor_pd_2020.csv"))
-    pprr20 = pd.read_csv(data_file_path("clean/pprr_new_orleans_harbor_pd_2020.csv"))
+    cprr = pd.read_csv(dirk.data("clean/cprr_new_orleans_harbor_pd_2020.csv"))
+    pprr20 = pd.read_csv(dirk.data("clean/pprr_new_orleans_harbor_pd_2020.csv"))
     agency = pprr20.agency[0]
-    post = load_for_agency("clean/pprr_post_2020_11_06.csv", agency)
+    post = load_for_agency(agency)
     cprr = match_uid_with_cprr(cprr, pprr20)
     post_event = match_pprr_and_post(pprr20, post)
-    ensure_data_dir("match")
-    cprr.to_csv(
-        data_file_path("match/cprr_new_orleans_harbor_pd_2020.csv"), index=False
-    )
+
+    cprr.to_csv(dirk.data("match/cprr_new_orleans_harbor_pd_2020.csv"), index=False)
     post_event.to_csv(
-        data_file_path("match/post_event_new_orleans_harbor_pd_2020.csv"), index=False
+        dirk.data("match/post_event_new_orleans_harbor_pd_2020.csv"), index=False
     )

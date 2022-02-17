@@ -1,5 +1,3 @@
-import sys
-
 import pandas as pd
 from datamatch import (
     ThresholdMatcher,
@@ -8,11 +6,9 @@ from datamatch import (
     DateSimilarity,
 )
 
-from lib.path import data_file_path
+import dirk
 from lib.date import combine_date_columns
 from lib.post import extract_events_from_post, load_for_agency
-
-sys.path.append("../")
 
 
 def extract_post_events(pprr, post):
@@ -42,7 +38,7 @@ def extract_post_events(pprr, post):
     )
     decision = 0.87
     matcher.save_pairs_to_excel(
-        data_file_path("match/vivian_pd_pprr_2021_v_post_pprr_2020_11_06.xlsx"),
+        dirk.data("match/vivian_pd_pprr_2021_v_post_pprr_2020_11_06.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
@@ -51,10 +47,8 @@ def extract_post_events(pprr, post):
 
 
 if __name__ == "__main__":
-    pprr = pd.read_csv(data_file_path("clean/pprr_vivian_pd_2021.csv"))
+    pprr = pd.read_csv(dirk.data("clean/pprr_vivian_pd_2021.csv"))
     agency = pprr.agency[0]
-    post = load_for_agency("clean/pprr_post_2020_11_06.csv", agency)
+    post = load_for_agency(agency)
     post_events = extract_post_events(pprr, post)
-    post_events.to_csv(
-        data_file_path("match/post_event_vivian_pd_2020.csv"), index=False
-    )
+    post_events.to_csv(dirk.data("match/post_event_vivian_pd_2020.csv"), index=False)

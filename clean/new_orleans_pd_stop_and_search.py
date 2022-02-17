@@ -5,7 +5,7 @@ from lib.clean import (
     standardize_desc_cols,
     clean_races,
 )
-from lib.path import data_file_path
+import dirk
 from lib.columns import clean_column_names, set_values
 from lib.uid import gen_uid
 
@@ -295,9 +295,7 @@ def split_names_and_extract_rank_badge(df):
 
 def clean():
     df = (
-        pd.read_csv(
-            data_file_path("raw/ipm/new_orleans_pd_stop_and_search_2007_2021.csv")
-        )
+        pd.read_csv(dirk.data("raw/ipm/new_orleans_pd_stop_and_search_2007_2021.csv"))
         .pipe(clean_column_names)
         .drop(columns=["subjectage"])
         .rename(
@@ -387,4 +385,4 @@ def clean():
 
 if __name__ == "__main__":
     df = clean()
-    df.to_csv(data_file_path("clean/sas_new_orleans_pd_2017_2021.csv"), index=False)
+    df.to_csv(dirk.data("clean/sas_new_orleans_pd_2017_2021.csv"), index=False)

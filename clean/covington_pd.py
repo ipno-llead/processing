@@ -1,14 +1,10 @@
-import sys
-
 import pandas as pd
 
 from lib.columns import clean_column_names, set_values
-from lib.path import data_file_path
+import dirk
 from lib.uid import gen_uid
 from lib import salary
 from lib.clean import clean_names, standardize_desc_cols, clean_salaries
-
-sys.path.append("../")
 
 
 def split_names(df, col, drop=True):
@@ -48,7 +44,7 @@ def clean_rank_desc(df):
 
 def clean_actions_history():
     return (
-        pd.read_csv(data_file_path("raw/covington_pd/covington_pd_actions_history.csv"))
+        pd.read_csv(dirk.data("raw/covington_pd/covington_pd_actions_history.csv"))
         .pipe(clean_column_names)
         .rename(
             columns={
@@ -82,10 +78,9 @@ def sum_salaries(df):
     return df
 
 
-def clean_pprr_2010_2020(filename):
+def clean_pprr_2010_2020(df):
     return (
-        pd.read_csv(data_file_path(filename))
-        .pipe(clean_column_names)
+        df.pipe(clean_column_names)
         .rename(
             columns={
                 "emp": "employee_id",
@@ -112,7 +107,7 @@ def clean_pprr_2010_2020(filename):
 def clean_pprr_2021():
     # deprecated: this dataset doesn't have employee_id so discarded for now.
     return (
-        pd.read_csv(data_file_path("raw/covington_pd/covington_pd_pprr_2021.csv"))
+        pd.read_csv(dirk.data("raw/covington_pd/covington_pd_pprr_2021.csv"))
         .pipe(clean_column_names)
         .rename(
             columns={
@@ -132,17 +127,39 @@ def clean_pprr_2021():
 def clean_pprr():
     return pd.concat(
         [
-            clean_pprr_2010_2020("raw/covington_pd/covington_pd_pprr_2010.csv"),
-            clean_pprr_2010_2020("raw/covington_pd/covington_pd_pprr_2011.csv"),
-            clean_pprr_2010_2020("raw/covington_pd/covington_pd_pprr_2012.csv"),
-            clean_pprr_2010_2020("raw/covington_pd/covington_pd_pprr_2013.csv"),
-            clean_pprr_2010_2020("raw/covington_pd/covington_pd_pprr_2014.csv"),
-            clean_pprr_2010_2020("raw/covington_pd/covington_pd_pprr_2015.csv"),
-            clean_pprr_2010_2020("raw/covington_pd/covington_pd_pprr_2016.csv"),
-            clean_pprr_2010_2020("raw/covington_pd/covington_pd_pprr_2017.csv"),
-            clean_pprr_2010_2020("raw/covington_pd/covington_pd_pprr_2018.csv"),
-            clean_pprr_2010_2020("raw/covington_pd/covington_pd_pprr_2019.csv"),
-            clean_pprr_2010_2020("raw/covington_pd/covington_pd_pprr_2020.csv"),
+            clean_pprr_2010_2020(
+                pd.read_csv(dirk.data("raw/covington_pd/covington_pd_pprr_2010.csv"))
+            ),
+            clean_pprr_2010_2020(
+                pd.read_csv(dirk.data("raw/covington_pd/covington_pd_pprr_2011.csv"))
+            ),
+            clean_pprr_2010_2020(
+                pd.read_csv(dirk.data("raw/covington_pd/covington_pd_pprr_2012.csv"))
+            ),
+            clean_pprr_2010_2020(
+                pd.read_csv(dirk.data("raw/covington_pd/covington_pd_pprr_2013.csv"))
+            ),
+            clean_pprr_2010_2020(
+                pd.read_csv(dirk.data("raw/covington_pd/covington_pd_pprr_2014.csv"))
+            ),
+            clean_pprr_2010_2020(
+                pd.read_csv(dirk.data("raw/covington_pd/covington_pd_pprr_2015.csv"))
+            ),
+            clean_pprr_2010_2020(
+                pd.read_csv(dirk.data("raw/covington_pd/covington_pd_pprr_2016.csv"))
+            ),
+            clean_pprr_2010_2020(
+                pd.read_csv(dirk.data("raw/covington_pd/covington_pd_pprr_2017.csv"))
+            ),
+            clean_pprr_2010_2020(
+                pd.read_csv(dirk.data("raw/covington_pd/covington_pd_pprr_2018.csv"))
+            ),
+            clean_pprr_2010_2020(
+                pd.read_csv(dirk.data("raw/covington_pd/covington_pd_pprr_2019.csv"))
+            ),
+            clean_pprr_2010_2020(
+                pd.read_csv(dirk.data("raw/covington_pd/covington_pd_pprr_2020.csv"))
+            ),
         ]
     )
 
@@ -150,5 +167,7 @@ def clean_pprr():
 if __name__ == "__main__":
     actions_history = clean_actions_history()
     pprr = clean_pprr()
-    actions_history.to_csv(data_file_path("clean/actions_history_covington_pd_2021.csv"), index=False)
-    pprr.to_csv(data_file_path("clean/pprr_covington_pd_2020.csv"), index=False)
+    actions_history.to_csv(
+        dirk.data("clean/actions_history_covington_pd_2021.csv"), index=False
+    )
+    pprr.to_csv(dirk.data("clean/pprr_covington_pd_2020.csv"), index=False)

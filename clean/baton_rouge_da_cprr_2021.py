@@ -1,11 +1,8 @@
 from lib.columns import clean_column_names
-from lib.path import data_file_path
+import dirk
 from lib.clean import clean_names, standardize_desc_cols
 from lib.uid import gen_uid
 import pandas as pd
-import sys
-
-sys.path.append("../")
 
 
 def clean_allegations(df):
@@ -30,7 +27,7 @@ def extract_disposition(df):
 
 def clean():
     df = (
-        pd.read_csv(data_file_path("raw/baton_rouge_da/baton_rouge_da_cprr_2021.csv"))
+        pd.read_csv(dirk.data("raw/baton_rouge_da/baton_rouge_da_cprr_2021.csv"))
         .pipe(clean_column_names)
         .pipe(clean_allegations)
         .pipe(extract_disposition)
@@ -45,4 +42,4 @@ def clean():
 
 if __name__ == "__main__":
     df = clean()
-    df.to_csv(data_file_path("clean/cprr_baton_rouge_da_2021.csv"), index=False)
+    df.to_csv(dirk.data("clean/cprr_baton_rouge_da_2021.csv"), index=False)

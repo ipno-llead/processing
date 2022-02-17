@@ -1,7 +1,4 @@
-import sys
-
-sys.path.append("../")
-from lib.path import data_file_path
+import dirk
 from scrapy.spiders import Spider
 from scrapy.http import FormRequest
 
@@ -10,7 +7,7 @@ class MySpider(Spider):
     name = "vine_scraper"
 
     def start_requests(self):
-        with open(data_file_path("raw/vine/vine_urls.csv")) as f:
+        with open(dirk.data("raw/vine/vine_urls.csv")) as f:
             for line in f:
                 if not line.strip():
                     continue

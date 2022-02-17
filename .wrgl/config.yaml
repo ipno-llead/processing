@@ -1433,7 +1433,7 @@ branch:
     merge: refs/heads/main
     file: data/fuse/event_erath_pd.csv
     primaryKey:
-      - event_uid 
+      - event_uid
   event-st-landry-so:
     remote: event-st-landry-so
     merge: refs/heads/main
@@ -1843,7 +1843,7 @@ branch:
   person:
     remote: person
     merge: refs/heads/main
-    file: data/match/person.csv
+    file: data/fuse/person.csv
     primaryKey:
       - person_id
   personnel:

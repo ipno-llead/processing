@@ -1,5 +1,5 @@
 import pandas as pd
-from lib.path import data_file_path
+import dirk
 from lib.personnel import fuse_personnel
 from lib.columns import (
     rearrange_event_columns,
@@ -7,9 +7,6 @@ from lib.columns import (
     rearrange_appeal_hearing_columns,
 )
 from lib import events
-import sys
-
-sys.path.append("../")
 
 
 def fuse_events(csd_pprr_17, csd_pprr_19, cprr_18, cprr_21, lprr):
@@ -102,13 +99,13 @@ def fuse_events(csd_pprr_17, csd_pprr_19, cprr_18, cprr_21, lprr):
 
 
 if __name__ == "__main__":
-    csd_pprr_17 = pd.read_csv(data_file_path("match/pprr_baton_rouge_csd_2017.csv"))
-    csd_pprr_19 = pd.read_csv(data_file_path("match/pprr_baton_rouge_csd_2019.csv"))
-    lprr = pd.read_csv(data_file_path("match/lprr_baton_rouge_fpcsb_1992_2012.csv"))
-    post_event = pd.read_csv(data_file_path("match/event_post_baton_rouge_pd.csv"))
-    cprr_18 = pd.read_csv(data_file_path("match/cprr_baton_rouge_pd_2018.csv"))
-    cprr_21 = pd.read_csv(data_file_path("match/cprr_baton_rouge_pd_2021.csv"))
-    pprr = pd.read_csv(data_file_path("clean/pprr_baton_rouge_pd_2021.csv"))
+    csd_pprr_17 = pd.read_csv(dirk.data("match/pprr_baton_rouge_csd_2017.csv"))
+    csd_pprr_19 = pd.read_csv(dirk.data("match/pprr_baton_rouge_csd_2019.csv"))
+    lprr = pd.read_csv(dirk.data("match/lprr_baton_rouge_fpcsb_1992_2012.csv"))
+    post_event = pd.read_csv(dirk.data("match/event_post_baton_rouge_pd.csv"))
+    cprr_18 = pd.read_csv(dirk.data("match/cprr_baton_rouge_pd_2018.csv"))
+    cprr_21 = pd.read_csv(dirk.data("match/cprr_baton_rouge_pd_2021.csv"))
+    pprr = pd.read_csv(dirk.data("clean/pprr_baton_rouge_pd_2021.csv"))
 
     # limit csd data to just officers found in PD roster
     csd_pprr_17.loc[:, "agency"] = "Baton Rouge PD"
@@ -131,7 +128,7 @@ if __name__ == "__main__":
     complaint_df = rearrange_allegation_columns(pd.concat([cprr_18, cprr_21]))
     lprr_df = rearrange_appeal_hearing_columns(lprr)
 
-    personnel_df.to_csv(data_file_path("fuse/per_baton_rouge_pd.csv"), index=False)
-    events_df.to_csv(data_file_path("fuse/event_baton_rouge_pd.csv"), index=False)
-    complaint_df.to_csv(data_file_path("fuse/com_baton_rouge_pd.csv"), index=False)
-    lprr_df.to_csv(data_file_path("fuse/app_baton_rouge_pd.csv"), index=False)
+    personnel_df.to_csv(dirk.data("fuse/per_baton_rouge_pd.csv"), index=False)
+    events_df.to_csv(dirk.data("fuse/event_baton_rouge_pd.csv"), index=False)
+    complaint_df.to_csv(dirk.data("fuse/com_baton_rouge_pd.csv"), index=False)
+    lprr_df.to_csv(dirk.data("fuse/app_baton_rouge_pd.csv"), index=False)

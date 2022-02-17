@@ -1,8 +1,5 @@
-import sys
-
-sys.path.append("../")
 import pandas as pd
-from lib.path import data_file_path, ensure_data_dir
+import dirk
 from datamatch import JaroWinklerSimilarity, ThresholdMatcher, ColumnsIndex
 from lib.post import load_for_agency
 
@@ -21,7 +18,7 @@ def deduplicate_cprr_14_officers(cprr):
     )
     decision = 0.85
     matcher.save_clusters_to_excel(
-        data_file_path("match/hammond_pd_cprr_2009_2014_deduplicate.xlsx"),
+        dirk.data("match/hammond_pd_cprr_2009_2014_deduplicate.xlsx"),
         decision,
         decision,
     )
@@ -60,7 +57,7 @@ def deduplicate_cprr_20_officers(cprr):
     )
     decision = 0.92
     matcher.save_clusters_to_excel(
-        data_file_path("match/hammond_pd_cprr_2015_2020_deduplicate.xlsx"),
+        dirk.data("match/hammond_pd_cprr_2015_2020_deduplicate.xlsx"),
         decision,
         decision,
     )
@@ -105,7 +102,7 @@ def match_cprr_14_and_post(cprr, post):
     )
     decision = 0.9
     matcher.save_pairs_to_excel(
-        data_file_path("match/hammond_pd_cprr_2009_2014_v_post_pprr_2020_11_06.xlsx"),
+        dirk.data("match/hammond_pd_cprr_2009_2014_v_post_pprr_2020_11_06.xlsx"),
         decision,
     )
     matches = matcher.get_index_clusters_within_thresholds(decision)
@@ -135,7 +132,7 @@ def match_cprr_20_and_post(cprr, post):
     )
     decision = 0.865
     matcher.save_pairs_to_excel(
-        data_file_path("match/hammond_pd_cprr_2015_2020_v_post_pprr_2020_11_06.xlsx"),
+        dirk.data("match/hammond_pd_cprr_2015_2020_v_post_pprr_2020_11_06.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(decision)
@@ -165,7 +162,7 @@ def match_cprr_08_and_post(cprr, post):
     )
     decision = 0.95
     matcher.save_pairs_to_excel(
-        data_file_path("match/hammond_pd_cprr_2004_2008_v_post_pprr_2020_11_06.xlsx"),
+        dirk.data("match/hammond_pd_cprr_2004_2008_v_post_pprr_2020_11_06.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(decision)
@@ -176,16 +173,16 @@ def match_cprr_08_and_post(cprr, post):
 
 
 if __name__ == "__main__":
-    cprr_20 = pd.read_csv(data_file_path("clean/cprr_hammond_pd_2015_2020.csv"))
-    cprr_14 = pd.read_csv(data_file_path("clean/cprr_hammond_pd_2009_2014.csv"))
-    cprr_08 = pd.read_csv(data_file_path("clean/cprr_hammond_pd_2004_2008.csv"))
+    cprr_20 = pd.read_csv(dirk.data("clean/cprr_hammond_pd_2015_2020.csv"))
+    cprr_14 = pd.read_csv(dirk.data("clean/cprr_hammond_pd_2009_2014.csv"))
+    cprr_08 = pd.read_csv(dirk.data("clean/cprr_hammond_pd_2004_2008.csv"))
     agency = cprr_08.agency[0]
-    post = load_for_agency("clean/pprr_post_2020_11_06.csv", agency)
+    post = load_for_agency(agency)
     cprr_14 = deduplicate_cprr_14_officers(cprr_14)
     cprr_20 = deduplicate_cprr_20_officers(cprr_20)
     cprr_20 = match_cprr_20_and_post(cprr_20, post)
     cprr_14 = match_cprr_14_and_post(cprr_14, post)
     cprr_08 = match_cprr_08_and_post(cprr_08, post)
-    ensure_data_dir("match")
-    cprr_20.to_csv(data_file_path("match/cprr_hammond_pd_2015_2020.csv"), index=False)
-    cprr_14.to_csv(data_file_path("match/cprr_hammond_pd_2009_2014.csv"), index=False)
+
+    cprr_20.to_csv(dirk.data("match/cprr_hammond_pd_2015_2020.csv"), index=False)
+    cprr_14.to_csv(dirk.data("match/cprr_hammond_pd_2009_2014.csv"), index=False)

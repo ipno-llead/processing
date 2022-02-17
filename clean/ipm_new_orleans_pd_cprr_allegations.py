@@ -1,4 +1,4 @@
-from lib.path import data_file_path
+import dirk
 from lib.columns import clean_column_names
 from lib.clean import (
     float_to_int_str,
@@ -10,14 +10,11 @@ from lib.clean import (
 )
 from lib.uid import gen_uid
 import pandas as pd
-import sys
-
-sys.path.append("../")
 
 
 def initial_processing():
     df = pd.read_csv(
-        data_file_path("raw/ipm/new_orleans_pd_cprr_allegations_1931-2020.csv"),
+        dirk.data("raw/ipm/new_orleans_pd_cprr_allegations_1931-2020.csv"),
         escapechar="\\",
     )
     df = df.dropna(axis=1, how="all")
@@ -475,4 +472,4 @@ def clean():
 
 if __name__ == "__main__":
     df = clean()
-    df.to_csv(data_file_path("clean/cprr_new_orleans_pd_1931_2020.csv"), index=False)
+    df.to_csv(dirk.data("clean/cprr_new_orleans_pd_1931_2020.csv"), index=False)

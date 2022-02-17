@@ -1,13 +1,10 @@
 from lib.uid import gen_uid
 from lib.clean import clean_names
-import sys
 
 import pandas as pd
 
 from lib.columns import clean_column_names, set_values
-from lib.path import data_file_path, ensure_data_dir
-
-sys.path.append("../")
+import dirk
 
 
 def split_names(df):
@@ -55,7 +52,7 @@ def clean_badge_no(df):
 
 def clean():
     return (
-        pd.read_csv(data_file_path("raw/baton_rouge_pd/baton_rouge_pd_pprr_2021.csv"))
+        pd.read_csv(dirk.data("raw/baton_rouge_pd/baton_rouge_pd_pprr_2021.csv"))
         .pipe(clean_column_names)
         .rename(
             columns={
@@ -74,5 +71,5 @@ def clean():
 
 if __name__ == "__main__":
     df = clean()
-    ensure_data_dir("clean")
-    df.to_csv(data_file_path("clean/pprr_baton_rouge_pd_2021.csv"), index=False)
+
+    df.to_csv(dirk.data("clean/pprr_baton_rouge_pd_2021.csv"), index=False)

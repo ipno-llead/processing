@@ -1,7 +1,4 @@
-import sys
-
-sys.path.append("../")
-from lib.path import data_file_path
+import dirk
 from lib.columns import rearrange_allegation_columns
 from lib.personnel import fuse_personnel
 from lib.post import load_for_agency
@@ -48,12 +45,12 @@ def fuse_events(cprr, post):
 
 
 if __name__ == "__main__":
-    cprr = pd.read_csv(data_file_path("match/cprr_benton_pd_2015_2021.csv"))
+    cprr = pd.read_csv(dirk.data("match/cprr_benton_pd_2015_2021.csv"))
     agency = cprr.agency[0]
-    post = load_for_agency("clean/pprr_post_2020_11_06.csv", agency)
+    post = load_for_agency(agency)
     per = fuse_personnel(cprr, post)
     complaints = rearrange_allegation_columns(cprr)
     event = fuse_events(cprr, post)
-    complaints.to_csv(data_file_path("fuse/com_benton_pd.csv"), index=False)
-    per.to_csv(data_file_path("fuse/per_benton_pd.csv"), index=False)
-    event.to_csv(data_file_path("fuse/event_benton_pd.csv"), index=False)
+    complaints.to_csv(dirk.data("fuse/com_benton_pd.csv"), index=False)
+    per.to_csv(dirk.data("fuse/per_benton_pd.csv"), index=False)
+    event.to_csv(dirk.data("fuse/event_benton_pd.csv"), index=False)

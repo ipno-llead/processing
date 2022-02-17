@@ -1,15 +1,18 @@
 dataDir: data
 patterns:
   inputs:
-    - pd.read_csv(data_file_path(r'.+\.csv'))
+    - pd.read_csv(dirk.data(r'.+\.csv'))
   outputs:
-    - "`*`.to_csv(data_file_path(r'.+\\.csv'))"
+    - "`*`.to_csv(dirk.data(r'.+\\.csv'))"
 stages:
   - name: clean
+    ignoredOutputs:
+      - duplicates.csv
   - name: match
   - name: fuse
     ignoredOutputs:
       - duplicates.csv
+      - fuse/person.csv
 targets:
   - fuse/personnel.csv
   - fuse/allegation.csv

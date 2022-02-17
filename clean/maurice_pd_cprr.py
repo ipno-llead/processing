@@ -1,7 +1,4 @@
-import sys
-
-sys.path.append("../")
-from lib.path import data_file_path
+import dirk
 import pandas as pd
 from lib.columns import clean_column_names, set_values
 from lib.clean import standardize_desc_cols, clean_dates
@@ -33,7 +30,7 @@ def clean_action(df):
 
 def clean():
     df = (
-        pd.read_csv(data_file_path("raw/maurice_pd/maurice_cprr_2020_2021_byhand.csv"))
+        pd.read_csv(dirk.data("raw/maurice_pd/maurice_cprr_2020_2021_byhand.csv"))
         .pipe(clean_column_names)
         .pipe(clean_allegation)
         .pipe(clean_disposition)
@@ -61,4 +58,4 @@ def clean():
 
 if __name__ == "__main__":
     df = clean()
-    df.to_csv(data_file_path("clean/cprr_maurice_pd_2020_2021.csv"), index=False)
+    df.to_csv(dirk.data("clean/cprr_maurice_pd_2020_2021.csv"), index=False)

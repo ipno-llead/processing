@@ -1,7 +1,4 @@
-import sys
-
-sys.path.append("../")
-from lib.path import data_file_path
+import dirk
 from lib.columns import rearrange_allegation_columns, rearrange_event_columns
 from lib.personnel import fuse_personnel
 from lib.post import load_for_agency
@@ -29,15 +26,15 @@ def fuse_events(pprr):
 
 
 if __name__ == "__main__":
-    cprr = pd.read_csv(data_file_path("match/cprr_baker_pd_2018_2020.csv"))
-    pprr = pd.read_csv(data_file_path("clean/pprr_baker_pd_2010_2020.csv"))
-    post_event = pd.read_csv(data_file_path("match/post_event_baker_pd_2020_11_06.csv"))
+    cprr = pd.read_csv(dirk.data("match/cprr_baker_pd_2018_2020.csv"))
+    pprr = pd.read_csv(dirk.data("clean/pprr_baker_pd_2010_2020.csv"))
+    post_event = pd.read_csv(dirk.data("match/post_event_baker_pd_2020_11_06.csv"))
     agency = cprr.agency[0]
-    post = load_for_agency("clean/pprr_post_2020_11_06.csv", agency)
+    post = load_for_agency(agency)
     per_df = fuse_personnel(cprr, pprr)
     com_df = rearrange_allegation_columns(cprr)
     event_df = fuse_events(pprr)
     event_df = rearrange_event_columns(pd.concat([post_event, event_df]))
-    com_df.to_csv(data_file_path("fuse/com_baker_pd.csv"), index=False)
-    per_df.to_csv(data_file_path("fuse/per_baker_pd.csv"), index=False)
-    event_df.to_csv(data_file_path("fuse/event_baker_pd.csv"), index=False)
+    com_df.to_csv(dirk.data("fuse/com_baker_pd.csv"), index=False)
+    per_df.to_csv(dirk.data("fuse/per_baker_pd.csv"), index=False)
+    event_df.to_csv(dirk.data("fuse/event_baker_pd.csv"), index=False)

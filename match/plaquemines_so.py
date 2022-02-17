@@ -1,10 +1,7 @@
 from datamatch import ThresholdMatcher, JaroWinklerSimilarity, ColumnsIndex
-from lib.path import data_file_path
+import dirk
 from lib.post import extract_events_from_post, load_for_agency
 import pandas as pd
-import sys
-
-sys.path.append("../")
 
 
 def match_cprr_19_and_pprr(cprr, pprr):
@@ -30,9 +27,7 @@ def match_cprr_19_and_pprr(cprr, pprr):
     )
     decision = 0.97
     matcher.save_pairs_to_excel(
-        data_file_path(
-            "match/plaquemines_so_cprr_2019_v__pprr_plaquemines_so_2018.xlsx"
-        ),
+        dirk.data("match/plaquemines_so_cprr_2019_v__pprr_plaquemines_so_2018.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(decision)
@@ -62,7 +57,7 @@ def match_pprr_and_post(pprr, post):
     )
     decision = 0.93
     matcher.save_pairs_to_excel(
-        data_file_path("match/plaquemines_so_pprr_2018_v_post_pprr_2020_11_06.xlsx"),
+        dirk.data("match/plaquemines_so_pprr_2018_v_post_pprr_2020_11_06.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
@@ -89,9 +84,7 @@ def match_cprr_2016_2020_and_pprr(cprr, pprr):
     )
     decision = 0.94
     matches = matcher.save_pairs_to_excel(
-        data_file_path(
-            "match/cprr_plaquemines_so_2016_2019_v_pprr_plaqumines_so_2018.xlsx"
-        ),
+        dirk.data("match/cprr_plaquemines_so_2016_2019_v_pprr_plaqumines_so_2018.xlsx"),
         decision,
     )
 
@@ -103,18 +96,14 @@ def match_cprr_2016_2020_and_pprr(cprr, pprr):
 
 
 if __name__ == "__main__":
-    cprr19 = pd.read_csv(data_file_path("clean/cprr_plaquemines_so_2019.csv"))
-    cprr20 = pd.read_csv(data_file_path("clean/cprr_plaquemines_so_2016_2020.csv"))
-    pprr = pd.read_csv(data_file_path("clean/pprr_plaquemines_so_2018.csv"))
+    cprr19 = pd.read_csv(dirk.data("clean/cprr_plaquemines_so_2019.csv"))
+    cprr20 = pd.read_csv(dirk.data("clean/cprr_plaquemines_so_2016_2020.csv"))
+    pprr = pd.read_csv(dirk.data("clean/pprr_plaquemines_so_2018.csv"))
     agency = pprr.agency[0]
-    post = load_for_agency("clean/pprr_post_2020_11_06.csv", agency)
+    post = load_for_agency(agency)
     cprr19 = match_cprr_19_and_pprr(cprr19, pprr)
     cprr20 = match_cprr_2016_2020_and_pprr(cprr20, pprr)
     post_event = match_pprr_and_post(pprr, post)
-    cprr19.to_csv(data_file_path("match/cprr_plaquemines_so_2019.csv"), index=False)
-    cprr20.to_csv(
-        data_file_path("match/cprr_plaquemines_so_2016_2020.csv"), index=False
-    )
-    post_event.to_csv(
-        data_file_path("match/event_plaquemines_so_2018.csv"), index=False
-    )
+    cprr19.to_csv(dirk.data("match/cprr_plaquemines_so_2019.csv"), index=False)
+    cprr20.to_csv(dirk.data("match/cprr_plaquemines_so_2016_2020.csv"), index=False)
+    post_event.to_csv(dirk.data("match/event_plaquemines_so_2018.csv"), index=False)

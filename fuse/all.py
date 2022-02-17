@@ -1,5 +1,5 @@
 import pandas as pd
-from lib.path import data_file_path
+import dirk
 from lib.columns import (
     rearrange_appeal_hearing_columns,
     rearrange_personnel_columns,
@@ -9,67 +9,64 @@ from lib.columns import (
     rearrange_use_of_force,
 )
 from lib.uid import ensure_uid_unique
-import sys
-
-sys.path.append("../")
 
 
 def fuse_personnel():
     return rearrange_personnel_columns(
         pd.concat(
             [
-                pd.read_csv(data_file_path("fuse/per_baton_rouge_pd.csv")),
-                pd.read_csv(data_file_path("fuse/per_baton_rouge_so.csv")),
-                pd.read_csv(data_file_path("fuse/per_new_orleans_harbor_pd.csv")),
-                pd.read_csv(data_file_path("fuse/per_new_orleans_pd.csv")),
-                pd.read_csv(data_file_path("fuse/per_brusly_pd.csv")),
-                pd.read_csv(data_file_path("fuse/per_port_allen_pd.csv")),
-                pd.read_csv(data_file_path("fuse/per_madisonville_pd.csv")),
-                pd.read_csv(data_file_path("fuse/per_greenwood_pd.csv")),
-                pd.read_csv(data_file_path("fuse/per_st_tammany_so.csv")),
-                pd.read_csv(data_file_path("fuse/per_plaquemines_so.csv")),
-                pd.read_csv(data_file_path("fuse/per_louisiana_state_police.csv")),
-                pd.read_csv(data_file_path("fuse/per_caddo_parish_so.csv")),
-                pd.read_csv(data_file_path("fuse/per_mandeville_pd.csv")),
-                pd.read_csv(data_file_path("fuse/per_levee_pd.csv")),
-                pd.read_csv(data_file_path("fuse/per_grand_isle_pd.csv")),
-                pd.read_csv(data_file_path("fuse/per_gretna_pd.csv")),
-                pd.read_csv(data_file_path("fuse/per_kenner_pd.csv")),
-                pd.read_csv(data_file_path("fuse/per_vivian_pd.csv")),
-                pd.read_csv(data_file_path("fuse/per_covington_pd.csv")),
-                pd.read_csv(data_file_path("fuse/per_slidell_pd.csv")),
-                pd.read_csv(data_file_path("fuse/per_new_orleans_so.csv")),
-                pd.read_csv(data_file_path("fuse/per_scott_pd.csv")),
-                pd.read_csv(data_file_path("fuse/per_shreveport_pd.csv")),
-                pd.read_csv(data_file_path("fuse/per_tangipahoa_so.csv")),
-                pd.read_csv(data_file_path("fuse/per_ponchatoula_pd.csv")),
-                pd.read_csv(data_file_path("fuse/per_lafayette_so.csv")),
-                pd.read_csv(data_file_path("fuse/per_lafayette_pd.csv")),
-                pd.read_csv(data_file_path("fuse/per_hammond_pd.csv")),
-                pd.read_csv(data_file_path("fuse/per_lake_charles_pd.csv")),
-                pd.read_csv(data_file_path("fuse/per_sterlington_pd.csv")),
-                pd.read_csv(data_file_path("fuse/per_youngsville_pd.csv")),
-                pd.read_csv(data_file_path("fuse/per_west_monroe_pd.csv")),
-                pd.read_csv(data_file_path("fuse/per_carencro_pd.csv")),
-                pd.read_csv(data_file_path("fuse/per_central_csd.csv")),
-                pd.read_csv(data_file_path("fuse/per_bossier_city_pd.csv")),
-                pd.read_csv(data_file_path("fuse/per_baker_pd.csv")),
-                pd.read_csv(data_file_path("fuse/per_houma_pd.csv")),
-                pd.read_csv(data_file_path("fuse/per_gonzales_pd.csv")),
-                pd.read_csv(data_file_path("fuse/per_denham_springs_pd.csv")),
-                pd.read_csv(data_file_path("fuse/per_abbeville_pd.csv")),
-                pd.read_csv(data_file_path("fuse/per_washington_so.csv")),
-                pd.read_csv(data_file_path("fuse/per_cameron_so.csv")),
-                pd.read_csv(data_file_path("fuse/per_maurice_pd.csv")),
-                pd.read_csv(data_file_path("fuse/per_terrebonne_so.csv")),
-                pd.read_csv(data_file_path("fuse/per_jefferson_so.csv")),
-                pd.read_csv(data_file_path("fuse/per_acadia_so.csv")),
-                pd.read_csv(data_file_path("fuse/per_post.csv")),
-                pd.read_csv(data_file_path("fuse/per_erath_pd.csv")),
-                pd.read_csv(data_file_path("fuse/per_st_landry_so.csv")),
-                pd.read_csv(data_file_path("fuse/per_benton_pd.csv")),
-                pd.read_csv(data_file_path("fuse/per_eunice_pd.csv")),
-                pd.read_csv(data_file_path("fuse/per_rayne_pd.csv")),
+                pd.read_csv(dirk.data("fuse/per_baton_rouge_pd.csv")),
+                pd.read_csv(dirk.data("fuse/per_baton_rouge_so.csv")),
+                pd.read_csv(dirk.data("fuse/per_new_orleans_harbor_pd.csv")),
+                pd.read_csv(dirk.data("fuse/per_new_orleans_pd.csv")),
+                pd.read_csv(dirk.data("fuse/per_brusly_pd.csv")),
+                pd.read_csv(dirk.data("fuse/per_port_allen_pd.csv")),
+                pd.read_csv(dirk.data("fuse/per_madisonville_pd.csv")),
+                pd.read_csv(dirk.data("fuse/per_greenwood_pd.csv")),
+                pd.read_csv(dirk.data("fuse/per_st_tammany_so.csv")),
+                pd.read_csv(dirk.data("fuse/per_plaquemines_so.csv")),
+                pd.read_csv(dirk.data("fuse/per_louisiana_state_police.csv")),
+                pd.read_csv(dirk.data("fuse/per_caddo_parish_so.csv")),
+                pd.read_csv(dirk.data("fuse/per_mandeville_pd.csv")),
+                pd.read_csv(dirk.data("fuse/per_levee_pd.csv")),
+                pd.read_csv(dirk.data("fuse/per_grand_isle_pd.csv")),
+                pd.read_csv(dirk.data("fuse/per_gretna_pd.csv")),
+                pd.read_csv(dirk.data("fuse/per_kenner_pd.csv")),
+                pd.read_csv(dirk.data("fuse/per_vivian_pd.csv")),
+                pd.read_csv(dirk.data("fuse/per_covington_pd.csv")),
+                pd.read_csv(dirk.data("fuse/per_slidell_pd.csv")),
+                pd.read_csv(dirk.data("fuse/per_new_orleans_so.csv")),
+                pd.read_csv(dirk.data("fuse/per_scott_pd.csv")),
+                pd.read_csv(dirk.data("fuse/per_shreveport_pd.csv")),
+                pd.read_csv(dirk.data("fuse/per_tangipahoa_so.csv")),
+                pd.read_csv(dirk.data("fuse/per_ponchatoula_pd.csv")),
+                pd.read_csv(dirk.data("fuse/per_lafayette_so.csv")),
+                pd.read_csv(dirk.data("fuse/per_lafayette_pd.csv")),
+                pd.read_csv(dirk.data("fuse/per_hammond_pd.csv")),
+                pd.read_csv(dirk.data("fuse/per_lake_charles_pd.csv")),
+                pd.read_csv(dirk.data("fuse/per_sterlington_pd.csv")),
+                pd.read_csv(dirk.data("fuse/per_youngsville_pd.csv")),
+                pd.read_csv(dirk.data("fuse/per_west_monroe_pd.csv")),
+                pd.read_csv(dirk.data("fuse/per_carencro_pd.csv")),
+                pd.read_csv(dirk.data("fuse/per_central_csd.csv")),
+                pd.read_csv(dirk.data("fuse/per_bossier_city_pd.csv")),
+                pd.read_csv(dirk.data("fuse/per_baker_pd.csv")),
+                pd.read_csv(dirk.data("fuse/per_houma_pd.csv")),
+                pd.read_csv(dirk.data("fuse/per_gonzales_pd.csv")),
+                pd.read_csv(dirk.data("fuse/per_denham_springs_pd.csv")),
+                pd.read_csv(dirk.data("fuse/per_abbeville_pd.csv")),
+                pd.read_csv(dirk.data("fuse/per_washington_so.csv")),
+                pd.read_csv(dirk.data("fuse/per_cameron_so.csv")),
+                pd.read_csv(dirk.data("fuse/per_maurice_pd.csv")),
+                pd.read_csv(dirk.data("fuse/per_terrebonne_so.csv")),
+                pd.read_csv(dirk.data("fuse/per_jefferson_so.csv")),
+                pd.read_csv(dirk.data("fuse/per_acadia_so.csv")),
+                pd.read_csv(dirk.data("fuse/per_post.csv")),
+                pd.read_csv(dirk.data("fuse/per_erath_pd.csv")),
+                pd.read_csv(dirk.data("fuse/per_st_landry_so.csv")),
+                pd.read_csv(dirk.data("fuse/per_benton_pd.csv")),
+                pd.read_csv(dirk.data("fuse/per_eunice_pd.csv")),
+                pd.read_csv(dirk.data("fuse/per_rayne_pd.csv")),
             ]
         )
     ).sort_values("uid", ignore_index=True)
@@ -79,57 +76,57 @@ def fuse_event():
     return rearrange_event_columns(
         pd.concat(
             [
-                pd.read_csv(data_file_path("fuse/event_baton_rouge_pd.csv")),
-                pd.read_csv(data_file_path("fuse/event_baton_rouge_so.csv")),
-                pd.read_csv(data_file_path("fuse/event_new_orleans_harbor_pd.csv")),
-                pd.read_csv(data_file_path("fuse/event_new_orleans_pd.csv")),
-                pd.read_csv(data_file_path("fuse/event_brusly_pd.csv")),
-                pd.read_csv(data_file_path("fuse/event_port_allen_pd.csv")),
-                pd.read_csv(data_file_path("fuse/event_madisonville_pd.csv")),
-                pd.read_csv(data_file_path("fuse/event_greenwood_pd.csv")),
-                pd.read_csv(data_file_path("fuse/event_st_tammany_so.csv")),
-                pd.read_csv(data_file_path("fuse/event_plaquemines_so.csv")),
-                pd.read_csv(data_file_path("fuse/event_louisiana_state_police.csv")),
-                pd.read_csv(data_file_path("fuse/event_caddo_parish_so.csv")),
-                pd.read_csv(data_file_path("fuse/event_mandeville_pd.csv")),
-                pd.read_csv(data_file_path("fuse/event_levee_pd.csv")),
-                pd.read_csv(data_file_path("fuse/event_grand_isle_pd.csv")),
-                pd.read_csv(data_file_path("fuse/event_gretna_pd.csv")),
-                pd.read_csv(data_file_path("fuse/event_kenner_pd.csv")),
-                pd.read_csv(data_file_path("fuse/event_vivian_pd.csv")),
-                pd.read_csv(data_file_path("fuse/event_covington_pd.csv")),
-                pd.read_csv(data_file_path("fuse/event_slidell_pd.csv")),
-                pd.read_csv(data_file_path("fuse/event_new_orleans_so.csv")),
-                pd.read_csv(data_file_path("fuse/event_scott_pd.csv")),
-                pd.read_csv(data_file_path("fuse/event_shreveport_pd.csv")),
-                pd.read_csv(data_file_path("fuse/event_tangipahoa_so.csv")),
-                pd.read_csv(data_file_path("fuse/event_ponchatoula_pd.csv")),
-                pd.read_csv(data_file_path("fuse/event_lafayette_so.csv")),
-                pd.read_csv(data_file_path("fuse/event_lafayette_pd.csv")),
-                pd.read_csv(data_file_path("fuse/event_hammond_pd.csv")),
-                pd.read_csv(data_file_path("fuse/event_lake_charles_pd.csv")),
-                pd.read_csv(data_file_path("fuse/event_sterlington_pd.csv")),
-                pd.read_csv(data_file_path("fuse/event_youngsville_pd.csv")),
-                pd.read_csv(data_file_path("fuse/event_west_monroe_pd.csv")),
-                pd.read_csv(data_file_path("fuse/event_carencro_pd.csv")),
-                pd.read_csv(data_file_path("fuse/event_central_csd.csv")),
-                pd.read_csv(data_file_path("fuse/event_bossier_city_pd.csv")),
-                pd.read_csv(data_file_path("fuse/event_baker_pd.csv")),
-                pd.read_csv(data_file_path("fuse/event_houma_pd.csv")),
-                pd.read_csv(data_file_path("fuse/event_gonzales_pd.csv")),
-                pd.read_csv(data_file_path("fuse/event_denham_springs_pd.csv")),
-                pd.read_csv(data_file_path("fuse/event_abbeville_pd.csv")),
-                pd.read_csv(data_file_path("fuse/event_washington_so.csv")),
-                pd.read_csv(data_file_path("fuse/event_cameron_so.csv")),
-                pd.read_csv(data_file_path("fuse/event_maurice_pd.csv")),
-                pd.read_csv(data_file_path("fuse/event_terrebonne_so.csv")),
-                pd.read_csv(data_file_path("fuse/event_jefferson_so.csv")),
-                pd.read_csv(data_file_path("fuse/event_acadia_so.csv")),
-                pd.read_csv(data_file_path("fuse/event_erath_pd.csv")),
-                pd.read_csv(data_file_path("fuse/event_st_landry_so.csv")),
-                pd.read_csv(data_file_path("fuse/event_benton_pd.csv")),
-                pd.read_csv(data_file_path("fuse/event_eunice_pd.csv")),
-                pd.read_csv(data_file_path("fuse/event_rayne_pd.csv")),
+                pd.read_csv(dirk.data("fuse/event_baton_rouge_pd.csv")),
+                pd.read_csv(dirk.data("fuse/event_baton_rouge_so.csv")),
+                pd.read_csv(dirk.data("fuse/event_new_orleans_harbor_pd.csv")),
+                pd.read_csv(dirk.data("fuse/event_new_orleans_pd.csv")),
+                pd.read_csv(dirk.data("fuse/event_brusly_pd.csv")),
+                pd.read_csv(dirk.data("fuse/event_port_allen_pd.csv")),
+                pd.read_csv(dirk.data("fuse/event_madisonville_pd.csv")),
+                pd.read_csv(dirk.data("fuse/event_greenwood_pd.csv")),
+                pd.read_csv(dirk.data("fuse/event_st_tammany_so.csv")),
+                pd.read_csv(dirk.data("fuse/event_plaquemines_so.csv")),
+                pd.read_csv(dirk.data("fuse/event_louisiana_state_police.csv")),
+                pd.read_csv(dirk.data("fuse/event_caddo_parish_so.csv")),
+                pd.read_csv(dirk.data("fuse/event_mandeville_pd.csv")),
+                pd.read_csv(dirk.data("fuse/event_levee_pd.csv")),
+                pd.read_csv(dirk.data("fuse/event_grand_isle_pd.csv")),
+                pd.read_csv(dirk.data("fuse/event_gretna_pd.csv")),
+                pd.read_csv(dirk.data("fuse/event_kenner_pd.csv")),
+                pd.read_csv(dirk.data("fuse/event_vivian_pd.csv")),
+                pd.read_csv(dirk.data("fuse/event_covington_pd.csv")),
+                pd.read_csv(dirk.data("fuse/event_slidell_pd.csv")),
+                pd.read_csv(dirk.data("fuse/event_new_orleans_so.csv")),
+                pd.read_csv(dirk.data("fuse/event_scott_pd.csv")),
+                pd.read_csv(dirk.data("fuse/event_shreveport_pd.csv")),
+                pd.read_csv(dirk.data("fuse/event_tangipahoa_so.csv")),
+                pd.read_csv(dirk.data("fuse/event_ponchatoula_pd.csv")),
+                pd.read_csv(dirk.data("fuse/event_lafayette_so.csv")),
+                pd.read_csv(dirk.data("fuse/event_lafayette_pd.csv")),
+                pd.read_csv(dirk.data("fuse/event_hammond_pd.csv")),
+                pd.read_csv(dirk.data("fuse/event_lake_charles_pd.csv")),
+                pd.read_csv(dirk.data("fuse/event_sterlington_pd.csv")),
+                pd.read_csv(dirk.data("fuse/event_youngsville_pd.csv")),
+                pd.read_csv(dirk.data("fuse/event_west_monroe_pd.csv")),
+                pd.read_csv(dirk.data("fuse/event_carencro_pd.csv")),
+                pd.read_csv(dirk.data("fuse/event_central_csd.csv")),
+                pd.read_csv(dirk.data("fuse/event_bossier_city_pd.csv")),
+                pd.read_csv(dirk.data("fuse/event_baker_pd.csv")),
+                pd.read_csv(dirk.data("fuse/event_houma_pd.csv")),
+                pd.read_csv(dirk.data("fuse/event_gonzales_pd.csv")),
+                pd.read_csv(dirk.data("fuse/event_denham_springs_pd.csv")),
+                pd.read_csv(dirk.data("fuse/event_abbeville_pd.csv")),
+                pd.read_csv(dirk.data("fuse/event_washington_so.csv")),
+                pd.read_csv(dirk.data("fuse/event_cameron_so.csv")),
+                pd.read_csv(dirk.data("fuse/event_maurice_pd.csv")),
+                pd.read_csv(dirk.data("fuse/event_terrebonne_so.csv")),
+                pd.read_csv(dirk.data("fuse/event_jefferson_so.csv")),
+                pd.read_csv(dirk.data("fuse/event_acadia_so.csv")),
+                pd.read_csv(dirk.data("fuse/event_erath_pd.csv")),
+                pd.read_csv(dirk.data("fuse/event_st_landry_so.csv")),
+                pd.read_csv(dirk.data("fuse/event_benton_pd.csv")),
+                pd.read_csv(dirk.data("fuse/event_eunice_pd.csv")),
+                pd.read_csv(dirk.data("fuse/event_rayne_pd.csv")),
             ]
         )
     ).sort_values(["agency", "event_uid"], ignore_index=True)
@@ -139,42 +136,42 @@ def fuse_allegation():
     return rearrange_allegation_columns(
         pd.concat(
             [
-                pd.read_csv(data_file_path("fuse/com_baton_rouge_pd.csv")),
-                pd.read_csv(data_file_path("fuse/com_baton_rouge_so.csv")),
-                pd.read_csv(data_file_path("fuse/com_new_orleans_harbor_pd.csv")),
-                pd.read_csv(data_file_path("fuse/com_brusly_pd.csv")),
-                pd.read_csv(data_file_path("fuse/com_port_allen_pd.csv")),
-                pd.read_csv(data_file_path("fuse/com_madisonville_pd.csv")),
-                pd.read_csv(data_file_path("fuse/com_greenwood_pd.csv")),
-                pd.read_csv(data_file_path("fuse/com_new_orleans_pd.csv")),
-                pd.read_csv(data_file_path("fuse/com_st_tammany_so.csv")),
-                pd.read_csv(data_file_path("fuse/com_plaquemines_so.csv")),
-                pd.read_csv(data_file_path("fuse/com_mandeville_pd.csv")),
-                pd.read_csv(data_file_path("fuse/com_levee_pd.csv")),
-                pd.read_csv(data_file_path("fuse/com_new_orleans_so.csv")),
-                pd.read_csv(data_file_path("fuse/com_scott_pd.csv")),
-                pd.read_csv(data_file_path("fuse/com_shreveport_pd.csv")),
-                pd.read_csv(data_file_path("fuse/com_tangipahoa_so.csv")),
-                pd.read_csv(data_file_path("fuse/com_lafayette_so.csv")),
-                pd.read_csv(data_file_path("fuse/com_lafayette_pd.csv")),
-                pd.read_csv(data_file_path("fuse/com_hammond_pd.csv")),
-                pd.read_csv(data_file_path("fuse/com_ponchatoula_pd.csv")),
-                pd.read_csv(data_file_path("fuse/com_lake_charles_pd.csv")),
-                pd.read_csv(data_file_path("fuse/com_bossier_city_pd.csv")),
-                pd.read_csv(data_file_path("fuse/com_baker_pd.csv")),
-                pd.read_csv(data_file_path("fuse/com_houma_pd.csv")),
-                pd.read_csv(data_file_path("fuse/com_denham_springs_pd.csv")),
-                pd.read_csv(data_file_path("fuse/com_abbeville_pd.csv")),
-                pd.read_csv(data_file_path("fuse/com_washington_so.csv")),
-                pd.read_csv(data_file_path("fuse/com_cameron_So.csv")),
-                pd.read_csv(data_file_path("fuse/com_maurice_pd.csv")),
-                pd.read_csv(data_file_path("fuse/com_terrebonne_so.csv")),
-                pd.read_csv(data_file_path("fuse/com_acadia_so.csv")),
-                pd.read_csv(data_file_path("fuse/com_west_monroe_pd.csv")),
-                pd.read_csv(data_file_path("fuse/com_erath_pd.csv")),
-                pd.read_csv(data_file_path("fuse/com_st_landry_so.csv")),
-                pd.read_csv(data_file_path("fuse/com_benton_pd.csv")),
-                pd.read_csv(data_file_path("fuse/com_eunice_pd.csv")),
+                pd.read_csv(dirk.data("fuse/com_baton_rouge_pd.csv")),
+                pd.read_csv(dirk.data("fuse/com_baton_rouge_so.csv")),
+                pd.read_csv(dirk.data("fuse/com_new_orleans_harbor_pd.csv")),
+                pd.read_csv(dirk.data("fuse/com_brusly_pd.csv")),
+                pd.read_csv(dirk.data("fuse/com_port_allen_pd.csv")),
+                pd.read_csv(dirk.data("fuse/com_madisonville_pd.csv")),
+                pd.read_csv(dirk.data("fuse/com_greenwood_pd.csv")),
+                pd.read_csv(dirk.data("fuse/com_new_orleans_pd.csv")),
+                pd.read_csv(dirk.data("fuse/com_st_tammany_so.csv")),
+                pd.read_csv(dirk.data("fuse/com_plaquemines_so.csv")),
+                pd.read_csv(dirk.data("fuse/com_mandeville_pd.csv")),
+                pd.read_csv(dirk.data("fuse/com_levee_pd.csv")),
+                pd.read_csv(dirk.data("fuse/com_new_orleans_so.csv")),
+                pd.read_csv(dirk.data("fuse/com_scott_pd.csv")),
+                pd.read_csv(dirk.data("fuse/com_shreveport_pd.csv")),
+                pd.read_csv(dirk.data("fuse/com_tangipahoa_so.csv")),
+                pd.read_csv(dirk.data("fuse/com_lafayette_so.csv")),
+                pd.read_csv(dirk.data("fuse/com_lafayette_pd.csv")),
+                pd.read_csv(dirk.data("fuse/com_hammond_pd.csv")),
+                pd.read_csv(dirk.data("fuse/com_ponchatoula_pd.csv")),
+                pd.read_csv(dirk.data("fuse/com_lake_charles_pd.csv")),
+                pd.read_csv(dirk.data("fuse/com_bossier_city_pd.csv")),
+                pd.read_csv(dirk.data("fuse/com_baker_pd.csv")),
+                pd.read_csv(dirk.data("fuse/com_houma_pd.csv")),
+                pd.read_csv(dirk.data("fuse/com_denham_springs_pd.csv")),
+                pd.read_csv(dirk.data("fuse/com_abbeville_pd.csv")),
+                pd.read_csv(dirk.data("fuse/com_washington_so.csv")),
+                pd.read_csv(dirk.data("fuse/com_cameron_So.csv")),
+                pd.read_csv(dirk.data("fuse/com_maurice_pd.csv")),
+                pd.read_csv(dirk.data("fuse/com_terrebonne_so.csv")),
+                pd.read_csv(dirk.data("fuse/com_acadia_so.csv")),
+                pd.read_csv(dirk.data("fuse/com_west_monroe_pd.csv")),
+                pd.read_csv(dirk.data("fuse/com_erath_pd.csv")),
+                pd.read_csv(dirk.data("fuse/com_st_landry_so.csv")),
+                pd.read_csv(dirk.data("fuse/com_benton_pd.csv")),
+                pd.read_csv(dirk.data("fuse/com_eunice_pd.csv")),
             ]
         )
     ).sort_values(["agency", "tracking_number"], ignore_index=True)
@@ -184,8 +181,8 @@ def fuse_use_of_force():
     return rearrange_use_of_force(
         pd.concat(
             [
-                pd.read_csv(data_file_path("fuse/uof_new_orleans_pd.csv")),
-                pd.read_csv(data_file_path("fuse/uof_kenner_pd.csv")),
+                pd.read_csv(dirk.data("fuse/uof_new_orleans_pd.csv")),
+                pd.read_csv(dirk.data("fuse/uof_kenner_pd.csv")),
             ]
         )
     ).sort_values(["agency", "uof_tracking_number"])
@@ -196,7 +193,7 @@ def fuse_stop_and_search():
         pd.concat(
             [
                 pd.read_csv(
-                    data_file_path("fuse/sas_new_orleans_pd.csv"),
+                    dirk.data("fuse/sas_new_orleans_pd.csv"),
                 )
             ]
         )
@@ -218,9 +215,9 @@ def fuse_appeal_hearing_logs():
     return rearrange_appeal_hearing_columns(
         pd.concat(
             [
-                pd.read_csv(data_file_path("fuse/app_baton_rouge_pd.csv")),
-                pd.read_csv(data_file_path("fuse/app_new_orleans_csc.csv")),
-                pd.read_csv(data_file_path("fuse/app_louisiana_state_police.csv")),
+                pd.read_csv(dirk.data("fuse/app_baton_rouge_pd.csv")),
+                pd.read_csv(dirk.data("fuse/app_new_orleans_csc.csv")),
+                pd.read_csv(dirk.data("fuse/app_louisiana_state_police.csv")),
             ]
         )
     ).sort_values("uid", ignore_index=True)
@@ -237,14 +234,14 @@ if __name__ == "__main__":
     ensure_uid_unique(uof_df, "uof_uid")
     sas_df = fuse_stop_and_search()
     app_df = fuse_appeal_hearing_logs()
-    per_df.to_csv(data_file_path("fuse/personnel.csv"), index=False)
-    allegation_df.to_csv(data_file_path("fuse/allegation.csv"), index=False)
-    uof_df.to_csv(data_file_path("fuse/use_of_force.csv"), index=False)
-    sas_df.to_csv(data_file_path("fuse/stop_and_search.csv"), index=False)
-    app_df.to_csv(data_file_path("fuse/appeals.csv"), index=False)
+    per_df.to_csv(dirk.data("fuse/personnel.csv"), index=False)
+    allegation_df.to_csv(dirk.data("fuse/allegation.csv"), index=False)
+    uof_df.to_csv(dirk.data("fuse/use_of_force.csv"), index=False)
+    sas_df.to_csv(dirk.data("fuse/stop_and_search.csv"), index=False)
+    app_df.to_csv(dirk.data("fuse/appeals.csv"), index=False)
 
-    post_event_df = pd.read_csv(data_file_path("fuse/events_post.csv"))
+    post_event_df = pd.read_csv(dirk.data("fuse/events_post.csv"))
     missing_agency_df = find_event_agency_if_missing_from_post(event_df, post_event_df)
     post_event_df = post_event_df[~post_event_df["agency"].isin(event_df["agency"])]
     event_df = pd.concat([event_df, post_event_df], ignore_index=True)
-    event_df.to_csv(data_file_path("fuse/event.csv"), index=False)
+    event_df.to_csv(dirk.data("fuse/event.csv"), index=False)

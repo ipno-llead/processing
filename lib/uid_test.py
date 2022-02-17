@@ -2,9 +2,6 @@ from uid import gen_uid, gen_uid_from_dict, ensure_uid_unique
 from pandas.testing import assert_series_equal
 import pandas as pd
 import unittest
-import sys
-
-sys.path.append("./")
 
 
 class UIDTestCase(unittest.TestCase):

@@ -1,10 +1,7 @@
 from datamatch import ColumnsIndex, JaroWinklerSimilarity, ThresholdMatcher
-from lib.path import data_file_path, ensure_data_dir
+import dirk
 from lib.post import extract_events_from_post, load_for_agency
 import pandas as pd
-import sys
-
-sys.path.append("../")
 
 
 def match_cprr_20_and_pprr(cprr, pprr):
@@ -27,7 +24,7 @@ def match_cprr_20_and_pprr(cprr, pprr):
     )
     decision = 1
     matcher.save_pairs_to_excel(
-        data_file_path("match/scott_pd_cprr_2020_v_scott_pd_pprr_2021.xlsx"), decision
+        dirk.data("match/scott_pd_cprr_2020_v_scott_pd_pprr_2021.xlsx"), decision
     )
     matches = matcher.get_index_pairs_within_thresholds(decision)
     match_dict = dict(matches)
@@ -56,7 +53,7 @@ def match_cprr_14_and_pprr(cprr, pprr):
     )
     decision = 1
     matcher.save_pairs_to_excel(
-        data_file_path("match/scott_pd_cprr_2009_2014_v_scott_pd_pprr_2021.xlsx"),
+        dirk.data("match/scott_pd_cprr_2009_2014_v_scott_pd_pprr_2021.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(decision)
@@ -86,22 +83,22 @@ def extract_post_events(pprr, post):
     )
     decision = 1
     matcher.save_pairs_to_excel(
-        data_file_path("match/scott_pd_pprr_2021_v_post_pprr_2020_11_06.xlsx"), decision
+        dirk.data("match/scott_pd_pprr_2021_v_post_pprr_2020_11_06.xlsx"), decision
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
     return extract_events_from_post(post, matches, "Scott PD")
 
 
 if __name__ == "__main__":
-    cprr20 = pd.read_csv(data_file_path("clean/cprr_scott_pd_2020.csv"))
-    cprr14 = pd.read_csv(data_file_path("clean/cprr_scott_pd_2009_2014.csv"))
-    pprr = pd.read_csv(data_file_path("clean/pprr_scott_pd_2021.csv"))
+    cprr20 = pd.read_csv(dirk.data("clean/cprr_scott_pd_2020.csv"))
+    cprr14 = pd.read_csv(dirk.data("clean/cprr_scott_pd_2009_2014.csv"))
+    pprr = pd.read_csv(dirk.data("clean/pprr_scott_pd_2021.csv"))
     agency = pprr.agency[0]
-    post = load_for_agency("clean/pprr_post_2020_11_06.csv", agency)
+    post = load_for_agency(agency)
     cprr20 = match_cprr_20_and_pprr(cprr20, pprr)
     cprr14 = match_cprr_14_and_pprr(cprr14, pprr)
     post_event = extract_post_events(pprr, post)
-    ensure_data_dir("match")
-    cprr20.to_csv(data_file_path("match/cprr_scott_pd_2020.csv"), index=False)
-    cprr14.to_csv(data_file_path("match/cprr_scott_pd_2009_2014.csv"), index=False)
-    post_event.to_csv(data_file_path("match/post_event_scott_pd_2021.csv"), index=False)
+
+    cprr20.to_csv(dirk.data("match/cprr_scott_pd_2020.csv"), index=False)
+    cprr14.to_csv(dirk.data("match/cprr_scott_pd_2009_2014.csv"), index=False)
+    post_event.to_csv(dirk.data("match/post_event_scott_pd_2021.csv"), index=False)

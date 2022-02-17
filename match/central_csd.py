@@ -1,7 +1,4 @@
-import sys
-
-sys.path.append("../")
-from lib.path import data_file_path
+import dirk
 from datamatch import ThresholdMatcher, JaroWinklerSimilarity, ColumnsIndex
 from lib.post import extract_events_from_post, load_for_agency
 import pandas as pd
@@ -27,7 +24,7 @@ def match_pprr_with_post(pprr, post):
     )
     decision = 0.88
     matcher.save_pairs_to_excel(
-        data_file_path("match/central_pd_pprr_2014_2019_v_post_pprr_2020_11_06.xlsx"),
+        dirk.data("match/central_pd_pprr_2014_2019_v_post_pprr_2020_11_06.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
@@ -35,10 +32,8 @@ def match_pprr_with_post(pprr, post):
 
 
 if __name__ == "__main__":
-    pprr = pd.read_csv(data_file_path("clean/pprr_central_csd_2014_2019.csv"))
+    pprr = pd.read_csv(dirk.data("clean/pprr_central_csd_2014_2019.csv"))
     agency = pprr.agency[0]
-    post = load_for_agency("clean/pprr_post_2020_11_06.csv", agency)
+    post = load_for_agency(agency)
     post_events = match_pprr_with_post(pprr, post)
-    post_events.to_csv(
-        data_file_path("match/post_events_central_csd_2020.csv"), index=False
-    )
+    post_events.to_csv(dirk.data("match/post_events_central_csd_2020.csv"), index=False)

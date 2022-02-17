@@ -1,10 +1,7 @@
 from datamatch import ThresholdMatcher, JaroWinklerSimilarity, ColumnsIndex
-from lib.path import data_file_path, ensure_data_dir
+import dirk
 from lib.post import load_for_agency
 import pandas as pd
-import sys
-
-sys.path.append("../")
 
 
 def match_cprr_and_post(cprr, post):
@@ -27,9 +24,7 @@ def match_cprr_and_post(cprr, post):
     )
     decision = 1
     matcher.save_pairs_to_excel(
-        data_file_path(
-            "match/new_orleans_da_cprr_2021_v_post_nopd_pprr_2020_11_06.xlsx"
-        ),
+        dirk.data("match/new_orleans_da_cprr_2021_v_post_nopd_pprr_2020_11_06.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
@@ -59,9 +54,7 @@ def match_against_new_orleans_pd_personnel(cprr, pprr):
     )
     decision = 1
     matcher.save_pairs_to_excel(
-        data_file_path(
-            "match/new_orleans_da_cprr_2021_v_new_orleans_pd_1946_2018.xlsx"
-        ),
+        dirk.data("match/new_orleans_da_cprr_2021_v_new_orleans_pd_1946_2018.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(decision)
@@ -72,11 +65,11 @@ def match_against_new_orleans_pd_personnel(cprr, pprr):
 
 
 if __name__ == "__main__":
-    pprr = pd.read_csv(data_file_path("clean/pprr_new_orleans_pd_1946_2018.csv"))
-    cprr = pd.read_csv(data_file_path("clean/cprr_new_orleans_da_2021.csv"))
+    pprr = pd.read_csv(dirk.data("clean/pprr_new_orleans_pd_1946_2018.csv"))
+    cprr = pd.read_csv(dirk.data("clean/cprr_new_orleans_da_2021.csv"))
     agency = cprr.agency[0]
-    post = load_for_agency("clean/pprr_post_2020_11_06.csv", agency)
+    post = load_for_agency(agency)
     cprr = match_against_new_orleans_pd_personnel(cprr, pprr)
     cprr = match_cprr_and_post(cprr, post)
-    ensure_data_dir("match")
-    cprr.to_csv(data_file_path("match/cprr_new_orleans_da_2021.csv"), index=False)
+
+    cprr.to_csv(dirk.data("match/cprr_new_orleans_da_2021.csv"), index=False)

@@ -1,5 +1,5 @@
 import pandas as pd
-from lib.path import data_file_path
+import dirk
 from lib.columns import (
     rearrange_appeal_hearing_columns,
     rearrange_allegation_columns,
@@ -10,10 +10,6 @@ from lib.columns import (
 from lib.clean import float_to_int_str
 from lib.personnel import fuse_personnel
 from lib import events
-
-import sys
-
-sys.path.append("../")
 
 
 def create_officer_number_dict(pprr):
@@ -157,16 +153,16 @@ def fuse_events(pprr_ipm, pprr_csd, cprr, uof, award, lprr, sas):
 
 
 if __name__ == "__main__":
-    pprr_ipm = pd.read_csv(data_file_path("clean/pprr_new_orleans_ipm_iapro_1946_2018.csv"))
-    pprr_csd = pd.read_csv(data_file_path("match/pprr_new_orleans_csd_2014.csv"))
+    pprr_ipm = pd.read_csv(dirk.data("clean/pprr_new_orleans_ipm_iapro_1946_2018.csv"))
+    pprr_csd = pd.read_csv(dirk.data("match/pprr_new_orleans_csd_2014.csv"))
     officer_number_dict = create_officer_number_dict(pprr_ipm)
-    cprr = pd.read_csv(data_file_path("clean/cprr_new_orleans_pd_1931_2020.csv"))
-    actions = pd.read_csv(data_file_path("clean/cprr_actions_new_orleans_pd_1931_2020.csv"))
-    uof = pd.read_csv(data_file_path("clean/uof_new_orleans_pd_2012_2019.csv"))
-    post_event = pd.read_csv(data_file_path("match/post_event_new_orleans_pd.csv"))
-    award = pd.read_csv(data_file_path("match/award_new_orleans_pd_2016_2021.csv"))
-    lprr = pd.read_csv(data_file_path("match/lprr_new_orleans_csc_2000_2016.csv"))
-    sas = pd.read_csv(data_file_path("match/sas_new_orleans_pd_2017_2021.csv"))
+    cprr = pd.read_csv(dirk.data("clean/cprr_new_orleans_pd_1931_2020.csv"))
+    actions = pd.read_csv(dirk.data("clean/cprr_actions_new_orleans_pd_1931_2020.csv"))
+    uof = pd.read_csv(dirk.data("clean/uof_new_orleans_pd_2012_2019.csv"))
+    post_event = pd.read_csv(dirk.data("match/post_event_new_orleans_pd.csv"))
+    award = pd.read_csv(dirk.data("match/award_new_orleans_pd_2016_2021.csv"))
+    lprr = pd.read_csv(dirk.data("match/lprr_new_orleans_csc_2000_2016.csv"))
+    sas = pd.read_csv(dirk.data("match/sas_new_orleans_pd_2017_2021.csv"))
     complaints = fuse_cprr(cprr, actions, officer_number_dict)
     use_of_force = fuse_use_of_force(uof, officer_number_dict)
     personnel = fuse_personnel(pprr_ipm, lprr, pprr_csd, sas)
@@ -174,9 +170,9 @@ if __name__ == "__main__":
     events_df = rearrange_event_columns(pd.concat([post_event, events_df]))
     sas_df = rearrange_stop_and_search_columns(sas)
     lprr_df = rearrange_appeal_hearing_columns(lprr)
-    complaints.to_csv(data_file_path("fuse/com_new_orleans_pd.csv"), index=False)
-    use_of_force.to_csv(data_file_path("fuse/uof_new_orleans_pd.csv"), index=False)
-    personnel.to_csv(data_file_path("fuse/per_new_orleans_pd.csv"), index=False)
-    events_df.to_csv(data_file_path("fuse/event_new_orleans_pd.csv"), index=False)
-    lprr_df.to_csv(data_file_path("fuse/app_new_orleans_csc.csv"), index=False)
-    sas_df.to_csv(data_file_path("fuse/sas_new_orleans_pd.csv"), index=False)
+    complaints.to_csv(dirk.data("fuse/com_new_orleans_pd.csv"), index=False)
+    use_of_force.to_csv(dirk.data("fuse/uof_new_orleans_pd.csv"), index=False)
+    personnel.to_csv(dirk.data("fuse/per_new_orleans_pd.csv"), index=False)
+    events_df.to_csv(dirk.data("fuse/event_new_orleans_pd.csv"), index=False)
+    lprr_df.to_csv(dirk.data("fuse/app_new_orleans_csc.csv"), index=False)
+    sas_df.to_csv(dirk.data("fuse/sas_new_orleans_pd.csv"), index=False)

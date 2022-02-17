@@ -1,8 +1,5 @@
-import sys
-
-sys.path.append("../")
 import pandas as pd
-from lib.path import data_file_path
+import dirk
 from lib import events
 from lib.columns import rearrange_allegation_columns, rearrange_event_columns
 from lib.personnel import fuse_personnel
@@ -37,13 +34,15 @@ def fuse_events(cprr20, cprr19):
 
 
 if __name__ == "__main__":
-    cprr20 = pd.read_csv(data_file_path("match/cprr_lake_charles_pd_2020.csv"))
-    cprr19 = pd.read_csv(data_file_path("match/cprr_lake_charles_pd_2014_2019.csv"))
-    pprr = pd.read_csv(data_file_path("clean/pprr_lake_charles_pd_2017_2021.csv"))
-    post_event = pd.read_csv(data_file_path("match/post_event_lake_charles_2020_11_06.csv"))
+    cprr20 = pd.read_csv(dirk.data("match/cprr_lake_charles_pd_2020.csv"))
+    cprr19 = pd.read_csv(dirk.data("match/cprr_lake_charles_pd_2014_2019.csv"))
+    pprr = pd.read_csv(dirk.data("clean/pprr_lake_charles_pd_2017_2021.csv"))
+    post_event = pd.read_csv(dirk.data("match/post_event_lake_charles_2020_11_06.csv"))
     per_df = fuse_personnel(cprr20, cprr19, pprr)
     com_df = rearrange_allegation_columns(pd.concat([cprr20, cprr19]))
-    event_df = rearrange_event_columns(pd.concat([fuse_events(cprr20, cprr19), post_event]))
-    event_df.to_csv(data_file_path("fuse/event_lake_charles_pd.csv"), index=False)
-    com_df.to_csv(data_file_path("fuse/com_lake_charles_pd.csv"), index=False)
-    per_df.to_csv(data_file_path("fuse/per_lake_charles_pd.csv"), index=False)
+    event_df = rearrange_event_columns(
+        pd.concat([fuse_events(cprr20, cprr19), post_event])
+    )
+    event_df.to_csv(dirk.data("fuse/event_lake_charles_pd.csv"), index=False)
+    com_df.to_csv(dirk.data("fuse/com_lake_charles_pd.csv"), index=False)
+    per_df.to_csv(dirk.data("fuse/per_lake_charles_pd.csv"), index=False)
