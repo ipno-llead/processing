@@ -251,6 +251,10 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/com-acadia-so
     fetch:
       - +refs/heads/*:refs/remotes/com-acadia-so/*
+  com-rayne-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/com-rayne-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/com-rayne-pd/*
   com-west-monroe-pd:
     url: https://hub.wrgl.co/api/users/ipno/repos/com-west-monroe-pd
     fetch:
@@ -459,6 +463,10 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/event-acadia-so
     fetch:
       - +refs/heads/*:refs/remotes/event-acadia-so/*
+  event-rayne-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/event-rayne-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/event-rayne-pd/*
   event-erath-pd:
     url: https://hub.wrgl.co/api/users/ipno/repos/event-erath-pd
     fetch:
@@ -475,10 +483,6 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/event-eunice-pd
     fetch:
       - +refs/heads/*:refs/remotes/event-eunice-pd*
-  event-rayne-pd:
-    url: https://hub.wrgl.co/api/users/ipno/repos/event-rayne-pd
-    fetch:
-      - +refs/heads/*:refs/remotes/event-rayne-pd*
   match-brusly-pd-2020:
     url: https://hub.wrgl.co/api/users/ipno/repos/match-brusly-pd-2020
     fetch:
@@ -1116,6 +1120,10 @@ branch:
     file: data/fuse/com_acadia_so.csv
     primaryKey:
       - allegation_uid
+  com-rayne-pd:
+    remote: com-rayne-pd
+    merge: refs/heads/main
+    file: data/fuse/com_rayne_pd.csv
   com-west-monroe-pd:
     remote: com-west-monroe-pd
     merge: refs/heads/main
