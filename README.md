@@ -12,13 +12,17 @@ To contribute you must use the following tools:
 - [vscode](https://code.visualstudio.com/download): This editor has all the features that one could ask for in a Python project. While there might be other great IDEs out there, it is very essential that everyone use the same IDE. It makes sharing know-hows and collaboration much smoother.
   - [vscode Python extension](https://marketplace.visualstudio.com/items?itemName=ms-python.python): It highlights code, auto-formats code, and allows you to run Jupyter notebook right inside vscode.
   - [vscode Live Share extension](https://marketplace.visualstudio.com/items?itemName=MS-vsliveshare.vsliveshare-pack): It allows you to quickly jump into a call and start a pair-programming session right inside vscode. Occasional Live Share session is a great way to unstuck a teammate's problem.
-- [Wrgl](https://www.wrgl.co/doc/guides/installation): Keep data in version control.
+- [Wrgl](https://www.wrgl.co/doc/guides/installation): Keep produced CSVs in version control.
+- [DVC](https://dvc.org/doc/install): Keep other binary data and model files in version control.
 
 ### 1.b. Run all processing steps
 
 ```bash
 # install all related packages
 pip install -r requirements.txt
+
+# pull raw data input with dvc
+dvc checkout
 
 # initialize the wrgl repo
 wrgl init
@@ -162,15 +166,37 @@ wrgl push --all
 wrgl push event
 ```
 
-## 5. Automated script dependency
+## 5. Working with DVC
+
+```bash
+# pull all dvc-tracked files
+dvc checkout
+
+# authenticate DVC so that you can push new files
+gcloud auth login
+dvc remote modify --local gcs credentialpath ~/.config/gcloud/legacy_credentials/<your email>/adc.json
+
+# update dvc after making changes
+dvc add data/raw
+git add data/raw.dvc
+
+# push file changes to google cloud storage
+dvc push
+```
+
+## 6. Automated script dependency
 
 As you might notice, we never have to declare script dependency anywhere because Make can figure out the dependency automatically. We do have to write the scripts in a particular way but the benefits are well worth it. We also use md5 checksums of the scripts as recipe dependencies instead of the scripts themselves, which makes the processing resistant against superfluous file changes caused by Git. See [Makefile](Makefile) and [scripts/write_deps.py](scripts/write_deps.py) to learn more.
 
-## 6. Library reference
+## 7. Library reference
 
 TBD.
 
-## 7. Future roadmap
+## 8. Future roadmap
 
 - Extract the dependency management and code organization out into a formal framework so that we can test and reuse it in other projects.
 - Implements continuous delivery.
+
+```
+
+```

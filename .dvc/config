@@ -1,5 +1,6 @@
 [core]
-    remote = google-storage
-['remote "google-storage"']
+    remote = gcs
+    autostage = true
+['remote "gcs"']
     url = gs://llead-dvc
     projectname = excellent-zoo-300106
