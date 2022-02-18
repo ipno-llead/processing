@@ -1,5 +1,5 @@
 from lib.columns import clean_column_names
-import dirk
+import bolo
 from lib.clean import clean_names, standardize_desc_cols
 from lib.uid import gen_uid
 import pandas as pd
@@ -54,7 +54,7 @@ def remove_NA_values(df, cols):
 
 def clean19():
     return (
-        pd.read_csv(dirk.data("raw/levee_pd/levee_pd_cprr_2019.csv"))
+        pd.read_csv(bolo.data("raw/levee_pd/levee_pd_cprr_2019.csv"))
         .pipe(clean_column_names)
         .rename(
             columns={
@@ -98,7 +98,7 @@ def clean19():
 
 def clean20():
     return (
-        pd.read_csv(dirk.data("raw/levee_pd/levee_pd_cprr_2020.csv"))
+        pd.read_csv(bolo.data("raw/levee_pd/levee_pd_cprr_2020.csv"))
         .pipe(clean_column_names)
         .rename(
             columns={
@@ -134,4 +134,4 @@ def clean20():
 if __name__ == "__main__":
     df20 = clean20()
     df19 = clean19()
-    pd.concat([df19, df20]).to_csv(dirk.data("clean/cprr_levee_pd.csv"), index=False)
+    pd.concat([df19, df20]).to_csv(bolo.data("clean/cprr_levee_pd.csv"), index=False)

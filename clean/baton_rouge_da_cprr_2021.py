@@ -1,5 +1,5 @@
 from lib.columns import clean_column_names
-import dirk
+import bolo
 from lib.clean import clean_names, standardize_desc_cols
 from lib.uid import gen_uid
 import pandas as pd
@@ -27,7 +27,7 @@ def extract_disposition(df):
 
 def clean():
     df = (
-        pd.read_csv(dirk.data("raw/baton_rouge_da/baton_rouge_da_cprr_2021.csv"))
+        pd.read_csv(bolo.data("raw/baton_rouge_da/baton_rouge_da_cprr_2021.csv"))
         .pipe(clean_column_names)
         .pipe(clean_allegations)
         .pipe(extract_disposition)
@@ -42,4 +42,4 @@ def clean():
 
 if __name__ == "__main__":
     df = clean()
-    df.to_csv(dirk.data("clean/cprr_baton_rouge_da_2021.csv"), index=False)
+    df.to_csv(bolo.data("clean/cprr_baton_rouge_da_2021.csv"), index=False)

@@ -1,4 +1,4 @@
-import dirk
+import bolo
 from lib.columns import clean_column_names
 from lib.clean import clean_names, clean_dates, standardize_desc_cols
 from lib.uid import gen_uid
@@ -30,7 +30,7 @@ def assign_agency(df):
 
 def clean():
     df = pd.read_csv(
-        dirk.data("raw/madisonville_pd/madisonville_pd_cprr_2010-2020_byhand.csv")
+        bolo.data("raw/madisonville_pd/madisonville_pd_cprr_2010-2020_byhand.csv")
     )
     df = clean_column_names(df)
     df = (
@@ -54,4 +54,4 @@ def clean():
 
 if __name__ == "__main__":
     df = clean()
-    df.to_csv(dirk.data("clean/cprr_madisonville_pd_2010_2020.csv"), index=False)
+    df.to_csv(bolo.data("clean/cprr_madisonville_pd_2010_2020.csv"), index=False)

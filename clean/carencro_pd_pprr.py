@@ -1,7 +1,7 @@
 import pandas as pd
 
 from lib.columns import clean_column_names, set_values
-import dirk
+import bolo
 from lib.standardize import standardize_from_lookup_table
 from lib.uid import gen_uid
 from lib.clean import clean_sexes, clean_races
@@ -9,7 +9,7 @@ from lib.clean import clean_sexes, clean_races
 
 def clean():
     return (
-        pd.read_csv(dirk.data("raw/carencro_pd/carencro_pd_pprr_2021.csv"))
+        pd.read_csv(bolo.data("raw/carencro_pd/carencro_pd_pprr_2021.csv"))
         .pipe(clean_column_names)
         .pipe(
             standardize_from_lookup_table,
@@ -33,4 +33,4 @@ def clean():
 
 if __name__ == "__main__":
     df = clean()
-    df.to_csv(dirk.data("clean/pprr_carencro_pd_2021.csv"), index=False)
+    df.to_csv(bolo.data("clean/pprr_carencro_pd_2021.csv"), index=False)

@@ -1,4 +1,4 @@
-import dirk
+import bolo
 from lib.columns import clean_column_names
 from lib.clean import (
     clean_races,
@@ -114,7 +114,7 @@ def clean_rank_desc(df):
 
 
 def clean():
-    df = pd.read_csv(dirk.data("raw/ipm/new_orleans_iapro_pprr_1946-2018.csv"))
+    df = pd.read_csv(bolo.data("raw/ipm/new_orleans_iapro_pprr_1946-2018.csv"))
     df = df.dropna(axis=1, how="all")
     df = clean_column_names(df)
     print(df.columns.tolist())
@@ -165,4 +165,4 @@ def clean():
 
 if __name__ == "__main__":
     df = clean()
-    df.to_csv(dirk.data("clean/pprr_new_orleans_ipm_iapro_1946_2018.csv"), index=False)
+    df.to_csv(bolo.data("clean/pprr_new_orleans_ipm_iapro_1946_2018.csv"), index=False)

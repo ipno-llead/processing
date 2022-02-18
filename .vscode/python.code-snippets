@@ -18,27 +18,27 @@
   "Read CSV from data folder": {
     "scope": "python",
     "prefix": "read_csv",
-    "body": "$1 = pd.read_csv(dirk.data('$2'))"
+    "body": "$1 = pd.read_csv(bolo.data('$2'))"
   },
   "Clean script": {
     "scope": "python",
     "prefix": "clean",
     "body": [
       "import pandas as pd",
-      "import dirk",
+      "import bolo",
       "",
       "from lib.columns import clean_column_names",
       "",
       "",
       "def clean():",
-      "    return pd.read_csv(dirk.data(",
+      "    return pd.read_csv(bolo.data(",
       "        '$1'",
       "    )).pipe(clean_column_names)",
       "",
       "",
       "if __name__ == '__main__':",
       "    df = clean()",
-      "    df.to_csv(dirk.data(",
+      "    df.to_csv(bolo.data(",
       "        'clean/$2.csv'",
       "    ), index=False)"
     ],
@@ -50,7 +50,7 @@
     "body": [
       "import pandas as pd",
       "from datamatch import ThresholdMatcher, JaroWinklerSimilarity, ColumnsIndex",
-      "import dirk"
+      "import bolo"
     ],
     "description": "Data match script"
   },
@@ -59,7 +59,7 @@
     "prefix": "fuse",
     "body": [
       "import pandas as pd",
-      "import dirk",
+      "import bolo",
       "",
       "from lib.columns import (",
       "    rearrange_personnel_columns, rearrange_complaint_columns, rearrange_event_columns",

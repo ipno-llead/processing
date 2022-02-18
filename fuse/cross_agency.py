@@ -17,7 +17,7 @@ from datamatch import (
     AbsoluteScorer,
 )
 from datavalid.spinner import Spinner
-import dirk
+import bolo
 
 from lib.date import combine_date_columns
 
@@ -120,7 +120,7 @@ def cross_match_officers_between_agencies(personnel, events, constraints):
     # filter down the full names to only those that are common
     common_names_sr = full_names[full_names.isin(common_names)]
 
-    excel_path = dirk.data("match/cross_agency_officers.xlsx")
+    excel_path = bolo.data("match/cross_agency_officers.xlsx")
     matcher = ThresholdMatcher(
         index=MultiIndex(
             [
@@ -235,7 +235,7 @@ def entity_resolution(
     decision = 0.001
     with Spinner("saving person entity resolution to Excel file"):
         matcher.save_pairs_to_excel(
-            name=dirk.data(
+            name=bolo.data(
                 "match/person_entity_resolution_%s.xlsx"
                 % datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
             ),
@@ -285,15 +285,15 @@ if __name__ == "__main__":
         person_df = entity_resolution(
             old_person=old_person_df, new_person=new_person_df
         )
-        person_df.to_csv(dirk.data("fuse/person.csv"), index=False)
+        person_df.to_csv(bolo.data("fuse/person.csv"), index=False)
     else:
-        personnel = pd.read_csv(dirk.data("fuse/personnel.csv"))
+        personnel = pd.read_csv(bolo.data("fuse/personnel.csv"))
         print("read personnel file (%d x %d)" % personnel.shape)
-        events = pd.read_csv(dirk.data("fuse/event.csv"))
+        events = pd.read_csv(bolo.data("fuse/event.csv"))
         print("read events file (%d x %d)" % events.shape)
         constraints = read_constraints()
         clusters, personnel_event = cross_match_officers_between_agencies(
             personnel, events, constraints
         )
         new_person_df = create_person_table(clusters, personnel, personnel_event)
-        new_person_df.to_csv(dirk.data("fuse/person.csv"), index=False)
+        new_person_df.to_csv(bolo.data("fuse/person.csv"), index=False)

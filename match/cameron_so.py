@@ -1,6 +1,6 @@
 import pandas as pd
 from datamatch import JaroWinklerSimilarity, ThresholdMatcher, ColumnsIndex
-import dirk
+import bolo
 from lib.post import load_for_agency
 
 
@@ -30,7 +30,7 @@ def assign_uid_from_post_20(cprr, post):
     )
     decision = 0.97
     matcher.save_pairs_to_excel(
-        dirk.data("match/cprr_cameron_so_2020_v_post_pprr_2020_11_06.xlsx"),
+        bolo.data("match/cprr_cameron_so_2020_v_post_pprr_2020_11_06.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(decision)
@@ -66,7 +66,7 @@ def assign_uid_from_post_19(cprr, post):
     )
     decision = 1
     matcher.save_pairs_to_excel(
-        dirk.data("match/cprr_cameron_so_2015_2019_v_post_pprr_2020_11_06.xlsx"),
+        bolo.data("match/cprr_cameron_so_2015_2019_v_post_pprr_2020_11_06.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(decision)
@@ -77,11 +77,11 @@ def assign_uid_from_post_19(cprr, post):
 
 
 if __name__ == "__main__":
-    cprr_20 = pd.read_csv(dirk.data("clean/cprr_cameron_so_2020.csv"))
-    cprr_19 = pd.read_csv(dirk.data("clean/cprr_cameron_so_2015_2019.csv"))
+    cprr_20 = pd.read_csv(bolo.data("clean/cprr_cameron_so_2020.csv"))
+    cprr_19 = pd.read_csv(bolo.data("clean/cprr_cameron_so_2015_2019.csv"))
     agency = cprr_20.agency[0]
     post = load_for_agency(agency)
     cprr_20 = assign_uid_from_post_20(cprr_20, post)
     cprr_19 = assign_uid_from_post_19(cprr_19, post)
-    cprr_20.to_csv(dirk.data("match/cprr_cameron_so_2020.csv"), index=False)
-    cprr_19.to_csv(dirk.data("match/cprr_cameron_so_2015_2019.csv"), index=False)
+    cprr_20.to_csv(bolo.data("match/cprr_cameron_so_2020.csv"), index=False)
+    cprr_19.to_csv(bolo.data("match/cprr_cameron_so_2015_2019.csv"), index=False)

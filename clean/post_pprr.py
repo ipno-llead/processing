@@ -1,5 +1,5 @@
 from lib.columns import clean_column_names
-import dirk
+import bolo
 from lib.clean import (
     clean_names,
     clean_dates,
@@ -68,7 +68,7 @@ def replace_impossible_dates(df):
 
 
 def clean():
-    df = pd.read_csv(dirk.data("raw/post_council/post_pprr_11-6-2020.csv"))
+    df = pd.read_csv(bolo.data("raw/post_council/post_pprr_11-6-2020.csv"))
     df = clean_column_names(df)
     df.columns = [
         "agency",
@@ -114,4 +114,4 @@ def clean():
 if __name__ == "__main__":
     df = clean()
 
-    df.to_csv(dirk.data("clean/pprr_post_2020_11_06.csv"), index=False)
+    df.to_csv(bolo.data("clean/pprr_post_2020_11_06.csv"), index=False)

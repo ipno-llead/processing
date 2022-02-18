@@ -7,7 +7,7 @@ from datamatch import (
 import pandas as pd
 
 from lib.date import combine_date_columns
-import dirk
+import bolo
 from lib.post import extract_events_from_post, load_for_agency
 
 
@@ -37,7 +37,7 @@ def match_cprr_with_pprr(cprr, pprr):
     )
     decision = 0.89
     matcher.save_pairs_to_excel(
-        dirk.data("match/mandeville_pd_cprr_2019_v_csd_pprr_2020.xlsx"), decision
+        bolo.data("match/mandeville_pd_cprr_2019_v_csd_pprr_2020.xlsx"), decision
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
     match_dict = dict(matches)
@@ -73,7 +73,7 @@ def match_pprr_against_post(pprr, post):
     )
     decision = 0.8
     matcher.save_pairs_to_excel(
-        dirk.data("match/mandeville_csd_pprr_2020_v_post_pprr_2020_11_06.xlsx"),
+        bolo.data("match/mandeville_csd_pprr_2020_v_post_pprr_2020_11_06.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
@@ -81,12 +81,12 @@ def match_pprr_against_post(pprr, post):
 
 
 if __name__ == "__main__":
-    cprr = pd.read_csv(dirk.data("clean/cprr_mandeville_pd_2019.csv"))
-    pprr = pd.read_csv(dirk.data("clean/pprr_mandeville_csd_2020.csv"))
+    cprr = pd.read_csv(bolo.data("clean/cprr_mandeville_pd_2019.csv"))
+    pprr = pd.read_csv(bolo.data("clean/pprr_mandeville_csd_2020.csv"))
     agency = pprr.agency[0]
     post = load_for_agency(agency)
     post_event = match_pprr_against_post(pprr, post)
     cprr = match_cprr_with_pprr(cprr, pprr)
 
-    post_event.to_csv(dirk.data("match/post_event_mandeville_pd_2019.csv"), index=False)
-    cprr.to_csv(dirk.data("match/cprr_mandeville_pd_2019.csv"), index=False)
+    post_event.to_csv(bolo.data("match/post_event_mandeville_pd_2019.csv"), index=False)
+    cprr.to_csv(bolo.data("match/cprr_mandeville_pd_2019.csv"), index=False)

@@ -1,6 +1,6 @@
 import pandas as pd
 from lib.clean import clean_dates, clean_names, standardize_desc_cols, clean_salaries
-import dirk
+import bolo
 from lib.columns import clean_column_names, set_values
 from lib.uid import gen_uid
 from lib import salary
@@ -47,7 +47,7 @@ def assign_pay_date_and_rank_date(df):
 
 def clean_personnel_2008():
     df = pd.read_csv(
-        dirk.data("raw/new_orleans_harbor_pd/new_orleans_harbor_pd_pprr_1991-2008.csv")
+        bolo.data("raw/new_orleans_harbor_pd/new_orleans_harbor_pd_pprr_1991-2008.csv")
     )
     df = clean_column_names(df)
     df = df.dropna(axis=1, how="all")
@@ -77,7 +77,7 @@ def clean_personnel_2008():
 
 def clean_personnel_2020():
     df = pd.read_csv(
-        dirk.data("raw/new_orleans_harbor_pd/new_orleans_harbor_pd_pprr_2020.csv")
+        bolo.data("raw/new_orleans_harbor_pd/new_orleans_harbor_pd_pprr_2020.csv")
     )
     df = clean_column_names(df)
     df = df.dropna(how="all")
@@ -128,7 +128,7 @@ if __name__ == "__main__":
     df20 = clean_personnel_2020()
     df08 = clean_personnel_2008()
 
-    df20.to_csv(dirk.data("clean/pprr_new_orleans_harbor_pd_2020.csv"), index=False)
+    df20.to_csv(bolo.data("clean/pprr_new_orleans_harbor_pd_2020.csv"), index=False)
     df08.to_csv(
-        dirk.data("clean/pprr_new_orleans_harbor_pd_1991_2008.csv"), index=False
+        bolo.data("clean/pprr_new_orleans_harbor_pd_1991_2008.csv"), index=False
     )

@@ -1,4 +1,4 @@
-import dirk
+import bolo
 from scrapy.spiders import Spider
 from scrapy.http import FormRequest
 
@@ -7,7 +7,7 @@ class MySpider(Spider):
     name = "vine_scraper"
 
     def start_requests(self):
-        with open(dirk.data("raw/vine/vine_urls.csv")) as f:
+        with open(bolo.data("raw/vine/vine_urls.csv")) as f:
             for line in f:
                 if not line.strip():
                     continue

@@ -8,5 +8,5 @@ pull_person:
 		echo 'file $(BUILD_DIR)/person.csv is up to date.'; \
 	fi
 
-$(DIRK_DATA_DIR)/fuse/person.csv: $(DIRK_MD5_DIR)/fuse/cross_agency.py.md5 $(DIRK_DATA_DIR)/fuse/personnel.csv $(DIRK_DATA_DIR)/fuse/event.csv | pull_person
-	$(call dirk_execute,fuse/cross_agency.py $(BUILD_DIR)/person.csv)
+$(BOLO_DATA_DIR)/fuse/person.csv: $(BOLO_MD5_DIR)/fuse/cross_agency.py.md5 $(BOLO_DATA_DIR)/fuse/personnel.csv $(BOLO_DATA_DIR)/fuse/event.csv | pull_person
+	$(call bolo_execute,fuse/cross_agency.py $(BUILD_DIR)/person.csv)

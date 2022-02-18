@@ -1,6 +1,6 @@
 from lib import events
 import pandas as pd
-import dirk
+import bolo
 
 
 def keep_latest_row_for_each_post_officer(post: pd.DataFrame) -> pd.DataFrame:
@@ -96,7 +96,7 @@ def extract_events_from_cprr_post(
 
 
 def load_for_agency(agency):
-    post = pd.read_csv(dirk.data("clean/pprr_post_2020_11_06.csv"))
+    post = pd.read_csv(bolo.data("clean/pprr_post_2020_11_06.csv"))
     post = post.loc[post.agency == agency]
     if len(post) == 0:
         raise ValueError("agency not found", agency)

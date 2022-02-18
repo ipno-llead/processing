@@ -1,6 +1,6 @@
 import pandas as pd
 from datamatch import ThresholdMatcher, JaroWinklerSimilarity, ColumnsIndex
-import dirk
+import bolo
 from lib.post import load_for_agency
 
 
@@ -18,7 +18,7 @@ def deduplicate_cprr_officers(cprr):
     )
     decision = 0.866
     matcher.save_clusters_to_excel(
-        dirk.data("match/tangipahoa_so_cprr_2015_2021_deduplicate.xlsx"),
+        bolo.data("match/tangipahoa_so_cprr_2015_2021_deduplicate.xlsx"),
         decision,
         decision,
     )
@@ -63,7 +63,7 @@ def match_cprr_post(cprr, post):
     )
     decision = 0.873
     matcher.save_pairs_to_excel(
-        dirk.data("match/tangipahoa_so_cprr_2015_2021_v_pprr_post_2020_11_06.xlsx"),
+        bolo.data("match/tangipahoa_so_cprr_2015_2021_v_pprr_post_2020_11_06.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(decision)
@@ -74,9 +74,9 @@ def match_cprr_post(cprr, post):
 
 
 if __name__ == "__main__":
-    cprr = pd.read_csv(dirk.data("clean/cprr_tangipahoa_so_2015_2021.csv"))
+    cprr = pd.read_csv(bolo.data("clean/cprr_tangipahoa_so_2015_2021.csv"))
     agency = cprr.agency[0]
     post = load_for_agency(agency)
     cprr = deduplicate_cprr_officers(cprr)
     cprr = match_cprr_post(cprr, post)
-    cprr.to_csv(dirk.data("match/cprr_tangipahoa_so_2015_2021.csv"), index=False)
+    cprr.to_csv(bolo.data("match/cprr_tangipahoa_so_2015_2021.csv"), index=False)

@@ -1,5 +1,5 @@
 from lib.columns import clean_column_names, set_values
-import dirk
+import bolo
 from lib.uid import gen_uid
 from lib.clean import (
     clean_names,
@@ -68,7 +68,7 @@ def assign_cols_2014(df):
 
 
 def clean_2014():
-    df = pd.read_csv(dirk.data("raw/new_orleans_csd/new_orleans_csd_pprr_2014.csv"))
+    df = pd.read_csv(bolo.data("raw/new_orleans_csd/new_orleans_csd_pprr_2014.csv"))
     df = (
         df.pipe(match_schema_2014)
         .pipe(
@@ -145,7 +145,7 @@ def assign_cols_2009(df):
 
 def clean_2009():
     df = pd.read_csv(
-        dirk.data("raw/new_orleans_csd/new_orleans_csd_pprr_2009_realigned.csv")
+        bolo.data("raw/new_orleans_csd/new_orleans_csd_pprr_2009_realigned.csv")
     )
     df = (
         df.pipe(match_schema_2009)
@@ -174,5 +174,5 @@ if __name__ == "__main__":
     df09 = clean_2009()
     df14 = clean_2014()
 
-    df09.to_csv(dirk.data("clean/pprr_new_orleans_csd_2009.csv"), index=False)
-    df14.to_csv(dirk.data("clean/pprr_new_orleans_csd_2014.csv"), index=False)
+    df09.to_csv(bolo.data("clean/pprr_new_orleans_csd_2009.csv"), index=False)
+    df14.to_csv(bolo.data("clean/pprr_new_orleans_csd_2014.csv"), index=False)

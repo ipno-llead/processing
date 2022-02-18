@@ -1,5 +1,5 @@
 import pandas as pd
-import dirk
+import bolo
 from lib.columns import clean_column_names, set_values
 from lib.clean import standardize_desc_cols, clean_dates
 from lib.uid import gen_uid
@@ -87,7 +87,7 @@ def assign_agency(df):
 
 
 def clean():
-    df = pd.read_csv(dirk.data("raw/plaquemines_so/plaqumines_so_pprr_2018.csv"))
+    df = pd.read_csv(bolo.data("raw/plaquemines_so/plaqumines_so_pprr_2018.csv"))
     df = (
         df.pipe(clean_column_names)
         .rename(columns={"emp_type": "employment_status"})
@@ -108,4 +108,4 @@ def clean():
 
 if __name__ == "__main__":
     df = clean()
-    df.to_csv(dirk.data("clean/pprr_plaquemines_so_2018.csv"), index=False)
+    df.to_csv(bolo.data("clean/pprr_plaquemines_so_2018.csv"), index=False)

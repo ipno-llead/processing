@@ -1,5 +1,5 @@
 import pandas as pd
-import dirk
+import bolo
 from lib.columns import clean_column_names, set_values
 from lib.clean import clean_dates, standardize_desc_cols
 from lib.uid import gen_uid
@@ -350,7 +350,7 @@ def clean_tracking_number_08(df):
 
 
 def clean_20():
-    df = pd.read_csv(dirk.data("raw/hammond_pd/hammond_pd_cprr_2015_2020.csv")).pipe(
+    df = pd.read_csv(bolo.data("raw/hammond_pd/hammond_pd_cprr_2015_2020.csv")).pipe(
         clean_column_names
     )
     df = (
@@ -384,7 +384,7 @@ def clean_20():
 
 
 def clean_14():
-    df = pd.read_csv(dirk.data("raw/hammond_pd/hammond_pd_cprr_2009_2014.csv"))
+    df = pd.read_csv(bolo.data("raw/hammond_pd/hammond_pd_cprr_2009_2014.csv"))
     df = (
         df.pipe(clean_column_names)
         .rename(columns={"date": "investigation_start_date"})
@@ -412,7 +412,7 @@ def clean_14():
 
 def clean_08():
     df = (
-        pd.read_csv(dirk.data("raw/hammond_pd/hammond_pd_cprr_2004_2008.csv"))
+        pd.read_csv(bolo.data("raw/hammond_pd/hammond_pd_cprr_2004_2008.csv"))
         .pipe(clean_column_names)
         .drop(columns=["letter_of_instruction"])
         .pipe(extract_rank_from_name)
@@ -440,6 +440,6 @@ if __name__ == "__main__":
     df20 = clean_20()
     df14 = clean_14()
     df08 = clean_08()
-    df20.to_csv(dirk.data("clean/cprr_hammond_pd_2015_2020.csv"), index=False)
-    df14.to_csv(dirk.data("clean/cprr_hammond_pd_2009_2014.csv"), index=False)
-    df08.to_csv(dirk.data("clean/cprr_hammond_pd_2004_2008.csv"), index=False)
+    df20.to_csv(bolo.data("clean/cprr_hammond_pd_2015_2020.csv"), index=False)
+    df14.to_csv(bolo.data("clean/cprr_hammond_pd_2009_2014.csv"), index=False)
+    df08.to_csv(bolo.data("clean/cprr_hammond_pd_2004_2008.csv"), index=False)

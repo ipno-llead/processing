@@ -1,5 +1,5 @@
 import pandas as pd
-import dirk
+import bolo
 from lib.columns import clean_column_names, set_values
 from lib.clean import clean_names, clean_dates
 from lib.uid import gen_uid
@@ -67,7 +67,7 @@ def split_names(df):
 
 def clean():
     df = (
-        pd.read_csv(dirk.data("raw/st_landry_so/st_landry_so_cprr_2019_2020.csv"))
+        pd.read_csv(bolo.data("raw/st_landry_so/st_landry_so_cprr_2019_2020.csv"))
         .pipe(clean_column_names)
         .rename(columns={"case": "tracking_number", "date": "receive_date"})
         .pipe(clean_dates, ["receive_date"])
@@ -90,4 +90,4 @@ def clean():
 
 if __name__ == "__main__":
     df = clean()
-    df.to_csv(dirk.data("clean/cprr_st_landry_so_2020.csv"), index=False)
+    df.to_csv(bolo.data("clean/cprr_st_landry_so_2020.csv"), index=False)

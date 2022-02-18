@@ -1,6 +1,6 @@
 import pandas as pd
 from lib.columns import clean_column_names, set_values
-import dirk
+import bolo
 from lib.uid import gen_uid
 from lib import salary
 from lib.clean import clean_names, clean_dates, clean_sexes, clean_races, clean_salaries
@@ -38,7 +38,7 @@ def clean_rank(df):
 
 
 def clean():
-    df = pd.read_csv(dirk.data("raw/scott_pd/scott_pd_pprr_2021.csv"))
+    df = pd.read_csv(bolo.data("raw/scott_pd/scott_pd_pprr_2021.csv"))
     df = clean_column_names(df)
     df.columns = [
         "full_name",
@@ -73,4 +73,4 @@ def clean():
 if __name__ == "__main__":
     df = clean()
 
-    df.to_csv(dirk.data("clean/pprr_scott_pd_2021.csv"), index=False)
+    df.to_csv(bolo.data("clean/pprr_scott_pd_2021.csv"), index=False)

@@ -79,19 +79,19 @@ See [data/datavalid.yml](data/datavalid.yml) for more details regarding the sche
 2. **Download raw CSVs**: Run `scripts/rawfiles.sh {agency_name}`. This does 3 things:
    - Ensure that your links work
    - Download the raw CSVs to the appropriate folder which is at `data/raw/{agency_name}/{file_name}`. Note that the file name will be inferred from the link. E.g. `https://www.dropbox.com/s/t24wgq7pdrcklxa/baton_rouge_pd_cprr_2021.csv?dl=1` becomes `baton_rouge_pd_pprr_2021.csv`.
-   - Display paths to the raw files for that agency so that you can load them with `dirk.data` when writing scripts.
+   - Display paths to the raw files for that agency so that you can load them with `bolo.data` when writing scripts.
 3. **Explore with Jupyter notebook**: We recommend running Jupyter notebooks right within vscode which is possible if you have the Python extension installed. If you want to save a notebook then please save it in the `notebooks` folder with a distinct name that should at least include the name of the dataset that you were exploring.
 4. **Write clean script**: Clean scripts are scripts in the `clean` folder which do what is outlined in the "Standardization & cleaning" step in [data integration principles](#2-data-integration-principles) section. There are some rules for writing clean scripts:
    - Must have a main block which is where the processing begin
    - All input and output must be CSVs
-   - Must not accept any argument but rather specify input and output CSVs directly by name via `dirk.data`. This is unconventional but it is essential for automated script dependency to work.
-   - Must save output to the `data/clean` folder using `dirk.data`.
+   - Must not accept any argument but rather specify input and output CSVs directly by name via `bolo.data`. This is unconventional but it is essential for automated script dependency to work.
+   - Must save output to the `data/clean` folder using `bolo.data`.
    - No dynamically generated CSV name. Otherwise automated script dependency will not work.
    - Data in a clean script typically pass through multiple steps of processing. Using `pandas.DataFrame.pipe` is the preferred way to join the steps together.
    - When in doubt, consult the existing scripts.
 5. **Write match script**: Match scripts are scripts in the `match` folder which do the "Data matching" step in [data integration principles](#2-data-integration-principles) section. We use the [datamatch](https://datamatch.readthedocs.io/en/latest/) library which not only facilitate record linkage but also data deduplication. Datamatch does not use machine learning but rely on a simple threshold-based algorithm. Still it is very flexible in what it can do and has the added benefits of being easy to understand and run very fast. Match scripts should follow most of the rules for clean scripts with a few additional rules:
    - For each matching task, save the matching result to an Excel file in the `data/match` folder with name in this format: `{agency}_{source_a}_v_{source_b}.xlsx`. For example `new_orleans_harbor_pd_cprr_2020_v_pprr_2020.xlsx` shows matched records between `New Orleans Harbor PD CPRR 2020` and `New Orleans Harbor PD PPRR 2020` datasets. See existing match scripts for example.
-   - Must save output to the `data/match` folder using `dirk.data`.
+   - Must save output to the `data/match` folder using `bolo.data`.
 6. **Review matching result**: The previous step should produce one or more Excel files in `data/match` folder showing matched records in an easy-to-review format. Each has 3 sheets:
    - **Sample pairs**: Show a small sample of record pairs for each score range.
    - **All pairs**: Show all pairs of records and their respective score for a more in-depth review. Pairs that score too low (and therefore could never be considered match anyway) are not present.
@@ -101,7 +101,7 @@ See [data/datavalid.yml](data/datavalid.yml) for more details regarding the sche
 7. **Write fuse script**: Fuse scripts are scripts in the `fuse` folder which do the "Data fusion" step in [data integration principles](#2-data-integration-principles) section. They follow most of the rules for clean scripts plus a few more rules:
    - Must output one or more of the data file outlined in the [output schema](#3-output-schema) section.
    - Must use functions from `lib.columns` package to validate and rearrange columns for each file type according to the schema in `data/datavalid.yml`.
-   - Must save output to the `data/fuse` folder using `dirk.data`.
+   - Must save output to the `data/fuse` folder using `bolo.data`.
 8. **Run make**: Literally just run `make`. If there's no problem then you will see new data files being generated.
 9. **Check data quality with datavalid**: Run `python -m datavalid --dir data` which will check and print out any error found in the newly generated data.
 10. **Add new branches to wrgl config**: Modify the [.wrgl/config.yaml](.wrgl/config.yaml) file to include new data files each as a new branch. Branch name should be the file name with underscores replaced with dashes. E.g. `event_baton_rouge_pd.csv` correspond to branch `event-baton-rouge-pd`.

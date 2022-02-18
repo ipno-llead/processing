@@ -1,5 +1,5 @@
 import pandas as pd
-import dirk
+import bolo
 from lib.columns import clean_column_names
 from lib.clean import clean_sexes, standardize_desc_cols
 
@@ -24,7 +24,7 @@ def clean_homeless(df):
 def clean():
     df = (
         pd.read_csv(
-            dirk.data("raw/baton_rouge_so/east_baton_rouge_booking_log_2020.csv")
+            bolo.data("raw/baton_rouge_so/east_baton_rouge_booking_log_2020.csv")
         )
         .pipe(clean_column_names)
         .drop(
@@ -60,4 +60,4 @@ def clean():
 
 if __name__ == "__main__":
     df = clean()
-    df.to_csv(dirk.data("clean/booking_baton_rouge_so_2020.csv"), index=False)
+    df.to_csv(bolo.data("clean/booking_baton_rouge_so_2020.csv"), index=False)

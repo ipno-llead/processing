@@ -4,7 +4,7 @@ import operator
 import pandas as pd
 
 from lib.columns import clean_column_names, set_values
-import dirk
+import bolo
 from lib.uid import gen_uid
 from lib.clean import (
     clean_names,
@@ -124,7 +124,7 @@ def fix_month_day_order(df, cols):
 
 def clean_pprr_09():
     return (
-        pd.read_csv(dirk.data("raw/slidell_pd/slidell_pd_pprr_2009.csv"), delimiter=";")
+        pd.read_csv(bolo.data("raw/slidell_pd/slidell_pd_pprr_2009.csv"), delimiter=";")
         .pipe(clean_column_names)
         .rename(
             columns={
@@ -186,7 +186,7 @@ def clean_badge_no(df):
 
 def clean_pprr_19():
     return (
-        pd.read_csv(dirk.data("raw/slidell_pd/slidell_pd_pprr_2019.csv"), delimiter=";")
+        pd.read_csv(bolo.data("raw/slidell_pd/slidell_pd_pprr_2019.csv"), delimiter=";")
         .pipe(realign19)
         .pipe(clean_column_names)
         .rename(
@@ -232,7 +232,7 @@ def fill_empty_columns_for_pprr_2009(df09, df19):
 
 def clean_csd_pprr():
     return (
-        pd.read_csv(dirk.data("raw/slidell_pd/slidell_csd_pprr_2010_2019.csv"))
+        pd.read_csv(bolo.data("raw/slidell_pd/slidell_csd_pprr_2010_2019.csv"))
         .dropna(how="all")
         .pipe(clean_column_names)
         .rename(
@@ -270,10 +270,10 @@ if __name__ == "__main__":
     # df09 = clean_pprr_09()
     # df19 = clean_pprr_19()
     df_csd = clean_csd_pprr()
-    # df09.to_csv(dirk.data(
+    # df09.to_csv(bolo.data(
     #     'clean/pprr_slidell_pd_2009.csv'
     # ), index=False)
-    # df19.to_csv(dirk.data(
+    # df19.to_csv(bolo.data(
     #     'clean/pprr_slidell_pd_2019.csv'
     # ), index=False)
-    df_csd.to_csv(dirk.data("clean/pprr_slidell_csd_2010_2019.csv"), index=False)
+    df_csd.to_csv(bolo.data("clean/pprr_slidell_csd_2010_2019.csv"), index=False)

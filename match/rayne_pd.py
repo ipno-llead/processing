@@ -1,7 +1,7 @@
 import pandas as pd
 from datamatch import ThresholdMatcher, JaroWinklerSimilarity, ColumnsIndex
 
-import dirk
+import bolo
 from lib.post import extract_events_from_post, load_for_agency
 
 
@@ -25,7 +25,7 @@ def extract_post_events(pprr, post):
     )
     decision = 0.981
     matcher.save_pairs_to_excel(
-        dirk.data("match/pprr_rayne_pd_2010_2020_v_post_pprr_2020_11_06.xlsx"),
+        bolo.data("match/pprr_rayne_pd_2010_2020_v_post_pprr_2020_11_06.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
@@ -34,10 +34,10 @@ def extract_post_events(pprr, post):
 
 
 if __name__ == "__main__":
-    pprr = pd.read_csv(dirk.data("clean/pprr_rayne_pd_2010_2020.csv"))
+    pprr = pd.read_csv(bolo.data("clean/pprr_rayne_pd_2010_2020.csv"))
     agency = pprr.agency[0]
     post = load_for_agency(agency)
     post_event = extract_post_events(pprr, post)
     post_event.to_csv(
-        dirk.data("match/post_event_rayne_pd_2020_11_06.csv"), index=False
+        bolo.data("match/post_event_rayne_pd_2020_11_06.csv"), index=False
     )

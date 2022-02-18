@@ -1,5 +1,5 @@
 from datamatch import JaroWinklerSimilarity, ThresholdMatcher, ColumnsIndex
-import dirk
+import bolo
 from lib.post import extract_events_from_post, load_for_agency
 import pandas as pd
 
@@ -24,7 +24,7 @@ def extract_post_events(pprr, post):
     )
     decision = 0.95
     matcher.save_pairs_to_excel(
-        dirk.data("match/pprr_bossier_city_pd_v_post_2016_2019.xlsx"), decision
+        bolo.data("match/pprr_bossier_city_pd_v_post_2016_2019.xlsx"), decision
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
     return extract_events_from_post(post, matches, "Bossier City PD")
@@ -50,7 +50,7 @@ def match_cprr_with_pprr(cprr, pprr):
     )
     decision = 0.81
     matcher.save_pairs_to_excel(
-        dirk.data(
+        bolo.data(
             "match/cprr_bossier_city_pd_2020_2014_v_pprr_bossier_city_pd_2009_2020.xlsx"
         ),
         decision,
@@ -63,10 +63,10 @@ def match_cprr_with_pprr(cprr, pprr):
 
 
 if __name__ == "__main__":
-    cprr = pd.read_csv(dirk.data("clean/cprr_bossier_city_pd_2020.csv"))
-    pprr = pd.read_csv(dirk.data("clean/pprr_bossier_city_pd_2000_2019.csv"))
+    cprr = pd.read_csv(bolo.data("clean/cprr_bossier_city_pd_2020.csv"))
+    pprr = pd.read_csv(bolo.data("clean/pprr_bossier_city_pd_2000_2019.csv"))
     agency = cprr.agency[0]
     post = load_for_agency(agency)
     cprr = match_cprr_with_pprr(cprr, pprr)
     post_event = extract_post_events(pprr, post)
-    post_event.to_csv(dirk.data("match/post_event_bossier_city_pd.csv"), index=False)
+    post_event.to_csv(bolo.data("match/post_event_bossier_city_pd.csv"), index=False)

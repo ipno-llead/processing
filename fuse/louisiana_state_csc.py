@@ -1,4 +1,4 @@
-import dirk
+import bolo
 from lib.columns import rearrange_appeal_hearing_columns, rearrange_event_columns
 from lib.personnel import fuse_personnel
 from lib import events
@@ -61,18 +61,18 @@ def fuse_events(lprr, pprr, pprr_term):
 
 
 if __name__ == "__main__":
-    lprr = pd.read_csv(dirk.data("match/lprr_louisiana_state_csc_1991_2020.csv"))
-    pprr = pd.read_csv(dirk.data("clean/pprr_demo_louisiana_csd_2021.csv"))
-    pprr_term = pd.read_csv(dirk.data("clean/pprr_term_louisiana_csd_2021.csv"))
+    lprr = pd.read_csv(bolo.data("match/lprr_louisiana_state_csc_1991_2020.csv"))
+    pprr = pd.read_csv(bolo.data("clean/pprr_demo_louisiana_csd_2021.csv"))
+    pprr_term = pd.read_csv(bolo.data("clean/pprr_term_louisiana_csd_2021.csv"))
     post_event = pd.read_csv(
-        dirk.data("match/post_event_louisiana_state_police_2020.csv")
+        bolo.data("match/post_event_louisiana_state_police_2020.csv")
     )
     per_df = fuse_personnel(pprr, pprr_term, lprr)
     event_df = rearrange_event_columns(
         pd.concat([post_event, fuse_events(lprr, pprr, pprr_term)])
     )
-    per_df.to_csv(dirk.data("fuse/per_louisiana_state_police.csv"), index=False)
-    event_df.to_csv(dirk.data("fuse/event_louisiana_state_police.csv"), index=False)
+    per_df.to_csv(bolo.data("fuse/per_louisiana_state_police.csv"), index=False)
+    event_df.to_csv(bolo.data("fuse/event_louisiana_state_police.csv"), index=False)
     rearrange_appeal_hearing_columns(lprr).to_csv(
-        dirk.data("fuse/app_louisiana_state_police.csv"), index=False
+        bolo.data("fuse/app_louisiana_state_police.csv"), index=False
     )

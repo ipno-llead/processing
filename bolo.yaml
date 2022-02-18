@@ -1,9 +1,9 @@
 dataDir: data
 patterns:
   inputs:
-    - pd.read_csv(dirk.data(r'.+\.csv'))
+    - pd.read_csv(bolo.data(r'.+\.csv'))
   outputs:
-    - "`*`.to_csv(dirk.data(r'.+\\.csv'))"
+    - "`*`.to_csv(bolo.data(r'.+\\.csv'))"
 stages:
   - name: clean
     ignoredOutputs:

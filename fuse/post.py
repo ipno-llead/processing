@@ -1,5 +1,5 @@
 import pandas as pd
-import dirk
+import bolo
 from lib.personnel import fuse_personnel
 from lib.columns import rearrange_personnel_columns
 from lib.columns import rearrange_event_columns
@@ -29,10 +29,10 @@ def fuse_events(post):
 
 
 if __name__ == "__main__":
-    post = pd.read_csv(dirk.data("clean/pprr_post_2020_11_06.csv"))
+    post = pd.read_csv(bolo.data("clean/pprr_post_2020_11_06.csv"))
     event_df = fuse_events(post)
     event_df = rearrange_event_columns(event_df)
     per_df = fuse_personnel(post)
     per_df = rearrange_personnel_columns(per_df)
-    event_df.to_csv(dirk.data("fuse/events_post.csv"), index=False)
-    per_df.to_csv(dirk.data("fuse/per_post.csv"), index=False)
+    event_df.to_csv(bolo.data("fuse/events_post.csv"), index=False)
+    per_df.to_csv(bolo.data("fuse/per_post.csv"), index=False)

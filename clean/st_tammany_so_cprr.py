@@ -1,5 +1,5 @@
 from lib.columns import clean_column_names
-import dirk
+import bolo
 from lib.clean import split_names, float_to_int_str, clean_names
 from lib.uid import gen_uid
 import pandas as pd
@@ -24,7 +24,7 @@ def pad_dept_code(df):
 
 def assign_department_desc(df):
     dept_df = pd.read_csv(
-        dirk.data("raw/st_tammany_so/st_tammany_department_codes_tabula.csv")
+        bolo.data("raw/st_tammany_so/st_tammany_department_codes_tabula.csv")
     )
     dept_df = clean_column_names(dept_df)
     dept_df.loc[:, "loc"] = dept_df.loc[:, "loc"].str.replace(r"\*$", "", regex=True)
@@ -68,10 +68,10 @@ def clean():
     df = pd.concat(
         [
             pd.read_csv(
-                dirk.data("raw/st_tammany_so/st_tammany_so_cprr_2011-2020_tabula.csv")
+                bolo.data("raw/st_tammany_so/st_tammany_so_cprr_2011-2020_tabula.csv")
             ),
             pd.read_csv(
-                dirk.data("raw/st_tammany_so/st_tammany_so_cprr_2020-2021_tabula.csv")
+                bolo.data("raw/st_tammany_so/st_tammany_so_cprr_2020-2021_tabula.csv")
             ),
         ]
     )
@@ -106,4 +106,4 @@ def clean():
 
 if __name__ == "__main__":
     df = clean()
-    df.to_csv(dirk.data("clean/cprr_st_tammany_so_2011_2021.csv"), index=False)
+    df.to_csv(bolo.data("clean/cprr_st_tammany_so_2011_2021.csv"), index=False)

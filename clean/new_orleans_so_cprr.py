@@ -1,6 +1,6 @@
 import pandas as pd
 from lib.columns import clean_column_names, set_values
-import dirk
+import bolo
 from lib.clean import clean_names, float_to_int_str, standardize_desc_cols
 from lib.uid import gen_uid
 from lib.standardize import standardize_from_lookup_table
@@ -842,7 +842,7 @@ def add_left_reason_column(df):
 
 def clean19():
     df = pd.read_csv(
-        dirk.data("raw/new_orleans_so/new_orleans_so_cprr_2019_tabula.csv")
+        bolo.data("raw/new_orleans_so/new_orleans_so_cprr_2019_tabula.csv")
     )
     df = clean_column_names(df)
     df = (
@@ -923,7 +923,7 @@ def clean19():
 
 def clean20():
     df = pd.read_csv(
-        dirk.data("raw/new_orleans_so/new_orleans_so_cprr_2020.csv")
+        bolo.data("raw/new_orleans_so/new_orleans_so_cprr_2020.csv")
     ).dropna(how="all")
     df = clean_column_names(df)
     df = (
@@ -1002,5 +1002,5 @@ def clean20():
 if __name__ == "__main__":
     df19 = clean19()
     df20 = clean20()
-    df19.to_csv(dirk.data("clean/cprr_new_orleans_so_2019.csv"), index=False)
-    df20.to_csv(dirk.data("clean/cprr_new_orleans_so_2020.csv"), index=False)
+    df19.to_csv(bolo.data("clean/cprr_new_orleans_so_2019.csv"), index=False)
+    df20.to_csv(bolo.data("clean/cprr_new_orleans_so_2020.csv"), index=False)

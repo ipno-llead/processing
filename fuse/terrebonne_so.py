@@ -1,5 +1,5 @@
 import pandas as pd
-import dirk
+import bolo
 from lib import events
 from lib.columns import rearrange_allegation_columns
 from lib.personnel import fuse_personnel
@@ -50,12 +50,12 @@ def fuse_events(cprr, post):
 
 
 if __name__ == "__main__":
-    cprr = pd.read_csv(dirk.data("clean/cprr_terrebonne_so_2019_2021.csv"))
+    cprr = pd.read_csv(bolo.data("clean/cprr_terrebonne_so_2019_2021.csv"))
     agency = cprr.agency[0]
     post = load_for_agency(agency)
     per = fuse_personnel(cprr, post)
     com = rearrange_allegation_columns(cprr)
     event = fuse_events(cprr, post)
-    event.to_csv(dirk.data("fuse/event_terrebonne_so.csv"), index=False)
-    com.to_csv(dirk.data("fuse/com_terrebonne_so.csv"), index=False)
-    per.to_csv(dirk.data("fuse/per_terrebonne_so.csv"), index=False)
+    event.to_csv(bolo.data("fuse/event_terrebonne_so.csv"), index=False)
+    com.to_csv(bolo.data("fuse/com_terrebonne_so.csv"), index=False)
+    per.to_csv(bolo.data("fuse/per_terrebonne_so.csv"), index=False)

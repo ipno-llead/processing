@@ -6,7 +6,7 @@ from datamatch import (
     StringSimilarity,
 )
 
-import dirk
+import bolo
 from lib.uid import gen_uid
 from lib.post import load_for_agency
 
@@ -24,7 +24,7 @@ def match_cprr_codebook(cprr, cb):
     decision = 0.541
     lower_bound = 0.5
     matcher.save_pairs_to_excel(
-        dirk.data("match/shreveport_pd_cprr_2018_2019_v_codebook.xlsx"),
+        bolo.data("match/shreveport_pd_cprr_2018_2019_v_codebook.xlsx"),
         decision,
         lower_bound=lower_bound,
     )
@@ -55,7 +55,7 @@ def match_cprr_post(cprr, post):
     )
     decision = 0.95
     matcher.save_pairs_to_excel(
-        dirk.data("match/shreveport_pd_cprr_2018_2019_v_post_pprr_2020_11_06.xlsx"),
+        bolo.data("match/shreveport_pd_cprr_2018_2019_v_post_pprr_2020_11_06.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(decision)
@@ -66,13 +66,13 @@ def match_cprr_post(cprr, post):
 
 
 if __name__ == "__main__":
-    cprr = pd.read_csv(dirk.data("clean/cprr_shreveport_pd_2018_2019.csv"))
+    cprr = pd.read_csv(bolo.data("clean/cprr_shreveport_pd_2018_2019.csv"))
     agency = cprr.agency[0]
     post = load_for_agency(agency)
-    cb = pd.read_csv(dirk.data("clean/cprr_codebook_shreveport_pd.csv"))
+    cb = pd.read_csv(bolo.data("clean/cprr_codebook_shreveport_pd.csv"))
     cprr = match_cprr_codebook(cprr, cb).pipe(
         gen_uid, ["agency", "tracking_number", "allegation"], "allegation_uid"
     )
     cprr = match_cprr_post(cprr, post)
 
-    cprr.to_csv(dirk.data("match/cprr_shreveport_pd_2018_2019.csv"), index=False)
+    cprr.to_csv(bolo.data("match/cprr_shreveport_pd_2018_2019.csv"), index=False)

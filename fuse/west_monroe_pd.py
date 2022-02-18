@@ -1,6 +1,6 @@
 import pandas as pd
 
-import dirk
+import bolo
 from lib.columns import (
     rearrange_allegation_columns,
     rearrange_personnel_columns,
@@ -47,16 +47,16 @@ def fuse_events(cprr, pprr):
 
 
 if __name__ == "__main__":
-    pprr = pd.read_csv(dirk.data("clean/pprr_west_monroe_pd_2015_2020.csv"))
-    cprr = pd.read_csv(dirk.data("clean/cprr_west_monroe_pd_2020.csv"))
+    pprr = pd.read_csv(bolo.data("clean/pprr_west_monroe_pd_2015_2020.csv"))
+    cprr = pd.read_csv(bolo.data("clean/cprr_west_monroe_pd_2020.csv"))
     post_event = pd.read_csv(
-        dirk.data("match/post_event_west_monroe_pd_2020_11_06.csv")
+        bolo.data("match/post_event_west_monroe_pd_2020_11_06.csv")
     )
     per_df = rearrange_personnel_columns(pprr)
     com_df = rearrange_allegation_columns(cprr)
     events_df = rearrange_event_columns(
         pd.concat([fuse_events(cprr, pprr), post_event])
     )
-    per_df.to_csv(dirk.data("fuse/per_west_monroe_pd.csv"), index=False)
-    com_df.to_csv(dirk.data("fuse/com_west_monroe_pd.csv"), index=False)
-    events_df.to_csv(dirk.data("fuse/event_west_monroe_pd.csv"), index=False)
+    per_df.to_csv(bolo.data("fuse/per_west_monroe_pd.csv"), index=False)
+    com_df.to_csv(bolo.data("fuse/com_west_monroe_pd.csv"), index=False)
+    events_df.to_csv(bolo.data("fuse/event_west_monroe_pd.csv"), index=False)

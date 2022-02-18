@@ -1,5 +1,5 @@
 import pandas as pd
-import dirk
+import bolo
 from lib.columns import clean_column_names, set_values
 from lib.clean import clean_names, standardize_desc_cols, clean_dates
 from lib.uid import gen_uid
@@ -7,7 +7,7 @@ from lib.uid import gen_uid
 
 def clean():
     df = (
-        pd.read_csv(dirk.data("raw/erath_pd/erath_pd_cprr_2018_2020_byhand.csv"))
+        pd.read_csv(bolo.data("raw/erath_pd/erath_pd_cprr_2018_2020_byhand.csv"))
         .pipe(clean_column_names)
         .pipe(clean_names, ["first_name", "last_name"])
         .pipe(standardize_desc_cols, ["initial_action", "action"])
@@ -23,4 +23,4 @@ def clean():
 
 if __name__ == "__main__":
     df = clean()
-    df.to_csv(dirk.data("clean/cprr_erath_pd_2018_2020.csv"), index=False)
+    df.to_csv(bolo.data("clean/cprr_erath_pd_2018_2020.csv"), index=False)

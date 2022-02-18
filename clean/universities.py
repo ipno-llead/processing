@@ -1,5 +1,5 @@
 import pandas as pd
-import dirk
+import bolo
 
 
 def extract_lsu_roster(df):
@@ -159,7 +159,7 @@ def clean_agency(df):
 
 
 def clean():
-    df = pd.read_csv(dirk.data("raw/universities/pprr_post_2020_11_06.csv"))
+    df = pd.read_csv(bolo.data("raw/universities/pprr_post_2020_11_06.csv"))
     df = df.pipe(extract_lsu_roster).pipe(clean_agency)
     return df
 
@@ -167,4 +167,4 @@ def clean():
 if __name__ == "__main__":
     df = clean()
 
-    df.to_csv(dirk.data("clean/pprr_universities.csv"), index=False)
+    df.to_csv(bolo.data("clean/pprr_universities.csv"), index=False)
