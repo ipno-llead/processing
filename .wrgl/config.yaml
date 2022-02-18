@@ -472,11 +472,11 @@ remote:
     fetch:
       - +refs/heads/*:refs/remotes/event-erath-pd*
   event-st-landry-so:
-    url: https://hub.wrgl.co/api/users/ipno/repos/st-landry-so
+    url: https://hub.wrgl.co/api/users/ipno/repos/event-st-landry-so
     fetch:
       - +refs/heads/*:refs/remotes/event-st-landry-so/*
   event-benton-pd:
-    url: https://hub.wrgl.co/api/users/ipno/repos/benton-pd
+    url: https://hub.wrgl.co/api/users/ipno/repos/event-benton-pd
     fetch:
       - +refs/heads/*:refs/remotes/event-benton-pd/*
   event-eunice-pd:
