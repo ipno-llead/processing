@@ -14,4 +14,4 @@ requests==2.26.0
 wrgl==0.7.3.1
 flake8==4.0.1
 black==21.12b0
-bolo==0.0.1
+bolo==0.0.2
