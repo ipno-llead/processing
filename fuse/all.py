@@ -167,6 +167,7 @@ def fuse_allegation():
                 pd.read_csv(bolo.data("fuse/com_maurice_pd.csv")),
                 pd.read_csv(bolo.data("fuse/com_terrebonne_so.csv")),
                 pd.read_csv(bolo.data("fuse/com_acadia_so.csv")),
+                pd.read_csv(bolo.data("fuse/com_rayne_pd.csv")),
                 pd.read_csv(bolo.data("fuse/com_west_monroe_pd.csv")),
                 pd.read_csv(bolo.data("fuse/com_erath_pd.csv")),
                 pd.read_csv(bolo.data("fuse/com_st_landry_so.csv")),

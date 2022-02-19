@@ -1,0 +1,284 @@
+{
+  "new_orleans_harbor_pd": [
+    "https://www.dropbox.com/s/oijixpqskkbm63k/new_orleans_harbor_pd_pprr_1991-2008.csv?dl=1",
+    "https://www.dropbox.com/s/9orpa67xwfuheia/new_orleans_harbor_pd_pprr_2020.csv?dl=1",
+    "https://www.dropbox.com/s/37ghr57lpq8d5tw/new_orleans_harbor_pd_cprr_2014-2020.csv?dl=1"
+  ],
+  "new_orleans_csd": [
+    "https://www.dropbox.com/sh/ymvc81kjfqqv9m6/AADoEpTWUNef0AMH5GaZxMPea/New%20Orleans_CSD_PPRR_2009_realigned.csv?dl=1",
+    "https://www.dropbox.com/sh/nv366qnl1vmhgny/AABVFv9T2bwTOI0XuHULfbD-a/Data%20Collected/New%20Orleans%20Civil%20Service%20Department/Administrative%20Data/New%20Orleans_CSD_PPRR_2014.csv?dl=1"
+  ],
+  "new_orleans_da": [
+    "https://www.dropbox.com/s/gyalu2tgut5ya2w/new_orleans_da_cprr_2021_brady.csv?dl=1"
+  ],
+  "baton_rouge_pd": [
+    "https://www.dropbox.com/s/90wrz84hmmpmrxv/Baton%20Rouge_PD_CPRR_2018.csv?dl=1",
+    "https://www.dropbox.com/s/oco6pc2hf9zoe07/baton_rouge_pd_pprr_2021.csv?dl=1",
+    "https://www.dropbox.com/s/t24wgq7pdrcklxa/baton_rouge_pd_cprr_2021.csv?dl=1"
+  ],
+  "baton_rouge_csd": [
+    "https://www.dropbox.com/sh/rc4a4961qqxu0co/AAATpIeZNzv0NJlzfSFOJKqZa/Data%20Collected/Baton%20Rouge%20Civil%20Service%20Department/Baton%20Rouge_CSD_PPRR_2017.csv?dl=1",
+    "https://www.dropbox.com/sh/rc4a4961qqxu0co/AADEvr8QN4RVb7Gb_xSyT934a/Data%20Collected/Baton%20Rouge%20Civil%20Service%20Department/Baton%20Rouge_CSD_PPRR_2019.csv?dl=1"
+  ],
+  "baton_rouge_fpcsb": [
+    "https://www.dropbox.com/sh/qihmr1a6wiswr6f/AAAwyYt429HSaOO6ZlNeNQsca/Baton_Rouge_FPCSB_Logs_1992-2012.csv?dl=1"
+  ],
+  "baton_rouge_so": [
+    "https://www.dropbox.com/s/aa8gwwebqfcmbp9/Baton_Rouge_SO_CPRR_2018.csv?dl=1",
+    "https://www.dropbox.com/s/ntxarlgwzlqoms9/baton_rouge_so_cprr_2016-2020.csv?dl=1",
+    "https://www.dropbox.com/s/ceayy4p7ne1egew/east_baton_rouge_booking_log_2020.csv?dl=1"
+  ],
+  "louisiana_state_csc": [
+    "https://www.dropbox.com/sh/9zndy2dz3w60etq/AAAqcTxDk8GVj3uvQbUto3XBa/Log%20Records/LouisianaState_CSC_LPRR_1991-2020.csv?dl=1",
+    "https://www.dropbox.com/s/eidur1nb3od5l55/la_lprr_appellants.csv?dl=1"
+  ],
+  "louisiana_csd": [
+    "https://www.dropbox.com/sh/afmp68wb09jbtif/AABIYkrTYK_-pASqMf5Ysibya/louisiana_csd_pprr_demographics_2021.csv?dl=1",
+    "https://www.dropbox.com/sh/afmp68wb09jbtif/AACTN6MNEjsp6sAs5_zCbUhKa/louisiana_csd_pprr_terminations_2021.csv?dl=1"
+  ],
+  "brusly_pd": [
+    "https://www.dropbox.com/sh/s3qchv84i0j5tsd/AAAx1lt_f2iqEERkEjK7wj2_a/Complaints%20Data/Brusly_PD_CPRR_2020.csv?dl=1",
+    "https://www.dropbox.com/sh/0t6dvicvhztbtya/AAACRW8-Smg0C7TdfMHtHUxua/Brusly_PD_PPRR_2020.csv?dl=1",
+    "https://www.dropbox.com/sh/rfvtxt3dw204mu0/AAAPRhyKNsN6k0T7khmtxhP2a/brusly_pd_awards_2015-2020_byhand.csv?dl=1"
+  ],
+  "post_council": [
+    "https://www.dropbox.com/s/vzm4ihad72pkw2b/POST_PPRR_11-6-2020.csv?dl=1",
+    "https://www.dropbox.com/s/uodxkhiyhhsmv2r/post_decertifications_2016_2019.csv?dl=1"
+  ],
+  "port_allen_pd": [
+    "https://www.dropbox.com/sh/8zs58ak2rpah9iu/AABUS6JdCHYyvjXWWk--RtGLa/Port_Allen_CPRR_2017-2018_byhand.csv?dl=1",
+    "https://www.dropbox.com/sh/8zs58ak2rpah9iu/AAC6iWLPwTHpXGr6NvEBNzgQa/Port_Allen_CPRR_2019.csv?dl=1",
+    "https://www.dropbox.com/s/db3fncb1j9tfz4p/Port_Allen_CPRR_2015-2016_byhand.csv?dl=1"
+  ],
+  "port_allen_csd": [
+    "https://www.dropbox.com/sh/5znysznypatmig0/AAD4gXEXXJMxnxNcK-TocbPDa/Port_Allen_CSD_PPRR_2020.csv?dl=1"
+  ],
+  "baton_rouge_da": [
+    "https://www.dropbox.com/sh/vdpyhf3lbi7lxy9/AAB_Qc3S4usW8QMatRXimi_za/Baton_Rouge_DA_CPRR_2021.csv?dl=1"
+  ],
+  "ipm": [
+    "https://www.dropbox.com/sh/1zdvf08kjarefyf/AACXnVrPKERs0F5Hs4c9_3GUa/new_orleans_IAPRO_PPRR_1946-2018.csv?dl=1",
+    "https://www.dropbox.com/sh/1zdvf08kjarefyf/AAD1_AaJAU5_6Vk8nMMspO0_a/new_orleans_PD_CPRR_actions_taken_1931-2020.csv?dl=1",
+    "https://www.dropbox.com/sh/1zdvf08kjarefyf/AAB-HhVpDXo0sUazVJvNd7soa/new_orleans_PD_CPRR_allegations_1931-2020.csv?dl=1",
+    "https://www.dropbox.com/sh/1zdvf08kjarefyf/AADcG1KGz9dJ-OovJ2GrFt_za/new_orleans_PD_PPRR_1946-2018.csv?dl=1",
+    "https://www.dropbox.com/sh/1zdvf08kjarefyf/AACJmVSIiBlUL5j8cFa8-RuJa/new_orleans_PD_use_of_force_2012-2019.csv?dl=1",
+    "https://www.dropbox.com/s/zhedsrle8itb2eh/missing_dates_8_6_2021.csv?dl=1",
+    "https://www.dropbox.com/s/wyqzauow1bd416z/new_orleans_pd_commendations_2016_2021.csv?dl=1",
+    "https://www.dropbox.com/s/dnroduov6dnj5o3/job_code_description_list.csv?dl=1",
+    "https://www.dropbox.com/s/if0g2l5muaccegt/new_orleans_so_charges_2015_2021.csv?dl=1",
+    "https://www.dropbox.com/s/3nnvwsedqifwpoc/new_orleans_so_bookings_2015_2021.CSV?dl=1",
+    "https://www.dropbox.com/s/wajwv8qab6bsvwm/new_orleans_pd_stop_and_search_2007_2021.csv?dl=1"
+  ],
+  "new_orleans_so": [
+    "https://www.dropbox.com/sh/dsrzc28teybtf4q/AAAq2PQtK_cM5Mt3PpknAoMOa/new_orleans_so_cprr_2019_tabula.csv?dl=1",
+    "https://www.dropbox.com/s/dojgzfdfjw84c0s/new_orleans_so_cprr_2020.csv?dl=1",
+    "https://www.dropbox.com/s/zkm1hch1scxez37/new_orleans_so_pprr_2021.csv?dl=1"
+  ],
+  "greenwood_pd": [
+    "https://www.dropbox.com/sh/9yu4fe2z6xuwnaf/AAALIGMiq95b2ZylzxFcUdqga/greenwood_pd_cprr_2015-2020_byhand.csv?dl=1"
+  ],
+  "st_tammany_so": [
+    "https://www.dropbox.com/sh/mwabzn85manxzo6/AACR-N1crrGx43ZJ2CYdtqUSa/St.Tammany_SO_CPRR_Lists_2015-2019_tabula.csv?dl=1",
+    "https://www.dropbox.com/sh/mwabzn85manxzo6/AACgbqjIwVL3XetaFcQHo-e5a/st_tammany_department_codes_tabula.csv?dl=1",
+    "https://www.dropbox.com/s/ir4jad3jm13n6se/st_tammany_so_cprr_2011-2020_tabula.csv?dl=1",
+    "https://www.dropbox.com/s/gd3a5638dbh7kmq/st_tammany_so_cprr_2020-2021_tabula.csv?dl=1",
+    "https://www.dropbox.com/s/j20pcmebe97ql7y/st._tammany_so_pprr_2020.csv?dl=1"
+  ],
+  "plaquemines_so": [
+    "https://www.dropbox.com/s/g1b98kn4e4k1dtr/plaquemines_so_cprr_2019.csv?dl=1",
+    "https://www.dropbox.com/s/0blyx05qcb0lbyw/plaqumines_so_pprr_2018.csv?dl=1",
+    "https://www.dropbox.com/s/8sepx73e2lxh53a/plaquemines_so_cprr_2016_2020.csv?dl=1"
+  ],
+  "caddo_parish_so": [
+    "https://www.dropbox.com/sh/8w4uff2emzbhcvr/AAC4YdwWdPudXeH4pdDvl-Fpa/Caddo%20Parish_SO_PPRR_2020.csv?dl=1"
+  ],
+  "levee_pd": [
+    "https://www.dropbox.com/sh/d1j6djl9jb7jvx3/AADgCrm6xbUHZJ0ATwfwZp2Ga/Log%20Records/levee_pd_cprr_2019.csv?dl=1",
+    "https://www.dropbox.com/sh/d1j6djl9jb7jvx3/AAB5DDSmd4Uo247gktnG3A9Za/Log%20Records/levee_pd_cprr_2020.csv?dl=1"
+  ],
+  "kenner_pd": [
+    "https://www.dropbox.com/sh/x1b2ve5ei3mod94/AACL1pMApTujHaUfooMPKoBEa/Kenner_PD_PPRR_2020.csv?dl=1",
+    "https://www.dropbox.com/sh/x1b2ve5ei3mod94/AADd22L9dZyWKXnxzCHxT-Oqa/Kenner_PD_PPRR_FormerEmployees_Long.csv?dl=1",
+    "https://www.dropbox.com/sh/x1b2ve5ei3mod94/AAA6YD5qjTmc8iL8ccq5mQZSa/Kenner_PD_PPRR_FormerEmployees_Short.csv?dl=1",
+    "https://www.dropbox.com/s/9w9ykqrsqivuiz3/kenner_pd_uof_2005_2021.csv?dl=1"
+  ],
+  "harahan_csd": [
+    "https://www.dropbox.com/s/kgiidkew18odd7m/Harahan_CSD_PPRR_Roster%20by%20Employment%20Status_2020.csv?dl=1",
+    "https://www.dropbox.com/s/r60o45dmuqpbnke/Harahan_CSD_PRRR_Roster%20by%20Employment%20Date_2020.csv?dl=1"
+  ],
+  "harahan_pd": [
+    "https://www.dropbox.com/s/e95kg68746ndcg9/Harahan_PD_PPRR_2020.csv?dl=1"
+  ],
+  "gretna_pd": [
+    "https://www.dropbox.com/s/qr92icxpgtcdcb4/Gretna_PD_PPRR_2018.csv?dl=1"
+  ],
+  "vivian_csd": [
+    "https://www.dropbox.com/sh/9wlhj0groq8eg84/AADaXj3Lr0WgxA4Vu8jelRjja/vivian_csd_pprr_2021.csv?dl=1"
+  ],
+  "covington_pd": [
+    "https://www.dropbox.com/s/tsqrq5gf19s96p2/covington_pd_actions_history.csv?dl=1",
+    "https://www.dropbox.com/sh/ngj8aygmmgqy2dg/AADa8X7eSd72sbsglvwO0DlWa/covington_pd_pprr_2010.csv?dl=1",
+    "https://www.dropbox.com/sh/ngj8aygmmgqy2dg/AADYcp9Z9-X_09E9PhYApvLfa/covington_pd_pprr_2011.csv?dl=1",
+    "https://www.dropbox.com/sh/ngj8aygmmgqy2dg/AADoPfUKgD386icBjXbW_weca/covington_pd_pprr_2012.csv?dl=1",
+    "https://www.dropbox.com/sh/ngj8aygmmgqy2dg/AAA61eg4XA8B6XGsJmzmr8v9a/covington_pd_pprr_2013.csv?dl=1",
+    "https://www.dropbox.com/sh/ngj8aygmmgqy2dg/AAC_1x7oC4Ps85x2070f0jXQa/covington_pd_pprr_2014.csv?dl=1",
+    "https://www.dropbox.com/sh/ngj8aygmmgqy2dg/AADpsk9XZBFJMLXDnofR_Wdla/covington_pd_pprr_2015.csv?dl=1",
+    "https://www.dropbox.com/sh/ngj8aygmmgqy2dg/AADhl3wSmQdV50QMpfn6aFcha/covington_pd_pprr_2016.csv?dl=1",
+    "https://www.dropbox.com/sh/ngj8aygmmgqy2dg/AADhEHTt8tHg2XCWzKUhssDMa/covington_pd_pprr_2017.csv?dl=1",
+    "https://www.dropbox.com/sh/ngj8aygmmgqy2dg/AAAz131JwVZwh74pq8U1nSFza/covington_pd_pprr_2018.csv?dl=1",
+    "https://www.dropbox.com/sh/ngj8aygmmgqy2dg/AACQhE7V_m8g9-q-UKEq8B8Ka/covington_pd_pprr_2019.csv?dl=1",
+    "https://www.dropbox.com/sh/ngj8aygmmgqy2dg/AAAfzXvjWo2j3W-Ke9OjomZia/covington_pd_pprr_2020.csv?dl=1",
+    "https://www.dropbox.com/sh/ngj8aygmmgqy2dg/AAAPr3m_zEV1FTeoK2EbfBu3a/covington_pd_pprr_2021.csv?dl=1"
+  ],
+  "scott_pd": [
+    "https://www.dropbox.com/s/a0fw6b3a6505eoi/scott_pd_cprr_2020.csv?dl=1",
+    "https://www.dropbox.com/s/9xstfdrq7h39cqy/scott_pd_pprr_2021.csv?dl=1",
+    "https://www.dropbox.com/s/zlqwausvmzrsj5r/scott_pd_cprr_2009_2014.csv?dl=1"
+  ],
+  "slidell_pd": [
+    "https://www.dropbox.com/s/1z09ujt4ja3b4wx/Slidell_PD_PPRR_2009.csv?dl=1",
+    "https://www.dropbox.com/s/ejgypovnab90z0p/Slidell_PD_PPRR_2019.csv?dl=1",
+    "https://www.dropbox.com/s/o5t1nm24hdct2zo/slidell_csd_pprr_2010_2019.csv?dl=1"
+  ],
+  "shreveport_pd": [
+    "https://www.dropbox.com/sh/d1z41ep6gpmys0d/AABJCO_ZpZF4t3-qahiI6plTa/shreveport_pd_cprr_dispositions_2018.csv?dl=1",
+    "https://www.dropbox.com/sh/d1z41ep6gpmys0d/AADRaYJj_kFnNZFwpYeYG8Oea/shreveport_pd_cprr_dispositions_2019.csv?dl=1",
+    "https://www.dropbox.com/sh/d1z41ep6gpmys0d/AADm2ePXquTLK0QkQZUYAsPoa/shreveport_pd_cprr_names_2018.csv?dl=1",
+    "https://www.dropbox.com/sh/d1z41ep6gpmys0d/AAAeN5dqSyb2woW-B9GTfbXta/shreveport_pd_cprr_names_2019.csv?dl=1",
+    "https://www.dropbox.com/s/q4etm3yafloqy84/shreveport_codebook.csv?dl=1"
+  ],
+  "tangipahoa_so": [
+    "https://www.dropbox.com/s/x034pjdzxamt3zk/tangipahoa_so_cprr_2015_2021.csv?dl=1"
+  ],
+  "madisonville_pd": [
+    "https://www.dropbox.com/s/u43a9vfwp3hl99e/Madisonville_PD_CPRR_2010-2020_byhand.csv?dl=1",
+    "https://www.dropbox.com/s/57mvxvuh9pulalf/Madisonville_CSD_PPRR_2019.csv?dl=1",
+    "https://www.dropbox.com/s/wsqr83x4fhz5j51/Madisonville_CSD_PPRR_2020.csv?dl=1"
+  ],
+  "mandeville_pd": [
+    "https://www.dropbox.com/s/r65gv24wz7xl2ox/mandeville_pd_cprr_2019_byhand.csv?dl=1",
+    "https://www.dropbox.com/s/07kbandklabka5x/mandeville_csd_pprr_2020.csv?dl=1"
+  ],
+  "grand_isle": [
+    "https://www.dropbox.com/s/u5jh3bm14kgz3l0/grand_isle_pd_pprr_2021_byhand.csv?dl=1"
+  ],
+  "lafayette_so": [
+    "https://www.dropbox.com/s/4d9m1y5g4pnlmkj/lafayette_so_cprr_2015_2020.csv?dl=1",
+    "https://www.dropbox.com/s/czyj8gi55dv72jf/lafayette_so_cprr_2009_2014.csv?dl=1",
+    "https://www.dropbox.com/s/o28ta1m4j1abd84/lafayette_so_cprr_2006_2008.csv?dl=1"
+  ],
+  "ponchatoula_pd": [
+    "https://www.dropbox.com/s/z9qtvy40jcvk518/ponchatoula_pd_pprr_2010_2020.csv?dl=1",
+    "https://www.dropbox.com/s/6g60frvtbhvyp4n/ponchatoula_cprr_2010_2020.csv?dl=1"
+  ],
+  "lafayette_pd": [
+    "https://www.dropbox.com/s/mzanvltddi52lpw/lafayette_pd_cprr_2015_2020.csv?dl=1",
+    "https://www.dropbox.com/s/vea5bh178sn7vpu/lafayette_pd_pprr_2010_2021.csv?dl=1",
+    "https://www.dropbox.com/s/wccapsuqdi3gqwo/lafayette_pd_cprr_2009_2014.csv?dl=0"
+  ],
+  "hammond_pd": [
+    "https://www.dropbox.com/s/87adfuzla1rngtt/hammond_pd_cprr_2015_2020.csv?dl=1",
+    "https://www.dropbox.com/s/6vtokmaqb2bn9ar/hammond_pd_cprr_2009_2014.csv?dl=1",
+    "https://www.dropbox.com/s/lkwid7x4jc1vjnr/hammond_pd_cprr_2004_2008.csv?dl=1",
+    "https://www.dropbox.com/s/rsx0kl0idb5gb6s/hammond_pd_pprr_2021.csv?dl=1"
+  ],
+  "lake_charles_pd": [
+    "https://www.dropbox.com/s/xzd2pr1nozb01ux/lake_charles_pd_cprr_2020.csv?dl=1",
+    "https://www.dropbox.com/s/b2s5rbtz8u2hflb/lake_charles_pd_cprr_2014_2019.csv?dl=1",
+    "https://www.dropbox.com/s/03ewu8ytartw0rd/pprr_lake_charles_pd_2017_2021.csv?dl=1"
+  ],
+  "sterlington_pd": [
+    "https://www.dropbox.com/s/wdhdn7g97cid57i/sterlington_csd_ppprr_2010_2020.csv?dl=1"
+  ],
+  "youngsville_pd": [
+    "https://www.dropbox.com/s/wit4yp65a118mcr/youngsville_csd_pprr_2017.csv?dl=1",
+    "https://www.dropbox.com/s/1qu3dfpkhpbxk4g/youngsville_csd_pprr_2018.csv?dl=1",
+    "https://www.dropbox.com/s/sg4bn2irswdr087/youngsville_csd_pprr_2019.csv?dl=1"
+  ],
+  "west_monroe_pd": [
+    "https://www.dropbox.com/s/tjuwpmcpwpeegvt/west_monroe_pd_pprr_2015_2020.csv?dl=1",
+    "https://www.dropbox.com/s/6ornoalkrf0kxzh/cprr_west_monroe_pd_2020_byhand.csv?dl=1"
+  ],
+  "universities": [
+    "https://www.dropbox.com/s/f0m3ym4vvk66134/pprr_post_2020_11_06.csv?dl=1"
+  ],
+  "carencro_pd": [
+    "https://www.dropbox.com/s/1r90j1ebbzdzhfq/carencro_pd_pprr_2021.csv?dl=1"
+  ],
+  "new_orleans_csc": [
+    "https://www.dropbox.com/s/p4n5ykrdsg097ur/new_orleans_csc_lprr_2000_2016.csv?dl=1"
+  ],
+  "ouachita_da": [
+    "https://www.dropbox.com/s/as7meor55frymtg/ouachita_da_cprr_2021_by_hand.csv?dl=1"
+  ],
+  "district_attorney": [
+    "https://www.dropbox.com/s/f0m3ym4vvk66134/pprr_post_2020_11_06.csv?dl=1"
+  ],
+  "central_csd": [
+    "https://www.dropbox.com/s/fpjb9bwwtrmqiwa/central_csd_pprr_2014_2019.csv?dl=1"
+  ],
+  "tangipahoa_da": [
+    "https://www.dropbox.com/s/mdq1erm4fve4j2u/tangipahoa_da_brady_2021.csv?dl=1"
+  ],
+  "bossier_city_pd": [
+    "https://www.dropbox.com/s/d7b8qyuny4k6b19/BossierCity_PD_PPRR_2019.csv?dl=1",
+    "https://www.dropbox.com/s/tr4vscidvngthql/bossier_city_pd_pprr_2018.csv?dl=1",
+    "https://www.dropbox.com/s/fu2sjq8ssjhpq0j/bossier_city_pd_cprr_2020.csv?dl=1"
+  ],
+  "baker_pd": [
+    "https://www.dropbox.com/s/glr8zm8s0jk3lvg/baker_pd_cprr_2018_2020.csv?dl=1",
+    "https://www.dropbox.com/s/b16n7c14pevrjdz/baker_csd_pprr_2010_2020.csv?dl=1"
+  ],
+  "jefferson_so": [
+    "https://www.dropbox.com/s/pxwqqxxnh0b8zj5/jefferson_parish_so_pprr_2020.csv?dl=1"
+  ],
+  "vine": [
+    "https://www.dropbox.com/s/o7i9qx11f5kkz68/vine_urls.csv?dl=1"
+  ],
+  "houma_pd": [
+    "https://www.dropbox.com/s/xtsw70fuqii9zyf/houma_pd_cprr_2019_2021.csv?dl=1",
+    "https://www.dropbox.com/s/0puttgozb2pqcco/houma_pd_cprr_2017_2018.csv?dl=1"
+  ],
+  "gonzales_pd": [
+    "https://www.dropbox.com/s/tg4jwj0ac79r6ru/gonzales_pd_pprr_2010_2021.csv?dl=1"
+  ],
+  "denham_springs_pd": [
+    "https://www.dropbox.com/s/s0tir00eb6a2oxb/denham_springs_pd_cprr_2016_2021.csv?dl=1"
+  ],
+  "abbeville_pd": [
+    "https://www.dropbox.com/s/uqytp67ghkz9teg/abbeville_pd_cprr_2019_2021.csv?dl=1",
+    "https://www.dropbox.com/s/j1jabdejti0hmim/abbeville_pd_2015_2018.csv?dl=1"
+  ],
+  "washington_so": [
+    "https://www.dropbox.com/s/4vjjbainf1bqzo8/washington_so_cprr_2015_2020.csv?dl=1"
+  ],
+  "cameron_so": [
+    "https://www.dropbox.com/s/0go0mcak9blucmz/cameron_so_cprr_2020.csv?dl=1",
+    "https://www.dropbox.com/s/4v24k9oil4xytj8/cameron_so_cprr_2015_2019.csv?dl=1"
+  ],
+  "maurice_pd": [
+    "https://www.dropbox.com/s/62jpkscghtd2w1q/maurice_cprr_2020_2021_byhand.csv?dl=1"
+  ],
+  "terrebonne_so": [
+    "https://www.dropbox.com/s/7bewi8vdhl8tzu9/terrebonne_so_cprr_2019_2021_byhand.csv?dl=1"
+  ],
+  "acadia_so": [
+    "https://www.dropbox.com/s/702ykr7k0khl477/cprr_acadia_so_2018_2021.csv?dl=1"
+  ],
+  "rayne_pd": [
+    "https://www.dropbox.com/s/ag30aiyllpzbxjc/rayne_pd_cprr_2019_2020.csv?dl=1",
+    "https://www.dropbox.com/s/3j32f2qekl92x1v/rayne_pd_pprr_2010_2020.csv?dl=1"
+  ],
+  "erath_pd": [
+    "https://www.dropbox.com/s/3rag9yqq1xfciqq/erath_pd_cprr_2018_2020_byhand.csv?dl=1"
+  ],
+  "st_landry_so": [
+    "https://www.dropbox.com/s/fev3d7hycbginbf/st_landry_so_cprr_2019_2020.csv?dl=1"
+  ],
+  "benton_pd": [
+    "https://www.dropbox.com/s/spci5855oyaoamw/benton_pd_cprr_2015_2021_byhand.csv?dl=1"
+  ],
+  "eunice_pd": [
+    "https://www.dropbox.com/s/vogk226khgov0vk/eunice_pd_cprr_2019_2021.csv?dl=1"
+  ]
+}

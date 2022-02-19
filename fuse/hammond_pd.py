@@ -1,12 +1,13 @@
 import pandas as pd
 import bolo
+
 from lib import events
 from lib.personnel import fuse_personnel
-from lib.columns import rearrange_allegation_columns
+from lib.columns import rearrange_allegation_columns, rearrange_event_columns
 from lib.post import load_for_agency
 
 
-def fuse_events(cprr_20, cprr_14, cprr_08, post):
+def fuse_events(cprr_20, cprr_14, cprr_08, pprr):
     builder = events.Builder()
     builder.extract_events(
         cprr_20,
@@ -47,21 +48,11 @@ def fuse_events(cprr_20, cprr_14, cprr_08, post):
         ["uid", "allegation_uid"],
     )
     builder.extract_events(
-        post,
+        pprr,
         {
-            events.OFFICER_LEVEL_1_CERT: {
-                "prefix": "level_1_cert",
-                "parse_date": "%Y-%m-%d",
-                "keep": ["uid", "agency", "employement_status"],
-            },
-            events.OFFICER_PC_12_QUALIFICATION: {
-                "prefix": "last_pc_12_qualification",
-                "parse_date": "%Y-%m-%d",
-                "keep": ["uid", "agency", "employment status"],
-            },
             events.OFFICER_HIRE: {
                 "prefix": "hire",
-                "keep": ["uid", "agency", "employment_status"],
+                "keep": ["uid", "agency", "rank_desc", "salary", "salary_freq"],
             },
         },
         ["uid"],
@@ -73,11 +64,12 @@ if __name__ == "__main__":
     cprr_20 = pd.read_csv(bolo.data("match/cprr_hammond_pd_2015_2020.csv"))
     cprr_14 = pd.read_csv(bolo.data("match/cprr_hammond_pd_2009_2014.csv"))
     cprr_08 = pd.read_csv(bolo.data("clean/cprr_hammond_pd_2004_2008.csv"))
-    agency = cprr_08.agency[0]
-    post = load_for_agency(agency)
-    personnel_df = fuse_personnel(cprr_20, cprr_14, cprr_08, post)
+    post_event = pd.read_csv(bolo.data("match/post_event_hammond_pd_2020_11_06.csv"))
+    pprr = pd.read_csv(bolo.data("clean/pprr_hammond_pd_2021.csv"))
+    personnel_df = fuse_personnel(cprr_20, cprr_14, cprr_08, pprr)
     complaints_df = rearrange_allegation_columns(pd.concat([cprr_20, cprr_14, cprr_08]))
-    event_df = fuse_events(cprr_20, cprr_14, cprr_08, post)
+    event_df = fuse_events(cprr_20, cprr_14, cprr_08, pprr)
+    event_df = rearrange_event_columns(pd.concat([event_df, post_event]))
     event_df.to_csv(bolo.data("fuse/event_hammond_pd.csv"))
     personnel_df.to_csv(bolo.data("fuse/per_hammond_pd.csv"))
     complaints_df.to_csv(bolo.data("fuse/com_hammond_pd.csv"))

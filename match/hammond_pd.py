@@ -1,7 +1,8 @@
 import pandas as pd
 import bolo
 from datamatch import JaroWinklerSimilarity, ThresholdMatcher, ColumnsIndex
-from lib.post import load_for_agency
+
+from lib.post import load_for_agency, extract_events_from_post
 
 
 def deduplicate_cprr_14_officers(cprr):
@@ -172,17 +173,46 @@ def match_cprr_08_and_post(cprr, post):
     return cprr
 
 
+def extract_post_events(pprr, post):
+    dfa = pprr[["uid", "first_name", "last_name"]]
+    dfa = dfa.drop_duplicates(subset=["uid"]).set_index("uid")
+    dfa.loc[:, "fc"] = dfa.first_name.fillna("").map(lambda x: x[:1])
+
+    dfb = post[["uid", "first_name", "last_name"]]
+    dfb = dfb.drop_duplicates(subset=["uid"]).set_index("uid")
+    dfb.loc[:, "fc"] = dfb.first_name.fillna("").map(lambda x: x[:1])
+
+    matcher = ThresholdMatcher(
+        ColumnsIndex("fc"),
+        {"first_name": JaroWinklerSimilarity(), "last_name": JaroWinklerSimilarity()},
+        dfa,
+        dfb,
+    )
+    decision = 0.951
+    matcher.save_pairs_to_excel(
+        bolo.data("match/pprr_hammond_pd_2021_pprr_v_post_11_06_2020.xlsx"),
+        decision,
+    )
+    matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
+
+    return extract_events_from_post(post, matches, "Hammond PD")
+
+
 if __name__ == "__main__":
     cprr_20 = pd.read_csv(bolo.data("clean/cprr_hammond_pd_2015_2020.csv"))
     cprr_14 = pd.read_csv(bolo.data("clean/cprr_hammond_pd_2009_2014.csv"))
     cprr_08 = pd.read_csv(bolo.data("clean/cprr_hammond_pd_2004_2008.csv"))
+    pprr = pd.read_csv(bolo.data("clean/pprr_hammond_pd_2021.csv"))
     agency = cprr_08.agency[0]
     post = load_for_agency(agency)
     cprr_14 = deduplicate_cprr_14_officers(cprr_14)
     cprr_20 = deduplicate_cprr_20_officers(cprr_20)
-    cprr_20 = match_cprr_20_and_post(cprr_20, post)
-    cprr_14 = match_cprr_14_and_post(cprr_14, post)
-    cprr_08 = match_cprr_08_and_post(cprr_08, post)
-
+    cprr_20 = match_cprr_20_and_post(cprr_20, pprr)
+    cprr_14 = match_cprr_14_and_post(cprr_14, pprr)
+    cprr_08 = match_cprr_08_and_post(cprr_08, pprr)
+    post_event = extract_post_events(pprr, post)
     cprr_20.to_csv(bolo.data("match/cprr_hammond_pd_2015_2020.csv"), index=False)
     cprr_14.to_csv(bolo.data("match/cprr_hammond_pd_2009_2014.csv"), index=False)
+    post_event.to_csv(
+        bolo.data("match/post_event_hammond_pd_2020_11_06.csv"), index=False
+    )
