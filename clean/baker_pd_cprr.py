@@ -1,7 +1,4 @@
-import sys
-
-sys.path.append("../")
-from lib.path import data_file_path
+import bolo
 import pandas as pd
 from lib.columns import clean_column_names
 from lib.uid import gen_uid
@@ -71,7 +68,7 @@ def clean_allegation(df):
 
 def clean():
     df = (
-        pd.read_csv(data_file_path("raw/baker_pd/baker_pd_cprr_2018_2020.csv"))
+        pd.read_csv(bolo.data("raw/baker_pd/baker_pd_cprr_2018_2020.csv"))
         .pipe(clean_column_names)
         .pipe(clean_allegation)
         .pipe(join_disposition_columns)
@@ -85,4 +82,4 @@ def clean():
 
 if __name__ == "__main__":
     df = clean()
-    df.to_csv(data_file_path("clean/cprr_baker_pd_2018_2020.csv"), index=False)
+    df.to_csv(bolo.data("clean/cprr_baker_pd_2018_2020.csv"), index=False)

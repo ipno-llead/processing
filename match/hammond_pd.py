@@ -1,17 +1,8 @@
-import sys
-
-sys.path.append("../")
 import pandas as pd
-from lib.path import data_file_path
-from datamatch import (
-    JaroWinklerSimilarity,
-    ThresholdMatcher,
-    ColumnsIndex,
-    DateSimilarity,
-    NoopIndex,
-)
+import bolo
+from datamatch import JaroWinklerSimilarity, ThresholdMatcher, ColumnsIndex
+
 from lib.post import load_for_agency, extract_events_from_post
-from lib.date import combine_date_columns
 
 
 def deduplicate_cprr_14_officers(cprr):
@@ -28,7 +19,7 @@ def deduplicate_cprr_14_officers(cprr):
     )
     decision = 0.85
     matcher.save_clusters_to_excel(
-        data_file_path("match/hammond_pd_cprr_2009_2014_deduplicate.xlsx"),
+        bolo.data("match/hammond_pd_cprr_2009_2014_deduplicate.xlsx"),
         decision,
         decision,
     )
@@ -67,7 +58,7 @@ def deduplicate_cprr_20_officers(cprr):
     )
     decision = 0.92
     matcher.save_clusters_to_excel(
-        data_file_path("match/hammond_pd_cprr_2015_2020_deduplicate.xlsx"),
+        bolo.data("match/hammond_pd_cprr_2015_2020_deduplicate.xlsx"),
         decision,
         decision,
     )
@@ -112,7 +103,7 @@ def match_cprr_14_and_post(cprr, post):
     )
     decision = 0.9
     matcher.save_pairs_to_excel(
-        data_file_path("match/hammond_pd_cprr_2009_2014_v_post_pprr_2020_11_06.xlsx"),
+        bolo.data("match/hammond_pd_cprr_2009_2014_v_post_pprr_2020_11_06.xlsx"),
         decision,
     )
     matches = matcher.get_index_clusters_within_thresholds(decision)
@@ -142,7 +133,7 @@ def match_cprr_20_and_post(cprr, post):
     )
     decision = 0.865
     matcher.save_pairs_to_excel(
-        data_file_path("match/hammond_pd_cprr_2015_2020_v_post_pprr_2020_11_06.xlsx"),
+        bolo.data("match/hammond_pd_cprr_2015_2020_v_post_pprr_2020_11_06.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(decision)
@@ -172,7 +163,7 @@ def match_cprr_08_and_post(cprr, post):
     )
     decision = 0.95
     matcher.save_pairs_to_excel(
-        data_file_path("match/hammond_pd_cprr_2004_2008_v_post_pprr_2020_11_06.xlsx"),
+        bolo.data("match/hammond_pd_cprr_2004_2008_v_post_pprr_2020_11_06.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(decision)
@@ -199,7 +190,7 @@ def extract_post_events(pprr, post):
     )
     decision = 0.951
     matcher.save_pairs_to_excel(
-        data_file_path("match/pprr_hammond_pd_2021_pprr_v_post_11_06_2020.xlsx"),
+        bolo.data("match/pprr_hammond_pd_2021_pprr_v_post_11_06_2020.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
@@ -208,18 +199,20 @@ def extract_post_events(pprr, post):
 
 
 if __name__ == "__main__":
-    cprr_20 = pd.read_csv(data_file_path("clean/cprr_hammond_pd_2015_2020.csv"))
-    cprr_14 = pd.read_csv(data_file_path("clean/cprr_hammond_pd_2009_2014.csv"))
-    cprr_08 = pd.read_csv(data_file_path("clean/cprr_hammond_pd_2004_2008.csv"))
-    pprr = pd.read_csv(data_file_path("clean/pprr_hammond_pd_2021.csv"))
+    cprr_20 = pd.read_csv(bolo.data("clean/cprr_hammond_pd_2015_2020.csv"))
+    cprr_14 = pd.read_csv(bolo.data("clean/cprr_hammond_pd_2009_2014.csv"))
+    cprr_08 = pd.read_csv(bolo.data("clean/cprr_hammond_pd_2004_2008.csv"))
+    pprr = pd.read_csv(bolo.data("clean/pprr_hammond_pd_2021.csv"))
     agency = cprr_08.agency[0]
-    post = load_for_agency("clean/pprr_post_2020_11_06.csv", agency)
+    post = load_for_agency(agency)
     cprr_14 = deduplicate_cprr_14_officers(cprr_14)
     cprr_20 = deduplicate_cprr_20_officers(cprr_20)
     cprr_20 = match_cprr_20_and_post(cprr_20, pprr)
     cprr_14 = match_cprr_14_and_post(cprr_14, pprr)
     cprr_08 = match_cprr_08_and_post(cprr_08, pprr)
     post_event = extract_post_events(pprr, post)
-    cprr_20.to_csv(data_file_path("match/cprr_hammond_pd_2015_2020.csv"), index=False)
-    cprr_14.to_csv(data_file_path("match/cprr_hammond_pd_2009_2014.csv"), index=False)
-    post_event.to_csv(("match/post_event_hammond_pd_2020_11_06.csv"), index=False)
+    cprr_20.to_csv(bolo.data("match/cprr_hammond_pd_2015_2020.csv"), index=False)
+    cprr_14.to_csv(bolo.data("match/cprr_hammond_pd_2009_2014.csv"), index=False)
+    post_event.to_csv(
+        bolo.data("match/post_event_hammond_pd_2020_11_06.csv"), index=False
+    )

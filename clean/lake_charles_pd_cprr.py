@@ -1,8 +1,5 @@
-import sys
-
-sys.path.append("../")
 import pandas as pd
-from lib.path import data_file_path
+import bolo
 from lib.clean import float_to_int_str
 from lib.columns import clean_column_names
 from lib.rows import duplicate_row
@@ -650,9 +647,7 @@ def clean_and_split_investigator_19(df):
 
 
 def clean_20():
-    df = pd.read_csv(
-        data_file_path("raw/lake_charles_pd/lake_charles_pd_cprr_2020.csv")
-    )
+    df = pd.read_csv(bolo.data("raw/lake_charles_pd/lake_charles_pd_cprr_2020.csv"))
     df = (
         df.pipe(clean_column_names)
         .rename(columns={"date_of_investigation": "investigation_start_date"})
@@ -685,9 +680,7 @@ def clean_20():
 
 def clean_19():
     df = (
-        pd.read_csv(
-            data_file_path("raw/lake_charles_pd/lake_charles_pd_cprr_2014_2019.csv")
-        )
+        pd.read_csv(bolo.data("raw/lake_charles_pd/lake_charles_pd_cprr_2014_2019.csv"))
         .pipe(clean_column_names)
         .drop(columns=["shift"])
         .pipe(clean_investigation_start_date_19)
@@ -726,5 +719,5 @@ def clean_19():
 if __name__ == "__main__":
     df20 = clean_20()
     df19 = clean_19()
-    df20.to_csv(data_file_path("clean/cprr_lake_charles_pd_2020.csv"), index=False)
-    df19.to_csv(data_file_path("clean/cprr_lake_charles_pd_2014_2019.csv"), index=False)
+    df20.to_csv(bolo.data("clean/cprr_lake_charles_pd_2020.csv"), index=False)
+    df19.to_csv(bolo.data("clean/cprr_lake_charles_pd_2014_2019.csv"), index=False)

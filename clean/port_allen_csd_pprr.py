@@ -1,11 +1,8 @@
 from lib.columns import clean_column_names
-from lib.path import data_file_path, ensure_data_dir
+import bolo
 from lib.uid import gen_uid
 from lib.clean import clean_names, clean_dates, standardize_desc_cols
 import pandas as pd
-import sys
-
-sys.path.append("../")
 
 
 def extract_name(df):
@@ -40,7 +37,7 @@ def assign_agency(df):
 
 
 def clean():
-    df = pd.read_csv(data_file_path("raw/port_allen_csd/port_allen_csd_pprr_2020.csv"))
+    df = pd.read_csv(bolo.data("raw/port_allen_csd/port_allen_csd_pprr_2020.csv"))
     df = clean_column_names(df)
     df = df.rename(
         columns={
@@ -65,5 +62,5 @@ def clean():
 
 if __name__ == "__main__":
     df = clean()
-    ensure_data_dir("clean")
-    df.to_csv(data_file_path("clean/pprr_port_allen_csd_2020.csv"), index=False)
+
+    df.to_csv(bolo.data("clean/pprr_port_allen_csd_2020.csv"), index=False)

@@ -2,12 +2,10 @@ from lib.columns import clean_column_names
 from lib.clean import clean_dates, standardize_desc_cols, float_to_int_str
 from lib.uid import gen_uid
 from lib.standardize import standardize_from_lookup_table
-from lib.path import data_file_path
+import bolo
 import pandas as pd
 import re
-import sys
 
-sys.path.append("../")
 
 actions_lookup = [
     ["exonerated"],
@@ -46,7 +44,7 @@ actions_lookup = [
 
 def realign_18():
     df = pd.read_csv(
-        data_file_path("raw/baton_rouge_pd/baton_rouge_pd_cprr_2018.csv"),
+        bolo.data("raw/baton_rouge_pd/baton_rouge_pd_cprr_2018.csv"),
         encoding="latin1",
     )
     df.rename(columns=lambda x: x.strip(), inplace=True)
@@ -778,9 +776,9 @@ def clean_18():
 
 
 def clean_21():
-    df = pd.read_csv(
-        data_file_path("raw/baton_rouge_pd/baton_rouge_pd_cprr_2021.csv")
-    ).pipe(clean_column_names)
+    df = pd.read_csv(bolo.data("raw/baton_rouge_pd/baton_rouge_pd_cprr_2021.csv")).pipe(
+        clean_column_names
+    )
     df = (
         df.pipe(clean_investigation_status_21)
         .pipe(float_to_int_str, ["ia_seq", "ia_year"])
@@ -904,5 +902,5 @@ def clean_21():
 if __name__ == "__main__":
     df18 = clean_18()
     df21 = clean_21()
-    df18.to_csv(data_file_path("clean/cprr_baton_rouge_pd_2018.csv"), index=False)
-    df21.to_csv(data_file_path("clean/cprr_baton_rouge_pd_2021.csv"), index=False)
+    df18.to_csv(bolo.data("clean/cprr_baton_rouge_pd_2018.csv"), index=False)
+    df21.to_csv(bolo.data("clean/cprr_baton_rouge_pd_2021.csv"), index=False)

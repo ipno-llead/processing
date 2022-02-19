@@ -15,5 +15,7 @@ __pycache__
 
 build
 data.d
-
+q
 .env
+
+.bolo

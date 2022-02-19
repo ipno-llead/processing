@@ -1,4 +1,4 @@
-from lib.path import data_file_path
+import bolo
 from lib.columns import clean_column_names, set_values
 from lib.clean import (
     clean_names,
@@ -11,9 +11,6 @@ from lib.clean import (
 from lib.uid import gen_uid
 from lib import salary
 import pandas as pd
-import sys
-
-sys.path.append("../")
 
 
 def split_cprr_name(df):
@@ -42,7 +39,7 @@ def split_supervisor(df):
 
 
 def clean_cprr():
-    df = pd.read_csv(data_file_path("raw/brusly_pd/brusly_pd_cprr_2020.csv"))
+    df = pd.read_csv(bolo.data("raw/brusly_pd/brusly_pd_cprr_2020.csv"))
     df = clean_column_names(df)
     df.columns = [
         "receive_date",
@@ -92,7 +89,7 @@ def clean_position(df):
 
 def clean_pprr():
     df = (
-        pd.read_csv(data_file_path("raw/brusly_pd/brusly_pd_pprr_2020.csv"))
+        pd.read_csv(bolo.data("raw/brusly_pd/brusly_pd_pprr_2020.csv"))
         .pipe(clean_column_names)
         .drop(columns=["company_name", "department_name"])
         .rename(columns={"annual_salary": "salary"})
@@ -123,9 +120,7 @@ def clean_pprr():
 
 def clean_award():
     return (
-        pd.read_csv(
-            data_file_path("raw/brusly_pd/brusly_pd_awards_2015-2020_byhand.csv")
-        )
+        pd.read_csv(bolo.data("raw/brusly_pd/brusly_pd_awards_2015-2020_byhand.csv"))
         .pipe(clean_column_names)
         .rename(
             columns={
@@ -143,6 +138,6 @@ if __name__ == "__main__":
     cprr = clean_cprr()
     pprr = clean_pprr()
     award = clean_award()
-    cprr.to_csv(data_file_path("clean/cprr_brusly_pd_2020.csv"), index=False)
-    pprr.to_csv(data_file_path("clean/pprr_brusly_pd_2020.csv"), index=False)
-    award.to_csv(data_file_path("clean/award_brusly_pd_2021.csv"), index=False)
+    cprr.to_csv(bolo.data("clean/cprr_brusly_pd_2020.csv"), index=False)
+    pprr.to_csv(bolo.data("clean/pprr_brusly_pd_2020.csv"), index=False)
+    award.to_csv(bolo.data("clean/award_brusly_pd_2021.csv"), index=False)

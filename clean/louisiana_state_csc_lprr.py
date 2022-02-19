@@ -1,13 +1,10 @@
 from pandas.io.parsers import read_csv
 from lib.clean import clean_dates, clean_names
 from lib.columns import clean_column_names
-from lib.path import data_file_path, ensure_data_dir
+import bolo
 from lib.uid import gen_uid
 import pandas as pd
 import re
-import sys
-
-sys.path.append("../")
 
 
 def standardize_appealed(df):
@@ -81,9 +78,7 @@ def split_appellant_column(df):
 
 
 def assign_additional_appellant_names(df):
-    names = pd.read_csv(
-        data_file_path("raw/louisiana_state_csc/la_lprr_appellants.csv")
-    )
+    names = pd.read_csv(bolo.data("raw/louisiana_state_csc/la_lprr_appellants.csv"))
     for _, row in names.iterrows():
         for col in ["first_name", "last_name", "middle_initial"]:
             df.loc[df.docket_no == row.docket_no, col] = row["appellant_%s" % col]
@@ -172,7 +167,7 @@ def assign_charging_supervisor(df):
 
 def clean():
     df = pd.read_csv(
-        data_file_path("raw/louisiana_state_csc/louisianastate_csc_lprr_1991-2020.csv")
+        bolo.data("raw/louisiana_state_csc/louisianastate_csc_lprr_1991-2020.csv")
     )
     df = clean_column_names(df)
     df = df.rename(
@@ -205,5 +200,5 @@ def clean():
 
 if __name__ == "__main__":
     df = clean()
-    ensure_data_dir("clean")
-    df.to_csv(data_file_path("clean/lprr_louisiana_state_csc_1991_2020.csv"), index=False)
+
+    df.to_csv(bolo.data("clean/lprr_louisiana_state_csc_1991_2020.csv"), index=False)

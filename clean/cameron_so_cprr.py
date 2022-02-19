@@ -1,8 +1,5 @@
-import sys
-
-sys.path.append("../")
 import pandas as pd
-from lib.path import data_file_path
+import bolo
 from lib.columns import clean_column_names, set_values
 from lib.clean import clean_names, standardize_desc_cols
 from lib.uid import gen_uid
@@ -40,7 +37,7 @@ def clean_disposition_19(df):
 
 def clean_20():
     df = (
-        pd.read_csv(data_file_path("raw/cameron_so/cameron_so_cprr_2020.csv"))
+        pd.read_csv(bolo.data("raw/cameron_so/cameron_so_cprr_2020.csv"))
         .pipe(clean_column_names)
         .pipe(split_name)
         .rename(
@@ -60,7 +57,7 @@ def clean_20():
 
 def clean_19():
     df = (
-        pd.read_csv(data_file_path("raw/cameron_so/cameron_so_cprr_2015_2019.csv"))
+        pd.read_csv(bolo.data("raw/cameron_so/cameron_so_cprr_2015_2019.csv"))
         .pipe(clean_column_names)
         .pipe(split_name)
         .pipe(clean_names, ["first_name", "last_name"])
@@ -77,5 +74,5 @@ def clean_19():
 if __name__ == "__main__":
     df_20 = clean_20()
     df_19 = clean_19()
-    df_20.to_csv(data_file_path("clean/cprr_cameron_so_2020.csv"), index=False)
-    df_19.to_csv(data_file_path("clean/cprr_cameron_so_2015_2019.csv"), index=False)
+    df_20.to_csv(bolo.data("clean/cprr_cameron_so_2020.csv"), index=False)
+    df_19.to_csv(bolo.data("clean/cprr_cameron_so_2015_2019.csv"), index=False)

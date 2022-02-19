@@ -1,9 +1,6 @@
-import sys
-
-sys.path.append("../")
 import pandas as pd
 from datamatch import JaroWinklerSimilarity, ThresholdMatcher, ColumnsIndex
-from lib.path import data_file_path
+import bolo
 from lib.post import load_for_agency
 
 
@@ -33,7 +30,7 @@ def assign_uid_from_post_21(cprr, post):
     )
     decision = 0.93
     matcher.save_pairs_to_excel(
-        data_file_path("match/abbeville_pd_2019_2021_v_post_pprr_2020_11_06.xlsx"),
+        bolo.data("match/abbeville_pd_2019_2021_v_post_pprr_2020_11_06.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(decision)
@@ -69,7 +66,7 @@ def assign_uid_from_post_18(cprr, post):
     )
     decision = 1
     matcher.save_pairs_to_excel(
-        data_file_path("match/abbeville_pd_2015_2018_v_post_pprr_2020_11_06.xlsx"),
+        bolo.data("match/abbeville_pd_2015_2018_v_post_pprr_2020_11_06.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(decision)
@@ -80,11 +77,11 @@ def assign_uid_from_post_18(cprr, post):
 
 
 if __name__ == "__main__":
-    cprr21 = pd.read_csv(data_file_path("clean/cprr_abbeville_pd_2019_2021.csv"))
-    cprr18 = pd.read_csv(data_file_path("clean/cprr_abbeville_pd_2015_2018.csv"))
+    cprr21 = pd.read_csv(bolo.data("clean/cprr_abbeville_pd_2019_2021.csv"))
+    cprr18 = pd.read_csv(bolo.data("clean/cprr_abbeville_pd_2015_2018.csv"))
     agency = cprr21.agency[0]
-    post = load_for_agency("clean/pprr_post_2020_11_06.csv", agency)
+    post = load_for_agency(agency)
     cprr21 = assign_uid_from_post_21(cprr21, post)
     cprr18 = assign_uid_from_post_18(cprr18, post)
-    cprr21.to_csv(data_file_path("match/cprr_abbeville_pd_2019_2021.csv"), index=False)
-    cprr18.to_csv(data_file_path("match/cprr_abbeville_pd_2015_2018.csv"), index=False)
+    cprr21.to_csv(bolo.data("match/cprr_abbeville_pd_2019_2021.csv"), index=False)
+    cprr18.to_csv(bolo.data("match/cprr_abbeville_pd_2015_2018.csv"), index=False)

@@ -1,13 +1,10 @@
 from lib.clean import names_to_title_case
-import sys
 
 import pandas as pd
 from datamatch import ThresholdMatcher, JaroWinklerSimilarity, ColumnsIndex, NoopIndex
 
-from lib.path import data_file_path
+import bolo
 from lib.post import extract_events_from_post, load_for_agency
-
-sys.path.append("../")
 
 
 def dedup_cprr_uid_20(cprr):
@@ -26,7 +23,7 @@ def dedup_cprr_uid_20(cprr):
     )
     decision = 0.89
     matcher.save_clusters_to_excel(
-        data_file_path("match/lafayette_pd_cprr_2015_2020_officer_dedup.xlsx"),
+        bolo.data("match/lafayette_pd_cprr_2015_2020_officer_dedup.xlsx"),
         decision,
         lower_bound=decision,
     )
@@ -68,7 +65,7 @@ def dedup_cprr_uid_14(cprr):
     )
     decision = 0.89
     matcher.save_clusters_to_excel(
-        data_file_path("match/lafayette_pd_cprr_2009_2014_officer_dedup.xlsx"),
+        bolo.data("match/lafayette_pd_cprr_2009_2014_officer_dedup.xlsx"),
         decision,
         lower_bound=decision,
     )
@@ -111,7 +108,7 @@ def dedup_cprr_investigator_uid_20(cprr):
     )
     decision = 0.87
     matcher.save_clusters_to_excel(
-        data_file_path("match/lafayette_pd_cprr_2015_2020_investigator_dedup.xlsx"),
+        bolo.data("match/lafayette_pd_cprr_2015_2020_investigator_dedup.xlsx"),
         decision,
         lower_bound=decision,
     )
@@ -164,7 +161,7 @@ def dedup_cprr_investigator_uid_20(cprr):
     )
     decision = 0.87
     matcher.save_pairs_to_excel(
-        data_file_path(
+        bolo.data(
             "match/lafayette_pd_cprr_2015_2020_investigator_only_last_name_dedup.xlsx"
         ),
         decision,
@@ -200,7 +197,7 @@ def dedup_cprr_investigator_uid_14(cprr):
     )
     decision = 0.95
     matcher.save_clusters_to_excel(
-        data_file_path("match/lafayette_pd_cprr_2015_2020_investigator_dedup.xlsx"),
+        bolo.data("match/lafayette_pd_cprr_2015_2020_investigator_dedup.xlsx"),
         decision,
         lower_bound=decision,
     )
@@ -253,7 +250,7 @@ def dedup_cprr_investigator_uid_14(cprr):
     )
     decision = 0.87
     matcher.save_pairs_to_excel(
-        data_file_path(
+        bolo.data(
             "match/lafayette_pd_cprr_2009_2014_investigator_only_last_name_dedup.xlsx"
         ),
         decision,
@@ -308,9 +305,7 @@ def match_cprr_20_officers_with_pprr(cprr, pprr):
     )
     decision = 0.87
     matcher.save_pairs_to_excel(
-        data_file_path(
-            "match/lafayette_pd_cprr_2015_2020_officers_v_pprr_2010_2021.xlsx"
-        ),
+        bolo.data("match/lafayette_pd_cprr_2015_2020_officers_v_pprr_2010_2021.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
@@ -348,9 +343,7 @@ def match_cprr_14_officers_with_pprr(cprr, pprr):
     )
     decision = 0.90
     matcher.save_pairs_to_excel(
-        data_file_path(
-            "match/lafayette_pd_cprr_2009_2014_officers_v_pprr_2010_2021.xlsx"
-        ),
+        bolo.data("match/lafayette_pd_cprr_2009_2014_officers_v_pprr_2010_2021.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
@@ -395,7 +388,7 @@ def match_cprr_20_investigators_with_pprr(cprr, pprr):
     )
     decision = 0.8
     matcher.save_pairs_to_excel(
-        data_file_path(
+        bolo.data(
             "match/lafayette_pd_cprr_2015_2020_investigators_v_pprr_2010_2021.xlsx"
         ),
         decision,
@@ -446,7 +439,7 @@ def match_cprr_14_investigators_with_pprr(cprr, pprr):
     )
     decision = 0.85
     matcher.save_pairs_to_excel(
-        data_file_path(
+        bolo.data(
             "match/lafayette_pd_cprr_2009_2014_investigators_v_pprr_2010_2021.xlsx"
         ),
         decision,
@@ -485,7 +478,7 @@ def extract_post_events(pprr, post):
     )
     decision = 0.94
     matcher.save_pairs_to_excel(
-        data_file_path("match/lafayette_pd_pprr_2010_2021_v_post_pprr_2020_11_06.xlsx"),
+        bolo.data("match/lafayette_pd_pprr_2010_2021_v_post_pprr_2020_11_06.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
@@ -494,11 +487,11 @@ def extract_post_events(pprr, post):
 
 
 if __name__ == "__main__":
-    cprr_20 = pd.read_csv(data_file_path("clean/cprr_lafayette_pd_2015_2020.csv"))
-    cprr_14 = pd.read_csv(data_file_path("clean/cprr_lafayette_pd_2009_2014.csv"))
-    pprr = pd.read_csv(data_file_path("clean/pprr_lafayette_pd_2010_2021.csv"))
+    cprr_20 = pd.read_csv(bolo.data("clean/cprr_lafayette_pd_2015_2020.csv"))
+    cprr_14 = pd.read_csv(bolo.data("clean/cprr_lafayette_pd_2009_2014.csv"))
+    pprr = pd.read_csv(bolo.data("clean/pprr_lafayette_pd_2010_2021.csv"))
     agency = pprr.agency[0]
-    post = load_for_agency("clean/pprr_post_2020_11_06.csv", agency)
+    post = load_for_agency(agency)
     cprr_20 = (
         dedup_cprr_uid_20(cprr_20)
         .pipe(dedup_cprr_investigator_uid_20)
@@ -514,8 +507,6 @@ if __name__ == "__main__":
         .pipe(combine_investigator_name)
     )
     post_events = extract_post_events(pprr, post)
-    cprr_20.to_csv(data_file_path("match/cprr_lafayette_pd_2015_2020.csv"), index=False)
-    cprr_14.to_csv(data_file_path("match/cprr_lafayette_pd_2009_2014.csv"), index=False)
-    post_events.to_csv(
-        data_file_path("match/post_event_lafayette_pd_2020.csv"), index=False
-    )
+    cprr_20.to_csv(bolo.data("match/cprr_lafayette_pd_2015_2020.csv"), index=False)
+    cprr_14.to_csv(bolo.data("match/cprr_lafayette_pd_2009_2014.csv"), index=False)
+    post_events.to_csv(bolo.data("match/post_event_lafayette_pd_2020.csv"), index=False)

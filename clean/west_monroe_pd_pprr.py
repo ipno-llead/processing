@@ -1,14 +1,10 @@
-import sys
-
 import pandas as pd
 
 from lib import salary
 from lib.columns import clean_column_names, set_values
-from lib.path import data_file_path
+import bolo
 from lib.clean import clean_salaries, clean_sexes, clean_races
 from lib.uid import gen_uid
-
-sys.path.append("../")
 
 
 def split_names(df):
@@ -45,9 +41,7 @@ def change_hire_date_format(df):
 
 def clean():
     return (
-        pd.read_csv(
-            data_file_path("raw/west_monroe_pd/west_monroe_pd_pprr_2015_2020.csv")
-        )
+        pd.read_csv(bolo.data("raw/west_monroe_pd/west_monroe_pd_pprr_2015_2020.csv"))
         .pipe(clean_column_names)
         .dropna(how="all")
         .rename(
@@ -72,4 +66,4 @@ def clean():
 
 if __name__ == "__main__":
     df = clean()
-    df.to_csv(data_file_path("clean/pprr_west_monroe_pd_2015_2020.csv"), index=False)
+    df.to_csv(bolo.data("clean/pprr_west_monroe_pd_2015_2020.csv"), index=False)

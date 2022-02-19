@@ -1,12 +1,8 @@
-import sys
-
 import pandas as pd
 from datamatch import ThresholdMatcher, JaroWinklerSimilarity, ColumnsIndex
 
-from lib.path import data_file_path
+import bolo
 from lib.post import extract_events_from_post, load_for_agency
-
-sys.path.append("../")
 
 
 def match_and_concat_pprr(df1, df2, year1, year2, decision):
@@ -31,7 +27,7 @@ def match_and_concat_pprr(df1, df2, year1, year2, decision):
         dfb,
     )
     matcher.save_pairs_to_excel(
-        data_file_path("match/youngsville_pd_pprr_%s_v_%s.xlsx" % (year1, year2)),
+        bolo.data("match/youngsville_pd_pprr_%s_v_%s.xlsx" % (year1, year2)),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
@@ -74,9 +70,7 @@ def match_pprr_and_post(pprr, post):
     )
     decision = 0.9
     matcher.save_pairs_to_excel(
-        data_file_path(
-            "match/youngsville_pd_pprr_2017_2019_v_post_pprr_2020_11_06.xlsx"
-        ),
+        bolo.data("match/youngsville_pd_pprr_2017_2019_v_post_pprr_2020_11_06.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
@@ -84,9 +78,9 @@ def match_pprr_and_post(pprr, post):
 
 
 if __name__ == "__main__":
-    pprr17 = pd.read_csv(data_file_path("clean/pprr_youngsville_csd_2017.csv"))
-    pprr18 = pd.read_csv(data_file_path("clean/pprr_youngsville_csd_2018.csv"))
-    pprr19 = pd.read_csv(data_file_path("clean/pprr_youngsville_csd_2019.csv"))
+    pprr17 = pd.read_csv(bolo.data("clean/pprr_youngsville_csd_2017.csv"))
+    pprr18 = pd.read_csv(bolo.data("clean/pprr_youngsville_csd_2018.csv"))
+    pprr19 = pd.read_csv(bolo.data("clean/pprr_youngsville_csd_2019.csv"))
     pprr = match_and_concat_pprr(
         match_and_concat_pprr(pprr17, pprr18, "2017", "2018", 0.9),
         pprr19,
@@ -95,9 +89,9 @@ if __name__ == "__main__":
         0.9,
     )
     agency = pprr17.agency[0]
-    post = load_for_agency("clean/pprr_post_2020_11_06.csv", agency)
+    post = load_for_agency(agency)
     post_event = match_pprr_and_post(pprr, post)
-    pprr.to_csv(data_file_path("match/pprr_youngsville_pd_2017_2019.csv"), index=False)
+    pprr.to_csv(bolo.data("match/pprr_youngsville_pd_2017_2019.csv"), index=False)
     post_event.to_csv(
-        data_file_path("match/post_event_youngsville_pd_2020.csv"), index=False
+        bolo.data("match/post_event_youngsville_pd_2020.csv"), index=False
     )

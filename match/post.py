@@ -1,9 +1,6 @@
-import sys
-
-sys.path.append("../")
 import pandas as pd
 from datamatch import JaroWinklerSimilarity, ThresholdMatcher, ColumnsIndex
-from lib.path import data_file_path
+import bolo
 
 
 def match_cprr_with_post(cprr, post):
@@ -26,7 +23,7 @@ def match_cprr_with_post(cprr, post):
     )
     decision = 0.8
     matcher.save_pairs_to_excel(
-        data_file_path("match/cprr_post_2016_2019_v_pprr_post_2020_11_06.xlsx"),
+        bolo.data("match/cprr_post_2016_2019_v_pprr_post_2020_11_06.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
@@ -36,7 +33,7 @@ def match_cprr_with_post(cprr, post):
 
 
 if __name__ == "__main__":
-    cprr = pd.read_csv(data_file_path("clean/cprr_post_2016_2019.csv"))
-    post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
+    cprr = pd.read_csv(bolo.data("clean/cprr_post_2016_2019.csv"))
+    post = pd.read_csv(bolo.data("clean/pprr_post_2020_11_06.csv"))
     cprr = match_cprr_with_post(cprr, post)
-    cprr.to_csv(data_file_path("match/cprr_post_2016_2019.csv"), index=False)
+    cprr.to_csv(bolo.data("match/cprr_post_2016_2019.csv"), index=False)
