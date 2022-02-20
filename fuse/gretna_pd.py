@@ -1,12 +1,8 @@
-import sys
-
 import pandas as pd
 
-from lib.path import data_file_path
+import bolo
 from lib.columns import rearrange_personnel_columns, rearrange_event_columns
 from lib import events
-
-sys.path.append("../")
 
 
 def fuse_events(pprr):
@@ -25,8 +21,10 @@ def fuse_events(pprr):
 
 
 if __name__ == "__main__":
-    pprr = pd.read_csv(data_file_path("clean/pprr_gretna_pd_2018.csv"))
-    post_event = pd.read_csv(data_file_path("match/post_event_gretna_pd_2020.csv"))
+    pprr = pd.read_csv(bolo.data("clean/pprr_gretna_pd_2018.csv"))
+    post_event = pd.read_csv(bolo.data("match/post_event_gretna_pd_2020.csv"))
     events_df = rearrange_event_columns(pd.concat([post_event, fuse_events(pprr)]))
-    rearrange_personnel_columns(pprr).to_csv(data_file_path("fuse/per_gretna_pd.csv"), index=False)
-    events_df.to_csv(data_file_path("fuse/event_gretna_pd.csv"), index=False)
+    rearrange_personnel_columns(pprr).to_csv(
+        bolo.data("fuse/per_gretna_pd.csv"), index=False
+    )
+    events_df.to_csv(bolo.data("fuse/event_gretna_pd.csv"), index=False)

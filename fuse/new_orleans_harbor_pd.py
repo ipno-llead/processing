@@ -1,14 +1,11 @@
 import pandas as pd
-from lib.path import data_file_path
+import bolo
 from lib.columns import (
     rearrange_personnel_columns,
     rearrange_event_columns,
     rearrange_allegation_columns,
 )
 from lib import events
-import sys
-
-sys.path.append("../")
 
 
 def fuse_events(pprr08, pprr20, cprr):
@@ -74,14 +71,16 @@ def fuse_events(pprr08, pprr20, cprr):
 
 
 if __name__ == "__main__":
-    pprr20 = pd.read_csv(data_file_path("clean/pprr_new_orleans_harbor_pd_2020.csv"))
-    pprr08 = pd.read_csv(data_file_path("clean/pprr_new_orleans_harbor_pd_1991_2008.csv"))
-    cprr = pd.read_csv(data_file_path("match/cprr_new_orleans_harbor_pd_2020.csv"))
-    post_event = pd.read_csv(data_file_path("match/post_event_new_orleans_harbor_pd_2020.csv"))
+    pprr20 = pd.read_csv(bolo.data("clean/pprr_new_orleans_harbor_pd_2020.csv"))
+    pprr08 = pd.read_csv(bolo.data("clean/pprr_new_orleans_harbor_pd_1991_2008.csv"))
+    cprr = pd.read_csv(bolo.data("match/cprr_new_orleans_harbor_pd_2020.csv"))
+    post_event = pd.read_csv(
+        bolo.data("match/post_event_new_orleans_harbor_pd_2020.csv")
+    )
     personnel_df = rearrange_personnel_columns(pd.concat([pprr08, pprr20]))
     complaint_df = rearrange_allegation_columns(cprr)
     event_df = fuse_events(pprr08, pprr20, cprr)
     event_df = rearrange_event_columns(pd.concat([post_event, event_df]))
-    personnel_df.to_csv(data_file_path("fuse/per_new_orleans_harbor_pd.csv"), index=False)
-    event_df.to_csv(data_file_path("fuse/event_new_orleans_harbor_pd.csv"), index=False)
-    complaint_df.to_csv(data_file_path("fuse/com_new_orleans_harbor_pd.csv"), index=False)
+    personnel_df.to_csv(bolo.data("fuse/per_new_orleans_harbor_pd.csv"), index=False)
+    event_df.to_csv(bolo.data("fuse/event_new_orleans_harbor_pd.csv"), index=False)
+    complaint_df.to_csv(bolo.data("fuse/com_new_orleans_harbor_pd.csv"), index=False)

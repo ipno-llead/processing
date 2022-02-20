@@ -1,14 +1,10 @@
-import sys
-
 import pandas as pd
 
 from lib import salary
 from lib.columns import clean_column_names, set_values
-from lib.path import data_file_path
+import bolo
 from lib.clean import clean_salaries
 from lib.uid import gen_uid
-
-sys.path.append("../")
 
 
 def split_names(df):
@@ -19,10 +15,9 @@ def split_names(df):
     return df.drop(columns=[col_name])
 
 
-def clean_pprr_17_18(name, year):
+def clean_pprr_17_18(df, year):
     return (
-        pd.read_csv(data_file_path(name))
-        .pipe(clean_column_names)
+        df.pipe(clean_column_names)
         .drop(columns=["department"])
         .pipe(
             set_values,
@@ -40,7 +35,7 @@ def clean_pprr_17_18(name, year):
 
 def clean_pprr_19():
     return (
-        pd.read_csv(data_file_path("raw/youngsville_pd/youngsville_csd_pprr_2019.csv"))
+        pd.read_csv(bolo.data("raw/youngsville_pd/youngsville_csd_pprr_2019.csv"))
         .pipe(clean_column_names)
         .drop(columns=["department", "department_name_category", "type"])
         .pipe(
@@ -59,9 +54,15 @@ def clean_pprr_19():
 
 
 if __name__ == "__main__":
-    df17 = clean_pprr_17_18("raw/youngsville_pd/youngsville_csd_pprr_2017.csv", 2017)
-    df18 = clean_pprr_17_18("raw/youngsville_pd/youngsville_csd_pprr_2018.csv", 2018)
+    df17 = clean_pprr_17_18(
+        pd.read_csv(bolo.data("raw/youngsville_pd/youngsville_csd_pprr_2017.csv")),
+        2017,
+    )
+    df18 = clean_pprr_17_18(
+        pd.read_csv(bolo.data("raw/youngsville_pd/youngsville_csd_pprr_2018.csv")),
+        2018,
+    )
     df19 = clean_pprr_19()
-    df17.to_csv(data_file_path("clean/pprr_youngsville_csd_2017.csv"), index=False)
-    df18.to_csv(data_file_path("clean/pprr_youngsville_csd_2018.csv"), index=False)
-    df19.to_csv(data_file_path("clean/pprr_youngsville_csd_2019.csv"), index=False)
+    df17.to_csv(bolo.data("clean/pprr_youngsville_csd_2017.csv"), index=False)
+    df18.to_csv(bolo.data("clean/pprr_youngsville_csd_2018.csv"), index=False)
+    df19.to_csv(bolo.data("clean/pprr_youngsville_csd_2019.csv"), index=False)

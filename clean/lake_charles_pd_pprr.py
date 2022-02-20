@@ -1,10 +1,7 @@
-import sys
-
 from lib.uid import gen_uid
 
-sys.path.append("../")
 import pandas as pd
-from lib.path import data_file_path
+import bolo
 from lib.columns import clean_column_names, set_values
 from lib.clean import clean_names, standardize_desc_cols, clean_salaries
 from lib import salary
@@ -99,9 +96,7 @@ def clean_annual_salary(df):
 
 def clean():
     df = (
-        pd.read_csv(
-            data_file_path("raw/lake_charles_pd/pprr_lake_charles_pd_2017_2021.csv")
-        )
+        pd.read_csv(bolo.data("raw/lake_charles_pd/pprr_lake_charles_pd_2017_2021.csv"))
         .pipe(clean_column_names)
         .drop(columns=["current_hourly_rate"])
         .pipe(clean_employee_id)
@@ -122,4 +117,4 @@ def clean():
 
 if __name__ == "__main__":
     df = clean()
-    df.to_csv(data_file_path("clean/pprr_lake_charles_pd_2017_2021.csv"), index=False)
+    df.to_csv(bolo.data("clean/pprr_lake_charles_pd_2017_2021.csv"), index=False)

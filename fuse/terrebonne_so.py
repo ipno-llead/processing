@@ -1,8 +1,5 @@
-import sys
-
-sys.path.append("../")
 import pandas as pd
-from lib.path import data_file_path
+import bolo
 from lib import events
 from lib.columns import rearrange_allegation_columns
 from lib.personnel import fuse_personnel
@@ -53,12 +50,12 @@ def fuse_events(cprr, post):
 
 
 if __name__ == "__main__":
-    cprr = pd.read_csv(data_file_path("clean/cprr_terrebonne_so_2019_2021.csv"))
+    cprr = pd.read_csv(bolo.data("clean/cprr_terrebonne_so_2019_2021.csv"))
     agency = cprr.agency[0]
-    post = load_for_agency("clean/pprr_post_2020_11_06.csv", agency)
+    post = load_for_agency(agency)
     per = fuse_personnel(cprr, post)
     com = rearrange_allegation_columns(cprr)
     event = fuse_events(cprr, post)
-    event.to_csv(data_file_path("fuse/event_terrebonne_so.csv"), index=False)
-    com.to_csv(data_file_path("fuse/com_terrebonne_so.csv"), index=False)
-    per.to_csv(data_file_path("fuse/per_terrebonne_so.csv"), index=False)
+    event.to_csv(bolo.data("fuse/event_terrebonne_so.csv"), index=False)
+    com.to_csv(bolo.data("fuse/com_terrebonne_so.csv"), index=False)
+    per.to_csv(bolo.data("fuse/per_terrebonne_so.csv"), index=False)

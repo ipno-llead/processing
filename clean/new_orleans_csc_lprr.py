@@ -1,8 +1,5 @@
-import sys
-
-sys.path.append("../")
 import pandas as pd
-from lib.path import data_file_path
+import bolo
 from lib.columns import clean_column_names
 from lib.clean import clean_dates, clean_names
 from lib.uid import gen_uid
@@ -130,9 +127,7 @@ def assign_agency(df):
 
 def clean():
     df = (
-        pd.read_csv(
-            data_file_path("raw/new_orleans_csc/new_orleans_csc_lprr_2000_2016.csv")
-        )
+        pd.read_csv(bolo.data("raw/new_orleans_csc/new_orleans_csc_lprr_2000_2016.csv"))
         .pipe(clean_column_names)
         .drop(
             columns=[
@@ -168,4 +163,4 @@ def clean():
 
 if __name__ == "__main__":
     df = clean()
-    df.to_csv(data_file_path("clean/lprr_new_orleans_csc_2000_2016.csv"), index=False)
+    df.to_csv(bolo.data("clean/lprr_new_orleans_csc_2000_2016.csv"), index=False)

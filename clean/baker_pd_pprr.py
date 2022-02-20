@@ -1,10 +1,13 @@
-import sys
-
-sys.path.append("../")
-from lib.path import data_file_path
+import bolo
 import pandas as pd
 from lib.columns import clean_column_names
-from lib.clean import clean_races, clean_sexes, clean_dates, standardize_desc_cols, clean_names
+from lib.clean import (
+    clean_races,
+    clean_sexes,
+    clean_dates,
+    standardize_desc_cols,
+    clean_names,
+)
 from lib.uid import gen_uid
 from lib.columns import set_values
 
@@ -44,7 +47,7 @@ def split_names(df):
 
 def clean():
     df = (
-        pd.read_csv(data_file_path("raw/baker_pd/baker_csd_pprr_2010_2020.csv"))
+        pd.read_csv(bolo.data("raw/baker_pd/baker_csd_pprr_2010_2020.csv"))
         .pipe(clean_column_names)
         .drop(columns=["annual_salary", "monthly_salary", "hourly_salary"])
         .rename(columns={"date_of_hire": "hire_date"})
@@ -64,4 +67,4 @@ def clean():
 
 if __name__ == "__main__":
     df = clean()
-    df.to_csv(data_file_path("clean/pprr_baker_pd_2010_2020.csv"), index=False)
+    df.to_csv(bolo.data("clean/pprr_baker_pd_2010_2020.csv"), index=False)

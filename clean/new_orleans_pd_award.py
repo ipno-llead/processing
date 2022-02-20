@@ -1,11 +1,8 @@
 from lib.columns import clean_column_names, set_values
 from lib.uid import gen_uid
-from lib.path import data_file_path, ensure_data_dir
+import bolo
 from lib.clean import standardize_desc_cols, clean_ranks
 import pandas as pd
-import sys
-
-sys.path.append("../")
 
 
 def extract_rank(df):
@@ -140,9 +137,7 @@ def remove_future_dates(df):
 
 
 def clean():
-    df = pd.read_csv(
-        data_file_path("raw/ipm/new_orleans_pd_commendations_2016_2021.csv")
-    )
+    df = pd.read_csv(bolo.data("raw/ipm/new_orleans_pd_commendations_2016_2021.csv"))
     df = (
         df.pipe(clean_column_names)
         .drop(columns={"item_number"})
@@ -177,5 +172,5 @@ def clean():
 
 if __name__ == "__main__":
     award = clean()
-    ensure_data_dir("clean")
-    award.to_csv(data_file_path("clean/award_new_orleans_pd_2016_2021.csv"), index=False)
+
+    award.to_csv(bolo.data("clean/award_new_orleans_pd_2016_2021.csv"), index=False)

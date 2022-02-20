@@ -1,9 +1,7 @@
-import sys
-
 import pandas as pd
 
 from lib.columns import clean_column_names, set_values
-from lib.path import data_file_path
+import bolo
 from lib.clean import (
     clean_names,
     clean_salaries,
@@ -17,8 +15,6 @@ from lib import salary
 from lib.standardize import standardize_from_lookup_table
 from lib.rows import duplicate_row
 import re
-
-sys.path.append("../")
 
 
 def split_names(df):
@@ -57,7 +53,7 @@ def standardize_rank(df):
 
 def clean_pprr():
     return (
-        pd.read_csv(data_file_path("raw/lafayette_pd/lafayette_pd_pprr_2010_2021.csv"))
+        pd.read_csv(bolo.data("raw/lafayette_pd/lafayette_pd_pprr_2010_2021.csv"))
         .pipe(clean_column_names)
         .drop(columns=["assigned_zone", "badge_number"])
         .rename(
@@ -357,7 +353,7 @@ def split_action_from_disposition(df):
 
 def clean_cprr_20():
     return (
-        pd.read_csv(data_file_path("raw/lafayette_pd/lafayette_pd_cprr_2015_2020.csv"))
+        pd.read_csv(bolo.data("raw/lafayette_pd/lafayette_pd_cprr_2015_2020.csv"))
         .pipe(clean_column_names)
         .dropna(how="all")
         .rename(
@@ -1047,7 +1043,7 @@ def assign_correct_disposition_14(df):
 
 def clean_cprr_14():
     df = (
-        pd.read_csv(data_file_path("raw/lafayette_pd/lafayette_pd_cprr_2009_2014.csv"))
+        pd.read_csv(bolo.data("raw/lafayette_pd/lafayette_pd_cprr_2009_2014.csv"))
         .pipe(clean_column_names)
         .pipe(clean_receive_date_14)
         .pipe(clean_complete_date_14)
@@ -1085,6 +1081,6 @@ if __name__ == "__main__":
     pprr = clean_pprr()
     cprr_20 = clean_cprr_20()
     cprr_14 = clean_cprr_14()
-    cprr_20.to_csv(data_file_path("clean/cprr_lafayette_pd_2015_2020.csv"), index=False)
-    cprr_14.to_csv(data_file_path("clean/cprr_lafayette_pd_2009_2014.csv"), index=False)
-    pprr.to_csv(data_file_path("clean/pprr_lafayette_pd_2010_2021.csv"), index=False)
+    cprr_20.to_csv(bolo.data("clean/cprr_lafayette_pd_2015_2020.csv"), index=False)
+    cprr_14.to_csv(bolo.data("clean/cprr_lafayette_pd_2009_2014.csv"), index=False)
+    pprr.to_csv(bolo.data("clean/pprr_lafayette_pd_2010_2021.csv"), index=False)

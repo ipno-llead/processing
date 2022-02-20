@@ -1,9 +1,7 @@
-import sys
-
-sys.path.append("../")
 import pandas as pd
+import bolo
+
 from lib.columns import clean_column_names, set_values
-from lib.path import data_file_path
 from lib.clean import clean_dates, clean_names
 from lib.uid import gen_uid
 
@@ -135,7 +133,7 @@ def clean_rank(df):
 
 def clean():
     df = (
-        pd.read_csv(data_file_path("raw/rayne_pd/rayne_pd_cprr_2019_2020.csv"))
+        pd.read_csv(bolo.data("raw/rayne_pd/rayne_pd_cprr_2019_2020.csv"))
         .pipe(clean_column_names)
         .rename(
             columns={
@@ -175,4 +173,4 @@ def clean():
 
 if __name__ == "__main__":
     df = clean()
-    df.to_csv(data_file_path("clean/cprr_rayne_pd_2019_2020.csv"), index=False)
+    df.to_csv(bolo.data("clean/cprr_rayne_pd_2019_2020.csv"), index=False)

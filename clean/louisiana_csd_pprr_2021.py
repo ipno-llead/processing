@@ -1,5 +1,5 @@
 from lib.columns import clean_column_names, set_values
-from lib.path import data_file_path
+import bolo
 from lib.clean import (
     clean_dates,
     clean_races,
@@ -13,9 +13,6 @@ from lib.uid import gen_uid
 from lib import salary
 import pandas as pd
 import numpy as np
-import sys
-
-sys.path.append("../")
 
 
 def split_names(df):
@@ -34,7 +31,7 @@ def clean_hire_date(df):
 def clean_demo():
     return (
         pd.read_csv(
-            data_file_path("raw/louisiana_csd/louisiana_csd_pprr_demographics_2021.csv")
+            bolo.data("raw/louisiana_csd/louisiana_csd_pprr_demographics_2021.csv")
         )
         .pipe(clean_column_names)
         .drop(columns=["agency_name", "classified_unclassified"])
@@ -72,7 +69,7 @@ def clean_demo():
 def clean_term():
     return (
         pd.read_csv(
-            data_file_path("raw/louisiana_csd/louisiana_csd_pprr_terminations_2021.csv")
+            bolo.data("raw/louisiana_csd/louisiana_csd_pprr_terminations_2021.csv")
         )
         .pipe(clean_column_names)
         .drop(columns=["agency_name", "action_type"])
@@ -101,5 +98,5 @@ def clean_term():
 if __name__ == "__main__":
     demo = clean_demo()
     term = clean_term()
-    demo.to_csv(data_file_path("clean/pprr_demo_louisiana_csd_2021.csv"), index=False)
-    term.to_csv(data_file_path("clean/pprr_term_louisiana_csd_2021.csv"), index=False)
+    demo.to_csv(bolo.data("clean/pprr_demo_louisiana_csd_2021.csv"), index=False)
+    term.to_csv(bolo.data("clean/pprr_term_louisiana_csd_2021.csv"), index=False)

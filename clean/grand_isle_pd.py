@@ -1,10 +1,9 @@
 import re
-import sys
 
 import pandas as pd
 
 from lib.columns import clean_column_names
-from lib.path import data_file_path, ensure_data_dir
+import bolo
 from lib.clean import (
     clean_names,
     clean_dates,
@@ -17,8 +16,6 @@ from lib.clean import (
 )
 from lib.uid import gen_uid
 from lib import salary
-
-sys.path.append("../")
 
 
 def parse_birthdate(df):
@@ -129,7 +126,7 @@ def assign_agency(df):
 def clean():
     return (
         pd.read_csv(
-            data_file_path("raw/grand_isle/grand_isle_pd_pprr_2021_byhand.csv"),
+            bolo.data("raw/grand_isle/grand_isle_pd_pprr_2021_byhand.csv"),
             encoding="latin-1",
         )
         .pipe(clean_column_names)
@@ -166,5 +163,5 @@ def clean():
 
 if __name__ == "__main__":
     df = clean()
-    ensure_data_dir("clean")
-    df.to_csv(data_file_path("clean/pprr_grand_isle_pd_2021.csv"), index=False)
+
+    df.to_csv(bolo.data("clean/pprr_grand_isle_pd_2021.csv"), index=False)

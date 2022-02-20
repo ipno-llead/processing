@@ -1,11 +1,8 @@
-from lib.path import data_file_path
+import bolo
 from lib.columns import clean_column_names, set_values
 from lib.clean import clean_dates, float_to_int_str
 from lib.uid import gen_uid
 import pandas as pd
-import sys
-
-sys.path.append("../")
 
 
 def assign_allegations(df):
@@ -18,7 +15,7 @@ def assign_allegations(df):
 
 def clean():
     df = pd.read_csv(
-        data_file_path("raw/greenwood_pd/greenwood_pd_cprr_2015-2020_byhand.csv")
+        bolo.data("raw/greenwood_pd/greenwood_pd_cprr_2015-2020_byhand.csv")
     )
     df = clean_column_names(df)
     df = df.rename(
@@ -46,4 +43,4 @@ def clean():
 
 if __name__ == "__main__":
     df = clean()
-    df.to_csv(data_file_path("clean/cprr_greenwood_pd_2015_2020.csv"), index=False)
+    df.to_csv(bolo.data("clean/cprr_greenwood_pd_2015_2020.csv"), index=False)

@@ -1,7 +1,4 @@
-import sys
-
-sys.path.append("../")
-from lib.path import data_file_path
+import bolo
 from lib.columns import set_values
 from lib.uid import gen_uid
 from lib.clean import clean_dates, float_to_int_str
@@ -228,9 +225,7 @@ def discard_impossible_dates(df):
 
 def clean():
     df = (
-        pd.read_csv(
-            data_file_path("raw/tangipahoa_so/tangipahoa_so_cprr_2015_2021.csv")
-        )
+        pd.read_csv(bolo.data("raw/tangipahoa_so/tangipahoa_so_cprr_2015_2021.csv"))
         .pipe(split_rows_with_name)
         .pipe(split_full_name)
         .pipe(clean_dept_desc)
@@ -269,4 +264,4 @@ def clean():
 
 if __name__ == "__main__":
     df = clean()
-    df.to_csv(data_file_path("clean/cprr_tangipahoa_so_2015_2021.csv"), index=False)
+    df.to_csv(bolo.data("clean/cprr_tangipahoa_so_2015_2021.csv"), index=False)

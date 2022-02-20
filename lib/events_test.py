@@ -18,9 +18,6 @@ from events import (
     discard_events_occur_more_than_once_every_30_days,
 )
 import salary
-import sys
-
-sys.path.append("./")
 
 
 class EventsBuilderTestCase(unittest.TestCase):

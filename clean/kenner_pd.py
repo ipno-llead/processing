@@ -1,11 +1,8 @@
 from lib.columns import clean_column_names
-from lib.path import data_file_path, ensure_data_dir
+import bolo
 from lib.clean import clean_names, standardize_desc_cols, clean_dates
 from lib.uid import gen_uid
 import pandas as pd
-import sys
-
-sys.path.append("../")
 
 
 def assign_agency(df):
@@ -33,7 +30,7 @@ def split_names(df):
 
 def clean():
     return (
-        pd.read_csv(data_file_path("raw/kenner_pd/kenner_pd_pprr_2020.csv"))
+        pd.read_csv(bolo.data("raw/kenner_pd/kenner_pd_pprr_2020.csv"))
         .pipe(clean_column_names)
         .rename(
             columns={
@@ -109,9 +106,7 @@ def clean_rank(df):
 
 def clean_former_long():
     return (
-        pd.read_csv(
-            data_file_path("raw/kenner_pd/kenner_pd_pprr_formeremployees_long.csv")
-        )
+        pd.read_csv(bolo.data("raw/kenner_pd/kenner_pd_pprr_formeremployees_long.csv"))
         .pipe(clean_column_names)
         .rename(
             columns={
@@ -133,9 +128,7 @@ def clean_former_long():
 
 def clean_former_short():
     return (
-        pd.read_csv(
-            data_file_path("raw/kenner_pd/kenner_pd_pprr_formeremployees_short.csv")
-        )
+        pd.read_csv(bolo.data("raw/kenner_pd/kenner_pd_pprr_formeremployees_short.csv"))
         .pipe(clean_column_names)
         .rename(
             columns={
@@ -186,5 +179,5 @@ if __name__ == "__main__":
     former_long = clean_former_long()
     former_short = clean_former_short()
     combined = combine_pprrs(pprr, former_long, former_short)
-    ensure_data_dir("clean")
-    combined.to_csv(data_file_path("clean/pprr_kenner_pd_2020.csv"), index=False)
+
+    combined.to_csv(bolo.data("clean/pprr_kenner_pd_2020.csv"), index=False)

@@ -1,15 +1,12 @@
 from lib.uid import gen_uid
 import re
-import sys
 
 import pandas as pd
 
 from lib.columns import clean_column_names, set_values
-from lib.path import data_file_path, ensure_data_dir
+import bolo
 from lib.clean import clean_dates, clean_salaries, clean_names
 from lib import salary
-
-sys.path.append("../")
 
 
 def realign(df):
@@ -117,7 +114,7 @@ def assign_agency(df):
 def clean():
     return (
         pd.read_csv(
-            data_file_path(
+            bolo.data(
                 "raw/harahan_csd/harahan_csd_pprr_roster_by_employment_status_2020.csv"
             )
         )
@@ -146,7 +143,7 @@ def clean():
 def join_employment_date(df):
     emp_dates = (
         pd.read_csv(
-            data_file_path(
+            bolo.data(
                 "raw/harahan_csd/harahan_csd_prrr_roster_by_employment_date_2020.csv"
             )
         )
@@ -166,5 +163,5 @@ def join_employment_date(df):
 
 if __name__ == "__main__":
     df = clean()
-    ensure_data_dir("clean")
-    df.to_csv(data_file_path("clean/pprr_harahan_csd_2020.csv"), index=False)
+
+    df.to_csv(bolo.data("clean/pprr_harahan_csd_2020.csv"), index=False)

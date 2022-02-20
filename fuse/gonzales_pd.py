@@ -1,7 +1,4 @@
-import sys
-
-sys.path.append("../")
-from lib.path import data_file_path
+import bolo
 import pandas as pd
 from lib.columns import rearrange_personnel_columns, rearrange_event_columns
 from lib import events
@@ -27,8 +24,10 @@ def fuse_events(pprr):
 
 
 if __name__ == "__main__":
-    pprr = pd.read_csv(data_file_path("clean/pprr_gonzales_pd_2010_2021.csv"))
-    post_event = pd.read_csv(data_file_path("match/post_event_gonzales_pd_2010_2021.csv"))
+    pprr = pd.read_csv(bolo.data("clean/pprr_gonzales_pd_2010_2021.csv"))
+    post_event = pd.read_csv(bolo.data("match/post_event_gonzales_pd_2010_2021.csv"))
     events_df = rearrange_event_columns(pd.concat([post_event, fuse_events(pprr)]))
-    rearrange_personnel_columns(pprr).to_csv(data_file_path("fuse/per_gonzales_pd.csv"), index=False)
-    events_df.to_csv(data_file_path("fuse/event_gonzales_pd.csv"), index=False)
+    rearrange_personnel_columns(pprr).to_csv(
+        bolo.data("fuse/per_gonzales_pd.csv"), index=False
+    )
+    events_df.to_csv(bolo.data("fuse/event_gonzales_pd.csv"), index=False)

@@ -1,12 +1,9 @@
 import pandas as pd
 from lib.clean import clean_dates, clean_names, standardize_desc_cols, clean_salaries
-from lib.path import data_file_path, ensure_data_dir
+import bolo
 from lib.columns import clean_column_names, set_values
 from lib.uid import gen_uid
 from lib import salary
-import sys
-
-sys.path.append("../")
 
 
 def assign_agency(df, year):
@@ -50,9 +47,7 @@ def assign_pay_date_and_rank_date(df):
 
 def clean_personnel_2008():
     df = pd.read_csv(
-        data_file_path(
-            "raw/new_orleans_harbor_pd/new_orleans_harbor_pd_pprr_1991-2008.csv"
-        )
+        bolo.data("raw/new_orleans_harbor_pd/new_orleans_harbor_pd_pprr_1991-2008.csv")
     )
     df = clean_column_names(df)
     df = df.dropna(axis=1, how="all")
@@ -82,7 +77,7 @@ def clean_personnel_2008():
 
 def clean_personnel_2020():
     df = pd.read_csv(
-        data_file_path("raw/new_orleans_harbor_pd/new_orleans_harbor_pd_pprr_2020.csv")
+        bolo.data("raw/new_orleans_harbor_pd/new_orleans_harbor_pd_pprr_2020.csv")
     )
     df = clean_column_names(df)
     df = df.dropna(how="all")
@@ -132,6 +127,8 @@ def clean_personnel_2020():
 if __name__ == "__main__":
     df20 = clean_personnel_2020()
     df08 = clean_personnel_2008()
-    ensure_data_dir("clean")
-    df20.to_csv(data_file_path("clean/pprr_new_orleans_harbor_pd_2020.csv"), index=False)
-    df08.to_csv(data_file_path("clean/pprr_new_orleans_harbor_pd_1991_2008.csv"), index=False)
+
+    df20.to_csv(bolo.data("clean/pprr_new_orleans_harbor_pd_2020.csv"), index=False)
+    df08.to_csv(
+        bolo.data("clean/pprr_new_orleans_harbor_pd_1991_2008.csv"), index=False
+    )

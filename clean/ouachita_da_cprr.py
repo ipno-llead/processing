@@ -1,8 +1,5 @@
-import sys
-
-sys.path.append("../")
 import pandas as pd
-from lib.path import data_file_path
+import bolo
 from lib.columns import clean_column_names
 from lib.uid import gen_uid
 
@@ -39,7 +36,9 @@ def clean_allegations(df):
 
 def extract_agency_and_department_desc(df):
     agency = df.action.str.extract(r"(lsp)")
-    df.loc[:, "agency"] = agency[0].str.replace("lsp", "Louisiana State PD", regex=False)
+    df.loc[:, "agency"] = agency[0].str.replace(
+        "lsp", "Louisiana State PD", regex=False
+    )
 
     departments = df.action.str.extract(r"(troof f)")
     df.loc[:, "department_desc"] = departments[0].str.replace(
@@ -65,7 +64,7 @@ def assign_agency(df):
 
 def clean():
     df = (
-        pd.read_csv(data_file_path("raw/ouachita_da/ouachita_da_cprr_2021_by_hand.csv"))
+        pd.read_csv(bolo.data("raw/ouachita_da/ouachita_da_cprr_2021_by_hand.csv"))
         .pipe(clean_column_names)
         .pipe(extract_disposition)
         .pipe(extract_charging_agency)
@@ -81,4 +80,4 @@ def clean():
 
 if __name__ == "__main__":
     df = clean()
-    df.to_csv(data_file_path("clean/cprr_ouachita_da_2021.csv"), index=False)
+    df.to_csv(bolo.data("clean/cprr_ouachita_da_2021.csv"), index=False)

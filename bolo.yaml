@@ -1,0 +1,22 @@
+dataDir: data
+patterns:
+  prerequisites:
+    - pd.read_csv(bolo.data(r'.+\.csv'))
+  targets:
+    - "`*`.to_csv(bolo.data(r'.+\\.csv'))"
+stages:
+  - name: clean
+    ignoredTargets:
+      - duplicates.csv
+  - name: match
+  - name: fuse
+    ignoredTargets:
+      - duplicates.csv
+      - fuse/person.csv
+targets:
+  - fuse/personnel.csv
+  - fuse/allegation.csv
+  - fuse/use_of_force.csv
+  - fuse/stop_and_search.csv
+  - fuse/appeals.csv
+  - fuse/event.csv

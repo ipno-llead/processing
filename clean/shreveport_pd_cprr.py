@@ -1,13 +1,9 @@
-import sys
-
 import pandas as pd
 
 from lib.columns import clean_column_names, set_values
-from lib.path import data_file_path
+import bolo
 from lib.clean import clean_names
 from lib.uid import gen_uid
-
-sys.path.append("../")
 
 
 def stack_disposition_rows(df):
@@ -114,10 +110,9 @@ def clean_tracking_number(df):
     return df
 
 
-def clean_cprr_disposition(name, year):
+def clean_cprr_disposition(disp_df, year):
     return (
-        pd.read_csv(data_file_path(name))
-        .pipe(clean_column_names)
+        disp_df.pipe(clean_column_names)
         .rename(
             columns={
                 "iab_num": "tracking_number",
@@ -171,10 +166,9 @@ def split_names(df):
     return df.drop(columns=["suffix"])
 
 
-def clean_cprr_names(name, year):
+def clean_cprr_names(cprr_df, year):
     return (
-        pd.read_csv(data_file_path(name))
-        .pipe(clean_column_names)
+        cprr_df.pipe(clean_column_names)
         .rename(
             columns={
                 "iab_number": "tracking_number",
@@ -259,7 +253,7 @@ def clean_cprr(disposition_file, name_file, year):
 
 def clean_codebook():
     df = pd.read_csv(
-        data_file_path("raw/shreveport_pd/shreveport_codebook.csv"),
+        bolo.data("raw/shreveport_pd/shreveport_codebook.csv"),
         names=["name", "code"],
     )
     df.loc[:, "name"] = df.name.str.strip().str.lower()
@@ -273,17 +267,29 @@ if __name__ == "__main__":
     df = pd.concat(
         [
             clean_cprr(
-                "raw/shreveport_pd/shreveport_pd_cprr_dispositions_2018.csv",
-                "raw/shreveport_pd/shreveport_pd_cprr_names_2018.csv",
+                pd.read_csv(
+                    bolo.data(
+                        "raw/shreveport_pd/shreveport_pd_cprr_dispositions_2018.csv"
+                    )
+                ),
+                pd.read_csv(
+                    bolo.data("raw/shreveport_pd/shreveport_pd_cprr_names_2018.csv")
+                ),
                 "2018",
             ),
             clean_cprr(
-                "raw/shreveport_pd/shreveport_pd_cprr_dispositions_2019.csv",
-                "raw/shreveport_pd/shreveport_pd_cprr_names_2019.csv",
+                pd.read_csv(
+                    bolo.data(
+                        "raw/shreveport_pd/shreveport_pd_cprr_dispositions_2019.csv"
+                    )
+                ),
+                pd.read_csv(
+                    bolo.data("raw/shreveport_pd/shreveport_pd_cprr_names_2019.csv")
+                ),
                 "2019",
             ),
         ]
     )
     cb_df = clean_codebook()
-    df.to_csv(data_file_path("clean/cprr_shreveport_pd_2018_2019.csv"), index=False)
-    cb_df.to_csv(data_file_path("clean/cprr_codebook_shreveport_pd.csv"), index=False)
+    df.to_csv(bolo.data("clean/cprr_shreveport_pd_2018_2019.csv"), index=False)
+    cb_df.to_csv(bolo.data("clean/cprr_codebook_shreveport_pd.csv"), index=False)

@@ -1,12 +1,9 @@
 import pandas as pd
 from lib.columns import clean_column_names, set_values
-from lib.path import data_file_path, ensure_data_dir
+import bolo
 from lib.uid import gen_uid
 from lib import salary
 from lib.clean import clean_names, clean_dates, clean_sexes, clean_races, clean_salaries
-import sys
-
-sys.path.append("../")
 
 
 def split_name(df):
@@ -41,7 +38,7 @@ def clean_rank(df):
 
 
 def clean():
-    df = pd.read_csv(data_file_path("raw/scott_pd/scott_pd_pprr_2021.csv"))
+    df = pd.read_csv(bolo.data("raw/scott_pd/scott_pd_pprr_2021.csv"))
     df = clean_column_names(df)
     df.columns = [
         "full_name",
@@ -75,5 +72,5 @@ def clean():
 
 if __name__ == "__main__":
     df = clean()
-    ensure_data_dir("clean")
-    df.to_csv(data_file_path("clean/pprr_scott_pd_2021.csv"), index=False)
+
+    df.to_csv(bolo.data("clean/pprr_scott_pd_2021.csv"), index=False)

@@ -1,14 +1,10 @@
-import sys
-
 import pandas as pd
 
 from lib import salary
 from lib.columns import clean_column_names, set_values
-from lib.path import data_file_path
+import bolo
 from lib.clean import clean_dates, clean_sexes, clean_races, clean_salaries
 from lib.uid import gen_uid
-
-sys.path.append("../")
 
 
 def split_names(df):
@@ -41,9 +37,7 @@ def remove_current_dates(df):
 
 def clean():
     return (
-        pd.read_csv(
-            data_file_path("raw/sterlington_pd/sterlington_csd_ppprr_2010_2020.csv")
-        )
+        pd.read_csv(bolo.data("raw/sterlington_pd/sterlington_csd_ppprr_2010_2020.csv"))
         .pipe(clean_column_names)
         .dropna(axis=1, how="all")
         .rename(columns={"rank": "rank_desc", "dob": "birth_date"})
@@ -61,4 +55,4 @@ def clean():
 
 if __name__ == "__main__":
     df = clean()
-    df.to_csv(data_file_path("clean/pprr_sterlington_csd_2010_2020.csv"), index=False)
+    df.to_csv(bolo.data("clean/pprr_sterlington_csd_2010_2020.csv"), index=False)
