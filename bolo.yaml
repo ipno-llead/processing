@@ -1,16 +1,16 @@
 dataDir: data
 patterns:
-  inputs:
+  prerequisites:
     - pd.read_csv(bolo.data(r'.+\.csv'))
-  outputs:
+  targets:
     - "`*`.to_csv(bolo.data(r'.+\\.csv'))"
 stages:
   - name: clean
-    ignoredOutputs:
+    ignoredTargets:
       - duplicates.csv
   - name: match
   - name: fuse
-    ignoredOutputs:
+    ignoredTargets:
       - duplicates.csv
       - fuse/person.csv
 targets:

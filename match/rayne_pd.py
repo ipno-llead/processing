@@ -72,7 +72,7 @@ if __name__ == "__main__":
     cprr = pd.read_csv(bolo.data("clean/cprr_rayne_pd_2019_2020.csv"))
     pprr = pd.read_csv(bolo.data("clean/pprr_rayne_pd_2010_2020.csv"))
     agency = cprr.agency[0]
-    post = load_for_agency("clean/pprr_post_2020_11_06.csv", agency)
+    post = load_for_agency(agency)
     post_event = extract_post_events(pprr, post)
     cprr = assign_uid_from_post(cprr, post)
     cprr.to_csv(bolo.data("match/cprr_rayne_pd_2019_2020.csv"), index=False)

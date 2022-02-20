@@ -1,6 +1,7 @@
 SHELL = /bin/bash
 
 OS := $(shell uname -s)
+BOLO_MD5 := $(if $(findstring Darwin,$(OS)),md5,md5sum)
 PYTHON := python
 BOLO_DIR := .bolo
 BOLO_FILE := bolo.yaml
@@ -22,14 +23,15 @@ cleanbolo:
 define bolo_execute
 @start_time=$$SECONDS && \
 echo "running $(1)" | sed $$'s,.*,\e[1;37m&\e[m,' && \
-(set -o pipefail; PYTHONPATH=$(BOLO_PYTHON_PATH) $(PYTHON) $(1) 2>&1>&3 | sed $$'s,.*,    \e[31m&\e[m,' >&2 )3>&1 | sed $$'s,.*,    \e[1;30m&\e[m,' && \
+set -o pipefail && \
+(PYTHONPATH=$(BOLO_PYTHON_PATH) $(PYTHON) $(1) 2>&1>&3 | sed $$'s,.*,    \e[31m&\e[m,' >&2 )3>&1 | sed $$'s,.*,    \e[1;30m&\e[m,' && \
 echo "    script completed in $$((SECONDS - start_time)) seconds" | sed $$'s,.*,\e[1;34m&\e[m,'
 endef
 
 # calculate md5
 $(BOLO_MD5_DIR)/%.md5: % | $(BOLO_MD5_DIR)
 	@-mkdir -p $(dir $@) 2>/dev/null
-	@$(PYTHON) -m bolo md5 $< $@
+	$(if $(filter-out $(shell cat $@ 2>/dev/null),$(shell $(BOLO_MD5) $<)),$(BOLO_MD5) $< > $@)
 
 $(BOLO_DEPS_DIR)/%.d: %/*.py $(BOLO_FILE) | $(BOLO_DEPS_DIR)
 	$(PYTHON) -m bolo deps --stage $*
