@@ -22,7 +22,7 @@ def clean_and_split_names(df):
         .str.replace(r"\'", "", regex=True)
         .str.replace(
             r"(unknown|records for file|(file)? ?for records? ?(only)?|"
-            r"intake booking|corrections intake)|metro narcotics",
+            r"intake booking|corrections intake)|metro narcotics|intel division",
             "",
             regex=True,
         )
@@ -32,7 +32,7 @@ def clean_and_split_names(df):
     df.loc[:, "last_name"] = names[0].str.replace(",", "", regex=False).fillna("")
     df.loc[:, "middle_name"] = names[1].fillna("")
     df.loc[:, "first_name"] = names[2].fillna("")
-    return df.drop(columns="name")
+    return df.drop(columns=["name"])
 
 
 def clean_allegations(df):
@@ -186,6 +186,12 @@ def clean_action_08(df):
     return df.drop(columns="leave")
 
 
+def remove_uid_for_unknown_officers(df):
+    df.loc[((df.first_name == "") & (df.last_name == "")), "uid"] = ""
+    df.loc[((df.first_name == "") & (df.last_name == "")), "allegation_uid"] = ""
+    return df
+
+
 def clean20():
     df = pd.read_csv(
         bolo.data("raw/lafayette_so/lafayette_so_cprr_2015_2020.csv")
@@ -219,6 +225,7 @@ def clean20():
             ["uid", "allegation", "action", "tracking_number"],
             "allegation_uid",
         )
+        .pipe(remove_uid_for_unknown_officers)
     )
     return df
 
@@ -244,6 +251,7 @@ def clean14():
             ["uid", "allegation", "action", "tracking_number", "receive_date"],
             "allegation_uid",
         )
+        .pipe(remove_uid_for_unknown_officers)
     )
     return df
 
@@ -269,6 +277,7 @@ def clean08():
             ["uid", "allegation", "action", "tracking_number", "receive_date"],
             "allegation_uid",
         )
+        .pipe(remove_uid_for_unknown_officers)
     )
     return df
 

@@ -351,6 +351,12 @@ def split_action_from_disposition(df):
     return df
 
 
+def remove_uid_for_unknown_officers(df):
+    df.loc[((df.first_name == "") & (df.last_name == "")), "uid"] = ""
+    df.loc[((df.first_name == "") & (df.last_name == "")), "allegation_uid"] = ""
+    return df
+
+
 def clean_cprr_20():
     return (
         pd.read_csv(bolo.data("raw/lafayette_pd/lafayette_pd_cprr_2015_2020.csv"))
@@ -839,6 +845,7 @@ def split_names_14(df):
             "pat elliot (district attorney's office)",
             regex=True,
         )
+        .str.replace(r"^metro narcotics", "", regex=True)
     )
     names = df.focus_officer_s.str.extract(
         r"(?:(officer|detective|sergeant|lieutenant|city marshall|major|recruit|"
@@ -857,11 +864,7 @@ def split_names_14(df):
         .str.replace(r"\(\(?|\)\)?", "", regex=True)
         .str.replace("cid", "criminal investigations", regex=False)
     )
-    return df.drop(columns=["focus_officer_s"])
-
-
-def drop_rows_missing_first_and_last_name_14(df):
-    return df[~((df.first_name == "") & (df.last_name == ""))]
+    return df
 
 
 def drop_rows_missing_charges_disposition_and_action_14(df):
@@ -1057,7 +1060,6 @@ def clean_cprr_14():
         .pipe(split_rows_with_multiple_charges_14)
         .pipe(split_rows_with_multiple_names_14)
         .pipe(split_names_14)
-        .pipe(drop_rows_missing_first_and_last_name_14)
         .pipe(assign_correct_actions_14)
         .pipe(assign_correct_disposition_14)
         .pipe(drop_rows_missing_charges_disposition_and_action_14)
@@ -1073,6 +1075,7 @@ def clean_cprr_14():
             ["uid", "charges", "action", "tracking_number", "disposition"],
             "allegation_uid",
         )
+        .pipe(remove_uid_for_unknown_officers)
     )
     return df
 

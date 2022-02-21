@@ -36,7 +36,7 @@ def split_full_name(df):
     )
     df.loc[:, "last_name"] = parts[2].str.strip().str.replace("deputy", "", regex=False)
     df.loc[df.full_name == "deputy", "rank_desc"] = "deputy"
-    return df.drop(columns="full_name")
+    return df.drop(columns=["full_name"])
 
 
 def clean_dept_desc(df):
@@ -223,6 +223,12 @@ def discard_impossible_dates(df):
     return df
 
 
+def remove_uid_for_unknown_officers(df):
+    df.loc[((df.first_name == "") & (df.last_name == "")), "uid"] = ""
+    df.loc[((df.first_name == "") & (df.last_name == "")), "allegation_uid"] = ""
+    return df
+
+
 def clean():
     df = (
         pd.read_csv(bolo.data("raw/tangipahoa_so/tangipahoa_so_cprr_2015_2021.csv"))
@@ -258,6 +264,7 @@ def clean():
             ],
             "supervisor_uid",
         )
+        .pipe(remove_uid_for_unknown_officers)
     )
     return df
 
