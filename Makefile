@@ -18,9 +18,9 @@ $(BUILD_DIR): ; @-mkdir $@ 2>/dev/null
 schema.md: $(MD5_DIR)/data/datavalid.yml.md5
 	python -m datavalid --dir $(DATA_DIR) --doc $@
 
-include bolo.mk
+include deba.mk
 include wrgl.mk
 
-all: bolo $(BOLO_DATA_DIR)/fuse/person.csv
-clean: cleanbolo
+all: deba $(DEBA_DATA_DIR)/fuse/person.csv
+clean: cleandeba
 	rm -rf $(BUILD_DIR)

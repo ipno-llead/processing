@@ -1,7 +1,7 @@
 import pandas as pd
 from lib.personnel import fuse_personnel
 from lib.columns import rearrange_allegation_columns, rearrange_event_columns
-import bolo
+import deba
 from lib import events
 
 
@@ -60,9 +60,9 @@ def fuse_events(pprr, cprr):
 
 
 if __name__ == "__main__":
-    pprr = pd.read_csv(bolo.data("clean/pprr_bossier_city_pd_2000_2019.csv"))
-    post_event = pd.read_csv(bolo.data("match/post_event_bossier_city_pd.csv"))
-    cprr = pd.read_csv(bolo.data("clean/cprr_bossier_city_pd_2020.csv"))
+    pprr = pd.read_csv(deba.data("clean/pprr_bossier_city_pd_2000_2019.csv"))
+    post_event = pd.read_csv(deba.data("match/post_event_bossier_city_pd.csv"))
+    cprr = pd.read_csv(deba.data("clean/cprr_bossier_city_pd_2020.csv"))
     per_df = fuse_personnel(pprr, cprr)
     com_df = rearrange_allegation_columns(cprr)
     events_df = fuse_events(pprr, cprr)
@@ -74,6 +74,6 @@ if __name__ == "__main__":
             ]
         )
     )
-    per_df.to_csv(bolo.data("fuse/per_bossier_city_pd.csv"), index=False)
-    events_df.to_csv(bolo.data("fuse/event_bossier_city_pd.csv"), index=False)
-    com_df.to_csv(bolo.data("fuse/com_bossier_city_pd.csv"), index=False)
+    per_df.to_csv(deba.data("fuse/per_bossier_city_pd.csv"), index=False)
+    events_df.to_csv(deba.data("fuse/event_bossier_city_pd.csv"), index=False)
+    com_df.to_csv(deba.data("fuse/com_bossier_city_pd.csv"), index=False)

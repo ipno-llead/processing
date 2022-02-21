@@ -9,7 +9,7 @@ from datamatch import (
 )
 import pandas as pd
 
-import bolo
+import deba
 from lib.post import extract_events_from_post, load_for_agency
 from lib.date import combine_date_columns
 
@@ -51,7 +51,7 @@ def match_lprr_and_pprr(lprr, pprr):
     )
     decision = 0.969
     matcher.save_pairs_to_excel(
-        bolo.data("match/louisiana_state_csc_lprr_1991_2020_v_csd_pprr_2021.xlsx"),
+        deba.data("match/louisiana_state_csc_lprr_1991_2020_v_csd_pprr_2021.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
@@ -87,7 +87,7 @@ def extract_post_events(pprr, post):
     )
     decision = 0.924
     matcher.save_pairs_to_excel(
-        bolo.data("match/louisiana_state_csd_pprr_2021_v_post_pprr_2020_11_06.xlsx"),
+        deba.data("match/louisiana_state_csd_pprr_2021_v_post_pprr_2020_11_06.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
@@ -135,7 +135,7 @@ def match_pprr_demo_and_term(demo, term):
     )
     decision = 0.98
     matcher.save_pairs_to_excel(
-        bolo.data(
+        deba.data(
             "match/louisiana_state_csd_pprr_demographic_2021_v_terminations_2021.xlsx"
         ),
         decision,
@@ -148,16 +148,16 @@ def match_pprr_demo_and_term(demo, term):
 
 
 if __name__ == "__main__":
-    lprr = pd.read_csv(bolo.data("clean/lprr_louisiana_state_csc_1991_2020.csv"))
-    pprr_demo = pd.read_csv(bolo.data("clean/pprr_demo_louisiana_csd_2021.csv"))
-    pprr_term = pd.read_csv(bolo.data("clean/pprr_term_louisiana_csd_2021.csv"))
+    lprr = pd.read_csv(deba.data("clean/lprr_louisiana_state_csc_1991_2020.csv"))
+    pprr_demo = pd.read_csv(deba.data("clean/pprr_demo_louisiana_csd_2021.csv"))
+    pprr_term = pd.read_csv(deba.data("clean/pprr_term_louisiana_csd_2021.csv"))
     agency = pprr_term.agency[0]
     post = load_for_agency(agency)
     pprr_term = match_pprr_demo_and_term(pprr_demo, pprr_term)
     lprr = match_lprr_and_pprr(lprr, pprr_demo)
     post_events = extract_post_events(pprr_demo, post)
-    lprr.to_csv(bolo.data("match/lprr_louisiana_state_csc_1991_2020.csv"), index=False)
+    lprr.to_csv(deba.data("match/lprr_louisiana_state_csc_1991_2020.csv"), index=False)
     post_events.to_csv(
-        bolo.data("match/post_event_louisiana_state_police_2020.csv"), index=False
+        deba.data("match/post_event_louisiana_state_police_2020.csv"), index=False
     )
-    pprr_term.to_csv(bolo.data("match/pprr_term_louisiana_csd_2021.csv"), index=False)
+    pprr_term.to_csv(deba.data("match/pprr_term_louisiana_csd_2021.csv"), index=False)

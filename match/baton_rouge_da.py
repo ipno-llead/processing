@@ -1,4 +1,4 @@
-import bolo
+import deba
 from datamatch import ColumnsIndex, JaroWinklerSimilarity, ThresholdMatcher
 import pandas as pd
 
@@ -27,7 +27,7 @@ def match_against_baton_rouge_csd_pprr(df, pprr, year, decision):
         dfb,
     )
     matcher.save_pairs_to_excel(
-        bolo.data("match/baton_rouge_da_cprr_2018_v_csd_pprr_%d.xlsx" % year),
+        deba.data("match/baton_rouge_da_cprr_2018_v_csd_pprr_%d.xlsx" % year),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
@@ -65,7 +65,7 @@ def match_against_baton_rouge_so_personnel(df, per):
     )
     decision = 1
     matcher.save_pairs_to_excel(
-        bolo.data("match/baton_rouge_da_cprr_2018_v_baton_rouge_so_personnel.xlsx"),
+        deba.data("match/baton_rouge_da_cprr_2018_v_baton_rouge_so_personnel.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
@@ -76,9 +76,9 @@ def match_against_baton_rouge_so_personnel(df, per):
 
 
 if __name__ == "__main__":
-    pprr19 = pd.read_csv(bolo.data("match/pprr_baton_rouge_csd_2019.csv"))
-    pprr17 = pd.read_csv(bolo.data("match/pprr_baton_rouge_csd_2017.csv"))
-    df = pd.read_csv(bolo.data("clean/cprr_baton_rouge_da_2021.csv"))
+    pprr19 = pd.read_csv(deba.data("match/pprr_baton_rouge_csd_2019.csv"))
+    pprr17 = pd.read_csv(deba.data("match/pprr_baton_rouge_csd_2017.csv"))
+    df = pd.read_csv(deba.data("clean/cprr_baton_rouge_da_2021.csv"))
     df = match_against_baton_rouge_csd_pprr(df, pprr17, 2017, 0.97)
     df = match_against_baton_rouge_csd_pprr(df, pprr19, 2019, 0.97)
-    df.to_csv(bolo.data("match/cprr_baton_rouge_da_2021.csv"), index=False)
+    df.to_csv(deba.data("match/cprr_baton_rouge_da_2021.csv"), index=False)

@@ -6,7 +6,7 @@ from datamatch import (
     DateSimilarity,
 )
 
-import bolo
+import deba
 from lib.date import combine_date_columns
 from lib.post import extract_events_from_post, load_for_agency
 
@@ -38,7 +38,7 @@ def extract_post_events(pprr, post):
     )
     decision = 0.87
     matcher.save_pairs_to_excel(
-        bolo.data("match/vivian_pd_pprr_2021_v_post_pprr_2020_11_06.xlsx"),
+        deba.data("match/vivian_pd_pprr_2021_v_post_pprr_2020_11_06.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
@@ -47,8 +47,8 @@ def extract_post_events(pprr, post):
 
 
 if __name__ == "__main__":
-    pprr = pd.read_csv(bolo.data("clean/pprr_vivian_pd_2021.csv"))
+    pprr = pd.read_csv(deba.data("clean/pprr_vivian_pd_2021.csv"))
     agency = pprr.agency[0]
     post = load_for_agency(agency)
     post_events = extract_post_events(pprr, post)
-    post_events.to_csv(bolo.data("match/post_event_vivian_pd_2020.csv"), index=False)
+    post_events.to_csv(deba.data("match/post_event_vivian_pd_2020.csv"), index=False)

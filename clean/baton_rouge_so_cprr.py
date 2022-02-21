@@ -1,6 +1,6 @@
 from lib.columns import clean_column_names
 from lib.uid import gen_uid
-import bolo
+import deba
 from lib.clean import (
     clean_names,
     standardize_desc_cols,
@@ -298,7 +298,7 @@ def assign_prod_year(df, year):
 
 
 def clean18():
-    df = pd.read_csv(bolo.data("raw/baton_rouge_so/baton_rouge_so_cprr_2018.csv"))
+    df = pd.read_csv(deba.data("raw/baton_rouge_so/baton_rouge_so_cprr_2018.csv"))
     df = clean_column_names(df)
     df.columns = [
         "name",
@@ -350,7 +350,7 @@ def clean18():
 
 
 def clean20():
-    df = pd.read_csv(bolo.data("raw/baton_rouge_so/baton_rouge_so_cprr_2016-2020.csv"))
+    df = pd.read_csv(deba.data("raw/baton_rouge_so/baton_rouge_so_cprr_2016-2020.csv"))
     df = clean_column_names(df)
     df.columns = [
         "tracking_number",
@@ -408,5 +408,5 @@ def clean20():
 if __name__ == "__main__":
     df18 = clean18()
     df20 = clean20()
-    df18.to_csv(bolo.data("clean/cprr_baton_rouge_so_2018.csv"), index=False)
-    df20.to_csv(bolo.data("clean/cprr_baton_rouge_so_2016_2020.csv"), index=False)
+    df18.to_csv(deba.data("clean/cprr_baton_rouge_so_2018.csv"), index=False)
+    df20.to_csv(deba.data("clean/cprr_baton_rouge_so_2016_2020.csv"), index=False)

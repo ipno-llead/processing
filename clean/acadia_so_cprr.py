@@ -1,4 +1,4 @@
-import bolo
+import deba
 import pandas as pd
 from lib.columns import clean_column_names, set_values
 from lib.clean import clean_dates, clean_names
@@ -37,7 +37,7 @@ def clean_action(df):
 
 def clean():
     df = (
-        pd.read_csv(bolo.data("raw/acadia_so/cprr_acadia_so_2018_2021.csv"))
+        pd.read_csv(deba.data("raw/acadia_so/cprr_acadia_so_2018_2021.csv"))
         .pipe(clean_column_names)
         .rename(columns={"date": "receive_date"})
         .pipe(clean_dates, ["receive_date"])
@@ -58,4 +58,4 @@ def clean():
 
 if __name__ == "__main__":
     df = clean()
-    df.to_csv(bolo.data("clean/cprr_acadia_so_2018_2021.csv"), index=False)
+    df.to_csv(deba.data("clean/cprr_acadia_so_2018_2021.csv"), index=False)

@@ -1,6 +1,6 @@
 from lib.columns import clean_column_names, set_values
 from lib.uid import gen_uid
-import bolo
+import deba
 from lib.clean import standardize_desc_cols, clean_ranks
 import pandas as pd
 
@@ -142,7 +142,7 @@ def remove_future_dates(df):
 
 
 def clean():
-    df = pd.read_csv(bolo.data("raw/ipm/new_orleans_pd_commendations_2016_2021.csv"))
+    df = pd.read_csv(deba.data("raw/ipm/new_orleans_pd_commendations_2016_2021.csv"))
     df = (
         df.pipe(clean_column_names)
         .drop(columns={"item_number"})
@@ -178,4 +178,4 @@ def clean():
 if __name__ == "__main__":
     award = clean()
 
-    award.to_csv(bolo.data("clean/award_new_orleans_pd_2016_2021.csv"), index=False)
+    award.to_csv(deba.data("clean/award_new_orleans_pd_2016_2021.csv"), index=False)

@@ -1,6 +1,6 @@
 from lib.clean import standardize_desc_cols
 import pandas as pd
-import bolo
+import deba
 from lib.columns import clean_column_names, set_values
 from lib.clean import clean_dates
 import re
@@ -135,7 +135,7 @@ def clean_names(df):
 def clean():
     df = (
         pd.read_csv(
-            bolo.data("raw/denham_springs_pd/denham_springs_pd_cprr_2016_2021.csv")
+            deba.data("raw/denham_springs_pd/denham_springs_pd_cprr_2016_2021.csv")
         )
         .pipe(clean_column_names)
         .pipe(clean_tracking_number)
@@ -161,4 +161,4 @@ def clean():
 
 if __name__ == "__main__":
     df = clean()
-    df.to_csv(bolo.data("clean/cprr_denham_springs_pd_2016_2021.csv"), index=False)
+    df.to_csv(deba.data("clean/cprr_denham_springs_pd_2016_2021.csv"), index=False)

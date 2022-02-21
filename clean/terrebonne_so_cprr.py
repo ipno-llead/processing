@@ -1,4 +1,4 @@
-import bolo
+import deba
 import pandas as pd
 from lib.columns import set_values
 from lib.clean import standardize_desc_cols, clean_dates
@@ -13,7 +13,7 @@ def clean_allegation(df):
 def clean():
     df = (
         pd.read_csv(
-            bolo.data("raw/terrebonne_so/terrebonne_so_cprr_2019_2021_byhand.csv")
+            deba.data("raw/terrebonne_so/terrebonne_so_cprr_2019_2021_byhand.csv")
         )
         .rename(
             columns={
@@ -45,4 +45,4 @@ def clean():
 
 if __name__ == "__main__":
     df = clean()
-    df.to_csv(bolo.data("clean/cprr_terrebonne_so_2019_2021.csv"), index=False)
+    df.to_csv(deba.data("clean/cprr_terrebonne_so_2019_2021.csv"), index=False)

@@ -1,7 +1,7 @@
 import pandas as pd
 
 from lib.columns import clean_column_names, set_values
-import bolo
+import deba
 from lib.clean import clean_names
 from lib.uid import gen_uid
 
@@ -255,7 +255,7 @@ def clean_cprr(disposition_file, name_file, year):
 
 def clean_codebook():
     df = pd.read_csv(
-        bolo.data("raw/shreveport_pd/shreveport_codebook.csv"),
+        deba.data("raw/shreveport_pd/shreveport_codebook.csv"),
         names=["name", "code"],
     )
     df.loc[:, "name"] = df.name.str.strip().str.lower()
@@ -270,28 +270,28 @@ if __name__ == "__main__":
         [
             clean_cprr(
                 pd.read_csv(
-                    bolo.data(
+                    deba.data(
                         "raw/shreveport_pd/shreveport_pd_cprr_dispositions_2018.csv"
                     )
                 ),
                 pd.read_csv(
-                    bolo.data("raw/shreveport_pd/shreveport_pd_cprr_names_2018.csv")
+                    deba.data("raw/shreveport_pd/shreveport_pd_cprr_names_2018.csv")
                 ),
                 "2018",
             ),
             clean_cprr(
                 pd.read_csv(
-                    bolo.data(
+                    deba.data(
                         "raw/shreveport_pd/shreveport_pd_cprr_dispositions_2019.csv"
                     )
                 ),
                 pd.read_csv(
-                    bolo.data("raw/shreveport_pd/shreveport_pd_cprr_names_2019.csv")
+                    deba.data("raw/shreveport_pd/shreveport_pd_cprr_names_2019.csv")
                 ),
                 "2019",
             ),
         ]
     )
     cb_df = clean_codebook()
-    df.to_csv(bolo.data("clean/cprr_shreveport_pd_2018_2019.csv"), index=False)
-    cb_df.to_csv(bolo.data("clean/cprr_codebook_shreveport_pd.csv"), index=False)
+    df.to_csv(deba.data("clean/cprr_shreveport_pd_2018_2019.csv"), index=False)
+    cb_df.to_csv(deba.data("clean/cprr_codebook_shreveport_pd.csv"), index=False)

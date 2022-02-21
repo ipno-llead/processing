@@ -1,5 +1,5 @@
 from lib.columns import clean_column_names, set_values
-import bolo
+import deba
 from lib.clean import float_to_int_str, clean_dates, clean_names
 from lib.uid import gen_uid
 from lib.rows import duplicate_row
@@ -50,7 +50,7 @@ def assign_agency(df):
 
 
 def clean():
-    df = pd.read_csv(bolo.data("raw/madisonville_pd/madisonville_csd_pprr_2019.csv"))
+    df = pd.read_csv(deba.data("raw/madisonville_pd/madisonville_csd_pprr_2019.csv"))
     df = clean_column_names(df)
     df.columns = [
         "name",
@@ -82,4 +82,4 @@ def clean():
 if __name__ == "__main__":
     df = clean()
 
-    df.to_csv(bolo.data("clean/pprr_madisonville_csd_2019.csv"), index=False)
+    df.to_csv(deba.data("clean/pprr_madisonville_csd_2019.csv"), index=False)

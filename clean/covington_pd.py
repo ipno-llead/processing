@@ -1,7 +1,7 @@
 import pandas as pd
 
 from lib.columns import clean_column_names, set_values
-import bolo
+import deba
 from lib.uid import gen_uid
 from lib import salary
 from lib.clean import clean_names, standardize_desc_cols, clean_salaries
@@ -44,7 +44,7 @@ def clean_rank_desc(df):
 
 def clean_actions_history():
     return (
-        pd.read_csv(bolo.data("raw/covington_pd/covington_pd_actions_history.csv"))
+        pd.read_csv(deba.data("raw/covington_pd/covington_pd_actions_history.csv"))
         .pipe(clean_column_names)
         .rename(
             columns={
@@ -107,7 +107,7 @@ def clean_pprr_2010_2020(df):
 def clean_pprr_2021():
     # deprecated: this dataset doesn't have employee_id so discarded for now.
     return (
-        pd.read_csv(bolo.data("raw/covington_pd/covington_pd_pprr_2021.csv"))
+        pd.read_csv(deba.data("raw/covington_pd/covington_pd_pprr_2021.csv"))
         .pipe(clean_column_names)
         .rename(
             columns={
@@ -128,37 +128,37 @@ def clean_pprr():
     return pd.concat(
         [
             clean_pprr_2010_2020(
-                pd.read_csv(bolo.data("raw/covington_pd/covington_pd_pprr_2010.csv"))
+                pd.read_csv(deba.data("raw/covington_pd/covington_pd_pprr_2010.csv"))
             ),
             clean_pprr_2010_2020(
-                pd.read_csv(bolo.data("raw/covington_pd/covington_pd_pprr_2011.csv"))
+                pd.read_csv(deba.data("raw/covington_pd/covington_pd_pprr_2011.csv"))
             ),
             clean_pprr_2010_2020(
-                pd.read_csv(bolo.data("raw/covington_pd/covington_pd_pprr_2012.csv"))
+                pd.read_csv(deba.data("raw/covington_pd/covington_pd_pprr_2012.csv"))
             ),
             clean_pprr_2010_2020(
-                pd.read_csv(bolo.data("raw/covington_pd/covington_pd_pprr_2013.csv"))
+                pd.read_csv(deba.data("raw/covington_pd/covington_pd_pprr_2013.csv"))
             ),
             clean_pprr_2010_2020(
-                pd.read_csv(bolo.data("raw/covington_pd/covington_pd_pprr_2014.csv"))
+                pd.read_csv(deba.data("raw/covington_pd/covington_pd_pprr_2014.csv"))
             ),
             clean_pprr_2010_2020(
-                pd.read_csv(bolo.data("raw/covington_pd/covington_pd_pprr_2015.csv"))
+                pd.read_csv(deba.data("raw/covington_pd/covington_pd_pprr_2015.csv"))
             ),
             clean_pprr_2010_2020(
-                pd.read_csv(bolo.data("raw/covington_pd/covington_pd_pprr_2016.csv"))
+                pd.read_csv(deba.data("raw/covington_pd/covington_pd_pprr_2016.csv"))
             ),
             clean_pprr_2010_2020(
-                pd.read_csv(bolo.data("raw/covington_pd/covington_pd_pprr_2017.csv"))
+                pd.read_csv(deba.data("raw/covington_pd/covington_pd_pprr_2017.csv"))
             ),
             clean_pprr_2010_2020(
-                pd.read_csv(bolo.data("raw/covington_pd/covington_pd_pprr_2018.csv"))
+                pd.read_csv(deba.data("raw/covington_pd/covington_pd_pprr_2018.csv"))
             ),
             clean_pprr_2010_2020(
-                pd.read_csv(bolo.data("raw/covington_pd/covington_pd_pprr_2019.csv"))
+                pd.read_csv(deba.data("raw/covington_pd/covington_pd_pprr_2019.csv"))
             ),
             clean_pprr_2010_2020(
-                pd.read_csv(bolo.data("raw/covington_pd/covington_pd_pprr_2020.csv"))
+                pd.read_csv(deba.data("raw/covington_pd/covington_pd_pprr_2020.csv"))
             ),
         ]
     )
@@ -168,6 +168,6 @@ if __name__ == "__main__":
     actions_history = clean_actions_history()
     pprr = clean_pprr()
     actions_history.to_csv(
-        bolo.data("clean/actions_history_covington_pd_2021.csv"), index=False
+        deba.data("clean/actions_history_covington_pd_2021.csv"), index=False
     )
-    pprr.to_csv(bolo.data("clean/pprr_covington_pd_2020.csv"), index=False)
+    pprr.to_csv(deba.data("clean/pprr_covington_pd_2020.csv"), index=False)

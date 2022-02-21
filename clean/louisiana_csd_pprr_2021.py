@@ -1,5 +1,5 @@
 from lib.columns import clean_column_names, set_values
-import bolo
+import deba
 from lib.clean import (
     clean_dates,
     clean_races,
@@ -32,7 +32,7 @@ def clean_hire_date(df):
 def clean_demo():
     return (
         pd.read_csv(
-            bolo.data("raw/louisiana_csd/louisiana_csd_pprr_demographics_2021.csv")
+            deba.data("raw/louisiana_csd/louisiana_csd_pprr_demographics_2021.csv")
         )
         .pipe(clean_column_names)
         .drop(columns=["agency_name", "classified_unclassified"])
@@ -70,7 +70,7 @@ def clean_demo():
 def clean_term():
     return (
         pd.read_csv(
-            bolo.data("raw/louisiana_csd/louisiana_csd_pprr_terminations_2021.csv")
+            deba.data("raw/louisiana_csd/louisiana_csd_pprr_terminations_2021.csv")
         )
         .pipe(clean_column_names)
         .drop(columns=["agency_name", "action_type"])
@@ -99,5 +99,5 @@ def clean_term():
 if __name__ == "__main__":
     demo = clean_demo()
     term = clean_term()
-    demo.to_csv(bolo.data("clean/pprr_demo_louisiana_csd_2021.csv"), index=False)
-    term.to_csv(bolo.data("clean/pprr_term_louisiana_csd_2021.csv"), index=False)
+    demo.to_csv(deba.data("clean/pprr_demo_louisiana_csd_2021.csv"), index=False)
+    term.to_csv(deba.data("clean/pprr_term_louisiana_csd_2021.csv"), index=False)
