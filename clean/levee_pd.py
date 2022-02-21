@@ -64,7 +64,6 @@ def clean19():
                 "assigned_investigator": "investigator",
                 "name_of_shift_supervisor_if_handeled_by_shift": "shift_supervisor",
                 "internal_external": "complainant_type",
-                "complainant": "complainant_name",
                 "date_occurred": "occur_date",
                 "date_received_by_iad": "receive_date",
                 "date_investigation_started": "investigation_start_date",
@@ -72,6 +71,7 @@ def clean19():
                 "action_taken": "action",
             }
         )
+        .drop(columns=['complainant'])
         .dropna(subset=["ejld_oldp"])
         .reset_index(drop=True)
         .pipe(assign_agency, 2019)

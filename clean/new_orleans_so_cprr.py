@@ -939,6 +939,7 @@ def clean20():
                 "related_item_number",
             ]
         )
+        .drop(columns=['referred_by'])
         .rename(
             columns={
                 "case_number": "tracking_number",
@@ -947,7 +948,6 @@ def clean20():
                 "location_or_facility": "department_desc",
                 "assigned_agent": "investigating_supervisor",
                 "terminated_resigned": "action",
-                "referred_by": "complainant",
                 "summary": "allegation_desc",
             }
         )
@@ -957,7 +957,6 @@ def clean20():
                 "investigating_supervisor",
                 "name_of_accused",
                 "charges",
-                "complainant",
                 "action",
             ],
         )
