@@ -1,9 +1,9 @@
 dataDir: data
 patterns:
   prerequisites:
-    - pd.read_csv(bolo.data(r'.+\.csv'))
+    - pd.read_csv(deba.data(r'.+\.csv'))
   targets:
-    - "`*`.to_csv(bolo.data(r'.+\\.csv'))"
+    - "`*`.to_csv(deba.data(r'.+\\.csv'))"
 stages:
   - name: clean
     ignoredTargets:

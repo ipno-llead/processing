@@ -1,4 +1,4 @@
-import bolo
+import deba
 from lib.columns import clean_column_names, set_values
 from lib.clean import (
     clean_dates,
@@ -34,7 +34,7 @@ def clean_rank_desc(df):
 
 def clean_pprr_20():
     return (
-        pd.read_csv(bolo.data("raw/mandeville_pd/mandeville_csd_pprr_2020.csv"))
+        pd.read_csv(deba.data("raw/mandeville_pd/mandeville_csd_pprr_2020.csv"))
         .pipe(clean_column_names)
         .rename(
             columns={
@@ -71,7 +71,7 @@ def clean_pprr_20():
 
 def clean_cprr_19():
     return (
-        pd.read_csv(bolo.data("raw/mandeville_pd/mandeville_pd_cprr_2019_byhand.csv"))
+        pd.read_csv(deba.data("raw/mandeville_pd/mandeville_pd_cprr_2019_byhand.csv"))
         .pipe(clean_column_names)
         .rename(columns={"title": "rank_desc", "charges": "allegation"})
         .dropna(axis=1, how="all")
@@ -88,5 +88,5 @@ def clean_cprr_19():
 if __name__ == "__main__":
     pprr = clean_pprr_20()
     cprr = clean_cprr_19()
-    pprr.to_csv(bolo.data("clean/pprr_mandeville_csd_2020.csv"), index=False)
-    cprr.to_csv(bolo.data("clean/cprr_mandeville_pd_2019.csv"), index=False)
+    pprr.to_csv(deba.data("clean/pprr_mandeville_csd_2020.csv"), index=False)
+    cprr.to_csv(deba.data("clean/cprr_mandeville_pd_2019.csv"), index=False)

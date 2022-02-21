@@ -4,7 +4,7 @@ import re
 import pandas as pd
 
 from lib.columns import clean_column_names, set_values
-import bolo
+import deba
 from lib.clean import clean_dates, clean_salaries, clean_names
 from lib import salary
 
@@ -115,7 +115,7 @@ def assign_agency(df):
 def clean():
     return (
         pd.read_csv(
-            bolo.data(
+            deba.data(
                 "raw/harahan_csd/harahan_csd_pprr_roster_by_employment_status_2020.csv"
             )
         )
@@ -144,7 +144,7 @@ def clean():
 def join_employment_date(df):
     emp_dates = (
         pd.read_csv(
-            bolo.data(
+            deba.data(
                 "raw/harahan_csd/harahan_csd_prrr_roster_by_employment_date_2020.csv"
             )
         )
@@ -165,4 +165,4 @@ def join_employment_date(df):
 if __name__ == "__main__":
     df = clean()
 
-    df.to_csv(bolo.data("clean/pprr_harahan_csd_2020.csv"), index=False)
+    df.to_csv(deba.data("clean/pprr_harahan_csd_2020.csv"), index=False)

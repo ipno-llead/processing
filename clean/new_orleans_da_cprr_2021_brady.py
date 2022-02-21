@@ -1,6 +1,6 @@
 from lib.columns import clean_column_names, set_values
 from lib.uid import gen_uid
-import bolo
+import deba
 from lib.clean import clean_names, standardize_desc_cols, clean_dates
 import pandas as pd
 
@@ -172,7 +172,7 @@ def drop_rows_without_last_name(df):
 
 
 def clean():
-    df = pd.read_csv(bolo.data("raw/new_orleans_da/new_orleans_da_cprr_2021_brady.csv"))
+    df = pd.read_csv(deba.data("raw/new_orleans_da/new_orleans_da_cprr_2021_brady.csv"))
     df = clean_column_names(df)
     df = (
         df.rename(
@@ -217,4 +217,4 @@ def clean():
 
 if __name__ == "__main__":
     df = clean()
-    df.to_csv(bolo.data("clean/cprr_new_orleans_da_2021.csv"), index=False)
+    df.to_csv(deba.data("clean/cprr_new_orleans_da_2021.csv"), index=False)

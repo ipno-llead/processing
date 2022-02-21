@@ -6,7 +6,7 @@ from lib.clean import (
     standardize_desc_cols,
     clean_employment_status,
 )
-import bolo
+import deba
 from lib.uid import gen_uid
 from lib import salary
 import pandas as pd
@@ -95,7 +95,7 @@ def clean_rank_desc(df):
 
 def clean_17():
     df = pd.read_csv(
-        bolo.data("raw/baton_rouge_csd/baton_rouge_csd_pprr_2017.csv")
+        deba.data("raw/baton_rouge_csd/baton_rouge_csd_pprr_2017.csv")
     ).pipe(clean_column_names)
     df = (
         df[
@@ -147,7 +147,7 @@ def clean_17():
 
 def clean_19():
     df = pd.read_csv(
-        bolo.data("raw/baton_rouge_csd/baton_rouge_csd_pprr_2019.csv")
+        deba.data("raw/baton_rouge_csd/baton_rouge_csd_pprr_2019.csv")
     ).pipe(clean_column_names)
 
     df = (
@@ -203,5 +203,5 @@ if __name__ == "__main__":
     df17 = clean_17()
     df19 = clean_19()
 
-    df17.to_csv(bolo.data("clean/pprr_baton_rouge_csd_2017.csv"), index=False)
-    df19.to_csv(bolo.data("clean/pprr_baton_rouge_csd_2019.csv"), index=False)
+    df17.to_csv(deba.data("clean/pprr_baton_rouge_csd_2017.csv"), index=False)
+    df19.to_csv(deba.data("clean/pprr_baton_rouge_csd_2019.csv"), index=False)

@@ -1,5 +1,5 @@
 import pandas as pd
-import bolo
+import deba
 from lib.columns import clean_column_names
 from lib.uid import gen_uid
 
@@ -92,7 +92,7 @@ def rename_agency(df):
 
 def clean():
     df = (
-        pd.read_csv(bolo.data("raw/post_council/post_decertifications_2016_2019.csv"))
+        pd.read_csv(deba.data("raw/post_council/post_decertifications_2016_2019.csv"))
         .pipe(clean_column_names)
         .rename(columns={"date": "decertification_date"})
         .pipe(split_name)
@@ -107,4 +107,4 @@ def clean():
 
 if __name__ == "__main__":
     df = clean()
-    df.to_csv(bolo.data("clean/cprr_post_2016_2019.csv"), index=False)
+    df.to_csv(deba.data("clean/cprr_post_2016_2019.csv"), index=False)

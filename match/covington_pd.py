@@ -1,7 +1,7 @@
 import pandas as pd
 from datamatch import ThresholdMatcher, JaroWinklerSimilarity, ColumnsIndex
 
-import bolo
+import deba
 from lib.post import extract_events_from_post, load_for_agency
 
 
@@ -24,7 +24,7 @@ def extract_post_events(roster, post):
     )
     decision = 0.9
     matcher.save_pairs_to_excel(
-        bolo.data("match/covington_pd_ah_2021_v_post_pprr_2020_11_06.xlsx"),
+        deba.data("match/covington_pd_ah_2021_v_post_pprr_2020_11_06.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
@@ -33,8 +33,8 @@ def extract_post_events(roster, post):
 
 
 if __name__ == "__main__":
-    ah = pd.read_csv(bolo.data("clean/actions_history_covington_pd_2021.csv"))
-    pprr = pd.read_csv(bolo.data("clean/pprr_covington_pd_2020.csv"))
+    ah = pd.read_csv(deba.data("clean/actions_history_covington_pd_2021.csv"))
+    pprr = pd.read_csv(deba.data("clean/pprr_covington_pd_2020.csv"))
     agency = pprr.agency[0]
     post = load_for_agency(agency)
     post_events = extract_post_events(
@@ -46,4 +46,4 @@ if __name__ == "__main__":
         ).drop_duplicates(),
         post,
     )
-    post_events.to_csv(bolo.data("match/post_event_covington_pd_2020.csv"), index=False)
+    post_events.to_csv(deba.data("match/post_event_covington_pd_2020.csv"), index=False)

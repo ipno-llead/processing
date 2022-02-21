@@ -1,6 +1,6 @@
 import pandas as pd
 from datamatch import JaroWinklerSimilarity, ThresholdMatcher, ColumnsIndex
-import bolo
+import deba
 from lib.post import load_for_agency, extract_events_from_post
 
 
@@ -30,7 +30,7 @@ def match_cprr_20_and_pprr(cprr, pprr):
     )
     decision = 1
     matcher.save_pairs_to_excel(
-        bolo.data("match/lake_charles_pd_cprr_20_v_post_pprr_2020_11_06.xlsx"),
+        deba.data("match/lake_charles_pd_cprr_20_v_post_pprr_2020_11_06.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(decision)
@@ -66,7 +66,7 @@ def match_cprr_19_and_pprr(cprr, pprr):
     )
     decision = 0.84
     matcher.save_pairs_to_excel(
-        bolo.data("match/lake_charles_pd_cprr_2014_2019_v_pprr_2020_11_06.xlsx"),
+        deba.data("match/lake_charles_pd_cprr_2014_2019_v_pprr_2020_11_06.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(decision)
@@ -96,7 +96,7 @@ def match_pprr_and_post(pprr, post):
     )
     decision = 0.91
     matcher.save_pairs_to_excel(
-        bolo.data("match/pprr_lake_charles_pd_pprr_2017_2021_v_pprr_2020_11_06.xlsx"),
+        deba.data("match/pprr_lake_charles_pd_pprr_2017_2021_v_pprr_2020_11_06.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
@@ -104,16 +104,16 @@ def match_pprr_and_post(pprr, post):
 
 
 if __name__ == "__main__":
-    cprr_20 = pd.read_csv(bolo.data("clean/cprr_lake_charles_pd_2020.csv"))
-    cprr_19 = pd.read_csv(bolo.data("clean/cprr_lake_charles_pd_2014_2019.csv"))
-    pprr = pd.read_csv(bolo.data("clean/pprr_lake_charles_pd_2017_2021.csv"))
+    cprr_20 = pd.read_csv(deba.data("clean/cprr_lake_charles_pd_2020.csv"))
+    cprr_19 = pd.read_csv(deba.data("clean/cprr_lake_charles_pd_2014_2019.csv"))
+    pprr = pd.read_csv(deba.data("clean/pprr_lake_charles_pd_2017_2021.csv"))
     agency = cprr_19.agency[0]
     post = load_for_agency(agency)
     cprr_20 = match_cprr_20_and_pprr(cprr_20, post)
     cprr_19 = match_cprr_19_and_pprr(cprr_19, post)
     post_event = match_pprr_and_post(pprr, post)
-    cprr_20.to_csv(bolo.data("match/cprr_lake_charles_pd_2020.csv"), index=False)
-    cprr_19.to_csv(bolo.data("match/cprr_lake_charles_pd_2014_2019.csv"), index=False)
+    cprr_20.to_csv(deba.data("match/cprr_lake_charles_pd_2020.csv"), index=False)
+    cprr_19.to_csv(deba.data("match/cprr_lake_charles_pd_2014_2019.csv"), index=False)
     post_event.to_csv(
-        bolo.data("match/post_event_lake_charles_2020_11_06.csv"), index=False
+        deba.data("match/post_event_lake_charles_2020_11_06.csv"), index=False
     )

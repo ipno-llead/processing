@@ -1,5 +1,5 @@
 import pandas as pd
-import bolo
+import deba
 from lib.columns import rearrange_allegation_columns
 from lib.personnel import fuse_personnel
 from lib.post import load_for_agency
@@ -59,13 +59,13 @@ def fuse_events(cprr_18, cprr_21, post):
 
 
 if __name__ == "__main__":
-    cprr_18 = pd.read_csv(bolo.data("match/cprr_baton_rouge_so_2018.csv"))
-    cprr_20 = pd.read_csv(bolo.data("match/cprr_baton_rouge_so_2016_2020.csv"))
+    cprr_18 = pd.read_csv(deba.data("match/cprr_baton_rouge_so_2018.csv"))
+    cprr_20 = pd.read_csv(deba.data("match/cprr_baton_rouge_so_2016_2020.csv"))
     agency = cprr_20.agency[0]
     post = load_for_agency(agency)
     personnel_df = fuse_personnel(cprr_18, cprr_20, post)
     event_df = fuse_events(cprr_18, cprr_20, post)
     complaint_df = rearrange_allegation_columns(pd.concat([cprr_18, cprr_20]))
-    personnel_df.to_csv(bolo.data("fuse/per_baton_rouge_so.csv"), index=False)
-    event_df.to_csv(bolo.data("fuse/event_baton_rouge_so.csv"), index=False)
-    complaint_df.to_csv(bolo.data("fuse/com_baton_rouge_so.csv"), index=False)
+    personnel_df.to_csv(deba.data("fuse/per_baton_rouge_so.csv"), index=False)
+    event_df.to_csv(deba.data("fuse/event_baton_rouge_so.csv"), index=False)
+    complaint_df.to_csv(deba.data("fuse/com_baton_rouge_so.csv"), index=False)
