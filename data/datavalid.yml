@@ -398,9 +398,6 @@ schemas:
       - name: appealed
       - name: agency
       - name: motions
-      - name: appeal_disposition_date
-      - name: appeal_hearing_date
-      - name: appeal_hearing_2_date
   stop_and_search:
     columns:
       - name: stop_and_search_uid
