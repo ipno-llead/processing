@@ -78,7 +78,8 @@ def split_appellant_column(df):
 
 
 def assign_additional_appellant_names(df):
-    names = pd.read_csv(deba.data("raw/louisiana_state_csc/la_lprr_appellants.csv"))
+    names = pd.read_csv(deba.data("raw/louisiana_state_csc/la_lprr_appellants.csv"))\
+        .rename(columns={'appellant_middle_initial': 'appellant_middle_name'})
     for _, row in names.iterrows():
         for col in ["first_name", "last_name", "middle_name"]:
             df.loc[df.docket_no == row.docket_no, col] = row["appellant_%s" % col]
