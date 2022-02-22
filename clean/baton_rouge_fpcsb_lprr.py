@@ -1,4 +1,4 @@
-import bolo
+import deba
 from lib.rows import duplicate_row
 from lib.clean import clean_names, standardize_desc_cols
 from lib.standardize import standardize_from_lookup_table
@@ -12,7 +12,7 @@ import datetime
 
 def realign():
     with open(
-        bolo.data("raw/baton_rouge_fpcsb/baton_rouge_fpcsb_logs_1992-2012.csv"),
+        deba.data("raw/baton_rouge_fpcsb/baton_rouge_fpcsb_logs_1992-2012.csv"),
         "r",
         encoding="latin-1",
     ) as f:
@@ -571,4 +571,4 @@ def clean():
 if __name__ == "__main__":
     df = clean()
 
-    df.to_csv(bolo.data("clean/lprr_baton_rouge_fpcsb_1992_2012.csv"), index=False)
+    df.to_csv(deba.data("clean/lprr_baton_rouge_fpcsb_1992_2012.csv"), index=False)

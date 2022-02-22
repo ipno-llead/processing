@@ -1,5 +1,5 @@
 import pandas as pd
-import bolo
+import deba
 from lib.columns import clean_column_names, set_values
 from lib.clean import clean_dates, standardize_desc_cols
 from lib.uid import gen_uid
@@ -194,7 +194,7 @@ def remove_uid_for_unknown_officers(df):
 
 def clean20():
     df = pd.read_csv(
-        bolo.data("raw/lafayette_so/lafayette_so_cprr_2015_2020.csv")
+        deba.data("raw/lafayette_so/lafayette_so_cprr_2015_2020.csv")
     ).pipe(clean_column_names)
     df = (
         df.rename(
@@ -232,7 +232,7 @@ def clean20():
 
 def clean14():
     df = (
-        pd.read_csv(bolo.data("raw/lafayette_so/lafayette_so_cprr_2009_2014.csv"))
+        pd.read_csv(deba.data("raw/lafayette_so/lafayette_so_cprr_2009_2014.csv"))
         .pipe(clean_column_names)
         .rename(columns={"date": "receive_date"})
         .drop(columns="days")
@@ -258,7 +258,7 @@ def clean14():
 
 def clean08():
     df = (
-        pd.read_csv(bolo.data("raw/lafayette_so/lafayette_so_cprr_2006_2008.csv"))
+        pd.read_csv(deba.data("raw/lafayette_so/lafayette_so_cprr_2006_2008.csv"))
         .pipe(clean_column_names)
         .drop(columns=["emp"])
         .rename(columns={"date": "receive_date"})
@@ -286,6 +286,6 @@ if __name__ == "__main__":
     df20 = clean20()
     df14 = clean14()
     df08 = clean08()
-    df20.to_csv(bolo.data("clean/cprr_lafayette_so_2015_2020.csv"), index=False)
-    df14.to_csv(bolo.data("clean/cprr_lafayette_so_2009_2014.csv"), index=False)
-    df08.to_csv(bolo.data("clean/cprr_lafayette_so_2006_2008.csv"), index=False)
+    df20.to_csv(deba.data("clean/cprr_lafayette_so_2015_2020.csv"), index=False)
+    df14.to_csv(deba.data("clean/cprr_lafayette_so_2009_2014.csv"), index=False)
+    df08.to_csv(deba.data("clean/cprr_lafayette_so_2006_2008.csv"), index=False)

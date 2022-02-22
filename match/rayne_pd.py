@@ -1,6 +1,6 @@
 import pandas as pd
 from datamatch import ThresholdMatcher, JaroWinklerSimilarity, ColumnsIndex
-import bolo
+import deba
 
 from lib.post import extract_events_from_post, load_for_agency
 
@@ -31,7 +31,7 @@ def assign_uid_from_post(cprr, post):
     )
     decision = 1
     matcher.save_pairs_to_excel(
-        bolo.data("match/cprr_rayne_pd_2019_2020_v_post_pprr_2020_11_06.xlsx"),
+        deba.data("match/cprr_rayne_pd_2019_2020_v_post_pprr_2020_11_06.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(decision)
@@ -61,7 +61,7 @@ def extract_post_events(pprr, post):
     )
     decision = 0.981
     matcher.save_pairs_to_excel(
-        bolo.data("match/pprr_rayne_pd_2010_2020_v_post_pprr_2020_11_06.xlsx"),
+        deba.data("match/pprr_rayne_pd_2010_2020_v_post_pprr_2020_11_06.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
@@ -69,13 +69,13 @@ def extract_post_events(pprr, post):
 
 
 if __name__ == "__main__":
-    cprr = pd.read_csv(bolo.data("clean/cprr_rayne_pd_2019_2020.csv"))
-    pprr = pd.read_csv(bolo.data("clean/pprr_rayne_pd_2010_2020.csv"))
+    cprr = pd.read_csv(deba.data("clean/cprr_rayne_pd_2019_2020.csv"))
+    pprr = pd.read_csv(deba.data("clean/pprr_rayne_pd_2010_2020.csv"))
     agency = cprr.agency[0]
     post = load_for_agency(agency)
     post_event = extract_post_events(pprr, post)
     cprr = assign_uid_from_post(cprr, post)
-    cprr.to_csv(bolo.data("match/cprr_rayne_pd_2019_2020.csv"), index=False)
+    cprr.to_csv(deba.data("match/cprr_rayne_pd_2019_2020.csv"), index=False)
     post_event.to_csv(
-        bolo.data("match/post_event_rayne_pd_2020_11_06.csv"), index=False
+        deba.data("match/post_event_rayne_pd_2020_11_06.csv"), index=False
     )

@@ -1,5 +1,5 @@
 from lib.columns import clean_column_names, set_values
-import bolo
+import deba
 from lib.clean import clean_names, clean_salaries, standardize_desc_cols, clean_dates
 from lib.uid import gen_uid, ensure_uid_unique
 from lib import salary
@@ -61,7 +61,7 @@ def clean_rank_desc(df):
 
 def clean():
     return (
-        pd.read_csv(bolo.data("raw/caddo_parish_so/caddo_parish_so_pprr_2020.csv"))
+        pd.read_csv(deba.data("raw/caddo_parish_so/caddo_parish_so_pprr_2020.csv"))
         .dropna(axis=1, how="all")
         .drop_duplicates(ignore_index=True)
         .pipe(clean_column_names)
@@ -91,4 +91,4 @@ if __name__ == "__main__":
     df = clean()
     ensure_uid_unique(df, "uid")
 
-    df.to_csv(bolo.data("clean/pprr_caddo_parish_so_2020.csv"), index=False)
+    df.to_csv(deba.data("clean/pprr_caddo_parish_so_2020.csv"), index=False)

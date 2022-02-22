@@ -1,5 +1,5 @@
 import pandas as pd
-import bolo
+import deba
 
 from lib.columns import clean_column_names, set_values
 from lib.clean import clean_dates, clean_names, clean_salaries
@@ -29,7 +29,7 @@ def clean_rank_desc(df):
 
 def clean():
     df = (
-        pd.read_csv(bolo.data("raw/hammond_pd/hammond_pd_pprr_2021.csv"))
+        pd.read_csv(deba.data("raw/hammond_pd/hammond_pd_pprr_2021.csv"))
         .pipe(clean_column_names)
         .rename(
             columns={
@@ -53,4 +53,4 @@ def clean():
 
 if __name__ == "__main__":
     df = clean()
-    df.to_csv(bolo.data("clean/pprr_hammond_pd_2021.csv"), index=False)
+    df.to_csv(deba.data("clean/pprr_hammond_pd_2021.csv"), index=False)

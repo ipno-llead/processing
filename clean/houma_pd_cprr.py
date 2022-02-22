@@ -1,4 +1,4 @@
-import bolo
+import deba
 import pandas as pd
 from lib.columns import clean_column_names
 from lib.clean import standardize_desc_cols
@@ -163,7 +163,7 @@ def drop_rows_missing_first_and_last_name(df):
 
 def clean21():
     df = (
-        pd.read_csv(bolo.data("raw/houma_pd/houma_pd_cprr_2019_2021.csv"))
+        pd.read_csv(deba.data("raw/houma_pd/houma_pd_cprr_2019_2021.csv"))
         .pipe(clean_column_names)
         .pipe(split_rows_with_multiple_allegations)
         .pipe(clean_allegations)
@@ -187,7 +187,7 @@ def clean21():
 
 def clean18():
     df = (
-        pd.read_csv(bolo.data("raw/houma_pd/houma_pd_cprr_2017_2018.csv"))
+        pd.read_csv(deba.data("raw/houma_pd/houma_pd_cprr_2017_2018.csv"))
         .pipe(clean_column_names)
         .drop(columns=["column_1", "column2", "column3"])
         .pipe(clean_tracking_number)
@@ -211,5 +211,5 @@ def clean18():
 if __name__ == "__main__":
     df21 = clean21()
     df18 = clean18()
-    df21.to_csv(bolo.data("clean/cprr_houma_pd_2019_2021.csv"), index=False)
-    df18.to_csv(bolo.data("clean/cprr_houma_pd_2017_2018.csv"), index=False)
+    df21.to_csv(deba.data("clean/cprr_houma_pd_2019_2021.csv"), index=False)
+    df18.to_csv(deba.data("clean/cprr_houma_pd_2017_2018.csv"), index=False)

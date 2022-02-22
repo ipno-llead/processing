@@ -1,5 +1,5 @@
 from lib.columns import clean_column_names
-import bolo
+import deba
 from lib.uid import gen_uid
 from lib.clean import clean_names, standardize_desc_cols, clean_dates
 from lib.rows import duplicate_row
@@ -128,7 +128,7 @@ def clean_disposition(df):
 
 
 def clean19():
-    df = pd.read_csv(bolo.data("raw/plaquemines_so/plaquemines_so_cprr_2019.csv"))
+    df = pd.read_csv(deba.data("raw/plaquemines_so/plaquemines_so_cprr_2019.csv"))
     df = clean_column_names(df)
     df = df.rename(columns={"rule_violation": "allegation"})
     return (
@@ -144,7 +144,7 @@ def clean19():
 
 def clean20():
     df = (
-        pd.read_csv(bolo.data("raw/plaquemines_so/plaquemines_so_cprr_2016_2020.csv"))
+        pd.read_csv(deba.data("raw/plaquemines_so/plaquemines_so_cprr_2016_2020.csv"))
         .pipe(clean_column_names)
         .drop(columns=["complainant"])
         .rename(
@@ -174,5 +174,5 @@ def clean20():
 if __name__ == "__main__":
     df19 = clean19()
     df20 = clean20()
-    df19.to_csv(bolo.data("clean/cprr_plaquemines_so_2019.csv"), index=False)
-    df20.to_csv(bolo.data("clean/cprr_plaquemines_so_2016_2020.csv"), index=False)
+    df19.to_csv(deba.data("clean/cprr_plaquemines_so_2019.csv"), index=False)
+    df20.to_csv(deba.data("clean/cprr_plaquemines_so_2016_2020.csv"), index=False)

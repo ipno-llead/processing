@@ -2,7 +2,7 @@ from lib.personnel import fuse_personnel
 
 import pandas as pd
 
-import bolo
+import deba
 from lib.columns import rearrange_allegation_columns, rearrange_event_columns
 from lib import events
 
@@ -60,10 +60,10 @@ def fuse_events(cprr_20, cprr_14, pprr):
 
 
 if __name__ == "__main__":
-    cprr_20 = pd.read_csv(bolo.data("match/cprr_lafayette_pd_2015_2020.csv"))
-    cprr_14 = pd.read_csv(bolo.data("match/cprr_lafayette_pd_2009_2014.csv"))
-    pprr = pd.read_csv(bolo.data("clean/pprr_lafayette_pd_2010_2021.csv"))
-    post_events = pd.read_csv(bolo.data("match/post_event_lafayette_pd_2020.csv"))
+    cprr_20 = pd.read_csv(deba.data("match/cprr_lafayette_pd_2015_2020.csv"))
+    cprr_14 = pd.read_csv(deba.data("match/cprr_lafayette_pd_2009_2014.csv"))
+    pprr = pd.read_csv(deba.data("clean/pprr_lafayette_pd_2010_2021.csv"))
+    post_events = pd.read_csv(deba.data("match/post_event_lafayette_pd_2020.csv"))
     events_df = fuse_events(cprr_20, cprr_14, pprr)
     events_df = rearrange_event_columns(pd.concat([post_events, events_df]))
     per = fuse_personnel(
@@ -90,6 +90,6 @@ if __name__ == "__main__":
         ),
     )
     com = rearrange_allegation_columns(pd.concat([cprr_20, cprr_14]))
-    per.to_csv(bolo.data("fuse/per_lafayette_pd.csv"), index=False)
-    com.to_csv(bolo.data("fuse/com_lafayette_pd.csv"), index=False)
-    events_df.to_csv(bolo.data("fuse/event_lafayette_pd.csv"), index=False)
+    per.to_csv(deba.data("fuse/per_lafayette_pd.csv"), index=False)
+    com.to_csv(deba.data("fuse/com_lafayette_pd.csv"), index=False)
+    events_df.to_csv(deba.data("fuse/event_lafayette_pd.csv"), index=False)

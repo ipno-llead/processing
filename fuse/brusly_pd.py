@@ -1,5 +1,5 @@
 import pandas as pd
-import bolo
+import deba
 from lib.columns import (
     rearrange_personnel_columns,
     rearrange_allegation_columns,
@@ -62,10 +62,10 @@ def fuse_events(pprr, cprr, award):
 
 
 if __name__ == "__main__":
-    pprr = pd.read_csv(bolo.data("clean/pprr_brusly_pd_2020.csv"))
-    post_event = pd.read_csv(bolo.data("match/post_event_brusly_pd_2020.csv"))
-    cprr = pd.read_csv(bolo.data("match/cprr_brusly_pd_2020.csv"))
-    award = pd.read_csv(bolo.data("match/award_brusly_pd_2021.csv"))
+    pprr = pd.read_csv(deba.data("clean/pprr_brusly_pd_2020.csv"))
+    post_event = pd.read_csv(deba.data("match/post_event_brusly_pd_2020.csv"))
+    cprr = pd.read_csv(deba.data("match/cprr_brusly_pd_2020.csv"))
+    award = pd.read_csv(deba.data("match/award_brusly_pd_2021.csv"))
     cprr = gen_uid(
         cprr, ["uid", "occur_year", "occur_month", "occur_day"], "allegation_uid"
     )
@@ -73,7 +73,7 @@ if __name__ == "__main__":
     events_df = rearrange_event_columns(pd.concat([post_event, events_df]))
     com_df = rearrange_allegation_columns(cprr)
     rearrange_personnel_columns(pprr).to_csv(
-        bolo.data("fuse/per_brusly_pd.csv"), index=False
+        deba.data("fuse/per_brusly_pd.csv"), index=False
     )
-    events_df.to_csv(bolo.data("fuse/event_brusly_pd.csv"), index=False)
-    com_df.to_csv(bolo.data("fuse/com_brusly_pd.csv"), index=False)
+    events_df.to_csv(deba.data("fuse/event_brusly_pd.csv"), index=False)
+    com_df.to_csv(deba.data("fuse/com_brusly_pd.csv"), index=False)

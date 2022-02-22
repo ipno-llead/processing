@@ -4,7 +4,7 @@ from lib.clean import clean_names
 import pandas as pd
 
 from lib.columns import clean_column_names, set_values
-import bolo
+import deba
 
 
 def split_names(df):
@@ -52,7 +52,7 @@ def clean_badge_no(df):
 
 def clean():
     return (
-        pd.read_csv(bolo.data("raw/baton_rouge_pd/baton_rouge_pd_pprr_2021.csv"))
+        pd.read_csv(deba.data("raw/baton_rouge_pd/baton_rouge_pd_pprr_2021.csv"))
         .pipe(clean_column_names)
         .rename(
             columns={
@@ -72,4 +72,4 @@ def clean():
 if __name__ == "__main__":
     df = clean()
 
-    df.to_csv(bolo.data("clean/pprr_baton_rouge_pd_2021.csv"), index=False)
+    df.to_csv(deba.data("clean/pprr_baton_rouge_pd_2021.csv"), index=False)

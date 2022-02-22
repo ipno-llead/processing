@@ -1,5 +1,5 @@
 import pandas as pd
-import bolo
+import deba
 from lib.columns import clean_column_names
 from lib.uid import gen_uid
 
@@ -18,7 +18,7 @@ def assign_agency(df):
 
 def clean():
     df = (
-        pd.read_csv(bolo.data("raw/tangipahoa_da/tangipahoa_da_brady_2021.csv"))
+        pd.read_csv(deba.data("raw/tangipahoa_da/tangipahoa_da_brady_2021.csv"))
         .pipe(clean_column_names)
         .pipe(split_name)
         .pipe(assign_agency)
@@ -29,4 +29,4 @@ def clean():
 
 if __name__ == "__main__":
     df = clean()
-    df.to_csv(bolo.data("clean/cprr_tangipahoa_da_2021.csv"), index=False)
+    df.to_csv(deba.data("clean/cprr_tangipahoa_da_2021.csv"), index=False)

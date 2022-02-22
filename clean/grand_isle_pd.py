@@ -3,7 +3,7 @@ import re
 import pandas as pd
 
 from lib.columns import clean_column_names
-import bolo
+import deba
 from lib.clean import (
     clean_names,
     clean_dates,
@@ -126,7 +126,7 @@ def assign_agency(df):
 def clean():
     return (
         pd.read_csv(
-            bolo.data("raw/grand_isle/grand_isle_pd_pprr_2021_byhand.csv"),
+            deba.data("raw/grand_isle/grand_isle_pd_pprr_2021_byhand.csv"),
             encoding="latin-1",
         )
         .pipe(clean_column_names)
@@ -164,4 +164,4 @@ def clean():
 if __name__ == "__main__":
     df = clean()
 
-    df.to_csv(bolo.data("clean/pprr_grand_isle_pd_2021.csv"), index=False)
+    df.to_csv(deba.data("clean/pprr_grand_isle_pd_2021.csv"), index=False)

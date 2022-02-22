@@ -1,5 +1,5 @@
 import pandas as pd
-import bolo
+import deba
 from lib import events
 from lib.columns import rearrange_allegation_columns
 from lib.personnel import fuse_personnel
@@ -42,12 +42,12 @@ def fuse_events(cprr, post):
 
 
 if __name__ == "__main__":
-    cprr = pd.read_csv(bolo.data("match/cprr_erath_pd_2018_2020.csv"))
+    cprr = pd.read_csv(deba.data("match/cprr_erath_pd_2018_2020.csv"))
     agency = cprr.agency[0]
     post = load_for_agency(agency)
     per = fuse_personnel(cprr, post)
     com = rearrange_allegation_columns(cprr)
     event = fuse_events(cprr, post)
-    event.to_csv(bolo.data("fuse/event_erath_pd.csv"), index=False)
-    com.to_csv(bolo.data("fuse/com_erath_pd.csv"), index=False)
-    per.to_csv(bolo.data("fuse/per_erath_pd.csv"), index=False)
+    event.to_csv(deba.data("fuse/event_erath_pd.csv"), index=False)
+    com.to_csv(deba.data("fuse/com_erath_pd.csv"), index=False)
+    per.to_csv(deba.data("fuse/per_erath_pd.csv"), index=False)

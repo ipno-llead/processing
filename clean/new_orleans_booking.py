@@ -1,5 +1,5 @@
 import pandas as pd
-import bolo
+import deba
 from lib.columns import clean_column_names
 from lib.clean import clean_sexes, float_to_int_str
 
@@ -191,10 +191,10 @@ def clean_race(df):
 
 
 def clean():
-    dfa = pd.read_csv(bolo.data("raw/ipm/new_orleans_so_charges_2015_2021.csv")).pipe(
+    dfa = pd.read_csv(deba.data("raw/ipm/new_orleans_so_charges_2015_2021.csv")).pipe(
         clean_column_names
     )
-    dfb = pd.read_csv(bolo.data("raw/ipm/new_orleans_so_bookings_2015_2021.csv")).pipe(
+    dfb = pd.read_csv(deba.data("raw/ipm/new_orleans_so_bookings_2015_2021.csv")).pipe(
         clean_column_names
     )
 
@@ -250,4 +250,4 @@ def clean():
 
 if __name__ == "__main__":
     df = clean()
-    df.to_csv(bolo.data("clean/booking_new_orleans_so_2015_2021.csv"), index=False)
+    df.to_csv(deba.data("clean/booking_new_orleans_so_2015_2021.csv"), index=False)

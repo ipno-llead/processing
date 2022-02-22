@@ -1,7 +1,7 @@
 import pandas as pd
 from datamatch import JaroWinklerSimilarity, ThresholdMatcher, ColumnsIndex
 from lib.post import load_for_agency
-import bolo
+import deba
 
 
 def assign_uid_from_post(cprr, post):
@@ -30,7 +30,7 @@ def assign_uid_from_post(cprr, post):
     )
     decision = 0
     matcher.save_pairs_to_excel(
-        bolo.data("match/cprr_terrebonne_2019_2021_v_post_pprr_2020_11_06.xlsx"),
+        deba.data("match/cprr_terrebonne_2019_2021_v_post_pprr_2020_11_06.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(decision)
@@ -41,8 +41,8 @@ def assign_uid_from_post(cprr, post):
 
 
 if __name__ == "__main__":
-    cprr = pd.read_csv(bolo.data("clean/cprr_terrebonne_so_2019_2021.csv"))
+    cprr = pd.read_csv(deba.data("clean/cprr_terrebonne_so_2019_2021.csv"))
     agency = cprr.agency[0]
     post = load_for_agency(agency)
     cprr = assign_uid_from_post(cprr, post)
-    cprr.to_csv(bolo.data("match/cprr_terrebonne_so_2019_2021.csv"), index=False)
+    cprr.to_csv(deba.data("match/cprr_terrebonne_so_2019_2021.csv"), index=False)

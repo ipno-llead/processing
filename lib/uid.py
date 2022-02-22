@@ -2,7 +2,7 @@ import hashlib
 
 import pandas as pd
 
-import bolo
+import deba
 from lib.exceptions import NonUniqueUIDException, HashCollisionException
 
 
@@ -88,6 +88,6 @@ def ensure_uid_unique(
         .sort_values(uid_cols)
     )
     if output_csv:
-        dup_df.to_csv(bolo.data("duplicates.csv"), index=False)
+        dup_df.to_csv(deba.data("duplicates.csv"), index=False)
         print("duplications written to data/duplicates.csv")
     raise NonUniqueUIDException("rows are not unique:\n%s" % dup_df)

@@ -1,5 +1,5 @@
 import pandas as pd
-import bolo
+import deba
 from lib.events import rearrange_event_columns
 from lib.personnel import fuse_personnel
 from lib import events
@@ -27,10 +27,10 @@ def fuse_events(pprr):
 
 
 if __name__ == "__main__":
-    pprr = pd.read_csv(bolo.data("clean/pprr_central_csd_2014_2019.csv"))
-    post_events = pd.read_csv(bolo.data("match/post_events_central_csd_2020.csv"))
+    pprr = pd.read_csv(deba.data("clean/pprr_central_csd_2014_2019.csv"))
+    post_events = pd.read_csv(deba.data("match/post_events_central_csd_2020.csv"))
     per_df = fuse_personnel(pprr)
     events_df = fuse_events(pprr)
     events_df = rearrange_event_columns(pd.concat([events_df, post_events]))
-    per_df.to_csv(bolo.data("fuse/per_central_csd.csv"), index=False)
-    events_df.to_csv(bolo.data("fuse/event_central_csd.csv"), index=False)
+    per_df.to_csv(deba.data("fuse/per_central_csd.csv"), index=False)
+    events_df.to_csv(deba.data("fuse/event_central_csd.csv"), index=False)

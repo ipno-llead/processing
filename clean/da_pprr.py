@@ -1,5 +1,5 @@
 import pandas as pd
-import bolo
+import deba
 
 
 def extract_da_rosters(df):
@@ -101,11 +101,11 @@ def clean_agency(df):
 
 
 def clean():
-    df = pd.read_csv(bolo.data("raw/district_attorney/pprr_post_2020_11_06.csv"))
+    df = pd.read_csv(deba.data("raw/district_attorney/pprr_post_2020_11_06.csv"))
     df = df.pipe(extract_da_rosters).pipe(clean_agency)
     return df
 
 
 if __name__ == "__main__":
     df = clean()
-    df.to_csv(bolo.data("clean/pprr_da_offices.csv"), index=False)
+    df.to_csv(deba.data("clean/pprr_da_offices.csv"), index=False)
