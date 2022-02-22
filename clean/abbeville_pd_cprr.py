@@ -108,7 +108,6 @@ def remove_q_marks_from_dates(df):
 
 def remove_uid_for_unknown_officers(df):
     df.loc[((df.first_name == "") & (df.last_name == "")), "uid"] = ""
-    df.loc[((df.first_name == "") & (df.last_name == "")), "allegation_uid"] = ""
     return df
 
 
