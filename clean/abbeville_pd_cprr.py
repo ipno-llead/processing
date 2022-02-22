@@ -97,16 +97,18 @@ def split_and_clean_names(df):
     return df.drop(columns="officer_name")
 
 
-def drop_rows_missing_names(df):
-    return df[~((df.first_name == "") & (df.last_name == ""))]
-
-
 def remove_q_marks_from_dates(df):
     df.loc[:, "receive_date"] = df.receive_date.str.replace(r"\? ", "", regex=True)
 
     df.loc[
         :, "investigation_complete_date"
     ] = df.investigation_complete_date.str.replace(r"\? ", "", regex=True)
+    return df
+
+
+def remove_uid_for_unknown_officers(df):
+    df.loc[((df.first_name == "") & (df.last_name == "")), "uid"] = ""
+    df.loc[((df.first_name == "") & (df.last_name == "")), "allegation_uid"] = ""
     return df
 
 
@@ -127,7 +129,6 @@ def clean21():
         .pipe(clean_allegation_desc)
         .pipe(split_rows_with_multiple_officers)
         .pipe(split_and_clean_names)
-        .pipe(drop_rows_missing_names)
         .pipe(clean_dates, ["receive_date", "investigation_complete_date"])
         .pipe(set_values, {"agency": "Abbeville PD"})
         .pipe(gen_uid, ["agency", "first_name", "last_name"])
@@ -144,6 +145,7 @@ def clean21():
             ],
             "allegation_uid",
         )
+        .pipe(remove_uid_for_unknown_officers)
     )
     return df
 
