@@ -353,7 +353,7 @@ def split_action_from_disposition(df):
 
 def remove_uid_for_unknown_officers(df):
     df.loc[((df.first_name == "") & (df.last_name == "")), "uid"] = ""
-    return df
+    return df[~((df.uid == ""))]
 
 
 def clean_cprr_20():

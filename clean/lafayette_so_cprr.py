@@ -188,7 +188,7 @@ def clean_action_08(df):
 
 def remove_uid_for_unknown_officers(df):
     df.loc[((df.first_name == "") & (df.last_name == "")), "uid"] = ""
-    return df
+    return df[~((df.uid == ""))]
 
 
 def clean20():
