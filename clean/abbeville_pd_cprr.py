@@ -111,16 +111,25 @@ def remove_uid_for_unknown_officers(df):
     return df[~((df.uid == ""))]
 
 
+def clean_receive_and_complete_dates(df):
+    df.loc[:, "receive_date"] = (
+        df.date_received.str.lower()
+        .str.strip()
+        .str.replace("date received", "", regex=False)
+    )
+
+    df.loc[:, "investigation_complete_date"] = (
+        df.date_completed.str.lower()
+        .str.strip()
+        .str.replace("date completed", "", regex=False)
+    )
+    return df.drop(columns=["date_received", "date_completed"])
+
+
 def clean21():
     df = (
         pd.read_csv(deba.data("raw/abbeville_pd/abbeville_pd_cprr_2019_2021.csv"))
         .pipe(clean_column_names)
-        .rename(
-            columns={
-                "date_received": "receive_date",
-                "date_completed": "investigation_complete_date",
-            }
-        )
         .pipe(clean_tracking_number)
         .pipe(clean_allegation)
         .pipe(clean_disposition)
@@ -128,6 +137,7 @@ def clean21():
         .pipe(clean_allegation_desc)
         .pipe(split_rows_with_multiple_officers)
         .pipe(split_and_clean_names)
+        .pipe(clean_receive_and_complete_dates)
         .pipe(clean_dates, ["receive_date", "investigation_complete_date"])
         .pipe(set_values, {"agency": "Abbeville PD"})
         .pipe(gen_uid, ["agency", "first_name", "last_name"])
