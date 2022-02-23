@@ -223,9 +223,8 @@ def discard_impossible_dates(df):
     return df
 
 
-def remove_uid_for_unknown_officers(df):
-    df.loc[((df.first_name == "") & (df.last_name == "")), "uid"] = ""
-    return df[~((df.uid == ""))]
+def drop_rows_missing_names(df):
+    return df[~((df.first_name == "") & (df.last_name == ""))]
 
 
 def clean():
@@ -264,7 +263,7 @@ def clean():
             ],
             "supervisor_uid",
         )
-        .pipe(remove_uid_for_unknown_officers)
+        .pipe(drop_rows_missing_names)
     )
     return df
 

@@ -186,9 +186,8 @@ def clean_action_08(df):
     return df.drop(columns="leave")
 
 
-def remove_uid_for_unknown_officers(df):
-    df.loc[((df.first_name == "") & (df.last_name == "")), "uid"] = ""
-    return df[~((df.uid == ""))]
+def drop_rows_missing_names(df):
+    return df[~((df.first_name == "") & (df.last_name == ""))]
 
 
 def clean20():
@@ -224,7 +223,7 @@ def clean20():
             ["uid", "allegation", "action", "tracking_number"],
             "allegation_uid",
         )
-        .pipe(remove_uid_for_unknown_officers)
+        .pipe(drop_rows_missing_names)
     )
     return df
 
@@ -250,7 +249,7 @@ def clean14():
             ["uid", "allegation", "action", "tracking_number", "receive_date"],
             "allegation_uid",
         )
-        .pipe(remove_uid_for_unknown_officers)
+        .pipe(drop_rows_missing_names)
     )
     return df
 
@@ -276,7 +275,7 @@ def clean08():
             ["uid", "allegation", "action", "tracking_number", "receive_date"],
             "allegation_uid",
         )
-        .pipe(remove_uid_for_unknown_officers)
+        .pipe(drop_rows_missing_names)
     )
     return df
 

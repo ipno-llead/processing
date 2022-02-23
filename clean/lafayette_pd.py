@@ -351,9 +351,8 @@ def split_action_from_disposition(df):
     return df
 
 
-def remove_uid_for_unknown_officers(df):
-    df.loc[((df.first_name == "") & (df.last_name == "")), "uid"] = ""
-    return df[~((df.uid == ""))]
+def drop_rows_missing_names(df):
+    return df[~((df.first_name == "") & (df.last_name == ""))]
 
 
 def clean_cprr_20():
@@ -1074,7 +1073,7 @@ def clean_cprr_14():
             ["uid", "charges", "action", "tracking_number", "disposition"],
             "allegation_uid",
         )
-        .pipe(remove_uid_for_unknown_officers)
+        .pipe(drop_rows_missing_names)
     )
     return df
 

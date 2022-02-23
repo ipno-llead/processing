@@ -61,10 +61,8 @@ def clean_and_split_names(df):
     return df
 
 
-def remove_uid_for_unknown_officers(df):
-    df.loc[((df.first_name == "") & (df.last_name == "")), "uid"] = ""
-    df.loc[((df.first_name == "") & (df.last_name == "")), "allegation_uid"] = ""
-    return df[~((df.uid == ""))]
+def drop_rows_missing_names(df):
+    return df[~((df.first_name == "") & (df.last_name == ""))]
 
 
 def clean_receive_dates(df):
@@ -169,7 +167,6 @@ def clean20():
             ["first_name", "last_name", "middle_name", "agency"],
         )
         .pipe(gen_uid, ["uid", "tracking_number", "allegation"], "allegation_uid")
-        .pipe(remove_uid_for_unknown_officers)
     )
     return df
 

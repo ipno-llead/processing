@@ -679,9 +679,8 @@ def split_name_20(df):
     return df.drop(columns=["name_of_accused"]).fillna("")
 
 
-def remove_uid_for_unknown_officers(df):
-    df.loc[((df.first_name == "") & (df.last_name == "")), "uid"] = ""
-    return df[~((df.uid == ""))]
+def drop_rows_missing_names(df):
+    return df[~((df.first_name == "") & (df.last_name == ""))]
 
 
 def clean_employee_id_20(df):
@@ -994,7 +993,7 @@ def clean20():
             "allegation_uid",
         )
         .pipe(add_left_reason_column)
-        .pipe(remove_uid_for_unknown_officers)
+        .pipe(drop_rows_missing_names)
     )
     return df
 
