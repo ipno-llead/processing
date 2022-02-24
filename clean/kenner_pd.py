@@ -22,7 +22,6 @@ def split_names(df):
     df.loc[:, "last_name"] = names[0]
     df.loc[:, "first_name"] = names[1]
     df.loc[:, "middle_name"] = names[2]
-    df.loc[:, "middle_initial"] = names[2].fillna("").map(lambda x: x[:1])
     df = df.loc[(df.name != "unknown") & df.name.notna()]
     # there's already a "Gregory, Jan-Michael" so this row is probably redundant
     df = df.loc[df.name != "gregory, Jan Michael"]
@@ -48,7 +47,7 @@ def clean():
         .pipe(clean_employee_id)
         .pipe(split_names)
         .drop(columns=["name"])
-        .pipe(clean_names, ["first_name", "last_name", "middle_name", "middle_initial"])
+        .pipe(clean_names, ["first_name", "last_name", "middle_name"])
         .pipe(
             standardize_desc_cols,
             [
@@ -146,7 +145,7 @@ def clean_former_short():
         .pipe(assign_agency)
         .pipe(split_names)
         .drop(columns=["name"])
-        .pipe(clean_names, ["first_name", "last_name", "middle_name", "middle_initial"])
+        .pipe(clean_names, ["first_name", "last_name", "middle_name"])
         .pipe(standardize_desc_cols, ["department_desc", "rank_desc", "sex"])
         .pipe(remove_non_officers)
         .pipe(clean_dates, ["hire_date", "left_date"])

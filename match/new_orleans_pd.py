@@ -89,12 +89,12 @@ def match_award_to_pprr_ipm(award, pprr_ipm):
 
 
 def match_lprr_to_pprr_ipm(lprr, pprr_ipm):
-    dfa = lprr[["uid", "first_name", "last_name", "middle_initial"]]
+    dfa = lprr[["uid", "first_name", "last_name", "middle_name"]]
     dfa.loc[:, "fc"] = dfa.first_name.fillna("").map(lambda x: x[:1])
     dfa.loc[:, "lc"] = dfa.last_name.fillna("").map(lambda x: x[:1])
     dfa = dfa.drop_duplicates(subset=["uid"]).set_index("uid")
 
-    dfb = pprr_ipm[["uid", "first_name", "last_name", "middle_initial"]]
+    dfb = pprr_ipm[["uid", "first_name", "last_name", "middle_name"]]
     dfb.loc[:, "fc"] = dfb.first_name.fillna("").map(lambda x: x[:1])
     dfb.loc[:, "lc"] = dfb.last_name.fillna("").map(lambda x: x[:1])
     dfb = dfb.drop_duplicates(subset=["uid"]).set_index("uid")
@@ -104,7 +104,7 @@ def match_lprr_to_pprr_ipm(lprr, pprr_ipm):
         {
             "first_name": JaroWinklerSimilarity(),
             "last_name": JaroWinklerSimilarity(),
-            "middle_initial": JaroWinklerSimilarity(),
+            "middle_name": JaroWinklerSimilarity(),
         },
         dfa,
         dfb,

@@ -28,10 +28,6 @@ schemas:
         description: >
           person middle name
         title_case: true
-      - name: middle_initial
-        description: >
-          initial letter of middle name
-        title_case: true
       - name: first_name
         description: >
           person first name

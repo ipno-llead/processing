@@ -157,7 +157,7 @@ def split_and_clean_names(df):
     return df.drop(columns="officer")
 
 
-def drop_rows_missing_first_and_last_name(df):
+def drop_rows_missing_names(df):
     return df[~((df.first_name == "") & (df.last_name == ""))]
 
 
@@ -172,7 +172,6 @@ def clean21():
         .pipe(clean_disposition)
         .pipe(split_and_clean_investigator21)
         .pipe(split_and_clean_names)
-        .pipe(drop_rows_missing_first_and_last_name)
         .pipe(standardize_desc_cols, ["tracking_number", "action"])
         .pipe(set_values, ({"agency": "Houma PD"}))
         .pipe(gen_uid, ["agency", "first_name", "last_name"])
@@ -181,6 +180,7 @@ def clean21():
             ["uid", "tracking_number", "case_number", "allegation", "action"],
             "allegation_uid",
         )
+        .pipe(drop_rows_missing_names)
     )
     return df
 

@@ -15,7 +15,7 @@ def deduplicate_cprr_19_personnel(cprr):
     df = (
         cprr.loc[
             cprr.uid.notna(),
-            ["employee_id", "first_name", "last_name", "middle_initial", "uid"],
+            ["employee_id", "first_name", "last_name", "middle_name", "uid"],
         ]
         .drop_duplicates()
         .set_index("uid", drop=True)
@@ -37,7 +37,7 @@ def deduplicate_cprr_19_personnel(cprr):
     clusters = matcher.get_index_clusters_within_thresholds(decision)
     # canonicalize name and uid
     for cluster in clusters:
-        uid, first_name, last_name, middle_initial = None, "", "", ""
+        uid, first_name, last_name, middle_name = None, "", "", ""
         for idx in cluster:
             row = df.loc[idx]
             if (
@@ -48,16 +48,16 @@ def deduplicate_cprr_19_personnel(cprr):
                     and len(row.last_name) > len(last_name)
                 )
             ):
-                uid, first_name, last_name, middle_initial = (
+                uid, first_name, last_name, middle_name = (
                     idx,
                     row.first_name,
                     row.last_name,
-                    row.middle_initial,
+                    row.middle_name,
                 )
         cprr.loc[cprr.uid.isin(cluster), "uid"] = uid
         cprr.loc[cprr.uid == uid, "first_name"] = first_name
         cprr.loc[cprr.uid == uid, "last_name"] = last_name
-        cprr.loc[cprr.uid == uid, "middle_initial"] = middle_initial
+        cprr.loc[cprr.uid == uid, "middle_name"] = middle_name
     return cprr
 
 

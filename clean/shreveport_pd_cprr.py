@@ -163,7 +163,6 @@ def split_names(df):
     names = df.first_name.str.extract(r"(\w{2,}) (\w+)")
     df.loc[names[0].notna(), "first_name"] = names.loc[names[0].notna(), 0]
     df.loc[:, "middle_name"] = names.loc[:, 1]
-    df.loc[:, "middle_initial"] = df.middle_name.fillna("").map(lambda x: x[:1])
     return df.drop(columns=["suffix"])
 
 
@@ -181,7 +180,7 @@ def clean_cprr_names(cprr_df, year):
         .pipe(clean_receive_date, year)
         .pipe(stack_name_rows)
         .pipe(split_names)
-        .pipe(clean_names, ["first_name", "last_name", "middle_name", "middle_initial"])
+        .pipe(clean_names, ["first_name", "last_name", "middle_name"])
         .pipe(
             set_values,
             {
@@ -227,7 +226,6 @@ def clean_cprr(disposition_file, name_file, year):
                 "first_name",
                 "last_name",
                 "middle_name",
-                "middle_initial",
                 "complainant_name",
             ]
         ].drop_duplicates(),

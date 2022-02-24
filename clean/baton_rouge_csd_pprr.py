@@ -119,7 +119,7 @@ def clean_17():
         .rename(
             columns={
                 "employee_num": "employee_id",
-                "middle_init": "middle_initial",
+                "middle_init": "middle_name",
                 "division_num": "department_code",
                 "division_name": "department_desc",
                 "job_code": "rank_code",
@@ -138,7 +138,7 @@ def clean_17():
         .pipe(clean_rank_desc)
         .pipe(parse_dates_with_known_format, ["hire_date", "resign_date"], "%m/%d/%Y")
         .pipe(assign_agency)
-        .pipe(clean_names, ["first_name", "last_name", "middle_initial"])
+        .pipe(clean_names, ["first_name", "last_name", "middle_name"])
         .pipe(gen_uid, ["agency", "employee_id"])
         .pipe(assign_rank_year_and_pay_year)
     )
@@ -170,7 +170,7 @@ def clean_19():
         ]
         .rename(
             columns={
-                "middle_init": "middle_initial",
+                "middle_init": "middle_name",
                 "pay_location_code": "department_code",
                 "pay_location_description": "department_desc",
                 "job_code": "rank_code",
@@ -192,7 +192,7 @@ def clean_19():
         .pipe(clean_employment_status, ["employment_status"])
         .pipe(clean_department_desc)
         .pipe(assign_agency)
-        .pipe(clean_names, ["first_name", "last_name", "middle_initial"])
+        .pipe(clean_names, ["first_name", "last_name", "middle_name"])
         .pipe(gen_uid, ["agency", "employee_id"])
         .pipe(assign_rank_year_and_pay_year)
     )

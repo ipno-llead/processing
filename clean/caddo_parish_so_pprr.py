@@ -31,7 +31,7 @@ def extract_name(df):
     df.loc[:, "first_name"] = df2.first_name
     df.loc[:, "last_name"] = df2.last_name
     df.loc[:, "middle_name"] = df2.middle_name
-    df.loc[:, "middle_initial"] = df2.middle_name.fillna("").map(lambda x: x[:1])
+    df.loc[:, "middle_name"] = df2.middle_name.fillna("").map(lambda x: x[:1])
     return df.drop(columns=["name"])
 
 

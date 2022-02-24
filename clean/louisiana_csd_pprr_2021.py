@@ -20,7 +20,6 @@ def split_names(df):
     df.loc[:, "last_name"] = names.loc[:, 0]
     df.loc[:, "first_name"] = names.loc[:, 1]
     df.loc[:, "middle_name"] = names.loc[:, 2]
-    df.loc[:, "middle_initial"] = df.middle_name.fillna("").map(lambda x: x[:1])
     return df.drop(columns=["employee_name"])
 
 
@@ -60,7 +59,7 @@ def clean_demo():
         .pipe(clean_races, ["race"])
         .pipe(clean_sexes, ["sex"])
         .pipe(standardize_desc_cols, ["rank_desc", "department_desc"])
-        .pipe(clean_names, ["first_name", "last_name", "middle_initial", "middle_name"])
+        .pipe(clean_names, ["first_name", "last_name", "middle_name"])
         .pipe(gen_uid, ["agency", "first_name", "last_name", "middle_name", "race"])
         .sort_values(["uid", "salary_date", "salary"], na_position="first")
         .drop_duplicates(["uid", "salary_date"], keep="last")

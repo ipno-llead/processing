@@ -258,7 +258,7 @@ def split_name_19(df):
     series = df.name_of_accused.fillna("").str.strip()
     for col, pat in [
         ("first_name", r"^([\w'-]+)(.*)$"),
-        ("middle_initial", r"^(\w\.) (.*)$"),
+        ("middle_name", r"^(\w\.) (.*)$"),
     ]:
         names = series[series.str.match(pat)].str.extract(pat)
         df.loc[series.str.match(pat), col] = names[0].str.replace(
@@ -679,7 +679,7 @@ def split_name_20(df):
     return df.drop(columns=["name_of_accused"]).fillna("")
 
 
-def drop_rows_missing_name_20(df):
+def drop_rows_missing_names(df):
     return df[~((df.first_name == "") & (df.last_name == ""))]
 
 
@@ -893,7 +893,7 @@ def clean19():
         .pipe(clean_department_desc)
         .pipe(standardize_desc_cols, ["rank_desc"])
         .pipe(split_name_19)
-        .pipe(clean_names, ["first_name", "last_name", "middle_initial"])
+        .pipe(clean_names, ["first_name", "last_name", "middle_name"])
         .pipe(clean_action_19)
         .pipe(set_values, {"agency": "New Orleans SO", "data_production_year": "2019"})
         .pipe(process_disposition)
@@ -903,7 +903,7 @@ def clean19():
         )
         .pipe(
             gen_uid,
-            ["agency", "employee_id", "first_name", "last_name", "middle_initial"],
+            ["agency", "employee_id", "first_name", "last_name", "middle_name"],
         )
         .pipe(set_empty_uid_for_anonymous_officers)
         .pipe(gen_uid, ["agency", "tracking_number", "uid"], "allegation_uid")
@@ -939,6 +939,7 @@ def clean20():
                 "related_item_number",
             ]
         )
+        .drop(columns=["referred_by"])
         .rename(
             columns={
                 "case_number": "tracking_number",
@@ -947,7 +948,6 @@ def clean20():
                 "location_or_facility": "department_desc",
                 "assigned_agent": "investigating_supervisor",
                 "terminated_resigned": "action",
-                "referred_by": "complainant",
                 "summary": "allegation_desc",
             }
         )
@@ -957,7 +957,6 @@ def clean20():
                 "investigating_supervisor",
                 "name_of_accused",
                 "charges",
-                "complainant",
                 "action",
             ],
         )
@@ -970,7 +969,6 @@ def clean20():
         .pipe(clean_allegations_20)
         .pipe(split_rows_with_multiple_allegations_20)
         .pipe(split_name_20)
-        .pipe(drop_rows_missing_name_20)
         .pipe(clean_employee_id_20)
         .pipe(fix_rank_desc_20)
         .pipe(clean_allegation_desc)
@@ -995,6 +993,7 @@ def clean20():
             "allegation_uid",
         )
         .pipe(add_left_reason_column)
+        .pipe(drop_rows_missing_names)
     )
     return df
 

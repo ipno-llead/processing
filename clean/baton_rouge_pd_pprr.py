@@ -17,7 +17,7 @@ def split_names(df):
     )
     df.loc[:, "last_name"] = names[0]
     df.loc[:, "first_name"] = names[1]
-    df.loc[:, "middle_initial"] = names[2]
+    df.loc[:, "middle_name"] = names[2]
     return df.drop(columns="name")
 
 
@@ -63,9 +63,9 @@ def clean():
         .pipe(replace_rank)
         .pipe(clean_badge_no)
         .pipe(split_names)
-        .pipe(clean_names, ["last_name", "first_name", "middle_initial"])
+        .pipe(clean_names, ["last_name", "first_name", "middle_name"])
         .pipe(set_values, {"data_production_year": "2021", "agency": "Baton Rouge PD"})
-        .pipe(gen_uid, ["agency", "first_name", "middle_initial", "last_name"])
+        .pipe(gen_uid, ["agency", "first_name", "middle_name", "last_name"])
     )
 
 

@@ -38,7 +38,7 @@ def split_name(df):
     df.loc[:, "last_name"] = names[0]
     df.loc[:, "suffix"] = names[1].fillna("")
     df.loc[:, "first_name"] = names[2]
-    df.loc[:, "middle_initial"] = names[3].str.replace(r"\.", "", regex=True).fillna("")
+    df.loc[:, "middle_name"] = names[3].str.replace(r"\.", "", regex=True).fillna("")
     df.loc[:, "last_name"] = df.last_name.str.cat(df.suffix, sep=" ")
     return df.drop(columns=["name_of_officer", "suffix"])
 
@@ -60,7 +60,7 @@ def clean():
         .pipe(assign_agency)
         .pipe(clean_salaries, ["salary"])
         .pipe(set_values, {"salary_freq": salary.YEARLY})
-        .pipe(gen_uid, ["last_name", "first_name", "middle_initial", "agency"])
+        .pipe(gen_uid, ["last_name", "first_name", "middle_name", "agency"])
         .drop_duplicates(subset=["hire_date", "uid"], keep="first")
     )
     return df

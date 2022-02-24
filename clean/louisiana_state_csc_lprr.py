@@ -72,18 +72,19 @@ def split_appellant_column(df):
     df.loc[:, "last_name"] = names.iloc[:, 1]
     names = names.iloc[:, 0].str.split(" ", expand=True)
     df.loc[:, "first_name"] = names.iloc[:, 0]
-    df.loc[:, "middle_initial"] = names.iloc[:, 1]
+    df.loc[:, "middle_name"] = names.iloc[:, 1]
 
     return df.drop(columns=["appellant"])
 
 
 def assign_additional_appellant_names(df):
-    names = pd.read_csv(deba.data("raw/louisiana_state_csc/la_lprr_appellants.csv"))
+    names = pd.read_csv(deba.data("raw/louisiana_state_csc/la_lprr_appellants.csv"))\
+        .rename(columns={'appellant_middle_initial': 'appellant_middle_name'})
     for _, row in names.iterrows():
-        for col in ["first_name", "last_name", "middle_initial"]:
+        for col in ["first_name", "last_name", "middle_name"]:
             df.loc[df.docket_no == row.docket_no, col] = row["appellant_%s" % col]
     df.loc[df.docket_no == "93-36-O", "first_name"] = "Edward"
-    df.loc[df.docket_no == "93-36-O", "middle_initial"] = "A"
+    df.loc[df.docket_no == "93-36-O", "middle_name"] = "A"
     df.loc[df.docket_no == "93-36-O", "last_name"] = "Kuhnest"
     return df
 
@@ -190,8 +191,8 @@ def clean():
         .pipe(correct_docket_no)
         .pipe(clean_appeal_disposition)
         .pipe(assign_agency)
-        .pipe(clean_names, ["first_name", "middle_initial", "last_name"])
-        .pipe(gen_uid, ["agency", "first_name", "middle_initial", "last_name"])
+        .pipe(clean_names, ["first_name", "middle_name", "last_name"])
+        .pipe(gen_uid, ["agency", "first_name", "middle_name", "last_name"])
         .pipe(gen_uid, ["agency", "docket_no", "uid"], "appeal_uid")
         .pipe(assign_charging_supervisor)
     )

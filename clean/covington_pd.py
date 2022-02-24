@@ -4,6 +4,8 @@ from lib.columns import clean_column_names, set_values
 import deba
 from lib.uid import gen_uid
 from lib import salary
+
+
 from lib.clean import clean_names, standardize_desc_cols, clean_salaries
 
 
@@ -14,7 +16,6 @@ def split_names(df, col, drop=True):
     df.loc[:, "first_name"] = names[1]
     df.loc[:, "middle_name"] = names[2]
     df.loc[:, "last_name"] = names[0]
-    df.loc[:, "middle_initial"] = df.middle_name.fillna("").map(lambda x: x[:1])
     if drop:
         df = df.drop(columns=[col])
     return df
@@ -56,7 +57,7 @@ def clean_actions_history():
         .drop_duplicates(ignore_index=True)
         .pipe(split_names, "name")
         .pipe(assign_agency)
-        .pipe(clean_names, ["first_name", "last_name", "middle_name", "middle_initial"])
+        .pipe(clean_names, ["first_name", "last_name", "middle_name"])
         .pipe(gen_uid, ["agency", "employee_id"])
         .pipe(standardize_desc_cols, ["rank_desc", "action_desc"])
         .pipe(clean_rank_desc)
@@ -117,7 +118,7 @@ def clean_pprr_2021():
         )
         .drop(columns=["stat"])
         .pipe(split_names, "employee_name")
-        .pipe(clean_names, ["first_name", "last_name", "middle_name", "middle_initial"])
+        .pipe(clean_names, ["first_name", "last_name", "middle_name"])
         .pipe(standardize_desc_cols, ["rank_desc"])
         .pipe(set_values, {"data_production_year": 2021, "agency": "Covington PD"})
         .pipe(gen_uid, ["agency", "employee_id"])

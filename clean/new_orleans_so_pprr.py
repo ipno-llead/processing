@@ -132,7 +132,7 @@ def split_names(df):
     df.loc[:, "suffix"] = names[1].fillna("")
     df.loc[:, "first_name"] = names[2].fillna("")
     df.loc[:, "middle_name"] = names[3].fillna("")
-    df.loc[:, "middle_initial"] = names[4].fillna("")
+    df.loc[:, "middle_name"] = names[4].fillna("")
     return df.drop(columns="payroll_name")
 
 
@@ -171,7 +171,7 @@ def clean():
         .pipe(assign_agency)
         .pipe(
             gen_uid,
-            ["first_name", "middle_initial", "middle_name", "last_name", "agency"],
+            ["first_name", "middle_name", "last_name", "agency"],
         )
     )
     return df

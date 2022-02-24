@@ -1,7 +1,7 @@
 import deba
 from lib.columns import set_values
 from lib.uid import gen_uid
-from lib.clean import clean_dates, float_to_int_str
+from lib.clean import clean_dates, float_to_int_str, clean_names
 import pandas as pd
 
 
@@ -36,7 +36,7 @@ def split_full_name(df):
     )
     df.loc[:, "last_name"] = parts[2].str.strip().str.replace("deputy", "", regex=False)
     df.loc[df.full_name == "deputy", "rank_desc"] = "deputy"
-    return df.drop(columns="full_name")
+    return df.drop(columns=["full_name"])
 
 
 def clean_dept_desc(df):
@@ -223,6 +223,10 @@ def discard_impossible_dates(df):
     return df
 
 
+def drop_rows_missing_names(df):
+    return df[~((df.first_name == "") & (df.last_name == ""))]
+
+
 def clean():
     df = (
         pd.read_csv(deba.data("raw/tangipahoa_so/tangipahoa_so_cprr_2015_2021.csv"))
@@ -243,6 +247,7 @@ def clean():
         .pipe(drop_rows_with_allegation_disposition_action_all_empty)
         .pipe(clean_dates, ["completion_date"], expand=True)
         .pipe(clean_dates, ["receive_date"], expand=False)
+        .pipe(clean_names, ["first_name", "last_name", "rank_desc"])
         .pipe(discard_impossible_dates)
         .pipe(set_values, {"agency": "Tangipahoa SO", "data_production_year": "2021"})
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
@@ -258,6 +263,7 @@ def clean():
             ],
             "supervisor_uid",
         )
+        .pipe(drop_rows_missing_names)
     )
     return df
 

@@ -20,7 +20,7 @@ def split_name(df):
     )
     names2 = names1.iloc[:, 0].str.split(" ", expand=True)
     df.loc[:, "first_name"] = names2.iloc[:, 0]
-    df.loc[:, "middle_initial"] = names2.iloc[:, 1]
+    df.loc[:, "middle_name"] = names2.iloc[:, 1]
     df.loc[:, "last_name"] = names1.iloc[:, 0]
     df = df.drop(columns=["name"])
     return df
@@ -338,7 +338,7 @@ def clean18():
         .pipe(clean_allegations)
         .pipe(assign_agency)
         .pipe(assign_prod_year, "2018")
-        .pipe(clean_names, ["first_name", "last_name", "middle_initial"])
+        .pipe(clean_names, ["first_name", "last_name", "middle_name"])
         .pipe(gen_uid, ["agency", "first_name", "last_name", "birth_year", "badge_no"])
         .pipe(
             gen_uid,
@@ -394,7 +394,7 @@ def clean20():
         .pipe(clean_complainant)
         .pipe(clean_disposition_20)
         .pipe(assign_prod_year, "2020")
-        .pipe(clean_names, ["first_name", "last_name", "middle_initial"])
+        .pipe(clean_names, ["first_name", "last_name", "middle_name"])
         .pipe(gen_uid, ["agency", "first_name", "last_name", "birth_year", "badge_no"])
         .pipe(
             gen_uid,

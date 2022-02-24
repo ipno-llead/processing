@@ -16,12 +16,7 @@ def split_name(df):
     df.loc[:, "last_name"] = names[0]
     df.loc[:, "suffix"] = names[1]
     df.loc[:, "first_name"] = names[2]
-    df.loc[:, "middle_name"] = (
-        names.loc[:, 3].str.strip().fillna("").map(lambda s: "" if len(s) < 3 else s)
-    )
-    df.loc[:, "middle_initial"] = (
-        names.loc[:, 3].str.strip().fillna("").map(lambda s: "" if len(s) > 1 else s)
-    )
+    df.loc[:, "middle_name"] = names[3]
     df.loc[:, "last_name"] = df.last_name.fillna("") + " " + df.suffix.fillna("")
     return df.drop(columns=["suffix", "officer"])
 
@@ -90,7 +85,7 @@ def clean():
         .pipe(clean_disposition)
         .pipe(clean_charges)
         .pipe(assign_agency)
-        .pipe(gen_uid, ["first_name", "middle_initial", "last_name", "agency"])
+        .pipe(gen_uid, ["first_name", "middle_name", "last_name", "agency"])
         .pipe(
             gen_uid, ["uid", "disposition", "action", "charges", "location"], "uof_uid"
         )

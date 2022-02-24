@@ -91,7 +91,6 @@ def split_names(df):
     ).str.extract(r"^([^,]+), (\w+)(?: (\w+))?$")
     df.loc[:, "first_name"] = names[1]
     df.loc[:, "middle_name"] = names[2].fillna("")
-    df.loc[:, "middle_initial"] = df.middle_name.map(lambda x: x[:1])
     df.loc[:, "last_name"] = names[0]
     return df.drop(columns=["name"])
 
@@ -134,7 +133,7 @@ def clean():
         .pipe(split_names)
         .pipe(clean_employment_status)
         .pipe(clean_salaries, ["salary"])
-        .pipe(clean_names, ["first_name", "middle_name", "middle_initial", "last_name"])
+        .pipe(clean_names, ["first_name", "middle_name", "last_name"])
         .pipe(join_employment_date)
         .pipe(assign_agency)
         .pipe(gen_uid, ["agency", "employee_id"])

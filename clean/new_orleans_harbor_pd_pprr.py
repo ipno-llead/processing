@@ -53,7 +53,7 @@ def clean_personnel_2008():
     df = df.dropna(axis=1, how="all")
     df = df.rename(
         columns={
-            "mi": "middle_initial",
+            "mi": "middle_name",
             "date_hired": "hire_date",
             "position_rank": "rank_desc",
             "hourly_pay_rate": "salary",
@@ -66,8 +66,8 @@ def clean_personnel_2008():
         .pipe(set_values, {"salary_freq": salary.HOURLY})
         .pipe(clean_salaries, ["salary"])
         .pipe(assign_agency, 2008)
-        .pipe(clean_names, ["first_name", "last_name", "middle_initial"])
-        .pipe(gen_uid, ["agency", "first_name", "last_name", "middle_initial"])
+        .pipe(clean_names, ["first_name", "last_name", "middle_name"])
+        .pipe(gen_uid, ["agency", "first_name", "last_name", "middle_name"])
         .pipe(assign_pay_date_and_rank_date)
         .pipe(
             clean_dates, ["hire_date", "resign_date", "pay_effective_date", "rank_date"]
@@ -98,7 +98,7 @@ def clean_personnel_2020():
             "date_hired": "hire_date",
             "position_rank": "rank_desc",
             "hourly_pay": "salary",
-            "mi": "middle_initial",
+            "mi": "middle_name",
             "term_date": "resign_date",
             "pay_effective_date": "effective_date",
         },
@@ -111,10 +111,10 @@ def clean_personnel_2020():
         .pipe(clean_rank_desc)
         .pipe(standardize_desc_cols, ["rank_desc"])
         .pipe(assign_agency, 2020)
-        .pipe(clean_names, ["last_name", "middle_initial", "first_name"])
+        .pipe(clean_names, ["last_name", "middle_name", "first_name"])
         .pipe(
             gen_uid,
-            ["agency", "first_name", "last_name", "middle_initial", "hire_date"],
+            ["agency", "first_name", "last_name", "middle_name", "hire_date"],
         )
         .pipe(assign_pay_date_and_rank_date)
         .pipe(gen_uid, ["uid", "pay_effective_date", "rank_date"], "perhist_uid")

@@ -11,7 +11,7 @@ def extract_name(df):
         .str.replace(r" +- +", r" ")
         .str.extract(r"^([-\d]+) +(.*) +(\w{2,})(?: (\w))?$")
     )
-    cols.columns = ["employee_id", "last_name", "first_name", "middle_initial"]
+    cols.columns = ["employee_id", "last_name", "first_name", "middle_name"]
     return pd.concat([df, cols], axis=1).drop(columns=["employee_number_full_name"])
 
 
@@ -50,7 +50,7 @@ def clean():
     df = df.dropna(how="all")
     return (
         df.pipe(extract_name)
-        .pipe(clean_names, ["first_name", "last_name", "middle_initial"])
+        .pipe(clean_names, ["first_name", "last_name", "middle_name"])
         .pipe(standardize_employment_status)
         .pipe(clean_dates, ["hire_date"])
         .pipe(standardize_desc_cols, ["rank_desc"])

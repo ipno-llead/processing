@@ -30,7 +30,7 @@ def split_names(df):
     )
     df.loc[:, "last_name"] = names[1]
     df.loc[:, "first_name"] = names[0]
-    df.loc[:, "middle_initial"] = names[2]
+    df.loc[:, "middle_name"] = names[2]
     return df[df.name.notna()].drop(columns=["name"])
 
 
@@ -79,8 +79,8 @@ def clean_pprr():
         .pipe(float_to_int_str, ["birth_year"])
         .pipe(standardize_rank)
         .pipe(split_names)
-        .pipe(clean_names, ["first_name", "last_name", "middle_initial"])
-        .pipe(gen_uid, ["agency", "first_name", "last_name", "middle_initial"])
+        .pipe(clean_names, ["first_name", "last_name", "middle_name"])
+        .pipe(gen_uid, ["agency", "first_name", "last_name", "middle_name"])
     )
 
 
@@ -349,6 +349,10 @@ def split_action_from_disposition(df):
     df.loc[:, "action"] = disp_action[1].fillna("").str.cat(disp_action[2].fillna(""))
     df.loc[:, "disposition"] = disp_action[0]
     return df
+
+
+def drop_rows_missing_names(df):
+    return df[~((df.first_name == "") & (df.last_name == ""))]
 
 
 def clean_cprr_20():
@@ -839,6 +843,7 @@ def split_names_14(df):
             "pat elliot (district attorney's office)",
             regex=True,
         )
+        .str.replace(r"^metro narcotics", "", regex=True)
     )
     names = df.focus_officer_s.str.extract(
         r"(?:(officer|detective|sergeant|lieutenant|city marshall|major|recruit|"
@@ -857,11 +862,7 @@ def split_names_14(df):
         .str.replace(r"\(\(?|\)\)?", "", regex=True)
         .str.replace("cid", "criminal investigations", regex=False)
     )
-    return df.drop(columns=["focus_officer_s"])
-
-
-def drop_rows_missing_first_and_last_name_14(df):
-    return df[~((df.first_name == "") & (df.last_name == ""))]
+    return df
 
 
 def drop_rows_missing_charges_disposition_and_action_14(df):
@@ -1057,7 +1058,6 @@ def clean_cprr_14():
         .pipe(split_rows_with_multiple_charges_14)
         .pipe(split_rows_with_multiple_names_14)
         .pipe(split_names_14)
-        .pipe(drop_rows_missing_first_and_last_name_14)
         .pipe(assign_correct_actions_14)
         .pipe(assign_correct_disposition_14)
         .pipe(drop_rows_missing_charges_disposition_and_action_14)
@@ -1073,6 +1073,7 @@ def clean_cprr_14():
             ["uid", "charges", "action", "tracking_number", "disposition"],
             "allegation_uid",
         )
+        .pipe(drop_rows_missing_names)
     )
     return df
 
