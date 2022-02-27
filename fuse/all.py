@@ -186,7 +186,7 @@ def fuse_use_of_force():
                 pd.read_csv(deba.data("fuse/uof_kenner_pd.csv")),
             ]
         )
-    ).sort_values(["agency", "uof_tracking_number"])
+    ).sort_values(["agency", "uof_uid"])
 
 
 def fuse_stop_and_search():

@@ -312,45 +312,28 @@ schemas:
           unique identifier of use of force report.
         unique: true
         no_na: true
-      - name: uof_tracking_number
+      - name: tracking_number
         description: >
           tracking number of use of force report from the originating agency.
-      - name: report_year
-        description: >
-          year of report
       - name: uid
         description: >
           officer unique identifier, this references the `uid` column from personnel.csv
-      - name: force_description
-        description: >
-          summary of force used
-      - name: force_type
-      - name: force_level
-      - name: effective_uof
-      - name: accidental_discharge
-      - name: less_than_lethal
-      - name: status
-      - name: source
+      - name: use_of_force_type
+      - name: use_of_force_level
+      - name: use_of_force_effective
+      - name: use_of_force_reason
+      - name: investigation_status
       - name: service_type
-      - name: county
-      - name: traffic_stop
-      - name: sustained
-      - name: force_reason
-      - name: weather_description
-      - name: distance_from_officer
-      - name: body_worn_camera_available
-      - name: app_used
-      - name: citizen_uid
-        description: >
-          unique identifier for each citizen involved in a report.
+      - name: light_condition
+      - name: weather_condition
+      - name: shift_time
+      - name: citizen_distance_from_officer
       - name: citizen_arrested
+      - name: citizen_arrest_charges
       - name: citizen_hospitalized
       - name: citizen_injured
-      - name: citizen_body_type
+      - name: citizen_build
       - name: citizen_height
-      - name: citizen_age
-        integer: true
-      - name: citizen_involvement
       - name: disposition
       - name: citizen_sex
         options:
@@ -363,24 +346,17 @@ schemas:
           - hispanic
           - native american
           - asian / pacific islander
+          - asian
+          - indian
           - mixed
-      - name: citizen_age_1
+      - name: citizen_age
         integer: true
-      - name: officer_current_supervisor
-      - name: officer_title
       - name: officer_injured
-      - name: officer_age
-        integer: true
-      - name: officer_years_exp
-        integer: true
-      - name: officer_years_with_unit
-        integer: true
-      - name: officer_type
-      - name: officer_employment_status
-      - name: officer_department
-      - name: officer_division
-      - name: officer_sub_division_a
-      - name: officer_sub_division_b
+      - name: age
+      - name: division
+      - name: division_level
+      - name: unit
+      - name: originating_bureau
       - name: agency
         description: >
           the police department this report originate from.
