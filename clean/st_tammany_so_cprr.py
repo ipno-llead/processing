@@ -59,6 +59,37 @@ def remove_new_lines_from_allegations(df):
     return df
 
 
+def extract_action_and_disposition(df):
+    actions = (
+        df.allegation.str.lower()
+        .str.strip()
+        .fillna("")
+        .str.extract(r"- (\w+ ?\w+? ?\w+? ?\w+?)$")
+    )
+    df.loc[:, "action"] = (
+        actions[0]
+        .str.replace(r"\bhours\b", "hour", regex=True)
+        .str.replace(
+            r"suspend?e?d?s?i?o?n? (\w+) (\w+)", r"\1-\2 suspension", regex=True
+        )
+        .str.replace(r"^terminated$", "termination", regex=True)
+        .str.replace(r"^demoted$", "demotion", regex=True)
+        .str.replace(r"^paragraph 4$", "", regex=True)
+        .str.replace(r"(^neglect of work$|^failure to work$)", "", regex=True)
+        .str.replace(r"^(\w+) hours?$", r"\1-hour suspension", regex=True)
+        .str.replace(
+            r"^(\w+) hour ?o?f? ?suspension$", r"\1-hour suspension", regex=True
+        )
+        .str.replace(r"^80hours$", "80-hour suspension", regex=True)
+        .str.replace(r"^verbal$", "verbal warning", regex=True)
+        .str.replace(r"^other 1 year ", "1-year ", regex=True)
+    )
+
+    df.loc[:, "disposition"] = df.action.str.replace(r"(.+)", "sustained", regex=True)
+
+    return df
+
+
 def clean():
     df = pd.concat(
         [
@@ -84,6 +115,7 @@ def clean():
         .pipe(pad_dept_code)
         .pipe(assign_department_desc)
         .pipe(extract_occur_date)
+        .pipe(extract_action_and_disposition)
         .pipe(assign_agency)
         .pipe(clean_names, ["first_name", "last_name", "middle_name"])
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
