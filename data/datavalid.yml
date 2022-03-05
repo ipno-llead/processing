@@ -327,6 +327,7 @@ schemas:
       - name: light_condition
       - name: weather_condition
       - name: shift_time
+      - name: citizen_influencing_factors
       - name: citizen_distance_from_officer
       - name: citizen_arrested
       - name: citizen_arrest_charges

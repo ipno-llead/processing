@@ -1,8 +1,10 @@
 from lib.columns import clean_column_names
 import deba
-from lib.clean import clean_dates, standardize_desc_cols
+from lib.clean import clean_sexes, standardize_desc_cols
 from lib.columns import set_values
+from lib.clean import clean_races, clean_names
 from lib.uid import gen_uid
+import numpy as np
 import pandas as pd
 import sys
 
@@ -10,526 +12,127 @@ sys.path.append("../")
 
 
 def join_citizen_columns(df):
-    df.loc[:, "citizen"] = (
-        df.subject_ethnicity.fillna("null")
-        + " ; "
-        + df.subject_gender.fillna("null")
-        + " ; "
-        + df.subject_hospitalized.fillna("null")
-        + " ; "
-        + df.subject_injured.fillna("null")
-        + " ; "
-        + df.subject_influencing_factors.fillna("null")
-        + " ; "
-        + df.subject_distance_from_officer.fillna("null")
-        + " ; "
-        + df.subject_age.fillna("null")
-        + " ; "
-        + df.subject_build.fillna("null")
-        + " ; "
-        + df.subject_height.fillna("null")
-        + " ; "
-        + df.subject_arrested.fillna("null")
-        + " ; "
-        + df.subject_arrest_charges.fillna("null")
-    )
-    df.loc[:, "citizen"] = (
-        df.citizen.str.lower()
-        .str.strip()
-        .fillna("null")
-        .astype(str)
-        .str.replace(r">", "", regex=True)
-        .str.replace(r"<", "", regex=True)
-        .str.replace(r'"', "", regex=True)
-        .str.replace(r"'", "", regex=True)
-        .str.replace(r"- ?", "", regex=True)
-        .str.replace(r"\|  \|", "| null |", regex=True)
-        .str.replace(r"\|  \)", "| null)", regex=True)
-        .str.replace(
-            r"(\w+) (\w+) ?(\w+)? ?(\w+)? ?(\w+)? ?(\w+)?",
-            r"\1\2\3\4\5\6",
-            regex=True,
-        )
-        .str.replace(r"(\w+)\|", r"\1 |", regex=True)
-        .str.replace(r"(\w+);", r"\1 ;", regex=True)
-        .str.replace(
-            r"(\w+) \| (\w+) ; (\w+) \| (\w+) ; (\w+) \| (\w+) ; (\w+) \| (\w+) ; "
-            r"(\w+) \| (\w+) ; (\w+) \| (\w+) ; (\w+) \| (\w+) ; (\w+) \| (\w+) ; "
-            r"(\w+) \| (\w+) ; (\w+) \| (\w+) ; (\w+) ?\|? ?(\w+)?",
-            r"(\1 | \3 | \5 | \7 | \9 | \11 | \13 | \15 | \17 | \19 | \21) & "
-            r"(\2 | \4 | \6 | \8 | \10 | \12 | \14 | \16 | \18 | \20 | \22)",
-            regex=True,
-        )
-        .str.replace(
-            r"(\w+) \| (\w+) \| (\w+) ; (\w+) \| (\w+) \| (\w+) ; (\w+) \| (\w+) \| (\w+) ; "
-            r"(\w+) \| (\w+) \| (\w+) ; (\w+) \| (\w+) \| (\w+) ; (\w+) \| (\w+) \| (\w+) ; "
-            r"(\w+) \| (\w+) \| (\w+) ; (\w+) \| (\w+) \| (\w+) ; (\w+) \| (\w+) \| (\w+) ; "
-            r"(\w+) \| (\w+) \| (\w+) ; (\w+) ?\|? ?(\w+)? ?\|? ?(\w+)?",
-            r"(\1 | \4 | \7 | \10 | \13 | \16 | \19 | \22 | \25 | \28 | \31) & "
-            r"(\2 | \5 | \8 | \11 | \14 | \17 | \20 | \23 | \26 | \29 | \32) & "
-            r"(\3 | \6 | \9 | \12 | \15 | \18 | \21 | \24 | \27 | \30 | \33)",
-            regex=True,
-        )
-        .str.replace(
-            r"(\w+) \| (\w+) \| (\w+) \| (\w+) ; (\w+) \| (\w+) \| (\w+) \| (\w+) ; "
-            r"(\w+) \| (\w+) \| (\w+) \| (\w+) ; (\w+) \| (\w+) \| (\w+) \| (\w+) ; "
-            r"(\w+) \| (\w+) \| (\w+) \| (\w+) ; (\w+) \| (\w+) \| (\w+) \| (\w+) ; "
-            r"(\w+) \| (\w+) \| (\w+) \| (\w+) ; (\w+) \| (\w+) \| (\w+) \| (\w+) ; "
-            r"(\w+) \| (\w+) \| (\w+) \| (\w+) ; (\w+) \| (\w+) \| (\w+) \| (\w+) ; "
-            r"(\w+) ?\|? ?(\w+)? ?\|? ?(\w+)? ?\|? ?(\w+)?",
-            r"(\1 | \5 | \9 | \13 | \17 | \21 | \25 | \29 | \33 | \37 | \41) & "
-            r"(\2 | \6 | \10 | \14 | \18 | \22 | \26 | \30 | \34 | \38 | \42) & "
-            r"(\3 | \7 | \11 | \15 | \19 | \23 | \27 | \31 | \35 | \39 | \43) & "
-            r"(\4 | \8 | \12 | \16 | \20 | \24 | \28 | \32 | \36 | \40 | \44)",
-            regex=True,
-        )
-        .str.replace(
-            r"(\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) ; (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) ; "
-            r"(\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) ; (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) ; "
-            r"(\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) ; (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) ; "
-            r"(\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) ; (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) ; "
-            r"(\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) ; (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) ; "
-            r"(\w+) ?\|? ?(\w+)? ?\|? ?(\w+)? ?\|? ?(\w+)? ?\|? ?(\w+)?",
-            r"(\1 | \6 | \11 | \16 | \21 | \26 | \31 | \36 | \41 | \46 | \51) & "
-            r"(\2 | \7 | \12 | \18 | \23 | \28 | \33 | \38 | \43 | \48 | \53) & "
-            r"(\3 | \8 | \13 | \18 | \23 | \28 | \33 | \38 | \43 | \48 | \53) & "
-            r"(\4 | \9 | \14 | \19 | \24 | \29 | \34 | \39 | \44 | \49 | \54) & "
-            r"(\5 | \10 | \15 | \20 | \25 | \30 | \35 | \40 | \45 | \50 | \55)",
-            regex=True,
-        )
-        .str.replace(
-            r"(\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) ; "
-            r"(\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) ; "
-            r"(\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) ; "
-            r"(\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) ; "
-            r"(\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) ; "
-            r"(\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) ; "
-            r"(\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) ; "
-            r"(\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) ; "
-            r"(\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) ; "
-            r"(\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) ; "
-            r"(\w+) ?\|? ?(\w+)? ?\|? ?(\w+)? ?\|? ?(\w+)? ?\|? ?(\w+)? ?\|? ?(\w+)?",
-            r"(\1 | \7 | \13 | \19 | \25 | \31 | \37 | \43 | \49 | \55 | \61) & "
-            r"(\2 | \8 | \14 | \20 | \26 | \32 | \38 | \44 | \50 | \56 | \62) & "
-            r"(\3 | \9 | \15 | \21 | \27 | \33 | \39 | \45 | \51 | \57 | \63) & "
-            r"(\4 | \10 | \16 | \22 | \28 | \34 | \40 | \46 | \52 | \58 | \64) & "
-            r"(\5 | \11 | \17 | \23 | \29 | \35 | \41 | \47 | \53 | \59 | \65) & "
-            r"(\6 | \12 | \18 | \24 | \30 | \36 | \42 | \48 | \54 | \60 | \66)",
-            regex=True,
-        )
-        .str.replace(
-            r"(\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) ; "
-            r"(\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) ; "
-            r"(\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) ; "
-            r"(\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) ; "
-            r"(\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) ; "
-            r"(\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) ; "
-            r"(\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) ; "
-            r"(\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) ; "
-            r"(\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) ; "
-            r"(\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) ; "
-            r"(\w+) ?\|? ?(\w+)? ?\|? ?(\w+)? ?\|? ?(\w+)? ?\|? ?(\w+)? ?\|? "
-            r"?(\w+)? ?\|? ?(\w+)?",
-            r"(\1 | \8 | \15 | \22 | \29 | \36 | \43 | \50 | \57 | \64 | \71) & "
-            r"(\2 | \9 | \16 | \23 | \30 | \37 | \44 | \51 | \58 | \65 | \72) & "
-            r"(\3 | \10 | \17 | \24 | \31 | \38 | \45 | \52 | \59 | \66 | \73) & "
-            r"(\4 | \11 | \18 | \25 | \32 | \39 | \46 | \53 | \60 | \67 | \74) & "
-            r"(\5 | \12 | \19 | \26 | \33 | \40 | \47 | \54 | \61 | \68 | \75) & "
-            r"(\6 | \13 | \20 | \27 | \34 | \41 | \48 | \55 | \62 | \69 | \76) & "
-            r"(\7 | \14 | \21 | \28 | \35 | \42 | \49 | \56 | \63 | \70 | \77)",
-            regex=True,
-        )
-        .str.replace(
-            r"(\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) ; "
-            r"(\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) ; "
-            r"(\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) ; "
-            r"(\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) ; "
-            r"(\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) ; "
-            r"(\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) ; "
-            r"(\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) ; "
-            r"(\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) ; "
-            r"(\w+) ?\|? ?(\w+)? ?\|? ?(\w+)? ?\|? ?(\w+)? ?\|? ?(\w+)? ?\|? ?(\w+)? "
-            r"?\|? ?(\w+)? ?\|? ?(\w+)? ; "
-            r"(\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) ; "
-            r"(\w+) ?\|? ?(\w+)? ?\|? ?(\w+)? ?\|? ?(\w+)? ?\|? ?(\w+)? ?\|? ?(\w+)? "
-            r"?\|? ?(\w+)? ?\|? ?(\w+)?",
-            r"(\1 | \9 | \17 | \25 | \33 | \41 | \49 | \57 | \65 | \73 | \81) & "
-            r"(\2 | \10 | \18 | \26 | \34 | \42 | \50 | \58 | \66 | \74 | \82) & "
-            r"(\3 | \11 | \19 | \27 | \35 | \43 | \51 | \59 | \67 | \75 | \83) & "
-            r"(\4 | \12 | \20 | \28 | \36 | \44 | \52 | \60 | \68 | \76 | \84) & "
-            r"(\5 | \13 | \21 | \29 | \37 | \45 | \53 | \61 | \69 | \77 | \85) & "
-            r"(\6 | \14 | \22 | \30 | \38 | \46 | \54 | \62 | \70 | \78 | \86) & "
-            r"(\7 | \15 | \23 | \31 | \39 | \47 | \55 | \63 | \71 | \79 | \87) & "
-            r"(\8 | \16 | \24 | \32 | \40 | \48 | \56 | \64 | \72 | \80 | \88)",
-            regex=True,
-        )
-        .str.replace(
-            r"(\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) ; "
-            r"(\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) ; "
-            r"(\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) ; "
-            r"(\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) ; "
-            r"(\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) ; "
-            r"(\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) ; "
-            r"(\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) ; "
-            r"(\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) ; "
-            r"(\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) ; "
-            r"(\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) ; "
-            r"(\w+) ?\|? ?(\w+)? ?\|? ?(\w+)? ?\|? ?(\w+)? ?\|? ?(\w+)? ?\|? ?(\w+)? "
-            r"?\|? ?(\w+)? ?\|? ?(\w+)? ?\|? ?(\w+)?",
-            r"(\1 | \10 | \19 | \28 | \37 | \46 | \55 | \64 | \73 | \82 | \91) & "
-            r"(\2 | \11 | \20 | \29 | \38 | \47 | \56 | \65 | \74 | \83 | \92) & "
-            r"(\3 | \12 | \21 | \30 | \39 | \48 | \57 | \66 | \75 | \84 | \93) & "
-            r"(\4 | \13 | \22 | \31 | \40 | \49 | \58 | \67 | \76 | \85 | \94) & "
-            r"(\5 | \14 | \23 | \32 | \41 | \50 | \59 | \68 | \77 | \86 | \95) & "
-            r"(\6 | \15 | \24 | \33 | \42 | \51 | \60 | \69 | \78 | \87 | \96) & "
-            r"(\7 | \16 | \25 | \34 | \43 | \52 | \61 | \70 | \79 | \88 | \97) & "
-            r"(\8 | \17 | \26 | \35 | \44 | \53 | \62 | \71 | \80 | \89 | \98) & "
-            r"(\9 | \18 | \27 | \36 | \45 | \54 | \63 | \72 | \81 | \90 | \99)",
-            regex=True,
-        )
-    )
-    return df
+    citizen_columns = [
+        "citizen_race",
+        "citizen_sex",
+        "citizen_hospitalized",
+        "citizen_injured",
+        "citizen_influencing_factors",
+        "citizen_distance_from_officer",
+        "citizen_age",
+        "citizen_build",
+        "citizen_height",
+        "citizen_arrested",
+        "citizen_arrest_charges",
+    ]
+    for col in citizen_columns:
+        df.loc[:, col] = df[col].str.split(r" \| ")
 
+    def create_citizen_dicts(row: pd.Series):
+        d = row.loc[citizen_columns].loc[row.notna()].to_dict()
+        keys = d.keys()
+        return [
+            {k: d[k][i] for k in keys} for i in range(max(len(v) for v in d.values()))
+        ]
 
-def split_rows_with_multiple_citizens(df):
-    df = (
-        df.drop("citizen", axis=1)
-        .join(
-            df["citizen"]
-            .str.split("&", expand=True)
-            .stack()
-            .reset_index(level=1, drop=True)
-            .rename("citizen"),
-            how="outer",
-        )
-        .reset_index(drop=True)
-    )
-    return df.drop(
+    df.loc[:, "citizen"] = df.apply(create_citizen_dicts, axis=1)
+    df = df.drop(
         columns=[
-            "subject_ethnicity",
-            "subject_gender",
-            "subject_hospitalized",
-            "subject_injured",
-            "subject_influencing_factors",
-            "subject_distance_from_officer",
-            "subject_age",
-            "subject_build",
-            "subject_height",
-            "subject_arrested",
-            "subject_arrest_charges",
+            "citizen_race",
+            "citizen_sex",
+            "citizen_hospitalized",
+            "citizen_injured",
+            "citizen_influencing_factors",
+            "citizen_distance_from_officer",
+            "citizen_age",
+            "citizen_build",
+            "citizen_height",
+            "citizen_arrested",
+            "citizen_arrest_charges",
         ]
     )
 
+    df.loc[:, "citizen"] = df.citizen.apply(pd.DataFrame)
+    df = df.drop("citizen", axis=1).join(
+        pd.concat(df["citizen"].values, keys=df.index).droplevel(1)
+    )
 
-def join_officer_columns(df):
-    df.loc[:, "officer"] = (
-        df.officer_name.fillna("null")
-        + " ; "
-        + df.officer_race_ethnicity.fillna("null")
-        + " ; "
-        + df.officer_gender.fillna("null")
-        + " ; "
-        + df.officer_age.fillna("null")
-        + " ; "
-        + df.use_of_force_effective.fillna("null")
-        + " ; "
-        + df.use_of_force_type.fillna("null")
-        + " ; "
-        + df.use_of_force_level.fillna("null")
-        + " ; "
-        + df.officer_injured.fillna("null")
-    )
-    df.loc[:, "officer"] = (
-        df.officer.str.lower()
-        .str.strip()
-        .fillna("null")
-        .astype(str)
-        .str.replace(r'"', "", regex=True)
-        .str.replace(r"'", "", regex=True)
-        .str.replace(r"\|  \|", "| null |", regex=True)
-        .str.replace(r"\(", "", regex=True)
-        .str.replace(r"\)", "", regex=True)
-        .str.replace(r"- ?", "", regex=True)
-        .str.replace(r"\/", "", regex=True)
-        .str.replace(r"\.", "", regex=True)
-        .str.replace(r"^ ", "", regex=True)
-        .str.replace(
-            r"(\w+) ?(\w+)? ?(\w+)? ?(\w+)? ?(\w+)? ?(\w+)?",
-            r"\1\2\3\4\5\6",
-            regex=True,
-        )
-        .str.replace(r"(\w+)\|", r"\1 |", regex=True)
-        .str.replace(r"(\w+);", r"\1 ;", regex=True)
-        .str.replace(
-            r"(\w+\,? ?\w+?) \| (\w+\,? ?\w+?) ; (\w+) \| (\w+) ; "
-            r"(\w+) \| (\w+) ; (\w+) \| (\w+) ; (\w+) \| (\w+) ; (\w+) \| (\w+) ; "
-            r"(\w+) \| (\w+) ; (\w+) \| (\w+)",
-            r"(\1 | \3 | \5 | \7 | \9 | \11 | \13 | \15) & "
-            r"(\2 | \4 | \6 | \8 | \10 | \12 | \14 | \16)",
-            regex=True,
-        )
-        .str.replace(
-            r"(\w+\,? ?\w+?) \| (\w+\,? ?\w+?) \| (\w+\w+?\,? ?\w+?) ; "
-            r"(\w+) \| (\w+) \| (\w+) ; (\w+) \| (\w+) \| (\w+) ; "
-            r"(\w+) \| (\w+) \| (\w+) ; (\w+) \| (\w+) \| (\w+) ; "
-            r"(\w+) \| (\w+) \| (\w+) ; (\w+) \| (\w+) \| (\w+) ; (\w+) \| (\w+) \| (\w+)",
-            r"(\1 | \4 | \7 | \10 | \13 | \16 | \19 | \22) & "
-            r"(\2 | \5 | \8 | \11 | \14 | \17 | \20 | \23) & "
-            r"(\3 | \6 | \9 | \12 | \15 | \18 | \21 | \24)",
-            regex=True,
-        )
-        .str.replace(
-            r"(\w+\,? ?\w+?) \| (\w+?\,? ?\w+?) \| (\w+?\,? ?\w+?) \| (\w+?\,? ?\w+?) ; "
-            r"(\w+) \| (\w+) \| (\w+) \| (\w+) ; (\w+) \| (\w+) \| (\w+) \| (\w+) ; "
-            r"(\w+) \| (\w+) \| (\w+) \| (\w+) ; (\w+) \| (\w+) \| (\w+) \| (\w+) ; "
-            r"(\w+) \| (\w+) \| (\w+) \| (\w+) ; (\w+) \| (\w+) \| (\w+) \| (\w+) ; "
-            r"(\w+) \| (\w+) \| (\w+) \| (\w+)",
-            r"(\1 | \5 | \9 | \13 | \17 | \21 | \25 | \29) & "
-            r"(\2 | \6 | \10 | \14 | \18 | \22 | \26 | \30) & "
-            r"(\3 | \7 | \11 | \15 | \19 | \23 | \27 | \31) & "
-            r"(\4 | \8 | \12 | \16 | \20 | \24 | \28 | \32)",
-            regex=True,
-        )
-        .str.replace(
-            r"(\w+\,? ?\w+?) \| (\w+?\,? ?\w+?) \| (\w+?\,? ?\w+?) \| "
-            r"(\w+?\,? ?\w+?) \| (\w+?\,? ?\w+?) ; (\w+) \| (\w+) \| "
-            r"(\w+) \| (\w+) \| (\w+) ; (\w+) \| (\w+) \| (\w+) \| "
-            r"(\w+) \| (\w+) ; (\w+) \| (\w+) \| (\w+) \| (\w+) \| "
-            r"(\w+) ; (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) ; "
-            r"(\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) ; (\w+) \| "
-            r"(\w+) \| (\w+) \| (\w+) \| (\w+) ; (\w+) \| (\w+) \| "
-            r"(\w+) \| (\w+) \| (\w+)",
-            r"(\1 | \6 | \11 | \16 | \21 | \26 | \31 | \36) & "
-            r"(\2 | \7 | \12 | \17 | \22 | \27 | \32 | \37) & "
-            r"(\3 | \8 | \13 | \18 | \23 | \28 | \33 | \38) & "
-            r"(\4 | \9 | \14 | \19 | \24 | \29 | \34 | \39) & "
-            r"(\5 | \10 | \15 | \20 | \25 | \30 | \35 | \40)",
-            regex=True,
-        )
-        .str.replace(
-            r"(\w+\,? ?\w+?) \| (\w+?\,? ?\w+?) \| (\w+?\,? ?\w+?) \| "
-            r"(\w+?\,? ?\w+?) \| (\w+?\,? ?\w+?) \| (\w+?\,? ?\w+?) ; "
-            r"(\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) ; (\w+) \| "
-            r"(\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) ; (\w+) \| (\w+) \| "
-            r"(\w+) \| (\w+) \| (\w+) \| (\w+) ; (\w+) \| (\w+) \| (\w+) \| "
-            r"(\w+) \| (\w+) \| (\w+) ; (\w+) \| (\w+) \| (\w+) \| (\w+) \| "
-            r"(\w+) \| (\w+) ; (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| "
-            r"(\w+) ; (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+)",
-            r"(\1 | \7 | \13 | \19 | \25 | \31 | \37 | \43) & "
-            r"(\2 | \8 | \14 | \20 | \26 | \32 | \38 | \44) & "
-            r"(\3 | \9 | \15 | \21 | \27 | \33 | \39 | \45) & "
-            r"(\4 | \10 | \16 | \22 | \28 | \34 | \40 | \46) & "
-            r"(\5 | \11 | \17 | \23 | \29 | \35 | \41 | \47) & "
-            r"(\6 | \12 | \18 | \24 | \30 | \36 | \42 | \48)",
-            regex=True,
-        )
-        .str.replace(
-            r"(\w+\,? ?\w+?) \| (\w+?\,? ?\w+?) \| (\w+?\,? ?\w+?) \| "
-            r"(\w+?\,? ?\w+?) \| (\w+?\,? ?\w+?) \| (\w+?\,? ?\w+?) \| "
-            r"(\w+?\,? ?\w+?) ; (\w+) \| (\w+) \| (\w+) \| (\w+) \| "
-            r"(\w+) \| (\w+) \| (\w+) ; (\w+) \| (\w+) \| (\w+) \| "
-            r"(\w+) \| (\w+) \| (\w+) \| (\w+) ; (\w+) \| (\w+) \| "
-            r"(\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) ; (\w+) \| "
-            r"(\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) ; (\w+) \| "
-            r"(\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) ; (\w+) \| "
-            r"(\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) ; (\w+) \| "
-            r"(\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+)",
-            r"(\1 | \8 | \15 | \22 | \29 | \36 | \43 | \50) & "
-            r"(\2 | \9 | \16 | \23 | \30 | \37 | \44 | \51) & "
-            r"(\3 | \10 | \17 | \24 | \31 | \38 | \45 | \52) & "
-            r"(\4 | \11 | \18 | \25 | \32 | \39 | \46 | \53) & "
-            r"(\5 | \12 | \19 | \26 | \33 | \40 | \47 | \54) & "
-            r"(\6 | \13 | \20 | \27 | \34 | \41 | \48 | \55) & "
-            r"(\7 | \14 | \21 | \28 | \35 | \42 | \49 | \56)",
-            regex=True,
-        )
-        .str.replace(
-            r"(\w+\,? ?\w+?) \| (\w+?\,? ?\w+?) \| (\w+?\,? ?\w+?) \| "
-            r"(\w+?\,? ?\w+?) \| (\w+?\,? ?\w+?) \| (\w+?\,? ?\w+?) \| "
-            r"(\w+?\,? ?\w+?) \| (\w+?\,? ?\w+?) ; (\w+) \| (\w+) \| "
-            r"(\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) ; (\w+) \| "
-            r"(\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) ; "
-            r"(\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| "
-            r"(\w+) ; (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| "
-            r"(\w+) \| (\w+) ; (\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+) \| "
-            r"(\w+) \| (\w+) \| (\w+) ; (\w+) \| (\w+) \| (\w+) \| (\w+) \| "
-            r"(\w+) \| (\w+) \| (\w+) \| (\w+) ; (\w+) \| (\w+) \| (\w+) \| "
-            r"(\w+) \| (\w+) \| (\w+) \| (\w+) \| (\w+)",
-            r"(\1 | \9 | \17 | \25 | \33 | \41 | \49 | \57) & "
-            r"(\2 | \10 | \18 | \26 | \34 | \42 | \50 | \58) & "
-            r"(\3 | \11 | \19 | \27 | \35 | \43 | \51 | \59) & "
-            r"(\4 | \12 | \20 | \28 | \36 | \44 | \52 | \60) & "
-            r"(\5 | \13 | \21 | \29 | \37 | \45 | \53 | \61) & "
-            r"(\6 | \14 | \22 | \30 | \38 | \46 | \54 | \62) & "
-            r"(\7 | \15 | \23 | \31 | \39 | \47 | \55 | \63) & "
-            r"(\7 | \16 | \24 | \32 | \40 | \48 | \56 | \64)",
-            regex=True,
-        )
-    )
     return df
 
 
-def split_rows_with_multiple_officers(df):
-    df = (
-        df.drop("officer", axis=1)
-        .join(
-            df["officer"]
-            .str.split("&", expand=True)
-            .stack()
-            .reset_index(level=1, drop=True)
-            .rename("officer"),
-            how="outer",
-        )
-        .reset_index(drop=True)
-    )
-    return df.drop(
+def join_officer_columns(df):
+    officer_columns = [
+        "officer_name",
+        "race",
+        "sex",
+        "age",
+        "years_of_service",
+        "officer_injured",
+    ]
+    for col in officer_columns:
+        df.loc[:, col] = df[col].str.split(r" \| ")
+
+    def create_officer_dicts(row: pd.Series):
+        d = row.loc[officer_columns].loc[row.notna()].to_dict()
+        keys = d.keys()
+        return [
+            {k: d[k][i] for k in keys} for i in range(max(len(v) for v in d.values()))
+        ]
+
+    df.loc[:, "officer"] = df.apply(create_officer_dicts, axis=1)
+    df = df.drop(
         columns=[
             "officer_name",
-            "officer_race_ethnicity",
-            "officer_gender",
-            "officer_age",
-            "use_of_force_effective",
-            "use_of_force_type",
-            "use_of_force_level",
+            "race",
+            "sex",
+            "age",
+            "years_of_service",
             "officer_injured",
         ]
     )
 
-
-def split_citizen_column(df):
-    df.loc[:, "citizen"] = df.citizen.str.replace(r"\(|\)", "", regex=True).str.replace(
-        r"^ ", "", regex=True
+    df.loc[:, "officer"] = df.officer.apply(pd.DataFrame)
+    df = df.drop("officer", axis=1).join(
+        pd.concat(df["officer"].values, keys=df.index).droplevel(1)
     )
 
-    data = df.citizen.str.extract(
-        r"(\w+?) [;\|] (\w+) [;\|] (\w+) [;\|] (\w+) [;\|] (\w+) [;\|] "
-        r"(\w+) [;\|] (\w+) [;\|] (\w+) [;\|] (\w+) [;\|] (\w+) [;\|] (\w+)"
-    )
-
-    df.loc[:, "citizen_race"] = (
-        data[0]
-        .str.replace(r"^raceunknown$", "", regex=True)
-        .str.replace(r"^w$", "white", regex=True)
-        .str.replace("null", "", regex=False)
-    )
-    df.loc[:, "citizen_sex"] = (
-        data[1]
-        .str.replace(r"^f[ae]maa?le$", "female", regex=True)
-        .str.replace(r"sexunk", "", regex=False)
-        .str.replace("null", "", regex=False)
-    )
-    df.loc[:, "citizen_hospitalized"] = data[2]
-    df.loc[:, "citizen_injured"] = data[3]
-    df.loc[:, "citizen_influencing_factors"] = (
-        data[4]
-        .fillna("")
-        .str.replace(
-            r"^alchoholandunknowndrugs$", "alchohol and unknown drugs", regex=True
-        )
-        .str.replace(r"nonedetected", "none detected", regex=True)
-        .str.replace(r"mentallyunstable", "mentally unstable", regex=True)
-        .str.replace(r"^unknowndrugs$", "unknown drugs", regex=True)
-        .str.replace(r"null", "", regex=True)
-    )
-    df.loc[:, "citizen_distance_from_officer"] = (
-        data[5]
-        .str.replace(r"(\w+)feetto(\w+)feet", r"\1' feet to \2' feet", regex=True)
-        .str.replace(r"null", "", regex=True)
-    )
-    df.loc[:, "citizen_age"] = data[6].str.replace("null", "", regex=False)
-    df.loc[:, "citizen_build"] = data[7].str.replace("null", "", regex=False)
-    df.loc[:, "citizen_height"] = (
-        data[8]
-        .fillna("")
-        .str.replace("510to60", "5'10 to 6'0", regex=False)
-        .str.replace(r"^(\w{1})(\w{1})to(\w{1})(\w{1})", r"\1'\2 to '\3'\4", regex=True)
-        .str.replace("null", "", regex=False)
-    )
-    df.loc[:, "citizen_arrested"] = data[9].fillna("")
-    df.loc[:, "citizen_arrest_charges"] = (
-        data[10]
-        .str.replace(
-            r"^illegalcarryingofaweapon$", "illegal carrying of a weapon", regex=True
-        )
-        .str.replace(
-            r"^possessionofstolenproperty$", "possession of stolen property", regex=True
-        )
-        .str.replace(r"^publicintoxication$", "public intoxication", regex=True)
-        .str.replace(r"(yes|no)", "", regex=True)
-        .str.replace("null", "", regex=False)
-    )
-    return df.drop(columns=["citizen"])
+    return df
 
 
-def split_officer_column(df):
-    df.loc[:, "officer"] = df.officer.str.replace(r"\(|\)", "", regex=True)
-
-    data = df.officer.str.extract(
-        r"(\w+\, ?\w+?) [;\|] (\w+) [;\|] (\w+) [;\|] (\w+) [;\|] (\w+) [;\|] (\w+) [;\|] (\w+) [;\|] (\w+)"
-    )
-
-    df.loc[:, "officer_name"] = data[0]
+def split_officer_names(df):
     names = df.officer_name.str.extract(r"(\w+)\, ?(\w+)?")
-    df.loc[:, "last_name"] = (
-        names[0]
-        .str.replace(r"^sanclementehaynes$", "sanclemente-haynes", regex=True)
-        .str.replace(r"^hamiltonmeyers$", "hamilton-meyers", regex=True)
-        .str.replace(r"^oquendojohnson$", "oquendo-johnson", regex=True)
-        .str.replace(r"^lewiswilliams$", "lewis-williams", regex=True)
-    )
-    df.loc[:, "first_name"] = names[1].str.replace(
-        r"seanmichael", "sean-michael", regex=True
+    df.loc[:, "last_name"] = names[0]
+    df.loc[:, "first_name"] = names[1]
+    return df.drop(columns=["officer_name"])
+
+
+def join_uof_columns(df):
+    uof_columns = [
+        "use_of_force_type",
+        "use_of_force_level",
+        "use_of_force_effective",
+    ]
+    for col in uof_columns:
+        df.loc[:, col] = df[col].str.split(r" \| ")
+
+    def create_uof_dicts(row: pd.Series):
+        d = row.loc[uof_columns].loc[row.notna()].to_dict()
+        keys = d.keys()
+        return [
+            {k: d[k][i] for k in keys} for i in range(max(len(v) for v in d.values()))
+        ]
+
+    df.loc[:, "uof"] = df.apply(create_uof_dicts, axis=1)
+    df = df.drop(
+        columns=["use_of_force_type", "use_of_force_level", "use_of_force_effective"]
     )
 
-    df.loc[:, "race"] = (
-        data[1]
-        .fillna("")
-        .str.replace("notspecified", "", regex=False)
-        .str.replace("asianpacificislander", "asian/pacific islander", regex=False)
-        .str.replace(r"^notapplicablenonus$", "", regex=True)
-        .str.replace(r"^americanindianalaskanative$", "native american", regex=True)
-    )
-    df.loc[:, "sex"] = data[2]
-    df.loc[:, "age"] = data[3]
-    df.loc[:, "use_of_force_effective"] = data[4]
-    df.loc[:, "use_of_force_type"] = (
-        data[5]
-        .str.replace("firearmexhibited", "firearm exhibited", regex=False)
-        .str.replace(r"^takedownwinjury$", "takedown with injury", regex=True)
-        .str.replace(r"^riflepointed$", "rifle pointed", regex=True)
-        .str.replace(r"^forcetakedown$", "force takedown", regex=True)
-        .str.replace(r"^takedownnoinjury$", "takedown no injury", regex=True)
-        .str.replace(r"^cewdeployment$", "cew deployment", regex=True)
-        .str.replace(r"^headstrikenowep$", "headstrike no weapon", regex=True)
-        .str.replace(r"^handcuffedsubject$", "handcuffed subject", regex=True)
-        .str.replace(r"^firearmdischarged$", "firearm discharged", regex=True)
-        .str.replace(r"^forceescorttech$", "force escort tech", regex=True)
-        .str.replace(r"^forcedefensetech$", "force defense tech", regex=True)
-        .str.replace(r"^caninenobite$", "canine no bite", regex=True)
-        .str.replace(r"^caninebite$", "canine bite", regex=True)
-        .str.replace(r"^vehicleasweapon$", "vehicle as weapon", regex=True)
-        .str.replace(r"^cewexhibitedlaser$", "cew exhibited laser", regex=True)
-        .str.replace(r"^batonpr24nonstrk$", "baton pr 24 non-strike", regex=True)
-        .str.replace(r"^batonpr24miss$", "baton pr 24 miss", regex=True)
-        .str.replace(r"^caninecontact$", "canine contact", regex=True)
-        .str.replace(r"^shotgunpointed$", "shotgun pointed", regex=True)
-        .str.replace(
-            r"^nontradimpactweapon$", "non traditional impact weapon", regex=True
-        )
-        .str.replace(r"^batonpr24strike$", "baton pr 24 strike", regex=True)
-        .str.replace(r"^batonnonstrike$", "baton non strike", regex=True)
-        .str.replace(r"^firearmetended$", "firearm exhibited", regex=True)
-        .str.replace(r"^forceneckholds$", "force neckholds", regex=True)
-        .str.replace(r"^handswithinjury$", "hands with injury", regex=True)
-        .str.replace(r"^vehpursuitswinjury$", "vehicle pursuit with injury", regex=True)
-        .str.replace(r"^rifledischarged$", "rifle discharged", regex=True)
+    df.loc[:, "uof"] = df.uof.apply(pd.DataFrame)
+    df = df.drop("uof", axis=1).join(
+        pd.concat(df["uof"].values, keys=df.index).droplevel(1)
     )
 
-    df.loc[:, "use_of_force_level"] = data[6]
-    df.loc[:, "officer_injured"] = data[7].str.replace("l1", "", regex=False)
-
-    df = df[~((df.first_name == "null") & (df.last_name == "null"))]
-    return df.drop(columns=["officer", "officer_name"])
+    return df
 
 
 def clean_tracking_number(df):
@@ -552,11 +155,16 @@ def clean_division_level(df):
     df.loc[:, "division_level"] = (
         df.division_level.str.lower()
         .str.strip()
+        .fillna("")
         .str.replace("police ", "", regex=False)
         .str.replace(" division", "", regex=False)
         .str.replace(r"\bisb\b", "investigative services", regex=True)
         .str.replace(r" ?staff", "", regex=True)
         .str.replace(" section", "", regex=False)
+        .str.replace(" unit", "", regex=False)
+        .str.replace(" team", "", regex=False)
+        .str.replace("not nopd", "", regex=False)
+        .str.replace("pib", "", regex=False)
     )
     return df
 
@@ -570,9 +178,14 @@ def clean_division(df):
         .str.replace(r"\bisb\b", "investigative services", regex=True)
         .str.replace(r" ?staff", "", regex=True)
         .str.replace(r"^b$", "", regex=True)
-        .str.replace("tact", "tactical", regex=False)
+        .str.replace(r"\btact\b", "tactical", regex=True)
         .str.replace(r" \| ", "; ", regex=True)
-        .str.replace("diu", "d.i.u", regex=False)
+        .str.replace(r"^admin$", "administration", regex=True)
+        .str.replace(r" persons$", "", regex=True)
+        .str.replace(r"d\.?i\.?u\.?", "", regex=True)
+        .str.replace(r"investigation$", "investigations", regex=True)
+        .str.replace("unknown", "", regex=False)
+        .str.replace(r"^cid$", "criminal investigations", regex=True)
     )
     return df
 
@@ -586,16 +199,17 @@ def clean_unit(df):
         .str.replace("unknown", "", regex=False)
         .str.replace(r"null \| ", "", regex=True)
         .str.replace(r"^patr?$", "patrol", regex=True)
-        .str.replace(r" diu$", "", regex=True)
         .str.replace(r"^k$", "k-9", regex=True)
         .str.replace(r" other$", "", regex=True)
-        .str.replace("dwi", "d.i.u", regex=False)
+        .str.replace("dwi", "district investigative unit", regex=False)
         .str.replace(r"^uof$", "use of force", regex=True)
         .str.replace(r"^admin$", "administration", regex=True)
         .str.replace(r"\btact\b", "tactical", regex=True)
-        .str.replace("diu", "d.i.u", regex=False)
+        .str.replace(r" persons diu$", "", regex=True)
+        .str.replace(r"d\.?i\.?u\.?", "", regex=True)
         .str.replace(" section", "", regex=False)
         .str.replace(" staff", "", regex=False)
+        .str.replace(r"v\.o\.\w\.s\.", "violent offender warrant squad", regex=True)
     )
     return df
 
@@ -675,58 +289,264 @@ def clean_use_of_force_reason(df):
         .str.replace(r"w\/", "with ", regex=True)
         .str.replace(" police ", " ", regex=False)
     )
+    return df.dropna()
+
+
+def clean_use_of_force_type(df):
+    df.loc[:, "use_of_force_type"] = (
+        df.use_of_force_type.str.lower()
+        .str.strip()
+        .fillna("")
+        .str.replace("nontrad", "non traditional", regex=False)
+        .str.replace(r"\bcew\b", "conducted electrical weapon", regex=True)
+        .str.replace(r"(\w+)\((\w+)\)", r"\1 (\2)", regex=True)
+        .str.replace(r"\(\)$", ")", regex=True)
+        .str.replace(r"^- ", "", regex=True)
+        .str.replace(r"^#name\?$", "", regex=True)
+        .str.replace(r"\bvehpursuits\b", "vehicle pursuits", regex=True)
+        .str.replace(r"w\/(\w+)", r"with \1", regex=True)
+        .str.replace(r"\bwep\b", "weapon", regex=True)
+        .str.replace(r"\bnonstrk\b", "non-strike", regex=True)
+        .str.replace(r"\/pr-24 ", " ", regex=True)
+    )
+    return df.dropna()
+
+
+def clean_citizen_arrest_charges(df):
+    df.loc[:, "citizen_arrest_charges"] = (
+        df.citizen_arrest_charges.str.lower()
+        .str.strip()
+        .fillna("")
+        .str.replace("flight,", "flight;", regex=False)
+        .str.replace("null", "", regex=False)
+        .str.replace("no", "", regex=False)
+    )
     return df
 
 
-def clean():
+def clean_citizen_age(df):
+    df.loc[:, "citizen_age"] = df.citizen_age.str.replace("-1", "", regex=False)
+    return df
+
+
+def clean_citizen():
     df = (
         pd.read_csv(deba.data("raw/new_orleans_pd/new_orleans_pd_uof_2016_2021.csv"))
         .pipe(clean_column_names)
-        .drop(columns="officer_years_of_service")
-        .rename(columns={"occurred_date": "occur_date", "shift": "shift_time"})
+        .rename(
+            columns={
+                "occurred_date": "occur_date",
+                "shift": "shift_time",
+                "subject_ethnicity": "citizen_race",
+                "subject_gender": "citizen_sex",
+                "subject_hospitalized": "citizen_hospitalized",
+                "subject_injured": "citizen_injured",
+                "subject_influencing_factors": "citizen_influencing_factors",
+                "subject_distance_from_officer": "citizen_distance_from_officer",
+                "subject_age": "citizen_age",
+                "subject_build": "citizen_build",
+                "subject_height": "citizen_height",
+                "subject_arrested": "citizen_arrested",
+                "subject_arrest_charges": "citizen_arrest_charges",
+            }
+        )
+        .drop(
+            columns=[
+                "officer_years_of_service",
+                "officer_name",
+                "officer_race_ethnicity",
+                "officer_gender",
+                "officer_age",
+                "officer_injured",
+                "use_of_force_effective",
+                "use_of_force_type",
+                "use_of_force_level",
+                "use_of_force_reason",
+                "occur_date",
+                "originating_bureau",
+                "division_level",
+                "division",
+                "unit",
+                "working_status",
+                "shift_time",
+                "investigation_status",
+                "disposition",
+                "service_type",
+                "light_condition",
+                "weather_condition",
+            ]
+        )
         .pipe(join_citizen_columns)
-        .pipe(join_officer_columns)
-        .pipe(split_rows_with_multiple_citizens)
-        .pipe(split_rows_with_multiple_officers)
-        .pipe(split_officer_column)
-        .pipe(split_citizen_column)
         .pipe(clean_tracking_number)
-        .pipe(clean_dates, ["occur_date"])
-        .pipe(clean_originating_bureau)
-        .pipe(clean_division_level)
-        .pipe(clean_division)
-        .pipe(clean_unit)
-        .pipe(clean_working_status)
-        .pipe(clean_shift)
-        .pipe(clean_disposition)
-        .pipe(clean_service_type)
-        .pipe(clean_light_condition)
-        .pipe(clean_weather_condition)
-        .pipe(clean_use_of_force_reason)
-        .pipe(standardize_desc_cols, ["investigation_status", "use_of_force_level"])
+        .pipe(clean_citizen_arrest_charges)
+        .pipe(clean_citizen_age)
+        .pipe(clean_races, ["citizen_race"])
+        .pipe(clean_sexes, ["citizen_sex"])
+        .pipe(
+            standardize_desc_cols,
+            [
+                "citizen_hospitalized",
+                "citizen_injured",
+                "citizen_distance_from_officer",
+                "citizen_age",
+                "citizen_arrested",
+                "citizen_influencing_factors",
+                "citizen_build",
+                "citizen_height",
+            ],
+        )
+        .pipe(set_values, {"agency": "New Orleans PD"})
+    )
+    return df
+
+
+def clean_officer():
+    df = (
+        pd.read_csv(deba.data("raw/new_orleans_pd/new_orleans_pd_uof_2016_2021.csv"))
+        .pipe(clean_column_names)
+        .rename(
+            columns={
+                "occurred_date": "occur_date",
+                "shift": "shift_time",
+                "officer_race_ethnicity": "race",
+                "officer_age": "age",
+                "officer_gender": "sex",
+                "officer_years_of_service": "years_of_service",
+            }
+        )
+        .drop(
+            columns=[
+                "subject_ethnicity",
+                "subject_gender",
+                "subject_hospitalized",
+                "subject_injured",
+                "subject_influencing_factors",
+                "subject_distance_from_officer",
+                "subject_age",
+                "subject_build",
+                "subject_height",
+                "subject_arrested",
+                "subject_arrest_charges",
+                "occur_date",
+                "originating_bureau",
+                "division_level",
+                "division",
+                "unit",
+                "working_status",
+                "shift_time",
+                "investigation_status",
+                "disposition",
+                "service_type",
+                "light_condition",
+                "weather_condition",
+                "use_of_force_reason",
+                "use_of_force_type",
+                "use_of_force_effective",
+                "use_of_force_level",
+            ]
+        )
+        .pipe(join_officer_columns)
+        .pipe(split_officer_names)
+        .pipe(clean_tracking_number)
+        .pipe(clean_races, ["race"])
+        .pipe(clean_sexes, ["sex"])
+        .pipe(clean_names, ["last_name", "first_name"])
+        .pipe(standardize_desc_cols, ["officer_injured"])
         .pipe(set_values, {"agency": "New Orleans PD"})
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
+    )
+    return df
+
+
+def clean_uof():
+    df = (
+        pd.read_csv(deba.data("raw/new_orleans_pd/new_orleans_pd_uof_2016_2021.csv"))
+        .pipe(clean_column_names)
+        .rename(
+            columns={
+                "occurred_date": "occur_date",
+                "shift": "shift_time",
+                "subject_ethnicity": "citizen_race",
+                "subject_gender": "citizen_sex",
+                "subject_hospitalized": "citizen_hospitalized",
+                "subject_injured": "citizen_injured",
+                "subject_influencing_factors": "citizen_influencing_factors",
+                "subject_distance_from_officer": "citizen_distance_from_officer",
+                "subject_age": "citizen_age",
+                "subject_build": "citizen_build",
+                "subject_arrested": "citizen_arrested",
+                "subject_arrest_charges": "citizen_arrest_charges",
+            }
+        )
+        .drop(
+            columns=[
+                "officer_years_of_service",
+                "officer_name",
+                "officer_race_ethnicity",
+                "officer_gender",
+                "officer_age",
+                "officer_injured",
+            ]
+        )
+        .pipe(join_uof_columns)
+        .pipe(clean_originating_bureau)
+        .pipe(clean_division)
+        .pipe(clean_division_level)
+        .pipe(clean_unit)
+        .pipe(clean_weather_condition)
+        .pipe(clean_service_type)
+        .pipe(clean_disposition)
+        .pipe(clean_working_status)
+        .pipe(clean_light_condition)
+        .pipe(clean_use_of_force_reason)
+        .pipe(clean_use_of_force_type)
+        .pipe(clean_tracking_number)
+        .pipe(
+            standardize_desc_cols,
+            [
+                "shift_time",
+                "investigation_status",
+                "use_of_force_reason",
+                "use_of_force_type",
+                "use_of_force_level",
+                "use_of_force_effective",
+            ],
+        )
+        .pipe(set_values, {"agency": "New Orleans PD"})
         .pipe(
             gen_uid,
             [
-                "uid",
-                "tracking_number",
-                "use_of_force_reason",
-                "use_of_force_level",
-                "use_of_force_type",
-                "use_of_force_effective",
+                "occur_date",
+                "originating_bureau",
+                "division_level",
+                "division",
+                "unit",
+                "working_status",
+                "shift_time",
+                "investigation_status",
                 "disposition",
-                "citizen_race",
-                "citizen_sex",
-                "citizen_age",
+                "service_type",
+                "light_condition",
+                "weather_condition",
+                "use_of_force_reason",
+                "use_of_force_type",
+                "use_of_force_level",
+                "use_of_force_effective",
+                "tracking_number",
+                "agency",
             ],
             "uof_uid",
         )
+        .dropna(subset=["uof_uid"])
         .drop_duplicates(subset=["uof_uid"])
     )
     return df
 
 
 if __name__ == "__main__":
-    df = clean()
-    df.to_csv(deba.data("clean/uof_new_orleans_pd_2016_2021.csv"), index=False)
+    uof_citizen = clean_citizen()
+    uof_officer = clean_officer()
+    uof = clean_uof()
+    uof_citizen.to_csv(deba.data("clean/uof_citizens_new_orleans_pd_2016_2021.csv"), index=False)
+    uof_officer.to_csv(deba.data("clean/uof_officers_new_orleans_pd_2016_2021.csv"), index=False)
+    uof.to_csv(deba.data("clean/uof_new_orleans_pd_2016_2021.csv"), index=False)

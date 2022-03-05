@@ -229,6 +229,17 @@ def clean_sexes(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
             .str.replace(r"^m$", "male", regex=True)
             .str.replace(r"^f$", "female", regex=True)
             .str.replace(r"^unknown.*", "", regex=True)
+            .str.replace(r"^null$", "", regex=True)
+        )
+        df = standardize_from_lookup_table(
+            df,
+            col,
+            [
+                [
+                    "male"
+                ],
+                ["female", "femaale", "famale"]
+            ]
         )
     return df
 
@@ -274,14 +285,17 @@ def clean_races(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
                     "american indian",
                     "american indian or alaskan native",
                     "amer. ind.",
+                    "american indian/alaska native",
                 ],
                 [
                     "asian / pacific islander",
+                    "asian/pacific islander",
                     "asian",
                     "native hawaiian or other pacific islander",
                     "islander",
                 ],
                 ["mixed", "two or more races", "multi-racial"],
+                ["indian"],
             ],
         )
     return df

@@ -10,6 +10,7 @@ from lib.columns import (
 from lib.clean import float_to_int_str
 from lib.personnel import fuse_personnel
 from lib import events
+from functools import reduce
 
 
 def create_officer_number_dict(pprr):
@@ -84,7 +85,7 @@ def fuse_events(pprr_ipm, pprr_csd, cprr, uof, award, lprr, sas):
     builder.extract_events(
         uof,
         {
-            events.UOF_INCIDENT: {"prefix": "occur"},
+            events.UOF_INCIDENT: {"prefix": "occur", "parse_date": True},
         },
         ["uid", "uof_uid"],
     )
@@ -149,18 +150,24 @@ if __name__ == "__main__":
     officer_number_dict = create_officer_number_dict(pprr_ipm)
     cprr = pd.read_csv(deba.data("clean/cprr_new_orleans_pd_1931_2020.csv"))
     actions = pd.read_csv(deba.data("clean/cprr_actions_new_orleans_pd_1931_2020.csv"))
+    uof_officers = pd.read_csv(deba.data("clean/uof_officers_new_orleans_pd_2016_2021.csv"))
+    uof_citizens = pd.read_csv(deba.data("clean/uof_citizens_new_orleans_pd_2016_2021.csv"))
     uof = pd.read_csv(deba.data("clean/uof_new_orleans_pd_2016_2021.csv"))
+    uof_dfs = [uof_officers, uof_citizens, uof]
+    uof = reduce(
+        lambda left, right: pd.merge(left, right, on="tracking_number"), uof_dfs
+    ).drop_duplicates(subset=["uof_uid"], keep="first")
     post_event = pd.read_csv(deba.data("match/post_event_new_orleans_pd.csv"))
     award = pd.read_csv(deba.data("match/award_new_orleans_pd_2016_2021.csv"))
     lprr = pd.read_csv(deba.data("match/lprr_new_orleans_csc_2000_2016.csv"))
     sas = pd.read_csv(deba.data("match/sas_new_orleans_pd_2017_2021.csv"))
     complaints = fuse_cprr(cprr, actions, officer_number_dict)
-    uof_df = rearrange_use_of_force(uof)
-    personnel = fuse_personnel(pprr_ipm, lprr, pprr_csd, sas)
+    personnel = fuse_personnel(pprr_ipm, lprr, pprr_csd, sas, uof_officers)
     events_df = fuse_events(pprr_ipm, pprr_csd, cprr, uof, award, lprr, sas)
     events_df = rearrange_event_columns(pd.concat([post_event, events_df]))
     sas_df = rearrange_stop_and_search_columns(sas)
     lprr_df = rearrange_appeal_hearing_columns(lprr)
+    uof_df = rearrange_use_of_force(uof)
     complaints.to_csv(deba.data("fuse/com_new_orleans_pd.csv"), index=False)
     uof_df.to_csv(deba.data("fuse/uof_new_orleans_pd.csv"), index=False)
     personnel.to_csv(deba.data("fuse/per_new_orleans_pd.csv"), index=False)

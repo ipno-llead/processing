@@ -223,7 +223,7 @@ def match_use_of_force_to_pprr(uof, pprr_ipm):
         dfb,
         show_progress=True,
     )
-    decision = 0.954
+    decision = 0.958
 
     matcher.save_pairs_to_excel(
         deba.data(
@@ -246,7 +246,7 @@ if __name__ == "__main__":
     award = pd.read_csv(deba.data("clean/award_new_orleans_pd_2016_2021.csv"))
     lprr = pd.read_csv(deba.data("clean/lprr_new_orleans_csc_2000_2016.csv"))
     sas = pd.read_csv(deba.data("clean/sas_new_orleans_pd_2017_2021.csv"))
-    uof = pd.read_csv(deba.data("clean/uof_new_orleans_pd_2016_2021.csv"))
+    uof = pd.read_csv(deba.data("clean/uof_officers_new_orleans_pd_2016_2021.csv"))
     event_df = match_pprr_against_post(pprr_ipm, post)
     award = match_award_to_pprr_ipm(award, pprr_ipm)
     lprr = match_lprr_to_pprr_ipm(lprr, pprr_ipm)
@@ -256,8 +256,6 @@ if __name__ == "__main__":
     award.to_csv(deba.data("match/award_new_orleans_pd_2016_2021.csv"), index=False)
     event_df.to_csv(deba.data("match/post_event_new_orleans_pd.csv"), index=False)
     lprr.to_csv(deba.data("match/lprr_new_orleans_csc_2000_2016.csv"), index=False)
-    pprr_csd_matched_with_ipm.to_csv(
-        deba.data("match/pprr_new_orleans_csd_2014.csv"), index=False
-    )
+    pprr_csd_matched_with_ipm.to_csv(deba.data("match/pprr_new_orleans_csd_2014.csv"), index=False)
     sas.to_csv(deba.data("match/sas_new_orleans_pd_2017_2021.csv"), index=False)
     uof.to_csv(deba.data("match/uof_new_orleans_pd_2016_2021.csv"), index=False)
