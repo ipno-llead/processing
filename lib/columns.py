@@ -215,3 +215,24 @@ def rearrange_stop_and_search_columns(df):
         .pipe(names_to_title_case, ["first_name", "last_name", "middle_name"])
         .sort_values(["agency", "stop_and_search_uid"]),
     )
+
+
+def rearrange_citizen_columns(df):
+    """Performs final processing step for a stop and search table
+
+    This performs the following tasks:
+    - discard columns not present in CITIZEN_COLUMNS
+    - drop row duplicates
+    - convert numeric columns to int or str
+
+    Args:
+        df (pd.DataFrame):
+            the frame to process
+
+    Returns:
+        the updated frame
+    """
+    return datavalid_config.rearrange_columns(
+        "citizen",
+        df.sort_values(["agency", "citizen_uid"]),
+    )

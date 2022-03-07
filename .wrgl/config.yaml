@@ -791,6 +791,10 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/uof-new-orleans-pd
     fetch:
       - +refs/heads/*:refs/remotes/uof-new-orleans-pd/*
+  citizen-new-orleans-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/citizen-new-orleans-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/citizen-new-orleans-pd/*
   use-of-force:
     url: https://hub.wrgl.co/api/users/ipno/repos/use-of-force
     fetch:
@@ -1840,6 +1844,12 @@ branch:
     file: data/fuse/per_rayne_pd.csv
     primaryKey:
       - uid
+  citizen-new-orleans-pd:
+    remote: citizen-new-orleans-pd
+    merge: refs/heads/main
+    file: data/fuse/citizen_new_orleans_pd.csv
+    primaryKey:
+      - citizen_uid
   person:
     remote: person
     merge: refs/heads/main

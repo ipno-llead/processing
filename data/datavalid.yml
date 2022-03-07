@@ -11,6 +11,8 @@ files:
     schema: stop_and_search
   fuse/appeals.csv:
     schema: appeal_hearing
+  fuse/citizen.csv:
+    schema: citizen
 
 schemas:
   personnel:
@@ -327,14 +329,7 @@ schemas:
       - name: light_condition
       - name: weather_condition
       - name: shift_time
-      - name: citizen_influencing_factors
-      - name: citizen_distance_from_officer
-      - name: citizen_arrested
-      - name: citizen_arrest_charges
-      - name: citizen_hospitalized
-      - name: citizen_injured
-      - name: citizen_build
-      - name: citizen_height
+
       - name: disposition
       - name: citizen_sex
         options:
@@ -347,7 +342,6 @@ schemas:
           - hispanic
           - native american
           - asian / pacific islander
-          - asian
           - indian
           - mixed
       - name: citizen_age
@@ -361,6 +355,24 @@ schemas:
       - name: agency
         description: >
           the police department this report originate from.
+  citizen:
+    columns:
+      - name: citizen_uid
+        description: >
+          unique identifier of citizen.
+      - name: tracking_number
+        description: >
+          tracking number of incident from the originating agency.
+      - name: citizen_influencing_factors
+      - name: citizen_distance_from_officer
+      - name: citizen_arrested
+      - name: citizen_arrest_charges
+      - name: citizen_hospitalized
+      - name: citizen_injured
+      - name: citizen_build
+      - name: citizen_height
+      - name: citizen_sex
+      - name: agency
   appeal_hearing:
     columns:
       - name: appeal_uid

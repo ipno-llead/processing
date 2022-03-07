@@ -3,6 +3,7 @@ import deba
 from lib.columns import (
     rearrange_appeal_hearing_columns,
     rearrange_allegation_columns,
+    rearrange_citizen_columns,
     rearrange_stop_and_search_columns,
     rearrange_use_of_force,
     rearrange_event_columns,
@@ -10,7 +11,6 @@ from lib.columns import (
 from lib.clean import float_to_int_str
 from lib.personnel import fuse_personnel
 from lib import events
-from functools import reduce
 
 
 def create_officer_number_dict(pprr):
@@ -153,10 +153,6 @@ if __name__ == "__main__":
     uof_officers = pd.read_csv(deba.data("clean/uof_officers_new_orleans_pd_2016_2021.csv"))
     uof_citizens = pd.read_csv(deba.data("clean/uof_citizens_new_orleans_pd_2016_2021.csv"))
     uof = pd.read_csv(deba.data("clean/uof_new_orleans_pd_2016_2021.csv"))
-    uof_dfs = [uof_officers, uof_citizens, uof]
-    uof = reduce(
-        lambda left, right: pd.merge(left, right, on="tracking_number"), uof_dfs
-    ).drop_duplicates(subset=["uof_uid"], keep="first")
     post_event = pd.read_csv(deba.data("match/post_event_new_orleans_pd.csv"))
     award = pd.read_csv(deba.data("match/award_new_orleans_pd_2016_2021.csv"))
     lprr = pd.read_csv(deba.data("match/lprr_new_orleans_csc_2000_2016.csv"))
@@ -168,9 +164,11 @@ if __name__ == "__main__":
     sas_df = rearrange_stop_and_search_columns(sas)
     lprr_df = rearrange_appeal_hearing_columns(lprr)
     uof_df = rearrange_use_of_force(uof)
+    citizen_df = rearrange_citizen_columns(uof_citizens)
     complaints.to_csv(deba.data("fuse/com_new_orleans_pd.csv"), index=False)
     uof_df.to_csv(deba.data("fuse/uof_new_orleans_pd.csv"), index=False)
     personnel.to_csv(deba.data("fuse/per_new_orleans_pd.csv"), index=False)
     events_df.to_csv(deba.data("fuse/event_new_orleans_pd.csv"), index=False)
     lprr_df.to_csv(deba.data("fuse/app_new_orleans_csc.csv"), index=False)
     sas_df.to_csv(deba.data("fuse/sas_new_orleans_pd.csv"), index=False)
+    citizen_df.to_csv(deba.data("fuse/citizen_new_orleans_pd.csv"))

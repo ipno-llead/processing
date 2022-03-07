@@ -4,14 +4,82 @@ from lib.clean import clean_sexes, standardize_desc_cols
 from lib.columns import set_values
 from lib.clean import clean_races, clean_names
 from lib.uid import gen_uid
-import numpy as np
 import pandas as pd
 import sys
 
 sys.path.append("../")
 
 
-def join_citizen_columns(df):
+def split_uof_rows(df):
+    uof_columns = [
+        "use_of_force_type",
+        "use_of_force_level",
+        "use_of_force_effective",
+        "officer_injured",
+    ]
+    for col in uof_columns:
+        df.loc[:, col] = df[col].str.split(r" \| ")
+
+    def create_uof_lists(row: pd.Series):
+        d = row.loc[uof_columns].loc[row.notna()].to_dict()
+        return [
+            [row.tracking_number] + [d[k][i] for k in d.keys()]
+            for i in range(max(len(v) for v in d.values()))
+        ]
+
+    uof_series = df.apply(create_uof_lists, axis=1)
+    uof_df = pd.DataFrame(
+        [element for list_ in uof_series for element in list_],
+        columns=["tracking_number"] + uof_columns,
+    )
+    df = df.drop(
+        columns=[
+            "use_of_force_type",
+            "use_of_force_level",
+            "use_of_force_effective",
+            "officer_injured",
+        ]
+    )
+    df = pd.merge(df, uof_df, on="tracking_number", how="outer")
+
+    return df
+
+
+def split_officer_rows(df):
+    officer_columns = [
+        "officer_name",
+        "race",
+        "sex",
+        "age",
+        "years_of_service",
+    ]
+    for col in officer_columns:
+        df.loc[:, col] = df[col].str.split(r" \| ")
+
+    def create_officer_lists(row: pd.Series):
+        d = row.loc[officer_columns].loc[row.notna()].to_dict()
+        return [
+            [row.tracking_number] + [d[k][i] for k in d.keys()]
+            for i in range(max(len(v) for v in d.values()))
+        ]
+
+    officer_series = df.apply(create_officer_lists, axis=1)
+    df = pd.DataFrame(
+        [element for list_ in officer_series for element in list_],
+        columns=["tracking_number"] + officer_columns,
+    )
+
+    return df
+
+
+def split_officer_names(df):
+    names = df.officer_name.str.extract(r"(\w+)\, ?(\w+)?")
+    df.loc[:, "last_name"] = names[0]
+    df.loc[:, "first_name"] = names[1]
+    return df.drop(columns=["officer_name"])
+
+
+def split_citizen_rows(df):
     citizen_columns = [
         "citizen_race",
         "citizen_sex",
@@ -28,108 +96,17 @@ def join_citizen_columns(df):
     for col in citizen_columns:
         df.loc[:, col] = df[col].str.split(r" \| ")
 
-    def create_citizen_dicts(row: pd.Series):
+    def create_citizen_lists(row: pd.Series):
         d = row.loc[citizen_columns].loc[row.notna()].to_dict()
-        keys = d.keys()
         return [
-            {k: d[k][i] for k in keys} for i in range(max(len(v) for v in d.values()))
+            [row.tracking_number] + [d[k][i] for k in d.keys()]
+            for i in range(max(len(v) for v in d.values()))
         ]
 
-    df.loc[:, "citizen"] = df.apply(create_citizen_dicts, axis=1)
-    df = df.drop(
-        columns=[
-            "citizen_race",
-            "citizen_sex",
-            "citizen_hospitalized",
-            "citizen_injured",
-            "citizen_influencing_factors",
-            "citizen_distance_from_officer",
-            "citizen_age",
-            "citizen_build",
-            "citizen_height",
-            "citizen_arrested",
-            "citizen_arrest_charges",
-        ]
-    )
-
-    df.loc[:, "citizen"] = df.citizen.apply(pd.DataFrame)
-    df = df.drop("citizen", axis=1).join(
-        pd.concat(df["citizen"].values, keys=df.index).droplevel(1)
-    )
-
-    return df
-
-
-def join_officer_columns(df):
-    officer_columns = [
-        "officer_name",
-        "race",
-        "sex",
-        "age",
-        "years_of_service",
-        "officer_injured",
-    ]
-    for col in officer_columns:
-        df.loc[:, col] = df[col].str.split(r" \| ")
-
-    def create_officer_dicts(row: pd.Series):
-        d = row.loc[officer_columns].loc[row.notna()].to_dict()
-        keys = d.keys()
-        return [
-            {k: d[k][i] for k in keys} for i in range(max(len(v) for v in d.values()))
-        ]
-
-    df.loc[:, "officer"] = df.apply(create_officer_dicts, axis=1)
-    df = df.drop(
-        columns=[
-            "officer_name",
-            "race",
-            "sex",
-            "age",
-            "years_of_service",
-            "officer_injured",
-        ]
-    )
-
-    df.loc[:, "officer"] = df.officer.apply(pd.DataFrame)
-    df = df.drop("officer", axis=1).join(
-        pd.concat(df["officer"].values, keys=df.index).droplevel(1)
-    )
-
-    return df
-
-
-def split_officer_names(df):
-    names = df.officer_name.str.extract(r"(\w+)\, ?(\w+)?")
-    df.loc[:, "last_name"] = names[0]
-    df.loc[:, "first_name"] = names[1]
-    return df.drop(columns=["officer_name"])
-
-
-def join_uof_columns(df):
-    uof_columns = [
-        "use_of_force_type",
-        "use_of_force_level",
-        "use_of_force_effective",
-    ]
-    for col in uof_columns:
-        df.loc[:, col] = df[col].str.split(r" \| ")
-
-    def create_uof_dicts(row: pd.Series):
-        d = row.loc[uof_columns].loc[row.notna()].to_dict()
-        keys = d.keys()
-        return [
-            {k: d[k][i] for k in keys} for i in range(max(len(v) for v in d.values()))
-        ]
-
-    df.loc[:, "uof"] = df.apply(create_uof_dicts, axis=1)
-    df = df.drop(
-        columns=["use_of_force_type", "use_of_force_level", "use_of_force_effective"]
-    )
-
-    df.loc[:, "uof"] = df.uof.apply(pd.DataFrame)
-    df = df.drop("uof", axis=1).join(
-        pd.concat(df["uof"].values, keys=df.index).droplevel(1)
+    citizen_series = df.apply(create_citizen_lists, axis=1)
+    df = pd.DataFrame(
+        [element for list_ in citizen_series for element in list_],
+        columns=["tracking_number"] + citizen_columns,
     )
 
     return df
@@ -137,9 +114,11 @@ def join_uof_columns(df):
 
 def clean_tracking_number(df):
     df.loc[:, "tracking_number"] = (
-        df.filenum.str.lower().str.strip().str.replace(r"^20", "ftn20", regex=True)
+        df.tracking_number.str.lower()
+        .str.strip()
+        .str.replace(r"^20", "ftn20", regex=True)
     )
-    return df.drop(columns=["filenum"])
+    return df
 
 
 def clean_originating_bureau(df):
@@ -329,55 +308,75 @@ def clean_citizen_age(df):
     return df
 
 
-def clean_citizen():
+def clean_uof():
     df = (
         pd.read_csv(deba.data("raw/new_orleans_pd/new_orleans_pd_uof_2016_2021.csv"))
         .pipe(clean_column_names)
+        .rename(columns={"filenum": "tracking_number", "occurred_date": "occur_date"})
+        .pipe(split_uof_rows)
+        .pipe(clean_use_of_force_type)
+        .pipe(
+            standardize_desc_cols,
+            [
+                "use_of_force_type",
+                "use_of_force_level",
+                "use_of_force_effective",
+            ],
+        )
+        .pipe(set_values, {"agency": "New Orleans PD"})
+        .pipe(
+            gen_uid,
+            [
+                "use_of_force_type",
+                "use_of_force_level",
+                "use_of_force_effective",
+                "tracking_number",
+                "agency",
+            ],
+            "uof_uid",
+        )
+        .dropna(subset=["uof_uid"])
+        .drop_duplicates(subset=["uof_uid"])
+    )
+    return df
+
+
+def extract_citizen(uof):
+    df = (
+        uof.loc[
+            :,
+            [
+                "subject_ethnicity",
+                "subject_gender",
+                "subject_hospitalized",
+                "subject_injured",
+                "subject_influencing_factors",
+                "subject_distance_from_officer",
+                "subject_age",
+                "subject_build",
+                "subject_height",
+                "subject_arrested",
+                "subject_arrest_charges",
+                "tracking_number",
+            ],
+        ]
+        .pipe(clean_column_names)
         .rename(
             columns={
-                "occurred_date": "occur_date",
-                "shift": "shift_time",
                 "subject_ethnicity": "citizen_race",
                 "subject_gender": "citizen_sex",
                 "subject_hospitalized": "citizen_hospitalized",
                 "subject_injured": "citizen_injured",
-                "subject_influencing_factors": "citizen_influencing_factors",
                 "subject_distance_from_officer": "citizen_distance_from_officer",
-                "subject_age": "citizen_age",
-                "subject_build": "citizen_build",
-                "subject_height": "citizen_height",
                 "subject_arrested": "citizen_arrested",
                 "subject_arrest_charges": "citizen_arrest_charges",
+                "subject_influencing_factors": "citizen_influencing_factors",
+                "subject_build": "citizen_build",
+                "subject_age": "citizen_age",
+                "subject_height": "citizen_height",
             }
         )
-        .drop(
-            columns=[
-                "officer_years_of_service",
-                "officer_name",
-                "officer_race_ethnicity",
-                "officer_gender",
-                "officer_age",
-                "officer_injured",
-                "use_of_force_effective",
-                "use_of_force_type",
-                "use_of_force_level",
-                "use_of_force_reason",
-                "occur_date",
-                "originating_bureau",
-                "division_level",
-                "division",
-                "unit",
-                "working_status",
-                "shift_time",
-                "investigation_status",
-                "disposition",
-                "service_type",
-                "light_condition",
-                "weather_condition",
-            ]
-        )
-        .pipe(join_citizen_columns)
-        .pipe(clean_tracking_number)
+        .pipe(split_citizen_rows)
         .pipe(clean_citizen_arrest_charges)
         .pipe(clean_citizen_age)
         .pipe(clean_races, ["citizen_race"])
@@ -396,157 +395,85 @@ def clean_citizen():
             ],
         )
         .pipe(set_values, {"agency": "New Orleans PD"})
+        .pipe(
+            gen_uid,
+            [
+                "citizen_hospitalized",
+                "citizen_injured",
+                "citizen_distance_from_officer",
+                "citizen_age",
+                "citizen_arrested",
+                "citizen_influencing_factors",
+                "citizen_build",
+                "citizen_height",
+            ],
+            "citizen_uid",
+        )
     )
-    return df
+    uof = uof.drop(
+        columns=[
+            "subject_ethnicity",
+            "subject_gender",
+            "subject_hospitalized",
+            "subject_injured",
+            "subject_distance_from_officer",
+            "subject_arrested",
+            "subject_arrest_charges",
+            "subject_influencing_factors",
+            "subject_build",
+            "subject_age",
+            "subject_height",
+        ]
+    )
+    return df, uof
 
 
-def clean_officer():
+def extract_officer(uof):
     df = (
-        pd.read_csv(deba.data("raw/new_orleans_pd/new_orleans_pd_uof_2016_2021.csv"))
-        .pipe(clean_column_names)
+        uof.loc[
+            :,
+            [
+                "officer_race_ethnicity",
+                "officer_gender",
+                "officer_age",
+                "officer_years_of_service",
+                "officer_name",
+                "tracking_number",
+            ],
+        ]
         .rename(
             columns={
-                "occurred_date": "occur_date",
-                "shift": "shift_time",
                 "officer_race_ethnicity": "race",
-                "officer_age": "age",
                 "officer_gender": "sex",
+                "officer_age": "age",
                 "officer_years_of_service": "years_of_service",
             }
         )
-        .drop(
-            columns=[
-                "subject_ethnicity",
-                "subject_gender",
-                "subject_hospitalized",
-                "subject_injured",
-                "subject_influencing_factors",
-                "subject_distance_from_officer",
-                "subject_age",
-                "subject_build",
-                "subject_height",
-                "subject_arrested",
-                "subject_arrest_charges",
-                "occur_date",
-                "originating_bureau",
-                "division_level",
-                "division",
-                "unit",
-                "working_status",
-                "shift_time",
-                "investigation_status",
-                "disposition",
-                "service_type",
-                "light_condition",
-                "weather_condition",
-                "use_of_force_reason",
-                "use_of_force_type",
-                "use_of_force_effective",
-                "use_of_force_level",
-            ]
-        )
-        .pipe(join_officer_columns)
+        .pipe(split_officer_rows)
         .pipe(split_officer_names)
         .pipe(clean_tracking_number)
         .pipe(clean_races, ["race"])
         .pipe(clean_sexes, ["sex"])
         .pipe(clean_names, ["last_name", "first_name"])
-        .pipe(standardize_desc_cols, ["officer_injured"])
         .pipe(set_values, {"agency": "New Orleans PD"})
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
     )
-    return df
-
-
-def clean_uof():
-    df = (
-        pd.read_csv(deba.data("raw/new_orleans_pd/new_orleans_pd_uof_2016_2021.csv"))
-        .pipe(clean_column_names)
-        .rename(
-            columns={
-                "occurred_date": "occur_date",
-                "shift": "shift_time",
-                "subject_ethnicity": "citizen_race",
-                "subject_gender": "citizen_sex",
-                "subject_hospitalized": "citizen_hospitalized",
-                "subject_injured": "citizen_injured",
-                "subject_influencing_factors": "citizen_influencing_factors",
-                "subject_distance_from_officer": "citizen_distance_from_officer",
-                "subject_age": "citizen_age",
-                "subject_build": "citizen_build",
-                "subject_arrested": "citizen_arrested",
-                "subject_arrest_charges": "citizen_arrest_charges",
-            }
-        )
-        .drop(
-            columns=[
-                "officer_years_of_service",
-                "officer_name",
-                "officer_race_ethnicity",
-                "officer_gender",
-                "officer_age",
-                "officer_injured",
-            ]
-        )
-        .pipe(join_uof_columns)
-        .pipe(clean_originating_bureau)
-        .pipe(clean_division)
-        .pipe(clean_division_level)
-        .pipe(clean_unit)
-        .pipe(clean_weather_condition)
-        .pipe(clean_service_type)
-        .pipe(clean_disposition)
-        .pipe(clean_working_status)
-        .pipe(clean_light_condition)
-        .pipe(clean_use_of_force_reason)
-        .pipe(clean_use_of_force_type)
-        .pipe(clean_tracking_number)
-        .pipe(
-            standardize_desc_cols,
-            [
-                "shift_time",
-                "investigation_status",
-                "use_of_force_reason",
-                "use_of_force_type",
-                "use_of_force_level",
-                "use_of_force_effective",
-            ],
-        )
-        .pipe(set_values, {"agency": "New Orleans PD"})
-        .pipe(
-            gen_uid,
-            [
-                "occur_date",
-                "originating_bureau",
-                "division_level",
-                "division",
-                "unit",
-                "working_status",
-                "shift_time",
-                "investigation_status",
-                "disposition",
-                "service_type",
-                "light_condition",
-                "weather_condition",
-                "use_of_force_reason",
-                "use_of_force_type",
-                "use_of_force_level",
-                "use_of_force_effective",
-                "tracking_number",
-                "agency",
-            ],
-            "uof_uid",
-        )
-        .dropna(subset=["uof_uid"])
-        .drop_duplicates(subset=["uof_uid"])
+    uof = uof.drop(
+        columns=[
+            "officer_race_ethnicity",
+            "officer_gender",
+            "officer_age",
+            "officer_years_of_service",
+            "officer_name",
+        ]
     )
-    return df
+    return df, uof
 
 
 if __name__ == "__main__":
-    uof_citizen = clean_citizen()
-    uof_officer = clean_officer()
     uof = clean_uof()
+    uof_citizen, uof = extract_citizen(uof)
+    uof_officer, uof = extract_officer(uof)
+    uof.to_csv(deba.data("clean/uof_new_orleans_pd_2016_2021.csv"), index=False)
     uof_citizen.to_csv(deba.data("clean/uof_citizens_new_orleans_pd_2016_2021.csv"), index=False)
     uof_officer.to_csv(deba.data("clean/uof_officers_new_orleans_pd_2016_2021.csv"), index=False)
-    uof.to_csv(deba.data("clean/uof_new_orleans_pd_2016_2021.csv"), index=False)
