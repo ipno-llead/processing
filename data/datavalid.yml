@@ -11,8 +11,10 @@ files:
     schema: stop_and_search
   fuse/appeals.csv:
     schema: appeal_hearing
-  fuse/citizen.csv:
-    schema: citizen
+  fuse/uof_citizen.csv:
+    schema: uof_citizen
+  fuse/uof_officer.csv:
+    schema: uof_officer
 
 schemas:
   personnel:
@@ -317,37 +319,12 @@ schemas:
       - name: tracking_number
         description: >
           tracking number of use of force report from the originating agency.
-      - name: uid
-        description: >
-          officer unique identifier, this references the `uid` column from personnel.csv
-      - name: use_of_force_type
-      - name: use_of_force_level
-      - name: use_of_force_effective
-      - name: use_of_force_reason
       - name: investigation_status
       - name: service_type
       - name: light_condition
       - name: weather_condition
       - name: shift_time
-
       - name: disposition
-      - name: citizen_sex
-        options:
-          - female
-          - male
-      - name: citizen_race
-        options:
-          - black
-          - white
-          - hispanic
-          - native american
-          - asian / pacific islander
-          - indian
-          - mixed
-      - name: citizen_age
-        integer: true
-      - name: officer_injured
-      - name: age
       - name: division
       - name: division_level
       - name: unit
@@ -355,24 +332,6 @@ schemas:
       - name: agency
         description: >
           the police department this report originate from.
-  citizen:
-    columns:
-      - name: citizen_uid
-        description: >
-          unique identifier of citizen.
-      - name: tracking_number
-        description: >
-          tracking number of incident from the originating agency.
-      - name: citizen_influencing_factors
-      - name: citizen_distance_from_officer
-      - name: citizen_arrested
-      - name: citizen_arrest_charges
-      - name: citizen_hospitalized
-      - name: citizen_injured
-      - name: citizen_build
-      - name: citizen_height
-      - name: citizen_sex
-      - name: agency
   appeal_hearing:
     columns:
       - name: appeal_uid
@@ -441,5 +400,46 @@ schemas:
       - name: stop_and_search_time
       - name: agency
       - name: uid
+  uof_citizen:
+    columns:
+      - name: uof_citizen_uid
+        description: >
+          unique identifier of citizen.
+      - name: tracking_number
+        description: >
+          tracking number of incident from the originating agency.
+      - name: citizen_influencing_factors
+      - name: citizen_distance_from_officer
+      - name: citizen_arrested
+      - name: citizen_arrest_charges
+      - name: citizen_hospitalized
+      - name: citizen_injured
+      - name: citizen_build
+      - name: citizen_height
+      - name: citizen_sex
+      - name: agency
+  uof_officer:
+    columns:
+      - name: uid
+        description: >
+          unique identifier of citizen.
+      - name: tracking_number
+        description: >
+          tracking number of incident from the originating agency.
+      - name: first_name
+      - name: last_name
+      - name: use_of_force_type
+      - name: use_of_force_level
+      - name: use_of_force_effective
+      - name: use_of_force_reason
+      - name: race
+      - name: sex
+      - name: age
+      - name: years_of_service
+      - name: officer_injured
+      - name: division
+      - name: division_level
+      - name: unit
+      - name: agency
 
 save_bad_rows_to: invalid_rows.csv

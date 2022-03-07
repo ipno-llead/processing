@@ -10,35 +10,6 @@ import sys
 sys.path.append("../")
 
 
-def split_uof_rows(df):
-    uof_columns = [
-        "use_of_force_type",
-        "use_of_force_level",
-        "use_of_force_effective",
-        "officer_injured",
-    ]
-    for col in uof_columns:
-        df.loc[:, col] = df[col].str.split(r" \| ")
-
-    def create_uof_lists(row: pd.Series):
-        d = row.loc[uof_columns].loc[row.notna()].to_dict()
-        return [
-            [row.tracking_number] + [d[k][i] for k in d.keys()]
-            for i in range(max(len(v) for v in d.values()))
-        ]
-
-    uof_series = df.apply(create_uof_lists, axis=1)
-    uof_df = pd.DataFrame(
-        [element for list_ in uof_series for element in list_],
-        columns=["tracking_number"] + uof_columns,
-    )
-
-    df = df.drop(columns=uof_columns)
-    df = pd.merge(df, uof_df, on="tracking_number", how="outer")
-
-    return df
-
-
 def split_officer_rows(df):
     officer_columns = [
         "officer_name",
@@ -46,6 +17,10 @@ def split_officer_rows(df):
         "sex",
         "age",
         "years_of_service",
+        "use_of_force_type",
+        "use_of_force_level",
+        "use_of_force_effective",
+        "officer_injured",
     ]
     for col in officer_columns:
         df.loc[:, col] = df[col].str.split(r" \| ")
@@ -58,10 +33,13 @@ def split_officer_rows(df):
         ]
 
     officer_series = df.apply(create_officer_lists, axis=1)
-    df = pd.DataFrame(
+    officer_df = pd.DataFrame(
         [element for list_ in officer_series for element in list_],
         columns=["tracking_number"] + officer_columns,
     )
+
+    df = df.drop(columns=officer_columns)
+    df = pd.merge(df, officer_df, on="tracking_number")
 
     return df
 
@@ -262,7 +240,7 @@ def clean_use_of_force_reason(df):
         .str.replace(r"w\/", "with ", regex=True)
         .str.replace(" police ", " ", regex=False)
     )
-    return df.dropna()
+    return df
 
 
 def clean_use_of_force_type(df):
@@ -282,7 +260,7 @@ def clean_use_of_force_type(df):
         .str.replace(r"\bnonstrk\b", "non-strike", regex=True)
         .str.replace(r"\/pr-24 ", " ", regex=True)
     )
-    return df.dropna()
+    return df
 
 
 def clean_citizen_arrest_charges(df):
@@ -306,31 +284,31 @@ def clean_uof():
     df = (
         pd.read_csv(deba.data("raw/new_orleans_pd/new_orleans_pd_uof_2016_2021.csv"))
         .pipe(clean_column_names)
-        .rename(columns={"filenum": "tracking_number", "occurred_date": "occur_date"})
-        .pipe(split_uof_rows)
-        .pipe(clean_use_of_force_type)
-        .pipe(
-            standardize_desc_cols,
-            [
-                "use_of_force_type",
-                "use_of_force_level",
-                "use_of_force_effective",
-            ],
+        .rename(
+            columns={
+                "filenum": "tracking_number",
+                "occurred_date": "occur_date",
+                "shift": "shift_time",
+            }
         )
+        .pipe(clean_weather_condition)
+        .pipe(clean_light_condition)
+        .pipe(clean_disposition)
+        .pipe(clean_shift)
+        .pipe(clean_originating_bureau)
+        .pipe(clean_tracking_number)
         .pipe(set_values, {"agency": "New Orleans PD"})
         .pipe(
             gen_uid,
             [
-                "use_of_force_type",
-                "use_of_force_level",
-                "use_of_force_effective",
+                "weather_condition",
+                "light_condition",
+                "disposition",
+                "occur_date",
                 "tracking_number",
-                "agency",
             ],
             "uof_uid",
         )
-        .dropna(subset=["uof_uid"])
-        .drop_duplicates(subset=["uof_uid"])
     )
     return df
 
@@ -401,7 +379,7 @@ def extract_citizen(uof):
                 "citizen_build",
                 "citizen_height",
             ],
-            "citizen_uid",
+            "uof_citizen_uid",
         )
     )
     uof = uof.drop(
@@ -432,6 +410,14 @@ def extract_officer(uof):
                 "officer_age",
                 "officer_years_of_service",
                 "officer_name",
+                "use_of_force_type",
+                "use_of_force_level",
+                "use_of_force_effective",
+                "use_of_force_reason",
+                "officer_injured",
+                "division",
+                "division_level",
+                "unit",
                 "tracking_number",
             ],
         ]
@@ -445,10 +431,23 @@ def extract_officer(uof):
         )
         .pipe(split_officer_rows)
         .pipe(split_officer_names)
-        .pipe(clean_tracking_number)
+        .pipe(clean_use_of_force_type)
+        .pipe(clean_use_of_force_reason)
+        .pipe(clean_division)
+        .pipe(clean_division_level)
+        .pipe(clean_unit)
         .pipe(clean_races, ["race"])
         .pipe(clean_sexes, ["sex"])
         .pipe(clean_names, ["last_name", "first_name"])
+        .pipe(
+            standardize_desc_cols,
+            [
+                "use_of_force_type",
+                "use_of_force_level",
+                "use_of_force_effective",
+                "use_of_force_reason",
+            ],
+        )
         .pipe(set_values, {"agency": "New Orleans PD"})
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
     )
@@ -459,6 +458,14 @@ def extract_officer(uof):
             "officer_age",
             "officer_years_of_service",
             "officer_name",
+            "use_of_force_type",
+            "use_of_force_level",
+            "use_of_force_effective",
+            "use_of_force_reason",
+            "division",
+            "division_level",
+            "unit",
+            "officer_injured",
         ]
     )
     return df, uof
@@ -469,9 +476,5 @@ if __name__ == "__main__":
     uof_citizen, uof = extract_citizen(uof)
     uof_officer, uof = extract_officer(uof)
     uof.to_csv(deba.data("clean/uof_new_orleans_pd_2016_2021.csv"), index=False)
-    uof_citizen.to_csv(
-        deba.data("clean/uof_citizens_new_orleans_pd_2016_2021.csv"), index=False
-    )
-    uof_officer.to_csv(
-        deba.data("clean/uof_officers_new_orleans_pd_2016_2021.csv"), index=False
-    )
+    uof_citizen.to_csv(deba.data("clean/uof_citizens_new_orleans_pd_2016_2021.csv"), index=False)
+    uof_officer.to_csv(deba.data("clean/uof_officers_new_orleans_pd_2016_2021.csv"), index=False)
