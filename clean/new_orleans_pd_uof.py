@@ -32,14 +32,8 @@ def split_uof_rows(df):
         [element for list_ in uof_series for element in list_],
         columns=["tracking_number"] + uof_columns,
     )
-    df = df.drop(
-        columns=[
-            "use_of_force_type",
-            "use_of_force_level",
-            "use_of_force_effective",
-            "officer_injured",
-        ]
-    )
+
+    df = df.drop(columns=uof_columns)
     df = pd.merge(df, uof_df, on="tracking_number", how="outer")
 
     return df
@@ -475,5 +469,9 @@ if __name__ == "__main__":
     uof_citizen, uof = extract_citizen(uof)
     uof_officer, uof = extract_officer(uof)
     uof.to_csv(deba.data("clean/uof_new_orleans_pd_2016_2021.csv"), index=False)
-    uof_citizen.to_csv(deba.data("clean/uof_citizens_new_orleans_pd_2016_2021.csv"), index=False)
-    uof_officer.to_csv(deba.data("clean/uof_officers_new_orleans_pd_2016_2021.csv"), index=False)
+    uof_citizen.to_csv(
+        deba.data("clean/uof_citizens_new_orleans_pd_2016_2021.csv"), index=False
+    )
+    uof_officer.to_csv(
+        deba.data("clean/uof_officers_new_orleans_pd_2016_2021.csv"), index=False
+    )
