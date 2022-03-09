@@ -1170,6 +1170,8 @@ branch:
     remote: com-st-john-soo
     merge: refs/heads/main
     file: data/fuse/com_st_john_so.csv
+    primaryKey:
+      - allegation_uid
   event:
     remote: event
     merge: refs/heads/main
