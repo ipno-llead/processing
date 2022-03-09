@@ -67,6 +67,7 @@ def fuse_personnel():
                 pd.read_csv(deba.data("fuse/per_benton_pd.csv")),
                 pd.read_csv(deba.data("fuse/per_eunice_pd.csv")),
                 pd.read_csv(deba.data("fuse/per_rayne_pd.csv")),
+                pd.read_csv(deba.data("fuse/per_lafourche_so.csv")),
             ]
         )
     ).sort_values("uid", ignore_index=True)
@@ -127,6 +128,7 @@ def fuse_event():
                 pd.read_csv(deba.data("fuse/event_benton_pd.csv")),
                 pd.read_csv(deba.data("fuse/event_eunice_pd.csv")),
                 pd.read_csv(deba.data("fuse/event_rayne_pd.csv")),
+                pd.read_csv(deba.data("fuse/event_lafourche_so.csv")),
             ]
         )
     ).sort_values(["agency", "event_uid"], ignore_index=True)
@@ -173,6 +175,7 @@ def fuse_allegation():
                 pd.read_csv(deba.data("fuse/com_st_landry_so.csv")),
                 pd.read_csv(deba.data("fuse/com_benton_pd.csv")),
                 pd.read_csv(deba.data("fuse/com_eunice_pd.csv")),
+                pd.read_csv(deba.data("fuse/com_lafourche_so.csv")),
             ]
         )
     ).sort_values(["agency", "tracking_number"], ignore_index=True)

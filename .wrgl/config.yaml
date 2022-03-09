@@ -275,6 +275,10 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/com-eunice-pd
     fetch:
       - +refs/heads/*:refs/remotes/com-eunice-pd/*
+  com-lafourche-so:
+    url: https://hub.wrgl.co/api/users/ipno/repos/com-lafourche-so
+    fetch:
+      - +refs/heads/*:refs/remotes/com-lafourche-so/*
   event:
     url: https://hub.wrgl.co/api/users/ipno/repos/event
     fetch:
@@ -483,6 +487,10 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/event-eunice-pd
     fetch:
       - +refs/heads/*:refs/remotes/event-eunice-pd*
+  event-lafourche-so:
+    url: https://hub.wrgl.co/api/users/ipno/repos/event-lafourche-so
+    fetch:
+      - +refs/heads/*:refs/remotes/event-lafourche-so/*
   match-brusly-pd-2020:
     url: https://hub.wrgl.co/api/users/ipno/repos/match-brusly-pd-2020
     fetch:
@@ -771,6 +779,10 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/per-rayne-pd
     fetch:
       - +refs/heads/*:refs/remotes/per-rayne-pd/*
+  per-lafourche-so:
+    url: https://hub.wrgl.co/api/users/ipno/repos/per-lafourche-so
+    fetch:
+      - +refs/heads/*:refs/remotes/per-lafourche-so/*
   person:
     url: https://hub.wrgl.co/api/users/ipno/repos/person
     fetch:
@@ -1154,6 +1166,10 @@ branch:
     file: data/fuse/com_eunice_pd.csv
     primaryKey:
       - allegation_uid
+  com-lafourche-so:
+    remote: com-lafourche-so
+    merge: refs/heads/main
+    file: data/fuse/com_lafourche_so.csv
   event:
     remote: event
     merge: refs/heads/main
@@ -1464,6 +1480,12 @@ branch:
     remote: event-rayne-pd
     merge: refs/heads/main
     file: data/fuse/event_rayne_pd.csv
+    primaryKey:
+      - event_uid
+  event-lafourche-so:
+    remote: event-lafourche-so
+    merge: refs/heads/main
+    file: data/fuse/event_lafourche_so.csv
     primaryKey:
       - event_uid
   match-brusly-pd-2020:
@@ -1846,6 +1868,12 @@ branch:
     remote: per-rayne-pd
     merge: refs/heads/main
     file: data/fuse/per_rayne_pd.csv
+    primaryKey:
+      - uid
+  per-lafourche-so:
+    remote: per-lafourche-so
+    merge: refs/heads/main
+    file: data/fuse/per_lafourche_so.csv
     primaryKey:
       - uid
   person:
