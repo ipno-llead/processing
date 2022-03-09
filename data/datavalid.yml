@@ -405,9 +405,9 @@ schemas:
       - name: uof_citizen_uid
         description: >
           unique identifier of citizen.
-      - name: tracking_number
+      - name: uof_uid
         description: >
-          tracking number of incident from the originating agency.
+          unique iidentifer of use of force report.
       - name: citizen_influencing_factors
       - name: citizen_distance_from_officer
       - name: citizen_arrested
@@ -422,10 +422,10 @@ schemas:
     columns:
       - name: uid
         description: >
-          unique identifier of citizen.
-      - name: tracking_number
+          unique identifier of officer.
+      - name: uof_uid
         description: >
-          tracking number of incident from the originating agency.
+          unique identifier of use of force report.
       - name: first_name
       - name: last_name
       - name: use_of_force_type

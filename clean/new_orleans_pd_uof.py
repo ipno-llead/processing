@@ -28,18 +28,15 @@ def split_officer_rows(df):
     def create_officer_lists(row: pd.Series):
         d = row.loc[officer_columns].loc[row.notna()].to_dict()
         return [
-            [row.tracking_number] + [d[k][i] for k in d.keys()]
+            [row.uof_uid] + [d[k][i] for k in d.keys()]
             for i in range(max(len(v) for v in d.values()))
         ]
 
     officer_series = df.apply(create_officer_lists, axis=1)
-    officer_df = pd.DataFrame(
+    df = pd.DataFrame(
         [element for list_ in officer_series for element in list_],
-        columns=["tracking_number"] + officer_columns,
+        columns=["uof_uid"] + officer_columns,
     )
-
-    df = df.drop(columns=officer_columns)
-    df = pd.merge(df, officer_df, on="tracking_number")
 
     return df
 
@@ -71,14 +68,14 @@ def split_citizen_rows(df):
     def create_citizen_lists(row: pd.Series):
         d = row.loc[citizen_columns].loc[row.notna()].to_dict()
         return [
-            [row.tracking_number] + [d[k][i] for k in d.keys()]
+            [row.uof_uid] + [d[k][i] for k in d.keys()]
             for i in range(max(len(v) for v in d.values()))
         ]
 
     citizen_series = df.apply(create_citizen_lists, axis=1)
     df = pd.DataFrame(
         [element for list_ in citizen_series for element in list_],
-        columns=["tracking_number"] + citizen_columns,
+        columns=["uof_uid"] + citizen_columns,
     )
 
     return df
@@ -296,6 +293,10 @@ def clean_uof():
         .pipe(clean_disposition)
         .pipe(clean_shift)
         .pipe(clean_originating_bureau)
+        .pipe(clean_use_of_force_reason)
+        .pipe(clean_division)
+        .pipe(clean_division_level)
+        .pipe(clean_unit)
         .pipe(clean_tracking_number)
         .pipe(set_values, {"agency": "New Orleans PD"})
         .pipe(
@@ -305,6 +306,10 @@ def clean_uof():
                 "light_condition",
                 "disposition",
                 "occur_date",
+                "use_of_force_reason",
+                "division",
+                "division_level",
+                "unit",
                 "tracking_number",
             ],
             "uof_uid",
@@ -329,7 +334,7 @@ def extract_citizen(uof):
                 "subject_height",
                 "subject_arrested",
                 "subject_arrest_charges",
-                "tracking_number",
+                "uof_uid",
             ],
         ]
         .pipe(clean_column_names)
@@ -413,12 +418,8 @@ def extract_officer(uof):
                 "use_of_force_type",
                 "use_of_force_level",
                 "use_of_force_effective",
-                "use_of_force_reason",
                 "officer_injured",
-                "division",
-                "division_level",
-                "unit",
-                "tracking_number",
+                "uof_uid",
             ],
         ]
         .rename(
@@ -432,10 +433,6 @@ def extract_officer(uof):
         .pipe(split_officer_rows)
         .pipe(split_officer_names)
         .pipe(clean_use_of_force_type)
-        .pipe(clean_use_of_force_reason)
-        .pipe(clean_division)
-        .pipe(clean_division_level)
-        .pipe(clean_unit)
         .pipe(clean_races, ["race"])
         .pipe(clean_sexes, ["sex"])
         .pipe(clean_names, ["last_name", "first_name"])
@@ -445,7 +442,6 @@ def extract_officer(uof):
                 "use_of_force_type",
                 "use_of_force_level",
                 "use_of_force_effective",
-                "use_of_force_reason",
             ],
         )
         .pipe(set_values, {"agency": "New Orleans PD"})
@@ -461,10 +457,6 @@ def extract_officer(uof):
             "use_of_force_type",
             "use_of_force_level",
             "use_of_force_effective",
-            "use_of_force_reason",
-            "division",
-            "division_level",
-            "unit",
             "officer_injured",
         ]
     )
