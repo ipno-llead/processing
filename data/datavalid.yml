@@ -426,14 +426,10 @@ schemas:
       - name: uof_uid
         description: >
           unique identifier of use of force report.
-      - name: first_name
-      - name: last_name
       - name: use_of_force_type
       - name: use_of_force_level
       - name: use_of_force_effective
       - name: use_of_force_reason
-      - name: race
-      - name: sex
       - name: age
       - name: years_of_service
       - name: officer_injured

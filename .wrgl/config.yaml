@@ -803,6 +803,14 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/use-of-force
     fetch:
       - +refs/heads/*:refs/remotes/use-of-force/*
+  use-of-force-officers:
+    url: https://hub.wrgl.co/api/users/ipno/repos/use-of-force-officers
+    fetch:
+      - +refs/heads/*:refs/remotes/use-of-force-officers/*
+  use-of-force-citizens:
+    url: https://hub.wrgl.co/api/users/ipno/repos/use-of-force-citizens
+    fetch:
+      - +refs/heads/*:refs/remotes/use-of-force-citizens/*
 branch:
   allegation:
     remote: allegation
@@ -1902,5 +1910,17 @@ branch:
     file: data/fuse/use_of_force.csv
     primaryKey:
       - uof_uid
+  use-of-force-officers:
+    remote: use-of-force-officers
+    merge: refs/heads/main
+    file: data/fuse/uof_officers.csv
+    primaryKey:
+      - uof_uid
+  use-of-force-citizens:
+    remote: use-of-force-citizens
+    merge: refs/heads/main
+    file: data/fuse/uof_citizens.csv
+    primaryKey:
+      - uof_citizen_uid
 merge:
   fastForward: only
