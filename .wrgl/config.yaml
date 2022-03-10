@@ -1884,6 +1884,8 @@ branch:
     remote: per-lafourche-so
     merge: refs/heads/main
     file: data/fuse/per_lafourche_so.csv
+    primaryKey:
+      - uid
   uof-citizens-new-orleans-pd:
     remote: uof-citizens-new-orleans-pd
     merge: refs/heads/main
