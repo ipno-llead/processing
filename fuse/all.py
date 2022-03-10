@@ -280,23 +280,17 @@ if __name__ == "__main__":
     ensure_uid_unique(uof_df, "uof_uid")
     sas_df = fuse_stop_and_search()
     app_df = fuse_appeal_hearing_logs()
-<<<<<<< HEAD
-    award_df = fuse_award()
-=======
     uof_citizen_df = fuse_uof_citizens()
     uof_officer_df = fuse_uof_officers()
->>>>>>> origin
+    award_df = fuse_award()
     per_df.to_csv(deba.data("fuse/personnel.csv"), index=False)
     allegation_df.to_csv(deba.data("fuse/allegation.csv"), index=False)
     uof_df.to_csv(deba.data("fuse/use_of_force.csv"), index=False)
     sas_df.to_csv(deba.data("fuse/stop_and_search.csv"), index=False)
     app_df.to_csv(deba.data("fuse/appeals.csv"), index=False)
-<<<<<<< HEAD
-    award_df.to_csv(deba.data("fuse/award.csv"), index=False)
-=======
     uof_citizen_df.to_csv(deba.data("fuse/uof_citizens.csv"), index=False)
     uof_officer_df.to_csv(deba.data("fuse/uof_officers.csv"), index=False)
->>>>>>> origin
+    award_df.to_csv(deba.data("fuse/award.csv"), index=False)
 
     post_event_df = pd.read_csv(deba.data("fuse/events_post.csv"))
     missing_agency_df = find_event_agency_if_missing_from_post(event_df, post_event_df)
