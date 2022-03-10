@@ -271,6 +271,10 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/com-eunice-pd
     fetch:
       - +refs/heads/*:refs/remotes/com-eunice-pd/*
+  com-st-john-so:
+    url: https://hub.wrgl.co/api/users/ipno/repos/com-st-john-so
+    fetch:
+      - +refs/heads/*:refs/remotes/com-st-john-so/*
   com-lafourche-so:
     url: https://hub.wrgl.co/api/users/ipno/repos/com-lafourche-so
     fetch:
@@ -483,6 +487,10 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/event-eunice-pd
     fetch:
       - +refs/heads/*:refs/remotes/event-eunice-pd*
+  event-st-john-so:
+    url: https://hub.wrgl.co/api/users/ipno/repos/event-st-john-so
+    fetch:
+      - +refs/heads/*:refs/remotes/event-st-john-so/*
   event-lafourche-so:
     url: https://hub.wrgl.co/api/users/ipno/repos/event-lafourche-so
     fetch:
@@ -775,6 +783,10 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/per-rayne-pd
     fetch:
       - +refs/heads/*:refs/remotes/per-rayne-pd/*
+  per-st-john-so:
+    url: https://hub.wrgl.co/api/users/ipno/repos/per-st-john-so
+    fetch:
+      - +refs/heads/*:refs/remotes/per-st-john-so/*
   per-lafourche-so:
     url: https://hub.wrgl.co/api/users/ipno/repos/per-lafourche-so
     fetch:
@@ -1174,6 +1186,12 @@ branch:
     file: data/fuse/com_eunice_pd.csv
     primaryKey:
       - allegation_uid
+  com-st-john-so:
+    remote: com-st-john-soo
+    merge: refs/heads/main
+    file: data/fuse/com_st_john_so.csv
+    primaryKey:
+      - allegation_uid
   com-lafourche-so:
     remote: com-lafourche-so
     merge: refs/heads/main
@@ -1490,6 +1508,12 @@ branch:
     remote: event-rayne-pd
     merge: refs/heads/main
     file: data/fuse/event_rayne_pd.csv
+    primaryKey:
+      - event_uid
+  event-st-john-so:
+    remote: event-st-john-so
+    merge: refs/heads/main
+    file: data/fuse/event_st_john_so.csv
     primaryKey:
       - event_uid
   event-lafourche-so:
@@ -1878,6 +1902,12 @@ branch:
     remote: per-rayne-pd
     merge: refs/heads/main
     file: data/fuse/per_rayne_pd.csv
+    primaryKey:
+      - uid
+  per-st-john-so:
+    remote: per-st-john-so
+    merge: refs/heads/main
+    file: data/fuse/per_st_john_so.csv
     primaryKey:
       - uid
   per-lafourche-so:
