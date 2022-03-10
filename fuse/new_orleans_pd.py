@@ -3,9 +3,11 @@ import deba
 from lib.columns import (
     rearrange_appeal_hearing_columns,
     rearrange_allegation_columns,
+    rearrange_uof_citizen_columns,
     rearrange_stop_and_search_columns,
     rearrange_use_of_force,
     rearrange_event_columns,
+    rearrange_uof_officer_columns,
 )
 from lib.clean import float_to_int_str
 from lib.personnel import fuse_personnel
@@ -29,14 +31,6 @@ def fuse_cprr(cprr, actions, officer_number_dict):
     # cprr.loc[:, 'action'] = cprr.allegation_primary_key.map(
     #     lambda x: actions_dict.get(x, ''))
     return rearrange_allegation_columns(cprr)
-
-
-def fuse_use_of_force(uof, officer_number_dict):
-    uof = float_to_int_str(uof, ["officer_primary_key"])
-    uof.loc[:, "uid"] = uof.officer_primary_key.map(
-        lambda x: officer_number_dict.get(x, "")
-    )
-    return rearrange_use_of_force(uof)
 
 
 def fuse_events(pprr_ipm, pprr_csd, cprr, uof, award, lprr, sas):
@@ -92,12 +86,7 @@ def fuse_events(pprr_ipm, pprr_csd, cprr, uof, award, lprr, sas):
     builder.extract_events(
         uof,
         {
-            events.UOF_INCIDENT: {"prefix": "occur"},
-            events.UOF_RECEIVE: {"prefix": "receive", "parse_date": True},
-            events.UOF_ASSIGNED: {"prefix": "assigned", "parse_date": True},
-            events.UOF_COMPLETED: {"prefix": "completed", "parse_date": True},
-            events.UOF_CREATED: {"prefix": "created", "parse_date": True},
-            events.UOF_DUE: {"prefix": "due", "parse_datetime": True},
+            events.UOF_INCIDENT: {"prefix": "occur", "parse_date": True},
         },
         ["uid", "uof_uid"],
     )
@@ -162,21 +151,31 @@ if __name__ == "__main__":
     officer_number_dict = create_officer_number_dict(pprr_ipm)
     cprr = pd.read_csv(deba.data("clean/cprr_new_orleans_pd_1931_2020.csv"))
     actions = pd.read_csv(deba.data("clean/cprr_actions_new_orleans_pd_1931_2020.csv"))
-    uof = pd.read_csv(deba.data("clean/uof_new_orleans_pd_2012_2019.csv"))
+    uof_officers = pd.read_csv(
+        deba.data("clean/uof_officers_new_orleans_pd_2016_2021.csv")
+    )
+    uof_citizens = pd.read_csv(
+        deba.data("clean/uof_citizens_new_orleans_pd_2016_2021.csv")
+    )
+    uof = pd.read_csv(deba.data("clean/uof_new_orleans_pd_2016_2021.csv"))
     post_event = pd.read_csv(deba.data("match/post_event_new_orleans_pd.csv"))
     award = pd.read_csv(deba.data("match/award_new_orleans_pd_2016_2021.csv"))
     lprr = pd.read_csv(deba.data("match/lprr_new_orleans_csc_2000_2016.csv"))
     sas = pd.read_csv(deba.data("match/sas_new_orleans_pd_2017_2021.csv"))
     complaints = fuse_cprr(cprr, actions, officer_number_dict)
-    use_of_force = fuse_use_of_force(uof, officer_number_dict)
-    personnel = fuse_personnel(pprr_ipm, lprr, pprr_csd, sas)
+    personnel = fuse_personnel(pprr_ipm, lprr, pprr_csd, sas, uof_officers)
     events_df = fuse_events(pprr_ipm, pprr_csd, cprr, uof, award, lprr, sas)
     events_df = rearrange_event_columns(pd.concat([post_event, events_df]))
     sas_df = rearrange_stop_and_search_columns(sas)
     lprr_df = rearrange_appeal_hearing_columns(lprr)
+    uof_officer_df = rearrange_uof_officer_columns(uof_officers)
+    uof_citizen_df = rearrange_uof_citizen_columns(uof_citizens)
+    uof_df = rearrange_use_of_force(uof)
     complaints.to_csv(deba.data("fuse/com_new_orleans_pd.csv"), index=False)
-    use_of_force.to_csv(deba.data("fuse/uof_new_orleans_pd.csv"), index=False)
     personnel.to_csv(deba.data("fuse/per_new_orleans_pd.csv"), index=False)
     events_df.to_csv(deba.data("fuse/event_new_orleans_pd.csv"), index=False)
     lprr_df.to_csv(deba.data("fuse/app_new_orleans_csc.csv"), index=False)
     sas_df.to_csv(deba.data("fuse/sas_new_orleans_pd.csv"), index=False)
+    uof_df.to_csv(deba.data("fuse/uof_new_orleans_pd.csv"), index=False)
+    uof_officer_df.to_csv(deba.data("fuse/uof_officers_new_orleans_pd.csv"), index=False)
+    uof_citizen_df.to_csv(deba.data("fuse/uof_citizens_new_orleans_pd.csv"), index=False)

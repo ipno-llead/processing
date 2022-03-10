@@ -217,11 +217,11 @@ def rearrange_stop_and_search_columns(df):
     )
 
 
-def rearrange_award_columns(df):
-    """Performs final processing step for an award table
+def rearrange_uof_citizen_columns(df):
+    """Performs final processing step for a use of force citizens table
 
     This performs the following tasks:
-    - discard columns not present in the award schema
+    - discard columns not present in uof_citizen schema
     - drop row duplicates
     - convert numeric columns to int or str
 
@@ -233,6 +233,27 @@ def rearrange_award_columns(df):
         the updated frame
     """
     return datavalid_config.rearrange_columns(
-        "award",
-        df.sort_values(["agency", "award_uid"]),
+        "uof_citizen",
+        df.sort_values(["agency", "uof_citizen_uid"]),
+    )
+
+
+def rearrange_uof_officer_columns(df):
+    """Performs final processing step for a use of force personnel table
+
+    This performs the following tasks:
+    - discard columns not present in uof_officer schema
+    - drop row duplicates
+    - convert numeric columns to int or str
+
+    Args:
+        df (pd.DataFrame):
+            the frame to process
+
+    Returns:
+        the updated frame
+    """
+    return datavalid_config.rearrange_columns(
+        "uof_officer",
+        df.sort_values(["agency", "uid"]),
     )
