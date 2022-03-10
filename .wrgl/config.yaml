@@ -1170,6 +1170,8 @@ branch:
     remote: com-lafourche-so
     merge: refs/heads/main
     file: data/fuse/com_lafourche_so.csv
+    primaryKey:
+      - allegation_uid
   event:
     remote: event
     merge: refs/heads/main
