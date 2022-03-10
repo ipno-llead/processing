@@ -7,6 +7,8 @@ from lib.columns import (
     rearrange_allegation_columns,
     rearrange_stop_and_search_columns,
     rearrange_use_of_force,
+    rearrange_uof_citizen_columns,
+    rearrange_uof_officer_columns,
 )
 from lib.uid import ensure_uid_unique
 
@@ -189,7 +191,7 @@ def fuse_use_of_force():
                 pd.read_csv(deba.data("fuse/uof_kenner_pd.csv")),
             ]
         )
-    ).sort_values(["agency", "uof_tracking_number"])
+    ).sort_values(["agency", "uof_uid"])
 
 
 def fuse_stop_and_search():
@@ -202,6 +204,30 @@ def fuse_stop_and_search():
             ]
         )
     ).sort_values(["agency", "stop_and_search_uid"])
+
+
+def fuse_uof_citizens():
+    return rearrange_uof_citizen_columns(
+        pd.concat(
+            [
+                pd.read_csv(
+                    deba.data("fuse/uof_citizens_new_orleans_pd.csv"),
+                )
+            ]
+        )
+    ).sort_values(["agency", "uof_citizen_uid"])
+
+
+def fuse_uof_officers():
+    return rearrange_uof_officer_columns(
+        pd.concat(
+            [
+                pd.read_csv(
+                    deba.data("fuse/uof_officers_new_orleans_pd.csv"),
+                )
+            ]
+        )
+    ).sort_values(["agency", "uid"])
 
 
 def find_event_agency_if_missing_from_post(event_df, post_event_df):
@@ -238,11 +264,15 @@ if __name__ == "__main__":
     ensure_uid_unique(uof_df, "uof_uid")
     sas_df = fuse_stop_and_search()
     app_df = fuse_appeal_hearing_logs()
+    uof_citizen_df = fuse_uof_citizens()
+    uof_officer_df = fuse_uof_officers()
     per_df.to_csv(deba.data("fuse/personnel.csv"), index=False)
     allegation_df.to_csv(deba.data("fuse/allegation.csv"), index=False)
     uof_df.to_csv(deba.data("fuse/use_of_force.csv"), index=False)
     sas_df.to_csv(deba.data("fuse/stop_and_search.csv"), index=False)
     app_df.to_csv(deba.data("fuse/appeals.csv"), index=False)
+    uof_citizen_df.to_csv(deba.data("fuse/uof_citizens.csv"), index=False)
+    uof_officer_df.to_csv(deba.data("fuse/uof_officers.csv"), index=False)
 
     post_event_df = pd.read_csv(deba.data("fuse/events_post.csv"))
     missing_agency_df = find_event_agency_if_missing_from_post(event_df, post_event_df)

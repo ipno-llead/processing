@@ -127,10 +127,6 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/clean-pprr-st-tammany-so-2020
     fetch:
       - +refs/heads/*:refs/remotes/clean-pprr-st-tammany-so-2020/*
-  clean-uof-new-orleans-pd-2012-2019:
-    url: https://hub.wrgl.co/api/users/ipno/repos/clean-uof-new-orleans-pd-2012-2019
-    fetch:
-      - +refs/heads/*:refs/remotes/clean-uof-new-orleans-pd-2012-2019/*
   com-abbeville-pd:
     url: https://hub.wrgl.co/api/users/ipno/repos/com-abbeville-pd
     fetch:
@@ -807,10 +803,26 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/uof-new-orleans-pd
     fetch:
       - +refs/heads/*:refs/remotes/uof-new-orleans-pd/*
+  uof-citizens-new-orleans-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/uof-citizens-new-orleans-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/uof-citizens-new-orleans-pd/*
+  uof-officers-new-orleans-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/uof-officers-new-orleans-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/uof-officers-new-orleans-pd/*
   use-of-force:
     url: https://hub.wrgl.co/api/users/ipno/repos/use-of-force
     fetch:
       - +refs/heads/*:refs/remotes/use-of-force/*
+  use-of-force-officers:
+    url: https://hub.wrgl.co/api/users/ipno/repos/use-of-force-officers
+    fetch:
+      - +refs/heads/*:refs/remotes/use-of-force-officers/*
+  use-of-force-citizens:
+    url: https://hub.wrgl.co/api/users/ipno/repos/use-of-force-citizens
+    fetch:
+      - +refs/heads/*:refs/remotes/use-of-force-citizens/*
 branch:
   allegation:
     remote: allegation
@@ -948,10 +960,6 @@ branch:
     remote: clean-pprr-st-tammany-so-2020
     merge: refs/heads/main
     file: data/clean/pprr_st_tammany_so_2020.csv
-  clean-uof-new-orleans-pd-2012-2019:
-    remote: clean-uof-new-orleans-pd-2012-2019
-    merge: refs/heads/main
-    file: data/clean/uof_new_orleans_pd_2012_2019.csv
   com-abbeville-pd:
     remote: com-abbeville-pd
     merge: refs/heads/main
@@ -1876,6 +1884,16 @@ branch:
     remote: per-lafourche-so
     merge: refs/heads/main
     file: data/fuse/per_lafourche_so.csv
+  uof-citizens-new-orleans-pd:
+    remote: uof-citizens-new-orleans-pd
+    merge: refs/heads/main
+    file: data/fuse/uof_citizens_new_orleans_pd.csv
+    primaryKey:
+      - uof_citizen_uid
+  uof-officers-new-orleans-pd:
+    remote: uof-officers-new-orleans-pd
+    merge: refs/heads/main
+    file: data/fuse/uof_officers_new_orleans_pd.csv
     primaryKey:
       - uid
   person:
@@ -1920,5 +1938,17 @@ branch:
     file: data/fuse/use_of_force.csv
     primaryKey:
       - uof_uid
+  use-of-force-officers:
+    remote: use-of-force-officers
+    merge: refs/heads/main
+    file: data/fuse/uof_officers.csv
+    primaryKey:
+      - uof_uid
+  use-of-force-citizens:
+    remote: use-of-force-citizens
+    merge: refs/heads/main
+    file: data/fuse/uof_citizens.csv
+    primaryKey:
+      - uof_citizen_uid
 merge:
   fastForward: only
