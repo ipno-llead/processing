@@ -691,3 +691,49 @@ def strip_birth_date(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
     for col in cols:
         df.loc[:, col] = strip_birth_day_and_month(df[col])
     return df
+
+
+def convert_dates(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
+    """converts dates to numerical format
+
+    Args:
+        df (pd.DataFrame):
+            the frame to process
+        cols (list of str):
+            date column
+
+    Returns:
+        the updated frame
+    """
+    for col in cols:
+        # replacing one-letter race because they are too short
+        # to use with standardize_from_lookup_table safely
+        df.loc[:, col] = df[col].str.strip().str.lower()
+        df = standardize_from_lookup_table(
+            df,
+            col,
+            [
+                [
+                    "1",
+                    "january",
+                ],
+                ["2", "february"],
+                ["3", "march"],
+                [
+                    "4",
+                    "april",
+                ],
+                [
+                    "5",
+                    "may",
+                ],
+                ["6", "june"],
+                ["7", "july"],
+                ["8", "august"],
+                ["9", "september"],
+                ["10", "october"],
+                ["11", "november"],
+                ["12", "december"],
+            ],
+        )
+    return df

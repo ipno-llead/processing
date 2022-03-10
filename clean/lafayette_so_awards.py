@@ -1,5 +1,7 @@
 import sys
 
+from lib.clean import convert_dates
+
 sys.path.append("../")
 import pandas as pd
 import deba
@@ -26,13 +28,21 @@ def clean():
         .pipe(clean_column_names)
         .rename(columns={"month": "receive_month", "division": "department_desc"})
         .pipe(split_officer_name)
-        .pipe(set_values, {"agency": "Lafaytte SO", "receive_day": "1", "receive_year": "2017"})
-        .pipe(gen_uid, ["first_name", "last_name", "agency"])\
-        .pipe(gen_uid, ["uid", "department_desc", "receive_month"], "award_uid")
+        .pipe(convert_dates, ["receive_month"])
+        .pipe(
+            set_values,
+            {"agency": "Lafayette SO", "receive_day": "1", "receive_year": "2017"},
+        )
+        .pipe(gen_uid, ["first_name", "last_name", "agency"])
+        .pipe(
+            gen_uid,
+            ["uid", "department_desc", "receive_month", "receive_day", "receive_year"],
+            "award_uid",
+        )
     )
     return df
 
 
 if __name__ == "__main__":
     df = clean()
-    df.to_csv(deba.data("clean/award_lafayette_so_2017.csv"), index=False   )
+    df.to_csv(deba.data("clean/award_lafayette_so_2017.csv"), index=False)

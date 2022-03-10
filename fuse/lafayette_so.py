@@ -1,14 +1,12 @@
 import deba
-from lib.columns import (
-    rearrange_allegation_columns,
-)
+from lib.columns import rearrange_allegation_columns, rearrange_award_columns
 from lib import events
 from lib.personnel import fuse_personnel
 from lib.post import load_for_agency
 import pandas as pd
 
 
-def fuse_events(award17 ,cprr20, cprr14, cprr08, post):
+def fuse_events(award17, cprr20, cprr14, cprr08, post):
     builder = events.Builder()
     builder.extract_events(
         award17,
@@ -83,8 +81,10 @@ if __name__ == "__main__":
     agency = cprr08.agency[0]
     post = load_for_agency(agency)
     complaints = rearrange_allegation_columns(pd.concat([cprr20, cprr14, cprr08]))
-    event = fuse_events( award17, cprr20, cprr14, cprr08, post)
-    personnel_df = fuse_personnel(cprr20, cprr14, cprr08, post)
+    event = fuse_events(award17, cprr20, cprr14, cprr08, post)
+    personnel_df = fuse_personnel(cprr20, cprr14, cprr08, post, award17)
+    award_df = rearrange_award_columns(award17)
+    award_df.to_csv(deba.data("fuse/award_lafayette_so.csv"), index=False)
     personnel_df.to_csv(deba.data("fuse/per_lafayette_so.csv"), index=False)
     event.to_csv(deba.data("fuse/event_lafayette_so.csv"), index=False)
     complaints.to_csv(deba.data("fuse/com_lafayette_so.csv"), index=False)

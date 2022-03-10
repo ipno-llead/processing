@@ -117,18 +117,19 @@ def match_award_17_with_post(award, post):
     award.loc[:, "uid"] = award.uid.map(lambda x: match_dict.get(x, x))
     return award
 
+
 if __name__ == "__main__":
     cprr20 = pd.read_csv(deba.data("clean/cprr_lafayette_so_2015_2020.csv"))
     cprr14 = pd.read_csv(deba.data("clean/cprr_lafayette_so_2009_2014.csv"))
     cprr08 = pd.read_csv(deba.data("clean/cprr_lafayette_so_2006_2008.csv"))
-    awards17 = pd.read_csv(deba.data("clean/award_lafayette_so_2017.csv"))
+    award17 = pd.read_csv(deba.data("clean/award_lafayette_so_2017.csv"))
     agency = cprr08.agency[0]
     post = load_for_agency(agency)
     cprr20 = match_cprr_20_and_post(cprr20, post)
     cprr14 = match_cprr_14_and_post(cprr14, post)
     cprr18 = match_cprr_08_with_post(cprr08, post)
-    awards17 = match_award_17_with_post(awards17, post)
+    award17 = match_award_17_with_post(award17, post)
     cprr20.to_csv(deba.data("match/cprr_lafayette_so_2015_2020.csv"), index=False)
     cprr14.to_csv(deba.data("match/cprr_lafayette_so_2009_2014.csv"), index=False)
     cprr08.to_csv(deba.data("match/cprr_lafayette_so_2006_2008.csv"), index=False)
-    awards17.to_csv(deba.data("match/award_lafayette_so_2017.csv"), index=False)
+    award17.to_csv(deba.data("match/award_lafayette_so_2017.csv"), index=False)

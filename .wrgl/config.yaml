@@ -771,6 +771,14 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/per-rayne-pd
     fetch:
       - +refs/heads/*:refs/remotes/per-rayne-pd/*
+  award-lafayette-so:
+    url: https://hub.wrgl.co/api/users/ipno/repos/award-lafayette-so
+    fetch:
+      - +refs/heads/*:refs/remotes/award-lafayette-so/*
+  award:
+    url: https://hub.wrgl.co/api/users/ipno/repos/award
+    fetch:
+      - +refs/heads/*:refs/remotes/award/*
   person:
     url: https://hub.wrgl.co/api/users/ipno/repos/person
     fetch:
@@ -1848,6 +1856,18 @@ branch:
     file: data/fuse/per_rayne_pd.csv
     primaryKey:
       - uid
+  award-lafayette-so:
+    remote: award-lafayette-so
+    merge: refs/heads/main
+    file: data/fuse/award_lafayette_so.csv
+    primaryKey:
+      - award_uid
+  award:
+    remote: award
+    merge: refs/heads/main
+    file: data/fuse/award.csv
+    primaryKey:
+      - award_uid
   person:
     remote: person
     merge: refs/heads/main

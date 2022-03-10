@@ -11,6 +11,9 @@ files:
     schema: stop_and_search
   fuse/appeals.csv:
     schema: appeal_hearing
+  fuse/awards.csv:
+    schema: award
+
 
 schemas:
   personnel:
@@ -451,5 +454,14 @@ schemas:
       - name: stop_and_search_time
       - name: agency
       - name: uid
+  award:
+    columns:
+      - name: award_uid
+        description: >
+          unique identifier of award.
+        unique: true
+        no_na: true
+      - name: award_type
+      - name: agency
 
 save_bad_rows_to: invalid_rows.csv
