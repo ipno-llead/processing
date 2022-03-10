@@ -201,7 +201,6 @@ schemas:
         integer: true
         no_na: true
       - name: month
-        integer: true
       - name: day
         integer: true
       - name: time

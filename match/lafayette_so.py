@@ -90,15 +90,45 @@ def match_cprr_08_with_post(cprr, post):
     return cprr
 
 
+def match_award_17_with_post(award, post):
+    dfa = award[["uid", "first_name", "last_name"]]
+    dfa = dfa.drop_duplicates(subset=["uid"]).set_index("uid")
+    dfa.loc[:, "fc"] = dfa.first_name.fillna("").map(lambda x: x[:1])
+
+    dfb = post[["uid", "first_name", "last_name"]]
+    dfb = dfb.drop_duplicates(subset=["uid"]).set_index("uid")
+    dfb.loc[:, "fc"] = dfb.first_name.fillna("").map(lambda x: x[:1])
+
+    matcher = ThresholdMatcher(
+        ColumnsIndex("fc"),
+        {"first_name": JaroWinklerSimilarity(), "last_name": JaroWinklerSimilarity()},
+        dfa,
+        dfb,
+    )
+    decision = 0.943
+
+    matcher.save_pairs_to_excel(
+        deba.data("match/award_lafayette_so_2017_v_post_2020_11_06.xlsx"),
+        decision,
+    )
+    matches = matcher.get_index_pairs_within_thresholds(decision)
+    match_dict = dict(matches)
+
+    award.loc[:, "uid"] = award.uid.map(lambda x: match_dict.get(x, x))
+    return award
+
 if __name__ == "__main__":
     cprr20 = pd.read_csv(deba.data("clean/cprr_lafayette_so_2015_2020.csv"))
     cprr14 = pd.read_csv(deba.data("clean/cprr_lafayette_so_2009_2014.csv"))
     cprr08 = pd.read_csv(deba.data("clean/cprr_lafayette_so_2006_2008.csv"))
+    awards17 = pd.read_csv(deba.data("clean/award_lafayette_so_2017.csv"))
     agency = cprr08.agency[0]
     post = load_for_agency(agency)
     cprr20 = match_cprr_20_and_post(cprr20, post)
     cprr14 = match_cprr_14_and_post(cprr14, post)
     cprr18 = match_cprr_08_with_post(cprr08, post)
+    awards17 = match_award_17_with_post(awards17, post)
     cprr20.to_csv(deba.data("match/cprr_lafayette_so_2015_2020.csv"), index=False)
     cprr14.to_csv(deba.data("match/cprr_lafayette_so_2009_2014.csv"), index=False)
     cprr08.to_csv(deba.data("match/cprr_lafayette_so_2006_2008.csv"), index=False)
+    awards17.to_csv(deba.data("match/award_lafayette_so_2017.csv"), index=False)
