@@ -2,6 +2,7 @@ import pandas as pd
 from datamatch import ThresholdMatcher, JaroWinklerSimilarity, ColumnsIndex
 import deba
 from lib.post import load_for_agency
+from lib.clean import canonicalize_officers
 
 
 def deduplicate_cprr_officers(cprr):
@@ -23,24 +24,7 @@ def deduplicate_cprr_officers(cprr):
         decision,
     )
     clusters = matcher.get_index_clusters_within_thresholds(decision)
-    # canonicalize name and uid
-    for cluster in clusters:
-        uid, first_name, last_name = None, "", ""
-        for idx in cluster:
-            row = df.loc[idx]
-            if (
-                uid is None
-                or len(row.first_name) > len(first_name)
-                or (
-                    len(row.first_name) == len(first_name)
-                    and len(row.last_name) > len(last_name)
-                )
-            ):
-                uid, first_name, last_name = idx, row.first_name, row.last_name
-        cprr.loc[cprr.uid.isin(cluster), "uid"] = uid
-        cprr.loc[cprr.uid == uid, "first_name"] = first_name
-        cprr.loc[cprr.uid == uid, "last_name"] = last_name
-    return cprr
+    return canonicalize_officers(cprr, clusters)
 
 
 def match_cprr_post(cprr, post):

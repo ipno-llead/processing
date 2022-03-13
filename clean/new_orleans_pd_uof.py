@@ -1,11 +1,12 @@
-from lib.columns import clean_column_names
+import sys
+
 import deba
+import pandas as pd
+
 from lib.clean import clean_sexes, standardize_desc_cols
-from lib.columns import set_values
+from lib.columns import set_values, clean_column_names
 from lib.clean import clean_races, clean_names
 from lib.uid import gen_uid
-import pandas as pd
-import sys
 
 sys.path.append("../")
 
@@ -27,10 +28,17 @@ def split_officer_rows(df):
 
     def create_officer_lists(row: pd.Series):
         d = row.loc[officer_columns].loc[row.notna()].to_dict()
-        return [
-            [row.uof_uid] + [d[k][i] for k in d.keys()]
-            for i in range(max(len(v) for v in d.values()))
-        ]
+        min_len = min(len(v) for v in d.values())
+        if min_len < max(len(v) for v in d.values()):
+            print(
+                "WARNING: inconsistent sub-values count detected\n%s" % d,
+                file=sys.stderr,
+            )
+        try:
+            return [[row.uof_uid] + [d[k][i] for k in d.keys()] for i in range(min_len)]
+        except IndexError as e:
+            e.args = ("%s\n\nrow: %s\n\nd: %s" % (e.args[0], row, d),)
+            raise
 
     officer_series = df.apply(create_officer_lists, axis=1)
     df = pd.DataFrame(
@@ -468,5 +476,9 @@ if __name__ == "__main__":
     uof_citizen, uof = extract_citizen(uof)
     uof_officer, uof = extract_officer(uof)
     uof.to_csv(deba.data("clean/uof_new_orleans_pd_2016_2021.csv"), index=False)
-    uof_citizen.to_csv(deba.data("clean/uof_citizens_new_orleans_pd_2016_2021.csv"), index=False)
-    uof_officer.to_csv(deba.data("clean/uof_officers_new_orleans_pd_2016_2021.csv"), index=False)
+    uof_citizen.to_csv(
+        deba.data("clean/uof_citizens_new_orleans_pd_2016_2021.csv"), index=False
+    )
+    uof_officer.to_csv(
+        deba.data("clean/uof_officers_new_orleans_pd_2016_2021.csv"), index=False
+    )

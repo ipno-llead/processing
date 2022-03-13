@@ -1,3 +1,4 @@
+import sys
 import re
 import json
 from typing import List
@@ -232,14 +233,7 @@ def clean_sexes(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
             .str.replace(r"^null$", "", regex=True)
         )
         df = standardize_from_lookup_table(
-            df,
-            col,
-            [
-                [
-                    "male"
-                ],
-                ["female", "femaale", "famale"]
-            ]
+            df, col, [["male"], ["female", "femaale", "famale"]]
         )
     return df
 
@@ -704,6 +698,50 @@ def strip_birth_date(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
     """
     for col in cols:
         df.loc[:, col] = strip_birth_day_and_month(df[col])
+    return df
+
+
+def canonicalize_officers(
+    df: pd.DataFrame,
+    clusters: list[tuple],
+    uid_column: str = "uid",
+    first_name_column: str = "first_name",
+    last_name_column: str = "last_name",
+    middle_name_column: str = "middle_name",
+) -> pd.DataFrame:
+    has_middle_name = middle_name_column in df.columns
+    for cluster in clusters:
+        uid, first_name, last_name, middle_name = None, "", "", ""
+        for idx in cluster:
+            row = df.loc[df[uid_column] == idx].squeeze()
+            if isinstance(row, pd.DataFrame):
+                row = row.iloc[0]
+            if uid is None or (
+                len(row[first_name_column]) > len(first_name)
+                or (
+                    len(row[first_name_column]) == len(first_name)
+                    and (
+                        len(row[last_name_column]) > len(last_name)
+                        or (
+                            has_middle_name
+                            and pd.notna(row[middle_name_column])
+                            and len(row[last_name_column]) == len(last_name)
+                            and len(row[middle_name_column]) > len(middle_name)
+                        )
+                    )
+                )
+            ):
+                uid = idx
+                first_name = row[first_name_column]
+                last_name = row[last_name_column]
+                if has_middle_name:
+                    middle_name = row[middle_name_column]
+
+        df.loc[df[uid_column].isin(cluster), uid_column] = uid
+        df.loc[df[uid_column].isin(cluster), first_name_column] = first_name
+        df.loc[df[uid_column].isin(cluster), last_name_column] = last_name
+        if has_middle_name:
+            df.loc[df[uid_column].isin(cluster), middle_name_column] = middle_name
     return df
 
 

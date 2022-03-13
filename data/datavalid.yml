@@ -18,7 +18,6 @@ files:
   fuse/awards.csv:
     schema: award
 
-
 schemas:
   personnel:
     columns:
@@ -125,7 +124,7 @@ schemas:
         description: >
           This field describes from where the data was sourced. This column should only be populated
           if the data was sourced from an agency other than where the accused is/was employed.
-          For example, POST, District Attorney's Office, News, etc. 
+          For example, POST, District Attorney's Office, News, etc.
       - name: incident_type
         description: >
           This field comes from IPM and seems to contains the same kind of info as
@@ -161,7 +160,7 @@ schemas:
           text description of the allegation
       - name: investigating_department
         description: >
-          small departments frequently turnover internal investigations to the sheriff's office 
+          small departments frequently turnover internal investigations to the sheriff's office
   event:
     columns:
       - name: event_uid
@@ -220,7 +219,7 @@ schemas:
           officer unique identifer, references the `uid` column in personnel.csv
       - name: allegation_uid
         description: >
-          complaint unique identifier, refernces the `allegation_uid` column in complaint.csv
+          complaint unique identifier, references the `allegation_uid` column in complaint.csv
       - name: appeal_uid
         description: >
           appeal hearing unique identifier, references the `appeal_uid` column in
