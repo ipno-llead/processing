@@ -1,5 +1,3 @@
-import sys
-
 import pandas as pd
 
 from lib.columns import clean_column_names, set_values
@@ -10,10 +8,8 @@ from lib.clean import (
     clean_sexes,
     standardize_desc_cols,
 )
-from lib.path import data_file_path
+import deba
 from lib.uid import gen_uid
-
-sys.path.append("../")
 
 
 def clean_department_desc(df):
@@ -27,20 +23,18 @@ def clean_department_desc(df):
 
 def clean_pprr():
     return (
-        pd.read_csv(
-            data_file_path("raw/ponchatoula_pd/ponchatoula_pd_pprr_2010_2020.csv")
-        )
+        pd.read_csv(deba.data("raw/ponchatoula_pd/ponchatoula_pd_pprr_2010_2020.csv"))
         .pipe(clean_column_names)
         .drop(columns=["class", "status_code"])
         .rename(
             columns={
                 "employee": "employee_id",
-                "middle_init": "middle_initial",
+                "middle_init": "middle_name",
                 "regular_rate": "salary",
                 "work_center": "department_desc",
             }
         )
-        .pipe(clean_names, ["first_name", "middle_initial", "last_name"])
+        .pipe(clean_names, ["first_name", "middle_name", "last_name"])
         .pipe(clean_salaries, ["salary"])
         .pipe(standardize_desc_cols, ["salary_freq"])
         .pipe(clean_department_desc)
@@ -70,7 +64,7 @@ def replace_names(df):
 
 def clean_cprr():
     return (
-        pd.read_csv(data_file_path("raw/ponchatoula_pd/ponchatoula_cprr_2010_2020.csv"))
+        pd.read_csv(deba.data("raw/ponchatoula_pd/ponchatoula_cprr_2010_2020.csv"))
         .pipe(clean_column_names)
         .rename(columns={"charges": "allegation"})
         .pipe(clean_allegation)
@@ -86,5 +80,9 @@ def clean_cprr():
 
 
 if __name__ == "__main__":
-    clean_pprr().to_csv(data_file_path("clean/pprr_ponchatoula_pd_2010_2020.csv"), index=False)
-    clean_cprr().to_csv(data_file_path("clean/cprr_ponchatoula_pd_2010_2020.csv"), index=False)
+    clean_pprr().to_csv(
+        deba.data("clean/pprr_ponchatoula_pd_2010_2020.csv"), index=False
+    )
+    clean_cprr().to_csv(
+        deba.data("clean/cprr_ponchatoula_pd_2010_2020.csv"), index=False
+    )

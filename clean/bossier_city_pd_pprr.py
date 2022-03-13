@@ -1,8 +1,5 @@
-import sys
-
-sys.path.append("../")
 import pandas as pd
-from lib.path import data_file_path
+import deba
 from lib.columns import clean_column_names, set_values
 from lib.clean import clean_dates, clean_salaries, float_to_int_str
 from lib import salary
@@ -67,7 +64,7 @@ def split_name(df):
     df.loc[:, "last_name"] = names[0]
     df.loc[:, "suffix"] = names[1].fillna("")
     df.loc[:, "first_name"] = names[2].fillna("")
-    df.loc[:, "middle_initial"] = names[3].fillna("")
+    df.loc[:, "middle_name"] = names[3].fillna("")
     df.loc[:, "last_name"] = df.last_name.str.cat(df.suffix, sep=" ").fillna("")
     return df
 
@@ -88,7 +85,7 @@ def clean_employee_id(df):
 
 def clean():
     df = (
-        pd.read_csv(data_file_path("raw/bossier_city_pd/bossiercity_pd_pprr_2019.csv"))
+        pd.read_csv(deba.data("raw/bossier_city_pd/bossiercity_pd_pprr_2019.csv"))
         .pipe(clean_column_names)
         .rename(
             columns={
@@ -172,11 +169,11 @@ def clean():
         .pipe(clean_dates, ["birth_date", "hire_date"])
         .pipe(assign_agency)
         .pipe(drop_rows_with_missing__firt_and_last_name)
-        .pipe(gen_uid, ["first_name", "last_name", "middle_initial", "agency"])
+        .pipe(gen_uid, ["first_name", "last_name", "middle_name", "agency"])
     )
     return df
 
 
 if __name__ == "__main__":
     df = clean()
-    df.to_csv(data_file_path("clean/pprr_bossier_city_pd_2000_2019.csv"), index=False)
+    df.to_csv(deba.data("clean/pprr_bossier_city_pd_2000_2019.csv"), index=False)

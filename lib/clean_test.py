@@ -1,14 +1,10 @@
-import sys
 import unittest
 
+import numpy as np
 import pandas as pd
 from pandas.testing import assert_frame_equal
 
-from clean import remove_future_dates
-from lib.clean import canonicalize_officers, float_to_int_str
-import numpy as np
-
-sys.path.append("./")
+from lib.clean import canonicalize_officers, float_to_int_str, remove_future_dates
 
 
 class RemoveFutureDatesTestCase(unittest.TestCase):
@@ -78,7 +74,7 @@ class CanonicalizeNamesTestCase(unittest.TestCase):
     def test_canonicalize_names(self):
         assert_frame_equal(
             canonicalize_officers(
-                pd.DataFrame(
+                pd.DataFrame.from_records(
                     [
                         {
                             "uid": "1e65c0807675ee3f25f6a6bf25eb121b",
@@ -148,26 +144,26 @@ class CanonicalizeNamesTestCase(unittest.TestCase):
                         "a5f3c016d4c3373aa74dc15c0638362e",
                     ),
                     (
-                        "dd9d72b5a514b416c15486a9b759b51b",
                         "495e30344d6f5913ac814caba56abb5d",
+                        "dd9d72b5a514b416c15486a9b759b51b",
                         "553baca6957acfbbf57832d22fabc4e2",
                     ),
                 ],
             ),
-            pd.DataFrame(
+            pd.DataFrame.from_records(
                 [
                     {
-                        "uid": "1e65c0807675ee3f25f6a6bf25eb121b",
+                        "uid": "db3d392b404754b2d4a127ca0922d2f8",
                         "first_name": "patrick",
-                        "last_name": "peterman",
+                        "last_name": "petermann",
                         "agency": "Baton Rouge PD",
                         "rank_desc": "sergeant",
                         "id": 10,
                     },
                     {
-                        "uid": "1e65c0807675ee3f25f6a6bf25eb121b",
+                        "uid": "db3d392b404754b2d4a127ca0922d2f8",
                         "first_name": "patrick",
-                        "last_name": "peterman",
+                        "last_name": "petermann",
                         "agency": "Baton Rouge PD",
                         "rank_desc": "sergeant",
                         "id": 9,

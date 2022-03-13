@@ -1,5 +1,3 @@
-import sys
-
 from datamatch import (
     ThresholdMatcher,
     ColumnsIndex,
@@ -9,10 +7,8 @@ from datamatch import (
 import pandas as pd
 
 from lib.date import combine_date_columns
-from lib.path import data_file_path, ensure_data_dir
+import deba
 from lib.post import extract_events_from_post, load_for_agency
-
-sys.path.append("../")
 
 
 def match_cprr_with_pprr(cprr, pprr):
@@ -41,7 +37,7 @@ def match_cprr_with_pprr(cprr, pprr):
     )
     decision = 0.89
     matcher.save_pairs_to_excel(
-        data_file_path("match/mandeville_pd_cprr_2019_v_csd_pprr_2020.xlsx"), decision
+        deba.data("match/mandeville_pd_cprr_2019_v_csd_pprr_2020.xlsx"), decision
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
     match_dict = dict(matches)
@@ -77,7 +73,7 @@ def match_pprr_against_post(pprr, post):
     )
     decision = 0.8
     matcher.save_pairs_to_excel(
-        data_file_path("match/mandeville_csd_pprr_2020_v_post_pprr_2020_11_06.xlsx"),
+        deba.data("match/mandeville_csd_pprr_2020_v_post_pprr_2020_11_06.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
@@ -85,14 +81,12 @@ def match_pprr_against_post(pprr, post):
 
 
 if __name__ == "__main__":
-    cprr = pd.read_csv(data_file_path("clean/cprr_mandeville_pd_2019.csv"))
-    pprr = pd.read_csv(data_file_path("clean/pprr_mandeville_csd_2020.csv"))
+    cprr = pd.read_csv(deba.data("clean/cprr_mandeville_pd_2019.csv"))
+    pprr = pd.read_csv(deba.data("clean/pprr_mandeville_csd_2020.csv"))
     agency = pprr.agency[0]
-    post = load_for_agency("clean/pprr_post_2020_11_06.csv", agency)
+    post = load_for_agency(agency)
     post_event = match_pprr_against_post(pprr, post)
     cprr = match_cprr_with_pprr(cprr, pprr)
-    ensure_data_dir("match")
-    post_event.to_csv(
-        data_file_path("match/post_event_mandeville_pd_2019.csv"), index=False
-    )
-    cprr.to_csv(data_file_path("match/cprr_mandeville_pd_2019.csv"), index=False)
+
+    post_event.to_csv(deba.data("match/post_event_mandeville_pd_2019.csv"), index=False)
+    cprr.to_csv(deba.data("match/cprr_mandeville_pd_2019.csv"), index=False)

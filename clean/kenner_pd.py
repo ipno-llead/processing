@@ -1,11 +1,8 @@
 from lib.columns import clean_column_names
-from lib.path import data_file_path, ensure_data_dir
+import deba
 from lib.clean import clean_names, standardize_desc_cols, clean_dates
 from lib.uid import gen_uid
 import pandas as pd
-import sys
-
-sys.path.append("../")
 
 
 def assign_agency(df):
@@ -25,7 +22,6 @@ def split_names(df):
     df.loc[:, "last_name"] = names[0]
     df.loc[:, "first_name"] = names[1]
     df.loc[:, "middle_name"] = names[2]
-    df.loc[:, "middle_initial"] = names[2].fillna("").map(lambda x: x[:1])
     df = df.loc[(df.name != "unknown") & df.name.notna()]
     # there's already a "Gregory, Jan-Michael" so this row is probably redundant
     df = df.loc[df.name != "gregory, Jan Michael"]
@@ -34,7 +30,7 @@ def split_names(df):
 
 def clean():
     return (
-        pd.read_csv(data_file_path("raw/kenner_pd/kenner_pd_pprr_2020.csv"))
+        pd.read_csv(deba.data("raw/kenner_pd/kenner_pd_pprr_2020.csv"))
         .pipe(clean_column_names)
         .rename(
             columns={
@@ -51,7 +47,7 @@ def clean():
         .pipe(clean_employee_id)
         .pipe(split_names)
         .drop(columns=["name"])
-        .pipe(clean_names, ["first_name", "last_name", "middle_name", "middle_initial"])
+        .pipe(clean_names, ["first_name", "last_name", "middle_name"])
         .pipe(
             standardize_desc_cols,
             [
@@ -110,9 +106,7 @@ def clean_rank(df):
 
 def clean_former_long():
     return (
-        pd.read_csv(
-            data_file_path("raw/kenner_pd/kenner_pd_pprr_formeremployees_long.csv")
-        )
+        pd.read_csv(deba.data("raw/kenner_pd/kenner_pd_pprr_formeremployees_long.csv"))
         .pipe(clean_column_names)
         .rename(
             columns={
@@ -134,9 +128,7 @@ def clean_former_long():
 
 def clean_former_short():
     return (
-        pd.read_csv(
-            data_file_path("raw/kenner_pd/kenner_pd_pprr_formeremployees_short.csv")
-        )
+        pd.read_csv(deba.data("raw/kenner_pd/kenner_pd_pprr_formeremployees_short.csv"))
         .pipe(clean_column_names)
         .rename(
             columns={
@@ -153,7 +145,7 @@ def clean_former_short():
         .pipe(assign_agency)
         .pipe(split_names)
         .drop(columns=["name"])
-        .pipe(clean_names, ["first_name", "last_name", "middle_name", "middle_initial"])
+        .pipe(clean_names, ["first_name", "last_name", "middle_name"])
         .pipe(standardize_desc_cols, ["department_desc", "rank_desc", "sex"])
         .pipe(remove_non_officers)
         .pipe(clean_dates, ["hire_date", "left_date"])
@@ -187,5 +179,5 @@ if __name__ == "__main__":
     former_long = clean_former_long()
     former_short = clean_former_short()
     combined = combine_pprrs(pprr, former_long, former_short)
-    ensure_data_dir("clean")
-    combined.to_csv(data_file_path("clean/pprr_kenner_pd_2020.csv"), index=False)
+
+    combined.to_csv(deba.data("clean/pprr_kenner_pd_2020.csv"), index=False)

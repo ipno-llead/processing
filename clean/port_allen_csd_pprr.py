@@ -1,11 +1,8 @@
 from lib.columns import clean_column_names
-from lib.path import data_file_path, ensure_data_dir
+import deba
 from lib.uid import gen_uid
 from lib.clean import clean_names, clean_dates, standardize_desc_cols
 import pandas as pd
-import sys
-
-sys.path.append("../")
 
 
 def extract_name(df):
@@ -14,7 +11,7 @@ def extract_name(df):
         .str.replace(r" +- +", r" ")
         .str.extract(r"^([-\d]+) +(.*) +(\w{2,})(?: (\w))?$")
     )
-    cols.columns = ["employee_id", "last_name", "first_name", "middle_initial"]
+    cols.columns = ["employee_id", "last_name", "first_name", "middle_name"]
     return pd.concat([df, cols], axis=1).drop(columns=["employee_number_full_name"])
 
 
@@ -40,7 +37,7 @@ def assign_agency(df):
 
 
 def clean():
-    df = pd.read_csv(data_file_path("raw/port_allen_csd/port_allen_csd_pprr_2020.csv"))
+    df = pd.read_csv(deba.data("raw/port_allen_csd/port_allen_csd_pprr_2020.csv"))
     df = clean_column_names(df)
     df = df.rename(
         columns={
@@ -53,7 +50,7 @@ def clean():
     df = df.dropna(how="all")
     return (
         df.pipe(extract_name)
-        .pipe(clean_names, ["first_name", "last_name", "middle_initial"])
+        .pipe(clean_names, ["first_name", "last_name", "middle_name"])
         .pipe(standardize_employment_status)
         .pipe(clean_dates, ["hire_date"])
         .pipe(standardize_desc_cols, ["rank_desc"])
@@ -65,5 +62,5 @@ def clean():
 
 if __name__ == "__main__":
     df = clean()
-    ensure_data_dir("clean")
-    df.to_csv(data_file_path("clean/pprr_port_allen_csd_2020.csv"), index=False)
+
+    df.to_csv(deba.data("clean/pprr_port_allen_csd_2020.csv"), index=False)

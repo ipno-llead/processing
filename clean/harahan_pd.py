@@ -1,11 +1,8 @@
 from lib.columns import clean_column_names
-from lib.path import data_file_path, ensure_data_dir
+import deba
 from lib.clean import clean_dates, clean_names
 from lib.uid import gen_uid
 import pandas as pd
-import sys
-
-sys.path.append("../")
 
 
 def split_rank_date(df):
@@ -30,7 +27,7 @@ def assign_agency(df):
 
 def clean():
     return (
-        pd.read_csv(data_file_path("raw/harahan_pd/harahan_pd_pprr_2020.csv"))
+        pd.read_csv(deba.data("raw/harahan_pd/harahan_pd_pprr_2020.csv"))
         .pipe(clean_column_names)
         .rename(
             columns={"first": "first_name", "last": "last_name", "badge": "badge_no"}
@@ -45,5 +42,5 @@ def clean():
 
 if __name__ == "__main__":
     df = clean()
-    ensure_data_dir("clean")
-    df.to_csv(data_file_path("clean/pprr_harahan_pd_2020.csv"), index=False)
+
+    df.to_csv(deba.data("clean/pprr_harahan_pd_2020.csv"), index=False)

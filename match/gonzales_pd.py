@@ -1,6 +1,3 @@
-import sys
-
-sys.path.append("../")
 import pandas as pd
 from datamatch import (
     ThresholdMatcher,
@@ -8,7 +5,7 @@ from datamatch import (
     ColumnsIndex,
     DateSimilarity,
 )
-from lib.path import data_file_path
+import deba
 from lib.date import combine_date_columns
 from lib.post import extract_events_from_post, load_for_agency
 
@@ -40,7 +37,7 @@ def extract_post_events(pprr, post):
     )
     decision = 0.816
     matcher.save_pairs_to_excel(
-        data_file_path("match/gonzales_pd_pprr_2010_2021_v_post_pprr_2020_11_06.xlsx"),
+        deba.data("match/gonzales_pd_pprr_2010_2021_v_post_pprr_2020_11_06.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
@@ -49,10 +46,10 @@ def extract_post_events(pprr, post):
 
 
 if __name__ == "__main__":
-    pprr = pd.read_csv(data_file_path("clean/pprr_gonzales_pd_2010_2021.csv"))
+    pprr = pd.read_csv(deba.data("clean/pprr_gonzales_pd_2010_2021.csv"))
     agency = pprr.agency[0]
-    post = load_for_agency("clean/pprr_post_2020_11_06.csv", agency)
+    post = load_for_agency(agency)
     post_events = extract_post_events(pprr, post)
     post_events.to_csv(
-        data_file_path("match/post_event_gonzales_pd_2010_2021.csv"), index=False
+        deba.data("match/post_event_gonzales_pd_2010_2021.csv"), index=False
     )

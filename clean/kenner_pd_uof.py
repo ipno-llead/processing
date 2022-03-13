@@ -1,8 +1,5 @@
-import sys
-
-sys.path.append("../")
 import pandas as pd
-from lib.path import data_file_path
+import deba
 from lib.columns import clean_column_names
 from lib.clean import clean_dates
 from lib.uid import gen_uid
@@ -19,12 +16,7 @@ def split_name(df):
     df.loc[:, "last_name"] = names[0]
     df.loc[:, "suffix"] = names[1]
     df.loc[:, "first_name"] = names[2]
-    df.loc[:, "middle_name"] = (
-        names.loc[:, 3].str.strip().fillna("").map(lambda s: "" if len(s) < 3 else s)
-    )
-    df.loc[:, "middle_initial"] = (
-        names.loc[:, 3].str.strip().fillna("").map(lambda s: "" if len(s) > 1 else s)
-    )
+    df.loc[:, "middle_name"] = names[3]
     df.loc[:, "last_name"] = df.last_name.fillna("") + " " + df.suffix.fillna("")
     return df.drop(columns=["suffix", "officer"])
 
@@ -84,7 +76,7 @@ def assign_agency(df):
 
 def clean():
     df = (
-        pd.read_csv(data_file_path("raw/kenner_pd/kenner_pd_uof_2005_2021.csv"))
+        pd.read_csv(deba.data("raw/kenner_pd/kenner_pd_uof_2005_2021.csv"))
         .pipe(clean_column_names)
         .rename(columns={"date": "incident_date", "address": "location"})
         .pipe(clean_dates, ["incident_date"])
@@ -93,7 +85,7 @@ def clean():
         .pipe(clean_disposition)
         .pipe(clean_charges)
         .pipe(assign_agency)
-        .pipe(gen_uid, ["first_name", "middle_initial", "last_name", "agency"])
+        .pipe(gen_uid, ["first_name", "middle_name", "last_name", "agency"])
         .pipe(
             gen_uid, ["uid", "disposition", "action", "charges", "location"], "uof_uid"
         )
@@ -103,4 +95,4 @@ def clean():
 
 if __name__ == "__main__":
     df = clean()
-    df.to_csv(data_file_path("clean/uof_kenner_pd_2005_2021.csv"), index=False)
+    df.to_csv(deba.data("clean/uof_kenner_pd_2005_2021.csv"), index=False)

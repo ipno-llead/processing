@@ -1,8 +1,5 @@
-import sys
-
-sys.path.append("../")
 import pandas as pd
-from lib.path import data_file_path
+import deba
 from lib.columns import clean_column_names, set_values
 from lib.uid import gen_uid
 from lib.clean import clean_salaries, standardize_desc_cols, clean_dates
@@ -135,7 +132,7 @@ def split_names(df):
     df.loc[:, "suffix"] = names[1].fillna("")
     df.loc[:, "first_name"] = names[2].fillna("")
     df.loc[:, "middle_name"] = names[3].fillna("")
-    df.loc[:, "middle_initial"] = names[4].fillna("")
+    df.loc[:, "middle_name"] = names[4].fillna("")
     return df.drop(columns="payroll_name")
 
 
@@ -150,7 +147,7 @@ def assign_agency(df):
 
 def clean():
     df = (
-        pd.read_csv(data_file_path("raw/new_orleans_so/new_orleans_so_pprr_2021.csv"))
+        pd.read_csv(deba.data("raw/new_orleans_so/new_orleans_so_pprr_2021.csv"))
         .pipe(clean_column_names)
         .rename(
             columns={
@@ -174,7 +171,7 @@ def clean():
         .pipe(assign_agency)
         .pipe(
             gen_uid,
-            ["first_name", "middle_initial", "middle_name", "last_name", "agency"],
+            ["first_name", "middle_name", "last_name", "agency"],
         )
     )
     return df
@@ -182,4 +179,4 @@ def clean():
 
 if __name__ == "__main__":
     df = clean()
-    df.to_csv(data_file_path("clean/pprr_new_orleans_so_2021.csv"), index=False)
+    df.to_csv(deba.data("clean/pprr_new_orleans_so_2021.csv"), index=False)

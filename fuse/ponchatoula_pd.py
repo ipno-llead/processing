@@ -1,16 +1,12 @@
-import sys
-
 import pandas as pd
 
-from lib.path import data_file_path
+import deba
 from lib.columns import (
     rearrange_allegation_columns,
     rearrange_personnel_columns,
     rearrange_event_columns,
 )
 from lib import events
-
-sys.path.append("../")
 
 
 def fuse_events(pprr, cprr):
@@ -59,12 +55,19 @@ def fuse_events(pprr, cprr):
 
 
 if __name__ == "__main__":
-    pprr = pd.read_csv(data_file_path("clean/pprr_ponchatoula_pd_2010_2020.csv"))
-    cprr = pd.read_csv(data_file_path("match/cprr_ponchatoula_pd_2010_2020.csv"))
-    post_event = pd.read_csv(data_file_path("match/post_event_ponchatoula_pd_2020.csv"))
-    cprr_post_events = pd.read_csv(data_file_path("match/cprr_post_events_ponchatoula_pd_2020.csv"))
+    pprr = pd.read_csv(deba.data("clean/pprr_ponchatoula_pd_2010_2020.csv"))
+    cprr = pd.read_csv(deba.data("match/cprr_ponchatoula_pd_2010_2020.csv"))
+    post_event = pd.read_csv(deba.data("match/post_event_ponchatoula_pd_2020.csv"))
+    cprr_post_events = pd.read_csv(
+        deba.data("match/cprr_post_events_ponchatoula_pd_2020.csv")
+    )
     event_df = rearrange_event_columns(
-        pd.concat([fuse_events(pprr, cprr), post_event, cprr_post_events]))
-    rearrange_personnel_columns(pprr).to_csv(data_file_path("fuse/per_ponchatoula_pd.csv"), index=False)
-    rearrange_allegation_columns(cprr).to_csv(data_file_path("fuse/com_ponchatoula_pd.csv"), index=False)
-    event_df.to_csv(data_file_path("fuse/event_ponchatoula_pd.csv"), index=False)
+        pd.concat([fuse_events(pprr, cprr), post_event, cprr_post_events])
+    )
+    rearrange_personnel_columns(pprr).to_csv(
+        deba.data("fuse/per_ponchatoula_pd.csv"), index=False
+    )
+    rearrange_allegation_columns(cprr).to_csv(
+        deba.data("fuse/com_ponchatoula_pd.csv"), index=False
+    )
+    event_df.to_csv(deba.data("fuse/event_ponchatoula_pd.csv"), index=False)

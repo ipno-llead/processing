@@ -1,19 +1,16 @@
 import pandas as pd
 from lib.columns import clean_column_names, set_values
-from lib.path import data_file_path, ensure_data_dir
+import deba
 from lib.uid import gen_uid
 from lib import salary
 from lib.clean import clean_names, clean_dates, clean_sexes, clean_races, clean_salaries
-import sys
-
-sys.path.append("../")
 
 
 def split_name(df):
     series = df.full_name.fillna("").str.strip()
     for col, pat in [
         ("first_name", r"^([\w'-]+)(.*)$"),
-        ("middle_initial", r"^(\w\.|\w\s)(.*)$"),
+        ("middle_name", r"^(\w\.|\w\s)(.*)$"),
     ]:
         names = series[series.str.match(pat)].str.extract(pat)
         df.loc[series.str.match(pat), col] = names[0]
@@ -41,7 +38,7 @@ def clean_rank(df):
 
 
 def clean():
-    df = pd.read_csv(data_file_path("raw/scott_pd/scott_pd_pprr_2021.csv"))
+    df = pd.read_csv(deba.data("raw/scott_pd/scott_pd_pprr_2021.csv"))
     df = clean_column_names(df)
     df.columns = [
         "full_name",
@@ -66,7 +63,7 @@ def clean():
         .pipe(clean_dates, ["birth_date", "hire_date", "term_date"])
         .pipe(clean_races, ["race"])
         .pipe(clean_sexes, ["sex"])
-        .pipe(clean_names, ["first_name", "last_name", "middle_initial"])
+        .pipe(clean_names, ["first_name", "last_name", "middle_name"])
         .pipe(set_values, {"data_production_year": 2021, "agency": "Scott PD"})
         .pipe(gen_uid, ["agency", "first_name", "last_name", "birth_year", "badge_no"])
     )
@@ -75,5 +72,5 @@ def clean():
 
 if __name__ == "__main__":
     df = clean()
-    ensure_data_dir("clean")
-    df.to_csv(data_file_path("clean/pprr_scott_pd_2021.csv"), index=False)
+
+    df.to_csv(deba.data("clean/pprr_scott_pd_2021.csv"), index=False)

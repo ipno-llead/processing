@@ -1,8 +1,5 @@
-import sys
-
-sys.path.append("../")
 import pandas as pd
-from lib.path import data_file_path
+import deba
 from lib.columns import clean_column_names
 from lib.clean import clean_sexes, standardize_desc_cols
 
@@ -27,7 +24,7 @@ def clean_homeless(df):
 def clean():
     df = (
         pd.read_csv(
-            data_file_path("raw/baton_rouge_so/east_baton_rouge_booking_log_2020.csv")
+            deba.data("raw/baton_rouge_so/east_baton_rouge_booking_log_2020.csv")
         )
         .pipe(clean_column_names)
         .drop(
@@ -63,4 +60,4 @@ def clean():
 
 if __name__ == "__main__":
     df = clean()
-    df.to_csv(data_file_path("clean/booking_baton_rouge_so_2020.csv"), index=False)
+    df.to_csv(deba.data("clean/booking_baton_rouge_so_2020.csv"), index=False)

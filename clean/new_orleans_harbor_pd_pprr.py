@@ -1,12 +1,9 @@
 import pandas as pd
 from lib.clean import clean_dates, clean_names, standardize_desc_cols, clean_salaries
-from lib.path import data_file_path, ensure_data_dir
+import deba
 from lib.columns import clean_column_names, set_values
 from lib.uid import gen_uid
 from lib import salary
-import sys
-
-sys.path.append("../")
 
 
 def assign_agency(df, year):
@@ -50,15 +47,13 @@ def assign_pay_date_and_rank_date(df):
 
 def clean_personnel_2008():
     df = pd.read_csv(
-        data_file_path(
-            "raw/new_orleans_harbor_pd/new_orleans_harbor_pd_pprr_1991-2008.csv"
-        )
+        deba.data("raw/new_orleans_harbor_pd/new_orleans_harbor_pd_pprr_1991-2008.csv")
     )
     df = clean_column_names(df)
     df = df.dropna(axis=1, how="all")
     df = df.rename(
         columns={
-            "mi": "middle_initial",
+            "mi": "middle_name",
             "date_hired": "hire_date",
             "position_rank": "rank_desc",
             "hourly_pay_rate": "salary",
@@ -71,8 +66,8 @@ def clean_personnel_2008():
         .pipe(set_values, {"salary_freq": salary.HOURLY})
         .pipe(clean_salaries, ["salary"])
         .pipe(assign_agency, 2008)
-        .pipe(clean_names, ["first_name", "last_name", "middle_initial"])
-        .pipe(gen_uid, ["agency", "first_name", "last_name", "middle_initial"])
+        .pipe(clean_names, ["first_name", "last_name", "middle_name"])
+        .pipe(gen_uid, ["agency", "first_name", "last_name", "middle_name"])
         .pipe(assign_pay_date_and_rank_date)
         .pipe(
             clean_dates, ["hire_date", "resign_date", "pay_effective_date", "rank_date"]
@@ -82,7 +77,7 @@ def clean_personnel_2008():
 
 def clean_personnel_2020():
     df = pd.read_csv(
-        data_file_path("raw/new_orleans_harbor_pd/new_orleans_harbor_pd_pprr_2020.csv")
+        deba.data("raw/new_orleans_harbor_pd/new_orleans_harbor_pd_pprr_2020.csv")
     )
     df = clean_column_names(df)
     df = df.dropna(how="all")
@@ -103,7 +98,7 @@ def clean_personnel_2020():
             "date_hired": "hire_date",
             "position_rank": "rank_desc",
             "hourly_pay": "salary",
-            "mi": "middle_initial",
+            "mi": "middle_name",
             "term_date": "resign_date",
             "pay_effective_date": "effective_date",
         },
@@ -116,10 +111,10 @@ def clean_personnel_2020():
         .pipe(clean_rank_desc)
         .pipe(standardize_desc_cols, ["rank_desc"])
         .pipe(assign_agency, 2020)
-        .pipe(clean_names, ["last_name", "middle_initial", "first_name"])
+        .pipe(clean_names, ["last_name", "middle_name", "first_name"])
         .pipe(
             gen_uid,
-            ["agency", "first_name", "last_name", "middle_initial", "hire_date"],
+            ["agency", "first_name", "last_name", "middle_name", "hire_date"],
         )
         .pipe(assign_pay_date_and_rank_date)
         .pipe(gen_uid, ["uid", "pay_effective_date", "rank_date"], "perhist_uid")
@@ -132,6 +127,8 @@ def clean_personnel_2020():
 if __name__ == "__main__":
     df20 = clean_personnel_2020()
     df08 = clean_personnel_2008()
-    ensure_data_dir("clean")
-    df20.to_csv(data_file_path("clean/pprr_new_orleans_harbor_pd_2020.csv"), index=False)
-    df08.to_csv(data_file_path("clean/pprr_new_orleans_harbor_pd_1991_2008.csv"), index=False)
+
+    df20.to_csv(deba.data("clean/pprr_new_orleans_harbor_pd_2020.csv"), index=False)
+    df08.to_csv(
+        deba.data("clean/pprr_new_orleans_harbor_pd_1991_2008.csv"), index=False
+    )

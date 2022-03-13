@@ -1,5 +1,5 @@
 from lib.date import combine_date_columns
-from lib.path import data_file_path
+import deba
 from datamatch import (
     ThresholdMatcher,
     JaroWinklerSimilarity,
@@ -8,9 +8,6 @@ from datamatch import (
 )
 from lib.post import extract_events_from_post, load_for_agency
 import pandas as pd
-import sys
-
-sys.path.append("../")
 
 
 def match_pprr_against_post(pprr_ipm, post):
@@ -43,7 +40,7 @@ def match_pprr_against_post(pprr_ipm, post):
     )
     decision = 0.803
     matcher.save_pairs_to_excel(
-        data_file_path(
+        deba.data(
             "match/pppr_ipm_new_orleans_pd_1946_2018_v_post_pprr_2020_11_06.xlsx"
         ),
         decision,
@@ -79,7 +76,7 @@ def match_award_to_pprr_ipm(award, pprr_ipm):
     )
     decision = 0.93
     matcher.save_pairs_to_excel(
-        data_file_path(
+        deba.data(
             "match/new_orleans_pd_award_2016_2021_v_pprr_ipm_new_orleans_pd_1946_2018.xlsx"
         ),
         decision,
@@ -92,12 +89,12 @@ def match_award_to_pprr_ipm(award, pprr_ipm):
 
 
 def match_lprr_to_pprr_ipm(lprr, pprr_ipm):
-    dfa = lprr[["uid", "first_name", "last_name", "middle_initial"]]
+    dfa = lprr[["uid", "first_name", "last_name", "middle_name"]]
     dfa.loc[:, "fc"] = dfa.first_name.fillna("").map(lambda x: x[:1])
     dfa.loc[:, "lc"] = dfa.last_name.fillna("").map(lambda x: x[:1])
     dfa = dfa.drop_duplicates(subset=["uid"]).set_index("uid")
 
-    dfb = pprr_ipm[["uid", "first_name", "last_name", "middle_initial"]]
+    dfb = pprr_ipm[["uid", "first_name", "last_name", "middle_name"]]
     dfb.loc[:, "fc"] = dfb.first_name.fillna("").map(lambda x: x[:1])
     dfb.loc[:, "lc"] = dfb.last_name.fillna("").map(lambda x: x[:1])
     dfb = dfb.drop_duplicates(subset=["uid"]).set_index("uid")
@@ -107,7 +104,7 @@ def match_lprr_to_pprr_ipm(lprr, pprr_ipm):
         {
             "first_name": JaroWinklerSimilarity(),
             "last_name": JaroWinklerSimilarity(),
-            "middle_initial": JaroWinklerSimilarity(),
+            "middle_name": JaroWinklerSimilarity(),
         },
         dfa,
         dfb,
@@ -115,7 +112,7 @@ def match_lprr_to_pprr_ipm(lprr, pprr_ipm):
     )
     decision = 0.80
     matcher.save_pairs_to_excel(
-        data_file_path(
+        deba.data(
             "match/new_orleans_lprr_2000_2016_v_pprr_ipm_new_orleans_pd_1946_2018.xlsx"
         ),
         decision,
@@ -157,7 +154,7 @@ def match_pprr_csd_to_pprr_ipm(pprr_csd, pprr_ipm):
     )
     decision = 1
     matcher.save_pairs_to_excel(
-        data_file_path(
+        deba.data(
             "match/pprr_new_orleans_csd_2014_v_pprr_ipm_new_orleans_pd_1946_2018.xlsx"
         ),
         decision,
@@ -193,7 +190,7 @@ def match_stop_and_search_to_pprr(sas, pprr_ipm):
     decision = 0.95
 
     matcher.save_pairs_to_excel(
-        data_file_path(
+        deba.data(
             "match/stop_and_search_new_orleans_pd_v_pprr_new_orleans_pd_1946_2018.xlsx"
         ),
         decision,
@@ -205,27 +202,60 @@ def match_stop_and_search_to_pprr(sas, pprr_ipm):
     return sas
 
 
-if __name__ == "__main__":
-    pprr_ipm = pd.read_csv(
-        data_file_path("clean/pprr_new_orleans_ipm_iapro_1946_2018.csv")
+def match_use_of_force_to_pprr(uof, pprr_ipm):
+    dfa = uof[["uid", "first_name", "last_name"]]
+    dfa.loc[:, "fc"] = dfa.first_name.fillna("").map(lambda x: x[:1])
+    dfa.loc[:, "lc"] = dfa.last_name.fillna("").map(lambda x: x[:1])
+    dfa = dfa.drop_duplicates(subset=["uid"]).set_index("uid")
+
+    dfb = pprr_ipm[["uid", "first_name", "last_name"]]
+    dfb.loc[:, "fc"] = dfb.first_name.fillna("").map(lambda x: x[:1])
+    dfb.loc[:, "lc"] = dfb.last_name.fillna("").map(lambda x: x[:1])
+    dfb = dfb.drop_duplicates(subset=["uid"]).set_index("uid")
+
+    matcher = ThresholdMatcher(
+        ColumnsIndex(["fc", "lc"]),
+        {
+            "first_name": JaroWinklerSimilarity(),
+            "last_name": JaroWinklerSimilarity(),
+        },
+        dfa,
+        dfb,
+        show_progress=True,
     )
-    pprr_csd = pd.read_csv(data_file_path("clean/pprr_new_orleans_csd_2014.csv"))
+    decision = 0.958
+
+    matcher.save_pairs_to_excel(
+        deba.data(
+            "match/uof_new_orleans_pd_2016_2021_v_pprr_new_orleans_pd_1946_2018.xlsx"
+        ),
+        decision,
+    )
+    matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
+    match_dict = dict(matches)
+
+    uof.loc[:, "uid"] = uof.uid.map(lambda x: match_dict.get(x, x))
+    return uof
+
+
+if __name__ == "__main__":
+    pprr_ipm = pd.read_csv(deba.data("clean/pprr_new_orleans_ipm_iapro_1946_2018.csv"))
+    pprr_csd = pd.read_csv(deba.data("clean/pprr_new_orleans_csd_2014.csv"))
     agency = pprr_ipm.agency[0]
-    post = load_for_agency("clean/pprr_post_2020_11_06.csv", agency)
-    award = pd.read_csv(data_file_path("clean/award_new_orleans_pd_2016_2021.csv"))
-    lprr = pd.read_csv(data_file_path("clean/lprr_new_orleans_csc_2000_2016.csv"))
-    sas = pd.read_csv(data_file_path("clean/sas_new_orleans_pd_2017_2021.csv"))
+    post = load_for_agency(agency)
+    award = pd.read_csv(deba.data("clean/award_new_orleans_pd_2016_2021.csv"))
+    lprr = pd.read_csv(deba.data("clean/lprr_new_orleans_csc_2000_2016.csv"))
+    sas = pd.read_csv(deba.data("clean/sas_new_orleans_pd_2017_2021.csv"))
+    uof_officers = pd.read_csv(deba.data("clean/uof_officers_new_orleans_pd_2016_2021.csv"))
     event_df = match_pprr_against_post(pprr_ipm, post)
     award = match_award_to_pprr_ipm(award, pprr_ipm)
     lprr = match_lprr_to_pprr_ipm(lprr, pprr_ipm)
     sas = match_stop_and_search_to_pprr(sas, pprr_ipm)
     pprr_csd_matched_with_ipm = match_pprr_csd_to_pprr_ipm(pprr_csd, pprr_ipm)
-    award.to_csv(
-        data_file_path("match/award_new_orleans_pd_2016_2021.csv"), index=False
-    )
-    event_df.to_csv(data_file_path("match/post_event_new_orleans_pd.csv"), index=False)
-    lprr.to_csv(data_file_path("match/lprr_new_orleans_csc_2000_2016.csv"), index=False)
-    pprr_csd_matched_with_ipm.to_csv(
-        data_file_path("match/pprr_new_orleans_csd_2014.csv"), index=False
-    )
-    sas.to_csv(data_file_path("match/sas_new_orleans_pd_2017_2021.csv"), index=False)
+    uof_officers = match_use_of_force_to_pprr(uof_officers, pprr_ipm)
+    award.to_csv(deba.data("match/award_new_orleans_pd_2016_2021.csv"), index=False)
+    event_df.to_csv(deba.data("match/post_event_new_orleans_pd.csv"), index=False)
+    lprr.to_csv(deba.data("match/lprr_new_orleans_csc_2000_2016.csv"), index=False)
+    pprr_csd_matched_with_ipm.to_csv(deba.data("match/pprr_new_orleans_csd_2014.csv"), index=False)
+    sas.to_csv(deba.data("match/sas_new_orleans_pd_2017_2021.csv"), index=False)
+    uof_officers.to_csv(deba.data("match/uof_new_orleans_pd_2016_2021.csv"), index=False)

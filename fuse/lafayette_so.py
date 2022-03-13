@@ -1,18 +1,23 @@
-import sys
-
-sys.path.append("../")
-from lib.path import data_file_path
-from lib.columns import (
-    rearrange_allegation_columns,
-)
+import deba
+from lib.columns import rearrange_allegation_columns, rearrange_award_columns
 from lib import events
 from lib.personnel import fuse_personnel
 from lib.post import load_for_agency
 import pandas as pd
 
 
-def fuse_events(cprr20, cprr14, cprr08, post):
+def fuse_events(award17, cprr20, cprr14, cprr08, post):
     builder = events.Builder()
+    builder.extract_events(
+        award17,
+        {
+            events.AWARD_RECEIVE: {
+                "prefix": "receive",
+                "keep": ["uid", "award_uid", "agency"],
+            },
+        },
+        ["uid", "award_uid"],
+    )
     builder.extract_events(
         cprr20,
         {
@@ -69,14 +74,17 @@ def fuse_events(cprr20, cprr14, cprr08, post):
 
 
 if __name__ == "__main__":
-    cprr20 = pd.read_csv(data_file_path("clean/cprr_lafayette_so_2015_2020.csv"))
-    cprr14 = pd.read_csv(data_file_path("clean/cprr_lafayette_so_2009_2014.csv"))
-    cprr08 = pd.read_csv(data_file_path("clean/cprr_lafayette_so_2006_2008.csv"))
+    cprr20 = pd.read_csv(deba.data("clean/cprr_lafayette_so_2015_2020.csv"))
+    cprr14 = pd.read_csv(deba.data("clean/cprr_lafayette_so_2009_2014.csv"))
+    cprr08 = pd.read_csv(deba.data("clean/cprr_lafayette_so_2006_2008.csv"))
+    award17 = pd.read_csv(deba.data("clean/award_lafayette_so_2017.csv"))
     agency = cprr08.agency[0]
-    post = load_for_agency("clean/pprr_post_2020_11_06.csv", agency)
+    post = load_for_agency(agency)
     complaints = rearrange_allegation_columns(pd.concat([cprr20, cprr14, cprr08]))
-    event = fuse_events(cprr20, cprr14, cprr08, post)
-    personnel_df = fuse_personnel(cprr20, cprr14, cprr08, post)
-    personnel_df.to_csv(data_file_path("fuse/per_lafayette_so.csv"), index=False)
-    event.to_csv(data_file_path("fuse/event_lafayette_so.csv"), index=False)
-    complaints.to_csv(data_file_path("fuse/com_lafayette_so.csv"), index=False)
+    event = fuse_events(award17, cprr20, cprr14, cprr08, post)
+    personnel_df = fuse_personnel(cprr20, cprr14, cprr08, post, award17)
+    award_df = rearrange_award_columns(award17)
+    award_df.to_csv(deba.data("fuse/award_lafayette_so.csv"), index=False)
+    personnel_df.to_csv(deba.data("fuse/per_lafayette_so.csv"), index=False)
+    event.to_csv(deba.data("fuse/event_lafayette_so.csv"), index=False)
+    complaints.to_csv(deba.data("fuse/com_lafayette_so.csv"), index=False)

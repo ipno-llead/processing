@@ -1,5 +1,3 @@
-import sys
-
 import pandas as pd
 from datamatch import (
     ThresholdMatcher,
@@ -8,11 +6,9 @@ from datamatch import (
     StringSimilarity,
 )
 
-from lib.path import data_file_path, ensure_data_dir
+import deba
 from lib.uid import gen_uid
 from lib.post import load_for_agency
-
-sys.path.append("../")
 
 
 def match_cprr_codebook(cprr, cb):
@@ -28,7 +24,7 @@ def match_cprr_codebook(cprr, cb):
     decision = 0.541
     lower_bound = 0.5
     matcher.save_pairs_to_excel(
-        data_file_path("match/shreveport_pd_cprr_2018_2019_v_codebook.xlsx"),
+        deba.data("match/shreveport_pd_cprr_2018_2019_v_codebook.xlsx"),
         decision,
         lower_bound=lower_bound,
     )
@@ -59,9 +55,7 @@ def match_cprr_post(cprr, post):
     )
     decision = 0.95
     matcher.save_pairs_to_excel(
-        data_file_path(
-            "match/shreveport_pd_cprr_2018_2019_v_post_pprr_2020_11_06.xlsx"
-        ),
+        deba.data("match/shreveport_pd_cprr_2018_2019_v_post_pprr_2020_11_06.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(decision)
@@ -72,13 +66,13 @@ def match_cprr_post(cprr, post):
 
 
 if __name__ == "__main__":
-    cprr = pd.read_csv(data_file_path("clean/cprr_shreveport_pd_2018_2019.csv"))
+    cprr = pd.read_csv(deba.data("clean/cprr_shreveport_pd_2018_2019.csv"))
     agency = cprr.agency[0]
-    post = load_for_agency("clean/pprr_post_2020_11_06.csv", agency)
-    cb = pd.read_csv(data_file_path("clean/cprr_codebook_shreveport_pd.csv"))
+    post = load_for_agency(agency)
+    cb = pd.read_csv(deba.data("clean/cprr_codebook_shreveport_pd.csv"))
     cprr = match_cprr_codebook(cprr, cb).pipe(
         gen_uid, ["agency", "tracking_number", "allegation"], "allegation_uid"
     )
     cprr = match_cprr_post(cprr, post)
-    ensure_data_dir("match")
-    cprr.to_csv(data_file_path("match/cprr_shreveport_pd_2018_2019.csv"), index=False)
+
+    cprr.to_csv(deba.data("match/cprr_shreveport_pd_2018_2019.csv"), index=False)

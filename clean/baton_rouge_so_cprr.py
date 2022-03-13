@@ -1,6 +1,6 @@
 from lib.columns import clean_column_names
 from lib.uid import gen_uid
-from lib.path import data_file_path
+import deba
 from lib.clean import (
     clean_names,
     standardize_desc_cols,
@@ -10,9 +10,6 @@ from lib.clean import (
     clean_datetimes,
 )
 import pandas as pd
-import sys
-
-sys.path.append("../")
 
 
 def split_name(df):
@@ -23,7 +20,7 @@ def split_name(df):
     )
     names2 = names1.iloc[:, 0].str.split(" ", expand=True)
     df.loc[:, "first_name"] = names2.iloc[:, 0]
-    df.loc[:, "middle_initial"] = names2.iloc[:, 1]
+    df.loc[:, "middle_name"] = names2.iloc[:, 1]
     df.loc[:, "last_name"] = names1.iloc[:, 0]
     df = df.drop(columns=["name"])
     return df
@@ -301,7 +298,7 @@ def assign_prod_year(df, year):
 
 
 def clean18():
-    df = pd.read_csv(data_file_path("raw/baton_rouge_so/baton_rouge_so_cprr_2018.csv"))
+    df = pd.read_csv(deba.data("raw/baton_rouge_so/baton_rouge_so_cprr_2018.csv"))
     df = clean_column_names(df)
     df.columns = [
         "name",
@@ -341,7 +338,7 @@ def clean18():
         .pipe(clean_allegations)
         .pipe(assign_agency)
         .pipe(assign_prod_year, "2018")
-        .pipe(clean_names, ["first_name", "last_name", "middle_initial"])
+        .pipe(clean_names, ["first_name", "last_name", "middle_name"])
         .pipe(gen_uid, ["agency", "first_name", "last_name", "birth_year", "badge_no"])
         .pipe(
             gen_uid,
@@ -353,9 +350,7 @@ def clean18():
 
 
 def clean20():
-    df = pd.read_csv(
-        data_file_path("raw/baton_rouge_so/baton_rouge_so_cprr_2016-2020.csv")
-    )
+    df = pd.read_csv(deba.data("raw/baton_rouge_so/baton_rouge_so_cprr_2016-2020.csv"))
     df = clean_column_names(df)
     df.columns = [
         "tracking_number",
@@ -399,7 +394,7 @@ def clean20():
         .pipe(clean_complainant)
         .pipe(clean_disposition_20)
         .pipe(assign_prod_year, "2020")
-        .pipe(clean_names, ["first_name", "last_name", "middle_initial"])
+        .pipe(clean_names, ["first_name", "last_name", "middle_name"])
         .pipe(gen_uid, ["agency", "first_name", "last_name", "birth_year", "badge_no"])
         .pipe(
             gen_uid,
@@ -413,5 +408,5 @@ def clean20():
 if __name__ == "__main__":
     df18 = clean18()
     df20 = clean20()
-    df18.to_csv(data_file_path("clean/cprr_baton_rouge_so_2018.csv"), index=False)
-    df20.to_csv(data_file_path("clean/cprr_baton_rouge_so_2016_2020.csv"), index=False)
+    df18.to_csv(deba.data("clean/cprr_baton_rouge_so_2018.csv"), index=False)
+    df20.to_csv(deba.data("clean/cprr_baton_rouge_so_2016_2020.csv"), index=False)

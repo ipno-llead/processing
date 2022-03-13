@@ -1,12 +1,8 @@
-import sys
-
 import pandas as pd
 from datamatch import ThresholdMatcher, JaroWinklerSimilarity, ColumnsIndex
 
-from lib.path import data_file_path
+import deba
 from lib.post import extract_events_from_post, load_for_agency
-
-sys.path.append("../")
 
 
 def match_pprr_and_post(pprr, post):
@@ -29,9 +25,7 @@ def match_pprr_and_post(pprr, post):
     )
     decision = 0.9
     matcher.save_pairs_to_excel(
-        data_file_path(
-            "match/west_monroe_pd_pprr_2015_2020_v_post_pprr_2020_11_06.xlsx"
-        ),
+        deba.data("match/west_monroe_pd_pprr_2015_2020_v_post_pprr_2020_11_06.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
@@ -62,7 +56,7 @@ def match_cprr_with_pprr(cprr, pprr):
     )
     decision = 0.82
     matcher.save_pairs_to_excel(
-        data_file_path(
+        deba.data(
             "match/cprr_west_monroe_pd_2020_v_pprr_west_monroe_pd_2015_2020.xlsx"
         ),
         decision,
@@ -75,10 +69,12 @@ def match_cprr_with_pprr(cprr, pprr):
 
 
 if __name__ == "__main__":
-    pprr = pd.read_csv(data_file_path("clean/pprr_west_monroe_pd_2015_2020.csv"))
-    cprr = pd.read_csv(data_file_path("clean/cprr_west_monroe_pd_2020.csv"))
+    pprr = pd.read_csv(deba.data("clean/pprr_west_monroe_pd_2015_2020.csv"))
+    cprr = pd.read_csv(deba.data("clean/cprr_west_monroe_pd_2020.csv"))
     agency = pprr.agency[0]
-    post = load_for_agency("clean/pprr_post_2020_11_06.csv", agency)
+    post = load_for_agency(agency)
     post_event = match_pprr_and_post(pprr, post)
     match_cprr_with_pprr(cprr, pprr)
-    post_event.to_csv(data_file_path("match/post_event_west_monroe_pd_2020_11_06.csv"), index=False)
+    post_event.to_csv(
+        deba.data("match/post_event_west_monroe_pd_2020_11_06.csv"), index=False
+    )

@@ -1,7 +1,4 @@
-import sys
-
-sys.path.append("../")
-from lib.path import data_file_path
+import deba
 import pandas as pd
 from lib.columns import clean_column_names
 from lib.clean import standardize_desc_cols
@@ -160,13 +157,13 @@ def split_and_clean_names(df):
     return df.drop(columns="officer")
 
 
-def drop_rows_missing_first_and_last_name(df):
+def drop_rows_missing_names(df):
     return df[~((df.first_name == "") & (df.last_name == ""))]
 
 
 def clean21():
     df = (
-        pd.read_csv(data_file_path("raw/houma_pd/houma_pd_cprr_2019_2021.csv"))
+        pd.read_csv(deba.data("raw/houma_pd/houma_pd_cprr_2019_2021.csv"))
         .pipe(clean_column_names)
         .pipe(split_rows_with_multiple_allegations)
         .pipe(clean_allegations)
@@ -175,7 +172,6 @@ def clean21():
         .pipe(clean_disposition)
         .pipe(split_and_clean_investigator21)
         .pipe(split_and_clean_names)
-        .pipe(drop_rows_missing_first_and_last_name)
         .pipe(standardize_desc_cols, ["tracking_number", "action"])
         .pipe(set_values, ({"agency": "Houma PD"}))
         .pipe(gen_uid, ["agency", "first_name", "last_name"])
@@ -184,13 +180,14 @@ def clean21():
             ["uid", "tracking_number", "case_number", "allegation", "action"],
             "allegation_uid",
         )
+        .pipe(drop_rows_missing_names)
     )
     return df
 
 
 def clean18():
     df = (
-        pd.read_csv(data_file_path("raw/houma_pd/houma_pd_cprr_2017_2018.csv"))
+        pd.read_csv(deba.data("raw/houma_pd/houma_pd_cprr_2017_2018.csv"))
         .pipe(clean_column_names)
         .drop(columns=["column_1", "column2", "column3"])
         .pipe(clean_tracking_number)
@@ -214,5 +211,5 @@ def clean18():
 if __name__ == "__main__":
     df21 = clean21()
     df18 = clean18()
-    df21.to_csv(data_file_path("clean/cprr_houma_pd_2019_2021.csv"), index=False)
-    df18.to_csv(data_file_path("clean/cprr_houma_pd_2017_2018.csv"), index=False)
+    df21.to_csv(deba.data("clean/cprr_houma_pd_2019_2021.csv"), index=False)
+    df18.to_csv(deba.data("clean/cprr_houma_pd_2017_2018.csv"), index=False)

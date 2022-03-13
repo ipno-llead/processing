@@ -1,8 +1,5 @@
-import sys
-
-sys.path.append("../")
 import pandas as pd
-from lib.path import data_file_path, ensure_data_dir
+import deba
 
 
 def extract_lsu_roster(df):
@@ -162,12 +159,12 @@ def clean_agency(df):
 
 
 def clean():
-    df = pd.read_csv(data_file_path("raw/universities/pprr_post_2020_11_06.csv"))
+    df = pd.read_csv(deba.data("raw/universities/pprr_post_2020_11_06.csv"))
     df = df.pipe(extract_lsu_roster).pipe(clean_agency)
     return df
 
 
 if __name__ == "__main__":
     df = clean()
-    ensure_data_dir("clean")
-    df.to_csv(data_file_path("clean/pprr_universities.csv"), index=False)
+
+    df.to_csv(deba.data("clean/pprr_universities.csv"), index=False)

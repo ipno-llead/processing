@@ -1,11 +1,8 @@
 from lib.columns import clean_column_names, set_values
 from lib.uid import gen_uid
-from lib.path import data_file_path
+import deba
 from lib.clean import clean_names, standardize_desc_cols, clean_dates
 import pandas as pd
-import sys
-
-sys.path.append("../")
 
 
 def split_names_20(df):
@@ -82,7 +79,7 @@ def clean_allegations(df):
 
 def clean20():
     df = (
-        pd.read_csv(data_file_path("raw/scott_pd/scott_pd_cprr_2020.csv"))
+        pd.read_csv(deba.data("raw/scott_pd/scott_pd_cprr_2020.csv"))
         .pipe(clean_column_names)
         .drop(columns="appeal")
         .dropna()
@@ -113,7 +110,7 @@ def clean20():
 
 def clean14():
     df = (
-        pd.read_csv(data_file_path("raw/scott_pd/scott_pd_cprr_2009_2014.csv"))
+        pd.read_csv(deba.data("raw/scott_pd/scott_pd_cprr_2009_2014.csv"))
         .pipe(clean_column_names)
         .drop(columns=["appeal"])
         .rename(columns={"date": "receive_date", "offense": "allegation"})
@@ -133,5 +130,5 @@ def clean14():
 if __name__ == "__main__":
     df20 = clean20()
     df14 = clean14()
-    df20.to_csv(data_file_path("clean/cprr_scott_pd_2020.csv"), index=False)
-    df14.to_csv(data_file_path("clean/cprr_scott_pd_2009_2014.csv"), index=False)
+    df20.to_csv(deba.data("clean/cprr_scott_pd_2020.csv"), index=False)
+    df14.to_csv(deba.data("clean/cprr_scott_pd_2009_2014.csv"), index=False)

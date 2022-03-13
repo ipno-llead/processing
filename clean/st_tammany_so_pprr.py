@@ -1,11 +1,8 @@
 from lib.columns import clean_column_names
-from lib.path import data_file_path, ensure_data_dir
+import deba
 from lib.clean import clean_dates, clean_names, float_to_int_str, standardize_desc_cols
 from lib.uid import gen_uid
 import pandas as pd
-import sys
-
-sys.path.append("../")
 
 
 def assign_agency(df):
@@ -15,7 +12,7 @@ def assign_agency(df):
 
 
 def clean():
-    df = pd.read_csv(data_file_path("raw/st_tammany_so/st._tammany_so_pprr_2020.csv"))
+    df = pd.read_csv(deba.data("raw/st_tammany_so/st._tammany_so_pprr_2020.csv"))
     df = clean_column_names(df)
     df = df.rename(
         columns={
@@ -39,5 +36,5 @@ def clean():
 
 if __name__ == "__main__":
     df = clean()
-    ensure_data_dir("clean")
-    df.to_csv(data_file_path("clean/pprr_st_tammany_so_2020.csv"), index=False)
+
+    df.to_csv(deba.data("clean/pprr_st_tammany_so_2020.csv"), index=False)

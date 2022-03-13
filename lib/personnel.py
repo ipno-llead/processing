@@ -1,8 +1,6 @@
-from lib.columns import rearrange_personnel_columns
 import pandas as pd
-import sys
 
-sys.path.append("../")
+from lib.columns import rearrange_personnel_columns
 
 
 def fuse_personnel(df: pd.DataFrame, *other_dfs: list[pd.DataFrame]) -> pd.DataFrame:

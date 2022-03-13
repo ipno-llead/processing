@@ -6,13 +6,10 @@ from lib.clean import (
     standardize_desc_cols,
     clean_employment_status,
 )
-from lib.path import data_file_path, ensure_data_dir
+import deba
 from lib.uid import gen_uid
 from lib import salary
 import pandas as pd
-import sys
-
-sys.path.append("../")
 
 
 def assign_agency(df):
@@ -98,7 +95,7 @@ def clean_rank_desc(df):
 
 def clean_17():
     df = pd.read_csv(
-        data_file_path("raw/baton_rouge_csd/baton_rouge_csd_pprr_2017.csv")
+        deba.data("raw/baton_rouge_csd/baton_rouge_csd_pprr_2017.csv")
     ).pipe(clean_column_names)
     df = (
         df[
@@ -122,7 +119,7 @@ def clean_17():
         .rename(
             columns={
                 "employee_num": "employee_id",
-                "middle_init": "middle_initial",
+                "middle_init": "middle_name",
                 "division_num": "department_code",
                 "division_name": "department_desc",
                 "job_code": "rank_code",
@@ -141,7 +138,7 @@ def clean_17():
         .pipe(clean_rank_desc)
         .pipe(parse_dates_with_known_format, ["hire_date", "resign_date"], "%m/%d/%Y")
         .pipe(assign_agency)
-        .pipe(clean_names, ["first_name", "last_name", "middle_initial"])
+        .pipe(clean_names, ["first_name", "last_name", "middle_name"])
         .pipe(gen_uid, ["agency", "employee_id"])
         .pipe(assign_rank_year_and_pay_year)
     )
@@ -150,7 +147,7 @@ def clean_17():
 
 def clean_19():
     df = pd.read_csv(
-        data_file_path("raw/baton_rouge_csd/baton_rouge_csd_pprr_2019.csv")
+        deba.data("raw/baton_rouge_csd/baton_rouge_csd_pprr_2019.csv")
     ).pipe(clean_column_names)
 
     df = (
@@ -173,7 +170,7 @@ def clean_19():
         ]
         .rename(
             columns={
-                "middle_init": "middle_initial",
+                "middle_init": "middle_name",
                 "pay_location_code": "department_code",
                 "pay_location_description": "department_desc",
                 "job_code": "rank_code",
@@ -195,7 +192,7 @@ def clean_19():
         .pipe(clean_employment_status, ["employment_status"])
         .pipe(clean_department_desc)
         .pipe(assign_agency)
-        .pipe(clean_names, ["first_name", "last_name", "middle_initial"])
+        .pipe(clean_names, ["first_name", "last_name", "middle_name"])
         .pipe(gen_uid, ["agency", "employee_id"])
         .pipe(assign_rank_year_and_pay_year)
     )
@@ -205,6 +202,6 @@ def clean_19():
 if __name__ == "__main__":
     df17 = clean_17()
     df19 = clean_19()
-    ensure_data_dir("clean")
-    df17.to_csv(data_file_path("clean/pprr_baton_rouge_csd_2017.csv"), index=False)
-    df19.to_csv(data_file_path("clean/pprr_baton_rouge_csd_2019.csv"), index=False)
+
+    df17.to_csv(deba.data("clean/pprr_baton_rouge_csd_2017.csv"), index=False)
+    df19.to_csv(deba.data("clean/pprr_baton_rouge_csd_2019.csv"), index=False)

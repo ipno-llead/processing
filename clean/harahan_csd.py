@@ -1,15 +1,12 @@
 from lib.uid import gen_uid
 import re
-import sys
 
 import pandas as pd
 
 from lib.columns import clean_column_names, set_values
-from lib.path import data_file_path, ensure_data_dir
+import deba
 from lib.clean import clean_dates, clean_salaries, clean_names
 from lib import salary
-
-sys.path.append("../")
 
 
 def realign(df):
@@ -94,7 +91,6 @@ def split_names(df):
     ).str.extract(r"^([^,]+), (\w+)(?: (\w+))?$")
     df.loc[:, "first_name"] = names[1]
     df.loc[:, "middle_name"] = names[2].fillna("")
-    df.loc[:, "middle_initial"] = df.middle_name.map(lambda x: x[:1])
     df.loc[:, "last_name"] = names[0]
     return df.drop(columns=["name"])
 
@@ -118,7 +114,7 @@ def assign_agency(df):
 def clean():
     return (
         pd.read_csv(
-            data_file_path(
+            deba.data(
                 "raw/harahan_csd/harahan_csd_pprr_roster_by_employment_status_2020.csv"
             )
         )
@@ -137,7 +133,7 @@ def clean():
         .pipe(split_names)
         .pipe(clean_employment_status)
         .pipe(clean_salaries, ["salary"])
-        .pipe(clean_names, ["first_name", "middle_name", "middle_initial", "last_name"])
+        .pipe(clean_names, ["first_name", "middle_name", "last_name"])
         .pipe(join_employment_date)
         .pipe(assign_agency)
         .pipe(gen_uid, ["agency", "employee_id"])
@@ -147,7 +143,7 @@ def clean():
 def join_employment_date(df):
     emp_dates = (
         pd.read_csv(
-            data_file_path(
+            deba.data(
                 "raw/harahan_csd/harahan_csd_prrr_roster_by_employment_date_2020.csv"
             )
         )
@@ -167,5 +163,5 @@ def join_employment_date(df):
 
 if __name__ == "__main__":
     df = clean()
-    ensure_data_dir("clean")
-    df.to_csv(data_file_path("clean/pprr_harahan_csd_2020.csv"), index=False)
+
+    df.to_csv(deba.data("clean/pprr_harahan_csd_2020.csv"), index=False)
