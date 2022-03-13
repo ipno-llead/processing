@@ -1,0 +1,5 @@
+outs:
+- md5: 31c5c713936b59fbe6b9c85c6e831862.dir
+  size: 1202956446
+  nfiles: 1494
+  path: raw_minutes
