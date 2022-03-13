@@ -2,7 +2,7 @@ import pandas as pd
 import deba
 from datamatch import JaroWinklerSimilarity, ThresholdMatcher, ColumnsIndex
 
-from lib.clean import canonicalize_names
+from lib.clean import canonicalize_officers
 from lib.post import load_for_agency, extract_events_from_post
 
 
@@ -26,8 +26,7 @@ def deduplicate_cprr_14_officers(cprr):
     )
     clusters = matcher.get_index_clusters_within_thresholds(decision)
     # canonicalize name and uid
-    canonicalize_names(cprr, clusters)
-    return cprr
+    return canonicalize_officers(cprr, clusters)
 
 
 def deduplicate_cprr_20_officers(cprr):
@@ -50,8 +49,7 @@ def deduplicate_cprr_20_officers(cprr):
     )
     clusters = matcher.get_index_clusters_within_thresholds(decision)
     # canonicalize name and uid
-    canonicalize_names(cprr, clusters)
-    return cprr
+    return canonicalize_officers(cprr, clusters)
 
 
 def match_cprr_14_and_post(cprr, post):

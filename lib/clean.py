@@ -1,3 +1,4 @@
+import sys
 import re
 import json
 from typing import List
@@ -713,30 +714,8 @@ def canonicalize_officers(
         uid, first_name, last_name, middle_name = None, "", "", ""
         for idx in cluster:
             row = df.loc[df[uid_column] == idx].squeeze()
-            # if idx == "a5f3c016d4c3373aa74dc15c0638362e":
-            #     raise Exception(
-            #         idx,
-            #         {
-            #             "type(row)": type(row),
-            #             "row.shape": row.shape,
-            #             "row[first_name_column]": row[first_name_column],
-            #             "first_name": first_name,
-            #             "uid is None": uid is None,
-            #             "len(row[first_name_column]) > len(first_name)": len(
-            #                 row[first_name_column]
-            #             )
-            #             > len(first_name),
-            #             "len(row[first_name_column]) == len(first_name)": len(
-            #                 row[first_name_column]
-            #             )
-            #             == len(first_name),
-            #             "len(row[last_name_column]) > len(last_name)": len(
-            #                 row[last_name_column]
-            #             )
-            #             > len(last_name),
-            #             "has_middle_name": has_middle_name,
-            #         },
-            #     )
+            if isinstance(row, pd.DataFrame):
+                row = row.iloc[0]
             if uid is None or (
                 len(row[first_name_column]) > len(first_name)
                 or (
@@ -745,6 +724,7 @@ def canonicalize_officers(
                         len(row[last_name_column]) > len(last_name)
                         or (
                             has_middle_name
+                            and pd.notna(row[middle_name_column])
                             and len(row[last_name_column]) == len(last_name)
                             and len(row[middle_name_column]) > len(middle_name)
                         )

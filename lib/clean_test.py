@@ -70,12 +70,20 @@ class FloatToIntStrTestCase(unittest.TestCase):
         )
 
 
-class CanonicalizeNamesTestCase(unittest.TestCase):
-    def test_canonicalize_names(self):
+class CanonicalizeOfficersTestCase(unittest.TestCase):
+    def test_canonicalize_officers(self):
         assert_frame_equal(
             canonicalize_officers(
                 pd.DataFrame.from_records(
                     [
+                        {
+                            "uid": "1e65c0807675ee3f25f6a6bf25eb121b",
+                            "first_name": "patrick",
+                            "last_name": "peterman",
+                            "agency": "Baton Rouge PD",
+                            "rank_desc": "sergeant",
+                            "id": 10,
+                        },
                         {
                             "uid": "1e65c0807675ee3f25f6a6bf25eb121b",
                             "first_name": "patrick",
@@ -166,6 +174,14 @@ class CanonicalizeNamesTestCase(unittest.TestCase):
                         "last_name": "petermann",
                         "agency": "Baton Rouge PD",
                         "rank_desc": "sergeant",
+                        "id": 10,
+                    },
+                    {
+                        "uid": "db3d392b404754b2d4a127ca0922d2f8",
+                        "first_name": "patrick",
+                        "last_name": "petermann",
+                        "agency": "Baton Rouge PD",
+                        "rank_desc": "sergeant",
                         "id": 9,
                     },
                     {
@@ -211,3 +227,60 @@ class CanonicalizeNamesTestCase(unittest.TestCase):
                 ]
             ),
         )
+
+
+def test_middle_name(self):
+    assert_frame_equal(
+        canonicalize_officers(
+            pd.DataFrame.from_records(
+                [
+                    {
+                        "uid": "1e65c0807675ee3f25f6a6bf25eb121b",
+                        "first_name": "patrick",
+                        "last_name": "peterman",
+                        "middle_name": "m",
+                        "agency": "Baton Rouge PD",
+                        "rank_desc": "sergeant",
+                        "id": 10,
+                    },
+                    {
+                        "uid": "db3d392b404754b2d4a127ca0922d2f8",
+                        "first_name": "patrick",
+                        "last_name": "peterman",
+                        "middle_name": "matt",
+                        "agency": "Baton Rouge PD",
+                        "rank_desc": "sergeant",
+                        "id": 10,
+                    },
+                ]
+            ),
+            clusters=[
+                (
+                    "1e65c0807675ee3f25f6a6bf25eb121b",
+                    "db3d392b404754b2d4a127ca0922d2f8",
+                ),
+            ],
+        ),
+        pd.DataFrame.from_records(
+            [
+                {
+                    "uid": "db3d392b404754b2d4a127ca0922d2f8",
+                    "first_name": "patrick",
+                    "last_name": "peterman",
+                    "middle_name": "matt",
+                    "agency": "Baton Rouge PD",
+                    "rank_desc": "sergeant",
+                    "id": 10,
+                },
+                {
+                    "uid": "db3d392b404754b2d4a127ca0922d2f8",
+                    "first_name": "patrick",
+                    "last_name": "peterman",
+                    "middle_name": "matt",
+                    "agency": "Baton Rouge PD",
+                    "rank_desc": "sergeant",
+                    "id": 10,
+                },
+            ]
+        ),
+    )

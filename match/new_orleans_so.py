@@ -9,7 +9,7 @@ from datamatch import (
 import deba
 from lib.post import extract_events_from_post, load_for_agency
 from lib.date import combine_date_columns
-from lib.clean import canonicalize_names
+from lib.clean import canonicalize_officers
 
 
 def deduplicate_cprr_19_personnel(cprr):
@@ -36,8 +36,7 @@ def deduplicate_cprr_19_personnel(cprr):
         deba.data("match/new_orleans_so_cprr_19_dedup.xlsx"), decision, decision
     )
     clusters = matcher.get_index_clusters_within_thresholds(decision)
-    canonicalize_names(cprr, clusters)
-    return cprr
+    return canonicalize_officers(cprr, clusters)
 
 
 def deduplicate_cprr_20_personnel(cprr):
@@ -65,7 +64,7 @@ def deduplicate_cprr_20_personnel(cprr):
     )
     clusters = matcher.get_index_clusters_within_thresholds(decision)
     # canonicalize name and uid
-    canonicalize_names(cprr, clusters)
+    canonicalize_officers(cprr, clusters)
     return cprr
 
 
