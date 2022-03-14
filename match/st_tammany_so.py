@@ -1,10 +1,7 @@
 from datamatch import ThresholdMatcher, JaroWinklerSimilarity, ColumnsIndex
-from lib.path import data_file_path, ensure_data_dir
+import deba
 from lib.post import extract_events_from_post, load_for_agency
 import pandas as pd
-import sys
-
-sys.path.append("../")
 
 
 def match_cprr(cprr, pprr):
@@ -31,7 +28,7 @@ def match_cprr(cprr, pprr):
     )
     decision = 0.94
     matcher.save_pairs_to_excel(
-        data_file_path("match/st_tammany_so_cprr_2011_2021_v_pprr_2020.xlsx"), decision
+        deba.data("match/st_tammany_so_cprr_2011_2021_v_pprr_2020.xlsx"), decision
     )
     matches = matcher.get_index_pairs_within_thresholds(decision)
 
@@ -60,7 +57,7 @@ def match_pprr_and_post(pprr, post):
     )
     decision = 0.955
     matcher.save_pairs_to_excel(
-        data_file_path("match/st_tammany_so_pprr_2020_v_post_pprr_2020_11_06.xlsx"),
+        deba.data("match/st_tammany_so_pprr_2020_v_post_pprr_2020_11_06.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
@@ -87,9 +84,7 @@ def match_cprr_and_post(cprr, post):
     )
     decision = 0.929
     matcher.save_pairs_to_excel(
-        data_file_path(
-            "match/st_tammany_so_cprr_2011_2021_v_post_pprr_2020_11_06.xlsx"
-        ),
+        deba.data("match/st_tammany_so_cprr_2011_2021_v_post_pprr_2020_11_06.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
@@ -97,16 +92,14 @@ def match_cprr_and_post(cprr, post):
 
 
 if __name__ == "__main__":
-    cprr = pd.read_csv(data_file_path("clean/cprr_st_tammany_so_2011_2021.csv"))
-    pprr = pd.read_csv(data_file_path("clean/pprr_st_tammany_so_2020.csv"))
+    cprr = pd.read_csv(deba.data("clean/cprr_st_tammany_so_2011_2021.csv"))
+    pprr = pd.read_csv(deba.data("clean/pprr_st_tammany_so_2020.csv"))
     agency = pprr.agency[0]
-    post = load_for_agency("clean/pprr_post_2020_11_06.csv", agency)
+    post = load_for_agency(agency)
     cprr = match_cprr(cprr, pprr)
     post_event = pd.concat(
         [match_pprr_and_post(pprr, post), match_cprr_and_post(cprr, post)]
     ).drop_duplicates(ignore_index=True)
-    ensure_data_dir("match")
-    cprr.to_csv(data_file_path("match/cprr_st_tammany_so_2011_2021.csv"), index=False)
-    post_event.to_csv(
-        data_file_path("match/post_event_st_tammany_so_2020.csv"), index=False
-    )
+
+    cprr.to_csv(deba.data("match/cprr_st_tammany_so_2011_2021.csv"), index=False)
+    post_event.to_csv(deba.data("match/post_event_st_tammany_so_2020.csv"), index=False)

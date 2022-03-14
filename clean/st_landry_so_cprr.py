@@ -1,8 +1,5 @@
-import sys
-
-sys.path.append("../")
 import pandas as pd
-from lib.path import data_file_path
+import deba
 from lib.columns import clean_column_names, set_values
 from lib.clean import clean_names, clean_dates
 from lib.uid import gen_uid
@@ -70,10 +67,12 @@ def split_names(df):
 
 def clean():
     df = (
-        pd.read_csv(data_file_path("raw/st_landry_so/st_landry_so_cprr_2019_2020.csv"))
+        pd.read_csv(deba.data("raw/st_landry_so/st_landry_so_cprr_2019_2020.csv"))
         .pipe(clean_column_names)
-        .rename(columns={"case": "tracking_number", "date": "receive_date"})\
-        .pipe(clean_dates, ['receive_date'])
+        .rename(
+            columns={"case": "tracking_number", "date": "investigation_complete_date"}
+        )
+        .pipe(clean_dates, ["investigation_complete_date"])
         .pipe(clean_allegation)
         .pipe(split_rows_with_allegations)
         .pipe(clean_investigation_status)
@@ -84,7 +83,6 @@ def clean():
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(
             gen_uid,
-            
             ["uid", "tracking_number", "allegation", "action"],
             "allegation_uid",
         )
@@ -94,4 +92,4 @@ def clean():
 
 if __name__ == "__main__":
     df = clean()
-    df.to_csv(data_file_path("clean/cprr_st_landry_so_2020.csv"), index=False)
+    df.to_csv(deba.data("clean/cprr_st_landry_so_2020.csv"), index=False)

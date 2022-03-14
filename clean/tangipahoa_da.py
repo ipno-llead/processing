@@ -1,9 +1,6 @@
-import sys
-
-sys.path.append("../")
 import pandas as pd
-from lib.path import data_file_path
-from lib.columns import clean_column_names, set_values
+import deba
+from lib.columns import clean_column_names
 from lib.uid import gen_uid
 
 
@@ -27,7 +24,7 @@ def assign_agency(df):
 
 def clean():
     df = (
-        pd.read_csv(data_file_path("raw/tangipahoa_da/tangipahoa_da_brady_2021.csv"))
+        pd.read_csv(deba.data("raw/tangipahoa_da/tangipahoa_da_brady_2021.csv"))
         .pipe(clean_column_names)
         .pipe(split_name)
         .pipe(set_values, {"agency": "Tangipahoa SO", "source_agency": "Tangipahoa DA"})
@@ -41,4 +38,4 @@ def clean():
 
 if __name__ == "__main__":
     df = clean()
-    df.to_csv(data_file_path("clean/brady_tangipahoa_da_2021.csv"), index=False)
+    df.to_csv(deba.data("clean/cprr_tangipahoa_da_2021.csv"), index=False)

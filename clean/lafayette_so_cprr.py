@@ -1,8 +1,5 @@
-import sys
-
-sys.path.append("../")
 import pandas as pd
-from lib.path import data_file_path
+import deba
 from lib.columns import clean_column_names, set_values
 from lib.clean import clean_dates, standardize_desc_cols
 from lib.uid import gen_uid
@@ -25,7 +22,7 @@ def clean_and_split_names(df):
         .str.replace(r"\'", "", regex=True)
         .str.replace(
             r"(unknown|records for file|(file)? ?for records? ?(only)?|"
-            r"intake booking|corrections intake)|metro narcotics",
+            r"intake booking|corrections intake)|metro narcotics|intel division",
             "",
             regex=True,
         )
@@ -35,7 +32,7 @@ def clean_and_split_names(df):
     df.loc[:, "last_name"] = names[0].str.replace(",", "", regex=False).fillna("")
     df.loc[:, "middle_name"] = names[1].fillna("")
     df.loc[:, "first_name"] = names[2].fillna("")
-    return df.drop(columns="name")
+    return df.drop(columns=["name"])
 
 
 def clean_allegations(df):
@@ -189,9 +186,13 @@ def clean_action_08(df):
     return df.drop(columns="leave")
 
 
+def drop_rows_missing_names(df):
+    return df[~((df.first_name == "") & (df.last_name == ""))]
+
+
 def clean20():
     df = pd.read_csv(
-        data_file_path("raw/lafayette_so/lafayette_so_cprr_2015_2020.csv")
+        deba.data("raw/lafayette_so/lafayette_so_cprr_2015_2020.csv")
     ).pipe(clean_column_names)
     df = (
         df.rename(
@@ -222,13 +223,14 @@ def clean20():
             ["uid", "allegation", "action", "tracking_number"],
             "allegation_uid",
         )
+        .pipe(drop_rows_missing_names)
     )
     return df
 
 
 def clean14():
     df = (
-        pd.read_csv(data_file_path("raw/lafayette_so/lafayette_so_cprr_2009_2014.csv"))
+        pd.read_csv(deba.data("raw/lafayette_so/lafayette_so_cprr_2009_2014.csv"))
         .pipe(clean_column_names)
         .rename(columns={"date": "receive_date"})
         .drop(columns="days")
@@ -247,13 +249,14 @@ def clean14():
             ["uid", "allegation", "action", "tracking_number", "receive_date"],
             "allegation_uid",
         )
+        .pipe(drop_rows_missing_names)
     )
     return df
 
 
 def clean08():
     df = (
-        pd.read_csv(data_file_path("raw/lafayette_so/lafayette_so_cprr_2006_2008.csv"))
+        pd.read_csv(deba.data("raw/lafayette_so/lafayette_so_cprr_2006_2008.csv"))
         .pipe(clean_column_names)
         .drop(columns=["emp"])
         .rename(columns={"date": "receive_date"})
@@ -272,6 +275,7 @@ def clean08():
             ["uid", "allegation", "action", "tracking_number", "receive_date"],
             "allegation_uid",
         )
+        .pipe(drop_rows_missing_names)
     )
     return df
 
@@ -280,6 +284,6 @@ if __name__ == "__main__":
     df20 = clean20()
     df14 = clean14()
     df08 = clean08()
-    df20.to_csv(data_file_path("clean/cprr_lafayette_so_2015_2020.csv"), index=False)
-    df14.to_csv(data_file_path("clean/cprr_lafayette_so_2009_2014.csv"), index=False)
-    df08.to_csv(data_file_path("clean/cprr_lafayette_so_2006_2008.csv"), index=False)
+    df20.to_csv(deba.data("clean/cprr_lafayette_so_2015_2020.csv"), index=False)
+    df14.to_csv(deba.data("clean/cprr_lafayette_so_2009_2014.csv"), index=False)
+    df08.to_csv(deba.data("clean/cprr_lafayette_so_2006_2008.csv"), index=False)

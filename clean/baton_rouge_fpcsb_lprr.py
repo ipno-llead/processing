@@ -1,4 +1,4 @@
-from lib.path import data_file_path, ensure_data_dir
+import deba
 from lib.rows import duplicate_row
 from lib.clean import clean_names, standardize_desc_cols
 from lib.standardize import standardize_from_lookup_table
@@ -8,14 +8,11 @@ import pandas as pd
 import io
 import re
 import datetime
-import sys
-
-sys.path.append("../")
 
 
 def realign():
     with open(
-        data_file_path("raw/baton_rouge_fpcsb/baton_rouge_fpcsb_logs_1992-2012.csv"),
+        deba.data("raw/baton_rouge_fpcsb/baton_rouge_fpcsb_logs_1992-2012.csv"),
         "r",
         encoding="latin-1",
     ) as f:
@@ -161,7 +158,7 @@ def add_missing_year_to_hearing_date(df):
     df.loc[df.appeal_hearing_date == "Dec", "appeal_hearing_date"] = "2003-12"
     df.loc[df.appeal_hearing_date == "June", "appeal_hearing_date"] = "2007-06"
 
-    return df.drop(columns='hearing_date')
+    return df.drop(columns="hearing_date")
 
 
 def split_row_by_appeal_hearing_date(df):
@@ -327,7 +324,7 @@ def split_appellant_names(df):
     df.loc[:, "middle_name"] = (
         names.loc[:, 1].fillna("").map(lambda s: "" if len(s) < 2 else s)
     )
-    df.loc[:, "middle_initial"] = names.loc[:, 1].fillna("").map(lambda s: s[:1])
+    df.loc[:, "middle_name"] = names.loc[:, 1].fillna("").map(lambda s: s[:1])
 
     df = df.drop(columns="appellant")
 
@@ -505,7 +502,6 @@ def condense_rows_with_same_docket_no(df):
                 or row1.counsel != row2.counsel
                 or row1.last_name != row2.last_name
                 or row1.middle_name != row2.middle_name
-                or row1.middle_initial != row2.middle_initial
                 or row1.first_name != row2.first_name
                 or row1.rank_desc != row2.rank_desc
                 or (
@@ -554,7 +550,7 @@ def clean():
         .rename(columns={"action": "action_appealed"})
         .pipe(
             gen_uid,
-            ["agency", "first_name", "last_name", "middle_name", "middle_initial"],
+            ["agency", "first_name", "last_name", "middle_name"],
         )
         .pipe(gen_uid, ["uid", "docket_no"], "appeal_uid")
         .pipe(
@@ -574,5 +570,5 @@ def clean():
 
 if __name__ == "__main__":
     df = clean()
-    ensure_data_dir("clean")
-    df.to_csv(data_file_path("clean/lprr_baton_rouge_fpcsb_1992_2012.csv"), index=False)
+
+    df.to_csv(deba.data("clean/lprr_baton_rouge_fpcsb_1992_2012.csv"), index=False)

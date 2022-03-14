@@ -1,12 +1,8 @@
-import sys
-
 from datamatch import ThresholdMatcher, JaroWinklerSimilarity, ColumnsIndex
 import pandas as pd
 
-from lib.path import data_file_path, ensure_data_dir
+import deba
 from lib.post import extract_events_from_post, load_for_agency
-
-sys.path.append("../")
 
 
 def match_pprr_post(pprr, post):
@@ -29,16 +25,16 @@ def match_pprr_post(pprr, post):
     )
     decision = 0.9
     matcher.save_pairs_to_excel(
-        data_file_path("match/grand_isle_pd_pprr_2021_v_post.xlsx"), decision
+        deba.data("match/grand_isle_pd_pprr_2021_v_post.xlsx"), decision
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
     return extract_events_from_post(post, matches, "Grand Isle PD")
 
 
 if __name__ == "__main__":
-    pprr = pd.read_csv(data_file_path("clean/pprr_grand_isle_pd_2021.csv"))
+    pprr = pd.read_csv(deba.data("clean/pprr_grand_isle_pd_2021.csv"))
     agency = pprr.agency[0]
-    post = load_for_agency("clean/pprr_post_2020_11_06.csv", agency)
+    post = load_for_agency(agency)
     post_event = match_pprr_post(pprr, post)
-    ensure_data_dir("match")
-    post_event.to_csv(data_file_path("match/post_event_grand_isle_pd.csv"), index=False)
+
+    post_event.to_csv(deba.data("match/post_event_grand_isle_pd.csv"), index=False)

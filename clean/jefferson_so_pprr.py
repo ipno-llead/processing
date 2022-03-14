@@ -1,7 +1,4 @@
-import sys
-
-sys.path.append("../")
-from lib.path import data_file_path
+import deba
 import pandas as pd
 from lib.columns import clean_column_names, set_values
 from lib.uid import gen_uid
@@ -283,9 +280,7 @@ def clean_rank_descriptions(df):
 
 def clean():
     df = (
-        pd.read_csv(
-            data_file_path("raw/jefferson_so/jefferson_parish_so_pprr_2020.csv")
-        )
+        pd.read_csv(deba.data("raw/jefferson_so/jefferson_parish_so_pprr_2020.csv"))
         .pipe(clean_column_names)
         .pipe(clean_district_desc)
         .pipe(split_names)
@@ -303,4 +298,4 @@ def clean():
 
 if __name__ == "__main__":
     df = clean()
-    df.to_csv(data_file_path("clean/pprr_jefferson_so_2020.csv"), index=False)
+    df.to_csv(deba.data("clean/pprr_jefferson_so_2020.csv"), index=False)

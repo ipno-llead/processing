@@ -1,7 +1,4 @@
-import sys
-
-sys.path.append("../")
-from lib.path import data_file_path
+import deba
 from lib.columns import clean_column_names, set_values
 from lib.clean import standardize_desc_cols, clean_dates, clean_salaries
 import pandas as pd
@@ -46,7 +43,7 @@ def clean_race(df):
 
 def clean():
     df = (
-        pd.read_csv(data_file_path("raw/gonzales_pd/gonzales_pd_pprr_2010_2021.csv"))
+        pd.read_csv(deba.data("raw/gonzales_pd/gonzales_pd_pprr_2010_2021.csv"))
         .pipe(clean_column_names)
         .rename(
             columns={
@@ -71,4 +68,4 @@ def clean():
 
 if __name__ == "__main__":
     df = clean()
-    df.to_csv(data_file_path("clean/pprr_gonzales_pd_2010_2021.csv"), index=False)
+    df.to_csv(deba.data("clean/pprr_gonzales_pd_2010_2021.csv"), index=False)

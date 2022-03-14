@@ -1,8 +1,5 @@
-import sys
-
-sys.path.append("../")
 import pandas as pd
-from lib.path import data_file_path
+import deba
 from lib.columns import clean_column_names, set_values
 from lib.clean import standardize_desc_cols, clean_dates
 from lib.uid import gen_uid
@@ -66,12 +63,8 @@ def split_name(df):
     df.loc[:, "first_name"] = names[1].fillna("")
     df.loc[:, "last_name"] = names[0].fillna("")
     df.loc[:, "suffixes"] = names[2].fillna("")
-    df.loc[:, "middle_name"] = (
-        names.loc[:, 3].str.strip().fillna("").map(lambda s: "" if len(s) < 3 else s)
-    )
-    df.loc[:, "middle_initial"] = (
-        names.loc[:, 3].str.strip().fillna("").map(lambda s: "" if len(s) > 1 else s)
-    )
+    df.loc[:, "middle_name"] = names[3]
+
     df.loc[:, "last_name"] = df.last_name.fillna("") + " " + df.suffixes.fillna("")
     return df.drop(columns={"suffixes", "name"})
 
@@ -90,7 +83,7 @@ def assign_agency(df):
 
 
 def clean():
-    df = pd.read_csv(data_file_path("raw/plaquemines_so/plaqumines_so_pprr_2018.csv"))
+    df = pd.read_csv(deba.data("raw/plaquemines_so/plaqumines_so_pprr_2018.csv"))
     df = (
         df.pipe(clean_column_names)
         .rename(columns={"emp_type": "employment_status"})
@@ -103,7 +96,7 @@ def clean():
         .pipe(set_values, {"agency": "Plaquemines SO"})
         .pipe(
             gen_uid,
-            ["first_name", "middle_initial", "middle_name", "last_name", "agency"],
+            ["first_name", "middle_name", "last_name", "agency"],
         )
     )
     return df
@@ -111,4 +104,4 @@ def clean():
 
 if __name__ == "__main__":
     df = clean()
-    df.to_csv(data_file_path("clean/pprr_plaquemines_so_2018.csv"), index=False)
+    df.to_csv(deba.data("clean/pprr_plaquemines_so_2018.csv"), index=False)

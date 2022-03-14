@@ -1,12 +1,9 @@
 from lib.columns import clean_column_names
-from lib.path import data_file_path, ensure_data_dir
+import deba
 from lib.clean import float_to_int_str, standardize_desc_cols, clean_sexes, clean_races
 from lib.uid import gen_uid
 import pandas as pd
 import numpy as np
-import sys
-
-sys.path.append("../")
 
 
 def clean_trailing_empty_time(df, cols):
@@ -43,9 +40,7 @@ def discard_negative_officer_years_exp(df):
 
 
 def clean():
-    df = pd.read_csv(
-        data_file_path("raw/ipm/new_orleans_pd_use_of_force_2012-2019.csv")
-    )
+    df = pd.read_csv(deba.data("raw/ipm/new_orleans_pd_use_of_force_2012-2019.csv"))
     df = df.dropna(axis=1, how="all")
     df = clean_column_names(df)
     df = df.drop(
@@ -186,5 +181,5 @@ def clean():
 
 if __name__ == "__main__":
     df = clean()
-    ensure_data_dir("clean")
-    df.to_csv(data_file_path("clean/uof_new_orleans_pd_2012_2019.csv"), index=False)
+
+    df.to_csv(deba.data("clean/uof_new_orleans_pd_2012_2019.csv"), index=False)

@@ -1,4 +1,4 @@
-from lib.path import data_file_path
+import deba
 from lib.columns import clean_column_names
 from lib.clean import (
     clean_races,
@@ -10,9 +10,6 @@ from lib.clean import (
 )
 from lib.uid import gen_uid
 import pandas as pd
-import sys
-
-sys.path.append("../")
 
 
 def remove_badge_number_zeroes_prefix(df):
@@ -34,11 +31,6 @@ def strip_time_from_dates(df, cols):
             .str.replace(r" \d+:.+", "", regex=True)
             .str.replace(r"(\d{4})-(\d{2})-(\d{2})", r"\2/\3/\1", regex=True)
         )
-    return df
-
-
-def generate_middle_initial(df):
-    df.loc[:, "middle_initial"] = df.middle_name.map(lambda x: x[:1])
     return df
 
 
@@ -82,10 +74,11 @@ def clean_rank_desc(df):
         df.rank_desc.str.lower()
         .str.strip()
         .str.replace(".", "", regex=False)
+        .str.replace(r' ?investigative special$', '', regex=True)
         .str.replace(r" ?police", "", regex=True)
         .str.replace(r"dec$", "decree", regex=True)
-        .str.replace("supt", "superintendent", regex=False)
-        .str.replace(r"\bdev(e)?\b", "development", regex=True)
+        .str.replace(r"supt", "superintendent", regex=False)
+        .str.replace(r"\bdev(e)?\b", "developer", regex=True)
         .str.replace(",", " ", regex=False)
         .str.replace(r"iv$", "", regex=True)
         .str.replace(r" ?-", " ", regex=True)
@@ -94,13 +87,12 @@ def clean_rank_desc(df):
         .str.replace(r"sup(v)?$", "supervisor", regex=True)
         .str.replace(r"\basst\b", "assistant", regex=True)
         .str.replace(" ?sr", "senior", regex=True)
-        .str.replace(r" ?mgr", "manager", regex=True)
+        .str.replace(r" ?mgr", " manager", regex=True)
         .str.replace(" academy", "", regex=False)
         .str.replace(r" \boff\b ?", " officer", regex=True)
         .str.replace(r" of$", "", regex=True)
-        .str.replace(r" analyt?", "analyst", regex=True)
         .str.replace(r"(3|4|&|5)", "", regex=True)
-        .str.replace(" coor", " coordinator", regex=False)
+        .str.replace(r" \bcoor\b", " coordinator", regex=True)
         .str.replace(r"\bopr\b", "operations", regex=True)
         .str.replace("default", "", regex=False)
         .str.replace(r"\bspec\b", "specialist", regex=True)
@@ -108,16 +100,31 @@ def clean_rank_desc(df):
         .str.replace(r"\bprog\b", "program", regex=True)
         .str.replace(r"\btech\b", "technician", regex=True)
         .str.replace("applic", "application", regex=False)
-        .str.replace(r"^admin", "administrative", regex=True)
         .str.replace(r" \(nopd\)$", "", regex=True)
         .str.replace("cnslr", "counseler", regex=False)
-        .str.replace("info", "information,", regex=False)
+        .str.replace(r"\binfo\b", "information,", regex=True)
+        .str.replace('  ', ' ', regex=False)
+        .str.replace(r'awards coord \( dept\)', 'awards coordinator', regex=True)
+        .str.replace(r'information?\,?', 'information', regex=True)
+        .str.replace(r'\binstru\b', 'instructor', regex=True)
+        .str.replace(r"\badmini?n?s?t?r?a?t?i?v?e?\b", "admin", regex=True)
+        .str.replace(r'\bcouns\b', 'counselor', regex=True)
+        .str.replace(r'\bfield\b', '', regex=True)
+        .str.replace(r'\(eis\)', '', regex=True)
+        .str.replace(r'\banalyt?\b', 'analyst', regex=True)
+        .str.replace(r'\bse$', '', regex=True)
+        .str.replace(r'\bapp inv a\b', '', regex=True)
+        .str.replace(r' \bex\b ', '', regex=True)
+        .str.replace(r'\bsup sup\b', '', regex=True)
+        .str.replace(r'operations$', 'operator', regex=True)
+        .str.replace(r'^unknown rank$', '', regex=True)
+        .str.replace(r'^dna analyst senior$', 'senior dna analyst', regex=True)
     )
     return df
 
 
 def clean():
-    df = pd.read_csv(data_file_path("raw/ipm/new_orleans_iapro_pprr_1946-2018.csv"))
+    df = pd.read_csv(deba.data("raw/ipm/new_orleans_iapro_pprr_1946-2018.csv"))
     df = df.dropna(axis=1, how="all")
     df = clean_column_names(df)
     print(df.columns.tolist())
@@ -161,11 +168,10 @@ def clean():
         .pipe(clean_dates, ["hire_date", "left_date", "dept_date"])
         .pipe(clean_names, ["first_name", "middle_name", "last_name"])
         .pipe(remove_unnamed_officers)
-        .pipe(generate_middle_initial)
         .pipe(clean_current_supervisor)
     )
 
 
 if __name__ == "__main__":
     df = clean()
-    df.to_csv(data_file_path("clean/pprr_new_orleans_ipm_iapro_1946_2018.csv"), index=False)
+    df.to_csv(deba.data("clean/pprr_new_orleans_ipm_iapro_1946_2018.csv"), index=False)

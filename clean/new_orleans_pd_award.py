@@ -1,11 +1,8 @@
 from lib.columns import clean_column_names, set_values
 from lib.uid import gen_uid
-from lib.path import data_file_path, ensure_data_dir
+import deba
 from lib.clean import standardize_desc_cols, clean_ranks
 import pandas as pd
-import sys
-
-sys.path.append("../")
 
 
 def extract_rank(df):
@@ -64,12 +61,7 @@ def split_award_nominee_name(df):
     names = df.nominee.str.lower().str.strip().str.extract(r"((\w+) (\w+ )?(.+))")
     df.loc[:, "first_name"] = names[1].str.strip()
     df.loc[:, "last_name"] = names[3].str.strip()
-    df.loc[:, "middle_name"] = (
-        names.loc[:, 2].str.strip().fillna("").map(lambda s: "" if len(s) < 2 else s)
-    )
-    df.loc[:, "middle_initial"] = (
-        names.loc[:, 2].str.strip().fillna("").map(lambda s: "" if len(s) > 1 else s)
-    )
+    df.loc[:, "middle_name"] = names[2]
     return df.drop(columns={"nominee"})
 
 
@@ -84,7 +76,7 @@ def split_award_nominator_name(df):
     df.loc[:, "nominator_badge_no"] = attributes[0]
     df.loc[:, "nominator_last_name"] = attributes[1]
     df.loc[:, "nominator_first_name"] = attributes[2]
-    df.loc[:, "nominator_middle_initial"] = attributes[3]
+    df.loc[:, "nominator_middle_name"] = attributes[3]
     df.loc[:, "nominator_rank_desc"] = (
         attributes[4]
         .fillna("")
@@ -145,9 +137,7 @@ def remove_future_dates(df):
 
 
 def clean():
-    df = pd.read_csv(
-        data_file_path("raw/ipm/new_orleans_pd_commendations_2016_2021.csv")
-    )
+    df = pd.read_csv(deba.data("raw/ipm/new_orleans_pd_commendations_2016_2021.csv"))
     df = (
         df.pipe(clean_column_names)
         .drop(columns={"item_number"})
@@ -182,5 +172,5 @@ def clean():
 
 if __name__ == "__main__":
     award = clean()
-    ensure_data_dir("clean")
-    award.to_csv(data_file_path("clean/award_new_orleans_pd_2016_2021.csv"), index=False)
+
+    award.to_csv(deba.data("clean/award_new_orleans_pd_2016_2021.csv"), index=False)

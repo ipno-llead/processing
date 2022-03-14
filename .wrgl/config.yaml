@@ -127,10 +127,6 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/clean-pprr-st-tammany-so-2020
     fetch:
       - +refs/heads/*:refs/remotes/clean-pprr-st-tammany-so-2020/*
-  clean-uof-new-orleans-pd-2012-2019:
-    url: https://hub.wrgl.co/api/users/ipno/repos/clean-uof-new-orleans-pd-2012-2019
-    fetch:
-      - +refs/heads/*:refs/remotes/clean-uof-new-orleans-pd-2012-2019/*
   com-abbeville-pd:
     url: https://hub.wrgl.co/api/users/ipno/repos/com-abbeville-pd
     fetch:
@@ -251,6 +247,10 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/com-acadia-so
     fetch:
       - +refs/heads/*:refs/remotes/com-acadia-so/*
+  com-rayne-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/com-rayne-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/com-rayne-pd/*
   com-west-monroe-pd:
     url: https://hub.wrgl.co/api/users/ipno/repos/com-west-monroe-pd
     fetch:
@@ -267,6 +267,18 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/com-benton-pd
     fetch:
       - +refs/heads/*:refs/remotes/com-benton-pd/*
+  com-eunice-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/com-eunice-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/com-eunice-pd/*
+  com-st-john-so:
+    url: https://hub.wrgl.co/api/users/ipno/repos/com-st-john-so
+    fetch:
+      - +refs/heads/*:refs/remotes/com-st-john-so/*
+  com-lafourche-so:
+    url: https://hub.wrgl.co/api/users/ipno/repos/com-lafourche-so
+    fetch:
+      - +refs/heads/*:refs/remotes/com-lafourche-so/*
   event:
     url: https://hub.wrgl.co/api/users/ipno/repos/event
     fetch:
@@ -455,16 +467,20 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/event-acadia-so
     fetch:
       - +refs/heads/*:refs/remotes/event-acadia-so/*
+  event-rayne-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/event-rayne-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/event-rayne-pd/*
   event-erath-pd:
     url: https://hub.wrgl.co/api/users/ipno/repos/event-erath-pd
     fetch:
       - +refs/heads/*:refs/remotes/event-erath-pd*
   event-st-landry-so:
-    url: https://hub.wrgl.co/api/users/ipno/repos/st-landry-so
+    url: https://hub.wrgl.co/api/users/ipno/repos/event-st-landry-so
     fetch:
       - +refs/heads/*:refs/remotes/event-st-landry-so/*
   event-benton-pd:
-    url: https://hub.wrgl.co/api/users/ipno/repos/benton-pd
+    url: https://hub.wrgl.co/api/users/ipno/repos/event-benton-pd
     fetch:
       - +refs/heads/*:refs/remotes/event-benton-pd/*
   event-new-orleans-da:
@@ -475,6 +491,18 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/event-ouachita-da
     fetch:
       - +refs/heads/*:refs/remotes/event-ouachita-da/*
+  event-eunice-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/event-eunice-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/event-eunice-pd*
+  event-st-john-so:
+    url: https://hub.wrgl.co/api/users/ipno/repos/event-st-john-so
+    fetch:
+      - +refs/heads/*:refs/remotes/event-st-john-so/*
+  event-lafourche-so:
+    url: https://hub.wrgl.co/api/users/ipno/repos/event-lafourche-so
+    fetch:
+      - +refs/heads/*:refs/remotes/event-lafourche-so/*
   match-brusly-pd-2020:
     url: https://hub.wrgl.co/api/users/ipno/repos/match-brusly-pd-2020
     fetch:
@@ -755,6 +783,30 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/per-benton-pd
     fetch:
       - +refs/heads/*:refs/remotes/per-benton-pd/*
+  per-eunice-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/per-eunice-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/per-eunice-pd/*
+  per-rayne-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/per-rayne-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/per-rayne-pd/*
+  award-lafayette-so:
+    url: https://hub.wrgl.co/api/users/ipno/repos/award-lafayette-so
+    fetch:
+      - +refs/heads/*:refs/remotes/award-lafayette-so/*
+  award:
+    url: https://hub.wrgl.co/api/users/ipno/repos/award
+    fetch:
+      - +refs/heads/*:refs/remotes/award/*
+  per-st-john-so:
+    url: https://hub.wrgl.co/api/users/ipno/repos/per-st-john-so
+    fetch:
+      - +refs/heads/*:refs/remotes/per-st-john-so/*
+  per-lafourche-so:
+    url: https://hub.wrgl.co/api/users/ipno/repos/per-lafourche-so
+    fetch:
+      - +refs/heads/*:refs/remotes/per-lafourche-so/*
   person:
     url: https://hub.wrgl.co/api/users/ipno/repos/person
     fetch:
@@ -779,6 +831,14 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/uof-new-orleans-pd
     fetch:
       - +refs/heads/*:refs/remotes/uof-new-orleans-pd/*
+  uof-citizens-new-orleans-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/uof-citizens-new-orleans-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/uof-citizens-new-orleans-pd/*
+  uof-officers-new-orleans-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/uof-officers-new-orleans-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/uof-officers-new-orleans-pd/*
   use-of-force:
     url: https://hub.wrgl.co/api/users/ipno/repos/use-of-force
     fetch:
@@ -787,6 +847,14 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/brady-list
     fetch:
       - +refs/heads/*:refs/remotes/brady-list/*
+  use-of-force-officers:
+    url: https://hub.wrgl.co/api/users/ipno/repos/use-of-force-officers
+    fetch:
+      - +refs/heads/*:refs/remotes/use-of-force-officers/*
+  use-of-force-citizens:
+    url: https://hub.wrgl.co/api/users/ipno/repos/use-of-force-citizens
+    fetch:
+      - +refs/heads/*:refs/remotes/use-of-force-citizens/*
 branch:
   allegation:
     remote: allegation
@@ -924,10 +992,6 @@ branch:
     remote: clean-pprr-st-tammany-so-2020
     merge: refs/heads/main
     file: data/clean/pprr_st_tammany_so_2020.csv
-  clean-uof-new-orleans-pd-2012-2019:
-    remote: clean-uof-new-orleans-pd-2012-2019
-    merge: refs/heads/main
-    file: data/clean/uof_new_orleans_pd_2012_2019.csv
   com-abbeville-pd:
     remote: com-abbeville-pd
     merge: refs/heads/main
@@ -1108,6 +1172,10 @@ branch:
     file: data/fuse/com_acadia_so.csv
     primaryKey:
       - allegation_uid
+  com-rayne-pd:
+    remote: com-rayne-pd
+    merge: refs/heads/main
+    file: data/fuse/com_rayne_pd.csv
   com-west-monroe-pd:
     remote: com-west-monroe-pd
     merge: refs/heads/main
@@ -1130,6 +1198,24 @@ branch:
     remote: com-benton-pd
     merge: refs/heads/main
     file: data/fuse/com_benton_pd.csv
+    primaryKey:
+      - allegation_uid
+  com-eunice-pd:
+    remote: com-eunice-pd
+    merge: refs/heads/main
+    file: data/fuse/com_eunice_pd.csv
+    primaryKey:
+      - allegation_uid
+  com-st-john-so:
+    remote: com-st-john-soo
+    merge: refs/heads/main
+    file: data/fuse/com_st_john_so.csv
+    primaryKey:
+      - allegation_uid
+  com-lafourche-so:
+    remote: com-lafourche-so
+    merge: refs/heads/main
+    file: data/fuse/com_lafourche_so.csv
     primaryKey:
       - allegation_uid
   event:
@@ -1419,7 +1505,7 @@ branch:
     merge: refs/heads/main
     file: data/fuse/event_erath_pd.csv
     primaryKey:
-      - event_uid 
+      - event_uid
   event-st-landry-so:
     remote: event-st-landry-so
     merge: refs/heads/main
@@ -1442,6 +1528,28 @@ branch:
     remote: event-ouachita-da
     merge: refs/heads/main
     file: data/fuse/event_ouachita_da.csv
+  event-eunice-pd:
+    remote: event-eunice-pd
+    merge: refs/heads/main
+    file: data/fuse/event_eunice_pd.csv
+    primaryKey:
+      - event_uid
+  event-rayne-pd:
+    remote: event-rayne-pd
+    merge: refs/heads/main
+    file: data/fuse/event_rayne_pd.csv
+    primaryKey:
+      - event_uid
+  event-st-john-so:
+    remote: event-st-john-so
+    merge: refs/heads/main
+    file: data/fuse/event_st_john_so.csv
+    primaryKey:
+      - event_uid
+  event-lafourche-so:
+    remote: event-lafourche-so
+    merge: refs/heads/main
+    file: data/fuse/event_lafourche_so.csv
     primaryKey:
       - event_uid
   match-brusly-pd-2020:
@@ -1838,10 +1946,58 @@ branch:
     file: data/fuse/brady_tangipahoa_da.csv
     primaryKey:
       - brady_uid
+  per-eunice-pd:
+    remote: per-eunice-pd
+    merge: refs/heads/main
+    file: data/fuse/per_eunice_pd.csv
+    primaryKey:
+      - uid
+  per-rayne-pd:
+    remote: per-rayne-pd
+    merge: refs/heads/main
+    file: data/fuse/per_rayne_pd.csv
+    primaryKey:
+      - uid
+  award-lafayette-so:
+    remote: award-lafayette-so
+    merge: refs/heads/main
+    file: data/fuse/award_lafayette_so.csv
+    primaryKey:
+      - award_uid
+  award:
+    remote: award
+    merge: refs/heads/main
+    file: data/fuse/award.csv
+    primaryKey:
+      - award_uid
+  per-st-john-so:
+    remote: per-st-john-so
+    merge: refs/heads/main
+    file: data/fuse/per_st_john_so.csv
+    primaryKey:
+      - uid
+  per-lafourche-so:
+    remote: per-lafourche-so
+    merge: refs/heads/main
+    file: data/fuse/per_lafourche_so.csv
+    primaryKey:
+      - uid
+  uof-citizens-new-orleans-pd:
+    remote: uof-citizens-new-orleans-pd
+    merge: refs/heads/main
+    file: data/fuse/uof_citizens_new_orleans_pd.csv
+    primaryKey:
+      - uof_citizen_uid
+  uof-officers-new-orleans-pd:
+    remote: uof-officers-new-orleans-pd
+    merge: refs/heads/main
+    file: data/fuse/uof_officers_new_orleans_pd.csv
+    primaryKey:
+      - uid
   person:
     remote: person
     merge: refs/heads/main
-    file: data/match/person.csv
+    file: data/fuse/person.csv
     primaryKey:
       - person_id
   personnel:
@@ -1886,5 +2042,17 @@ branch:
     file: data/fuse/brady_list.csv
     primaryKey:
       - brady_uid
+  use-of-force-officers:
+    remote: use-of-force-officers
+    merge: refs/heads/main
+    file: data/fuse/uof_officers.csv
+    primaryKey:
+      - uof_uid
+  use-of-force-citizens:
+    remote: use-of-force-citizens
+    merge: refs/heads/main
+    file: data/fuse/uof_citizens.csv
+    primaryKey:
+      - uof_citizen_uid
 merge:
   fastForward: only

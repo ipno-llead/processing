@@ -1,5 +1,3 @@
-import sys
-
 from datamatch import (
     ThresholdMatcher,
     JaroWinklerSimilarity,
@@ -8,15 +6,13 @@ from datamatch import (
 )
 import pandas as pd
 
-from lib.path import data_file_path, ensure_data_dir
+import deba
 from lib.date import combine_date_columns
 from lib.post import (
     extract_events_from_post,
     extract_events_from_cprr_post,
     load_for_agency,
 )
-
-sys.path.append("../")
 
 
 def match_pprr_against_post(pprr, post):
@@ -50,7 +46,7 @@ def match_pprr_against_post(pprr, post):
     )
     decision = 0.793
     matcher.save_pairs_to_excel(
-        data_file_path("match/caddo_parish_so_pprr_2020_v_post.xlsx"), decision
+        deba.data("match/caddo_parish_so_pprr_2020_v_post.xlsx"), decision
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
     return extract_events_from_post(post, matches, "Caddo SO")
@@ -80,7 +76,7 @@ def extract_cprr_post_events(pprr, cprr_post):
     )
     decision = 0.95
     matcher.save_pairs_to_excel(
-        data_file_path("match/pprr_caddo_parish_so_2020_v_cprr_post_2016_2019.xlsx"),
+        deba.data("match/pprr_caddo_parish_so_2020_v_cprr_post_2016_2019.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
@@ -88,16 +84,14 @@ def extract_cprr_post_events(pprr, cprr_post):
 
 
 if __name__ == "__main__":
-    pprr = pd.read_csv(data_file_path("clean/pprr_caddo_parish_so_2020.csv"))
+    pprr = pd.read_csv(deba.data("clean/pprr_caddo_parish_so_2020.csv"))
     agency = pprr.agency[0]
-    post = load_for_agency("clean/pprr_post_2020_11_06.csv", agency)
-    cprr_post = pd.read_csv(data_file_path("match/cprr_post_2016_2019.csv"))
+    post = load_for_agency(agency)
+    cprr_post = pd.read_csv(deba.data("match/cprr_post_2016_2019.csv"))
     post_event = match_pprr_against_post(pprr, post)
     cprr_post_event = extract_cprr_post_events(pprr, cprr_post)
-    ensure_data_dir("match")
-    post_event.to_csv(
-        data_file_path("match/post_event_caddo_parish_so.csv"), index=False
-    )
+
+    post_event.to_csv(deba.data("match/post_event_caddo_parish_so.csv"), index=False)
     cprr_post_event.to_csv(
-        data_file_path("match/cprr_post_event_caddo_parish_so.csv"), index=False
+        deba.data("match/cprr_post_event_caddo_parish_so.csv"), index=False
     )

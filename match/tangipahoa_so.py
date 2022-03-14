@@ -1,10 +1,8 @@
-import sys
-
-sys.path.append("../")
 import pandas as pd
 from datamatch import ThresholdMatcher, JaroWinklerSimilarity, ColumnsIndex
-from lib.path import data_file_path
+import deba
 from lib.post import load_for_agency
+from lib.clean import canonicalize_officers
 
 
 def deduplicate_cprr_officers(cprr):
@@ -21,29 +19,12 @@ def deduplicate_cprr_officers(cprr):
     )
     decision = 0.866
     matcher.save_clusters_to_excel(
-        data_file_path("match/tangipahoa_so_cprr_2015_2021_deduplicate.xlsx"),
+        deba.data("match/tangipahoa_so_cprr_2015_2021_deduplicate.xlsx"),
         decision,
         decision,
     )
     clusters = matcher.get_index_clusters_within_thresholds(decision)
-    # canonicalize name and uid
-    for cluster in clusters:
-        uid, first_name, last_name = None, "", ""
-        for idx in cluster:
-            row = df.loc[idx]
-            if (
-                uid is None
-                or len(row.first_name) > len(first_name)
-                or (
-                    len(row.first_name) == len(first_name)
-                    and len(row.last_name) > len(last_name)
-                )
-            ):
-                uid, first_name, last_name = idx, row.first_name, row.last_name
-        cprr.loc[cprr.uid.isin(cluster), "uid"] = uid
-        cprr.loc[cprr.uid == uid, "first_name"] = first_name
-        cprr.loc[cprr.uid == uid, "last_name"] = last_name
-    return cprr
+    return canonicalize_officers(cprr, clusters)
 
 
 def match_cprr_post(cprr, post):
@@ -66,9 +47,7 @@ def match_cprr_post(cprr, post):
     )
     decision = 0.873
     matcher.save_pairs_to_excel(
-        data_file_path(
-            "match/tangipahoa_so_cprr_2015_2021_v_pprr_post_2020_11_06.xlsx"
-        ),
+        deba.data("match/tangipahoa_so_cprr_2015_2021_v_pprr_post_2020_11_06.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(decision)
@@ -79,9 +58,9 @@ def match_cprr_post(cprr, post):
 
 
 if __name__ == "__main__":
-    cprr = pd.read_csv(data_file_path("clean/cprr_tangipahoa_so_2015_2021.csv"))
+    cprr = pd.read_csv(deba.data("clean/cprr_tangipahoa_so_2015_2021.csv"))
     agency = cprr.agency[0]
-    post = load_for_agency("clean/pprr_post_2020_11_06.csv", agency)
+    post = load_for_agency(agency)
     cprr = deduplicate_cprr_officers(cprr)
     cprr = match_cprr_post(cprr, post)
-    cprr.to_csv(data_file_path("match/cprr_tangipahoa_so_2015_2021.csv"), index=False)
+    cprr.to_csv(deba.data("match/cprr_tangipahoa_so_2015_2021.csv"), index=False)

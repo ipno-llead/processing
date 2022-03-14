@@ -1,8 +1,5 @@
-import sys
-
-sys.path.append("../")
 import pandas as pd
-from lib.path import data_file_path
+import deba
 from lib.columns import clean_column_names, set_values
 from lib.uid import gen_uid
 from lib.clean import clean_salaries
@@ -41,7 +38,7 @@ def split_name(df):
     df.loc[:, "last_name"] = names[0]
     df.loc[:, "suffix"] = names[1].fillna("")
     df.loc[:, "first_name"] = names[2]
-    df.loc[:, "middle_initial"] = names[3].str.replace(r"\.", "", regex=True).fillna("")
+    df.loc[:, "middle_name"] = names[3].str.replace(r"\.", "", regex=True).fillna("")
     df.loc[:, "last_name"] = df.last_name.str.cat(df.suffix, sep=" ")
     return df.drop(columns=["name_of_officer", "suffix"])
 
@@ -53,7 +50,7 @@ def assign_agency(df):
 
 def clean():
     df = (
-        pd.read_csv(data_file_path("raw/central_csd/central_csd_pprr_2014_2019.csv"))
+        pd.read_csv(deba.data("raw/central_csd/central_csd_pprr_2014_2019.csv"))
         .pipe(clean_column_names)
         .drop(columns=["sadge_number", "hourty_rate"])
         .rename(columns={"date_of_hire": "hire_date"})
@@ -63,7 +60,7 @@ def clean():
         .pipe(assign_agency)
         .pipe(clean_salaries, ["salary"])
         .pipe(set_values, {"salary_freq": salary.YEARLY})
-        .pipe(gen_uid, ["last_name", "first_name", "middle_initial", "agency"])
+        .pipe(gen_uid, ["last_name", "first_name", "middle_name", "agency"])
         .drop_duplicates(subset=["hire_date", "uid"], keep="first")
     )
     return df
@@ -71,4 +68,4 @@ def clean():
 
 if __name__ == "__main__":
     df = clean()
-    df.to_csv(data_file_path("clean/pprr_central_csd_2014_2019.csv"), index=False)
+    df.to_csv(deba.data("clean/pprr_central_csd_2014_2019.csv"), index=False)

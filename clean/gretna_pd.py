@@ -1,14 +1,10 @@
-import sys
-
 import pandas as pd
 
 from lib.columns import clean_column_names, set_values
-from lib.path import data_file_path, ensure_data_dir
+import deba
 from lib.clean import clean_names, clean_salaries, clean_dates, standardize_desc_cols
 from lib.uid import gen_uid
 from lib import salary
-
-sys.path.append("../")
 
 
 def split_names(df):
@@ -24,7 +20,6 @@ def split_names(df):
     df.loc[:, "first_name"] = names[1]
     df.loc[:, "middle_name"] = names[2]
     df.loc[:, "last_name"] = names[0]
-    df.loc[:, "middle_initial"] = names[2].fillna("").map(lambda x: x[:1])
     return df[df.name.notna()].reset_index(drop=True).drop(columns=["name"])
 
 
@@ -46,7 +41,7 @@ def clean_rank_desc(df):
 
 def clean():
     return (
-        pd.read_csv(data_file_path("raw/gretna_pd/gretna_pd_pprr_2018.csv"))
+        pd.read_csv(deba.data("raw/gretna_pd/gretna_pd_pprr_2018.csv"))
         .pipe(clean_column_names)
         .rename(
             columns={
@@ -68,5 +63,5 @@ def clean():
 
 if __name__ == "__main__":
     df = clean()
-    ensure_data_dir("clean")
-    df.to_csv(data_file_path("clean/pprr_gretna_pd_2018.csv"), index=False)
+
+    df.to_csv(deba.data("clean/pprr_gretna_pd_2018.csv"), index=False)

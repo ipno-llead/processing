@@ -1,5 +1,3 @@
-import sys
-
 import pandas as pd
 from datamatch import (
     ThresholdMatcher,
@@ -14,9 +12,7 @@ from lib.post import (
     load_for_agency,
 )
 from lib.date import combine_date_columns
-from lib.path import data_file_path
-
-sys.path.append("../")
+import deba
 
 
 def extract_post_events(pprr, post):
@@ -46,7 +42,7 @@ def extract_post_events(pprr, post):
     )
     decision = 0.89
     matcher.save_pairs_to_excel(
-        data_file_path("match/kenner_pd_pprr_2020_v_post_pprr_2020_11_06.xlsx"),
+        deba.data("match/kenner_pd_pprr_2020_v_post_pprr_2020_11_06.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
@@ -55,11 +51,11 @@ def extract_post_events(pprr, post):
 
 
 def match_uof_pprr(uof, ppprr):
-    dfa = uof[["uid", "first_name", "last_name", "middle_initial"]]
+    dfa = uof[["uid", "first_name", "last_name", "middle_name"]]
     dfa = dfa.drop_duplicates(subset=["uid"]).set_index("uid")
     dfa.loc[:, "fc"] = dfa.first_name.fillna("").map(lambda x: x[:1])
 
-    dfb = pprr[["uid", "first_name", "last_name", "middle_initial"]]
+    dfb = pprr[["uid", "first_name", "last_name", "middle_name"]]
     dfb = dfb.drop_duplicates(subset=["uid"]).set_index("uid")
     dfb.loc[:, "fc"] = dfb.first_name.fillna("").map(lambda x: x[:1])
 
@@ -74,7 +70,7 @@ def match_uof_pprr(uof, ppprr):
     )
     decision = 0.98
     matcher.save_pairs_to_excel(
-        data_file_path("match/kenner_pd_uof_2005_2021_v_pprr_post_2020_11_06.xlsx"),
+        deba.data("match/kenner_pd_uof_2005_2021_v_pprr_post_2020_11_06.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(decision)
@@ -108,7 +104,7 @@ def extract_cprr_post_events(pprr, cprr_post):
     )
     decision = 0.95
     matcher.save_pairs_to_excel(
-        data_file_path("match/pprr_kenner_pd_2020_v_cprr_post_2016_2019.csv.xlsx"),
+        deba.data("match/pprr_kenner_pd_2020_v_cprr_post_2016_2019.csv.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
@@ -116,18 +112,16 @@ def extract_cprr_post_events(pprr, cprr_post):
 
 
 if __name__ == "__main__":
-    pprr = pd.read_csv(data_file_path("clean/pprr_kenner_pd_2020.csv"))
+    pprr = pd.read_csv(deba.data("clean/pprr_kenner_pd_2020.csv"))
     agency = pprr.agency[0]
-    post = load_for_agency("clean/pprr_post_2020_11_06.csv", agency)
-    uof = pd.read_csv(data_file_path("clean/uof_kenner_pd_2005_2021.csv"))
-    cprr_post = pd.read_csv(data_file_path("match/cprr_post_2016_2019.csv"))
+    post = load_for_agency(agency)
+    uof = pd.read_csv(deba.data("clean/uof_kenner_pd_2005_2021.csv"))
+    cprr_post = pd.read_csv(deba.data("match/cprr_post_2016_2019.csv"))
     post_events = extract_post_events(pprr, post)
     cprr_post_events = extract_cprr_post_events(pprr, cprr_post)
     uof = match_uof_pprr(uof, pprr)
-    post_events.to_csv(
-        data_file_path("match/post_event_kenner_pd_2020.csv"), index=False
-    )
-    uof.to_csv(data_file_path("match/uof_kenner_pd_2005_2021.csv"), index=False)
+    post_events.to_csv(deba.data("match/post_event_kenner_pd_2020.csv"), index=False)
+    uof.to_csv(deba.data("match/uof_kenner_pd_2005_2021.csv"), index=False)
     cprr_post_events.to_csv(
-        data_file_path("match/cprr_post_events_kenner_pd_2020.csv"), index=False
+        deba.data("match/cprr_post_events_kenner_pd_2020.csv"), index=False
     )

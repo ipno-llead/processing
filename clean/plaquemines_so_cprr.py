@@ -1,21 +1,10 @@
 from lib.columns import clean_column_names
-from lib.path import data_file_path
+import deba
 from lib.uid import gen_uid
 from lib.clean import clean_names, standardize_desc_cols, clean_dates
 from lib.rows import duplicate_row
 import pandas as pd
 import re
-import sys
-
-sys.path.append("../")
-
-
-def gen_middle_initial(df):
-    df.loc[df.middle_name.isna(), "middle_name"] = df.loc[
-        df.middle_name.isna(), "middle_initial"
-    ]
-    df.loc[:, "middle_initial"] = df.middle_name.fillna("").map(lambda x: x[:1])
-    return df
 
 
 def assign_agency(df):
@@ -68,17 +57,12 @@ def clean_and_split_names(df):
     names = df.against.str.extract(r"(\w+) ?(\w+)? ?(.+)?")
     df.loc[:, "first_name"] = names[0].fillna("")
     df.loc[:, "last_name"] = names[1].fillna("")
-    df.loc[:, "middle_name"] = (
-        names.loc[:, 2].str.strip().fillna("").map(lambda s: "" if len(s) < 2 else s)
-    )
-    df.loc[:, "middle_initial"] = (
-        names.loc[:, 2].str.strip().fillna("").map(lambda s: "" if len(s) > 2 else s)
-    )
+    df.loc[:, "middle_name"] = names[2]
     return df
 
 
 def drop_rows_missing_names(df):
-    return df[~(((df.first_name == "") & (df.last_name == "")))]
+    return df[~((df.first_name == "") & (df.last_name == ""))]
 
 
 def clean_receive_dates(df):
@@ -144,16 +128,15 @@ def clean_disposition(df):
 
 
 def clean19():
-    df = pd.read_csv(data_file_path("raw/plaquemines_so/plaquemines_so_cprr_2019.csv"))
+    df = pd.read_csv(deba.data("raw/plaquemines_so/plaquemines_so_cprr_2019.csv"))
     df = clean_column_names(df)
     df = df.rename(columns={"rule_violation": "allegation"})
     return (
-        df.pipe(gen_middle_initial)
-        .pipe(assign_agency)
-        .pipe(clean_names, ["first_name", "last_name", "middle_name", "middle_initial"])
+        df.pipe(assign_agency)
+        .pipe(clean_names, ["first_name", "last_name", "middle_name"])
         .pipe(
             gen_uid,
-            ["agency", "first_name", "last_name", "middle_name", "middle_initial"],
+            ["agency", "first_name", "last_name", "middle_name"],
         )
         .pipe(gen_uid, ["agency", "tracking_number"], "allegation_uid")
     )
@@ -161,9 +144,7 @@ def clean19():
 
 def clean20():
     df = (
-        pd.read_csv(
-            data_file_path("raw/plaquemines_so/plaquemines_so_cprr_2016_2020.csv")
-        )
+        pd.read_csv(deba.data("raw/plaquemines_so/plaquemines_so_cprr_2016_2020.csv"))
         .pipe(clean_column_names)
         .drop(columns=["complainant"])
         .rename(
@@ -183,7 +164,7 @@ def clean20():
         .pipe(assign_agency)
         .pipe(
             gen_uid,
-            ["first_name", "last_name", "middle_name", "middle_initial", "agency"],
+            ["first_name", "last_name", "middle_name", "agency"],
         )
         .pipe(gen_uid, ["uid", "tracking_number", "allegation"], "allegation_uid")
     )
@@ -193,5 +174,5 @@ def clean20():
 if __name__ == "__main__":
     df19 = clean19()
     df20 = clean20()
-    df19.to_csv(data_file_path("clean/cprr_plaquemines_so_2019.csv"), index=False)
-    df20.to_csv(data_file_path("clean/cprr_plaquemines_so_2016_2020.csv"), index=False)
+    df19.to_csv(deba.data("clean/cprr_plaquemines_so_2019.csv"), index=False)
+    df20.to_csv(deba.data("clean/cprr_plaquemines_so_2016_2020.csv"), index=False)

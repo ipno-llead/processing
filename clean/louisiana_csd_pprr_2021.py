@@ -1,5 +1,5 @@
 from lib.columns import clean_column_names, set_values
-from lib.path import data_file_path
+import deba
 from lib.clean import (
     clean_dates,
     clean_races,
@@ -13,9 +13,6 @@ from lib.uid import gen_uid
 from lib import salary
 import pandas as pd
 import numpy as np
-import sys
-
-sys.path.append("../")
 
 
 def split_names(df):
@@ -23,7 +20,6 @@ def split_names(df):
     df.loc[:, "last_name"] = names.loc[:, 0]
     df.loc[:, "first_name"] = names.loc[:, 1]
     df.loc[:, "middle_name"] = names.loc[:, 2]
-    df.loc[:, "middle_initial"] = df.middle_name.fillna("").map(lambda x: x[:1])
     return df.drop(columns=["employee_name"])
 
 
@@ -35,7 +31,7 @@ def clean_hire_date(df):
 def clean_demo():
     return (
         pd.read_csv(
-            data_file_path("raw/louisiana_csd/louisiana_csd_pprr_demographics_2021.csv")
+            deba.data("raw/louisiana_csd/louisiana_csd_pprr_demographics_2021.csv")
         )
         .pipe(clean_column_names)
         .drop(columns=["agency_name", "classified_unclassified"])
@@ -63,7 +59,7 @@ def clean_demo():
         .pipe(clean_races, ["race"])
         .pipe(clean_sexes, ["sex"])
         .pipe(standardize_desc_cols, ["rank_desc", "department_desc"])
-        .pipe(clean_names, ["first_name", "last_name", "middle_initial", "middle_name"])
+        .pipe(clean_names, ["first_name", "last_name", "middle_name"])
         .pipe(gen_uid, ["agency", "first_name", "last_name", "middle_name", "race"])
         .sort_values(["uid", "salary_date", "salary"], na_position="first")
         .drop_duplicates(["uid", "salary_date"], keep="last")
@@ -73,7 +69,7 @@ def clean_demo():
 def clean_term():
     return (
         pd.read_csv(
-            data_file_path("raw/louisiana_csd/louisiana_csd_pprr_terminations_2021.csv")
+            deba.data("raw/louisiana_csd/louisiana_csd_pprr_terminations_2021.csv")
         )
         .pipe(clean_column_names)
         .drop(columns=["agency_name", "action_type"])
@@ -102,5 +98,5 @@ def clean_term():
 if __name__ == "__main__":
     demo = clean_demo()
     term = clean_term()
-    demo.to_csv(data_file_path("clean/pprr_demo_louisiana_csd_2021.csv"), index=False)
-    term.to_csv(data_file_path("clean/pprr_term_louisiana_csd_2021.csv"), index=False)
+    demo.to_csv(deba.data("clean/pprr_demo_louisiana_csd_2021.csv"), index=False)
+    term.to_csv(deba.data("clean/pprr_term_louisiana_csd_2021.csv"), index=False)

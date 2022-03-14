@@ -2,12 +2,10 @@ from lib.columns import clean_column_names
 from lib.clean import clean_dates, standardize_desc_cols, float_to_int_str
 from lib.uid import gen_uid
 from lib.standardize import standardize_from_lookup_table
-from lib.path import data_file_path
+import deba
 import pandas as pd
 import re
-import sys
 
-sys.path.append("../")
 
 actions_lookup = [
     ["exonerated"],
@@ -46,7 +44,7 @@ actions_lookup = [
 
 def realign_18():
     df = pd.read_csv(
-        data_file_path("raw/baton_rouge_pd/baton_rouge_pd_cprr_2018.csv"),
+        deba.data("raw/baton_rouge_pd/baton_rouge_pd_cprr_2018.csv"),
         encoding="latin1",
     )
     df.rename(columns=lambda x: x.strip(), inplace=True)
@@ -202,17 +200,12 @@ def parse_officer_name_18(df):
         )
         .str.split(" # ", expand=True)
     )
-    names.columns = ["last_name", "first_name", "middle_initial"]
-    names.loc[:, "middle_initial"] = (
-        names["middle_initial"].str.replace("n/a", "", regex=False).fillna("")
+    names.columns = ["last_name", "first_name", "middle_name"]
+    names.loc[:, "middle_name"] = (
+        names["middle_name"].str.replace("n/a", "", regex=False).fillna("")
     )
-    names.loc[:, "middle_name"] = names.middle_initial.map(
-        lambda v: "" if len(v) < 2 else v
-    )
-    names.loc[:, "middle_initial"] = names.middle_initial.map(lambda v: v[:1])
 
     df = pd.concat([df, dep, names], axis=1)
-    df.drop(columns=["officer_name", "name"], inplace=True)
     return df
 
 
@@ -489,6 +482,11 @@ def split_name_21(df):
         .str.replace("-", "", regex=False)
         .str.replace("krumm amy e", "amy e krumm", regex=False)
         .str.replace(r"passman (m|jon) (jon|m)", "jon m passman", regex=True)
+        .str.replace(
+            r"(\w+) (\biii\b|\bii\b|\bjr\b|sr) (\w+)$", r"\1 \3,\2", regex=True
+        )
+        .str.replace(r"(\w+) (jr|\biii\b|\bii\b|sr)", r"\1,\2", regex=True)
+        .str.replace("al mutakabbir", "almutakabbir", regex=False)
     )
     names = (
         df.name.str.lower()
@@ -506,15 +504,12 @@ def split_name_21(df):
             "det": "detective",
         }
     )
-    df.loc[:, "first_name"] = names[1].str.strip()
-    df.loc[:, "last_name"] = names[3].str.strip()
-    df.loc[:, "middle_name"] = (
-        names.loc[:, 2].str.strip().fillna("").map(lambda s: "" if len(s) < 2 else s)
+    df.loc[:, "first_name"] = names[1].str.strip().fillna("")
+    df.loc[:, "last_name"] = (
+        names[3].str.strip().fillna("").str.replace(r"\,", " ", regex=True)
     )
-    df.loc[:, "middle_initial"] = (
-        names.loc[:, 2].str.strip().fillna("").map(lambda s: "" if len(s) > 2 else s)
-    )
-    return df.drop(columns=["name"])
+    df.loc[:, "middle_name"] = names[2]
+    return df[~((df.first_name == "") & (df.last_name == ""))].drop(columns="name")
 
 
 def split_department_and_division_desc_21(df):
@@ -767,7 +762,7 @@ def clean_18():
         .pipe(combine_rule_and_paragraph)
         .pipe(assign_agency)
         .pipe(assign_prod_year, "2020")
-        .pipe(gen_uid, ["agency", "first_name", "middle_initial", "last_name"])
+        .pipe(gen_uid, ["agency", "first_name", "middle_name", "last_name"])
         .pipe(
             gen_uid,
             ["agency", "tracking_number", "uid", "action", "allegation"],
@@ -778,9 +773,9 @@ def clean_18():
 
 
 def clean_21():
-    df = pd.read_csv(
-        data_file_path("raw/baton_rouge_pd/baton_rouge_pd_cprr_2021.csv")
-    ).pipe(clean_column_names)
+    df = pd.read_csv(deba.data("raw/baton_rouge_pd/baton_rouge_pd_cprr_2021.csv")).pipe(
+        clean_column_names
+    )
     df = (
         df.pipe(clean_investigation_status_21)
         .pipe(float_to_int_str, ["ia_seq", "ia_year"])
@@ -808,7 +803,7 @@ def clean_21():
         .pipe(drop_rows_with_allegations_disposition_action_all_empty_21)
         .pipe(assign_agency)
         .pipe(assign_prod_year, "2021")
-        .pipe(gen_uid, ["agency", "first_name", "middle_initial", "last_name"])
+        .pipe(gen_uid, ["agency", "first_name", "last_name"])
         .drop_duplicates(
             subset=["uid", "tracking_number", "allegation", "disposition", "action"],
             keep="first",
@@ -904,5 +899,5 @@ def clean_21():
 if __name__ == "__main__":
     df18 = clean_18()
     df21 = clean_21()
-    df18.to_csv(data_file_path("clean/cprr_baton_rouge_pd_2018.csv"), index=False)
-    df21.to_csv(data_file_path("clean/cprr_baton_rouge_pd_2021.csv"), index=False)
+    df18.to_csv(deba.data("clean/cprr_baton_rouge_pd_2018.csv"), index=False)
+    df21.to_csv(deba.data("clean/cprr_baton_rouge_pd_2021.csv"), index=False)

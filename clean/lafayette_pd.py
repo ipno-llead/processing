@@ -1,9 +1,7 @@
-import sys
-
 import pandas as pd
 
 from lib.columns import clean_column_names, set_values
-from lib.path import data_file_path
+import deba
 from lib.clean import (
     clean_names,
     clean_salaries,
@@ -17,8 +15,6 @@ from lib import salary
 from lib.standardize import standardize_from_lookup_table
 from lib.rows import duplicate_row
 import re
-
-sys.path.append("../")
 
 
 def split_names(df):
@@ -34,7 +30,7 @@ def split_names(df):
     )
     df.loc[:, "last_name"] = names[1]
     df.loc[:, "first_name"] = names[0]
-    df.loc[:, "middle_initial"] = names[2]
+    df.loc[:, "middle_name"] = names[2]
     return df[df.name.notna()].drop(columns=["name"])
 
 
@@ -57,7 +53,7 @@ def standardize_rank(df):
 
 def clean_pprr():
     return (
-        pd.read_csv(data_file_path("raw/lafayette_pd/lafayette_pd_pprr_2010_2021.csv"))
+        pd.read_csv(deba.data("raw/lafayette_pd/lafayette_pd_pprr_2010_2021.csv"))
         .pipe(clean_column_names)
         .drop(columns=["assigned_zone", "badge_number"])
         .rename(
@@ -83,8 +79,8 @@ def clean_pprr():
         .pipe(float_to_int_str, ["birth_year"])
         .pipe(standardize_rank)
         .pipe(split_names)
-        .pipe(clean_names, ["first_name", "last_name", "middle_initial"])
-        .pipe(gen_uid, ["agency", "first_name", "last_name", "middle_initial"])
+        .pipe(clean_names, ["first_name", "last_name", "middle_name"])
+        .pipe(gen_uid, ["agency", "first_name", "last_name", "middle_name"])
     )
 
 
@@ -355,9 +351,13 @@ def split_action_from_disposition(df):
     return df
 
 
+def drop_rows_missing_names(df):
+    return df[~((df.first_name == "") & (df.last_name == ""))]
+
+
 def clean_cprr_20():
     return (
-        pd.read_csv(data_file_path("raw/lafayette_pd/lafayette_pd_cprr_2015_2020.csv"))
+        pd.read_csv(deba.data("raw/lafayette_pd/lafayette_pd_cprr_2015_2020.csv"))
         .pipe(clean_column_names)
         .dropna(how="all")
         .rename(
@@ -843,6 +843,7 @@ def split_names_14(df):
             "pat elliot (district attorney's office)",
             regex=True,
         )
+        .str.replace(r"^metro narcotics", "", regex=True)
     )
     names = df.focus_officer_s.str.extract(
         r"(?:(officer|detective|sergeant|lieutenant|city marshall|major|recruit|"
@@ -861,11 +862,7 @@ def split_names_14(df):
         .str.replace(r"\(\(?|\)\)?", "", regex=True)
         .str.replace("cid", "criminal investigations", regex=False)
     )
-    return df.drop(columns=["focus_officer_s"])
-
-
-def drop_rows_missing_first_and_last_name_14(df):
-    return df[~((df.first_name == "") & (df.last_name == ""))]
+    return df
 
 
 def drop_rows_missing_charges_disposition_and_action_14(df):
@@ -1047,7 +1044,7 @@ def assign_correct_disposition_14(df):
 
 def clean_cprr_14():
     df = (
-        pd.read_csv(data_file_path("raw/lafayette_pd/lafayette_pd_cprr_2009_2014.csv"))
+        pd.read_csv(deba.data("raw/lafayette_pd/lafayette_pd_cprr_2009_2014.csv"))
         .pipe(clean_column_names)
         .pipe(clean_receive_date_14)
         .pipe(clean_complete_date_14)
@@ -1061,7 +1058,6 @@ def clean_cprr_14():
         .pipe(split_rows_with_multiple_charges_14)
         .pipe(split_rows_with_multiple_names_14)
         .pipe(split_names_14)
-        .pipe(drop_rows_missing_first_and_last_name_14)
         .pipe(assign_correct_actions_14)
         .pipe(assign_correct_disposition_14)
         .pipe(drop_rows_missing_charges_disposition_and_action_14)
@@ -1077,6 +1073,7 @@ def clean_cprr_14():
             ["uid", "charges", "action", "tracking_number", "disposition"],
             "allegation_uid",
         )
+        .pipe(drop_rows_missing_names)
     )
     return df
 
@@ -1085,6 +1082,6 @@ if __name__ == "__main__":
     pprr = clean_pprr()
     cprr_20 = clean_cprr_20()
     cprr_14 = clean_cprr_14()
-    cprr_20.to_csv(data_file_path("clean/cprr_lafayette_pd_2015_2020.csv"), index=False)
-    cprr_14.to_csv(data_file_path("clean/cprr_lafayette_pd_2009_2014.csv"), index=False)
-    pprr.to_csv(data_file_path("clean/pprr_lafayette_pd_2010_2021.csv"), index=False)
+    cprr_20.to_csv(deba.data("clean/cprr_lafayette_pd_2015_2020.csv"), index=False)
+    cprr_14.to_csv(deba.data("clean/cprr_lafayette_pd_2009_2014.csv"), index=False)
+    pprr.to_csv(deba.data("clean/pprr_lafayette_pd_2010_2021.csv"), index=False)

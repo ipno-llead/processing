@@ -1,14 +1,11 @@
 from lib.columns import clean_column_names
-from lib.path import data_file_path
+import deba
 from lib.uid import gen_uid
 from lib.clean import clean_names, clean_dates, standardize_desc_cols, float_to_int_str
 from lib.standardize import standardize_from_lookup_table
 from lib.rows import duplicate_row
 import pandas as pd
 import re
-import sys
-
-sys.path.append("../")
 
 
 def standardize_rank_desc(df):
@@ -149,7 +146,7 @@ def assign_prod_year(df, year):
 
 
 def clean19():
-    df = pd.read_csv(data_file_path("raw/port_allen_pd/port_allen_cprr_2019.csv"))
+    df = pd.read_csv(deba.data("raw/port_allen_pd/port_allen_cprr_2019.csv"))
     df = clean_column_names(df)
     df.columns = [
         "receive_date",
@@ -206,9 +203,7 @@ def combine_appeal_and_action_columns(df):
 
 def clean18():
     return (
-        pd.read_csv(
-            data_file_path("raw/port_allen_pd/port_allen_cprr_2017-2018_byhand.csv")
-        )
+        pd.read_csv(deba.data("raw/port_allen_pd/port_allen_cprr_2017-2018_byhand.csv"))
         .pipe(clean_column_names)
         .rename(
             columns={
@@ -238,9 +233,7 @@ def clean18():
 
 def clean16():
     return (
-        pd.read_csv(
-            data_file_path("raw/port_allen_pd/port_allen_cprr_2015-2016_byhand.csv")
-        )
+        pd.read_csv(deba.data("raw/port_allen_pd/port_allen_cprr_2015-2016_byhand.csv"))
         .pipe(clean_column_names)
         .dropna(how="all")
         .dropna(subset=["tracking_number"])
@@ -281,6 +274,6 @@ if __name__ == "__main__":
     df19 = clean19()
     df18 = clean18()
     df16 = clean16()
-    df19.to_csv(data_file_path("clean/cprr_port_allen_pd_2019.csv"), index=False)
-    df18.to_csv(data_file_path("clean/cprr_port_allen_pd_2017_2018.csv"), index=False)
-    df16.to_csv(data_file_path("clean/cprr_port_allen_pd_2015_2016.csv"), index=False)
+    df19.to_csv(deba.data("clean/cprr_port_allen_pd_2019.csv"), index=False)
+    df18.to_csv(deba.data("clean/cprr_port_allen_pd_2017_2018.csv"), index=False)
+    df16.to_csv(deba.data("clean/cprr_port_allen_pd_2015_2016.csv"), index=False)

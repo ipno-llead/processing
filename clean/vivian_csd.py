@@ -1,14 +1,10 @@
-import sys
-
 import pandas as pd
 
 from lib.columns import clean_column_names
-from lib.path import data_file_path, ensure_data_dir
+import deba
 from lib.clean import clean_dates, clean_names, float_to_int_str, standardize_desc_cols
 from lib.uid import gen_uid
 from lib import salary
-
-sys.path.append("../")
 
 
 def split_salary_col(df):
@@ -29,7 +25,7 @@ def assign_agency(df):
 
 def clean():
     return (
-        pd.read_csv(data_file_path("raw/vivian_csd/vivian_csd_pprr_2021.csv"))
+        pd.read_csv(deba.data("raw/vivian_csd/vivian_csd_pprr_2021.csv"))
         .pipe(clean_column_names)
         .drop(columns=["length_of_service"])
         .rename(
@@ -52,5 +48,5 @@ def clean():
 
 if __name__ == "__main__":
     df = clean()
-    ensure_data_dir("clean")
-    df.to_csv(data_file_path("clean/pprr_vivian_pd_2021.csv"), index=False)
+
+    df.to_csv(deba.data("clean/pprr_vivian_pd_2021.csv"), index=False)

@@ -1,14 +1,11 @@
 import pandas as pd
-from lib.path import data_file_path
+import deba
 from lib.columns import (
     rearrange_allegation_columns,
     rearrange_personnel_columns,
     rearrange_event_columns,
 )
 from lib import events
-import sys
-
-sys.path.append("../")
 
 
 def fuse_events(pprr, cprr):
@@ -41,14 +38,14 @@ def fuse_events(pprr, cprr):
 
 
 if __name__ == "__main__":
-    cprr = pd.read_csv(data_file_path("match/cprr_madisonville_pd_2010_2020.csv"))
-    pprr = pd.read_csv(data_file_path("clean/pprr_madisonville_csd_2019.csv"))
+    cprr = pd.read_csv(deba.data("match/cprr_madisonville_pd_2010_2020.csv"))
+    pprr = pd.read_csv(deba.data("clean/pprr_madisonville_csd_2019.csv"))
     pprr.loc[:, "agency"] = "Madisonville PD"
-    post_event = pd.read_csv(data_file_path("match/post_event_madisonville_csd_2019.csv"))
+    post_event = pd.read_csv(deba.data("match/post_event_madisonville_csd_2019.csv"))
     per = rearrange_personnel_columns(pprr)
     com = rearrange_allegation_columns(cprr)
     event = fuse_events(pprr, cprr)
     event = rearrange_event_columns(pd.concat([post_event, event]))
-    per.to_csv(data_file_path("fuse/per_madisonville_pd.csv"), index=False)
-    event.to_csv(data_file_path("fuse/event_madisonville_pd.csv"), index=False)
-    com.to_csv(data_file_path("fuse/com_madisonville_pd.csv"), index=False)
+    per.to_csv(deba.data("fuse/per_madisonville_pd.csv"), index=False)
+    event.to_csv(deba.data("fuse/event_madisonville_pd.csv"), index=False)
+    com.to_csv(deba.data("fuse/com_madisonville_pd.csv"), index=False)

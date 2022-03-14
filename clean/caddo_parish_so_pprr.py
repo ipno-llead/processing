@@ -1,12 +1,9 @@
 from lib.columns import clean_column_names, set_values
-from lib.path import data_file_path, ensure_data_dir
+import deba
 from lib.clean import clean_names, clean_salaries, standardize_desc_cols, clean_dates
 from lib.uid import gen_uid, ensure_uid_unique
 from lib import salary
 import pandas as pd
-import sys
-
-sys.path.append("../")
 
 
 def extract_name(df):
@@ -34,13 +31,13 @@ def extract_name(df):
     df.loc[:, "first_name"] = df2.first_name
     df.loc[:, "last_name"] = df2.last_name
     df.loc[:, "middle_name"] = df2.middle_name
-    df.loc[:, "middle_initial"] = df2.middle_name.fillna("").map(lambda x: x[:1])
+    df.loc[:, "middle_name"] = df2.middle_name.fillna("").map(lambda x: x[:1])
     return df.drop(columns=["name"])
 
 
 def assign_agency(df):
-    df.loc[:, 'agency'] = 'Caddo SO'
-    df.loc[:, 'data_production_year'] = 2020
+    df.loc[:, "agency"] = "Caddo SO"
+    df.loc[:, "data_production_year"] = 2020
     return df
 
 
@@ -64,7 +61,7 @@ def clean_rank_desc(df):
 
 def clean():
     return (
-        pd.read_csv(data_file_path("raw/caddo_parish_so/caddo_parish_so_pprr_2020.csv"))
+        pd.read_csv(deba.data("raw/caddo_parish_so/caddo_parish_so_pprr_2020.csv"))
         .dropna(axis=1, how="all")
         .drop_duplicates(ignore_index=True)
         .pipe(clean_column_names)
@@ -93,5 +90,5 @@ def clean():
 if __name__ == "__main__":
     df = clean()
     ensure_uid_unique(df, "uid")
-    ensure_data_dir("clean")
-    df.to_csv(data_file_path("clean/pprr_caddo_parish_so_2020.csv"), index=False)
+
+    df.to_csv(deba.data("clean/pprr_caddo_parish_so_2020.csv"), index=False)

@@ -1,8 +1,5 @@
-import sys
-
-sys.path.append("../")
 import pandas as pd
-from lib.path import data_file_path
+import deba
 from lib import events
 from lib.columns import rearrange_allegation_columns
 from lib.personnel import fuse_personnel
@@ -59,13 +56,13 @@ def fuse_events(cprr21, cprr18, post):
 
 
 if __name__ == "__main__":
-    cprr21 = pd.read_csv(data_file_path("match/cprr_abbeville_pd_2019_2021.csv"))
-    cprr18 = pd.read_csv(data_file_path("match/cprr_abbeville_pd_2015_2018.csv"))
+    cprr21 = pd.read_csv(deba.data("match/cprr_abbeville_pd_2019_2021.csv"))
+    cprr18 = pd.read_csv(deba.data("match/cprr_abbeville_pd_2015_2018.csv"))
     agency = cprr21.agency[0]
-    post = load_for_agency("clean/pprr_post_2020_11_06.csv", agency)
+    post = load_for_agency(agency)
     per = fuse_personnel(cprr21, cprr18, post)
     com = rearrange_allegation_columns(pd.concat([cprr21, cprr18]))
     event = fuse_events(cprr21, cprr18, post)
-    event.to_csv(data_file_path("fuse/event_abbeville_pd.csv"), index=False)
-    com.to_csv(data_file_path("fuse/com_abbeville_pd.csv"), index=False)
-    per.to_csv(data_file_path("fuse/per_abbeville_pd.csv"), index=False)
+    event.to_csv(deba.data("fuse/event_abbeville_pd.csv"), index=False)
+    com.to_csv(deba.data("fuse/com_abbeville_pd.csv"), index=False)
+    per.to_csv(deba.data("fuse/per_abbeville_pd.csv"), index=False)

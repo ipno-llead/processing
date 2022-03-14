@@ -1,11 +1,7 @@
-import sys
-
 import pandas as pd
 from datamatch import ThresholdMatcher, JaroWinklerSimilarity, ColumnsIndex
 
-from lib.path import data_file_path
-
-sys.path.append("../")
+import deba
 
 
 def match_pd_pprr_with_csd_pprr(pdpprr, csdpprr):
@@ -34,11 +30,11 @@ def match_pd_pprr_with_csd_pprr(pdpprr, csdpprr):
     )
     decision = 0.97
     matcher.save_pairs_to_excel(
-        data_file_path("match/harahan_pd_pprr_2020_v_csd_pprr_2020.xlsx"), decision
+        deba.data("match/harahan_pd_pprr_2020_v_csd_pprr_2020.xlsx"), decision
     )
 
 
 if __name__ == "__main__":
-    pdpprr = pd.read_csv(data_file_path("clean/pprr_harahan_pd_2020.csv"))
-    csdpprr = pd.read_csv(data_file_path("clean/pprr_harahan_csd_2020.csv"))
+    pdpprr = pd.read_csv(deba.data("clean/pprr_harahan_pd_2020.csv"))
+    csdpprr = pd.read_csv(deba.data("clean/pprr_harahan_csd_2020.csv"))
     match_pd_pprr_with_csd_pprr(pdpprr, csdpprr)

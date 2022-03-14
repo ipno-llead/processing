@@ -1,5 +1,5 @@
 from lib.columns import clean_column_names, set_values
-from lib.path import data_file_path, ensure_data_dir
+import deba
 from lib.uid import gen_uid
 from lib.clean import (
     clean_names,
@@ -10,9 +10,6 @@ from lib.clean import (
 from lib import salary
 import pandas as pd
 import numpy as np
-import sys
-
-sys.path.insert(0, "../")
 
 
 def match_schema_2014(df):
@@ -71,9 +68,7 @@ def assign_cols_2014(df):
 
 
 def clean_2014():
-    df = pd.read_csv(
-        data_file_path("raw/new_orleans_csd/new_orleans_csd_pprr_2014.csv")
-    )
+    df = pd.read_csv(deba.data("raw/new_orleans_csd/new_orleans_csd_pprr_2014.csv"))
     df = (
         df.pipe(match_schema_2014)
         .pipe(
@@ -150,7 +145,7 @@ def assign_cols_2009(df):
 
 def clean_2009():
     df = pd.read_csv(
-        data_file_path("raw/new_orleans_csd/new_orleans_csd_pprr_2009_realigned.csv")
+        deba.data("raw/new_orleans_csd/new_orleans_csd_pprr_2009_realigned.csv")
     )
     df = (
         df.pipe(match_schema_2009)
@@ -178,6 +173,6 @@ def clean_2009():
 if __name__ == "__main__":
     df09 = clean_2009()
     df14 = clean_2014()
-    ensure_data_dir("clean")
-    df09.to_csv(data_file_path("clean/pprr_new_orleans_csd_2009.csv"), index=False)
-    df14.to_csv(data_file_path("clean/pprr_new_orleans_csd_2014.csv"), index=False)
+
+    df09.to_csv(deba.data("clean/pprr_new_orleans_csd_2009.csv"), index=False)
+    df14.to_csv(deba.data("clean/pprr_new_orleans_csd_2014.csv"), index=False)

@@ -1,10 +1,7 @@
 from datamatch import ThresholdMatcher, JaroWinklerSimilarity, ColumnsIndex
-from lib.path import data_file_path
+import deba
 from lib.post import load_for_agency
 import pandas as pd
-import sys
-
-sys.path.append("../")
 
 
 def match_brady_with_post(brady, post):
@@ -29,7 +26,7 @@ def match_brady_with_post(brady, post):
     )
     decision = 0
     matcher.save_pairs_to_excel(
-        data_file_path("match/brady_ouachita_da_2021_v_post_2020_11_06.xlsx"),
+        deba.data("match/ouachita_da_cprr_2021_v_post_lsp_and_opso_2020_11_06.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
@@ -40,8 +37,8 @@ def match_brady_with_post(brady, post):
 
 
 if __name__ == "__main__":
-    brady = pd.read_csv(data_file_path("clean/brady_ouachita_da_2021.csv"))
-    agency = brady.agency[0]
-    post = load_for_agency("clean/pprr_post_2020_11_06.csv", agency)
-    brady = match_brady_with_post(brady, post)
-    brady.to_csv(data_file_path("match/brady_ouachita_da_2021.csv"), index=False)
+    cprr = pd.read_csv(deba.data("clean/cprr_ouachita_da_2021.csv"))
+    agency = cprr.agency[0]
+    post = load_for_agency(agency)
+    cprr = match_cprr_with_post(cprr, post)
+    cprr.to_csv(deba.data("match/cprr_ouachita_da_2021.csv"), index=False)

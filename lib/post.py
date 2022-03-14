@@ -1,9 +1,6 @@
 from lib import events
 import pandas as pd
-from lib.path import data_file_path
-import sys
-
-sys.path.append("../")
+import deba
 
 
 def keep_latest_row_for_each_post_officer(post: pd.DataFrame) -> pd.DataFrame:
@@ -98,8 +95,8 @@ def extract_events_from_cprr_post(
     return builder.to_frame()
 
 
-def load_for_agency(post_path, agency):
-    post = pd.read_csv(data_file_path(post_path))
+def load_for_agency(agency):
+    post = pd.read_csv(deba.data("clean/pprr_post_2020_11_06.csv"))
     post = post.loc[post.agency == agency]
     if len(post) == 0:
         raise ValueError("agency not found", agency)

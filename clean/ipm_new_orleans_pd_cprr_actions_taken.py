@@ -1,15 +1,12 @@
-from lib.path import data_file_path, ensure_data_dir
+import deba
 from lib.columns import clean_column_names
 from lib.clean import float_to_int_str
 import pandas as pd
-import sys
-
-sys.path.append("../")
 
 
 def initial_processing():
     df = pd.read_csv(
-        data_file_path("raw/ipm/new_orleans_pd_cprr_actions_taken_1931-2020.csv"),
+        deba.data("raw/ipm/new_orleans_pd_cprr_actions_taken_1931-2020.csv"),
         escapechar="\\",
     )
     df = df.dropna(axis=1, how="all")
@@ -115,5 +112,5 @@ def clean():
 
 if __name__ == "__main__":
     df = clean()
-    ensure_data_dir("clean")
-    df.to_csv(data_file_path("clean/cprr_actions_new_orleans_pd_1931_2020.csv"), index=False)
+
+    df.to_csv(deba.data("clean/cprr_actions_new_orleans_pd_1931_2020.csv"), index=False)

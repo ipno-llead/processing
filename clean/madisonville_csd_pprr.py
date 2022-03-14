@@ -1,14 +1,11 @@
 from lib.columns import clean_column_names, set_values
-from lib.path import data_file_path, ensure_data_dir
+import deba
 from lib.clean import float_to_int_str, clean_dates, clean_names
 from lib.uid import gen_uid
 from lib.rows import duplicate_row
 from lib import salary
 import pandas as pd
 import numpy as np
-import sys
-
-sys.path.append("../")
 
 
 def split_names(df):
@@ -53,9 +50,7 @@ def assign_agency(df):
 
 
 def clean():
-    df = pd.read_csv(
-        data_file_path("raw/madisonville_pd/madisonville_csd_pprr_2019.csv")
-    )
+    df = pd.read_csv(deba.data("raw/madisonville_pd/madisonville_csd_pprr_2019.csv"))
     df = clean_column_names(df)
     df.columns = [
         "name",
@@ -86,5 +81,5 @@ def clean():
 
 if __name__ == "__main__":
     df = clean()
-    ensure_data_dir("clean")
-    df.to_csv(data_file_path("clean/pprr_madisonville_csd_2019.csv"), index=False)
+
+    df.to_csv(deba.data("clean/pprr_madisonville_csd_2019.csv"), index=False)
