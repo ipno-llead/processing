@@ -7,10 +7,10 @@ from lib.columns import (
     rearrange_allegation_columns,
     rearrange_stop_and_search_columns,
     rearrange_use_of_force,
-    rearrange_brady_list_columns
     rearrange_award_columns,
     rearrange_uof_citizen_columns,
     rearrange_uof_officer_columns,
+    rearrange_brady_columns,
 )
 from lib.uid import ensure_uid_unique
 
@@ -258,17 +258,6 @@ def fuse_appeal_hearing_logs():
     ).sort_values("uid", ignore_index=True)
 
 
-def fuse_brady_list():
-    return rearrange_brady_list_columns(
-        pd.concat(
-            [
-                pd.read_csv(data_file_path("fuse/brady_baton_rouge_da.csv")),
-                pd.read_csv(data_file_path("fuse/brady_new_orleans_da.csv")),
-                pd.read_csv(data_file_path("fuse/brady_ouachita_da.csv")),
-                pd.read_csv(data_file_path("fuse/brady_tangipahoa_da.csv")),
-            ]
-        )
-    ).sort_values("brady_uid", ignore_index=True)
 def fuse_award():
     return rearrange_award_columns(
         pd.concat(
@@ -279,6 +268,19 @@ def fuse_award():
             ]
         )
     ).sort_values(["agency", "award_uid"])
+
+
+def fuse_brady():
+    return rearrange_brady_columns(
+        pd.concat(
+            [
+                pd.read_csv(deba.data("fuse/brady_baton_rouge_pd.csv")),
+                pd.read_csv(deba.data("fuse/brady_new_orleans_pd.csv")),
+                pd.read_csv(deba.data("fuse/brady_ouachita_so.csv")),
+                pd.read_csv(deba.data("fuse/brady_tangipahoa_so.csv")),
+            ]
+        )
+    ).sort_values("brady_uid", ignore_index=True)
 
 
 if __name__ == "__main__":
@@ -295,6 +297,8 @@ if __name__ == "__main__":
     uof_citizen_df = fuse_uof_citizens()
     uof_officer_df = fuse_uof_officers()
     award_df = fuse_award()
+    brady_df = fuse_brady()
+
     per_df.to_csv(deba.data("fuse/personnel.csv"), index=False)
     allegation_df.to_csv(deba.data("fuse/allegation.csv"), index=False)
     uof_df.to_csv(deba.data("fuse/use_of_force.csv"), index=False)
@@ -303,6 +307,7 @@ if __name__ == "__main__":
     uof_citizen_df.to_csv(deba.data("fuse/uof_citizens.csv"), index=False)
     uof_officer_df.to_csv(deba.data("fuse/uof_officers.csv"), index=False)
     award_df.to_csv(deba.data("fuse/award.csv"), index=False)
+    brady_df.to_csv(deba.data("fuse/brady.csv"), index=False)
 
     post_event_df = pd.read_csv(deba.data("fuse/events_post.csv"))
     missing_agency_df = find_event_agency_if_missing_from_post(event_df, post_event_df)

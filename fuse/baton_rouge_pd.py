@@ -2,6 +2,7 @@ import pandas as pd
 import deba
 from lib.personnel import fuse_personnel
 from lib.columns import (
+    rearrange_brady_columns,
     rearrange_event_columns,
     rearrange_allegation_columns,
     rearrange_appeal_hearing_columns,
@@ -106,6 +107,8 @@ if __name__ == "__main__":
     cprr_18 = pd.read_csv(deba.data("match/cprr_baton_rouge_pd_2018.csv"))
     cprr_21 = pd.read_csv(deba.data("match/cprr_baton_rouge_pd_2021.csv"))
     pprr = pd.read_csv(deba.data("clean/pprr_baton_rouge_pd_2021.csv"))
+    brady = pd.read_csv(deba.data("match/brady_baton_rouge_da_2021.csv"))
+    brady = brady.loc[brady.agency == "Baton Rouge PD"]
 
     # limit csd data to just officers found in PD roster
     csd_pprr_17.loc[:, "agency"] = "Baton Rouge PD"
@@ -121,14 +124,17 @@ if __name__ == "__main__":
         cprr_18,
         cprr_21,
         lprr,
+        brady,
     )
 
     events_df = fuse_events(csd_pprr_17, csd_pprr_19, cprr_18, cprr_21, lprr)
     events_df = rearrange_event_columns(pd.concat([post_event, events_df]))
     complaint_df = rearrange_allegation_columns(pd.concat([cprr_18, cprr_21]))
     lprr_df = rearrange_appeal_hearing_columns(lprr)
+    brady_df = rearrange_brady_columns(brady)
 
     personnel_df.to_csv(deba.data("fuse/per_baton_rouge_pd.csv"), index=False)
     events_df.to_csv(deba.data("fuse/event_baton_rouge_pd.csv"), index=False)
     complaint_df.to_csv(deba.data("fuse/com_baton_rouge_pd.csv"), index=False)
     lprr_df.to_csv(deba.data("fuse/app_baton_rouge_pd.csv"), index=False)
+    brady_df.to_csv(deba.data("fuse/brady_baton_rouge_pd.csv"), index=False)

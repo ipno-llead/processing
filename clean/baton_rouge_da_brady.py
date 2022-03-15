@@ -1,4 +1,4 @@
-from lib.columns import clean_column_names
+from lib.columns import clean_column_names, set_values
 import deba
 from lib.clean import clean_names, standardize_desc_cols
 from lib.uid import gen_uid
@@ -47,7 +47,7 @@ def clean():
         .pipe(clean_column_names)
         .pipe(clean_allegations)
         .pipe(extract_disposition)
-        .pipe(set_values, {"source_agency": "East Baton Rouge DA"})
+        .pipe(set_values, {"source_agency": "Baton Rouge DA"})
         .rename(columns={"status": "action"})
     )
     return (
@@ -55,11 +55,10 @@ def clean():
         .pipe(standardize_desc_cols, ["action"])
         .pipe(clean_agency)
         .pipe(gen_uid, ["agency", "first_name", "last_name", "middle_name"])
-        .pipe(gen_uid, ["uid", "allegation", "disposition", "action"], "allegation_uid")
-        .pipe(gen_uid, ["uid", "allegation_uid", "source_agency"], "brady_uid")
+        .pipe(gen_uid, ["uid", "source_agency"], "brady_uid")
     )
 
 
 if __name__ == "__main__":
     df = clean()
-    df.to_csv(deba.data("clean/cprr_baton_rouge_da_2021.csv"), index=False)
+    df.to_csv(deba.data("clean/brady_baton_rouge_da_2021.csv"), index=False)

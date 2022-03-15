@@ -1,53 +1,36 @@
 from datamatch import ThresholdMatcher, JaroWinklerSimilarity, ColumnsIndex
 import deba
-from lib.post import load_for_agency
 import pandas as pd
 
 
-def match_brady_and_post(brady, post):
-    dfa = (
-        brady.loc[brady.uid.notna(), ["uid", "first_name", "last_name"]]
-        .drop_duplicates(subset=["uid"])
-        .set_index("uid", drop=True)
-    )
-    decision = 1
-    matcher.save_pairs_to_excel(
-        deba.data("match/new_orleans_da_cprr_2021_v_post_nopd_pprr_2020_11_06.xlsx"),
-        decision,
-    )
-    matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
-    match_dict = dict(matches)
-
-    cprr.loc[:, "uid"] = cprr.uid.map(lambda x: match_dict.get(x, x))
-    return cprr
-
-
-def match_against_new_orleans_pd_personnel(cprr, pprr):
-    dfa = cprr[["first_name", "last_name", "uid"]]
+def match_brady_to_personnel(brady, per):
+    dfa = brady[["uid", "first_name", "last_name"]]
     dfa.loc[:, "fc"] = dfa.first_name.fillna("").map(lambda x: x[:1])
+    dfa.loc[:, "lc"] = dfa.last_name.fillna("").map(lambda x: x[:1])
+    dfa = dfa.drop_duplicates(subset=["uid"]).set_index("uid")
 
-    dfb = (
-        post[["uid", "first_name", "last_name"]]
-        .drop_duplicates()
-        .set_index("uid", drop=True)
-    )
+    dfb = per[["uid", "first_name", "last_name"]]
+    dfb.loc[:, "first_name"] = dfb.first_name.str.lower().str.strip()
+    dfb.loc[:, "last_name"] = dfb.last_name.str.lower().str.strip()
     dfb.loc[:, "fc"] = dfb.first_name.fillna("").map(lambda x: x[:1])
+    dfb.loc[:, "lc"] = dfb.last_name.fillna("").map(lambda x: x[:1])
+    dfb = dfb.drop_duplicates(subset=["uid"]).set_index("uid")
 
     matcher = ThresholdMatcher(
-        ColumnsIndex("fc"),
+        ColumnsIndex(["fc", "lc"]),
         {
-            "first_name": JaroWinklerSimilarity(),
             "last_name": JaroWinklerSimilarity(),
+            "first_name": JaroWinklerSimilarity(),
         },
         dfa,
         dfb,
     )
-    decision = 0.94
+    decision = 1
     matcher.save_pairs_to_excel(
-        deba.data("match/new_orleans_da_cprr_2021_v_new_orleans_pd_1946_2018.xlsx"),
+        deba.data("match/brady_new_orleans_da_2021_v_personnel.xlsx"),
         decision,
     )
-    matches = matcher.get_index_pairs_within_thresholds(decision)
+    matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
     match_dict = dict(matches)
 
     brady.loc[:, "uid"] = brady.uid.map(lambda x: match_dict.get(x, x))
@@ -55,11 +38,7 @@ def match_against_new_orleans_pd_personnel(cprr, pprr):
 
 
 if __name__ == "__main__":
-    pprr = pd.read_csv(deba.data("clean/pprr_new_orleans_pd_1946_2018.csv"))
-    cprr = pd.read_csv(deba.data("clean/cprr_new_orleans_da_2021.csv"))
-    agency = cprr.agency[0]
-    post = load_for_agency(agency)
-    cprr = match_against_new_orleans_pd_personnel(cprr, pprr)
-    cprr = match_cprr_and_post(cprr, post)
-
-    cprr.to_csv(deba.data("match/cprr_new_orleans_da_2021.csv"), index=False)
+    per = pd.read_csv(deba.data("raw/fused/personnel.csv"))
+    brady = pd.read_csv(deba.data("clean/brady_new_orleans_da_2021.csv"))
+    brady = match_brady_to_personnel(brady, per)
+    brady.to_csv(deba.data("match/brady_new_orleans_da_2021.csv"), index=False)

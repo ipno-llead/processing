@@ -1,6 +1,6 @@
 import pandas as pd
 import deba
-from lib.columns import clean_column_names
+from lib.columns import clean_column_names, set_values
 from lib.uid import gen_uid
 
 
@@ -30,7 +30,6 @@ def clean():
         .pipe(set_values, {"agency": "Tangipahoa SO", "source_agency": "Tangipahoa DA"})
         .pipe(assign_agency)
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
-        .pipe(gen_uid, ["uid", "source_agency"], "allegation_uid")
         .pipe(gen_uid, ["uid", "source_agency"], "brady_uid")
     )
     return df
@@ -38,4 +37,4 @@ def clean():
 
 if __name__ == "__main__":
     df = clean()
-    df.to_csv(deba.data("clean/cprr_tangipahoa_da_2021.csv"), index=False)
+    df.to_csv(deba.data("clean/brady_tangipahoa_da_2021.csv"), index=False)
