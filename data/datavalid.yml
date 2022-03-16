@@ -11,9 +11,9 @@ files:
     schema: stop_and_search
   fuse/appeals.csv:
     schema: appeal_hearing
-  fuse/uof_citizen.csv:
+  fuse/uof_citizens.csv:
     schema: uof_citizen
-  fuse/uof_officer.csv:
+  fuse/uof_officers.csv:
     schema: uof_officer
   fuse/awards.csv:
     schema: award
@@ -430,13 +430,9 @@ schemas:
       - name: use_of_force_type
       - name: use_of_force_level
       - name: use_of_force_effective
-      - name: use_of_force_reason
       - name: age
       - name: years_of_service
       - name: officer_injured
-      - name: division
-      - name: division_level
-      - name: unit
       - name: agency
   award:
     columns:
@@ -445,7 +441,6 @@ schemas:
           unique identifier of award.
         unique: true
         no_na: true
-      - name: award_type
       - name: agency
 
 save_bad_rows_to: invalid_rows.csv
