@@ -1,20 +1,9 @@
-import sys
-
-from datamatch import (
-    ThresholdMatcher, ColumnsIndex, JaroWinklerSimilarity
-)
+from datamatch import ThresholdMatcher, ColumnsIndex, JaroWinklerSimilarity
 import pandas as pd
 
-from lib.path import data_file_path, ensure_data_dir
+import deba
 from lib.uid import gen_uid
-from lib.post import extract_events_from_post
-
-sys.path.append("../")
-
-
-def prepare_post_data():
-    post = pd.read_csv(data_file_path("clean/pprr_post_2020_11_06.csv"))
-    return post[post.agency == 'new orleans harbor pd']
+from lib.post import extract_events_from_post, load_for_agency
 
 
 def match_uid_with_cprr(cprr, pprr):
@@ -27,18 +16,25 @@ def match_uid_with_cprr(cprr, pprr):
 
     # limit number of columns before matching
     dfa = cprr[["mid", "first_name", "last_name"]].drop_duplicates()
-    dfa.loc[:, 'fc'] = dfa.first_name.map(lambda x: x[:1])
+    dfa.loc[:, "fc"] = dfa.first_name.map(lambda x: x[:1])
     dfa = dfa.set_index("mid", drop=True)
     dfb = pprr[["uid", "first_name", "last_name"]].drop_duplicates()
-    dfb.loc[:, 'fc'] = dfb.first_name.map(lambda x: x[:1])
+    dfb.loc[:, "fc"] = dfb.first_name.map(lambda x: x[:1])
     dfb = dfb.set_index("uid", drop=True)
-    matcher = ThresholdMatcher(ColumnsIndex(["fc"]), {
-        "first_name": JaroWinklerSimilarity(),
-        "last_name": JaroWinklerSimilarity(),
-    }, dfa, dfb)
+    matcher = ThresholdMatcher(
+        ColumnsIndex(["fc"]),
+        {
+            "first_name": JaroWinklerSimilarity(),
+            "last_name": JaroWinklerSimilarity(),
+        },
+        dfa,
+        dfb,
+    )
     decision = 0.96
-    matcher.save_pairs_to_excel(data_file_path(
-        "match/new_orleans_harbor_pd_cprr_2020_v_pprr_2020.xlsx"), decision)
+    matcher.save_pairs_to_excel(
+        deba.data("match/new_orleans_harbor_pd_cprr_2020_v_pprr_2020.xlsx"),
+        decision,
+    )
     matches = matcher.get_index_pairs_within_thresholds(decision)
 
     mid_to_uid_d = dict(matches)
@@ -48,37 +44,41 @@ def match_uid_with_cprr(cprr, pprr):
 
 
 def match_pprr_and_post(pprr, post):
-    dfa = pprr[['uid', 'first_name', 'last_name']]
-    dfa.loc[:, 'fc'] = dfa.first_name.map(lambda x: x[:1])
-    dfa = dfa.drop_duplicates(subset=['uid']).set_index('uid')
+    dfa = pprr[["uid", "first_name", "last_name"]]
+    dfa.loc[:, "fc"] = dfa.first_name.map(lambda x: x[:1])
+    dfa = dfa.drop_duplicates(subset=["uid"]).set_index("uid")
 
-    dfb = post[['uid', 'first_name', 'last_name']]
-    dfb.loc[:, 'fc'] = dfb.first_name.map(lambda x: x[:1])
-    dfb = dfb.drop_duplicates(subset=['uid']).set_index('uid')
+    dfb = post[["uid", "first_name", "last_name"]]
+    dfb.loc[:, "fc"] = dfb.first_name.map(lambda x: x[:1])
+    dfb = dfb.drop_duplicates(subset=["uid"]).set_index("uid")
 
-    matcher = ThresholdMatcher(ColumnsIndex(["fc"]), {
-        "last_name": JaroWinklerSimilarity(),
-        "first_name": JaroWinklerSimilarity(),
-    }, dfa, dfb)
+    matcher = ThresholdMatcher(
+        ColumnsIndex(["fc"]),
+        {
+            "last_name": JaroWinklerSimilarity(),
+            "first_name": JaroWinklerSimilarity(),
+        },
+        dfa,
+        dfb,
+    )
     decision = 0.96
-    matcher.save_pairs_to_excel(data_file_path(
-        "match/new_orleans_harbor_pd_pprr_2020_v_post_pprr_2020_11_06.xlsx"), decision)
+    matcher.save_pairs_to_excel(
+        deba.data("match/new_orleans_harbor_pd_pprr_2020_v_post_pprr_2020_11_06.xlsx"),
+        decision,
+    )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
-    return extract_events_from_post(post, matches, 'New Orleans Harbor PD')
+    return extract_events_from_post(post, matches, "New Orleans Harbor PD")
 
 
 if __name__ == "__main__":
-    cprr = pd.read_csv(data_file_path(
-        "clean/cprr_new_orleans_harbor_pd_2020.csv"))
-    pprr20 = pd.read_csv(data_file_path(
-        "clean/pprr_new_orleans_harbor_pd_2020.csv"))
-    post = prepare_post_data()
+    cprr = pd.read_csv(deba.data("clean/cprr_new_orleans_harbor_pd_2020.csv"))
+    pprr20 = pd.read_csv(deba.data("clean/pprr_new_orleans_harbor_pd_2020.csv"))
+    agency = pprr20.agency[0]
+    post = load_for_agency(agency)
     cprr = match_uid_with_cprr(cprr, pprr20)
     post_event = match_pprr_and_post(pprr20, post)
-    ensure_data_dir("match")
-    cprr.to_csv(
-        data_file_path("match/cprr_new_orleans_harbor_pd_2020.csv"),
-        index=False)
+
+    cprr.to_csv(deba.data("match/cprr_new_orleans_harbor_pd_2020.csv"), index=False)
     post_event.to_csv(
-        data_file_path("match/post_event_new_orleans_harbor_pd_2020.csv"),
-        index=False)
+        deba.data("match/post_event_new_orleans_harbor_pd_2020.csv"), index=False
+    )

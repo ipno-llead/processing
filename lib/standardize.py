@@ -84,8 +84,7 @@ def standardize_from_lookup_table(
 
     if not quiet:
         print(
-            "standardize_from_lookup_table: unmatched sequences:\n  %s" %
-            unmatched_seqs
+            "standardize_from_lookup_table: unmatched sequences:\n  %s" % unmatched_seqs
         )
 
     return df

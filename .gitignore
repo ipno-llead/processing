@@ -9,10 +9,13 @@ __pycache__
 *.csv
 *.pdf
 
-.wrglmod.yaml
-.wrglsync
+!.wrgl
+.wrgl/*
+!.wrgl/config.yaml
 
 build
 data.d
-
+q
 .env
+
+.deba

@@ -1,3 +1,4 @@
+import sys
 import re
 import json
 from typing import List
@@ -12,7 +13,7 @@ from lib.standardize import standardize_from_lookup_table
 mdy_date_pattern_1 = re.compile(r"^\d{1,2}/\d{1,2}/\d{2}$")
 mdy_date_pattern_2 = re.compile(r"^\d{1,2}/\d{1,2}/\d{4}$")
 mdy_date_pattern_3 = re.compile(r"^\d{1,2}-\d{1,2}-\d{2}$")
-dmy_date_pattern = re.compile(r'^\d{1,2}-\w{3}-\d{2}$')
+dmy_date_pattern = re.compile(r"^\d{1,2}-\w{3}-\d{2}$")
 year_pattern = re.compile(r"^(19|20)\d{2}$")
 year_month_pattern = re.compile(r"^(19|20)\d{4}$")
 month_day_pattern = re.compile(r"^[A-Z][a-z]{2}-\d{1,2}$")
@@ -63,7 +64,7 @@ def clean_date(val) -> tuple[str, str, str]:
     m = dmy_date_pattern.match(val)
     if m is not None:
         [day, month, year] = val.split("-")
-        month = str(datetime.datetime.strptime(month, '%b').month)
+        month = str(datetime.datetime.strptime(month, "%b").month)
         if year[0] in ["1", "2", "0"]:
             year = "20" + year
         else:
@@ -79,7 +80,7 @@ def clean_date(val) -> tuple[str, str, str]:
     if m is not None:
         dt = datetime.datetime.strptime(val, "%b-%d")
         return "", str(dt.month).zfill(2), str(dt.day).zfill(2)
-    raise ValueError("unknown date format \"%s\"" % val)
+    raise ValueError('unknown date format "%s"' % val)
 
 
 def clean_dates(df: pd.DataFrame, cols: list[str], expand: bool = True) -> pd.DataFrame:
@@ -100,9 +101,7 @@ def clean_dates(df: pd.DataFrame, cols: list[str], expand: bool = True) -> pd.Da
     for col in cols:
         assert col.endswith("_date")
         dates = pd.DataFrame.from_records(
-            df[col].str.strip().str.replace(
-                r'//', r'/', regex=False
-            ).map(clean_date)
+            df[col].str.strip().str.replace(r"//", r"/", regex=False).map(clean_date)
         )
         if expand:
             prefix = col[:-5]
@@ -140,10 +139,12 @@ def clean_datetime(val) -> tuple[str, str, str, str]:
         [hour, minute] = time.split(":")
         year, month, day = clean_date(date)
         return year, month, day, "%s:%s" % (hour.zfill(2), minute.zfill(2))
-    raise ValueError("unknown datetime format \"%s\"" % val)
+    raise ValueError('unknown datetime format "%s"' % val)
 
 
-def clean_datetimes(df: pd.DataFrame, cols: list[str], expand: bool = True) -> pd.DataFrame:
+def clean_datetimes(
+    df: pd.DataFrame, cols: list[str], expand: bool = True
+) -> pd.DataFrame:
     """Parses datetime columns using known patterns
 
     Args:
@@ -160,12 +161,15 @@ def clean_datetimes(df: pd.DataFrame, cols: list[str], expand: bool = True) -> p
     """
     for col in cols:
         assert col.endswith("_datetime")
-        dates = pd.DataFrame.from_records(
-            df[col].str.strip().map(clean_datetime))
+        dates = pd.DataFrame.from_records(df[col].str.strip().map(clean_datetime))
         if expand:
             prefix = col[:-9]
-            dates.columns = [prefix + "_year", prefix +
-                             "_month", prefix + "_day", prefix + "_time"]
+            dates.columns = [
+                prefix + "_year",
+                prefix + "_month",
+                prefix + "_day",
+                prefix + "_time",
+            ]
             df = pd.concat([df, dates], axis=1)
         else:
             df.loc[:, col] = combine_datetime_columns(dates, 0, 1, 2, 3)
@@ -174,7 +178,9 @@ def clean_datetimes(df: pd.DataFrame, cols: list[str], expand: bool = True) -> p
     return df
 
 
-def parse_dates_with_known_format(df: pd.DataFrame, cols: list[str], format: str) -> pd.DataFrame:
+def parse_dates_with_known_format(
+    df: pd.DataFrame, cols: list[str], format: str
+) -> pd.DataFrame:
     """Parses dates using strptime format and expands into _year, _month, _day columns
 
     Args:
@@ -190,8 +196,13 @@ def parse_dates_with_known_format(df: pd.DataFrame, cols: list[str], format: str
     """
     for col in cols:
         assert col.endswith("_date")
-        dates = pd.DataFrame.from_records(pd.to_datetime(df[col].astype(str), format=format).map(lambda x: (
-            "", "", "") if pd.isnull(x) else (str(x.year), str(x.month), str(x.day))))
+        dates = pd.DataFrame.from_records(
+            pd.to_datetime(df[col].astype(str), format=format).map(
+                lambda x: ("", "", "")
+                if pd.isnull(x)
+                else (str(x.year), str(x.month), str(x.day))
+            )
+        )
         prefix = col[:-5]
         dates.columns = [prefix + "_year", prefix + "_month", prefix + "_day"]
         df = pd.concat([df, dates], axis=1)
@@ -212,9 +223,18 @@ def clean_sexes(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
         the updated frame
     """
     for col in cols:
-        df.loc[:, col] = df[col].str.strip().str.lower()\
-            .str.replace(r"^m$", "male", regex=True).str.replace(r"^f$", "female", regex=True)\
+        df.loc[:, col] = (
+            df[col]
+            .str.strip()
+            .str.lower()
+            .str.replace(r"^m$", "male", regex=True)
+            .str.replace(r"^f$", "female", regex=True)
             .str.replace(r"^unknown.*", "", regex=True)
+            .str.replace(r"^null$", "", regex=True)
+        )
+        df = standardize_from_lookup_table(
+            df, col, [["male"], ["female", "femaale", "famale"]]
+        )
     return df
 
 
@@ -233,19 +253,45 @@ def clean_races(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
     for col in cols:
         # replacing one-letter race because they are too short
         # to use with standardize_from_lookup_table safely
-        df.loc[:, col] = df[col].str.strip().str.lower()\
-            .str.replace(r'^w$', 'white', regex=True)\
-            .str.replace(r'^h$', 'hispanic', regex=True)\
-            .str.replace(r'^b$', 'black', regex=True)\
-            .str.replace(r'\bislande\b', 'islander', regex=True)
-        df = standardize_from_lookup_table(df, col, [
-            ['black', 'african american', 'black / african american', 'black or african american'],
-            ['white'],
-            ['hispanic', 'latino'],
-            ['native american', 'american indian', 'american indian or alaskan native', 'amer. ind.'],
-            ['asian / pacific islander', 'asian', 'native hawaiian or other pacific islander', 'islander'],
-            ['mixed', 'two or more races', 'multi-racial'],
-        ])
+        df.loc[:, col] = (
+            df[col]
+            .str.strip()
+            .str.lower()
+            .str.replace(r"^w$", "white", regex=True)
+            .str.replace(r"^h$", "hispanic", regex=True)
+            .str.replace(r"^b$", "black", regex=True)
+            .str.replace(r"\bislande\b", "islander", regex=True)
+        )
+        df = standardize_from_lookup_table(
+            df,
+            col,
+            [
+                [
+                    "black",
+                    "african american",
+                    "black / african american",
+                    "black or african american",
+                ],
+                ["white"],
+                ["hispanic", "latino"],
+                [
+                    "native american",
+                    "american indian",
+                    "american indian or alaskan native",
+                    "amer. ind.",
+                    "american indian/alaska native",
+                ],
+                [
+                    "asian / pacific islander",
+                    "asian/pacific islander",
+                    "asian",
+                    "native hawaiian or other pacific islander",
+                    "islander",
+                ],
+                ["mixed", "two or more races", "multi-racial"],
+                ["indian"],
+            ],
+        )
     return df
 
 
@@ -262,8 +308,13 @@ def clean_employment_status(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
         the updated frame
     """
     for col in cols:
-        df.loc[:, col] = df[col].str.strip().str.lower()\
-            .str.replace(r"^i$", "inactive", regex=True).str.replace(r"^a$", "active", regex=True)
+        df.loc[:, col] = (
+            df[col]
+            .str.strip()
+            .str.lower()
+            .str.replace(r"^i$", "inactive", regex=True)
+            .str.replace(r"^a$", "active", regex=True)
+        )
     return df
 
 
@@ -277,11 +328,14 @@ def clean_salary(series: pd.Series) -> pd.Series:
     Returns:
         the updated series
     """
-    return series.str.strip().str.lower()\
-        .str.replace('k', '000', regex=False)\
-        .str.replace(r"[^\d\.]", "", regex=True)\
-        .str.replace(r'^$', '0', regex=True)\
+    return (
+        series.str.strip()
+        .str.lower()
+        .str.replace("k", "000", regex=False)
+        .str.replace(r"[^\d\.]", "", regex=True)
+        .str.replace(r"^$", "0", regex=True)
         .astype("float64")
+    )
 
 
 def clean_salaries(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
@@ -311,9 +365,16 @@ def clean_name(series: pd.Series) -> pd.Series:
     Returns:
         the updated series
     """
-    return series.str.strip().str.replace(r"[^\w-]+", " ", regex=True)\
-        .str.replace(r"\s+", " ", regex=True).str.replace(r"\s*-\s*", "-", regex=True)\
-        .str.lower().str.strip().fillna("").str.strip("-")
+    return (
+        series.str.strip()
+        .str.replace(r"[^\w-]+", " ", regex=True)
+        .str.replace(r"\s+", " ", regex=True)
+        .str.replace(r"\s*-\s*", "-", regex=True)
+        .str.lower()
+        .str.strip()
+        .fillna("")
+        .str.strip("-")
+    )
 
 
 def clean_rank(series: pd.Series) -> pd.Series:
@@ -326,11 +387,20 @@ def clean_rank(series: pd.Series) -> pd.Series:
     Returns:
         the updated series
     """
-    return series.str.strip().str.replace("s/ofc", 'senior officer', regex=False)\
-        .str.replace("sgt", "sergeant", regex=False).str.replace("ofc", "officer", regex=False)\
-        .str.replace("lt", "lieutenant", regex=False).str.replace("cpt", "captain", regex=False)\
-        .str.replace("a/supt", "superintendent", regex=False).str.replace(r"\(|\)", " ", regex=True)\
-        .str.lower().str.strip().fillna("").str.strip("-")
+    return (
+        series.str.strip()
+        .str.replace("s/ofc", "senior officer", regex=False)
+        .str.replace("sgt", "sergeant", regex=False)
+        .str.replace("ofc", "officer", regex=False)
+        .str.replace("lt", "lieutenant", regex=False)
+        .str.replace("cpt", "captain", regex=False)
+        .str.replace("a/supt", "superintendent", regex=False)
+        .str.replace(r"\(|\)", " ", regex=True)
+        .str.lower()
+        .str.strip()
+        .fillna("")
+        .str.strip("-")
+    )
 
 
 def clean_ranks(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
@@ -366,9 +436,16 @@ def names_to_title_case(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
     for col in cols:
         if col not in cols_set:
             continue
-        df.loc[:, col] = df[col].str.title()\
-            .str.replace(r" I(i|ii|v|x)$", lambda m: " I" + m.group(1).upper(), regex=True)\
-            .str.replace(r" V(i|ii|iii)$", lambda m: " V" + m.group(1).upper(), regex=True)
+        df.loc[:, col] = (
+            df[col]
+            .str.title()
+            .str.replace(
+                r" I(i|ii|v|x)$", lambda m: " I" + m.group(1).upper(), regex=True
+            )
+            .str.replace(
+                r" V(i|ii|iii)$", lambda m: " V" + m.group(1).upper(), regex=True
+            )
+        )
     return df
 
 
@@ -392,9 +469,8 @@ def clean_names(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
 name_pattern_1 = re.compile(r"^(\w{2,}) (\w\.) (\w{2,}.+)$")
 name_pattern_2 = re.compile(r"^([-\w\']+), (\w{2,})$")
 name_pattern_3 = re.compile(r'^(\w{2,}) ("\w+") ([-\w\']+)$')
-name_pattern_4 = re.compile(
-    r'^(\w{2,}) ([-\w\']+ (?:i|ii|iii|iv|v|jr|sr)\W?)$')
-name_pattern_5 = re.compile(r'^([\w-]{2,}) (\w+) ([-\w\']+)$')
+name_pattern_4 = re.compile(r"^(\w{2,}) ([-\w\']+ (?:i|ii|iii|iv|v|jr|sr)\W?)$")
+name_pattern_5 = re.compile(r"^([\w-]{2,}) (\w+) ([-\w\']+)$")
 name_pattern_6 = re.compile(r"^([\w-]{2,}) ([-\w\']+)$")
 name_pattern_7 = re.compile(r"^\w+$")
 
@@ -412,6 +488,7 @@ def split_names(df: pd.DataFrame, col: str) -> pd.DataFrame:
         the updated frame with new columns: 'first_name',
         'middle_name' and 'last_name'
     """
+
     def split_name(val):
         if pd.isnull(val) or not val:
             return "", "", ""
@@ -450,13 +527,19 @@ def split_names(df: pd.DataFrame, col: str) -> pd.DataFrame:
         m = name_pattern_7.match(val)
         if m is not None:
             return "", "", val
-        raise ValueError('unrecognized name format %s' % json.dumps(val))
+        raise ValueError("unrecognized name format %s" % json.dumps(val))
 
     df = df.reset_index(drop=True)
     names = pd.DataFrame.from_records(
-        df[col].fillna('').str.strip().str.replace(r' +', ' ', regex=True)
-        .str.lower().map(split_name).to_list())
-    names.columns = ['first_name', 'middle_name', 'last_name']
+        df[col]
+        .fillna("")
+        .str.strip()
+        .str.replace(r" +", " ", regex=True)
+        .str.lower()
+        .map(split_name)
+        .to_list()
+    )
+    names.columns = ["first_name", "middle_name", "last_name"]
     return pd.concat([df, names], axis=1)
 
 
@@ -490,7 +573,9 @@ def standardize_desc_cols(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
     return df
 
 
-def float_to_int_str(df: pd.DataFrame, cols: list[str], cast_as_str: bool = False) -> pd.DataFrame:
+def float_to_int_str(
+    df: pd.DataFrame, cols: list[str], cast_as_str: bool = False
+) -> pd.DataFrame:
     """Turns float values in column into strings without trailing ".0"
 
     Data loaded with pd.read_csv tends to turn integer columns into
@@ -518,12 +603,22 @@ def float_to_int_str(df: pd.DataFrame, cols: list[str], cast_as_str: bool = Fals
         if col not in cols_set:
             continue
         if df[col].dtype == np.float64:
-            df.loc[:, col] = df[col].fillna(0).astype(
-                "int64").astype(str).str.replace(r"^0$", "", regex=True)
+            df.loc[:, col] = (
+                df[col]
+                .fillna(0)
+                .astype("int64")
+                .astype(str)
+                .str.replace(r"^0$", "", regex=True)
+            )
         elif df[col].dtype == np.object:
             idx = df[col].map(lambda v: type(v) == float)
-            df.loc[idx, col] = df.loc[idx, col].fillna(0).astype(
-                "int64").astype(str).str.replace(r"^0$", "", regex=True)
+            df.loc[idx, col] = (
+                df.loc[idx, col]
+                .fillna(0)
+                .astype("int64")
+                .astype(str)
+                .str.replace(r"^0$", "", regex=True)
+            )
             if cast_as_str:
                 df.loc[~idx, col] = df.loc[~idx, col].astype(str)
         elif cast_as_str:
@@ -531,7 +626,9 @@ def float_to_int_str(df: pd.DataFrame, cols: list[str], cast_as_str: bool = Fals
     return df
 
 
-def remove_future_dates(df: pd.DataFrame, max_date: str, prefixes: List[str]) -> pd.DataFrame:
+def remove_future_dates(
+    df: pd.DataFrame, max_date: str, prefixes: List[str]
+) -> pd.DataFrame:
     """Sets to empty any date that is greater than max_date
 
     Args:
@@ -547,10 +644,10 @@ def remove_future_dates(df: pd.DataFrame, max_date: str, prefixes: List[str]) ->
     Returns:
         the updated frame
     """
-    md = datetime.datetime.strptime(max_date, '%Y-%m-%d')
+    md = datetime.datetime.strptime(max_date, "%Y-%m-%d")
     for prefix in prefixes:
-        cols = [prefix + '_year', prefix + '_month', prefix + '_day']
-        dates = df[cols].replace({'': np.NaN}).astype(float).astype('Int64')
+        cols = [prefix + "_year", prefix + "_month", prefix + "_day"]
+        dates = df[cols].replace({"": np.NaN}).astype(float).astype("Int64")
         for idx, _ in df.loc[
             (dates.iloc[:, 0] > md.year)
             | (
@@ -558,14 +655,15 @@ def remove_future_dates(df: pd.DataFrame, max_date: str, prefixes: List[str]) ->
                 & (
                     (dates.iloc[:, 1].notna() & (dates.iloc[:, 1] > md.month))
                     | (
-                        dates.iloc[:, 2].notna() & (dates.iloc[:, 1] == md.month)
+                        dates.iloc[:, 2].notna()
+                        & (dates.iloc[:, 1] == md.month)
                         & (dates.iloc[:, 2] > md.day)
                     )
                 )
             )
         ].iterrows():
             for col in cols:
-                df.loc[idx, col] = ''
+                df.loc[idx, col] = ""
     return df
 
 
@@ -579,8 +677,11 @@ def strip_birth_day_and_month(series: pd.Series) -> pd.Series:
     Returns:
         the updated series
     """
-    return series.str.strip().str.lower()\
-        .str.replace(r'(\w{2})\/(\w{2})\/(\w{4})', r'\3', regex=True)
+    return (
+        series.str.strip()
+        .str.lower()
+        .str.replace(r"(\w{2})\/(\w{2})\/(\w{4})", r"\3", regex=True)
+    )
 
 
 def strip_birth_date(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
@@ -600,21 +701,91 @@ def strip_birth_date(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
     return df
 
 
-def canonicalize_names(
-        df: pd.DataFrame, clusters: list[tuple], uid_column: str = 'uid',
-        first_name_column: str = 'first_name', last_name_column: str = 'last_name'
+def canonicalize_officers(
+    df: pd.DataFrame,
+    clusters: list[tuple],
+    uid_column: str = "uid",
+    first_name_column: str = "first_name",
+    last_name_column: str = "last_name",
+    middle_name_column: str = "middle_name",
 ) -> pd.DataFrame:
+    has_middle_name = middle_name_column in df.columns
     for cluster in clusters:
-        uid, first_name, last_name = None, '', ''
+        uid, first_name, last_name, middle_name = None, "", "", ""
         for idx in cluster:
-            row = df.loc[df[uid_column] == idx]
-            if (
-                uid is None
-                or len(row[first_name_column]) > len(first_name)
-                or (len(row[first_name_column]) == len(first_name) and len(row[last_name_column]) > len(last_name))
+            row = df.loc[df[uid_column] == idx].squeeze()
+            if isinstance(row, pd.DataFrame):
+                row = row.iloc[0]
+            if uid is None or (
+                len(row[first_name_column]) > len(first_name)
+                or (
+                    len(row[first_name_column]) == len(first_name)
+                    and (
+                        len(row[last_name_column]) > len(last_name)
+                        or (
+                            has_middle_name
+                            and pd.notna(row[middle_name_column])
+                            and len(row[last_name_column]) == len(last_name)
+                            and len(row[middle_name_column]) > len(middle_name)
+                        )
+                    )
+                )
             ):
-                uid, first_name, last_name = idx, row[first_name_column], row[last_name_column]
+                uid = idx
+                first_name = row[first_name_column]
+                last_name = row[last_name_column]
+                if has_middle_name:
+                    middle_name = row[middle_name_column]
+
         df.loc[df[uid_column].isin(cluster), uid_column] = uid
-        df.loc[df[uid_column] == uid, first_name_column] = first_name
-        df.loc[df[uid_column] == uid, last_name_column] = last_name
+        df.loc[df[uid_column].isin(cluster), first_name_column] = first_name
+        df.loc[df[uid_column].isin(cluster), last_name_column] = last_name
+        if has_middle_name:
+            df.loc[df[uid_column].isin(cluster), middle_name_column] = middle_name
+    return df
+
+
+def convert_dates(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
+    """converts dates to numerical format
+
+    Args:
+        df (pd.DataFrame):
+            the frame to process
+        cols (list of str):
+            date column
+
+    Returns:
+        the updated frame
+    """
+    for col in cols:
+        # replacing one-letter race because they are too short
+        # to use with standardize_from_lookup_table safely
+        df.loc[:, col] = df[col].str.strip().str.lower()
+        df = standardize_from_lookup_table(
+            df,
+            col,
+            [
+                [
+                    "1",
+                    "january",
+                ],
+                ["2", "february"],
+                ["3", "march"],
+                [
+                    "4",
+                    "april",
+                ],
+                [
+                    "5",
+                    "may",
+                ],
+                ["6", "june"],
+                ["7", "july"],
+                ["8", "august"],
+                ["9", "september"],
+                ["10", "october"],
+                ["11", "november"],
+                ["12", "december"],
+            ],
+        )
     return df

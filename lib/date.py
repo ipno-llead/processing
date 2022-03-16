@@ -1,7 +1,9 @@
 import pandas as pd
 
 
-def combine_date_columns(df: pd.DataFrame, year_col: str, month_col: str, day_col: str) -> pd.Series:
+def combine_date_columns(
+    df: pd.DataFrame, year_col: str, month_col: str, day_col: str
+) -> pd.Series:
     """Combines date columns into a single column
 
     Args:
@@ -42,10 +44,7 @@ def combine_datetime_columns(
     Returns:
         the combined datetime series
     """
-    time_frame = df[time_col].str.split(':', expand=True)
-    dates = pd.concat([
-        df[[year_col, month_col, day_col]],
-        time_frame
-    ], axis=1)
+    time_frame = df[time_col].str.split(":", expand=True)
+    dates = pd.concat([df[[year_col, month_col, day_col]], time_frame], axis=1)
     dates.columns = ["year", "month", "day", "hour", "minute"]
     return pd.to_datetime(dates)

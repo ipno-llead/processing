@@ -9,6 +9,14 @@ files:
     schema: use_of_force
   fuse/stop_and_search.csv:
     schema: stop_and_search
+  fuse/appeals.csv:
+    schema: appeal_hearing
+  fuse/uof_citizen.csv:
+    schema: uof_citizen
+  fuse/uof_officer.csv:
+    schema: uof_officer
+  fuse/awards.csv:
+    schema: award
 
 schemas:
   personnel:
@@ -25,10 +33,6 @@ schemas:
       - name: middle_name
         description: >
           person middle name
-        title_case: true
-      - name: middle_initial
-        description: >
-          initial letter of middle name
         title_case: true
       - name: first_name
         description: >
@@ -67,7 +71,10 @@ schemas:
           accused officer's unique identifier. This references the `uid` column in personnel.csv
       - name: tracking_number
         description: >
-          complaint tracking number from the agency the data originate from
+          internal affairs complaint tracking number from the agency the data originate from
+      - name: case_number
+        description: >
+          administrative complaint tracking number from the agency the data originate from
       - name: allegation_uid
         description: >
           complaint unique identifier
@@ -83,28 +90,9 @@ schemas:
       - name: citizen
         description: >
           demographic info of the involved citizen
-      - name: initial_disposition
-        description: >
-          the initial disposition for the complaint
       - name: disposition
         description: >
           the final disposition for the complaint
-      - name: rule_code
-        description: >
-          an allegation is usually consist of a rule and paragraph that was violated. This is
-          the code of the violated rule.
-      - name: rule_violation
-        description: >
-          an allegation is usually consist of a rule and paragraph that was violated. This is
-          the text of the violated rule.
-      - name: paragraph_code
-        description: >
-          an allegation is usually consist of a rule and paragraph that was violated. This is
-          the paragraph number.
-      - name: paragraph_violation
-        description: >
-          an allegation is usually consist of a rule and paragraph that was violated. This is
-          the text of the violated paragraph.
       - name: complainant_name
         description: >
           redacted if the complainant isn't a police officer.
@@ -132,6 +120,11 @@ schemas:
       - name: agency
         description: >
           the police department the accused belong to.
+      - name: source_agency
+        description: >
+          This field describes from where the data was sourced. This column should only be populated
+          if the data was sourced from an agency other than where the accused is/was employed.
+          For example, POST, District Attorney's Office, News, etc.
       - name: incident_type
         description: >
           This field comes from IPM and seems to contains the same kind of info as
@@ -165,6 +158,9 @@ schemas:
       - name: allegation_desc
         description: >
           text description of the allegation
+      - name: investigating_department
+        description: >
+          small departments frequently turnover internal investigations to the sheriff's office
   event:
     columns:
       - name: event_uid
@@ -211,7 +207,6 @@ schemas:
         integer: true
         no_na: true
       - name: month
-        integer: true
       - name: day
         integer: true
       - name: time
@@ -224,7 +219,7 @@ schemas:
           officer unique identifer, references the `uid` column in personnel.csv
       - name: allegation_uid
         description: >
-          complaint unique identifier, refernces the `allegation_uid` column in complaint.csv
+          complaint unique identifier, references the `allegation_uid` column in complaint.csv
       - name: appeal_uid
         description: >
           appeal hearing unique identifier, references the `appeal_uid` column in
@@ -322,91 +317,36 @@ schemas:
           unique identifier of use of force report.
         unique: true
         no_na: true
-      - name: uof_tracking_number
+      - name: tracking_number
         description: >
           tracking number of use of force report from the originating agency.
-      - name: report_year
-        description: >
-          year of report
-      - name: uid
-        description: >
-          officer unique identifier, this references the `uid` column from personnel.csv
-      - name: force_description
-        description: >
-          summary of force used
-      - name: force_type
-      - name: force_level
-      - name: effective_uof
-      - name: accidental_discharge
-      - name: less_than_lethal
-      - name: status
-      - name: source
+      - name: investigation_status
       - name: service_type
-      - name: county
-      - name: traffic_stop
-      - name: sustained
-      - name: force_reason
-      - name: weather_description
-      - name: distance_from_officer
-      - name: body_worn_camera_available
-      - name: app_used
-      - name: citizen_uid
-        description: >
-          unique identifier for each citizen involved in a report.
-      - name: citizen_arrested
-      - name: citizen_hospitalized
-      - name: citizen_injured
-      - name: citizen_body_type
-      - name: citizen_height
-      - name: citizen_age
-        integer: true
-      - name: citizen_involvement
+      - name: light_condition
+      - name: weather_condition
+      - name: shift_time
       - name: disposition
-      - name: citizen_sex
-        options:
-          - female
-          - male
-      - name: citizen_race
-        options:
-          - black
-          - white
-          - hispanic
-          - native american
-          - asian / pacific islander
-          - mixed
-      - name: citizen_age_1
-        integer: true
-      - name: officer_current_supervisor
-      - name: officer_title
-      - name: officer_injured
-      - name: officer_age
-        integer: true
-      - name: officer_years_exp
-        integer: true
-      - name: officer_years_with_unit
-        integer: true
-      - name: officer_type
-      - name: officer_employment_status
-      - name: officer_department
-      - name: officer_division
-      - name: officer_sub_division_a
-      - name: officer_sub_division_b
+      - name: division
+      - name: division_level
+      - name: unit
+      - name: originating_bureau
       - name: agency
         description: >
           the police department this report originate from.
   appeal_hearing:
     columns:
       - name: appeal_uid
-        description: unique per docket_no and uid
+        description: >
+          unique per docket_no and uid
       - name: docket_no
       - name: uid
       - name: counsel
       - name: charging_supervisor
-      - name: resolution
-      - name: action
-      - name: delay
+      - name: appeal_disposition
+      - name: action_appealed
       - name: appealed
       - name: agency
+      - name: motions
   stop_and_search:
     columns:
       - name: stop_and_search_uid
@@ -461,5 +401,51 @@ schemas:
       - name: stop_and_search_time
       - name: agency
       - name: uid
+  uof_citizen:
+    columns:
+      - name: uof_citizen_uid
+        description: >
+          unique identifier of citizen.
+      - name: uof_uid
+        description: >
+          unique iidentifer of use of force report.
+      - name: citizen_influencing_factors
+      - name: citizen_distance_from_officer
+      - name: citizen_arrested
+      - name: citizen_arrest_charges
+      - name: citizen_hospitalized
+      - name: citizen_injured
+      - name: citizen_build
+      - name: citizen_height
+      - name: citizen_sex
+      - name: agency
+  uof_officer:
+    columns:
+      - name: uid
+        description: >
+          unique identifier of officer.
+      - name: uof_uid
+        description: >
+          unique identifier of use of force report.
+      - name: use_of_force_type
+      - name: use_of_force_level
+      - name: use_of_force_effective
+      - name: use_of_force_reason
+      - name: age
+      - name: years_of_service
+      - name: officer_injured
+      - name: division
+      - name: division_level
+      - name: unit
+      - name: agency
+  award:
+    columns:
+      - name: award_uid
+        description: >
+          unique identifier of award.
+        unique: true
+        no_na: true
+      - name: award_type
+      - name: agency
 
 save_bad_rows_to: invalid_rows.csv
