@@ -9,6 +9,7 @@ from lib.clean import (
     clean_dates,
 )
 from lib.uid import gen_uid
+from lib.standardize import standardize_from_lookup_table
 import pandas as pd
 
 
@@ -74,7 +75,7 @@ def clean_rank_desc(df):
         df.rank_desc.str.lower()
         .str.strip()
         .str.replace(".", "", regex=False)
-        .str.replace(r' ?investigative special$', '', regex=True)
+        .str.replace(r" ?investigative special$", "", regex=True)
         .str.replace(r" ?police", "", regex=True)
         .str.replace(r"dec$", "decree", regex=True)
         .str.replace(r"supt", "superintendent", regex=False)
@@ -103,22 +104,39 @@ def clean_rank_desc(df):
         .str.replace(r" \(nopd\)$", "", regex=True)
         .str.replace("cnslr", "counseler", regex=False)
         .str.replace(r"\binfo\b", "information,", regex=True)
-        .str.replace('  ', ' ', regex=False)
-        .str.replace(r'awards coord \( dept\)', 'awards coordinator', regex=True)
-        .str.replace(r'information?\,?', 'information', regex=True)
-        .str.replace(r'\binstru\b', 'instructor', regex=True)
+        .str.replace("  ", " ", regex=False)
+        .str.replace(r"awards coord \( dept\)", "awards coordinator", regex=True)
+        .str.replace(r"information?\,?", "information", regex=True)
+        .str.replace(r"\binstru\b", "instructor", regex=True)
         .str.replace(r"\badmini?n?s?t?r?a?t?i?v?e?\b", "admin", regex=True)
-        .str.replace(r'\bcouns\b', 'counselor', regex=True)
-        .str.replace(r'\bfield\b', '', regex=True)
-        .str.replace(r'\(eis\)', '', regex=True)
-        .str.replace(r'\banalyt?\b', 'analyst', regex=True)
-        .str.replace(r'\bse$', '', regex=True)
-        .str.replace(r'\bapp inv a\b', '', regex=True)
-        .str.replace(r' \bex\b ', '', regex=True)
-        .str.replace(r'\bsup sup\b', '', regex=True)
-        .str.replace(r'operations$', 'operator', regex=True)
-        .str.replace(r'^unknown rank$', '', regex=True)
-        .str.replace(r'^dna analyst senior$', 'senior dna analyst', regex=True)
+        .str.replace(r"\bcouns\b", "counselor", regex=True)
+        .str.replace(r"\bfield\b", "", regex=True)
+        .str.replace(r"\(eis\)", "", regex=True)
+        .str.replace(r"\banalyt?\b", "analyst", regex=True)
+        .str.replace(r"\bse$", "", regex=True)
+        .str.replace(r"\bapp inv a\b", "", regex=True)
+        .str.replace(r" \bex\b ", "", regex=True)
+        .str.replace(r"\bsup sup\b", "", regex=True)
+        .str.replace(r"operations$", "operator", regex=True)
+        .str.replace(r"^unknown rank$", "", regex=True)
+        .str.replace(r"^dna analyst senior$", "senior dna analyst", regex=True)
+    )
+    return df
+
+
+def clean_sub_division_b_desc(df):
+    df.loc[:, "sub_division_b_desc"] = (
+        df.sub_division_b_desc.str.lower()
+        .str.strip()
+        .str.replace(r"^not - nopd officer$", "", regex=True)
+        .str.replace(r"^unknown ?(assignment)?", "", regex=True)
+        .str.replace(r"^(.+) platoon (\w{1})$", r"\1; platoon \2", regex=True)
+        .str.replace(r"^(.+) squad (\w{1})$", r"\1; squad \2", regex=True)
+        .str.replace(r"^admin unit$", "administrative unit", regex=True)
+        .str.replace(r"v\.o\.w\.s\.", "violent offender warrant squad", regex=True)
+        .str.replace(r"squad unit$", "squad", regex=True)
+        .str.replace(r"^district$", "", regex=True)
+        .str.replace(r"^detailed officers$", "", regex=True)
     )
     return df
 
@@ -156,7 +174,14 @@ def clean():
         .pipe(clean_rank_desc)
         .pipe(
             standardize_desc_cols,
-            ["rank_desc", "employment_status", "officer_inactive", "department_desc"],
+            [
+                "rank_desc",
+                "employment_status",
+                "officer_inactive",
+                "department_desc",
+                "division_desc",
+                "sub_division_a_desc",
+            ],
         )
         .pipe(clean_employee_type)
         .pipe(clean_sexes, ["sex"])
@@ -169,6 +194,155 @@ def clean():
         .pipe(clean_names, ["first_name", "middle_name", "last_name"])
         .pipe(remove_unnamed_officers)
         .pipe(clean_current_supervisor)
+        .pipe(
+            standardize_from_lookup_table,
+            "division_desc",
+            [
+                ["eighth district"],
+                ["seventh district"],
+                ["sixth district"],
+                ["fifth district"],
+                ["fourth district"],
+                ["third district"],
+                ["second district"],
+                ["first district"],
+                ["budget services", "superintendant's budget staff"],
+                ["recruitment", "police recruits"],
+                ["special operations", "special operations division"],
+                ["administration", "administrative duties services"],
+                ["staff", "staff division", "staff programs unit"],
+                ["communications", "communications division"],
+                [
+                    "special investigations",
+                    "special investigation section",
+                    "special investigations division",
+                ],
+                ["reserves", "reserve division"],
+                [
+                    "education, training, recruitment",
+                    "education/training & recruitment division",
+                ],
+                [
+                    "records, identification, support",
+                    "records & identification / support services divisi",
+                ],
+                ["crime lab", "crime lab and evidence division"],
+                ["intake", "intake unit"],
+                ["consent decree"],
+                [
+                    "criminal investigations",
+                    "criminal investigations division",
+                    "criminal investigation section",
+                ],
+                ["technology", "technology section"],
+                ["alternative police response"],
+                [
+                    "administrative investigations",
+                    "administrative investigation section",
+                ],
+                ["force investigations", "force investigation team"],
+                ["command", "command staff"],
+                ["special events"],
+                ["public information office"],
+                ["police", "polpln policy planning"],
+                ["i.s.b", "isb"],
+                ["office of the superintendant"],
+            ],
+        )
+        .pipe(
+            standardize_from_lookup_table,
+            "sub_division_a_desc",
+            [
+                ["staff"],
+                ["personnel", "personnel division"],
+                ["workmans compensation"],
+                ["traffic", "traffic section"],
+                ["platoon 2", "b platoon", "2nd platoon"],
+                ["platoon 1", "a platoon", "1st platoon"],
+                ["platoon 3", "c platoon", "3rd platoon"],
+                ["investigations"],
+                ["d.i.u"],
+                ["i.o.d"],
+                ["i.s.b", "isb"],
+                ["l.w.o.p", "lwop"],
+                ["fiscal", "fiscal / criminal justice"],
+                ["special investigations", "special investigation section"],
+                ["training", "training section"],
+                ["records", "records & i.d."],
+                ["night beat", "night watch"],
+                ["day beat", "day watch", "day beats"],
+                ["evening beat", "evening watch"],
+                ["k9", "k9 section"],
+                [
+                    "criminal investigations",
+                    "scientific criminal investigations section",
+                    "criminal investigation section",
+                ],
+                ["professional standards", "professional standards section"],
+                ["support", "support services"],
+                ["tactical", "tactical section"],
+                ["narcotics", "narcotics section"],
+                ["street gang", "street gang unit"],
+                [
+                    "central evidence and property section",
+                    "central evidence & property section",
+                ],
+                ["intelligence", "intelligence section"],
+                ["juvenile", "juvenile section"],
+                ["task force"],
+                ["school resources", "school resource officers"],
+                ["multi-agency gang unit"],
+                ["mayor's security", "mayors security"],
+                ["military leave"],
+                ["recruitment", "recruitment division"],
+                [
+                    "administrative investigations",
+                    "administrative investigation section",
+                ],
+                ["special victims", "special victim  section"],
+                ["force investigations", "force investigation team"],
+                ["homicide", "homicide section"],
+                ["administration", "admin"],
+                ["property crimes", "property crimes section"],
+                ["lost property"],
+                ["task force a"],
+                ["staff", "staff programs unit"],
+                ["public affairs"],
+                ["building security"],
+                [
+                    "crime prevention",
+                    "crime prevention section",
+                    "crime prevention/quality of life",
+                ],
+                ["court liason", "court liaison"],
+                ["victim/witness assistance", "victim/witness assistance unit"],
+                ["neighborhood watch", "neighborhood policing"],
+                ["criminal investigations staff", "cid staff"],
+                ["homeland security"],
+                ["crime analysis"],
+                ["grants", "grants administration section"],
+                ["training", "training platoon"],
+                ["magazine street patrol", "magazine st. patrol"],
+                ["homeless assistance"],
+                ["lakeview crime prevention"],
+                ["french market patrol"],
+                ["mid-city patrol", "mid-city"],
+                ["compliance", "compliance section"],
+                ["8th district"],
+                ["5th district"],
+                ["district attorney", "district attorney section"],
+                ["communications"],
+                ["mounted"],
+                ["3rd district"],
+                ["bourbon promenade"],
+                ["6th district"],
+                ["quality of life"],
+                ["crime lab", "crime lab section"],
+                ["opse"],
+                ["fleet equipment services", "fleet & equipment services section"],
+            ],
+        )
+        .pipe(clean_sub_division_b_desc)
     )
 
 
