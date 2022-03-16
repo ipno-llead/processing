@@ -73,7 +73,7 @@ def clean_cprr_19():
     return (
         pd.read_csv(deba.data("raw/mandeville_pd/mandeville_pd_cprr_2019_byhand.csv"))
         .pipe(clean_column_names)
-        .rename(columns={"title": "rank_desc", "charges": "allegation"})
+        .rename(columns={"title": "rank_desc", "charges": "allegation", "tracking_number": "tracking_id"})
         .dropna(axis=1, how="all")
         .pipe(clean_names, ["last_name"])
         .pipe(float_to_int_str, ["occur_year", "occur_month", "occur_day"])
@@ -81,7 +81,7 @@ def clean_cprr_19():
         .pipe(assign_agency, 2020)
         .pipe(clean_names, ["last_name"])
         .pipe(gen_uid, ["agency", "rank_desc", "last_name"])
-        .pipe(gen_uid, ["agency", "tracking_number"], "allegation_uid")
+        .pipe(gen_uid, ["agency", "tracking_id"], "allegation_uid")
     )
 
 

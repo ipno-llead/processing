@@ -51,15 +51,15 @@ def clean():
         pd.read_csv(deba.data("raw/st_john_so/st_john_so_cprr_2018_2020.csv"))
         .pipe(clean_column_names)
         .drop(columns=["personnel_free_form", "cfs"])
-        .rename(columns={"complaint_number": "tracking_number"})
+        .rename(columns={"complaint_number": "tracking_id"})
         .pipe(concat_and_split_rows_with_multiple_officers)
         .pipe(split_officer_names)
-        .pipe(standardize_desc_cols, ["tracking_number"])
+        .pipe(standardize_desc_cols, ["tracking_id"])
         .pipe(clean_names, ["first_name", "last_name"])
         .pipe(drop_rows_missing_names)
         .pipe(set_values, {"agency": "St. John SO"})
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
-        .pipe(gen_uid, ["uid", "tracking_number", "case_number"], "allegation_uid")
+        .pipe(gen_uid, ["uid", "tracking_id", "case_number"], "allegation_uid")
     )
     return df
 

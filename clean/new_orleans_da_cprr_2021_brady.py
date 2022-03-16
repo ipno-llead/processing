@@ -8,11 +8,11 @@ import pandas as pd
 def extract_date_from_pib(df):
     tracking = df.pib_control.str.split("-", 1, expand=True)
     df.loc[:, "receive_date"] = tracking.loc[:, 0].fillna("")
-    df.loc[:, "partial_tracking_number"] = tracking.loc[:, 1].fillna("")
-    df.loc[:, "tracking_number"] = df.receive_date.str.cat(
-        df.partial_tracking_number, sep="-"
+    df.loc[:, "partial_tracking_id"] = tracking.loc[:, 1].fillna("")
+    df.loc[:, "tracking_id"] = df.receive_date.str.cat(
+        df.partial_tracking_id, sep="-"
     )
-    df = df.drop(columns=["pib_control", "partial_tracking_number"])
+    df = df.drop(columns=["pib_control", "partial_tracking_id"])
     return df
 
 
@@ -203,7 +203,7 @@ def clean():
                 "uid",
                 "receive_year",
                 "allegation_desc",
-                "tracking_number",
+                "tracking_id",
                 "initial_disposition",
                 "disposition",
                 "allegation",

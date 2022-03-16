@@ -44,7 +44,7 @@ def clean():
         )
         .rename(
             columns={
-                "booking_number": "tracking_number",
+                "booking_number": "tracking_id",
                 "gender": "citizen_sex",
                 "admission_date": "check_in_date",
                 "is_doc": "is_department_of_corrections",

@@ -69,12 +69,12 @@ schemas:
       - name: uid
         description: >
           accused officer's unique identifier. This references the `uid` column in personnel.csv
-      - name: tracking_number
+      - name: tracking_id
         description: >
-          internal affairs complaint tracking number from the agency the data originate from
+          internal affairs complaint tracking id from the agency the data originate from
       - name: case_number
         description: >
-          administrative complaint tracking number from the agency the data originate from
+          administrative complaint tracking id from the agency the data originate from
       - name: allegation_uid
         description: >
           complaint unique identifier
@@ -317,9 +317,9 @@ schemas:
           unique identifier of use of force report.
         unique: true
         no_na: true
-      - name: tracking_number
+      - name: tracking_id
         description: >
-          tracking number of use of force report from the originating agency.
+          tracking id of use of force report from the originating agency.
       - name: investigation_status
       - name: service_type
       - name: light_condition

@@ -353,7 +353,7 @@ def clean20():
     df = pd.read_csv(deba.data("raw/baton_rouge_so/baton_rouge_so_cprr_2016-2020.csv"))
     df = clean_column_names(df)
     df.columns = [
-        "tracking_number",
+        "tracking_id",
         "name",
         "badge_no",
         "rank_desc",

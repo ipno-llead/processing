@@ -58,7 +58,7 @@ def clean19():
         .pipe(clean_column_names)
         .rename(
             columns={
-                "case_no": "tracking_number",
+                "case_no": "tracking_id",
                 "reserve_full_time": "employment_status",
                 "type_of_complaint_or_allegation": "allegation",
                 "assigned_investigator": "investigator",
@@ -82,7 +82,7 @@ def clean19():
             ["employment_status", "disposition", "action", "complainant_type"],
         )
         .pipe(assign_uid)
-        .pipe(gen_uid, ["agency", "tracking_number"], "allegation_uid")
+        .pipe(gen_uid, ["agency", "tracking_id"], "allegation_uid")
         .pipe(
             remove_NA_values,
             [
@@ -102,7 +102,7 @@ def clean20():
         .pipe(clean_column_names)
         .rename(
             columns={
-                "case_no": "tracking_number",
+                "case_no": "tracking_id",
                 "reserve_full_time": "employment_status",
                 "type_of_complaint_or_allegation": "allegation",
                 "assigned_investigator": "investigator",
@@ -126,7 +126,7 @@ def clean20():
             ["employment_status", "disposition", "action", "complainant_type"],
         )
         .pipe(assign_uid)
-        .pipe(gen_uid, ["agency", "tracking_number"], "allegation_uid")
+        .pipe(gen_uid, ["agency", "tracking_id"], "allegation_uid")
         .pipe(remove_NA_values, ["shift_supervisor", "action"])
     )
 

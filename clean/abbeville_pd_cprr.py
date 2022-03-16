@@ -7,8 +7,8 @@ import re
 from lib.rows import duplicate_row
 
 
-def clean_tracking_number(df):
-    df.loc[:, "tracking_number"] = (
+def clean_tracking_id(df):
+    df.loc[:, "tracking_id"] = (
         df.ia_case_number.str.lower()
         .str.strip()
         .str.replace("ia case number", "", regex=False)
@@ -129,7 +129,7 @@ def clean21():
     df = (
         pd.read_csv(deba.data("raw/abbeville_pd/abbeville_pd_cprr_2019_2021.csv"))
         .pipe(clean_column_names)
-        .pipe(clean_tracking_number)
+        .pipe(clean_tracking_id)
         .pipe(clean_allegation)
         .pipe(clean_disposition)
         .pipe(clean_action)

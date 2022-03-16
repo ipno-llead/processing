@@ -863,7 +863,7 @@ def clean19():
         .rename(
             columns={
                 "date_received": "receive_date",
-                "case_number": "tracking_number",
+                "case_number": "tracking_id",
                 "job_title": "rank_desc",
                 "charge_disposition": "disposition",
                 "location_or_facility": "department_desc",
@@ -906,8 +906,8 @@ def clean19():
             ["agency", "employee_id", "first_name", "last_name", "middle_name"],
         )
         .pipe(set_empty_uid_for_anonymous_officers)
-        .pipe(gen_uid, ["agency", "tracking_number", "uid"], "allegation_uid")
-        .sort_values(["tracking_number", "investigation_complete_date"])
+        .pipe(gen_uid, ["agency", "tracking_id", "uid"], "allegation_uid")
+        .sort_values(["tracking_id", "investigation_complete_date"])
         .drop_duplicates(subset=["allegation_uid"], keep="last", ignore_index=True)
         .pipe(split_investigating_supervisor)
         .pipe(clean_allegation_desc)
@@ -942,7 +942,7 @@ def clean20():
         .drop(columns=["referred_by"])
         .rename(
             columns={
-                "case_number": "tracking_number",
+                "case_number": "tracking_id",
                 "job_title": "rank_desc",
                 "charge_disposition": "disposition",
                 "location_or_facility": "department_desc",
@@ -989,7 +989,7 @@ def clean20():
         )
         .pipe(
             gen_uid,
-            ["tracking_number", "allegation", "action", "employee_id"],
+            ["tracking_id", "allegation", "action", "employee_id"],
             "allegation_uid",
         )
         .pipe(add_left_reason_column)

@@ -184,7 +184,7 @@ def fuse_allegation():
                 pd.read_csv(deba.data("fuse/com_lafourche_so.csv")),
             ]
         )
-    ).sort_values(["agency", "tracking_number"], ignore_index=True)
+    ).sort_values(["agency", "tracking_id"], ignore_index=True)
 
 
 def fuse_use_of_force():

@@ -8,8 +8,8 @@ from lib.rows import duplicate_row
 from lib.uid import gen_uid
 
 
-def clean_tracking_number(df):
-    df.loc[:, "tracking_number"] = df.file.str.replace(r"-$", "", regex=True)
+def clean_tracking_id(df):
+    df.loc[:, "tracking_id"] = df.file.str.replace(r"-$", "", regex=True)
     return df.drop(columns="file")
 
 
@@ -138,7 +138,7 @@ def clean():
             deba.data("raw/denham_springs_pd/denham_springs_pd_cprr_2016_2021.csv")
         )
         .pipe(clean_column_names)
-        .pipe(clean_tracking_number)
+        .pipe(clean_tracking_id)
         .pipe(clean_incident_dates)
         .pipe(clean_allegation)
         .pipe(clean_names)
@@ -147,7 +147,7 @@ def clean():
         .pipe(clean_disposition)
         .pipe(clean_action)
         .pipe(clean_dates, ["incident_date"])
-        .pipe(standardize_desc_cols, ["tracking_number"])
+        .pipe(standardize_desc_cols, ["tracking_id"])
         .pipe(set_values, {"agency": "Denham Springs PD"})
         .pipe(gen_uid, ["agency", "first_name", "last_name"])
         .pipe(

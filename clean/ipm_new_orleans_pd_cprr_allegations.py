@@ -59,9 +59,9 @@ def combine_citizen_columns(df):
     return df
 
 
-def drop_rows_without_tracking_number(df):
-    df = df[df.tracking_number != "test"]
-    return df.dropna(subset=["tracking_number"]).reset_index(drop=True)
+def drop_rows_without_tracking_id(df):
+    df = df[df.tracking_id != "test"]
+    return df.dropna(subset=["tracking_id"]).reset_index(drop=True)
 
 
 def clean_trailing_empty_time(df, cols):
@@ -255,7 +255,7 @@ def discard_allegations_with_same_description(df):
         {"di-2": "counseling", "nfim": "no investigation merited"}
     ).astype(finding_cat)
     return (
-        df.sort_values(["tracking_number", "allegation_uid", "allegation_finding"])
+        df.sort_values(["tracking_id", "allegation_uid", "allegation_finding"])
         .drop_duplicates(subset=["allegation_uid"], keep="first")
         .reset_index(drop=True)
     )
@@ -266,13 +266,13 @@ def remove_rows_with_conflicting_disposition(df):
     return df
 
 
-def clean_tracking_number(df):
-    df.loc[:, "tracking_number"] = df.tracking_number.str.replace(
+def clean_tracking_id(df):
+    df.loc[:, "tracking_id"] = df.tracking_id.str.replace(
         r"^Rule9-", "", regex=True
     )
-    for idx, row in df.loc[df.tracking_number.str.match(r"^\d{3}-")].iterrows():
-        df.loc[idx, "tracking_number"] = (
-            row.allegation_create_year + row.tracking_number[3:]
+    for idx, row in df.loc[df.tracking_id.str.match(r"^\d{3}-")].iterrows():
+        df.loc[idx, "tracking_id"] = (
+            row.allegation_create_year + row.tracking_id[3:]
         )
     return df
 
@@ -416,7 +416,7 @@ def clean():
         .dropna(how="all")
         .rename(
             columns={
-                "pib_control_number": "tracking_number",
+                "pib_control_number": "tracking_id",
                 "occurred_date": "occur_date",
                 "disposition_oipm_by_officer": "disposition",
                 "received_date": "receive_date",
@@ -427,7 +427,7 @@ def clean():
             }
         )
         .pipe(clean_allegation)
-        .pipe(drop_rows_without_tracking_number)
+        .pipe(drop_rows_without_tracking_id)
         .pipe(clean_sexes, ["citizen_sex"])
         .pipe(clean_races, ["citizen_race"])
         .pipe(combine_citizen_columns)
@@ -452,13 +452,13 @@ def clean():
                 "investigation_complete_date",
             ],
         )
-        .pipe(clean_tracking_number)
+        .pipe(clean_tracking_id)
         .pipe(clean_complainant_type)
         .pipe(clean_investigating_unit)
         .pipe(assign_agency)
         .pipe(
             gen_uid,
-            ["agency", "tracking_number", "officer_primary_key", "allegation"],
+            ["agency", "tracking_id", "officer_primary_key", "allegation"],
             "allegation_uid",
         )
         .pipe(replace_disposition)

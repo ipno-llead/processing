@@ -29,7 +29,7 @@ def clean():
         .rename(
             columns={
                 "title": "rank_desc",
-                "incident_number": "tracking_number",
+                "incident_number": "tracking_id",
             }
         )
         .pipe(swap_names)
@@ -37,7 +37,7 @@ def clean():
         .pipe(standardize_desc_cols, ["rank_desc"])
         .pipe(assign_agency)
         .pipe(clean_names, ["first_name", "last_name"])
-        .pipe(gen_uid, ["agency", "tracking_number"], "allegation_uid")
+        .pipe(gen_uid, ["agency", "tracking_id"], "allegation_uid")
     )
     return df
 

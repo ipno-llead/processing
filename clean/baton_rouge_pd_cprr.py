@@ -209,8 +209,8 @@ def parse_officer_name_18(df):
     return df
 
 
-def assign_tracking_num_18(df):
-    df.loc[:, "tracking_number"] = df.ia_year + "-" + df["1a_seq"]
+def assign_id_num_18(df):
+    df.loc[:, "tracking_id"] = df.ia_year + "-" + df["1a_seq"]
     df = df.drop(columns=["1a_seq", "ia_year"])
     return df
 
@@ -253,8 +253,8 @@ def clean_investigation_status_21(df):
     return df.drop(columns="status")
 
 
-def assign_tracking_number_21(df):
-    df.loc[:, "tracking_number"] = df.ia_year.apply(str) + "-" + df.ia_seq.apply(str)
+def assign_tracking_id_21(df):
+    df.loc[:, "tracking_id"] = df.ia_year.apply(str) + "-" + df.ia_seq.apply(str)
     return df.drop(columns=["ia_seq", "ia_year"])
 
 
@@ -757,7 +757,7 @@ def clean_18():
         )
         .pipe(drop_office_investigation_rows_from_action)
         .pipe(clean_dates, ["receive_date", "occur_date"])
-        .pipe(assign_tracking_num_18)
+        .pipe(assign_id_num_18)
         .pipe(standardize_action_18)
         .pipe(combine_rule_and_paragraph)
         .pipe(assign_agency)
@@ -765,7 +765,7 @@ def clean_18():
         .pipe(gen_uid, ["agency", "first_name", "middle_name", "last_name"])
         .pipe(
             gen_uid,
-            ["agency", "tracking_number", "uid", "action", "allegation"],
+            ["agency", "tracking_id", "uid", "action", "allegation"],
             "allegation_uid",
         )
     )
@@ -779,7 +779,7 @@ def clean_21():
     df = (
         df.pipe(clean_investigation_status_21)
         .pipe(float_to_int_str, ["ia_seq", "ia_year"])
-        .pipe(assign_tracking_number_21)
+        .pipe(assign_tracking_id_21)
         .pipe(clean_receive_and_occur_dates_21)
         .pipe(clean_complainant_21)
         .pipe(clean_dates, ["receive_date", "occur_date"])
@@ -805,12 +805,12 @@ def clean_21():
         .pipe(assign_prod_year, "2021")
         .pipe(gen_uid, ["agency", "first_name", "last_name"])
         .drop_duplicates(
-            subset=["uid", "tracking_number", "allegation", "disposition", "action"],
+            subset=["uid", "tracking_id", "allegation", "disposition", "action"],
             keep="first",
         )
         .pipe(
             gen_uid,
-            ["agency", "uid", "allegation", "tracking_number", "action"],
+            ["agency", "uid", "allegation", "tracking_id", "action"],
             "allegation_uid",
         )
         .pipe(

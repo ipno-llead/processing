@@ -116,8 +116,8 @@ def clean_days(df):
     return df.drop(columns="days")
 
 
-def clean_tracking_number_14(df):
-    df.loc[:, "tracking_number"] = (
+def clean_tracking_id_14(df):
+    df.loc[:, "tracking_id"] = (
         df.case.str.lower()
         .str.strip()
         .str.replace(r"(\d+)?-?sep-?(\d+)?", r"09-\1", regex=True)
@@ -147,8 +147,8 @@ def clean_department_desc(df):
     return df.drop(columns="emp_assign")
 
 
-def clean_tracking_number_08(df):
-    df.loc[:, "tracking_number"] = (
+def clean_tracking_id_08(df):
+    df.loc[:, "tracking_id"] = (
         df.case.str.lower()
         .str.strip()
         .str.replace(r"(\d+)?-?aug-?(\d+)?", r"12-\1", regex=True)
@@ -197,7 +197,7 @@ def clean20():
     df = (
         df.rename(
             columns={
-                "case": "tracking_number",
+                "case": "tracking_id",
                 "date": "receive_date",
                 "emp_assign": "department_desc",
             }
@@ -220,7 +220,7 @@ def clean20():
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(
             gen_uid,
-            ["uid", "allegation", "action", "tracking_number"],
+            ["uid", "allegation", "action", "tracking_id"],
             "allegation_uid",
         )
         .pipe(drop_rows_missing_names)
@@ -235,7 +235,7 @@ def clean14():
         .rename(columns={"date": "receive_date"})
         .drop(columns="days")
         .pipe(clean_and_split_names)
-        .pipe(clean_tracking_number_14)
+        .pipe(clean_tracking_id_14)
         .pipe(clean_level)
         .pipe(clean_allegations)
         .pipe(clean_complete)
@@ -246,7 +246,7 @@ def clean14():
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(
             gen_uid,
-            ["uid", "allegation", "action", "tracking_number", "receive_date"],
+            ["uid", "allegation", "action", "tracking_id", "receive_date"],
             "allegation_uid",
         )
         .pipe(drop_rows_missing_names)
@@ -261,7 +261,7 @@ def clean08():
         .drop(columns=["emp"])
         .rename(columns={"date": "receive_date"})
         .pipe(clean_and_split_names)
-        .pipe(clean_tracking_number_08)
+        .pipe(clean_tracking_id_08)
         .pipe(clean_department_desc)
         .pipe(clean_allegations)
         .pipe(split_rows_with_multiple_allegations)
@@ -272,7 +272,7 @@ def clean08():
         .pipe(gen_uid, ["agency", "first_name", "last_name"])
         .pipe(
             gen_uid,
-            ["uid", "allegation", "action", "tracking_number", "receive_date"],
+            ["uid", "allegation", "action", "tracking_id", "receive_date"],
             "allegation_uid",
         )
         .pipe(drop_rows_missing_names)
