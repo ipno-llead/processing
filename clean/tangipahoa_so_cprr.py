@@ -29,7 +29,7 @@ def split_full_name(df):
     )
     parts = df.full_name.str.extract(r"(?:(dy|sgt|lt|capt) )?(?:([^ ]+) )?(.+)")
     df.loc[:, "rank_desc"] = parts[0].replace(
-        {"dy": "deputy", "sgt": "sargeant", "lt": "lieutenant", "capt": "captain"}
+        {"dy": "deputy", "sgt": "sergeant", "lt": "lieutenant", "capt": "captain"}
     )
     df.loc[:, "first_name"] = (
         parts[1].str.strip().str.replace("jessical", "jessica", regex=False)

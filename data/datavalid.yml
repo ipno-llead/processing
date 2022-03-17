@@ -145,9 +145,6 @@ schemas:
       - name: department_desc
         description: >
           text description of the department the accused belonged to during the incident.
-      - name: rank_desc
-        description: >
-          text description of the accused's rank during the incident.
       - name: employment_status
         description: >
           whether the accused was fulltime or reserve during incident.
@@ -390,7 +387,6 @@ schemas:
       - name: consent_form_completed
       - name: search_types
       - name: exit_vehicle
-      - name: rank_desc
       - name: first_name
       - name: middle_name
       - name: last_name

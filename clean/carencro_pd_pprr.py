@@ -21,7 +21,7 @@ def clean():
                 ["captain"],
                 ["detective"],
                 ["sergeant", "sargeant"],
-                ["military/activated"],
+                ["military"],
             ],
         )
         .pipe(set_values, {"agency": "Carencro PD"})

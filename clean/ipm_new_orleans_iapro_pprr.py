@@ -3,6 +3,7 @@ from lib.columns import clean_column_names
 from lib.clean import (
     clean_races,
     float_to_int_str,
+    names_to_title_case,
     standardize_desc_cols,
     clean_sexes,
     clean_names,

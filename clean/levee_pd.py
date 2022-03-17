@@ -21,7 +21,7 @@ def split_name_19(df):
     df.loc[:, "rank_desc"] = (
         names.loc[:, 0]
         .str.lower()
-        .str.replace(r"^po$", "police officer", regex=True)
+        .str.replace(r"^po$", "officer", regex=True)
         .str.replace(r"^lt\.$", "lieutenant", regex=True)
         .str.replace(r"^sgt\.$", "sergeant", regex=True)
     )

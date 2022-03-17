@@ -840,6 +840,12 @@ def add_left_reason_column(df):
     )
 
 
+def clean_rank_desc_19(df):
+    df.loc[:, "rank_desc"] = df.job_title.str.lower().str.strip()\
+        .str.replace(r"mr\.", "", regex=True)
+    return df 
+
+
 def clean19():
     df = pd.read_csv(
         deba.data("raw/new_orleans_so/new_orleans_so_cprr_2019_tabula.csv")
@@ -864,7 +870,6 @@ def clean19():
             columns={
                 "date_received": "receive_date",
                 "case_number": "tracking_id",
-                "job_title": "rank_desc",
                 "charge_disposition": "disposition",
                 "location_or_facility": "department_desc",
                 "assigned_agent": "investigating_supervisor",
@@ -875,6 +880,7 @@ def clean19():
                 "summary": "allegation_desc",
             }
         )
+        .pipe(clean_rank_desc_19)
         .pipe(split_rows_with_multiple_alllegations_19)
         .pipe(clean_allegations_19)
         .pipe(
@@ -891,7 +897,6 @@ def clean19():
             ],
         )
         .pipe(clean_department_desc)
-        .pipe(standardize_desc_cols, ["rank_desc"])
         .pipe(split_name_19)
         .pipe(clean_names, ["first_name", "last_name", "middle_name"])
         .pipe(clean_action_19)

@@ -47,6 +47,7 @@ def standardize_rank(df):
         .str.replace(r"\basst\b", "assistant", regex=True)
         .str.replace(r"\baccredi?ation\b", "accreditation", regex=True)
         .str.replace("/", " to ", regex=False)
+        .str.replace(r"^pco$", "communications officer", regex=True)
     )
     return df
 
@@ -158,7 +159,7 @@ def extract_rank(df):
         "officer",
         "captain",
         "reserve officer",
-        "pco",
+        "communications officer",
         "detective",
     ]
     rank_name = df.officer.str.extract(r"^(?:(%s) )?(.+)" % "|".join(ranks))

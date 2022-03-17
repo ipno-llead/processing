@@ -26,8 +26,9 @@ def clean_rank_desc(df):
         .str.strip()
         .str.replace(r"(officer )?", "", regex=True)
         .str.replace("community policing", "community service officer", regex=False)
-        .str.replace("sergeant", "sargeant", regex=False)
+ 
         .str.replace("police ", "", regex=False)
+        .str.replace(r"sargeant", "sergeant", regex=True)
     )
     return df
 

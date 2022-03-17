@@ -76,7 +76,7 @@ def rearrange_personnel_columns(df: pd.DataFrame) -> pd.DataFrame:
         .drop_duplicates(subset=["uid"])
         .pipe(
             names_to_title_case,
-            ["first_name", "last_name", "middle_name", "middle_initial"],
+            ["first_name", "last_name", "middle_name", "middle_initial", "rank_desc"],
         )
         .pipe(float_to_int_str, ["birth_year", "birth_month", "birth_day"])
         .sort_values("uid"),

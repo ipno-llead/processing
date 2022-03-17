@@ -54,6 +54,7 @@ def clean_rank(df):
             r"administrative assistant (.+)", "administrative assistant", regex=True
         )
         .str.replace(r"(.+) analyst", "analyst", regex=True)
+        .str.replace(r"\/(.+)", "", regex=True)
     )
     return df.drop(columns="job_title_description")
 
