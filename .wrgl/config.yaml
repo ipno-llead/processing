@@ -1532,6 +1532,8 @@ branch:
     remote: event-ouachita-da
     merge: refs/heads/main
     file: data/fuse/event_ouachita_da.csv
+    primaryKey:
+      - event_uid
   event-eunice-pd:
     remote: event-eunice-pd
     merge: refs/heads/main
