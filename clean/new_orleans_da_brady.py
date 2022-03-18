@@ -194,27 +194,15 @@ def clean():
             ["initial_disposition", "disposition", "allegation", "allegation_desc"],
         )
         .pipe(clean_names, ["first_name", "last_name"])
-        .pipe(set_values, {"data_production_year": 2021, "agency": "New Orleans DA"})
-        .pipe(gen_uid, ["agency", "first_name", "last_name"])
         .pipe(
-            gen_uid,
-            [
-                "agency",
-                "uid",
-                "receive_year",
-                "allegation_desc",
-                "tracking_id",
-                "initial_disposition",
-                "disposition",
-                "allegation",
-            ],
-            "allegation_uid",
+            set_values, {"source_agency": "New Orleans DA", "agency": "New Orleans PD"}
         )
-        .drop_duplicates(subset=["allegation_uid"])
+        .pipe(gen_uid, ["agency", "first_name", "last_name"])
+        .pipe(gen_uid, ["uid", "source_agency"], "brady_uid")
     )
     return df
 
 
 if __name__ == "__main__":
     df = clean()
-    df.to_csv(deba.data("clean/cprr_new_orleans_da_2021.csv"), index=False)
+    df.to_csv(deba.data("clean/brady_new_orleans_da_2021.csv"), index=False)

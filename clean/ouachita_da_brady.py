@@ -1,6 +1,7 @@
 import pandas as pd
 import deba
-from lib.columns import clean_column_names
+from lib.columns import clean_column_names, set_values
+from lib.clean import clean_names, names_to_title_case, clean_dates
 from lib.uid import gen_uid
 
 
@@ -66,18 +67,23 @@ def clean():
     df = (
         pd.read_csv(deba.data("raw/ouachita_da/ouachita_da_cprr_2021_by_hand.csv"))
         .pipe(clean_column_names)
+        .rename(columns={"investigation_end_date": "investigation_complete_date"})
+        .pipe(clean_dates, ["investigation_complete_date"])
         .pipe(extract_disposition)
         .pipe(extract_charging_agency)
         .pipe(clean_allegations)
         .pipe(extract_agency_and_department_desc)
         .pipe(clean_action)
         .pipe(assign_agency)
+        .pipe(clean_names, ["first_name", "middle_name", "last_name"])
+        .pipe(names_to_title_case, ["charging_agency"])
+        .pipe(set_values, {"source_agency": "Ouachita DA"})
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
-        .pipe(gen_uid, ["uid", "allegation", "action", "disposition"], "allegation_uid")
+        .pipe(gen_uid, ["uid", "source_agency"], "brady_uid")
     )
     return df
 
 
 if __name__ == "__main__":
     df = clean()
-    df.to_csv(deba.data("clean/cprr_ouachita_da_2021.csv"), index=False)
+    df.to_csv(deba.data("clean/brady_ouachita_da_2021.csv"), index=False)

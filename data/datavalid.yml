@@ -11,7 +11,9 @@ files:
     schema: stop_and_search
   fuse/appeals.csv:
     schema: appeal_hearing
-  fuse/uof_citizens.csv:
+  fuse/brady.csv:
+    schema: brady
+  fuse/uof_citizen.csv:
     schema: uof_citizen
   fuse/uof_officers.csv:
     schema: uof_officer
@@ -397,6 +399,22 @@ schemas:
       - name: stop_and_search_time
       - name: agency
       - name: uid
+  brady:
+    columns:
+      - name: brady_uid
+        description: >
+          unique brady uid 
+      - name: uid
+      - name: tracking_number
+      - name: allegation
+      - name: initial_disposition
+      - name: disposition
+      - name: action
+      - name: allegation_desc
+      - name: court_location
+      - name: agency
+      - name: source_agency
+      - name: charging_agency
   uof_citizen:
     columns:
       - name: uof_citizen_uid
