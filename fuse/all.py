@@ -307,7 +307,6 @@ if __name__ == "__main__":
     uof_citizen_df.to_csv(deba.data("fuse/uof_citizens.csv"), index=False)
     uof_officer_df.to_csv(deba.data("fuse/uof_officers.csv"), index=False)
     award_df.to_csv(deba.data("fuse/awards.csv"), index=False)
-    award_df.to_csv(deba.data("fuse/award.csv"), index=False)
     brady_df.to_csv(deba.data("fuse/brady.csv"), index=False)
 
     post_event_df = pd.read_csv(deba.data("fuse/events_post.csv"))
