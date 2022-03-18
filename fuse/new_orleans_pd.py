@@ -3,6 +3,7 @@ import deba
 from lib.columns import (
     rearrange_appeal_hearing_columns,
     rearrange_allegation_columns,
+    rearrange_brady_columns,
     rearrange_uof_citizen_columns,
     rearrange_stop_and_search_columns,
     rearrange_use_of_force,
@@ -162,8 +163,11 @@ if __name__ == "__main__":
     award = pd.read_csv(deba.data("match/award_new_orleans_pd_2016_2021.csv"))
     lprr = pd.read_csv(deba.data("match/lprr_new_orleans_csc_2000_2016.csv"))
     sas = pd.read_csv(deba.data("match/sas_new_orleans_pd_2017_2021.csv"))
+    brady = pd.read_csv(deba.data("match/brady_new_orleans_da_2021.csv"))
+    brady = brady.loc[brady.agency == "New Orleans PD"]
+
     complaints = fuse_cprr(cprr, actions, officer_number_dict)
-    personnel = fuse_personnel(pprr_ipm, lprr, pprr_csd, sas, uof_officers)
+    personnel = fuse_personnel(pprr_ipm, lprr, pprr_csd, sas, uof_officers, brady)
     events_df = fuse_events(pprr_ipm, pprr_csd, cprr, uof, award, lprr, sas)
     events_df = rearrange_event_columns(pd.concat([post_event, events_df]))
     sas_df = rearrange_stop_and_search_columns(sas)
@@ -171,6 +175,7 @@ if __name__ == "__main__":
     uof_officer_df = rearrange_uof_officer_columns(uof_officers)
     uof_citizen_df = rearrange_uof_citizen_columns(uof_citizens)
     uof_df = rearrange_use_of_force(uof)
+    brady_df = rearrange_brady_columns(brady)
     complaints.to_csv(deba.data("fuse/com_new_orleans_pd.csv"), index=False)
     personnel.to_csv(deba.data("fuse/per_new_orleans_pd.csv"), index=False)
     events_df.to_csv(deba.data("fuse/event_new_orleans_pd.csv"), index=False)
@@ -179,3 +184,4 @@ if __name__ == "__main__":
     uof_df.to_csv(deba.data("fuse/uof_new_orleans_pd.csv"), index=False)
     uof_officer_df.to_csv(deba.data("fuse/uof_officers_new_orleans_pd.csv"), index=False)
     uof_citizen_df.to_csv(deba.data("fuse/uof_citizens_new_orleans_pd.csv"), index=False)
+    brady_df.to_csv(deba.data("fuse/brady_new_orleans_pd.csv"), index=False)
