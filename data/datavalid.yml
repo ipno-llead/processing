@@ -13,7 +13,7 @@ files:
     schema: appeal_hearing
   fuse/brady.csv:
     schema: brady
-  fuse/uof_citizen.csv:
+  fuse/uof_citizens.csv:
     schema: uof_citizen
   fuse/uof_officers.csv:
     schema: uof_officer
