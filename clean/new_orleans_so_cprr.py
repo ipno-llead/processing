@@ -1,7 +1,7 @@
 import pandas as pd
 from lib.columns import clean_column_names, set_values
 import deba
-from lib.clean import clean_names, float_to_int_str, standardize_desc_cols
+from lib.clean import clean_names, float_to_int_str, standardize_desc_cols, clean_dates
 from lib.uid import gen_uid
 from lib.standardize import standardize_from_lookup_table
 
@@ -409,6 +409,7 @@ def fix_date_typos(df, cols):
 def split_investigating_supervisor(df):
     df.loc[:, "investigating_supervisor"] = (
         df.investigating_supervisor.fillna("")
+        .str.replace(r"([A-Z][a-z]+)([A-Z][a-z]+)", r"\1 \2", regex=True)
         .str.strip()
         .str.lower()
         .str.replace(
@@ -423,7 +424,6 @@ def split_investigating_supervisor(df):
         )
         .str.replace("ms", "", regex=False)
         .str.replace("augusuts", "augustus", regex=False)
-        .str.replace("karengant", "karen gant", regex=False)
         .str.replace(r"^(\w+)  (\w+)", r"\1 \2", regex=True)
         .str.replace(r"^ (\w+)", r"\1", regex=True)
         .str.replace(r"^sergeant$", "", regex=True)
@@ -841,15 +841,14 @@ def add_left_reason_column(df):
 
 
 def clean_rank_desc_19(df):
-    df.loc[:, "rank_desc"] = df.job_title.str.lower().str.strip()\
-        .str.replace(r"mr\.", "", regex=True)
-    return df 
+    df.loc[:, "rank_desc"] = (
+        df.job_title.str.lower().str.strip().str.replace(r"mr\.", "", regex=True)
+    )
+    return df
 
 
 def clean19():
-    df = pd.read_csv(
-        deba.data("raw/new_orleans_so/new_orleans_so_cprr_2019_tabula.csv")
-    )
+    df = pd.read_csv(deba.data("raw/new_orleans_so/new_orleans_so_cprr_2019_tabula.csv"))
     df = clean_column_names(df)
     df = (
         df.pipe(remove_header_rows)
@@ -880,40 +879,28 @@ def clean19():
                 "summary": "allegation_desc",
             }
         )
-        .pipe(clean_rank_desc_19)
-        .pipe(split_rows_with_multiple_alllegations_19)
-        .pipe(clean_allegations_19)
         .pipe(
             remove_carriage_return,
             [
                 "name_of_accused",
                 "disposition",
-                "allegation",
                 "allegation_desc",
                 "investigating_supervisor",
                 "action",
                 "department_desc",
-                "rank_desc",
+                "charges",
+                "job_title",
             ],
         )
+        .pipe(clean_rank_desc_19)
+        .pipe(split_rows_with_multiple_alllegations_19)
+        .pipe(clean_allegations_19)
         .pipe(clean_department_desc)
         .pipe(split_name_19)
         .pipe(clean_names, ["first_name", "last_name", "middle_name"])
         .pipe(clean_action_19)
-        .pipe(set_values, {"agency": "New Orleans SO", "data_production_year": "2019"})
+        .pipe(set_values, {"agency": "New Orleans SO"})
         .pipe(process_disposition)
-        .pipe(
-            fix_date_typos,
-            ["receive_date", "investigation_start_date", "investigation_complete_date"],
-        )
-        .pipe(
-            gen_uid,
-            ["agency", "employee_id", "first_name", "last_name", "middle_name"],
-        )
-        .pipe(set_empty_uid_for_anonymous_officers)
-        .pipe(gen_uid, ["agency", "tracking_id", "uid"], "allegation_uid")
-        .sort_values(["tracking_id", "investigation_complete_date"])
-        .drop_duplicates(subset=["allegation_uid"], keep="last", ignore_index=True)
         .pipe(split_investigating_supervisor)
         .pipe(clean_allegation_desc)
         .pipe(extract_arrest_date)
@@ -922,6 +909,31 @@ def clean19():
         .pipe(extract_suspension_end_date)
         .pipe(extract_termination_date)
         .pipe(add_left_reason_column)
+        .pipe(
+            fix_date_typos,
+            ["receive_date", "investigation_start_date", "investigation_complete_date"],
+        )
+        .pipe(
+            clean_dates,
+            [
+                "receive_date",
+                "investigation_start_date",
+                "investigation_complete_date",
+                "termination_date",
+                "resignation_date",
+                "suspension_start_date",
+                "suspension_end_date",
+                "arrest_date",
+            ],
+        )
+        .pipe(
+            gen_uid,
+            ["agency", "employee_id", "first_name", "last_name", "middle_name"],
+        )
+        .pipe(gen_uid, ["agency", "tracking_id", "uid"], "allegation_uid")
+        .pipe(set_empty_uid_for_anonymous_officers)
+        .sort_values(["tracking_id"])
+        .drop_duplicates(subset=["allegation_uid"], keep="last", ignore_index=True)
     )
     return df
 
@@ -987,8 +999,8 @@ def clean20():
         .pipe(split_investigating_supervisor)
         .pipe(process_disposition)
         .pipe(clean_department_desc)
-        .pipe(set_values, {"agency": "New Orleans SO", "data_production_year": "2020"})
         .pipe(float_to_int_str, ["employee_id"])
+        .pipe(set_values, {"agency": "New Orleans SO"})
         .pipe(
             gen_uid, ["agency", "first_name", "middle_name", "last_name", "employee_id"]
         )
@@ -999,6 +1011,19 @@ def clean20():
         )
         .pipe(add_left_reason_column)
         .pipe(drop_rows_missing_names)
+        .pipe(
+            clean_dates,
+            [
+                "receive_date",
+                "investigation_start_date",
+                "investigation_complete_date",
+                "termination_date",
+                "resignation_date",
+                "suspension_start_date",
+                "suspension_end_date",
+                "arrest_date",
+            ],
+        )
     )
     return df
 

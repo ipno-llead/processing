@@ -742,6 +742,7 @@ def canonicalize_officers(
         df.loc[df[uid_column].isin(cluster), last_name_column] = last_name
         if has_middle_name:
             df.loc[df[uid_column].isin(cluster), middle_name_column] = middle_name
+
     return df
 
 

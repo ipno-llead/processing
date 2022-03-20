@@ -133,9 +133,9 @@ def rearrange_allegation_columns(df):
     """
     return datavalid_config.rearrange_columns(
         "allegation",
-        df.pipe(float_to_int_str, ["paragraph_code"]).sort_values(
-            ["agency", "allegation_uid"]
-        ),
+        df[~((df.allegation_uid.fillna("") == ""))]
+        .pipe(float_to_int_str, ["paragraph_code"])
+        .sort_values(["agency", "allegation_uid"]),
     )
 
 
