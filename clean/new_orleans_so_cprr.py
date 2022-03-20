@@ -1,7 +1,13 @@
 import pandas as pd
 from lib.columns import clean_column_names, set_values
 import deba
-from lib.clean import clean_names, float_to_int_str, standardize_desc_cols, clean_dates
+from lib.clean import (
+    clean_names,
+    float_to_int_str,
+    standardize_desc_cols,
+    clean_dates,
+    clean_names,
+)
 from lib.uid import gen_uid
 from lib.standardize import standardize_from_lookup_table
 
@@ -847,8 +853,48 @@ def clean_rank_desc_19(df):
     return df
 
 
+def clean_referred_by(df):
+    df.loc[:, "referred_by"] = (
+        df.referred_by.str.lower()
+        .str.strip()
+        .fillna("")
+        .str.replace(r"^mainten ?(ance)?$", "maintenance", regex=True)
+        .str.replace(r"^ad?ministrativ? (\w+)", "admin", regex=True)
+        .str.replace(r"^mechani c$", "mechanic", regex=True)
+        .str.replace(r"(^ccs (.+)|deputy (.+))", "", regex=True)
+        .str.replace(
+            r"^planning , complai nce, and grants$",
+            "planning, compliance, grants",
+            regex=True,
+        )
+        .str.replace("grievnce", "grievance", regex=False)
+        .str.replace(r"^hr$", "human resources", regex=True)
+        .str.replace(
+            r"^iad-? ?(crimi?n?a?l?)",
+            "internal affairs department - criminal",
+            regex=True,
+        )
+    )
+    return df
+
+
+def clean_initial_action(df):
+    df.loc[:, "initial_action"] = (
+        df.intial_action.str.lower()
+        .str.strip()
+        .fillna("")
+        .str.replace(r"\bdn\b", "dm", regex=True)
+        .str.replace("--", "-", regex=False)
+        .str.replace(r"(^dm-!$|`)", "", regex=True)
+        .str.replace(r"^dm1$", "dm-1", regex=True)
+    )
+    return df.drop(columns=["intial_action"])
+
+
 def clean19():
-    df = pd.read_csv(deba.data("raw/new_orleans_so/new_orleans_so_cprr_2019_tabula.csv"))
+    df = pd.read_csv(
+        deba.data("raw/new_orleans_so/new_orleans_so_cprr_2019_tabula.csv")
+    )
     df = clean_column_names(df)
     df = (
         df.pipe(remove_header_rows)
@@ -859,9 +905,7 @@ def clean19():
                 "numb_er_of_cases",
                 "related_item_number",
                 "a_i",
-                "intial_action",
                 "inmate_grievance",
-                "referred_by",
                 "date_of_board",
             ]
         )
@@ -890,6 +934,7 @@ def clean19():
                 "department_desc",
                 "charges",
                 "job_title",
+                "referred_by",
             ],
         )
         .pipe(clean_rank_desc_19)
@@ -934,6 +979,10 @@ def clean19():
         .pipe(set_empty_uid_for_anonymous_officers)
         .sort_values(["tracking_id"])
         .drop_duplicates(subset=["allegation_uid"], keep="last", ignore_index=True)
+        .pipe(clean_referred_by)
+        .pipe(clean_initial_action)
+        .pipe(standardize_desc_cols, ["referred_by", "allegation", "action"])
+        .pipe(clean_names, ["first_name", "middle_name", "last_name"])
     )
     return df
 
@@ -948,7 +997,6 @@ def clean20():
             columns=[
                 "month",
                 "quarter",
-                "intial_action",
                 "number_of_cases",
                 "date_of_board",
                 "a_i",
@@ -1024,6 +1072,7 @@ def clean20():
                 "arrest_date",
             ],
         )
+        .pipe(clean_initial_action)
     )
     return df
 

@@ -160,6 +160,7 @@ schemas:
       - name: investigating_department
         description: >
           small departments frequently turnover internal investigations to the sheriff's office
+      - name: referred_by
   event:
     columns:
       - name: event_uid
