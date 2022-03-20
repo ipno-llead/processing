@@ -125,6 +125,20 @@ def assign_agency(df):
     return df
 
 
+def assign_final_appeal_hearing_date(df):
+    df.loc[
+        (df.hearing_date_1 == "11/17/2011")
+        & (df.appeal_uid == "1b36e4b575c20b622c6dd5d87c0c43cb"),
+        "appeal_hearing_date",
+    ] = "11/17/2011"
+    df.loc[
+        (df.hearing_date_1 == "5/31/2018")
+        & (df.appeal_uid == "c3ec99940d680b1272c6aee1b497a3ca"),
+        "appeal_hearing_date",
+    ] = "5/31/2018"
+    return df.drop(columns=["hearing_date_1"])
+
+
 def clean():
     df = (
         pd.read_csv(deba.data("raw/new_orleans_csc/new_orleans_csc_lprr_2000_2016.csv"))
@@ -141,7 +155,6 @@ def clean():
             columns={
                 "date_received": "appeal_receive_date",
                 "hearing_date": "appeal_hearing_date",
-                "hearing_date_1": "appeal_hearing_2_date",
                 "transcript_received": "transcript_receive_date",
                 "h_e_report_received": "h_e_report_receive_date",
                 "final_disposition_date": "appeal_disposition_date",
@@ -157,6 +170,7 @@ def clean():
         .pipe(clean_names, ["first_name", "last_name"])
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(gen_uid, ["uid", "docket_no"], "appeal_uid")
+        .pipe(assign_final_appeal_hearing_date)
     )
     return df
 

@@ -188,7 +188,6 @@ schemas:
           - suspension_end
           - appeal_file
           - appeal_hearing
-          - appeal_hearing_2
           - appeal_receive
           - appeal_render
           - appeal_disposition
