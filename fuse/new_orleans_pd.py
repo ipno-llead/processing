@@ -112,17 +112,14 @@ def fuse_events(pprr_ipm, pprr_csd, cprr, uof, award, lprr, sas):
         {
             events.APPEAL_DISPOSITION: {
                 "prefix": "appeal_disposition",
-                "parse_date": True,
                 "keep": ["uid", "agency", "appeal_uid"],
             },
             events.APPEAL_RECEIVE: {
                 "prefix": "appeal_receive",
-                "parse_date": True,
                 "keep": ["uid", "agency", "appeal_uid"],
             },
             events.APPEAL_HEARING: {
                 "prefix": "appeal_hearing",
-                "parse_date": True,
                 "keep": ["uid", "agency", "appeal_uid"],
             },
         },
