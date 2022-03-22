@@ -310,7 +310,7 @@ def clean_action_19(df):
     return df
 
 
-def split_rows_with_multiple_alllegations_19(df):
+def split_rows_with_multiple_allegations_19(df):
     df.loc[:, "allegation"] = (
         df.charges.str.lower()
         .str.strip()
@@ -340,11 +340,9 @@ def split_rows_with_multiple_alllegations_19(df):
 def clean_allegations_19(df):
     df.loc[:, "allegation"] = (
         df.allegation.fillna("")
-        .str.replace(r"\"(\w+)\"", "", regex=True)
-        .str.replace("responsibilities", "responsibility", regex=False)
-        .str.replace(r"porfessionalism", "professionalism", regex=True)
+        .str.replace("respnsibilities", "responsibilities", regex=False)
+        .str.replace(r"pr?o?r?fessioa?n?a?lism", "professionalism", regex=True)
         .str.replace(r"duty (\w+)", r"duty-\1", regex=True)
-        .str.replace(r"\(|\)", "", regex=True)
         .str.replace("fo", "of", regex=False)
         .str.replace("proceudres", "procedures", regex=False)
         .str.replace("beofre", "before", regex=False)
@@ -352,6 +350,14 @@ def clean_allegations_19(df):
         .str.replace(r"\- (\w+)", r"-\1", regex=True)
         .str.replace("neglct", "neglect", regex=False)
         .str.replace("supervisory", "supervisor", regex=False)
+        .str.replace("ofr", "for", regex=False)
+        .str.replace(r"\bo\b", "to", regex=True)
+        .str.replace("failkure", "failure", regex=False)
+        .str.replace(r"\"(\w+)\" \"(\w+)\"", r'"\1", "\2"', regex=True)
+        .str.replace(r"(\w+) \"(\w+)\"", r'\1: "\2"', regex=True)
+        .str.replace(r"3 counts each$", "(3 counts each)", regex=True)
+        .str.replace(r"2 counts$", "(2 counts)", regex=True)
+        .str.replace(r"^instr?ucti?ons", "instructions", regex=True)
     )
     return df
 
@@ -645,6 +651,7 @@ def clean_allegations_20(df):
         .str.replace(r"(\w+) physical", r"\1/physical", regex=True)
         .str.replace("courtesy intimidation", "courtesy/intimidation", regex=False)
         .str.replace("unfounded", "", regex=False)
+        .str.replace("posession", "possession", regex=False)
         .str.replace(r"/$", "", regex=True)
         .str.replace(r"  +", "", regex=True)
     )
@@ -906,6 +913,13 @@ def clean_initial_action(df):
     )
     return df.drop(columns=["intial_action"])
 
+def clean_disposition_19(df):
+    dispositions = df.disposition.str.lower().str.strip()\
+        .str.extract(r"(non-? ?sustained|sustained|exonerated|terminated all charges|unfounded)")
+    
+    df.loc[:, "disposition"] = dispositions[0]\
+        .str.replace(r"non ?sustained", "non-sustained", regex=True)
+    return df 
 
 def clean19():
     df = pd.read_csv(
@@ -954,7 +968,7 @@ def clean19():
             ],
         )
         .pipe(clean_rank_desc_19)
-        .pipe(split_rows_with_multiple_alllegations_19)
+        .pipe(split_rows_with_multiple_allegations_19)
         .pipe(clean_allegations_19)
         .pipe(clean_department_desc)
         .pipe(split_name_19)
@@ -962,6 +976,7 @@ def clean19():
         .pipe(clean_action_19)
         .pipe(set_values, {"agency": "New Orleans SO"})
         .pipe(process_disposition)
+        .pipe(clean_disposition_19)
         .pipe(split_investigating_supervisor)
         .pipe(clean_allegation_desc)
         .pipe(extract_arrest_date)
