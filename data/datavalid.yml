@@ -82,6 +82,7 @@ schemas:
           complaint unique identifier
         unique: true
         no_na: true
+      - name: allegation
       - name: investigation_status
       - name: assigned_department
       - name: assigned_division
