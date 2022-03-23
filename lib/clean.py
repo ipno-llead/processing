@@ -223,17 +223,9 @@ def clean_sexes(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
         the updated frame
     """
     for col in cols:
-        df.loc[:, col] = (
-            df[col]
-            .str.strip()
-            .str.lower()
-            .str.replace(r"^m$", "male", regex=True)
-            .str.replace(r"^f$", "female", regex=True)
-            .str.replace(r"^unknown.*", "", regex=True)
-            .str.replace(r"^null$", "", regex=True)
-        )
+        df.loc[:, col] = df[col].str.strip().str.lower()
         df = standardize_from_lookup_table(
-            df, col, [["male"], ["female", "femaale", "famale"]]
+            df, col, [["male", "m"], ["female", "femaale", "famale", "f"]]
         )
     return df
 
