@@ -15,10 +15,22 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/app-new-orleans-pd
     fetch:
       - +refs/heads/*:refs/remotes/app-new-orleans-pd/*
-  baton-rouge-da-brady-list:
-    url: https://hub.wrgl.co/api/users/ipno/repos/baton-rouge-da-brady-list
+  brady-baton-rouge-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/brady-baton-rouge-pd
     fetch:
-      - +refs/heads/*:refs/remotes/baton-rouge-da-brady-list/*
+      - +refs/heads/*:refs/remotes/brady-baton-rouge-pd/*
+  brady-new-orleans-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/brady=new-orleans-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/brady-new-orleans-pd/*
+  brady-ouachita-so:
+    url: https://hub.wrgl.co/api/users/ipno/repos/brady-ouachita-so
+    fetch:
+      - +refs/heads/*:refs/remotes/brady-ouachita-so/*
+  brady-tangipahoa-so:
+    url: https://hub.wrgl.co/api/users/ipno/repos/brady-tangipahoa-so
+    fetch:
+      - +refs/heads/*:refs/remotes/brady-tangipahoa-so/*
   clean-cprr-actions-new-orleans-pd-1931-2020:
     url: https://hub.wrgl.co/api/users/ipno/repos/clean-cprr-actions-new-orleans-pd-1931-2020
     fetch:
@@ -483,6 +495,14 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/event-benton-pd
     fetch:
       - +refs/heads/*:refs/remotes/event-benton-pd/*
+  event-new-orleans-da:
+    url: https://hub.wrgl.co/api/users/ipno/repos/event-new-orleans-da
+    fetch:
+      - +refs/heads/*:refs/remotes/event-new-orleans-da/*
+  event-ouachita-da:
+    url: https://hub.wrgl.co/api/users/ipno/repos/event-ouachita-da
+    fetch:
+      - +refs/heads/*:refs/remotes/event-ouachita-da/*
   event-eunice-pd:
     url: https://hub.wrgl.co/api/users/ipno/repos/event-eunice-pd
     fetch:
@@ -575,10 +595,6 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/match-pprr-st-tammany-so-2020
     fetch:
       - +refs/heads/*:refs/remotes/match-pprr-st-tammany-so-2020/*
-  new-orleans-da-brady-list:
-    url: https://hub.wrgl.co/api/users/ipno/repos/new-orleans-da-brady-list
-    fetch:
-      - +refs/heads/*:refs/remotes/new-orleans-da-brady-list/*
   per-abbeville-pd:
     url: https://hub.wrgl.co/api/users/ipno/repos/per-abbeville-pd
     fetch:
@@ -835,6 +851,10 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/use-of-force
     fetch:
       - +refs/heads/*:refs/remotes/use-of-force/*
+  brady:
+    url: https://hub.wrgl.co/api/users/ipno/repos/brady
+    fetch:
+      - +refs/heads/*:refs/remotes/brady/*
   use-of-force-officers:
     url: https://hub.wrgl.co/api/users/ipno/repos/use-of-force-officers
     fetch:
@@ -868,10 +888,6 @@ branch:
     file: data/fuse/app_new_orleans_csc.csv
     primaryKey:
       - appeal_uid
-  baton-rouge-da-brady-list:
-    remote: baton-rouge-da-brady-list
-    merge: refs/heads/main
-    file: data/match/cprr_baton_rouge_da_2021.csv
   clean-cprr-actions-new-orleans-pd-1931-2020:
     remote: clean-cprr-actions-new-orleans-pd-1931-2020
     merge: refs/heads/main
@@ -1506,6 +1522,18 @@ branch:
     file: data/fuse/event_benton_pd.csv
     primaryKey:
       - event_uid
+  event-new-orleans-da:
+    remote: event-new-orleans-da
+    merge: refs/heads/main
+    file: data/fuse/event_new_orleans_da.csv
+    primaryKey:
+      - event_uid
+  event-ouachita-da:
+    remote: event-ouachita-da
+    merge: refs/heads/main
+    file: data/fuse/event_ouachita_da.csv
+    primaryKey:
+      - event_uid
   event-eunice-pd:
     remote: event-eunice-pd
     merge: refs/heads/main
@@ -1602,10 +1630,6 @@ branch:
     remote: match-pprr-port-allen-csd-2020
     merge: refs/heads/main
     file: data/match/pprr_port_allen_csd_2020.csv
-  new-orleans-da-brady-list:
-    remote: new-orleans-da-brady-list
-    merge: refs/heads/main
-    file: data/match/cprr_new_orleans_da_2021.csv
   per-abbeville-pd:
     remote: per-abbeville-pd
     merge: refs/heads/main
@@ -1900,6 +1924,30 @@ branch:
     file: data/fuse/per_benton_pd.csv
     primaryKey:
       - uid
+  brady-baton-rouge-pd:
+    remote: brady-baton-rouge-pd
+    merge: refs/heads/main
+    file: data/fuse/brady_baton_rouge_pd.csv
+    primaryKey:
+      - brady_uid
+  brady-new-orleans-pd:
+    remote: brady-new-orleans-pd
+    merge: refs/heads/main
+    file: data/fuse/brady_new_orleans_pd.csv
+    primaryKey:
+      - brady_uid
+  brady-ouachita-so:
+    remote: brady-ouachita-so
+    merge: refs/heads/main
+    file: data/fuse/brady_ouachita_so.csv
+    primaryKey:
+      - brady_uid
+  brady-tangipahoa-so:
+    remote: brady-tangipahoa-so
+    merge: refs/heads/main
+    file: data/fuse/brady_tangipahoa_so.csv
+    primaryKey:
+      - brady_uid
   per-eunice-pd:
     remote: per-eunice-pd
     merge: refs/heads/main
@@ -1990,6 +2038,12 @@ branch:
     file: data/fuse/use_of_force.csv
     primaryKey:
       - uof_uid
+  brady:
+    remote: brady
+    merge: refs/heads/main
+    file: data/fuse/brady.csv
+    primaryKey:
+      - brady_uid
   use-of-force-officers:
     remote: use-of-force-officers
     merge: refs/heads/main

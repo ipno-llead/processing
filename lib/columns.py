@@ -278,3 +278,24 @@ def rearrange_award_columns(df):
         "award",
         df.sort_values(["agency", "award_uid"]),
     )
+
+
+def rearrange_brady_columns(df):
+    """Performs final processing step for an brady table
+
+    This performs the following tasks:
+    - discard columns not present in brady schema
+    - drop row duplicates
+    - convert numeric columns to int or str
+
+    Args:
+        df (pd.DataFrame):
+            the frame to process
+
+    Returns:
+        the updated frame
+    """
+    return datavalid_config.rearrange_columns(
+        "brady",
+        df.sort_values(["agency", "brady_uid"]),
+    )
