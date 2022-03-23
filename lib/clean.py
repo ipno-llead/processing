@@ -10,6 +10,12 @@ from lib.date import combine_date_columns, combine_datetime_columns
 from lib.standardize import standardize_from_lookup_table
 
 
+def full_year_str(yr: str) -> str:
+    if yr[0] in ["1", "2", "0"]:
+        return "20" + yr
+    return "19" + yr
+
+
 mdy_date_pattern_1 = re.compile(r"^\d{1,2}/\d{1,2}/\d{2}$")
 mdy_date_pattern_2 = re.compile(r"^\d{1,2}/\d{1,2}/\d{4}$")
 mdy_date_pattern_3 = re.compile(r"^\d{1,2}-\d{1,2}-\d{2}$")
@@ -44,20 +50,14 @@ def clean_date(val) -> tuple[str, str, str]:
     m = mdy_date_pattern_1.match(val)
     if m is not None:
         [month, day, year] = val.split("/")
-        if year[0] in ["1", "2", "0"]:
-            year = "20" + year
-        else:
-            year = "19" + year
+        year = full_year_str(year)
         if int(month) > 12 and int(day) <= 12:
             month, day = day, month
         return year, month.lstrip("0"), day.lstrip("0")
     m = mdy_date_pattern_3.match(val)
     if m is not None:
         [month, day, year] = val.split("-")
-        if year[0] in ["1", "2", "0"]:
-            year = "20" + year
-        else:
-            year = "19" + year
+        year = full_year_str(year)
         if int(month) > 12 and int(day) <= 12:
             month, day = day, month
         return year, month.lstrip("0"), day.lstrip("0")
@@ -65,10 +65,7 @@ def clean_date(val) -> tuple[str, str, str]:
     if m is not None:
         [day, month, year] = val.split("-")
         month = str(datetime.datetime.strptime(month, "%b").month)
-        if year[0] in ["1", "2", "0"]:
-            year = "20" + year
-        else:
-            year = "19" + year
+        year = full_year_str(year)
         return year, month, day
     m = year_month_pattern.match(val)
     if m is not None:
@@ -79,7 +76,7 @@ def clean_date(val) -> tuple[str, str, str]:
     m = month_day_pattern.match(val)
     if m is not None:
         dt = datetime.datetime.strptime(val, "%b-%d")
-        return "", str(dt.month).zfill(2), str(dt.day).zfill(2)
+        return "", str(dt.month), str(dt.day)
     raise ValueError('unknown date format "%s"' % val)
 
 
