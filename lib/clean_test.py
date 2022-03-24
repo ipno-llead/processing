@@ -4,7 +4,12 @@ import numpy as np
 import pandas as pd
 from pandas.testing import assert_frame_equal
 
-from lib.clean import canonicalize_officers, float_to_int_str, remove_future_dates
+from lib.clean import (
+    canonicalize_officers,
+    float_to_int_str,
+    remove_future_dates,
+    clean_date,
+)
 
 
 class RemoveFutureDatesTestCase(unittest.TestCase):
@@ -284,3 +289,22 @@ def test_middle_name(self):
             ]
         ),
     )
+
+
+class CleanDateTestCase(unittest.TestCase):
+    def test_run(self):
+        for value, year, month, day in [
+            ("", "", "", ""),
+            ("02/11/2022", "2022", "2", "11"),
+            ("02/11/22", "2022", "2", "11"),
+            ("02-11-99", "1999", "2", "11"),
+            ("3-feb-20", "2020", "2", "3"),
+            ("1998", "1998", "", ""),
+            ("2022", "2022", "", ""),
+            ("199803", "1998", "3", ""),
+            ("202004", "2020", "4", ""),
+            ("Feb-19", "", "2", "19"),
+            ("Mar-8", "", "3", "8"),
+            ("02 11 2022", "2022", "2", "11"),
+        ]:
+            self.assertEqual(clean_date(value), (year, month, day))

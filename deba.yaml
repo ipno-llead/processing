@@ -5,6 +5,8 @@ patterns:
   targets:
     - "`*`.to_csv(deba.data(r'.+\\.csv'))"
 stages:
+  - name: meta
+  - name: ocr
   - name: clean
     ignoredTargets:
       - duplicates.csv
