@@ -4,7 +4,12 @@ import numpy as np
 import pandas as pd
 from pandas.testing import assert_frame_equal
 
-from lib.clean import canonicalize_officers, float_to_int_str, remove_future_dates
+from lib.clean import (
+    canonicalize_officers,
+    float_to_int_str,
+    remove_future_dates,
+    clean_sexes,
+)
 
 
 class RemoveFutureDatesTestCase(unittest.TestCase):
@@ -284,3 +289,31 @@ def test_middle_name(self):
             ]
         ),
     )
+
+
+class CleanSexesTestCase(unittest.TestCase):
+    def test_clean_sexes(self):
+        columns = ["sex"]
+        assert_frame_equal(
+            clean_sexes(
+                pd.DataFrame(
+                    [
+                        ["m"],
+                        ["f"],
+                        ["femaale"],
+                        ["famale"],
+                    ],
+                    columns=columns,
+                ),
+                ["sex"],
+            ),
+            pd.DataFrame(
+                [
+                    ["male"],
+                    ["female"],
+                    ["female"],
+                    ["female"],
+                ],
+                columns=columns,
+            ),
+        )
