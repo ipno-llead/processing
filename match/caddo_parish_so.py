@@ -13,6 +13,29 @@ from lib.post import (
     extract_events_from_cprr_post,
     load_for_agency,
 )
+from lib.clean import canonicalize_officers
+
+
+def deduplicate_pprr(pprr):
+    df = pprr[["uid", "first_name", "last_name"]]
+    df = df.drop_duplicates(subset=["uid"]).set_index("uid")
+    df.loc[:, "fc"] = df.first_name.fillna("").map(lambda x: x[:1])
+    matcher = ThresholdMatcher(
+        ColumnsIndex("fc"),
+        {
+            "first_name": JaroWinklerSimilarity(),
+            "last_name": JaroWinklerSimilarity(),
+        },
+        df,
+    )
+    decision = 0.974
+    matcher.save_clusters_to_excel(
+        deba.data("match/pprr_caddo_parish_so_deduplicate.xlsx"),
+        decision,
+        decision,
+    )
+    clusters = matcher.get_index_clusters_within_thresholds(decision)
+    return canonicalize_officers(pprr, clusters)
 
 
 def match_pprr_against_post(pprr, post):
@@ -88,6 +111,7 @@ if __name__ == "__main__":
     agency = pprr.agency[0]
     post = load_for_agency(agency)
     cprr_post = pd.read_csv(deba.data("match/cprr_post_2016_2019.csv"))
+    pprr = deduplicate_pprr(pprr)
     post_event = match_pprr_against_post(pprr, post)
     cprr_post_event = extract_cprr_post_events(pprr, cprr_post)
 
@@ -95,3 +119,4 @@ if __name__ == "__main__":
     cprr_post_event.to_csv(
         deba.data("match/cprr_post_event_caddo_parish_so.csv"), index=False
     )
+    pprr.to_csv(deba.data("match/pprr_caddo_parish_so_2020.csv"), index=False)

@@ -2,6 +2,30 @@ from datamatch import ThresholdMatcher, JaroWinklerSimilarity, ColumnsIndex
 import deba
 import pandas as pd
 
+from lib.clean import canonicalize_officers
+
+
+def deduplicate_brady(cprr):
+    df = cprr[["uid", "first_name", "last_name"]]
+    df = df.drop_duplicates(subset=["uid"]).set_index("uid")
+    df.loc[:, "fc"] = df.first_name.fillna("").map(lambda x: x[:1])
+    matcher = ThresholdMatcher(
+        ColumnsIndex("fc"),
+        {
+            "first_name": JaroWinklerSimilarity(),
+            "last_name": JaroWinklerSimilarity(),
+        },
+        df,
+    )
+    decision = 0.950
+    matcher.save_clusters_to_excel(
+        deba.data("match/brady_new_orleans_da_deduplicate.xlsx"),
+        decision,
+        decision,
+    )
+    clusters = matcher.get_index_clusters_within_thresholds(decision)
+    return canonicalize_officers(cprr, clusters)
+
 
 def match_brady_to_personnel(brady, per):
     dfa = brady[["uid", "first_name", "last_name"]]
@@ -40,5 +64,6 @@ def match_brady_to_personnel(brady, per):
 if __name__ == "__main__":
     per = pd.read_csv(deba.data("raw/fused/personnel.csv"))
     brady = pd.read_csv(deba.data("clean/brady_new_orleans_da_2021.csv"))
+    brady = deduplicate_brady(brady)
     brady = match_brady_to_personnel(brady, per)
     brady.to_csv(deba.data("match/brady_new_orleans_da_2021.csv"), index=False)

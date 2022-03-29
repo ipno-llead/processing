@@ -5,9 +5,61 @@ from datamatch import (
     JaroWinklerSimilarity,
     DateSimilarity,
     ColumnsIndex,
+    Swap,
 )
 from lib.post import extract_events_from_post, load_for_agency
 import pandas as pd
+from lib.clean import canonicalize_officers
+
+
+def deduplicate_pprr(pprr):
+    df = (
+        pprr.loc[
+            pprr.uid.notna(),
+            ["employee_id", "first_name", "last_name", "middle_name", "uid"],
+        ]
+        .drop_duplicates()
+        .set_index("uid", drop=True)
+    )
+
+    matcher = ThresholdMatcher(
+        ColumnsIndex("employee_id"),
+        {
+            "first_name": JaroWinklerSimilarity(),
+            "last_name": JaroWinklerSimilarity(),
+        },
+        df,
+        variator=Swap("first_name", "last_name"),
+    )
+    decision = 0.950
+    matcher.save_clusters_to_excel(
+        deba.data("match/pprr_new_orleans_pd_dedup.xlsx"), decision, decision
+    )
+    clusters = matcher.get_index_clusters_within_thresholds(decision)
+    return canonicalize_officers(pprr, clusters)
+
+
+def deduplicate_award(award):
+    df = award[["uid", "first_name", "last_name", "middle_name"]]
+    df = df.drop_duplicates(subset=["uid"]).set_index("uid")
+    df.loc[:, "fc"] = df.first_name.fillna("").map(lambda x: x[:1])
+    df.loc[:, "mc"] = df.middle_name.fillna("").map(lambda x: x[:1])
+    df.loc[:, "lc"] = df.last_name.fillna("").map(lambda x: x[:1])
+    matcher = ThresholdMatcher(
+        ColumnsIndex(["fc", "lc", "mc"]),
+        {
+            "first_name": JaroWinklerSimilarity(),
+            "last_name": JaroWinklerSimilarity(),
+        },
+        df,
+        variator=Swap("first_name", "last_name"),
+    )
+    decision = 0.983
+    matcher.save_clusters_to_excel(
+        deba.data("match/award_new_orleans_pd_dedup.xlsx"), decision, decision
+    )
+    clusters = matcher.get_index_clusters_within_thresholds(decision)
+    return canonicalize_officers(award, clusters)
 
 
 def match_pprr_against_post(pprr_ipm, post):
@@ -238,6 +290,40 @@ def match_use_of_force_to_pprr(uof, pprr_ipm):
     return uof
 
 
+def match_cprr_to_pprr(cprr, pprr_ipm):
+    dfa = cprr[["uid", "first_name", "last_name"]]
+    dfa.loc[:, "fc"] = dfa.first_name.fillna("").map(lambda x: x[:1])
+    dfa.loc[:, "lc"] = dfa.last_name.fillna("").map(lambda x: x[:1])
+    dfa = dfa.drop_duplicates(subset=["uid"]).set_index("uid")
+
+    dfb = pprr_ipm[["uid", "first_name", "last_name"]]
+    dfb.loc[:, "fc"] = dfb.first_name.fillna("").map(lambda x: x[:1])
+    dfb.loc[:, "lc"] = dfb.last_name.fillna("").map(lambda x: x[:1])
+    dfb = dfb.drop_duplicates(subset=["uid"]).set_index("uid")
+
+    matcher = ThresholdMatcher(
+        ColumnsIndex(["fc", "lc"]),
+        {
+            "first_name": JaroWinklerSimilarity(),
+            "last_name": JaroWinklerSimilarity(),
+        },
+        dfa,
+        dfb,
+        show_progress=True,
+    )
+    decision = 0.958
+
+    matcher.save_pairs_to_excel(
+        deba.data("match/cprr_new_orleans_pd_v_pprr_new_orleans_pd_1946_2018.xlsx"),
+        decision,
+    )
+    matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
+    match_dict = dict(matches)
+
+    cprr.loc[:, "uid"] = cprr.uid.map(lambda x: match_dict.get(x, x))
+    return cprr
+
+
 if __name__ == "__main__":
     pprr_ipm = pd.read_csv(deba.data("clean/pprr_new_orleans_ipm_iapro_1946_2018.csv"))
     pprr_csd = pd.read_csv(deba.data("clean/pprr_new_orleans_csd_2014.csv"))
@@ -246,7 +332,10 @@ if __name__ == "__main__":
     award = pd.read_csv(deba.data("clean/award_new_orleans_pd_2016_2021.csv"))
     lprr = pd.read_csv(deba.data("clean/lprr_new_orleans_csc_2000_2016.csv"))
     sas = pd.read_csv(deba.data("clean/sas_new_orleans_pd_2017_2021.csv"))
-    uof_officers = pd.read_csv(deba.data("clean/uof_officers_new_orleans_pd_2016_2021.csv"))
+    uof_officers = pd.read_csv(
+        deba.data("clean/uof_officers_new_orleans_pd_2016_2021.csv")
+    )
+    award = deduplicate_award(award)
     event_df = match_pprr_against_post(pprr_ipm, post)
     award = match_award_to_pprr_ipm(award, pprr_ipm)
     lprr = match_lprr_to_pprr_ipm(lprr, pprr_ipm)
@@ -256,6 +345,13 @@ if __name__ == "__main__":
     award.to_csv(deba.data("match/award_new_orleans_pd_2016_2021.csv"), index=False)
     event_df.to_csv(deba.data("match/post_event_new_orleans_pd.csv"), index=False)
     lprr.to_csv(deba.data("match/lprr_new_orleans_csc_2000_2016.csv"), index=False)
-    pprr_csd_matched_with_ipm.to_csv(deba.data("match/pprr_new_orleans_csd_2014.csv"), index=False)
+    pprr_csd_matched_with_ipm.to_csv(
+        deba.data("match/pprr_new_orleans_csd_2014.csv"), index=False
+    )
     sas.to_csv(deba.data("match/sas_new_orleans_pd_2017_2021.csv"), index=False)
-    uof_officers.to_csv(deba.data("match/uof_new_orleans_pd_2016_2021.csv"), index=False)
+    uof_officers.to_csv(
+        deba.data("match/uof_new_orleans_pd_2016_2021.csv"), index=False
+    )
+    pprr_ipm.to_csv(
+        deba.data("match/pprr_new_orleans_ipm_iapro_1946_2018.csv"), index=False
+    )

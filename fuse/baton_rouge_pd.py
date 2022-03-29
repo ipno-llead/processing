@@ -106,7 +106,7 @@ if __name__ == "__main__":
     post_event = pd.read_csv(deba.data("match/event_post_baton_rouge_pd.csv"))
     cprr_18 = pd.read_csv(deba.data("match/cprr_baton_rouge_pd_2018.csv"))
     cprr_21 = pd.read_csv(deba.data("match/cprr_baton_rouge_pd_2021.csv"))
-    pprr = pd.read_csv(deba.data("clean/pprr_baton_rouge_pd_2021.csv"))
+    pprr = pd.read_csv(deba.data("match/pprr_baton_rouge_pd_2021.csv"))
     brady = pd.read_csv(deba.data("match/brady_baton_rouge_da_2021.csv"))
     brady = brady.loc[brady.agency == "Baton Rouge PD"]
 

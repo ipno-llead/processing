@@ -62,7 +62,7 @@ def fuse_events(pprr, cprr):
 if __name__ == "__main__":
     pprr = pd.read_csv(deba.data("clean/pprr_bossier_city_pd_2000_2019.csv"))
     post_event = pd.read_csv(deba.data("match/post_event_bossier_city_pd.csv"))
-    cprr = pd.read_csv(deba.data("clean/cprr_bossier_city_pd_2020.csv"))
+    cprr = pd.read_csv(deba.data("match/cprr_bossier_city_pd_2020.csv"))
     per_df = fuse_personnel(pprr, cprr)
     com_df = rearrange_allegation_columns(cprr)
     events_df = fuse_events(pprr, cprr)

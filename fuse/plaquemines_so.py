@@ -41,9 +41,9 @@ def fuse_events(cprr19, cprr20, pprr):
 
 
 if __name__ == "__main__":
-    cprr19 = pd.read_csv(deba.data("clean/cprr_plaquemines_so_2019.csv"))
-    cprr20 = pd.read_csv(deba.data("clean/cprr_plaquemines_so_2016_2020.csv"))
-    pprr = pd.read_csv(deba.data("clean/pprr_plaquemines_so_2018.csv"))
+    cprr19 = pd.read_csv(deba.data("match/cprr_plaquemines_so_2019.csv"))
+    cprr20 = pd.read_csv(deba.data("match/cprr_plaquemines_so_2016_2020.csv"))
+    pprr = pd.read_csv(deba.data("match/pprr_plaquemines_so_2018.csv"))
     post_event = pd.read_csv(deba.data("match/event_plaquemines_so_2018.csv"))
     events_df = fuse_events(cprr19, cprr20, pprr)
     fuse_personnel(pprr, cprr19, cprr20).to_csv(

@@ -137,7 +137,10 @@ def remove_future_dates(df):
 
 
 def clean():
-    df = pd.read_csv(deba.data("raw/ipm/new_orleans_pd_commendations_2016_2021.csv"))
+    df = pd.read_csv(
+        deba.data("raw/ipm/new_orleans_pd_commendations_2016_2021.csv"),
+        encoding="cp1252",
+    )
     df = (
         df.pipe(clean_column_names)
         .drop(columns={"item_number"})
