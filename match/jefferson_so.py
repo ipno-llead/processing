@@ -19,9 +19,9 @@ def deduplicate_pprr(pprr):
         },
         df,
     )
-    decision = 0.970
+    decision = 0.978
     matcher.save_clusters_to_excel(
-        deba.data("match/pprr_jefferson_so_deduplicate.xlsx"),
+        deba.data("match/deduplicate_pprr_jefferson_so.xlsx"),
         decision,
         decision,
     )

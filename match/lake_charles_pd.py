@@ -19,7 +19,7 @@ def deduplicate_cprr19(cprr):
     )
     decision = 0.950
     matcher.save_clusters_to_excel(
-        deba.data("match/cprr_lake_charles_so_19_deduplicate.xlsx"),
+        deba.data("match/deduplicate_cprr_lake_charles_so_19.xlsx"),
         decision,
         decision,
     )

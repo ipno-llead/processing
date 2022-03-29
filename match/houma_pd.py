@@ -19,7 +19,7 @@ def deduplicate_cprr21(cprr):
     )
     decision = 0.950
     matcher.save_clusters_to_excel(
-        deba.data("match/cprr_houma_pd_2021_deduplicate.xlsx"),
+        deba.data("match/deduplicate_cprr_houma_pd_2021.xlsx"),
         decision,
         decision,
     )
@@ -41,7 +41,7 @@ def deduplicate_cprr18(cprr):
     )
     decision = 0.950
     matcher.save_clusters_to_excel(
-        deba.data("match/cprr_houma_pd_2018_deduplicate.xlsx"),
+        deba.data("match/deduplicate_cprr_houma_pd_2018.xlsx"),
         decision,
         decision,
     )

@@ -33,7 +33,7 @@ def deduplicate_cprr_19_personnel(cprr):
     )
     decision = 0.9
     matcher.save_clusters_to_excel(
-        deba.data("match/new_orleans_so_cprr_19_dedup.xlsx"), decision, decision
+        deba.data("match/deduplicate_new_orleans_so_cprr_19.xlsx"), decision, decision
     )
     clusters = matcher.get_index_clusters_within_thresholds(decision)
     return canonicalize_officers(cprr, clusters)
@@ -60,7 +60,7 @@ def deduplicate_cprr_20_personnel(cprr):
     )
     decision = 0.9
     matcher.save_clusters_to_excel(
-        deba.data("match/new_orleans_so_cprr_20_dedup.xlsx"), decision, decision
+        deba.data("match/deduplicate_new_orleans_so_cprr_20.xlsx"), decision, decision
     )
     clusters = matcher.get_index_clusters_within_thresholds(decision)
     # canonicalize name and uid

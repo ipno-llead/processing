@@ -17,9 +17,9 @@ def deduplicate_cprr20(cprr):
         },
         df,
     )
-    decision = 0.950
+    decision = 0.955
     matcher.save_clusters_to_excel(
-        deba.data("match/cprr_lafayette_so_20_deduplicate.xlsx"),
+        deba.data("match/deduplicate_cprr_lafayette_so_20.xlsx"),
         decision,
         decision,
     )
@@ -39,9 +39,9 @@ def deduplicate_cprr14(cprr):
         },
         df,
     )
-    decision = 0.950
+    decision = 0.955
     matcher.save_clusters_to_excel(
-        deba.data("match/cprr_lafayette_so_14_deduplicate.xlsx"),
+        deba.data("match/deduplicate_cprr_lafayette_so_14.xlsx"),
         decision,
         decision,
     )
@@ -61,9 +61,9 @@ def deduplicate_cprr08(cprr):
         },
         df,
     )
-    decision = 0.950
+    decision = 0.955
     matcher.save_clusters_to_excel(
-        deba.data("match/cprr_lafayette_so_08_deduplicate.xlsx"),
+        deba.data("match/deduplicate_cprr_lafayette_so_08.xlsx"),
         decision,
         decision,
     )
@@ -194,7 +194,7 @@ if __name__ == "__main__":
     post = load_for_agency(agency)
     cprr20 = deduplicate_cprr20(cprr20)
     cprr14 = deduplicate_cprr14(cprr14)
-    cprr08 = deduplicate_cprr14(cprr08)
+    cprr08 = deduplicate_cprr08(cprr08)
     cprr20 = match_cprr_20_and_post(cprr20, post)
     cprr14 = match_cprr_14_and_post(cprr14, post)
     cprr08 = match_cprr_08_with_post(cprr08, post)

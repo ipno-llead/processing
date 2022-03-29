@@ -16,24 +16,24 @@ def deduplicate_pprr(pprr):
     df = (
         pprr.loc[
             pprr.uid.notna(),
-            ["employee_id", "first_name", "last_name", "middle_name", "uid"],
+            ["employee_id", "first_name", "last_name", "uid"],
         ]
         .drop_duplicates()
         .set_index("uid", drop=True)
     )
+    df.loc[:, "fc"] = df.first_name.fillna().map(lambda x: x[:1])
 
     matcher = ThresholdMatcher(
-        ColumnsIndex("employee_id"),
+        ColumnsIndex("fc"),
         {
             "first_name": JaroWinklerSimilarity(),
             "last_name": JaroWinklerSimilarity(),
         },
         df,
-        variator=Swap("first_name", "last_name"),
     )
     decision = 0.950
     matcher.save_clusters_to_excel(
-        deba.data("match/pprr_new_orleans_pd_dedup.xlsx"), decision, decision
+        deba.data("match/deduplicate_pprr_new_orleans_pd.xlsx"), decision, decision
     )
     clusters = matcher.get_index_clusters_within_thresholds(decision)
     return canonicalize_officers(pprr, clusters)
@@ -52,11 +52,10 @@ def deduplicate_award(award):
             "last_name": JaroWinklerSimilarity(),
         },
         df,
-        variator=Swap("first_name", "last_name"),
     )
     decision = 0.983
     matcher.save_clusters_to_excel(
-        deba.data("match/award_new_orleans_pd_dedup.xlsx"), decision, decision
+        deba.data("match/deduplicate_award_new_orleans_pd.xlsx"), decision, decision
     )
     clusters = matcher.get_index_clusters_within_thresholds(decision)
     return canonicalize_officers(award, clusters)

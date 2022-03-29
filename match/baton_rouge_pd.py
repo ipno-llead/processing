@@ -11,28 +11,6 @@ from lib.post import extract_events_from_post, load_for_agency
 from lib.clean import canonicalize_officers
 
 
-def deduplicate_pprr(pprr):
-    df = pprr[["uid", "first_name", "last_name", "middle_name"]]
-    df = df.drop_duplicates(subset=["uid"]).set_index("uid")
-    df.loc[:, "fc"] = df.first_name.fillna("").map(lambda x: x[:1])
-    matcher = ThresholdMatcher(
-        ColumnsIndex("fc"),
-        {
-            "first_name": JaroWinklerSimilarity(),
-            "last_name": JaroWinklerSimilarity(),
-        },
-        df,
-    )
-    decision = 0.950
-    matcher.save_clusters_to_excel(
-        deba.data("match/pprr_baton_rouge_pd_deduplicate.xlsx"),
-        decision,
-        decision,
-    )
-    clusters = matcher.get_index_clusters_within_thresholds(decision)
-    return canonicalize_officers(pprr, clusters)
-
-
 def match_csd_and_pd_pprr(csd, pprr, year, decision):
     dfa = (
         csd[["last_name", "first_name", "middle_name", "uid"]]
@@ -228,7 +206,6 @@ if __name__ == "__main__":
         )
     )
     pprr = pd.read_csv(deba.data("clean/pprr_baton_rouge_pd_2021.csv"))
-    pprr = deduplicate_pprr(pprr)
     csd17 = match_csd_and_pd_pprr(csd17, pprr, 2017, 0.88)
     csd19 = match_csd_and_pd_pprr(csd19, pprr, 2019, 0.88)
     lprr = match_lprr_against_pprr(lprr, pprr)

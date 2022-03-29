@@ -19,7 +19,7 @@ def deduplicate_pprr(pprr):
     )
     decision = 0.950
     matcher.save_clusters_to_excel(
-        deba.data("match/pprr_plaquemines_2018_deduplicate.xlsx"),
+        deba.data("match/deduplicate_pprr_plaquemines_2018.xlsx"),
         decision,
         decision,
     )
