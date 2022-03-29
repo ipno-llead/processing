@@ -1,4 +1,4 @@
-from datamatch import JaroWinklerSimilarity, ThresholdMatcher, ColumnsIndex, Swap
+from datamatch import JaroWinklerSimilarity, ThresholdMatcher, ColumnsIndex
 import deba
 from lib.post import extract_events_from_post, load_for_agency
 from lib.clean import canonicalize_officers
