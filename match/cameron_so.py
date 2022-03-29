@@ -2,29 +2,6 @@ import pandas as pd
 from datamatch import JaroWinklerSimilarity, ThresholdMatcher, ColumnsIndex
 import deba
 from lib.post import load_for_agency
-from lib.clean import canonicalize_officers
-
-
-def deduplicate_cprr14(cprr):
-    df = cprr[["uid", "first_name", "last_name"]]
-    df = df.drop_duplicates(subset=["uid"]).set_index("uid")
-    df.loc[:, "fc"] = df.first_name.fillna("").map(lambda x: x[:1])
-    matcher = ThresholdMatcher(
-        ColumnsIndex("fc"),
-        {
-            "first_name": JaroWinklerSimilarity(),
-            "last_name": JaroWinklerSimilarity(),
-        },
-        df,
-    )
-    decision = 1
-    matcher.save_clusters_to_excel(
-        deba.data("match/cprr_cameron_so_2014_deduplicate.xlsx"),
-        decision,
-        decision,
-    )
-    clusters = matcher.get_index_clusters_within_thresholds(decision)
-    return canonicalize_officers(cprr, clusters)
 
 
 def assign_uid_from_post_20(cprr, post):
@@ -141,7 +118,6 @@ if __name__ == "__main__":
     cprr_14 = pd.read_csv(deba.data("clean/cprr_cameron_so_2013_2014.csv"))
     agency = cprr_20.agency[0]
     post = load_for_agency(agency)
-    cprr_14 = deduplicate_cprr14(cprr_14)
     cprr_20 = assign_uid_from_post_20(cprr_20, post)
     cprr_19 = assign_uid_from_post_19(cprr_19, post)
     cprr_14 = assign_uid_from_post_14(cprr_14, post)
