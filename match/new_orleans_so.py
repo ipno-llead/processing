@@ -3,7 +3,6 @@ from datamatch import (
     ThresholdMatcher,
     JaroWinklerSimilarity,
     ColumnsIndex,
-    Swap,
     DateSimilarity,
 )
 import deba
@@ -28,8 +27,7 @@ def deduplicate_cprr_19_personnel(cprr):
             "first_name": JaroWinklerSimilarity(),
             "last_name": JaroWinklerSimilarity(),
         },
-        df,
-        variator=Swap("first_name", "last_name"),
+        df
     )
     decision = 0.9
     matcher.save_clusters_to_excel(
@@ -55,8 +53,7 @@ def deduplicate_cprr_20_personnel(cprr):
             "first_name": JaroWinklerSimilarity(),
             "last_name": JaroWinklerSimilarity(),
         },
-        df,
-        variator=Swap("first_name", "last_name"),
+        df
     )
     decision = 0.9
     matcher.save_clusters_to_excel(

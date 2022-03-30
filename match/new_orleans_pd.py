@@ -5,7 +5,6 @@ from datamatch import (
     JaroWinklerSimilarity,
     DateSimilarity,
     ColumnsIndex,
-    Swap,
 )
 from lib.post import extract_events_from_post, load_for_agency
 import pandas as pd
