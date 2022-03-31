@@ -40,7 +40,7 @@ def fuse_events(cprr, pprr):
 
 
 if __name__ == "__main__":
-    cprr = pd.read_csv(deba.data("clean/cprr_rayne_pd_2019_2020.csv"))
+    cprr = pd.read_csv(deba.data("match/cprr_rayne_pd_2019_2020.csv"))
     pprr = pd.read_csv(deba.data("clean/pprr_rayne_pd_2010_2020.csv"))
     post_event = pd.read_csv(deba.data("match/post_event_rayne_pd_2020_11_06.csv"))
     per = fuse_personnel(cprr, pprr)

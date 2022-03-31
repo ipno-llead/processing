@@ -19,7 +19,7 @@ def deduplicate_cprr_officers(cprr):
     )
     decision = 0.866
     matcher.save_clusters_to_excel(
-        deba.data("match/tangipahoa_so_cprr_2015_2021_deduplicate.xlsx"),
+        deba.data("match/deduplicate_tangipahoa_so_cprr_2015_2021.xlsx"),
         decision,
         decision,
     )

@@ -2,6 +2,29 @@ import pandas as pd
 from datamatch import JaroWinklerSimilarity, ThresholdMatcher, ColumnsIndex
 import deba
 from lib.post import load_for_agency, extract_events_from_post
+from lib.clean import canonicalize_officers
+
+
+def deduplicate_cprr19(cprr):
+    df = cprr[["uid", "first_name", "last_name"]]
+    df = df.drop_duplicates(subset=["uid"]).set_index("uid")
+    df.loc[:, "fc"] = df.first_name.fillna("").map(lambda x: x[:1])
+    matcher = ThresholdMatcher(
+        ColumnsIndex("fc"),
+        {
+            "first_name": JaroWinklerSimilarity(),
+            "last_name": JaroWinklerSimilarity(),
+        },
+        df,
+    )
+    decision = 0.950
+    matcher.save_clusters_to_excel(
+        deba.data("match/deduplicate_cprr_lake_charles_so_19.xlsx"),
+        decision,
+        decision,
+    )
+    clusters = matcher.get_index_clusters_within_thresholds(decision)
+    return canonicalize_officers(cprr, clusters)
 
 
 def match_cprr_20_and_pprr(cprr, pprr):
@@ -109,6 +132,7 @@ if __name__ == "__main__":
     pprr = pd.read_csv(deba.data("clean/pprr_lake_charles_pd_2017_2021.csv"))
     agency = cprr_19.agency[0]
     post = load_for_agency(agency)
+    cprr_19 = deduplicate_cprr19(cprr_19)
     cprr_20 = match_cprr_20_and_pprr(cprr_20, post)
     cprr_19 = match_cprr_19_and_pprr(cprr_19, post)
     post_event = match_pprr_and_post(pprr, post)
