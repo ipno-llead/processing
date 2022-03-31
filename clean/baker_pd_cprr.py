@@ -184,7 +184,7 @@ def clean17():
         .pipe(split_rows_with_multiple_allegations)
         .pipe(clean_dispositions17)
         .pipe(standardize_desc_cols, ["allegation"])
-        .pipe(set_values, {"agency": "Brown PD"})
+        .pipe(set_values, {"agency": "Baker PD"})
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(gen_uid, ["uid", "allegation", "disposition"], "allegation_uid")
         .drop_duplicates(subset=["allegation_uid"])
