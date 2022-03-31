@@ -5,90 +5,52 @@ from datamatch import ThresholdMatcher, JaroWinklerSimilarity, ColumnsIndex, Noo
 
 import deba
 from lib.post import extract_events_from_post, load_for_agency
+from lib.clean import canonicalize_officers
 
 
 def dedup_cprr_uid_20(cprr):
-    df = (
-        cprr[["first_name", "last_name", "uid"]]
-        .drop_duplicates()
-        .set_index("uid", drop=True)
-    )
+    df = cprr[["uid", "first_name", "last_name"]]
+    df = df.drop_duplicates(subset=["uid"]).set_index("uid")
+    df.loc[:, "fc"] = df.first_name.fillna("").map(lambda x: x[:1])
     matcher = ThresholdMatcher(
-        NoopIndex(),
+        ColumnsIndex("fc"),
         {
-            "first_name": JaroWinklerSimilarity(0.2),
+            "first_name": JaroWinklerSimilarity(),
             "last_name": JaroWinklerSimilarity(),
         },
         df,
     )
-    decision = 0.89
+    decision = 0.950
     matcher.save_clusters_to_excel(
-        deba.data("match/lafayette_pd_cprr_2015_2020_officer_dedup.xlsx"),
+        deba.data("match/deduplicate_cprr_lafayette_pd_20.xlsx"),
         decision,
-        lower_bound=decision,
+        decision,
     )
-    clusters = matcher.get_index_clusters_within_thresholds(lower_bound=decision)
-
-    for cluster in clusters:
-        uid, first_name, last_name = None, "", ""
-        for idx in cluster:
-            row = df.loc[idx]
-            if (
-                uid is None
-                or len(row.first_name) > len(first_name)
-                or (
-                    len(row.first_name) == len(first_name)
-                    and len(row.last_name) > len(last_name)
-                )
-            ):
-                uid, first_name, last_name = idx, row.first_name, row.last_name
-        cprr.loc[cprr.uid.isin(cluster), "uid"] = uid
-        cprr.loc[cprr.uid == uid, "first_name"] = first_name
-        cprr.loc[cprr.uid == uid, "last_name"] = last_name
-
-    return cprr
+    clusters = matcher.get_index_clusters_within_thresholds(decision)
+    return canonicalize_officers(cprr, clusters)
 
 
 def dedup_cprr_uid_14(cprr):
-    df = (
-        cprr[["first_name", "last_name", "uid"]]
-        .drop_duplicates()
-        .set_index("uid", drop=True)
-    )
+    df = cprr[["uid", "first_name", "last_name"]]
+    df = df.drop_duplicates(subset=["uid"]).set_index("uid")
+    df.loc[:, "fc"] = df.first_name.fillna("").map(lambda x: x[:1])
     matcher = ThresholdMatcher(
-        NoopIndex(),
+        ColumnsIndex("fc"),
         {
-            "first_name": JaroWinklerSimilarity(0.2),
+            "first_name": JaroWinklerSimilarity(),
             "last_name": JaroWinklerSimilarity(),
         },
         df,
     )
-    decision = 0.89
+    decision = 0.950
     matcher.save_clusters_to_excel(
-        deba.data("match/lafayette_pd_cprr_2009_2014_officer_dedup.xlsx"),
+        deba.data("match/deduplicate_cprr_lafayette_pd_14.xlsx"),
         decision,
-        lower_bound=decision,
+        decision,
     )
-    clusters = matcher.get_index_clusters_within_thresholds(lower_bound=decision)
+    clusters = matcher.get_index_clusters_within_thresholds(decision)
+    return canonicalize_officers(cprr, clusters)
 
-    for cluster in clusters:
-        uid, first_name, last_name = None, "", ""
-        for idx in cluster:
-            row = df.loc[idx]
-            if (
-                uid is None
-                or len(row.first_name) > len(first_name)
-                or (
-                    len(row.first_name) == len(first_name)
-                    and len(row.last_name) > len(last_name)
-                )
-            ):
-                uid, first_name, last_name = idx, row.first_name, row.last_name
-        cprr.loc[cprr.uid.isin(cluster), "uid"] = uid
-        cprr.loc[cprr.uid == uid, "first_name"] = first_name
-        cprr.loc[cprr.uid == uid, "last_name"] = last_name
-
-    return cprr
 
 
 def dedup_cprr_investigator_uid_20(cprr):

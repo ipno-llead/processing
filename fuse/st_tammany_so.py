@@ -36,7 +36,7 @@ def fuse_events(pprr, cprr):
 
 if __name__ == "__main__":
     cprr = pd.read_csv(deba.data("match/cprr_st_tammany_so_2011_2021.csv"))
-    pprr = pd.read_csv(deba.data("clean/pprr_st_tammany_so_2020.csv"))
+    pprr = pd.read_csv(deba.data("match/pprr_st_tammany_so_2020.csv"))
     post_event = pd.read_csv(deba.data("match/post_event_st_tammany_so_2020.csv"))
     personnels = fuse_personnel(pprr, cprr)
     complaints = rearrange_allegation_columns(cprr)

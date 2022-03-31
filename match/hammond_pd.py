@@ -6,29 +6,6 @@ from lib.clean import canonicalize_officers
 from lib.post import load_for_agency, extract_events_from_post
 
 
-def deduplicate_cprr_14_officers(cprr):
-    df = cprr[["uid", "first_name", "last_name"]]
-    df = df.drop_duplicates(subset=["uid"]).set_index("uid")
-    df.loc[:, "fc"] = df.first_name.fillna("").map(lambda x: x[:1])
-    matcher = ThresholdMatcher(
-        ColumnsIndex("fc"),
-        {
-            "first_name": JaroWinklerSimilarity(),
-            "last_name": JaroWinklerSimilarity(),
-        },
-        df,
-    )
-    decision = 0.85
-    matcher.save_clusters_to_excel(
-        deba.data("match/hammond_pd_cprr_2009_2014_deduplicate.xlsx"),
-        decision,
-        decision,
-    )
-    clusters = matcher.get_index_clusters_within_thresholds(decision)
-    # canonicalize name and uid
-    return canonicalize_officers(cprr, clusters)
-
-
 def deduplicate_cprr_20_officers(cprr):
     df = cprr[["uid", "first_name", "last_name"]]
     df = df.drop_duplicates(subset=["uid"]).set_index("uid")
@@ -43,7 +20,7 @@ def deduplicate_cprr_20_officers(cprr):
     )
     decision = 0.92
     matcher.save_clusters_to_excel(
-        deba.data("match/hammond_pd_cprr_2015_2020_deduplicate.xlsx"),
+        deba.data("match/deduplicate_hammond_pd_cprr_2015_2020.xlsx"),
         decision,
         decision,
     )
@@ -174,7 +151,6 @@ if __name__ == "__main__":
     pprr = pd.read_csv(deba.data("clean/pprr_hammond_pd_2021.csv"))
     agency = cprr_08.agency[0]
     post = load_for_agency(agency)
-    cprr_14 = deduplicate_cprr_14_officers(cprr_14)
     cprr_20 = deduplicate_cprr_20_officers(cprr_20)
     cprr_20 = match_cprr_20_and_post(cprr_20, pprr)
     cprr_14 = match_cprr_14_and_post(cprr_14, pprr)

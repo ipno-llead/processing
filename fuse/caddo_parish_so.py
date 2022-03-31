@@ -27,7 +27,7 @@ def fuse_events(pprr):
 
 
 if __name__ == "__main__":
-    pprr = pd.read_csv(deba.data("clean/pprr_caddo_parish_so_2020.csv"))
+    pprr = pd.read_csv(deba.data("match/pprr_caddo_parish_so_2020.csv"))
     post_event = pd.read_csv(deba.data("match/post_event_caddo_parish_so.csv"))
     cprr_post_event = pd.read_csv(
         deba.data("match/cprr_post_event_caddo_parish_so.csv")
