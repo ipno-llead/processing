@@ -1020,7 +1020,7 @@ def clean19():
 
 def clean20():
     df = pd.read_csv(
-        deba.data("raw/new_orleans_so/new_orleans_so_cprr_2020.csv")
+        deba.data("raw/new_orleans_so/new_orleans_so_cprr_2020.csv"), encoding="cp1252"
     ).dropna(how="all")
     df = clean_column_names(df)
     df = (

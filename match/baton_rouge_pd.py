@@ -8,6 +8,7 @@ import pandas as pd
 
 import deba
 from lib.post import extract_events_from_post, load_for_agency
+from lib.clean import canonicalize_officers
 
 
 def match_csd_and_pd_pprr(csd, pprr, year, decision):
@@ -221,3 +222,4 @@ if __name__ == "__main__":
     cprr18.to_csv(deba.data("match/cprr_baton_rouge_pd_2018.csv"), index=False)
     cprr21.to_csv(deba.data("match/cprr_baton_rouge_pd_2021.csv"), index=False)
     post_event.to_csv(deba.data("match/event_post_baton_rouge_pd.csv"), index=False)
+    pprr.to_csv(deba.data("match/pprr_baton_rouge_pd_2021.csv"), index=False)

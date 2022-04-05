@@ -162,6 +162,10 @@ schemas:
         description: >
           small departments frequently turnover internal investigations to the sheriff's office
       - name: referred_by
+      - name: incident_location
+      - name: disposition_desc
+         description: >
+          text description of aftermath of disposition, or reason for disposition. 
   event:
     columns:
       - name: event_uid

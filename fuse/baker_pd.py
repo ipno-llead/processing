@@ -26,13 +26,14 @@ def fuse_events(pprr):
 
 
 if __name__ == "__main__":
-    cprr = pd.read_csv(deba.data("match/cprr_baker_pd_2018_2020.csv"))
+    cprr20 = pd.read_csv(deba.data("match/cprr_baker_pd_2018_2020.csv"))
+    cprr17 = pd.read_csv(deba.data("match/cprr_baker_pd_2014_2017.csv"))
     pprr = pd.read_csv(deba.data("clean/pprr_baker_pd_2010_2020.csv"))
     post_event = pd.read_csv(deba.data("match/post_event_baker_pd_2020_11_06.csv"))
-    agency = cprr.agency[0]
+    agency = cprr20.agency[0]
     post = load_for_agency(agency)
-    per_df = fuse_personnel(cprr, pprr)
-    com_df = rearrange_allegation_columns(cprr)
+    per_df = fuse_personnel(cprr20, pprr, cprr17)
+    com_df = rearrange_allegation_columns(pd.concat([cprr20, cprr17]))
     event_df = fuse_events(pprr)
     event_df = rearrange_event_columns(pd.concat([post_event, event_df]))
     com_df.to_csv(deba.data("fuse/com_baker_pd.csv"), index=False)

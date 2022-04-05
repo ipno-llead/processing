@@ -139,7 +139,7 @@ def fuse_events(pprr_ipm, pprr_csd, cprr, uof, award, lprr, sas):
 
 
 if __name__ == "__main__":
-    pprr_ipm = pd.read_csv(deba.data("clean/pprr_new_orleans_ipm_iapro_1946_2018.csv"))
+    pprr_ipm = pd.read_csv(deba.data("match/pprr_new_orleans_ipm_iapro_1946_2018.csv"))
     pprr_csd = pd.read_csv(deba.data("match/pprr_new_orleans_csd_2014.csv"))
     officer_number_dict = create_officer_number_dict(pprr_ipm)
     cprr = pd.read_csv(deba.data("clean/cprr_new_orleans_pd_1931_2020.csv"))
@@ -174,6 +174,10 @@ if __name__ == "__main__":
     lprr_df.to_csv(deba.data("fuse/app_new_orleans_csc.csv"), index=False)
     sas_df.to_csv(deba.data("fuse/sas_new_orleans_pd.csv"), index=False)
     uof_df.to_csv(deba.data("fuse/uof_new_orleans_pd.csv"), index=False)
-    uof_officer_df.to_csv(deba.data("fuse/uof_officers_new_orleans_pd.csv"), index=False)
-    uof_citizen_df.to_csv(deba.data("fuse/uof_citizens_new_orleans_pd.csv"), index=False)
+    uof_officer_df.to_csv(
+        deba.data("fuse/uof_officers_new_orleans_pd.csv"), index=False
+    )
+    uof_citizen_df.to_csv(
+        deba.data("fuse/uof_citizens_new_orleans_pd.csv"), index=False
+    )
     brady_df.to_csv(deba.data("fuse/brady_new_orleans_pd.csv"), index=False)

@@ -291,6 +291,14 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/com-lafourche-so
     fetch:
       - +refs/heads/*:refs/remotes/com-lafourche-so/*
+  com-ascension-so:
+    url: https://hub.wrgl.co/api/users/ipno/repos/com-ascension-so
+    fetch:
+      - +refs/heads/*:refs/remotes/com-ascension-so/*
+  com-sulphur-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/com-sulphur-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/com-sulphur-pd/*
   event:
     url: https://hub.wrgl.co/api/users/ipno/repos/event
     fetch:
@@ -515,6 +523,14 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/event-lafourche-so
     fetch:
       - +refs/heads/*:refs/remotes/event-lafourche-so/*
+  event-ascension-so:
+    url: https://hub.wrgl.co/api/users/ipno/repos/event-ascension-so
+    fetch:
+      - +refs/heads/*:refs/remotes/event-ascension-so/*
+  event-sulphur-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/event-sulphur-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/event-sulphur-pd/*
   match-brusly-pd-2020:
     url: https://hub.wrgl.co/api/users/ipno/repos/match-brusly-pd-2020
     fetch:
@@ -815,6 +831,14 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/per-lafourche-so
     fetch:
       - +refs/heads/*:refs/remotes/per-lafourche-so/*
+  per-ascension-so:
+    url: https://hub.wrgl.co/api/users/ipno/repos/per-ascension-so
+    fetch:
+      - +refs/heads/*:refs/remotes/per-ascension-so/*
+  per-sulphur-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/per-sulphur-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/per-sulphur-pd/*
   person:
     url: https://hub.wrgl.co/api/users/ipno/repos/person
     fetch:
@@ -1222,6 +1246,18 @@ branch:
     file: data/fuse/com_lafourche_so.csv
     primaryKey:
       - allegation_uid
+  com-ascension-so:
+    remote: com-ascension-so
+    merge: refs/heads/main
+    file: data/fuse/com_ascension_so.csv
+    primaryKey:
+      - allegation_uid
+  com-sulphur-pd:
+    remote: com-sulphur-pd
+    merge: refs/heads/main
+    file: data/fuse/com_sulphur_pd.csv
+    primaryKey:
+      - allegation_uid
   event:
     remote: event
     merge: refs/heads/main
@@ -1556,6 +1592,18 @@ branch:
     remote: event-lafourche-so
     merge: refs/heads/main
     file: data/fuse/event_lafourche_so.csv
+    primaryKey:
+      - event_uid
+  event-ascension-so:
+    remote: event-ascension-so
+    merge: refs/heads/main
+    file: data/fuse/event_ascension_so.csv
+    primaryKey:
+      - event_uid
+  event-sulphur-pd:
+    remote: event-sulphur-pd
+    merge: refs/heads/main
+    file: data/fuse/event_sulphur_pd.csv
     primaryKey:
       - event_uid
   match-brusly-pd-2020:
@@ -1982,6 +2030,18 @@ branch:
     remote: per-lafourche-so
     merge: refs/heads/main
     file: data/fuse/per_lafourche_so.csv
+    primaryKey:
+      - uid
+  per-ascension-so:
+    remote: per-ascension-so
+    merge: refs/heads/main
+    file: data/fuse/per_ascension_so.csv
+    primaryKey:
+      - uid
+  per-sulphur-pd:
+    remote: per-sulphur-pd
+    merge: refs/heads/main
+    file: data/fuse/per_sulphur_pd.csv
     primaryKey:
       - uid
   uof-citizens-new-orleans-pd:

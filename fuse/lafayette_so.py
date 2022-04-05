@@ -74,10 +74,10 @@ def fuse_events(award17, cprr20, cprr14, cprr08, post):
 
 
 if __name__ == "__main__":
-    cprr20 = pd.read_csv(deba.data("clean/cprr_lafayette_so_2015_2020.csv"))
-    cprr14 = pd.read_csv(deba.data("clean/cprr_lafayette_so_2009_2014.csv"))
-    cprr08 = pd.read_csv(deba.data("clean/cprr_lafayette_so_2006_2008.csv"))
-    award17 = pd.read_csv(deba.data("clean/award_lafayette_so_2017.csv"))
+    cprr20 = pd.read_csv(deba.data("match/cprr_lafayette_so_2015_2020.csv"))
+    cprr14 = pd.read_csv(deba.data("match/cprr_lafayette_so_2009_2014.csv"))
+    cprr08 = pd.read_csv(deba.data("match/cprr_lafayette_so_2006_2008.csv"))
+    award17 = pd.read_csv(deba.data("match/award_lafayette_so_2017.csv"))
     agency = cprr08.agency[0]
     post = load_for_agency(agency)
     complaints = rearrange_allegation_columns(pd.concat([cprr20, cprr14, cprr08]))

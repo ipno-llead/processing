@@ -53,9 +53,16 @@ def clean_current_supervisor(df):
 
 def remove_unnamed_officers(df):
     df.loc[:, "last_name"] = (
-        df.last_name.str.replace(r"^unknown.*", "", regex=True)
+        df.last_name.fillna("")
+        .str.replace(r"^unknown.*", "", regex=True)
         .str.replace(r"^none$", "", regex=True)
         .str.replace("not an nopd officer", "", regex=False)
+        .str.replace(r"^anonymous$", "", regex=True)
+        .str.replace(r"^known$", "", regex=True)
+        .str.replace(r"^unkown$", "", regex=True)
+        .str.replace(r"^delete$", "", regex=True)
+        .str.replace(r"^nopd$", "", regex=True)
+        .str.replace(r"^not nopd$", "", regex=True)
     )
     return df[df.last_name != ""].reset_index(drop=True)
 
@@ -189,7 +196,9 @@ def clean():
         .pipe(clean_races, ["race"])
         .pipe(clean_department_desc)
         .pipe(assign_agency)
-        .pipe(gen_uid, ["agency", "employee_id"])
+        .pipe(
+            gen_uid, ["agency", "employee_id", "first_name", "last_name", "middle_name"]
+        )
         .pipe(strip_time_from_dates, ["hire_date", "left_date", "dept_date"])
         .pipe(clean_dates, ["hire_date", "left_date", "dept_date"])
         .pipe(clean_names, ["first_name", "middle_name", "last_name"])
@@ -344,6 +353,7 @@ def clean():
             ],
         )
         .pipe(clean_sub_division_b_desc)
+        .drop_duplicates()
     )
 
 
