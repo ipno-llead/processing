@@ -325,8 +325,8 @@ def assign_agency(df):
     return df
 
 
-def clean_tracking_number_19(df):
-    df.loc[:, "tracking_number"] = (
+def clean_tracking_id_19(df):
+    df.loc[:, "tracking_id"] = (
         df.iad_file.str.replace(" ", "", regex=False)
         .str.replace(",", "", regex=False)
         .str.replace(r":|\.", "-", regex=True)
@@ -458,10 +458,10 @@ def clean_names_19(df):
 
 
 def assign_missing_names_19(df):
-    df.loc[(df.tracking_number == "16-7"), "officer_s_accused"] = "a malveaux"
-    df.loc[(df.tracking_number == "19-54"), "officer_s_accused"] = "a aeheb"
-    df.loc[(df.tracking_number == "17-36"), "officer_s_accused"] = "john saunier"
-    df.loc[(df.tracking_number == "17-38"), "officer_s_accused"] = "j littleton"
+    df.loc[(df.tracking_id == "16-7"), "officer_s_accused"] = "a malveaux"
+    df.loc[(df.tracking_id == "19-54"), "officer_s_accused"] = "a aeheb"
+    df.loc[(df.tracking_id == "17-36"), "officer_s_accused"] = "john saunier"
+    df.loc[(df.tracking_id == "17-38"), "officer_s_accused"] = "j littleton"
     return df
 
 
@@ -528,9 +528,9 @@ def drop_rows_missing_name_19(df):
 
 
 def assign_allegations_19(df):
-    df.loc[(df.tracking_number == "19-2"), "allegation"] = "fleet crash"
+    df.loc[(df.tracking_id == "19-2"), "allegation"] = "fleet crash"
     df.loc[
-        (df.tracking_number == "17-14"), "allegation"
+        (df.tracking_id == "17-14"), "allegation"
     ] = "unauthorized force/unsatisfactory performance"
     return df
 
@@ -684,7 +684,7 @@ def clean_19():
         .pipe(clean_column_names)
         .drop(columns=["shift"])
         .pipe(clean_investigation_start_date_19)
-        .pipe(clean_tracking_number_19)
+        .pipe(clean_tracking_id_19)
         .pipe(clean_complainant_19)
         .pipe(extract_rank_from_name_19)
         .pipe(clean_names_19)
@@ -705,7 +705,7 @@ def clean_19():
             [
                 "first_name",
                 "last_name",
-                "tracking_number",
+                "tracking_id",
                 "investigation_start_date",
                 "allegation",
                 "action",

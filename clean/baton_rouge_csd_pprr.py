@@ -5,6 +5,7 @@ from lib.clean import (
     clean_salaries,
     standardize_desc_cols,
     clean_employment_status,
+    names_to_title_case
 )
 import deba
 from lib.uid import gen_uid
@@ -89,6 +90,8 @@ def clean_rank_desc(df):
             "programmer and systems analyst",
             regex=True,
         )
+        .str.replace(r"\bpc\b", r"p.c.", regex=True)
+        .str.replace(r"\bwc\b", "w.c.", regex=True)
     )
     return df
 

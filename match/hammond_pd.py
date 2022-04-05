@@ -1,7 +1,6 @@
 import pandas as pd
 import deba
 from datamatch import JaroWinklerSimilarity, ThresholdMatcher, ColumnsIndex
-
 from lib.clean import canonicalize_officers
 from lib.post import load_for_agency, extract_events_from_post
 

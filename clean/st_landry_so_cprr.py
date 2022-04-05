@@ -70,7 +70,7 @@ def clean():
         pd.read_csv(deba.data("raw/st_landry_so/st_landry_so_cprr_2019_2020.csv"))
         .pipe(clean_column_names)
         .rename(
-            columns={"case": "tracking_number", "date": "investigation_complete_date"}
+            columns={"case": "tracking_id", "date": "investigation_complete_date"}
         )
         .pipe(clean_dates, ["investigation_complete_date"])
         .pipe(clean_allegation)
@@ -83,7 +83,7 @@ def clean():
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(
             gen_uid,
-            ["uid", "tracking_number", "allegation", "action"],
+            ["uid", "tracking_id", "allegation", "action"],
             "allegation_uid",
         )
     )

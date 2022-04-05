@@ -24,9 +24,9 @@ def standardize_employment_status(df):
 
 
 def fix_typo(df):
-    df.loc[:, "rank_desc"] = df.rank_desc.str.replace(r"^t ", "").str.replace(
+    df.loc[:, "rank_desc"] = df.rank_desc.str.lower().str.strip().str.replace(r"^t ", "").str.replace(
         r"offtcer", "officer"
-    )
+    ).str.replace(r" ?o?f? ?police", "", regex=True)
     return df
 
 
@@ -53,8 +53,8 @@ def clean():
         .pipe(clean_names, ["first_name", "last_name", "middle_name"])
         .pipe(standardize_employment_status)
         .pipe(clean_dates, ["hire_date"])
-        .pipe(standardize_desc_cols, ["rank_desc"])
         .pipe(fix_typo)
+        .pipe(standardize_desc_cols, ["rank_desc"])
         .pipe(assign_agency)
         .pipe(gen_uid, ["agency", "employee_id"])
     )

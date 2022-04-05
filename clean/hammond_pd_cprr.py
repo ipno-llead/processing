@@ -7,8 +7,8 @@ from lib.rows import duplicate_row
 import re
 
 
-def clean_tracking_number(df):
-    df.loc[:, "tracking_number"] = (
+def clean_tracking_id(df):
+    df.loc[:, "tracking_id"] = (
         df.internal_affairs.fillna("")
         .str.lower()
         .str.strip()
@@ -137,19 +137,19 @@ def split_rows_with_multiple_allegations_20(df):
 
 def realign_action_column(df):
     df.loc[
-        (df.tracking_number == "15-10") & (df.incident_month == "10"),
+        (df.tracking_id == "15-10") & (df.incident_month == "10"),
         "action",
     ] = "3-day suspension without pay"
 
     df.loc[
-        (df.tracking_number == "15-09") & (df.incident_month == "10"),
+        (df.tracking_id == "15-09") & (df.incident_month == "10"),
         "action",
     ] = "5-day suspension without pay"
     return df
 
 
-def drop_rows_without_tracking_number(df):
-    return df[df.tracking_number != ""].reset_index(drop=True)
+def drop_rows_without_tracking_id(df):
+    return df[df.tracking_id != ""].reset_index(drop=True)
 
 
 def split_name_09(df):
@@ -339,8 +339,8 @@ def clean_action_date_08(df):
     return df.drop(columns="date_of_action")
 
 
-def clean_tracking_number_08(df):
-    df.loc[:, "tracking_number"] = (
+def clean_tracking_id_08(df):
+    df.loc[:, "tracking_id"] = (
         df.ia_no.str.lower()
         .str.strip()
         .str.replace(r"(\d+) (\w+)?(\d+)?(\w{1})", r"\1-\2\3", regex=True)
@@ -355,7 +355,7 @@ def clean_20():
     )
     df = (
         df.pipe(split_name)
-        .pipe(clean_tracking_number)
+        .pipe(clean_tracking_id)
         .pipe(clean_incident_date)
         .pipe(clean_disposition)
         .pipe(clean_action)
@@ -365,7 +365,7 @@ def clean_20():
         .pipe(clean_department_desc)
         .pipe(clean_dates, ["incident_date", "investigation_start_date"])
         .pipe(realign_action_column)
-        .pipe(drop_rows_without_tracking_number)
+        .pipe(drop_rows_without_tracking_id)
         .pipe(standardize_desc_cols, ["department_desc", "action", "allegation"])
         .pipe(
             set_values,
@@ -376,7 +376,7 @@ def clean_20():
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(
             gen_uid,
-            ["uid", "allegation", "tracking_number", "disposition"],
+            ["uid", "allegation", "tracking_id", "disposition"],
             "allegation_uid",
         )
     )
@@ -390,7 +390,7 @@ def clean_14():
         .rename(columns={"date": "investigation_start_date"})
         .pipe(clean_dates, ["investigation_start_date"])
         .pipe(split_name_09)
-        .pipe(clean_tracking_number)
+        .pipe(clean_tracking_id)
         .pipe(clean_allegations_09)
         .pipe(clean_disposition_09)
         .pipe(clean_action_09)
@@ -403,7 +403,7 @@ def clean_14():
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(
             gen_uid,
-            ["uid", "allegation", "tracking_number", "disposition"],
+            ["uid", "allegation", "tracking_id", "disposition"],
             "allegation_uid",
         )
     )
@@ -423,13 +423,13 @@ def clean_08():
         .pipe(extract_and_clean_dispositions_08)
         .pipe(clean_incident_date_08)
         .pipe(clean_action_date_08)
-        .pipe(clean_tracking_number_08)
+        .pipe(clean_tracking_id_08)
         .pipe(clean_dates, ["initial_action_date", "incident_date"])
         .pipe(set_values, {"agency": "Hammond PD"})
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(
             gen_uid,
-            ["uid", "allegation", "action", "tracking_number"],
+            ["uid", "allegation", "action", "tracking_id"],
             "allegation_uid",
         )
     )

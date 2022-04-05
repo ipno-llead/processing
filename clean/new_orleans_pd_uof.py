@@ -89,9 +89,9 @@ def split_citizen_rows(df):
     return df
 
 
-def clean_tracking_number(df):
-    df.loc[:, "tracking_number"] = (
-        df.tracking_number.str.lower()
+def clean_tracking_id(df):
+    df.loc[:, "tracking_id"] = (
+        df.tracking_id.str.lower()
         .str.strip()
         .str.replace(r"^20", "ftn20", regex=True)
     )
@@ -291,7 +291,7 @@ def clean_uof():
         .pipe(clean_column_names)
         .rename(
             columns={
-                "filenum": "tracking_number",
+                "filenum": "tracking_id",
                 "occurred_date": "occur_date",
                 "shift": "shift_time",
             }
@@ -305,7 +305,7 @@ def clean_uof():
         .pipe(clean_division)
         .pipe(clean_division_level)
         .pipe(clean_unit)
-        .pipe(clean_tracking_number)
+        .pipe(clean_tracking_id)
         .pipe(set_values, {"agency": "New Orleans PD"})
         .pipe(
             gen_uid,
@@ -318,7 +318,7 @@ def clean_uof():
                 "division",
                 "division_level",
                 "unit",
-                "tracking_number",
+                "tracking_id",
             ],
             "uof_uid",
         )

@@ -4,6 +4,7 @@ from lib.clean import (
     clean_dates,
     clean_races,
     clean_sexes,
+    names_to_title_case,
     parse_dates_with_known_format,
     clean_salaries,
     standardize_desc_cols,
@@ -28,6 +29,21 @@ def clean_hire_date(df):
     return df
 
 
+def clean_ranks(df):
+    df.loc[:, "rank_desc"] = df.job_title.str.lower().str.strip()\
+        .str.replace(r"(state |police )", "", regex=True)\
+        .str.replace(r"\btroop$", "trooper", regex=True)\
+        .str.replace(r"^sp ", "", regex=True)\
+        .str.replace(r"superintende$", "superindentent", regex=True)\
+        .str.replace(r"^tech sup sen$", "technical superintendent", regex=True)\
+        .str.replace(r"emer\b", "emergency", regex=True)\
+        .str.replace(r"\bdep\b", "deputy", regex=True)\
+        .str.replace(r"^depu?t?y? supt (.+)", "deputy superintendent", regex=True)\
+        .str.replace(r"tec$", "technician", regex=True)\
+        .str.replace(r"su$", "superintendent", regex=True)\
+        .str.replace(r"( com$| sen$)", "", regex=True)
+    return df 
+
 def clean_demo():
     return (
         pd.read_csv(
@@ -38,7 +54,6 @@ def clean_demo():
         .rename(
             columns={
                 "organizational_unit": "department_desc",
-                "job_title": "rank_desc",
                 "annual_rate_of_pay": "salary",
                 "gender": "sex",
                 "data_date": "salary_date",
@@ -52,6 +67,7 @@ def clean_demo():
                 "agency": "Louisiana State PD",
             },
         )
+        .pipe(clean_ranks)
         .pipe(clean_salaries, ["salary"])
         .pipe(split_names)
         .pipe(clean_hire_date)
@@ -76,11 +92,11 @@ def clean_term():
         .rename(
             columns={
                 "organization_unit": "department_desc",
-                "job_title": "rank_desc",
                 "action_reason": "left_reason",
                 "action_effective_date": "left_date",
             }
         )
+        .pipe(clean_ranks)
         .pipe(standardize_desc_cols, ["rank_desc", "department_desc"])
         .pipe(clean_names, ["first_name", "last_name"])
         .pipe(clean_dates, ["left_date"])

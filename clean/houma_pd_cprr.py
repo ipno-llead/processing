@@ -130,8 +130,8 @@ def split_and_clean_investigator18(df):
     return df.drop(columns="i_a_investigator")
 
 
-def clean_tracking_number(df):
-    df.loc[:, "tracking_number"] = (
+def clean_tracking_id(df):
+    df.loc[:, "tracking_id"] = (
         df.pd_case_number.str.lower()
         .str.strip()
         .str.replace(r"pd(.+)", r"pd-\1", regex=True)
@@ -167,17 +167,17 @@ def clean21():
         .pipe(clean_column_names)
         .pipe(split_rows_with_multiple_allegations)
         .pipe(clean_allegations)
-        .pipe(clean_tracking_number)
+        .pipe(clean_tracking_id)
         .pipe(extract_action)
         .pipe(clean_disposition)
         .pipe(split_and_clean_investigator21)
         .pipe(split_and_clean_names)
-        .pipe(standardize_desc_cols, ["tracking_number", "action"])
+        .pipe(standardize_desc_cols, ["tracking_id", "action"])
         .pipe(set_values, ({"agency": "Houma PD"}))
         .pipe(gen_uid, ["agency", "first_name", "last_name"])
         .pipe(
             gen_uid,
-            ["uid", "tracking_number", "case_number", "allegation", "action"],
+            ["uid", "tracking_id", "case_number", "allegation", "action"],
             "allegation_uid",
         )
         .pipe(drop_rows_missing_names)
@@ -190,7 +190,7 @@ def clean18():
         pd.read_csv(deba.data("raw/houma_pd/houma_pd_cprr_2017_2018.csv"))
         .pipe(clean_column_names)
         .drop(columns=["column_1", "column2", "column3"])
-        .pipe(clean_tracking_number)
+        .pipe(clean_tracking_id)
         .pipe(split_and_clean_names)
         .pipe(split_rows_with_multiple_allegations)
         .pipe(clean_allegations)
@@ -201,7 +201,7 @@ def clean18():
         .pipe(gen_uid, ["agency", "first_name", "last_name"])
         .pipe(
             gen_uid,
-            ["uid", "allegation", "action", "case_number", "tracking_number"],
+            ["uid", "allegation", "action", "case_number", "tracking_id"],
             "allegation_uid",
         )
     )

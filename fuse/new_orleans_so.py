@@ -13,42 +13,34 @@ def fuse_events(cprr19, cprr20, pprr):
         {
             events.COMPLAINT_RECEIVE: {
                 "prefix": "receive",
-                "parse_date": True,
                 "keep": ["uid", "agency", "allegation_uid"],
             },
             events.INVESTIGATION_START: {
                 "prefix": "investigation_start",
-                "parse_date": True,
                 "keep": ["uid", "agency", "allegation_uid"],
             },
             events.INVESTIGATION_COMPLETE: {
                 "prefix": "investigation_complete",
-                "parse_date": True,
                 "keep": ["uid", "agency", "allegation_uid"],
             },
             events.SUSPENSION_START: {
                 "prefix": "suspension_start",
-                "parse_date": True,
                 "keep": ["uid", "agency", "allegation_uid"],
             },
             events.SUSPENSION_END: {
                 "prefix": "suspension_end",
-                "parse_date": True,
                 "keep": ["uid", "agency", "allegation_uid"],
             },
             events.OFFICER_LEFT: {
                 "prefix": "resignation",
-                "parse_date": True,
                 "keep": ["uid", "agency", "allegation_uid", "left_reason"],
             },
             events.OFFICER_LEFT: {
                 "prefix": "arrest",
-                "parse_date": True,
                 "keep": ["uid", "agency", "allegation_uid", "left_reason"],
             },
             events.OFFICER_LEFT: {
                 "prefix": "termination",
-                "parse_date": True,
                 "keep": ["uid", "agency", "allegation_uid", "left_reason"],
             },
         },
@@ -59,42 +51,34 @@ def fuse_events(cprr19, cprr20, pprr):
         {
             events.COMPLAINT_RECEIVE: {
                 "prefix": "receive",
-                "parse_date": True,
                 "keep": ["uid", "agency", "allegation_uid"],
             },
             events.INVESTIGATION_START: {
                 "prefix": "investigation_start",
-                "parse_date": True,
                 "keep": ["uid", "agency", "allegation_uid"],
             },
             events.INVESTIGATION_COMPLETE: {
                 "prefix": "investigation_complete",
-                "parse_date": True,
                 "keep": ["uid", "agency", "allegation_uid"],
             },
             events.SUSPENSION_START: {
                 "prefix": "suspension_start",
-                "parse_date": True,
                 "keep": ["uid", "agency", "allegation_uid"],
             },
             events.SUSPENSION_END: {
                 "prefix": "suspension_end",
-                "parse_date": True,
                 "keep": ["uid", "agency", "allegation_uid"],
             },
             events.OFFICER_LEFT: {
                 "prefix": "resignation",
-                "parse_date": True,
                 "keep": ["uid", "agency", "allegation_uid", "left_reason"],
             },
             events.OFFICER_LEFT: {
                 "prefix": "arrest",
-                "parse_date": True,
                 "keep": ["uid", "agency", "allegation_uid", "left_reason"],
             },
             events.OFFICER_LEFT: {
                 "prefix": "termination",
-                "parse_date": True,
                 "keep": ["uid", "agency", "allegation_uid", "left_reason"],
             },
         },

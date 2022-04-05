@@ -819,10 +819,10 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/award-lafayette-so
     fetch:
       - +refs/heads/*:refs/remotes/award-lafayette-so/*
-  award:
-    url: https://hub.wrgl.co/api/users/ipno/repos/award
+  awards:
+    url: https://hub.wrgl.co/api/users/ipno/repos/awards
     fetch:
-      - +refs/heads/*:refs/remotes/award/*
+      - +refs/heads/*:refs/remotes/awards/*
   per-st-john-so:
     url: https://hub.wrgl.co/api/users/ipno/repos/per-st-john-so
     fetch:
@@ -2014,10 +2014,10 @@ branch:
     file: data/fuse/award_lafayette_so.csv
     primaryKey:
       - award_uid
-  award:
-    remote: award
+  awards:
+    remote: awards
     merge: refs/heads/main
-    file: data/fuse/award.csv
+    file: data/fuse/awards.csv
     primaryKey:
       - award_uid
   per-st-john-so:

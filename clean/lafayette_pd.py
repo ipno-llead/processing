@@ -47,6 +47,7 @@ def standardize_rank(df):
         .str.replace(r"\basst\b", "assistant", regex=True)
         .str.replace(r"\baccredi?ation\b", "accreditation", regex=True)
         .str.replace("/", " to ", regex=False)
+        .str.replace(r"^pco$", "communications officer", regex=True)
     )
     return df
 
@@ -84,13 +85,13 @@ def clean_pprr():
     )
 
 
-def clean_tracking_number(df):
-    df.loc[:, "tracking_number"] = (
-        df.tracking_number.str.strip()
+def clean_tracking_id(df):
+    df.loc[:, "tracking_id"] = (
+        df.tracking_id.str.strip()
         .str.replace(" ", "", regex=False)
         .str.replace(r"(\w+)(\d+)", r"\1 \2", regex=True)
     )
-    return df[df.tracking_number != "\x1a"].reset_index(drop=True)
+    return df[df.tracking_id != "\x1a"].reset_index(drop=True)
 
 
 def split_rows_with_multiple_officers(df):
@@ -130,7 +131,7 @@ def split_rows_with_multiple_officers(df):
                 rows,
             ]
         )
-        .sort_values("tracking_number")
+        .sort_values("tracking_id")
         .reset_index(drop=True)
     )
 
@@ -158,7 +159,7 @@ def extract_rank(df):
         "officer",
         "captain",
         "reserve officer",
-        "pco",
+        "communications officer",
         "detective",
     ]
     rank_name = df.officer.str.extract(r"^(?:(%s) )?(.+)" % "|".join(ranks))
@@ -208,52 +209,52 @@ def lower_strip(df, cols):
 def split_disposition(df):
     # splitting for 'AD2015-005': 'sustained-benoit-3 days, all others letter of reprimand'
     df.loc[
-        (df.tracking_number == "AD2015-005") & (df.last_name == "benoit"),
+        (df.tracking_id == "AD2015-005") & (df.last_name == "benoit"),
         "disposition",
     ] = "sustained-3 days"
     df.loc[
-        (df.tracking_number == "AD2015-005") & (df.last_name != "benoit"),
+        (df.tracking_id == "AD2015-005") & (df.last_name != "benoit"),
         "disposition",
     ] = "sustained-letter of reprimand"
 
     # splitting for 'AD2015-015': 'sustained- bajat- loc; allred- counseling form'
     df.loc[
-        (df.tracking_number == "AD2015-015") & (df.last_name == "bajat"),
+        (df.tracking_id == "AD2015-015") & (df.last_name == "bajat"),
         "disposition",
     ] = "sustained-loc"
     df.loc[
-        (df.tracking_number == "AD2015-015") & (df.last_name != "allred"),
+        (df.tracking_id == "AD2015-015") & (df.last_name != "allred"),
         "disposition",
     ] = "sustained-counseling form"
 
     # 'AD2019-004': 'excessive force - not sustained att. to duty - sustained/deficiency'
     df.loc[
-        (df.tracking_number == "AD2019-004") & (df.allegation == "excessive force"),
+        (df.tracking_id == "AD2019-004") & (df.allegation == "excessive force"),
         "disposition",
     ] = "not sustained"
     df.loc[
-        (df.tracking_number == "AD2019-004") & (df.allegation != "attention to duty"),
+        (df.tracking_id == "AD2019-004") & (df.allegation != "attention to duty"),
         "disposition",
     ] = "sustained/deficiency"
 
     # 'AD2019-005': 'terminated - trent (overturned - 10 days) kyle 3 days susp.'
     df.loc[
-        (df.tracking_number == "AD2019-005") & (df.first_name == "trent"),
+        (df.tracking_id == "AD2019-005") & (df.first_name == "trent"),
         "disposition",
     ] = "10 days"
     df.loc[
-        (df.tracking_number == "AD2019-005") & (df.first_name != "kyle"),
+        (df.tracking_id == "AD2019-005") & (df.first_name != "kyle"),
         "disposition",
     ] = "3 days susp"
 
     # 'CC1801': 'thibodeaux - counseling form; brasseaux - counseling form'
     df.loc[
-        (df.tracking_number == "CC1801")
+        (df.tracking_id == "CC1801")
         & ((df.last_name == "thibodeaux") | (df.last_name == "brasseaux")),
         "disposition",
     ] = "counseling form"
     df.loc[
-        (df.tracking_number == "CC1801")
+        (df.tracking_id == "CC1801")
         & ~((df.last_name == "thibodeaux") | (df.last_name == "brasseaux")),
         "disposition",
     ] = ""
@@ -331,7 +332,7 @@ def split_rows_with_multiple_allegations(df):
                 pd.DataFrame.from_records(records),
             ]
         )
-        .sort_values("tracking_number")
+        .sort_values("tracking_id")
         .reset_index(drop=True)
     )
 
@@ -362,7 +363,7 @@ def clean_cprr_20():
         .dropna(how="all")
         .rename(
             columns={
-                "cc_number": "tracking_number",
+                "cc_number": "tracking_id",
                 "complaint": "allegation",
                 "date_received": "receive_date",
                 "date_completed": "complete_date",
@@ -370,7 +371,7 @@ def clean_cprr_20():
                 "focus_officer_s": "officer",
             }
         )
-        .pipe(clean_tracking_number)
+        .pipe(clean_tracking_id)
         .pipe(split_rows_with_multiple_officers)
         .pipe(extract_rank)
         .pipe(split_cprr_name)
@@ -516,14 +517,14 @@ def clean_cprr_20():
         )
         .pipe(
             gen_uid,
-            ["agency", "tracking_number", "allegation", "uid"],
+            ["agency", "tracking_id", "allegation", "uid"],
             "allegation_uid",
         )
     )
 
 
-def clean_tracking_number_14(df):
-    df.loc[:, "tracking_number"] = (
+def clean_tracking_id_14(df):
+    df.loc[:, "tracking_id"] = (
         df.cc_number.str.lower()
         .str.strip()
         .str.replace(r"^-", "", regex=True)
@@ -871,72 +872,72 @@ def drop_rows_missing_charges_disposition_and_action_14(df):
 
 def assign_correct_actions_14(df):
     df.loc[
-        ((df.first_name == "brent") & (df.tracking_number == "2012-008")), "action"
+        ((df.first_name == "brent") & (df.tracking_id == "2012-008")), "action"
     ] = "3-day suspension"
     df.loc[
-        ((df.first_name == "devin") & (df.tracking_number == "2012-008")), "action"
+        ((df.first_name == "devin") & (df.tracking_id == "2012-008")), "action"
     ] = "1-day suspension"
     df.loc[
-        ((df.last_name == "firmin") & (df.tracking_number == "2009-002")), "action"
+        ((df.last_name == "firmin") & (df.tracking_id == "2009-002")), "action"
     ] = "resigned"
     df.loc[
-        ((df.last_name == "starling") & (df.tracking_number == "sl 13-006")), "action"
+        ((df.last_name == "starling") & (df.tracking_id == "sl 13-006")), "action"
     ] = "letter of counseling"
     df.loc[
-        ((df.last_name == "hebert") & (df.tracking_number == "2011-012")), "action"
+        ((df.last_name == "hebert") & (df.tracking_id == "2011-012")), "action"
     ] = "resigned"
     df.loc[
-        ((df.last_name == "roberts") & (df.tracking_number == "2011-006")), "action"
+        ((df.last_name == "roberts") & (df.tracking_id == "2011-006")), "action"
     ] = "resigned"
     df.loc[
-        ((df.last_name == "hackworth") & (df.tracking_number == "2012-022")), "action"
+        ((df.last_name == "hackworth") & (df.tracking_id == "2012-022")), "action"
     ] = "resigned"
     df.loc[
-        ((df.last_name == "taylor") & (df.tracking_number == "ad 13-001")), "action"
+        ((df.last_name == "taylor") & (df.tracking_id == "ad 13-001")), "action"
     ] = "resigned"
     df.loc[
-        ((df.last_name == "taylor") & (df.tracking_number == "ad 13-002")), "action"
+        ((df.last_name == "taylor") & (df.tracking_id == "ad 13-002")), "action"
     ] = "resigned"
     df.loc[
-        ((df.last_name == "baumgardner") & (df.tracking_number == "2012-015")), "action"
+        ((df.last_name == "baumgardner") & (df.tracking_id == "2012-015")), "action"
     ] = "resigned"
     df.loc[
-        ((df.last_name == "baumgardner") & (df.tracking_number == "2012-013")), "action"
+        ((df.last_name == "baumgardner") & (df.tracking_id == "2012-013")), "action"
     ] = "resigned"
     df.loc[
-        ((df.last_name == "dangerfield") & (df.tracking_number == "2012-001")), "action"
+        ((df.last_name == "dangerfield") & (df.tracking_id == "2012-001")), "action"
     ] = "resigned"
     df.loc[
-        ((df.last_name == "thompson") & (df.tracking_number == "2012-010")), "action"
+        ((df.last_name == "thompson") & (df.tracking_id == "2012-010")), "action"
     ] = "resigned"
     df.loc[
-        ((df.last_name == "poiencot") & (df.tracking_number == "2012-010")), "action"
+        ((df.last_name == "poiencot") & (df.tracking_id == "2012-010")), "action"
     ] = "terminated"
     df.loc[
-        ((df.last_name == "roberts") & (df.tracking_number == "2011-004")), "action"
+        ((df.last_name == "roberts") & (df.tracking_id == "2011-004")), "action"
     ] = "resigned"
     df.loc[
-        ((df.last_name == "roberts") & (df.tracking_number == "2011-001")), "action"
+        ((df.last_name == "roberts") & (df.tracking_id == "2011-001")), "action"
     ] = "resigned"
     df.loc[
-        ((df.last_name == "bricker") & (df.tracking_number == "2011-007")), "action"
+        ((df.last_name == "bricker") & (df.tracking_id == "2011-007")), "action"
     ] = "resigned"
     df.loc[
-        ((df.last_name == "carter") & (df.tracking_number == "2010-011")), "action"
+        ((df.last_name == "carter") & (df.tracking_id == "2010-011")), "action"
     ] = "resigned"
     df.loc[
-        ((df.last_name == "dartez") & (df.tracking_number == "2010-012")), "action"
+        ((df.last_name == "dartez") & (df.tracking_id == "2010-012")), "action"
     ] = "resigned"
     df.loc[
-        ((df.last_name == "howard") & (df.tracking_number == "2009-008")), "action"
+        ((df.last_name == "howard") & (df.tracking_id == "2009-008")), "action"
     ] = "resigned"
     df.loc[
-        ((df.last_name == "winjum") & (df.tracking_number == "2010-014")), "action"
+        ((df.last_name == "winjum") & (df.tracking_id == "2010-014")), "action"
     ] = "resigned"
     df.loc[
         (
             (df.last_name == "bertrand")
-            & (df.tracking_number == "2012-003")
+            & (df.tracking_id == "2012-003")
             & (df.charges == "insubordination")
         ),
         "action",
@@ -946,87 +947,87 @@ def assign_correct_actions_14(df):
 
 def assign_correct_disposition_14(df):
     df.loc[
-        ((df.last_name == "crozier") & (df.tracking_number == "sl 13-006")),
+        ((df.last_name == "crozier") & (df.tracking_id == "sl 13-006")),
         "disposition",
     ] = "unfounded"
     df.loc[
-        ((df.last_name == "starling") & (df.tracking_number == "sl 13-006")),
+        ((df.last_name == "starling") & (df.tracking_id == "sl 13-006")),
         "disposition",
     ] = "sustained"
     df.loc[
-        ((df.last_name == "sonnier") & (df.tracking_number == "sl 13-006")),
+        ((df.last_name == "sonnier") & (df.tracking_id == "sl 13-006")),
         "disposition",
     ] = ""
     df.loc[
-        ((df.last_name == "firmin") & (df.tracking_number == "2009-002")), "disposition"
+        ((df.last_name == "firmin") & (df.tracking_id == "2009-002")), "disposition"
     ] = "sustained"
     df.loc[
-        ((df.last_name == "hebert") & (df.tracking_number == "2011-012")), "disposition"
+        ((df.last_name == "hebert") & (df.tracking_id == "2011-012")), "disposition"
     ] = "sustained"
     df.loc[
-        ((df.last_name == "roberts") & (df.tracking_number == "2011-006")),
+        ((df.last_name == "roberts") & (df.tracking_id == "2011-006")),
         "disposition",
     ] = "sustained"
     df.loc[
-        ((df.last_name == "hackworth") & (df.tracking_number == "2012-022")),
+        ((df.last_name == "hackworth") & (df.tracking_id == "2012-022")),
         "disposition",
     ] = "sustained"
     df.loc[
-        ((df.last_name == "taylor") & (df.tracking_number == "ad 13-001")),
+        ((df.last_name == "taylor") & (df.tracking_id == "ad 13-001")),
         "disposition",
     ] = "sustained"
     df.loc[
-        ((df.last_name == "taylor") & (df.tracking_number == "ad 13-002")),
+        ((df.last_name == "taylor") & (df.tracking_id == "ad 13-002")),
         "disposition",
     ] = "sustained"
     df.loc[
-        ((df.last_name == "baumgardner") & (df.tracking_number == "2012-015")),
+        ((df.last_name == "baumgardner") & (df.tracking_id == "2012-015")),
         "disposition",
     ] = "sustained"
     df.loc[
-        ((df.last_name == "baumgardner") & (df.tracking_number == "2012-013")),
+        ((df.last_name == "baumgardner") & (df.tracking_id == "2012-013")),
         "disposition",
     ] = "not sustained"
     df.loc[
-        ((df.last_name == "dangerfield") & (df.tracking_number == "2012-001")),
+        ((df.last_name == "dangerfield") & (df.tracking_id == "2012-001")),
         "disposition",
     ] = "sustained"
     df.loc[
-        ((df.last_name == "thompson") & (df.tracking_number == "2012-010")),
-        "disposition",
-    ] = ""
-    df.loc[
-        ((df.last_name == "poiencot") & (df.tracking_number == "2012-010")),
+        ((df.last_name == "thompson") & (df.tracking_id == "2012-010")),
         "disposition",
     ] = ""
     df.loc[
-        ((df.last_name == "roberts") & (df.tracking_number == "2011-004")),
+        ((df.last_name == "poiencot") & (df.tracking_id == "2012-010")),
+        "disposition",
+    ] = ""
+    df.loc[
+        ((df.last_name == "roberts") & (df.tracking_id == "2011-004")),
         "disposition",
     ] = "sustained"
     df.loc[
-        ((df.last_name == "roberts") & (df.tracking_number == "2011-001")),
+        ((df.last_name == "roberts") & (df.tracking_id == "2011-001")),
         "disposition",
     ] = "sustained"
     df.loc[
-        ((df.last_name == "bricker") & (df.tracking_number == "2011-007")),
+        ((df.last_name == "bricker") & (df.tracking_id == "2011-007")),
         "disposition",
     ] = "sustained"
     df.loc[
-        ((df.last_name == "carter") & (df.tracking_number == "2010-011")), "disposition"
+        ((df.last_name == "carter") & (df.tracking_id == "2010-011")), "disposition"
     ] = "sustained"
     df.loc[
-        ((df.last_name == "dartez") & (df.tracking_number == "2010-012")), "disposition"
+        ((df.last_name == "dartez") & (df.tracking_id == "2010-012")), "disposition"
     ] = "sustained"
     df.loc[
-        ((df.last_name == "howard") & (df.tracking_number == "2009-008")), "disposition"
+        ((df.last_name == "howard") & (df.tracking_id == "2009-008")), "disposition"
     ] = "sustained"
     df.loc[
-        ((df.last_name == "winjum") & (df.tracking_number == "2010-014")), "disposition"
+        ((df.last_name == "winjum") & (df.tracking_id == "2010-014")), "disposition"
     ] = "sustained"
     df.loc[
         (
             (df.last_name == "bertrand")
-            & (df.tracking_number == "2012-003")
+            & (df.tracking_id == "2012-003")
             & (df.charges == "insubordination")
         ),
         "disposition",
@@ -1034,7 +1035,7 @@ def assign_correct_disposition_14(df):
     df.loc[
         (
             (df.last_name == "bertrand")
-            & (df.tracking_number == "2012-003")
+            & (df.tracking_id == "2012-003")
             & (df.charges == "rude and unprofessional")
         ),
         "disposition",
@@ -1049,7 +1050,7 @@ def clean_cprr_14():
         .pipe(clean_receive_date_14)
         .pipe(clean_complete_date_14)
         .pipe(clean_dates, ["receive_date", "complete_date"])
-        .pipe(clean_tracking_number_14)
+        .pipe(clean_tracking_id_14)
         .pipe(clean_complainant)
         .pipe(clean_and_split_investigator_14)
         .pipe(extract_action_from_disposition_14)
@@ -1070,7 +1071,7 @@ def clean_cprr_14():
         )
         .pipe(
             gen_uid,
-            ["uid", "charges", "action", "tracking_number", "disposition"],
+            ["uid", "charges", "action", "tracking_id", "disposition"],
             "allegation_uid",
         )
         .pipe(drop_rows_missing_names)

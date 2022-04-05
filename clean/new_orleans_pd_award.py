@@ -17,7 +17,10 @@ def extract_rank(df):
             r"group supervisor|supervisory special agent|s/t|tpr)"
         )
     )
-    df.loc[:, "rank_desc"] = ranks[0]
+    df.loc[:, "rank_desc"] = ranks[0]\
+        .str.replace(r"s\/t", "", regex=True)\
+        .str.replace(r"\bmag unit\b", "multi-agency gang unit", regex=True)\
+        .str.replace(r"\batf\b", "alcohol tobacco firearms and explosives", regex=True)
     return df
 
 

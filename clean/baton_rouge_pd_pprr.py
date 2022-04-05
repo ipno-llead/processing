@@ -27,16 +27,16 @@ def replace_rank(df):
         .str.lower()
         .replace(
             {
-                "CPL": "corporal",
-                "OFF": "officer",
-                "SGT": "sergeant",
-                "OFC": "officer",
-                "LT": "lieutenant",
-                "DEP. CHIEF": "deputy chief",
-                "CAPT": "captain",
-                "MJR": "major",
-                "DPTY. CHIEF": "deputy chief",
-                "CPT": "captain",
+                "cpl": "corporal",
+                "off": "officer",
+                "sgt": "sergeant",
+                "ofc": "officer",
+                "lt": "lieutenant",
+                "dep. chief": "deputy chief",
+                "capt": "captain",
+                "mjr": "major",
+                "dpty. chief": "deputy chief",
+                "cpt": "captain",
             }
         )
     )

@@ -191,7 +191,7 @@ def fuse_allegation():
                 pd.read_csv(deba.data("fuse/com_sulphur_pd.csv")),
             ]
         )
-    ).sort_values(["agency", "tracking_number"], ignore_index=True)
+    ).sort_values(["agency", "tracking_id"], ignore_index=True)
 
 
 def fuse_use_of_force():
@@ -312,7 +312,7 @@ if __name__ == "__main__":
     app_df.to_csv(deba.data("fuse/appeals.csv"), index=False)
     uof_citizen_df.to_csv(deba.data("fuse/uof_citizens.csv"), index=False)
     uof_officer_df.to_csv(deba.data("fuse/uof_officers.csv"), index=False)
-    award_df.to_csv(deba.data("fuse/award.csv"), index=False)
+    award_df.to_csv(deba.data("fuse/awards.csv"), index=False)
     brady_df.to_csv(deba.data("fuse/brady.csv"), index=False)
 
     post_event_df = pd.read_csv(deba.data("fuse/events_post.csv"))

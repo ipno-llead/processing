@@ -12,11 +12,17 @@ def clean_rank_desc(df):
     return df
 
 
+def clean_allegation_desc(df):
+    df.loc[:, "allegation_desc"] = df.allegation_desc.str.replace(r"\biinformation\b", "information", regex=True)
+    return df 
+
+
 def clean():
     df = (
         pd.read_csv(deba.data("raw/benton_pd/benton_pd_cprr_2015_2021_byhand.csv"))
         .pipe(clean_column_names)
         .pipe(clean_rank_desc)
+        .pipe(clean_allegation_desc)
         .pipe(clean_dates, ["receive_date"])
         .pipe(clean_names, ["first_name", "last_name"])
         .pipe(standardize_desc_cols, ["allegation_desc", "disposition"])

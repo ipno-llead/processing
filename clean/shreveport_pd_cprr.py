@@ -239,10 +239,11 @@ def clean_cprr(disposition_file, name_file, year):
     return (
         df.pipe(clean_allegation)
         .drop_duplicates()
-        .pipe(gen_uid, ["agency", "tracking_number", "allegation"], "allegation_uid")
+        .rename(columns={"tracking_number": "tracking_id"})
+        .pipe(gen_uid, ["agency", "tracking_id", "allegation"], "allegation_uid")
         .pipe(make_disposition_categorical)
         .sort_values(
-            ["receive_date", "tracking_number", "disposition"],
+            ["receive_date", "tracking_id", "disposition"],
             ascending=[True, True, False],
             na_position="first",
         )

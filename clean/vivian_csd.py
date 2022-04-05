@@ -22,6 +22,11 @@ def assign_agency(df):
     df.loc[:, "data_production_year"] = 2021
     return df
 
+def clean_rank_desc(df):
+    df.loc[:, "rank_desc"] = df.job_title.str.lower().str.strip()\
+        .str.replace(r" ?o?f? ?police", "", regex=True)
+    return df 
+
 
 def clean():
     return (
@@ -33,9 +38,9 @@ def clean():
                 "employee_type": "employment_status",
                 "last_promotion": "rank_year",
                 "date_of_hire": "hire_date",
-                "job_title": "rank_desc",
             }
         )
+        .pipe(clean_rank_desc)
         .pipe(clean_names, ["first_name", "last_name"])
         .pipe(split_salary_col)
         .pipe(float_to_int_str, ["rank_year"])

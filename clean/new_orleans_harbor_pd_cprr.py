@@ -90,7 +90,7 @@ def clean():
                 "8_date_of_appointment": "hire_date",
                 "e_the_final_discipline_imposed": "action",
                 "a_the_incident_type": "incident_type",
-                "b_the_complaint_tracking_number": "tracking_number",
+                "b_the_complaint_tracking_number": "tracking_id",
                 "c_the_date_on_which_the_complaint_incident_took_place": "occur_date",
                 "d_the_date_on_which_the_complaint_was_received": "receive_date",
                 "e_the_date_on_which_the_complaint_investigation_was_completed": "investigation_complete_date",
@@ -132,7 +132,7 @@ def clean():
         )
         .pipe(assign_agency)
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
-        .pipe(gen_uid, ["agency", "tracking_number"], "allegation_uid")
+        .pipe(gen_uid, ["agency", "tracking_id"], "allegation_uid")
     )
     return df
 

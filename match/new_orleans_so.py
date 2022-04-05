@@ -17,7 +17,7 @@ def deduplicate_cprr_19_personnel(cprr):
             cprr.uid.notna(),
             ["employee_id", "first_name", "last_name", "middle_name", "uid"],
         ]
-        .drop_duplicates()
+        .drop_duplicates(subset=["uid"])
         .set_index("uid", drop=True)
     )
 
@@ -43,7 +43,7 @@ def deduplicate_cprr_20_personnel(cprr):
             cprr.uid.notna(),
             ["employee_id", "first_name", "last_name", "middle_name", "uid"],
         ]
-        .drop_duplicates()
+        .drop_duplicates(subset=["uid"])
         .set_index("uid", drop=True)
     )
 
@@ -61,8 +61,7 @@ def deduplicate_cprr_20_personnel(cprr):
     )
     clusters = matcher.get_index_clusters_within_thresholds(decision)
     # canonicalize name and uid
-    canonicalize_officers(cprr, clusters)
-    return cprr
+    return canonicalize_officers(cprr, clusters)
 
 
 def assign_uid_19_from_pprr(cprr, pprr):
@@ -75,7 +74,7 @@ def assign_uid_19_from_pprr(cprr, pprr):
 
     dfb = (
         pprr[["uid", "first_name", "last_name"]]
-        .drop_duplicates()
+        .drop_duplicates(subset=["uid"])
         .set_index("uid", drop=True)
     )
     dfb.loc[:, "fc"] = dfb.first_name.fillna("").map(lambda x: x[:1])
@@ -111,7 +110,7 @@ def assign_uid_20_from_pprr(cprr, pprr):
 
     dfb = (
         pprr[["uid", "first_name", "last_name"]]
-        .drop_duplicates()
+        .drop_duplicates(subset=["uid"])
         .set_index("uid", drop=True)
     )
     dfb.loc[:, "fc"] = dfb.first_name.map(lambda x: x[:1])
