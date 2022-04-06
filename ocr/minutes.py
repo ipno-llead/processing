@@ -3,10 +3,9 @@ import tempfile
 import json
 from typing import List
 
-# from PIL import Image
 from pdf2image import convert_from_path
 import pytesseract
-from tqdm import trange, tqdm
+from tqdm import tqdm
 import deba
 import pandas as pd
 
@@ -19,7 +18,7 @@ def process_pdf(df: pd.DataFrame) -> pd.DataFrame:
     texts: List[List[str]] = []
     for _, row in tqdm(df.iterrows(), desc="OCR pdf", total=df.shape[0], position=0):
         pdfpath = "raw_minutes/%s" % row.filepath
-        ocr_cachefile: Path = deba.data("ocr_cache/minutes/") / (row.md5 + ".json")
+        ocr_cachefile: Path = deba.data("ocr_cache/minutes/") / (row.filesha1 + ".json")
         ocr_cachefile.parent.mkdir(parents=True, exist_ok=True)
 
         if ocr_cachefile.is_file():
