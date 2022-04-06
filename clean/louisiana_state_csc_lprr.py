@@ -1,4 +1,3 @@
-from pandas.io.parsers import read_csv
 from lib.clean import clean_dates, clean_names
 from lib.columns import clean_column_names
 import deba
@@ -78,8 +77,9 @@ def split_appellant_column(df):
 
 
 def assign_additional_appellant_names(df):
-    names = pd.read_csv(deba.data("raw/louisiana_state_csc/la_lprr_appellants.csv"))\
-        .rename(columns={'appellant_middle_initial': 'appellant_middle_name'})
+    names = pd.read_csv(
+        deba.data("raw/louisiana_state_csc/la_lprr_appellants.csv")
+    ).rename(columns={"appellant_middle_initial": "appellant_middle_name"})
     for _, row in names.iterrows():
         for col in ["first_name", "last_name", "middle_name"]:
             df.loc[df.docket_no == row.docket_no, col] = row["appellant_%s" % col]
@@ -115,8 +115,9 @@ def correct_docket_no(df):
             return row.filed_year[2:] + row.docket_no[2:]
         return row.docket_no
 
-    df.loc[:, "docket_no"] = df.agg(process, axis=1)\
-        .str.lower().replace(r"(-|\/)", "", regex=True)
+    df.loc[:, "docket_no"] = (
+        df.agg(process, axis=1).str.lower().replace(r"(-|\/)", "", regex=True)
+    )
     return df
 
 

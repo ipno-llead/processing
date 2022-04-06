@@ -1,6 +1,3 @@
-import sys
-
-sys.path.append("../")
 import pandas as pd
 import deba
 from lib.clean import (

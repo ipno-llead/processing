@@ -2,7 +2,6 @@ from lib.columns import clean_column_names
 import deba
 from lib.uid import gen_uid
 from lib.clean import clean_names, clean_dates, standardize_desc_cols, float_to_int_str
-from lib.standardize import standardize_from_lookup_table
 from lib.rows import duplicate_row
 import pandas as pd
 import re

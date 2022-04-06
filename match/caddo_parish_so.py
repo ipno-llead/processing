@@ -13,7 +13,6 @@ from lib.post import (
     extract_events_from_cprr_post,
     load_for_agency,
 )
-from lib.clean import canonicalize_officers
 
 
 def match_pprr_against_post(pprr, post):
