@@ -116,7 +116,7 @@ def correct_docket_no(df):
         return row.docket_no
 
     df.loc[:, "docket_no"] = (
-        df.agg(process, axis=1).str.lower().replace(r"(-|\/)", "", regex=True)
+        df.agg(process, axis=1).str.replace(r"(-|\/)", "", regex=True)
     )
     return df
 
