@@ -228,6 +228,7 @@ def clean18():
         .pipe(gen_uid, ["agency", "first_name", "last_name"])
         .pipe(gen_uid, ["agency", "tracking_id", "uid"], "allegation_uid")
         .dropna(subset=["tracking_id"])
+        .drop_duplicates(subset=["allegation_uid"])
     )
 
 

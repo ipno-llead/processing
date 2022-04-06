@@ -164,7 +164,7 @@ schemas:
       - name: referred_by
       - name: incident_location
       - name: disposition_desc
-         description: >
+        description: >
           text description of aftermath of disposition, or reason for disposition. 
   event:
     columns:
