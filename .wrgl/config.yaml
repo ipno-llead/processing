@@ -299,6 +299,10 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/com-sulphur-pd
     fetch:
       - +refs/heads/*:refs/remotes/com-sulphur-pd/*
+  com-pineville-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/com-pineville-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/com-pineville-pd/*
   event:
     url: https://hub.wrgl.co/api/users/ipno/repos/event
     fetch:
@@ -531,6 +535,10 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/event-sulphur-pd
     fetch:
       - +refs/heads/*:refs/remotes/event-sulphur-pd/*
+  event-pineville-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/event-pineville-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/event-pineville-pd/*
   match-brusly-pd-2020:
     url: https://hub.wrgl.co/api/users/ipno/repos/match-brusly-pd-2020
     fetch:
@@ -839,6 +847,10 @@ remote:
     url: https://hub.wrgl.co/api/users/ipno/repos/per-sulphur-pd
     fetch:
       - +refs/heads/*:refs/remotes/per-sulphur-pd/*
+  per-pineville-pd:
+    url: https://hub.wrgl.co/api/users/ipno/repos/per-pineville-pd
+    fetch:
+      - +refs/heads/*:refs/remotes/per-pineville-pd/*
   person:
     url: https://hub.wrgl.co/api/users/ipno/repos/person
     fetch:
@@ -1258,6 +1270,12 @@ branch:
     file: data/fuse/com_sulphur_pd.csv
     primaryKey:
       - allegation_uid
+  com-pineville-pd:
+    remote: com-pineville-pd
+    merge: refs/heads/main
+    file: data/fuse/com_pineville_pd.csv
+    primaryKey:
+      - allegation_uid
   event:
     remote: event
     merge: refs/heads/main
@@ -1604,6 +1622,12 @@ branch:
     remote: event-sulphur-pd
     merge: refs/heads/main
     file: data/fuse/event_sulphur_pd.csv
+    primaryKey:
+      - event_uid
+  event-pineville-pd:
+    remote: event-pineville-pd
+    merge: refs/heads/main
+    file: data/fuse/event_pineville_pd.csv
     primaryKey:
       - event_uid
   match-brusly-pd-2020:
@@ -2042,6 +2066,12 @@ branch:
     remote: per-sulphur-pd
     merge: refs/heads/main
     file: data/fuse/per_sulphur_pd.csv
+    primaryKey:
+      - uid
+  per-pineville-pd:
+    remote: per-pineville-pd
+    merge: refs/heads/main
+    file: data/fuse/per_pineville_pd.csv
     primaryKey:
       - uid
   uof-citizens-new-orleans-pd:
