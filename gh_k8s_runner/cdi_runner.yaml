@@ -1,0 +1,20 @@
+apiVersion: actions.summerwind.dev/v1alpha1
+kind: Runner
+metadata:
+  name: cdi-runner
+spec:
+  repository: ppact/processing
+  env: []
+  ephemeral: false
+  volumes:
+    - name: data
+      persistentVolumeClaim:
+        claimName: cdi-runner-data
+    - name: dvc-cache
+      persistentVolumeClaim:
+        claimName: cdi-runner-dvc-cache
+  volumeMounts:
+    - mountPath: /runner/_work/data
+      name: data
+    - mountPath: /runner/_work/.dvc/cache
+      name: dvc-cache

@@ -1,23 +1,23 @@
 files:
-  fuse/personnel.csv:
+  data/fuse/personnel.csv:
     schema: personnel
-  fuse/allegation.csv:
+  data/fuse/allegation.csv:
     schema: allegation
-  fuse/event.csv:
+  data/fuse/event.csv:
     schema: event
-  fuse/use_of_force.csv:
+  data/fuse/use_of_force.csv:
     schema: use_of_force
-  fuse/stop_and_search.csv:
+  data/fuse/stop_and_search.csv:
     schema: stop_and_search
-  fuse/appeals.csv:
+  data/fuse/appeals.csv:
     schema: appeal_hearing
-  fuse/brady.csv:
+  data/fuse/brady.csv:
     schema: brady
-  fuse/uof_citizens.csv:
+  data/fuse/uof_citizens.csv:
     schema: uof_citizen
-  fuse/uof_officers.csv:
+  data/fuse/uof_officers.csv:
     schema: uof_officer
-  fuse/awards.csv:
+  data/fuse/awards.csv:
     schema: award
 
 schemas:
@@ -165,7 +165,7 @@ schemas:
       - name: incident_location
       - name: disposition_desc
         description: >
-          text description of aftermath of disposition, or reason for disposition. 
+          text description of aftermath of disposition, or reason for disposition.
   event:
     columns:
       - name: event_uid
@@ -408,7 +408,7 @@ schemas:
     columns:
       - name: brady_uid
         description: >
-          unique brady uid 
+          unique brady uid
       - name: uid
       - name: tracking_number
       - name: allegation
@@ -462,4 +462,4 @@ schemas:
         no_na: true
       - name: agency
 
-save_bad_rows_to: invalid_rows.csv
+save_bad_rows_to: data/invalid_rows.csv
