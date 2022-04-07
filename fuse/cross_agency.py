@@ -54,7 +54,7 @@ def assign_max_col(events: pd.DataFrame, per: pd.DataFrame, col: str):
 
 def read_constraints():
     # TODO: replace this line with the real constraints data
-    constraints = pd.DataFrame([], columns=["type", "uids"])
+    constraints = pd.read_csv(deba.data("clean/post_officer_history.csv"))
     print("read constraints (%d rows)" % constraints.shape[0])
     records = dict()
     for idx, row in constraints.iterrows():
@@ -62,12 +62,10 @@ def read_constraints():
         for uid in uids:
             if row.kind == "attract":
                 records.setdefault(uid, dict())["attract_id"] = idx
-            elif row.kind == "repell":
-                records.setdefault(uid, dict())["repell_id"] = idx
     return pd.DataFrame.from_records(records)
 
 
-def cross_match_officers_between_agencies(personnel, events, constraints):
+def cross_match_officers_between_agencies(personnel, events):
     events = discard_rows(
         events, events.uid.notna(), "events with empty uid column", reset_index=True
     )
@@ -105,7 +103,6 @@ def cross_match_officers_between_agencies(personnel, events, constraints):
         per, per.agency != "", "officers not linked to any event", reset_index=True
     )
     per = per.set_index("uid")
-    per = per.join(constraints)
 
     # aggregating min/max date
     events = events.set_index(["uid", "event_uid"])
@@ -127,7 +124,6 @@ def cross_match_officers_between_agencies(personnel, events, constraints):
                 # only officers who have the same first letter in their first name would be matched
                 ColumnsIndex(["fc", "lc"]),
                 # or if they are in the same attract constraint
-                ColumnsIndex("attract_id", ignore_key_error=True),
             ]
         ),
         scorer=MaxScorer(
@@ -145,16 +141,12 @@ def cross_match_officers_between_agencies(personnel, events, constraints):
                     # give a penalty of -.2 which is enough to eliminate them
                     alter=lambda score: score - 0.2,
                 ),
-                # but if two officers belong to the same attract constraint then give them the highest score regardless
-                AbsoluteScorer("attract_id", 1, ignore_key_error=True),
             ]
         ),
         dfa=per,
         filters=[
             # don't match officers who belong in the same agency
             DissimilarFilter("agency"),
-            # don't match officers who are in the same repell constraint
-            DissimilarFilter("repell_id", ignore_key_error=True),
             # don't match officers who appear in overlapping time ranges
             NonOverlappingFilter("min_timestamp", "max_timestamp"),
         ],
@@ -293,7 +285,7 @@ if __name__ == "__main__":
         print("read events file (%d x %d)" % events.shape)
         constraints = read_constraints()
         clusters, personnel_event = cross_match_officers_between_agencies(
-            personnel, events, constraints
+            personnel, events
         )
         new_person_df = create_person_table(clusters, personnel, personnel_event)
         new_person_df.to_csv(deba.data("fuse/person.csv"), index=False)
