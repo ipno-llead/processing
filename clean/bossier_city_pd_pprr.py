@@ -1,7 +1,7 @@
 import pandas as pd
 import deba
 from lib.columns import clean_column_names, set_values
-from lib.clean import clean_dates, clean_salaries, float_to_int_str, names_to_title_case
+from lib.clean import clean_dates, clean_salaries, float_to_int_str
 from lib import salary
 from lib.uid import gen_uid
 

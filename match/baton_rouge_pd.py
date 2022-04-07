@@ -8,7 +8,6 @@ import pandas as pd
 
 import deba
 from lib.post import extract_events_from_post, load_for_agency
-from lib.clean import canonicalize_officers
 
 
 def match_csd_and_pd_pprr(csd, pprr, year, decision):

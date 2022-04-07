@@ -4,7 +4,6 @@ from lib.clean import (
     clean_dates,
     clean_races,
     clean_sexes,
-    names_to_title_case,
     parse_dates_with_known_format,
     clean_salaries,
     standardize_desc_cols,
@@ -30,19 +29,23 @@ def clean_hire_date(df):
 
 
 def clean_ranks(df):
-    df.loc[:, "rank_desc"] = df.job_title.str.lower().str.strip()\
-        .str.replace(r"(state |police )", "", regex=True)\
-        .str.replace(r"\btroop$", "trooper", regex=True)\
-        .str.replace(r"^sp ", "", regex=True)\
-        .str.replace(r"superintende$", "superindentent", regex=True)\
-        .str.replace(r"^tech sup sen$", "technical superintendent", regex=True)\
-        .str.replace(r"emer\b", "emergency", regex=True)\
-        .str.replace(r"\bdep\b", "deputy", regex=True)\
-        .str.replace(r"^depu?t?y? supt (.+)", "deputy superintendent", regex=True)\
-        .str.replace(r"tec$", "technician", regex=True)\
-        .str.replace(r"su$", "superintendent", regex=True)\
+    df.loc[:, "rank_desc"] = (
+        df.job_title.str.lower()
+        .str.strip()
+        .str.replace(r"(state |police )", "", regex=True)
+        .str.replace(r"\btroop$", "trooper", regex=True)
+        .str.replace(r"^sp ", "", regex=True)
+        .str.replace(r"superintende$", "superindentent", regex=True)
+        .str.replace(r"^tech sup sen$", "technical superintendent", regex=True)
+        .str.replace(r"emer\b", "emergency", regex=True)
+        .str.replace(r"\bdep\b", "deputy", regex=True)
+        .str.replace(r"^depu?t?y? supt (.+)", "deputy superintendent", regex=True)
+        .str.replace(r"tec$", "technician", regex=True)
+        .str.replace(r"su$", "superintendent", regex=True)
         .str.replace(r"( com$| sen$)", "", regex=True)
-    return df 
+    )
+    return df
+
 
 def clean_demo():
     return (

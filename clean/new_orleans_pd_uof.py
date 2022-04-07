@@ -1,5 +1,3 @@
-import sys
-
 import deba
 import pandas as pd
 
@@ -7,8 +5,6 @@ from lib.clean import clean_sexes, standardize_desc_cols
 from lib.columns import set_values, clean_column_names
 from lib.clean import clean_races, clean_names
 from lib.uid import gen_uid
-
-sys.path.append("../")
 
 
 def split_officer_rows(df):
@@ -91,9 +87,7 @@ def split_citizen_rows(df):
 
 def clean_tracking_id(df):
     df.loc[:, "tracking_id"] = (
-        df.tracking_id.str.lower()
-        .str.strip()
-        .str.replace(r"^20", "ftn20", regex=True)
+        df.tracking_id.str.lower().str.strip().str.replace(r"^20", "ftn20", regex=True)
     )
     return df
 

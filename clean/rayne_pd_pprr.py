@@ -3,7 +3,6 @@ import deba
 from lib.columns import clean_column_names, set_values
 from lib.clean import (
     clean_names,
-    standardize_desc_cols,
     clean_races,
     clean_sexes,
     clean_dates,

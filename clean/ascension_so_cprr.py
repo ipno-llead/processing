@@ -1,6 +1,3 @@
-import sys
-
-sys.path.append("../")
 import pandas as pd
 from lib.uid import gen_uid
 from lib.columns import clean_column_names, set_values
