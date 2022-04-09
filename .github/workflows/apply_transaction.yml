@@ -33,7 +33,7 @@ jobs:
         uses: ashley-taylor/regex-property-action@v1.2
         with:
           value: ${{ steps.fc.outputs.comment-body }}
-          regex: "\[1\]: .+\/@(.+)\/r\/([^/]+).+"
+          regex: ": https://hub\.wrgl\.co\/@(.+)\/r\/([^/]+).+"
           flags: "" # Optional, defaults to "g"
           replacement: https://hub.wrgl.co/api/users/$1/repos/$2
       - name: Apply transaction
