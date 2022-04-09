@@ -1,0 +1,48 @@
+on:
+  pull_request:
+    branches:
+      - main
+    types: [closed]
+
+jobs:
+  apply-transaction:
+    if: github.event.pull_request.merged == true
+    steps:
+      - uses: jwalton/gh-find-current-pr@v1
+        id: findPr
+        with:
+          state: open
+      - name: Find transaction comment
+        uses: peter-evans/find-comment@v2
+        id: fc
+        with:
+          issue-number: ${{ steps.findPr.outputs.pr }}
+          body-includes: Review data changes at [tx/
+      - name: Extract transaction id
+        if: ${{ steps.fc.outputs.comment-id == 0 }}
+        id: txid
+        uses: ashley-taylor/regex-property-action@v1.2
+        with:
+          value: ${{ steps.fc.outputs.comment-body }}
+          regex: Review data changes at \[tx\/(.+)\].+
+          flags: "" # Optional, defaults to "g"
+          replacement: $1
+      - name: Extract repo url
+        if: ${{ steps.fc.outputs.comment-id == 0 }}
+        id: repoURL
+        uses: ashley-taylor/regex-property-action@v1.2
+        with:
+          value: ${{ steps.fc.outputs.comment-body }}
+          regex: "\[1\]: .+\/@(.+)\/r\/([^/]+).+"
+          flags: "" # Optional, defaults to "g"
+          replacement: https://hub.wrgl.co/api/users/$1/repos/$2
+      - name: Apply transaction
+        if: ${{ steps.txid.outputs.value != 0 && steps.repoURL.outputs.value != 0 }}
+        run: |
+          curl -XPOST ${REPO_URL}/transactions/${TXID}/ \
+          -H "Content-Type: application/json" \
+          -H "Authorization: Bearer ${WRGLHUB_TOKEN}" \
+          -d '{"commit":true}'
+        env:
+          TXID: ${{ steps.txid.outputs.value }}
+          REPO_URL: ${{ steps.repoURL.outputs.value }}
