@@ -24,7 +24,8 @@ jobs:
       - run: pip install -r requirements.txt
       - name: install wrgl
         run: sudo bash -c 'curl -L https://github.com/wrgl/wrgl/releases/latest/download/install.sh | bash'
-      - run: dvc pull
+      - name: dvc pull
+        run: mkdir data/raw; dvc pull
       - run: wrgl pull --all
       - name: process data
         run: make
