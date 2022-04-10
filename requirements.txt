@@ -14,5 +14,5 @@ requests==2.26.0
 wrgl==0.10.2
 flake8==4.0.1
 black==21.12b0
-deba==0.0.9
+deba==0.0.10
 dvc[gs]==2.10.1
