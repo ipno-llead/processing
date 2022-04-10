@@ -1,0 +1,31 @@
+apiVersion: actions.summerwind.dev/v1alpha1
+kind: RunnerDeployment
+metadata:
+  name: cdi-runner
+  namespace: cdi-runner
+spec:
+  replicas: 1
+  template:
+    spec:
+      repository: ppact/processing
+      labels:
+        - cdi-runner
+      env: []
+      # ephemeral: false
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: cdi-runner-data
+        - name: wrgl
+          persistentVolumeClaim:
+            claimName: cdi-runner-wrgl
+        - name: dvc-cache
+          persistentVolumeClaim:
+            claimName: cdi-runner-dvc-cache
+      volumeMounts:
+        - mountPath: /runner/_work/data
+          name: data
+        - mountPath: /runner/_work/.wrgl
+          name: wrgl
+        - mountPath: /runner/_work/.dvc/cache
+          name: dvc-cache
