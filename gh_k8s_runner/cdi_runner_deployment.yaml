@@ -16,16 +16,6 @@ spec:
         - name: data
           persistentVolumeClaim:
             claimName: cdi-runner-data
-        - name: wrgl
-          persistentVolumeClaim:
-            claimName: cdi-runner-wrgl
-        - name: dvc-cache
-          persistentVolumeClaim:
-            claimName: cdi-runner-dvc-cache
       volumeMounts:
         - mountPath: /runner/_work/data
           name: data
-        - mountPath: /runner/_work/.wrgl
-          name: wrgl
-        - mountPath: /runner/_work/.dvc/cache
-          name: dvc-cache

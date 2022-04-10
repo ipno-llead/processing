@@ -30,24 +30,27 @@ jobs:
         run: sudo bash -c 'curl -L https://github.com/wrgl/wrgl/releases/latest/download/install.sh | bash'
       - name: dvc pull
         run: |
-          sed -iE 's/path\: data/path\: \/runner\/_work\/data/g' raw.dvc
-          dvc cache dir --local /runner/_work/.dvc/cache
+          sed -iE 's/path\: data/path\: \/runner\/_work\/data\/data/g' raw.dvc
+          mkdir /runner/_work/data/dvc_cache || true
+          dvc cache dir --local /runner/_work/data/dvc_cache
           dvc pull
       - name: wrgl pull
         run: |
           wrgl config set --global user.email "gh-action@publicdata.works"
           wrgl config set --global user.name "Github Action"
-          cp .wrgl/config.yaml /runner/_work/.wrgl/
-          wrgl init --wrgl-dir /runner/_work/.wrgl || true
-          wrgl pull --wrgl-dir /runner/_work/.wrgl --all
+          mkdir /runner/_work/data/.wrgl || true
+          cp .wrgl/config.yaml /runner/_work/data/.wrgl/
+          wrgl init --wrgl-dir /runner/_work/data/.wrgl || true
+          wrgl pull --wrgl-dir /runner/_work/data/.wrgl --all
       - name: process data
         run: |
-          sed -iE 's/dataDir\: data/dataDir\: \/runner\/_work\/data/g' deba.yaml
-          make WRGL_FLAGS="--wrgl-dir /runner/_work/.wrgl"
+          sed -iE 's/dataDir\: data/dataDir\: \/runner\/_work\/data\/data/g' deba.yaml
+          echo "md5Dir: /runner/_work/data/md5" >> deba.yaml
+          make WRGL_FLAGS="--wrgl-dir /runner/_work/data/.wrgl"
       - name: commit changes in transaction
         id: transaction
         run: |
-          cd /runner/_work/
+          cd /runner/_work/data
           wrgl transaction start | tr -d "[:space:]" > txid.txt
           wrgl commit --all --txid $(cat txid.txt) "PR #${PR}: ${PR_TITLE}\nhttps://github.com/${GITHUB_REPOSITORY}/pull/${PR}"
           wrgl transaction push origin $(cat txid.txt)
