@@ -41,7 +41,7 @@ if __name__ == "__main__":
     agency = cprr.agency[0]
     post = load_for_agency(agency)
 
-    pd.concat(
+    matched_cprr = pd.concat(
         [
             match_cprr_post(
                 cprr[cprr.agency == "East Jefferson Levee PD"],
@@ -58,4 +58,5 @@ if __name__ == "__main__":
                 0.9,
             ),
         ]
-    ).to_csv(deba.data("match/cprr_levee_pd.csv"), index=False)
+    )
+    matched_cprr.to_csv(deba.data("match/cprr_levee_pd.csv"), index=False)
