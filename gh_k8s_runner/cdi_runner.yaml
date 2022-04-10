@@ -8,7 +8,7 @@ spec:
   labels:
     - cdi-runner
   env: []
-  ephemeral: false
+  # ephemeral: false
   volumes:
     - name: data
       persistentVolumeClaim:
@@ -17,7 +17,7 @@ spec:
       persistentVolumeClaim:
         claimName: cdi-runner-dvc-cache
   volumeMounts:
-    - mountPath: /runner/_work/data
+    - mountPath: /runner/_work/processing/processing/data/raw
       name: data
-    - mountPath: /runner/_work/.dvc/cache
+    - mountPath: /runner/_work/processing/processing/.dvc/cache
       name: dvc-cache
