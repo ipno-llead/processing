@@ -43,7 +43,7 @@ jobs:
       - name: process data
         run: |
           sed -iE 's/dataDir\: data/dataDir\: \/runner\/_work\/data/g' deba.yaml
-          make
+          make WRGL_FLAGS="--wrgl-dir /runner/_work/.wrgl"
       - name: commit changes in transaction
         id: transaction
         run: |
