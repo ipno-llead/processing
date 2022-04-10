@@ -25,7 +25,7 @@ jobs:
       - name: install wrgl
         run: sudo bash -c 'curl -L https://github.com/wrgl/wrgl/releases/latest/download/install.sh | bash'
       - name: dvc pull
-        run: mkdir data/raw; dvc pull
+        run: dvc pull data/raw -r gcs
       - run: wrgl pull --all
       - name: process data
         run: make
