@@ -38,7 +38,7 @@ jobs:
           wrgl config set --global user.email "gh-action@publicdata.works"
           wrgl config set --global user.name "Github Action"
           cp .wrgl/config.yaml /runner/_work/.wrgl/
-          wrgl init --wrgl-dir /runner/_work/.wrgl
+          wrgl init --wrgl-dir /runner/_work/.wrgl || true
           wrgl pull --wrgl-dir /runner/_work/.wrgl --all
       - name: process data
         run: |
