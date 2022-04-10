@@ -3,5 +3,6 @@ kind: Kustomization
 resources:
   - namespace.yaml
   - cdi_runner_data_pvc.yaml
+  - cdi_runner_wrgl_pvc.yaml
   - cdi_runner_dvc_cache_pvc.yaml
   - cdi_runner.yaml
