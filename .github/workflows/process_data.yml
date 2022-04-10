@@ -26,7 +26,11 @@ jobs:
         run: sudo bash -c 'curl -L https://github.com/wrgl/wrgl/releases/latest/download/install.sh | bash'
       - name: dvc pull
         run: dvc pull
-      - run: wrgl pull --all
+      - run: wrgl pull
+        run: |
+          wrgl config set --global user.email "gh-action@publicdata.works"
+          wrgl config set --global user.name "Github Action"
+          wrgl pull --all
       - name: process data
         run: make
       - name: commit changes in transaction
