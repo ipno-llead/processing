@@ -8,7 +8,7 @@ DEBA_FILE := deba.yaml
 
 DEBA_DEPS_DIR := $(DEBA_DIR)/deps
 DEBA_DATA_DIR := $(shell $(PYTHON) -m deba dataDir)
-DEBA_MD5_DIR := $(DEBA_DIR)/md5
+DEBA_MD5_DIR := $(shell $(PYTHON) -m deba md5Dir)
 DEBA_STAGES := $(shell $(PYTHON) -m deba stages)
 DEBA_DEP_FILES := $(patsubst %,$(DEBA_DEPS_DIR)/%.d,$(DEBA_STAGES))
 DEBA_PYTHON_PATH := $(shell $(PYTHON) -m deba pythonPath)
