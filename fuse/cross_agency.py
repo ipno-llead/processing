@@ -54,7 +54,7 @@ def assign_max_col(events: pd.DataFrame, per: pd.DataFrame, col: str):
 
 def read_constraints():
     # TODO: replace this line with the real constraints data
-    constraints = pd.DataFrame([], columns=["type", "uids"])
+    constraints = pd.DataFrame([], columns=["uids", "kind"])
     print("read constraints (%d rows)" % constraints.shape[0])
     records = dict()
     for idx, row in constraints.iterrows():
@@ -65,6 +65,13 @@ def read_constraints():
             elif row.kind == "repell":
                 records.setdefault(uid, dict())["repell_id"] = idx
     return pd.DataFrame.from_records(records)
+
+
+def read_post():
+    post = pd.read_csv(deba.data("clean/post_officer_history.csv"))
+    print("read post officer history (%d rows)" % post.shape[0])
+    return post
+
 
 
 def cross_match_officers_between_agencies(personnel, events, constraints):
@@ -172,9 +179,9 @@ def cross_match_officers_between_agencies(personnel, events, constraints):
     return clusters, per[["max_timestamp", "agency"]]
 
 
-def create_person_table(clusters, personnel, personnel_event):
+def create_person_table(clusters, personnel, personnel_event, post):
     # add back unmatched officers into clusters list
-    matched_uids = frozenset().union(*[s for s in clusters])
+    matched_uids = frozenset().union(*[s for s in post["uids"]])
     clusters = [sorted(list(cluster)) for cluster in clusters] + [
         [uid]
         for uid in personnel.loc[~personnel.uid.isin(matched_uids), "uid"].tolist()
@@ -292,8 +299,9 @@ if __name__ == "__main__":
         events = pd.read_csv(deba.data("fuse/event.csv"))
         print("read events file (%d x %d)" % events.shape)
         constraints = read_constraints()
+        post = read_post()
         clusters, personnel_event = cross_match_officers_between_agencies(
             personnel, events, constraints
         )
-        new_person_df = create_person_table(clusters, personnel, personnel_event)
+        new_person_df = create_person_table(clusters, personnel, personnel_event, post)
         new_person_df.to_csv(deba.data("fuse/person.csv"), index=False)
