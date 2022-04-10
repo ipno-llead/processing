@@ -17,7 +17,7 @@ spec:
       persistentVolumeClaim:
         claimName: cdi-runner-dvc-cache
   volumeMounts:
-    - mountPath: /runner/_work/processing/processing/data/raw
+    - mountPath: /runner/_work/data
       name: data
-    - mountPath: /runner/_work/processing/processing/.dvc/cache
+    - mountPath: /runner/_work/.dvc/cache
       name: dvc-cache

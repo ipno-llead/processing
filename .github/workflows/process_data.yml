@@ -29,14 +29,19 @@ jobs:
       - name: install wrgl
         run: sudo bash -c 'curl -L https://github.com/wrgl/wrgl/releases/latest/download/install.sh | bash'
       - name: dvc pull
-        run: dvc pull
+        run: |
+          sed -iE 's/path\: data/path\: \/runner\/_work\/data/g' raw.dvc
+          dvc cache dir --local /runner/_work/.dvc/cache
+          dvc pull
       - name: wrgl pull
         run: |
           wrgl config set --global user.email "gh-action@publicdata.works"
           wrgl config set --global user.name "Github Action"
           wrgl pull --all
       - name: process data
-        run: make
+        run: |
+          sed -iE 's/dataDir\: data/dataDir\: \/runner\/_work\/data/g' deba.yaml
+          make
       - name: commit changes in transaction
         id: transaction
         run: |
