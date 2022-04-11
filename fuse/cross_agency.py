@@ -54,7 +54,8 @@ def assign_max_col(events: pd.DataFrame, per: pd.DataFrame, col: str):
 
 def read_constraints():
     # TODO: replace this line with the real constraints data
-    constraints = pd.DataFrame([], columns=["uids", "kind"])
+    data = pd.read_csv(deba.data("raw/cross_agency/constraints_11_18_2021.csv"))
+    constraints = pd.DataFrame(data, columns=["uids", "kind"])
     print("read constraints (%d rows)" % constraints.shape[0])
     records = dict()
     for idx, row in constraints.iterrows():
@@ -71,7 +72,6 @@ def read_post():
     post = pd.read_csv(deba.data("clean/post_officer_history.csv"))
     print("read post officer history (%d rows)" % post.shape[0])
     return post
-
 
 
 def cross_match_officers_between_agencies(personnel, events, constraints):
@@ -181,7 +181,12 @@ def cross_match_officers_between_agencies(personnel, events, constraints):
 
 def create_person_table(clusters, personnel, personnel_event, post):
     # add back unmatched officers into clusters list
-    matched_uids = frozenset().union(*[s for s in post["uids"]])
+    matched_uids_post = frozenset().union(*[s for s in post["uids"]])
+    matched_uids_clusters = frozenset().union(*[s for s in clusters])
+
+    list_matched_uids = [matched_uids_post, matched_uids_clusters]
+    matched_uids = frozenset().union(*list_matched_uids)
+
     clusters = [sorted(list(cluster)) for cluster in clusters] + [
         [uid]
         for uid in personnel.loc[~personnel.uid.isin(matched_uids), "uid"].tolist()

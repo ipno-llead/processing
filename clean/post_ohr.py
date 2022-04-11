@@ -1,7 +1,6 @@
 import pandas as pd
 import deba
-from lib.clean import float_to_int_str, standardize_desc_cols
-from lib.columns import set_values
+from lib.clean import standardize_desc_cols
 
 
 def drop_missing_agency(df):
@@ -40,10 +39,9 @@ def clean():
         .pipe(drop_missing_matched_uid)
         .pipe(uids)
         .pipe(standardize_desc_cols, ["uids"])
-        .pipe(set_values, {"kind": "attract"})
     )
 
-    df = df[["uids", "kind"]]
+    df = df[["uids"]]
     return df
 
 
