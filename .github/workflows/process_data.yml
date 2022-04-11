@@ -1,10 +1,6 @@
 name: Process Data
 on:
-  push:
-    branches:
-      - enhancement/gh-k8s-runner
   pull_request:
-    types: ["opened", "edited", "reopened", "synchronize"]
     branches:
       - main
 jobs:
