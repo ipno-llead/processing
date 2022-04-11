@@ -11,6 +11,7 @@ spec:
       labels:
         - cdi-runner
       env: []
+      # # uncomment when there's a need to inspect runner pod after job finished
       # ephemeral: false
       volumes:
         - name: data

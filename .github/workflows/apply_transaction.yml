@@ -45,5 +45,6 @@ jobs:
           -H "Authorization: Bearer ${WRGLHUB_TOKEN}" \
           -d '{"commit":true}'
         env:
+          WRGLHUB_TOKEN: ${{ secrets.WRGLHUB_TOKEN }}
           TXID: ${{ steps.txid.outputs.value }}
           REPO_URL: ${{ steps.repoURL.outputs.value }}
