@@ -51,6 +51,9 @@ jobs:
         id: transaction
         run: |
           cd /runner/_work/data
+          echo "${WRGLHUB_TOKEN}" > token.txt
+          wrgl credentials authenticate https://hub.wrgl.co/api --token-location token.txt
+          rm token.txt
           wrgl transaction start | tr -d "[:space:]" > txid.txt
           wrgl commit --all --txid $(cat txid.txt) "PR #${PR}: ${PR_TITLE}\nhttps://github.com/${GITHUB_REPOSITORY}/pull/${PR}"
           wrgl transaction push origin $(cat txid.txt)
