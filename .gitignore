@@ -8,11 +8,13 @@ __pycache__
 *.xlsx
 *.csv
 *.pdf
+*.pem
 
 !.wrgl
 .wrgl/*
 !.wrgl/config.yaml
 
+data
 build
 data.d
 q
