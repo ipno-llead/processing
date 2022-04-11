@@ -56,13 +56,14 @@ jobs:
           rm token.txt
           wrgl transaction start | tr -d "[:space:]" > txid.txt
           wrgl commit --all --txid $(cat txid.txt) "PR #${PR}: ${PR_TITLE}\nhttps://github.com/${GITHUB_REPOSITORY}/pull/${PR}"
-          wrgl transaction push origin $(cat txid.txt)
+          wrgl transaction push origin $(cat txid.txt) || true
           echo "::set-output name=txid::$(cat txid.txt)"
           echo "::set-output name=txURL::https://hub.wrgl.co/$(wrgl remote -v | grep origin | sed -E 's/.+\/api\/users\/(.+)\/repos\/(.+)/@\1\/r\/\2/')/tx/$(cat txid.txt)"
         env:
           PR: ${{ steps.findPr.outputs.pr }}
           PR_TITLE: ${{ steps.findPr.outputs.title }}
       - name: Create comment
+        if: ${{ steps.findPr.outputs.pr != 0 }}
         uses: peter-evans/create-or-update-comment@v2
         with:
           issue-number: ${{ steps.findPr.outputs.pr }}
