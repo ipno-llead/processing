@@ -118,7 +118,7 @@ jobs:
         if: ${{ steps.txid.outputs.value != null && steps.repoURL.outputs.value != null }}
         run: |
           echo "To ${REPO_URL}/transactions/${TXID}/"
-          curl --fail-with-body -XPOST ${REPO_URL}/transactions/${TXID}/ \
+          curl --fail -XPOST ${REPO_URL}/transactions/${TXID}/ \
           -H "Content-Type: application/json" \
           -H "Authorization: Bearer ${WRGLHUB_TOKEN}" \
           -d '{"commit":true}'
@@ -127,7 +127,7 @@ jobs:
           TXID: ${{ steps.txid.outputs.value }}
           REPO_URL: ${{ steps.repoURL.outputs.value }}
       - name: Create comment
-        if: ${{ steps.txURL.outputs.value != null }}
+        if: ${{ steps.txURL.outputs.value != null && steps.txid.outputs.value != null }}
         uses: peter-evans/create-or-update-comment@v2
         with:
           issue-number: ${{ steps.findPr.outputs.pr }}
