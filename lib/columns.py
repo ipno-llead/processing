@@ -7,7 +7,7 @@ from datavalid import load_config
 from .clean import float_to_int_str, names_to_title_case
 
 
-datavalid_config = load_config(os.path.join(os.path.dirname(__file__), "../data"))
+datavalid_config = load_config(os.path.join(os.path.dirname(__file__), ".."))
 
 
 def clean_column_names(df: pd.DataFrame) -> pd.DataFrame:

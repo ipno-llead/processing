@@ -59,4 +59,4 @@ if __name__ == "__main__":
     event.to_csv(deba.data("fuse/event_tangipahoa_so.csv"), index=False)
     complaints.to_csv(deba.data("fuse/com_tangipahoa_so.csv"), index=False)
     per.to_csv(deba.data("fuse/per_tangipahoa_so.csv"), index=False)
-    brady_df.to_csv(deba.data("fuse/brady_tangipahoa_da.csv"), index=False)
+    brady_df.to_csv(deba.data("fuse/brady_tangipahoa_so.csv"), index=False)
