@@ -117,7 +117,8 @@ jobs:
       - name: Apply transaction
         if: ${{ steps.txid.outputs.value != null && steps.repoURL.outputs.value != null }}
         run: |
-          curl -XPOST ${REPO_URL}/transactions/${TXID}/ \
+          echo "To ${REPO_URL}/transactions/${TXID}/"
+          curl --fail -XPOST ${REPO_URL}/transactions/${TXID}/ \
           -H "Content-Type: application/json" \
           -H "Authorization: Bearer ${WRGLHUB_TOKEN}" \
           -d '{"commit":true}'
