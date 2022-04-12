@@ -93,7 +93,7 @@ jobs:
           value: ${{ steps.fc.outputs.comment-body }}
           regex: |
             .+(https://hub\.wrgl\.co\/@.+).+
-          flags: "" # Optional, defaults to "g"
+          flags: "s"
           replacement: $1
       - name: Extract transaction id
         if: ${{ steps.txURL.outputs.value != null }}
@@ -126,6 +126,7 @@ jobs:
           TXID: ${{ steps.txid.outputs.value }}
           REPO_URL: ${{ steps.repoURL.outputs.value }}
       - name: Create comment
+        if: ${{ steps.txURL.outputs.value != null }}
         uses: peter-evans/create-or-update-comment@v2
         with:
           issue-number: ${{ steps.findPr.outputs.pr }}
