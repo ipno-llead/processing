@@ -51,7 +51,7 @@ jobs:
           wrgl credentials authenticate https://hub.wrgl.co/api --token-location token.txt
           rm token.txt
           wrgl transaction start | tr -d "[:space:]" > txid.txt
-          wrgl commit --all --txid $(cat txid.txt) "PR #${PR}: ${PR_TITLE}\nhttps://github.com/${GITHUB_REPOSITORY}/pull/${PR}"
+          wrgl commit --all --txid $(cat txid.txt) $'[PR #${PR}: ${PR_TITLE}][1]\n\n[1]: https://github.com/${GITHUB_REPOSITORY}/pull/${PR}'
           wrgl transaction push origin $(cat txid.txt)
           echo "::set-output name=txid::$(cat txid.txt)"
           echo "::set-output name=txURL::https://hub.wrgl.co/$(wrgl remote -v | grep origin | sed -E 's/.+\/api\/users\/(.+)\/repos\/(.+)/@\1\/r\/\2/')/tx/$(cat txid.txt)"
@@ -69,69 +69,3 @@ jobs:
             When this PR is merged, this transaction will be applied.
 
             [1]: ${{ steps.transaction.outputs.txURL }}
-  apply-transaction:
-    runs-on: cdi-runner
-    needs: process-data
-    steps:
-      - uses: jwalton/gh-find-current-pr@v1
-        id: findPr
-        with:
-          state: open
-      - name: Find transaction comment
-        uses: peter-evans/find-comment@v2.0.0
-        id: fc
-        with:
-          issue-number: ${{ steps.findPr.outputs.pr }}
-          comment-author: github-actions[bot]
-          body-includes: Review data changes at
-          direction: last
-      - name: Extract transaction url
-        if: ${{ steps.fc.outputs.comment-id != 0 }}
-        id: txURL
-        uses: ashley-taylor/regex-property-action@1.2
-        with:
-          value: ${{ steps.fc.outputs.comment-body }}
-          regex: |
-            .+(https://hub\.wrgl\.co\/@.+)
-          flags: "s"
-          replacement: $1
-      - name: Extract transaction id
-        if: ${{ steps.txURL.outputs.value != null }}
-        id: txid
-        uses: ashley-taylor/regex-property-action@1.2
-        with:
-          value: ${{ steps.txURL.outputs.value }}
-          regex: .+\/tx\/(.+)
-          flags: "" # Optional, defaults to "g"
-          replacement: $1
-      - name: Extract repo url
-        if: ${{ steps.txURL.outputs.value != null }}
-        id: repoURL
-        uses: ashley-taylor/regex-property-action@1.2
-        with:
-          value: ${{ steps.txURL.outputs.value }}
-          regex: |
-            https://hub\.wrgl\.co\/@(.+)\/r\/([^/]+).+
-          flags: "" # Optional, defaults to "g"
-          replacement: https://hub.wrgl.co/api/users/$1/repos/$2
-      - name: Apply transaction
-        if: ${{ steps.txid.outputs.value != null && steps.repoURL.outputs.value != null }}
-        run: |
-          echo "To ${REPO_URL}/transactions/${TXID}/"
-          curl --fail -XPOST ${REPO_URL}/transactions/${TXID}/ \
-          -H "Content-Type: application/json" \
-          -H "Authorization: Bearer ${WRGLHUB_TOKEN}" \
-          -d '{"commit":true}'
-        env:
-          WRGLHUB_TOKEN: ${{ secrets.WRGLHUB_TOKEN }}
-          TXID: ${{ steps.txid.outputs.value }}
-          REPO_URL: ${{ steps.repoURL.outputs.value }}
-      - name: Create comment
-        if: ${{ steps.txURL.outputs.value != null && steps.txid.outputs.value != null }}
-        uses: peter-evans/create-or-update-comment@v2
-        with:
-          issue-number: ${{ steps.findPr.outputs.pr }}
-          body: |
-            Transaction [tx/${{ steps.txid.outputs.value }}][1] applied.
-
-            [1]: ${{ steps.txURL.outputs.value }}
