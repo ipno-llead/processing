@@ -92,7 +92,7 @@ jobs:
         with:
           value: ${{ steps.fc.outputs.comment-body }}
           regex: |
-            .+(https://hub\.wrgl\.co\/@.+).+
+            .+(https://hub\.wrgl\.co\/@.+)
           flags: "s"
           replacement: $1
       - name: Extract transaction id
@@ -118,7 +118,7 @@ jobs:
         if: ${{ steps.txid.outputs.value != null && steps.repoURL.outputs.value != null }}
         run: |
           echo "To ${REPO_URL}/transactions/${TXID}/"
-          curl --fail -XPOST ${REPO_URL}/transactions/${TXID}/ \
+          curl --fail-with-body -XPOST ${REPO_URL}/transactions/${TXID}/ \
           -H "Content-Type: application/json" \
           -H "Authorization: Bearer ${WRGLHUB_TOKEN}" \
           -d '{"commit":true}'
