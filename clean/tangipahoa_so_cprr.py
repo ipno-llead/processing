@@ -1,8 +1,11 @@
 import deba
-from lib.columns import set_values
+from regex import R
+from lib.columns import clean_column_names, set_values
 from lib.uid import gen_uid
-from lib.clean import clean_dates, float_to_int_str, clean_names
+from lib.clean import clean_dates, float_to_int_str, clean_names, standardize_desc_cols
 import pandas as pd
+from lib.rows import duplicate_row
+import re
 
 
 def split_rows_with_name(df):
@@ -180,7 +183,7 @@ def clean_action(df):
 
 
 def clean_received_by(df):
-    df.loc[:, "receiver"] = (
+    df.loc[:, "received_by"] = (
         df.receive_by.str.lower()
         .str.strip()
         .str.replace("/", "", regex=False)
@@ -196,8 +199,8 @@ def clean_received_by(df):
         .str.replace("dennise", "denise", regex=False)
         .str.replace("whittingtton", "whittington", regex=False)
     )
-    parts = df.receiver.str.extract(r"(?:(lt|cpl|capt|sgt|dy|major|chief) )?(.+)")
-    df.loc[:, "receiver"] = parts[1].fillna("")
+    parts = df.received_by.str.extract(r"(?:(lt|cpl|capt|sgt|dy|major|chief) )?(.+)")
+    df.loc[:, "received_by"] = parts[1].fillna("")
     return df.drop(columns="receive_by")
 
 
@@ -227,7 +230,104 @@ def drop_rows_missing_names(df):
     return df[~((df.first_name == "") & (df.last_name == ""))]
 
 
-def clean():
+def correct_dates(df):
+    df.loc[:, "receive_date"] = df.date_time_received_00_00_hours.astype(
+        str
+    ).str.replace(r"\'", "", regex=True)
+    return df.drop(columns=["date_time_received_00_00_hours"])
+
+
+def clean_received_by_13(df):
+    df.loc[:, "received_by"] = (
+        df.complaint_received_by.str.lower()
+        .str.strip()
+        .str.replace(r"^tpso$", "tangipahoa parish sheriff's office", regex=True)
+    )
+    return df.drop(columns=["complaint_received_by"])
+
+
+def clean_supervisor(df):
+    names = (
+        df.complaint_referred_or_assigned_to.str.lower()
+        .str.strip()
+        .str.replace(r"^\'", "", regex=True)
+        .str.extract(r"(^l[ti][\,\.]|^sg[tl]\.|^capt\.) ?(\w+)")
+    )
+
+    df.loc[:, "supervisor_rank_desc"] = (
+        names[0]
+        .str.replace(r"^l[ti][\,\.]", "lieutenant", regex=True)
+        .str.replace(r"^sg[tl]\.", "sergeant", regex=True)
+        .str.replace(r"^capt\.", "captain", regex=True)
+    )
+    df.loc[:, "supervisor_last_name"] = names[1]
+    return df.drop(columns=["complaint_referred_or_assigned_to"])
+
+
+def extract_actions(df):
+    actions = (
+        df.final_status_and_dispo.str.lower()
+        .str.strip()
+        .str.extract(r"(terminated|12 hr susp|written reprimand)")
+    )
+    df.loc[:, "action"] = (
+        actions[0]
+        .fillna("")
+        .str.replace(r"^12 hr susp$", "12-hour suspension", regex=True)
+    )
+    return df
+
+
+def clean_disposition13(df):
+    df.loc[:, "disposition"] = (
+        df.final_status_and_dispo.str.lower()
+        .str.strip()
+        .str.replace(r"(terminated|12 hr susp|written reprimand)", "", regex=True)
+        .str.replace("compl withdrawn", "withdrawn", regex=False)
+        .str.replace("discipline", "disciplinary", regex=False)
+        .str.replace(r"\'", "", regex=True)
+    )
+    return df.drop(columns=["final_status_and_dispo"])
+
+
+def clean_allegation(df):
+    df.loc[:, "allegation"] = (
+        df.allegation_charge.str.lower().str.strip().str.replace(r"\'", "", regex=True)
+    )
+    return df
+
+
+def split_rows_with_multiple_allegations_13(df):
+    i = 0
+    for idx in df[df.allegation.str.contains("/")].index:
+        s = df.loc[idx + i, "allegation"]
+        parts = re.split(r"\/", s)
+        df = duplicate_row(df, idx + i, len(parts))
+        for j, name in enumerate(parts):
+            df.loc[idx + i + j, "allegation"] = name
+        i += len(parts) - 1
+    return df.drop(columns=["allegation_charge"])
+
+
+def split_names(df):
+    names = (
+        df.investigated_member_s_name_last_name_first_initial_badge.str.lower()
+        .str.strip()
+        .fillna("")
+        .str.replace(r"\'", "", regex=True)
+        .str.replace(r"unknown", "", regex=True)
+        .str.extract(r"(sgt\.)? ?(?:(\w+) )? ?(\w+)")
+    )
+
+    df.loc[:, "rank_desc"] = names[0].fillna("")
+    df.loc[:, "first_name"] = names[1].fillna("")
+    df.loc[:, "last_name"] = names[2].fillna("")
+    return df[~((df.first_name == "") & (df.last_name == ""))].drop(
+        columns=["investigated_member_s_name_last_name_first_initial_badge"]
+    )
+
+
+def clean21():
     df = (
         pd.read_csv(deba.data("raw/tangipahoa_so/tangipahoa_so_cprr_2015_2021.csv"))
         .pipe(split_rows_with_name)
@@ -268,6 +368,44 @@ def clean():
     return df
 
 
+def clean13():
+    df = (
+        pd.read_csv(deba.data("raw/tangipahoa_so/tangipahoa_so_cprr_2013.csv"))
+        .pipe(clean_column_names)
+        .drop(
+            columns=[
+                "complainant_name_address_age_telephone",
+                "air",
+                "ccf",
+                "per",
+                "ph",
+                "l",
+            ]
+        )
+        .rename(columns={"air_pid_complaint_number_yr_mo": "tracking_id"})
+        .pipe(correct_dates)
+        .pipe(clean_dates, ["receive_date"])
+        .pipe(clean_received_by_13)
+        .pipe(clean_supervisor)
+        .pipe(extract_actions)
+        .pipe(clean_disposition13)
+        .pipe(standardize_desc_cols, ["disposition"])
+        .pipe(clean_allegation)
+        .pipe(split_rows_with_multiple_allegations_13)
+        .pipe(split_names)
+        .pipe(set_values, {"agency": "Tangipahoa SO"})
+        .pipe(gen_uid, ["first_name", "last_name", "agency"])
+        .pipe(
+            gen_uid,
+            ["uid", "allegation", "disposition", "tracking_id"],
+            "allegation_uid",
+        )
+    )
+    return df
+
+
 if __name__ == "__main__":
-    df = clean()
-    df.to_csv(deba.data("clean/cprr_tangipahoa_so_2015_2021.csv"), index=False)
+    df21 = clean21()
+    df13 = clean13()
+    df21.to_csv(deba.data("clean/cprr_tangipahoa_so_2015_2021.csv"), index=False)
+    df13.to_csv(deba.data("clean/tangipahoa_so_cprr_2013.csv"), index=False)

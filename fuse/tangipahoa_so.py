@@ -6,10 +6,10 @@ from lib.post import load_for_agency
 import pandas as pd
 
 
-def fuse_events(cprr, post):
+def fuse_events(cprr21, post):
     builder = events.Builder()
     builder.extract_events(
-        cprr,
+        cprr21,
         {
             events.INVESTIGATION_COMPLETE: {
                 "prefix": "completion",
@@ -46,16 +46,17 @@ def fuse_events(cprr, post):
 
 
 if __name__ == "__main__":
-    cprr = pd.read_csv(deba.data("match/cprr_tangipahoa_so_2015_2021.csv"))
+    cprr21 = pd.read_csv(deba.data("match/cprr_tangipahoa_so_2015_2021.csv"))
+    cprr13 = pd.read_csv(deba.data("match/tangipahoa_so_cprr_2013.csv"))
     brady = pd.read_csv(deba.data("match/brady_tangipahoa_da_2021.csv"))
     brady = brady.loc[brady.agency == "Tangipahoa SO"]
-    agency = cprr.agency[0]
+    agency = cprr21.agency[0]
     post = load_for_agency(agency)
-    per = fuse_personnel(cprr, post, brady)
-    complaints = rearrange_allegation_columns(cprr)
-    event = fuse_events(cprr, post)
+    per = fuse_personnel(cprr21, cprr13, post, brady)
+    complaints = rearrange_allegation_columns(pd.concat([cprr21, cprr13]))
+    event = fuse_events(cprr21, post)
     brady_df = rearrange_brady_columns(brady)
     event.to_csv(deba.data("fuse/event_tangipahoa_so.csv"), index=False)
     complaints.to_csv(deba.data("fuse/com_tangipahoa_so.csv"), index=False)
     per.to_csv(deba.data("fuse/per_tangipahoa_so.csv"), index=False)
-    brady_df.to_csv(deba.data("fuse/brady_tangipahoa_da.csv"), index=False)
+    brady_df.to_csv(deba.data("fuse/brady_tangipahoa_so.csv"), index=False)
