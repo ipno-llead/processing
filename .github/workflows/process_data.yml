@@ -86,7 +86,7 @@ jobs:
       - name: Extract transaction id
         if: ${{ steps.fc.outputs.comment-id == 0 }}
         id: txid
-        uses: ashley-taylor/regex-property-action@v1.2
+        uses: ashley-taylor/regex-property-action@1.2
         with:
           value: ${{ steps.fc.outputs.comment-body }}
           regex: Review data changes at \[tx\/(.+)\].+
@@ -95,7 +95,7 @@ jobs:
       - name: Extract repo url
         if: ${{ steps.fc.outputs.comment-id == 0 }}
         id: repoURL
-        uses: ashley-taylor/regex-property-action@v1.2
+        uses: ashley-taylor/regex-property-action@1.2
         with:
           value: ${{ steps.fc.outputs.comment-body }}
           regex: |
