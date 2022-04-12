@@ -85,23 +85,33 @@ jobs:
           comment-author: github-actions[bot]
           body-includes: Review data changes at
           direction: last
-      - name: Extract transaction id
+      - name: Extract transaction url
         if: ${{ steps.fc.outputs.comment-id != 0 }}
-        id: txid
-        uses: ashley-taylor/regex-property-action@1.2
-        with:
-          value: ${{ steps.fc.outputs.comment-body }}
-          regex: Review data changes at \[tx\/(.+)\].+
-          flags: "" # Optional, defaults to "g"
-          replacement: $1
-      - name: Extract repo url
-        if: ${{ steps.fc.outputs.comment-id != 0 }}
-        id: repoURL
+        id: txURL
         uses: ashley-taylor/regex-property-action@1.2
         with:
           value: ${{ steps.fc.outputs.comment-body }}
           regex: |
-            : https://hub\.wrgl\.co\/@(.+)\/r\/([^/]+).+
+            .+(https://hub\.wrgl\.co\/@.+).+
+          flags: "" # Optional, defaults to "g"
+          replacement: $1
+      - name: Extract transaction id
+        if: ${{ steps.txURL.outputs.value != null }}
+        id: txid
+        uses: ashley-taylor/regex-property-action@1.2
+        with:
+          value: ${{ steps.txURL.outputs.value }}
+          regex: .+\/tx\/(.+)
+          flags: "" # Optional, defaults to "g"
+          replacement: $1
+      - name: Extract repo url
+        if: ${{ steps.txURL.outputs.value != null }}
+        id: repoURL
+        uses: ashley-taylor/regex-property-action@1.2
+        with:
+          value: ${{ steps.txURL.outputs.value }}
+          regex: |
+            https://hub\.wrgl\.co\/@(.+)\/r\/([^/]+).+
           flags: "" # Optional, defaults to "g"
           replacement: https://hub.wrgl.co/api/users/$1/repos/$2
       - name: Apply transaction
@@ -115,3 +125,11 @@ jobs:
           WRGLHUB_TOKEN: ${{ secrets.WRGLHUB_TOKEN }}
           TXID: ${{ steps.txid.outputs.value }}
           REPO_URL: ${{ steps.repoURL.outputs.value }}
+      - name: Create comment
+        uses: peter-evans/create-or-update-comment@v2
+        with:
+          issue-number: ${{ steps.findPr.outputs.pr }}
+          body: |
+            Transaction [tx/${{ steps.txid.outputs.value }}][1] applied.
+
+            [1]: ${{ steps.txURL.outputs.value }}
