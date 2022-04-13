@@ -71,7 +71,7 @@ def clean19():
                 "action_taken": "action",
             }
         )
-        .drop(columns=['complainant'])
+        .drop(columns=["complainant"])
         .dropna(subset=["ejld_oldp"])
         .reset_index(drop=True)
         .pipe(assign_agency, 2019)
@@ -134,4 +134,5 @@ def clean20():
 if __name__ == "__main__":
     df20 = clean20()
     df19 = clean19()
-    pd.concat([df19, df20]).to_csv(deba.data("clean/cprr_levee_pd.csv"), index=False)
+    df = pd.concat([df19, df20])
+    df.to_csv(deba.data("clean/cprr_levee_pd.csv"), index=False)

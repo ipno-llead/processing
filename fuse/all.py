@@ -175,7 +175,7 @@ def fuse_allegation():
                 pd.read_csv(deba.data("fuse/com_denham_springs_pd.csv")),
                 pd.read_csv(deba.data("fuse/com_abbeville_pd.csv")),
                 pd.read_csv(deba.data("fuse/com_washington_so.csv")),
-                pd.read_csv(deba.data("fuse/com_cameron_So.csv")),
+                pd.read_csv(deba.data("fuse/com_cameron_so.csv")),
                 pd.read_csv(deba.data("fuse/com_maurice_pd.csv")),
                 pd.read_csv(deba.data("fuse/com_terrebonne_so.csv")),
                 pd.read_csv(deba.data("fuse/com_acadia_so.csv")),

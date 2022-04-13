@@ -65,4 +65,5 @@ if __name__ == "__main__":
     event_df.to_csv(deba.data("fuse/event_levee_pd.csv"), index=False)
     complaint_df = rearrange_allegation_columns(cprr)
     complaint_df.to_csv(deba.data("fuse/com_levee_pd.csv"), index=False)
-    fuse_personnel(post, cprr).to_csv(deba.data("fuse/per_levee_pd.csv"), index=False)
+    per_df = fuse_personnel(post, cprr)
+    per_df.to_csv(deba.data("fuse/per_levee_pd.csv"), index=False)

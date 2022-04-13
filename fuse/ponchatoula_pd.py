@@ -64,10 +64,8 @@ if __name__ == "__main__":
     event_df = rearrange_event_columns(
         pd.concat([fuse_events(pprr, cprr), post_event, cprr_post_events])
     )
-    rearrange_personnel_columns(pprr).to_csv(
-        deba.data("fuse/per_ponchatoula_pd.csv"), index=False
-    )
-    rearrange_allegation_columns(cprr).to_csv(
-        deba.data("fuse/com_ponchatoula_pd.csv"), index=False
-    )
+    per_df = rearrange_personnel_columns(pprr)
+    per_df.to_csv(deba.data("fuse/per_ponchatoula_pd.csv"), index=False)
+    com_df = rearrange_allegation_columns(cprr)
+    com_df.to_csv(deba.data("fuse/com_ponchatoula_pd.csv"), index=False)
     event_df.to_csv(deba.data("fuse/event_ponchatoula_pd.csv"), index=False)
