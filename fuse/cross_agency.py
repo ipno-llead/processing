@@ -70,7 +70,6 @@ def read_constraints():
 
 def read_post():
     post = pd.read_csv(deba.data("match/post_officer_history.csv"))
-    post = post[["history_id"]]
     print("read post officer history (%d rows)" % post.shape[0])
     return post
 

@@ -296,37 +296,25 @@ def match_uid_8_and_personnel(cprr, pprr):
 
 
 def join_matched_uids(df):
-    df.loc[:, "history_id"] = df.matched_uid.fillna("").str.cat(
+    df.loc[:, "post_id"] = df.matched_uid.fillna("").str.cat(
         df.matched_uid_1.fillna(""), sep=","
     )
-    df.loc[:, "history_id"] = df.history_id.str.cat(
-        df.matched_uid_2.fillna(""), sep=","
-    )
-    df.loc[:, "history_id"] = df.history_id.str.cat(
-        df.matched_uid_3.fillna(""), sep=","
-    )
-    df.loc[:, "history_id"] = df.history_id.str.cat(
-        df.matched_uid_4.fillna(""), sep=","
-    )
-    df.loc[:, "history_id"] = df.history_id.str.cat(
-        df.matched_uid_5.fillna(""), sep=","
-    )
-    df.loc[:, "history_id"] = df.history_id.str.cat(
-        df.matched_uid_6.fillna(""), sep=","
-    )
-    df.loc[:, "history_id"] = df.history_id.str.cat(
-        df.matched_uid_7.fillna(""), sep=","
-    )
-    df.loc[:, "history_id"] = df.history_id.str.cat(
-        df.matched_uid_8.fillna(""), sep=","
-    )
+    df.loc[:, "post_id"] = df.post_id.str.cat(df.matched_uid_2.fillna(""), sep=",")
+    df.loc[:, "post_id"] = df.post_id.str.cat(df.matched_uid_3.fillna(""), sep=",")
+    df.loc[:, "post_id"] = df.post_id.str.cat(df.matched_uid_4.fillna(""), sep=",")
+    df.loc[:, "post_id"] = df.post_id.str.cat(df.matched_uid_5.fillna(""), sep=",")
+    df.loc[:, "post_id"] = df.post_id.str.cat(df.matched_uid_6.fillna(""), sep=",")
+    df.loc[:, "post_id"] = df.post_id.str.cat(df.matched_uid_7.fillna(""), sep=",")
+    df.loc[:, "post_id"] = df.post_id.str.cat(df.matched_uid_8.fillna(""), sep=",")
 
-    df.loc[:, "history_id"] = (
-        df.history_id.fillna("")
+    df.loc[:, "post_id"] = (
+        df.post_id.fillna("")
         .str.replace(r"\,\, ?(.+)?", "", regex=True)
         .str.replace(r"^\,", "", regex=True)
     )
-    return df[~((df.history_id.fillna("") == ""))]
+    df = df.fillna("")
+    df = df[["post_id"]]
+    return df[~((df.post_id == ""))]
 
 
 if __name__ == "__main__":
@@ -342,4 +330,4 @@ if __name__ == "__main__":
     cprr = match_uid_7_and_personnel(cprr, pprr)
     cprr = match_uid_8_and_personnel(cprr, pprr)
     cprr = cprr.pipe(join_matched_uids)
-    cprr.to_csv(deba.data("match/post_officer_history.csv"))
+    cprr.to_csv(deba.data("match/post_officer_history.csv"), index=False)
