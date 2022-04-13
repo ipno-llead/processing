@@ -790,3 +790,82 @@ def convert_dates(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
             ],
         )
     return df
+
+
+def clean_post_agency(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
+    """Cleans and standardizes POST agency from officer history reports
+
+    Args:
+        df (pd.DataFrame):
+            the frame to process
+        cols (list of str):
+            post agency columns
+
+    Returns:
+        the updated frame
+    """
+    for col in cols:
+        df.loc[:, col] = (
+            df[col]
+            .str.strip()
+            .str.replace(r"So$", "SO", regex=True)
+            .str.replace(r"Pd", "PD", regex=True)
+            .str.replace(r"(\w+)SO$", r"\1 SO", regex=True)
+            .str.replace(r"(\w+)PD$", r"\1 PD", regex=True)
+            .str.replace(r"Stcharles", "St. Charles", regex=True)
+            .str.replace(r"^St ?[mM]artin", "St. Martin", regex=True)
+            .str.replace(r"^Stfrancisville", "St. Francisville", regex=True)
+            .str.replace(r"^Stlandry", "St. Landry", regex=True)
+            .str.replace(r"^Stbernard", "St. Bernard", regex=True)
+            .str.replace(r"Sttammany", "St. Tammany", regex=True)
+            .str.replace(r"Stjohn", "St. John", regex=True)
+            .str.replace(r"Stmary", "St. Mary", regex=True)
+            .str.replace(r"Slidellpd", "Slidell PD")
+            .str.replace(
+                r"^Probationparoleadult$", "Probation & Parole - Adult", regex=True
+            )
+            .str.replace(
+                r"^Deptpublic Safety$", "Department Of Public Safety", regex=True
+            )
+            .str.replace(r"^W\b ", "West ", regex=True)
+            .str.replace(
+                r"^E jefferson levee pd", "East Jefferson Levee PD", regex=True
+            )
+            .str.replace(r"^E\b ", "", regex=True)
+            .str.replace(r"^Univ PDxavier", "Xavier University PD", regex=True)
+            .str.replace(r"La State Police", "Louisiana State PD", regex=True)
+            .str.replace(r"^Univ PDlsuhscno$", "LSUHSC - No University PD", regex=True)
+            .str.replace(
+                r"^Univ PDdelgado Cc$",
+                "Delgado Community College University PD",
+                regex=True,
+            )
+            .str.replace(r"Univ PDdillard", "Dillard University PD", regex=True)
+            .str.replace(r"^Outstate", "Out of State", regex=True)
+            .str.replace(
+                r"^Medical Centerlano$", "Medical Center Of La - No", regex=True
+            )
+            .str.replace(r"^Univ PDloyola$", "Loyola University PD", regex=True)
+            .str.replace(r"^Univ PDlsu$", "LSU University PD", regex=True)
+            .str.replace(r"^Orleans", "New Orleans", regex=True)
+            .str.replace(r"\bLsu\b", "LSU", regex=True)
+            .str.replace(
+                r"Univ PDsouthernno",
+                "Southern University PD - New Orleans ",
+                regex=True,
+            )
+            .str.replace(r" Par ", "", regex=True)
+            .str.replace(
+                r"Alcoholtobacco Control", "Alcohol Tobacco Control", regex=True
+            )
+            .str.replace(
+                r"^Housing Authorityno$", "Housing Authority of New Orleans", regex=True
+            )
+            .str.replace(r"^Univ PDtulane$", "Tulane University PD", regex=True)
+            .str.replace(r"Univ PDuno", "UNO University PD")
+            .str.replace(r"\bLa\b", "Louisiana")
+            .str.replace(r"^PlaqueminesSO$", "Plaquemines SO", regex=True)
+            .str.replace(r"\bNo\b", "New Orleans", regex=True)
+        )
+
+    return df

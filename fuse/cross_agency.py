@@ -69,12 +69,13 @@ def read_constraints():
 
 
 def read_post():
-    post = pd.read_csv(deba.data("clean/post_officer_history.csv"))
+    post = pd.read_csv(deba.data("match/post_officer_history.csv"))
+    post = post[["history_id"]]
     print("read post officer history (%d rows)" % post.shape[0])
     return post
 
 
-def cross_match_officers_between_agencies(personnel, events, constraints):
+def cross_match_officers_between_agencies(personnel, events, constraints, post):
     events = discard_rows(
         events, events.uid.notna(), "events with empty uid column", reset_index=True
     )
@@ -113,6 +114,7 @@ def cross_match_officers_between_agencies(personnel, events, constraints):
     )
     per = per.set_index("uid")
     per = per.join(constraints)
+    per = per.join(post)
 
     # aggregating min/max date
     events = events.set_index(["uid", "event_uid"])
@@ -135,6 +137,8 @@ def cross_match_officers_between_agencies(personnel, events, constraints):
                 ColumnsIndex(["fc", "lc"]),
                 # or if they are in the same attract constraint
                 ColumnsIndex("attract_id", ignore_key_error=True),
+                # or if they are in the same history constraingt
+                ColumnsIndex("history_id", ignore_key_error=True),
             ]
         ),
         scorer=MaxScorer(
@@ -154,6 +158,7 @@ def cross_match_officers_between_agencies(personnel, events, constraints):
                 ),
                 # but if two officers belong to the same attract constraint then give them the highest score regardless
                 AbsoluteScorer("attract_id", 1, ignore_key_error=True),
+                AbsoluteScorer("history_id", 1, ignore_key_error=True),
             ]
         ),
         dfa=per,
@@ -179,13 +184,9 @@ def cross_match_officers_between_agencies(personnel, events, constraints):
     return clusters, per[["max_timestamp", "agency"]]
 
 
-def create_person_table(clusters, personnel, personnel_event, post):
+def create_person_table(clusters, personnel, personnel_event):
     # add back unmatched officers into clusters list
-    matched_uids_post = frozenset().union(*[s for s in post["uids"]])
-    matched_uids_clusters = frozenset().union(*[s for s in clusters])
-
-    list_matched_uids = [matched_uids_post, matched_uids_clusters]
-    matched_uids = frozenset().union(*list_matched_uids)
+    matched_uids = frozenset().union(*[s for s in clusters])
 
     clusters = [sorted(list(cluster)) for cluster in clusters] + [
         [uid]
@@ -306,7 +307,7 @@ if __name__ == "__main__":
         constraints = read_constraints()
         post = read_post()
         clusters, personnel_event = cross_match_officers_between_agencies(
-            personnel, events, constraints
+            personnel, events, constraints, post
         )
-        new_person_df = create_person_table(clusters, personnel, personnel_event, post)
+        new_person_df = create_person_table(clusters, personnel, personnel_event)
         new_person_df.to_csv(deba.data("fuse/person.csv"), index=False)
