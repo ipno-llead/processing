@@ -40,7 +40,6 @@ if __name__ == "__main__":
     post_event = pd.read_csv(deba.data("match/post_event_grand_isle_pd.csv"))
     events_df = fuse_events(pprr)
     events_df = rearrange_event_columns(pd.concat([post_event, events_df]))
-    rearrange_personnel_columns(pprr).to_csv(
-        deba.data("fuse/per_grand_isle_pd.csv"), index=False
-    )
+    per_df = rearrange_personnel_columns(pprr)
+    per_df.to_csv(deba.data("fuse/per_grand_isle_pd.csv"), index=False)
     events_df.to_csv(deba.data("fuse/event_grand_isle_pd.csv"), index=False)

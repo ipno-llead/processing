@@ -8,6 +8,7 @@ __pycache__
 *.xlsx
 *.csv
 *.pdf
+data.d
 *.pem
 
 !.wrgl
@@ -16,8 +17,5 @@ __pycache__
 
 data
 build
-data.d
-q
 .env
-
 .deba
