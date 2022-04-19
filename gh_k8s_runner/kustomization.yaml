@@ -1,0 +1,6 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - namespace.yaml
+  - cdi_runner_data_pvc.yaml
+  - cdi_runner_deployment.yaml
