@@ -107,4 +107,4 @@ def clean():
 
 if __name__ == "__main__":
     df = clean()
-    df.to_csv(deba.data("fuse/cleaned_post_officer_history.csv"), index=False)
+    df.to_csv(deba.data("clean/post_officer_history.csv"), index=False)
