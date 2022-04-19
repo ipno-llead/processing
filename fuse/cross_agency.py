@@ -137,7 +137,7 @@ def cross_match_officers_between_agencies(personnel, events, constraints, post):
                 # or if they are in the same attract constraint
                 ColumnsIndex("attract_id", ignore_key_error=True),
                 # or if they are in the same history constraingt
-                ColumnsIndex("history_id", ignore_key_error=True),
+                ColumnsIndex("post_id", ignore_key_error=True),
             ]
         ),
         scorer=MaxScorer(
@@ -157,7 +157,7 @@ def cross_match_officers_between_agencies(personnel, events, constraints, post):
                 ),
                 # but if two officers belong to the same attract constraint then give them the highest score regardless
                 AbsoluteScorer("attract_id", 1, ignore_key_error=True),
-                AbsoluteScorer("history_id", 1, ignore_key_error=True),
+                AbsoluteScorer("post_id", 1, ignore_key_error=True),
             ]
         ),
         dfa=per,

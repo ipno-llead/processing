@@ -792,7 +792,7 @@ def convert_dates(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
     return df
 
 
-def clean_post_agency(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
+def clean_post_agency_column(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
     """Cleans and standardizes POST agency from officer history reports
 
     Args:
@@ -868,4 +868,61 @@ def clean_post_agency(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
             .str.replace(r"\bNo\b", "New Orleans", regex=True)
         )
 
+    return df
+
+
+def clean_agency_row(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
+    """Cleans and standardizes POST agency from officer history reports
+
+    Args:
+        df (pd.DataFrame):
+            the frame to process
+        cols (list of str):
+            post agency columns
+
+    Returns:
+        the updated frame
+    """
+    for col in cols:
+        df.loc[:, col] = (
+            df[col]
+            .str.strip()
+            .str.lower()
+            .str.replace(r"(\w+) = (\w+)", r"\1 \2", regex=True)
+            .str.replace(
+                r"^orleans parish coroner\'s office",
+                "orleans coroners office",
+                regex=True,
+            )
+            .str.replace(r"(\w+) Ã¢â‚¬â€ (\w+)", r"\1 \2", regex=True)
+            .str.replace(r"1st parish court", "first court", regex=False)
+            .str.replace(r"(\w+) Ã‚Â© (\w+)\/(\w+)\/(\w+)", r"\1 \2/\3/\4", regex=True)
+            .str.replace(r" Â© ", "", regex=True)
+            .str.replace(r"--BULL-TIME", "FULL-TIME", regex=True)
+            .str.replace(r"_(\w+)\/(\w+)\/(\w+)â€”_", r"\1/\2/\3", regex=True)
+            .str.replace(r" â€”= ", "", regex=True)
+            .str.replace(r" +", " ", regex=True)
+            .str.replace(r" & ", "", regex=True)
+            .str.replace(r" - ", "", regex=True)
+            .str.replace(r" _?â€\” ", "", regex=True)
+            .str.replace(r" _ ", "", regex=True)
+            .str.replace(r" = ", "", regex=True)
+            .str.replace(r"^ (\w+)", r"\1", regex=True)
+            .str.replace(r"^st (\w+)", r"st\1", regex=True)
+            .str.replace(r" of ", "", regex=True)
+            .str.replace(r" p\.d\.", " pd", regex=True)
+            .str.replace(r" pari?s?h? so", " so", regex=True)
+            .str.replace(r" Â§ ", "", regex=True)
+            .str.replace(r" â€˜", "", regex=True)
+            .str.replace(r"(\.|\,)", "", regex=True)
+            .str.replace(r"miss river", "river", regex=False)
+            .str.replace(r" ~ ", "", regex=False)
+            .str.replace(r"(\w+) _ (\w+)", r"\1 \2", regex=True)
+            .str.replace("new orleans harbor", "orleans harbor", regex=False)
+            .str.replace(
+                "probation & parcole - adult",
+                "adult probation",
+                regex=True,
+            )
+        )
     return df
