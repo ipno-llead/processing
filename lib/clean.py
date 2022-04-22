@@ -865,13 +865,26 @@ def clean_post_agency_column(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
             .str.replace(r"Univ PDuno", "UNO University PD")
             .str.replace(r"\bLa\b", "Louisiana")
             .str.replace(r"^PlaqueminesSO$", "Plaquemines SO", regex=True)
-            .str.replace(r"\bNo\b", "New Orleans", regex=True)
+            .str.replace(r"\bNo\b", "New Orleans PD", regex=True)
+            .str.replace(r"^St\. Martin$", "St. Martin SO")
+            .str.replace(r"^Tangipahoa$", "Tangipahoa SO", regex=True)
+            .str.replace(r"^Lake Charles$", "Lake Charles PD")
+            .str.replace(r"^St\. Tammany$", "St. Tammany SO", regex=True)
+            .str.replace(r"^Hammond$", "Hammond PD", regex=True)
+            .str.replace(r"^New Orleans$", "New Orleans PD")
+            .str.replace(r"^Lafayette City$", "Lafayette City PD", regex=True)
+            .str.replace(r"^Grand Isle$", "Grand Isle PD", regex=True)
+            .str.replace(r"^New Orleans Levee$", "New Orleans Levee PD", regex=True)
+            .str.replace(r"^Harbor PD$", "New Orleans Harbor PD", regex=True)
+            .str.replace(r"^Lafayette$", "Lafayette PD", regex=True)
+            .str.replace(r"^Louisiana State$", "Louisiana State PD", regex=True)
+            .str.replace(r"^Caddo Parish$", "Caddo SO", regex=True)
         )
 
     return df
 
 
-def clean_agency_row(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
+def clean_post_agency_row(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
     """Cleans and standardizes POST agency from officer history reports
 
     Args:
