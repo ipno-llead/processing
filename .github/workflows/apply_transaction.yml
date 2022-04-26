@@ -7,7 +7,6 @@ on:
 jobs:
   apply-transaction:
     runs-on: cdi-runner
-    needs: process-data
     steps:
       - uses: jwalton/gh-find-current-pr@v1
         id: findPr
