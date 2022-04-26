@@ -614,87 +614,12 @@ branch:
     file: data/fuse/event_sulphur_pd.csv
     primaryKey:
       - event_uid
-<<<<<<< HEAD
   event-pineville-pd:
-    remote: event-pineville-pd
-    merge: refs/heads/main
+    remote: origin
+    merge: refs/heads/event-pineville-pd
     file: data/fuse/event_pineville_pd.csv
     primaryKey:
       - event_uid
-  match-brusly-pd-2020:
-    remote: match-brusly-pd-2020
-    merge: refs/heads/main
-    file: data/match/cprr_brusly_pd_2020.csv
-  match-cprr-baton-rouge-pd-2018:
-    remote: match-cprr-baton-rouge-pd-2018
-    merge: refs/heads/main
-    file: data/match/cprr_baton_rouge_pd_2018.csv
-  match-cprr-baton-rouge-pd-2021:
-    remote: match-cprr-baton-rouge-pd-2021
-    merge: refs/heads/main
-    file: data/match/cprr_baton_rouge_pd_2021.csv
-  match-cprr-baton-rouge-so-2016-2020:
-    remote: match-cprr-baton-rouge-so-2016-2020
-    merge: refs/heads/main
-    file: data/match/cprr_baton_rouge_so_2016_2020.csv
-  match-cprr-baton-rouge-so-2018:
-    remote: match-cprr-baton-rouge-so-2018
-    merge: refs/heads/main
-    file: data/match/cprr_baton_rouge_so_2018.csv
-  match-cprr-greenwood-pd-2015-2020:
-    remote: match-cprr-greenwood-pd-2015-2020
-    merge: refs/heads/main
-    file: data/match/cprr_greenwood_pd_2015_2020.csv
-  match-cprr-hammond-pd-2015-2020:
-    remote: match-cprr-hammond-pd-2015-2020
-    merge: refs/heads/main
-    file: data/match/cprr_hammond_pd_2015_2020.csv
-  match-cprr-madisonville-pd-2010-2020:
-    remote: match-cprr-madisonville-pd-2010-2020
-    merge: refs/heads/main
-    file: data/match/cprr_madisonville_pd_2010_2020.csv
-  match-cprr-new-orleans-harbor-pd-2020:
-    remote: match-cprr-new-orleans-harbor-pd-2020
-    merge: refs/heads/main
-    file: data/match/cprr_new_orleans_harbor_pd_2020.csv
-  match-cprr-plaquemines-so-2019:
-    remote: match-cprr-plaquemines-so-2019
-    merge: refs/heads/main
-    file: data/match/cprr_plaquemines_so_2019.csv
-  match-cprr-port-allen-pd-2019:
-    remote: match-cprr-port-allen-pd-2019
-    merge: refs/heads/main
-    file: data/match/cprr_port_allen_pd_2019.csv
-  match-cprr-scott-pd-2020:
-    remote: match-cprr-scott-pd-2020
-    merge: refs/heads/main
-    file: data/match/cprr_scott_pd_2020.csv
-  match-cprr-tangipahoa-so-2015-2021:
-    remote: match-cprr-tangipahoa-so-2015-2021
-    merge: refs/heads/main
-    file: data/match/cprr_tangipahoa_so_2015_2021.csv
-  match-lprr-baton-rouge-fpcsb-1992-2012:
-    remote: match-lprr-baton-rouge-fpcsb-1992-2012
-    merge: refs/heads/main
-    file: data/match/lprr_baton_rouge_fpcsb_1992_2012.csv
-  match-lprr-louisiana-state-csc-1991-2020:
-    remote: match-lprr-louisiana-state-csc-1991-2020
-    merge: refs/heads/main
-    file: data/match/lprr_louisiana_state_csc_1991_2020.csv
-  match-pprr-baton-rouge-csd-2017:
-    remote: match-pprr-baton-rouge-csd-2017
-    merge: refs/heads/main
-    file: data/match/pprr_baton_rouge_csd_2017.csv
-  match-pprr-baton-rouge-csd-2019:
-    remote: match-pprr-baton-rouge-csd-2019
-    merge: refs/heads/main
-    file: data/match/pprr_baton_rouge_csd_2019.csv
-  match-pprr-port-allen-csd-2020:
-    remote: match-pprr-port-allen-csd-2020
-    merge: refs/heads/main
-    file: data/match/pprr_port_allen_csd_2020.csv
-=======
->>>>>>> main
   per-abbeville-pd:
     remote: origin
     merge: refs/heads/per-abbeville-pd
