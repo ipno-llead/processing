@@ -54,8 +54,7 @@ def assign_max_col(events: pd.DataFrame, per: pd.DataFrame, col: str):
 
 def read_constraints():
     # TODO: replace this line with the real constraints data
-    data = pd.read_csv(deba.data("raw/cross_agency/constraints_11_18_2021.csv"))
-    constraints = pd.DataFrame(data, columns=["uids", "kind"])
+    constraints = pd.DataFrame([], columns=["uids", "kind"])
     print("read constraints (%d rows)" % constraints.shape[0])
     records = dict()
     for idx, row in constraints.iterrows():
@@ -69,7 +68,7 @@ def read_constraints():
 
 
 def read_post():
-    post = pd.read_csv(deba.data("fuse/post_officer_history.csv"))
+    post = pd.read_csv(deba.data("match/post_officer_history.csv"))
     print("read post officer history (%d rows)" % post.shape[0])
     return post
 
@@ -137,7 +136,7 @@ def cross_match_officers_between_agencies(personnel, events, constraints, post):
                 # or if they are in the same attract constraint
                 ColumnsIndex("attract_id", ignore_key_error=True),
                 # or if they are in the same history constraingt
-                ColumnsIndex("post_id", ignore_key_error=True),
+                ColumnsIndex("history_id", ignore_key_error=True),
             ]
         ),
         scorer=MaxScorer(
@@ -157,7 +156,7 @@ def cross_match_officers_between_agencies(personnel, events, constraints, post):
                 ),
                 # but if two officers belong to the same attract constraint then give them the highest score regardless
                 AbsoluteScorer("attract_id", 1, ignore_key_error=True),
-                AbsoluteScorer("post_id", 1, ignore_key_error=True),
+                AbsoluteScorer("history_id", 1, ignore_key_error=True),
             ]
         ),
         dfa=per,
