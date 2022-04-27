@@ -79,7 +79,7 @@ def extract_agency(df):
                 .fillna("")
                 .str.lower()
                 .str.strip()
-                .str.replace(r"(\w{1}? ?\w+ ?\w+? ?\w+) (.+)", r"\1", regex=True)
+                .str.replace(r"(\w? ?\w+ ?\w+? ?\w+) (.+)", r"\1", regex=True)
             )
     return df
 
