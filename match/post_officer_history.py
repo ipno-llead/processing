@@ -30,7 +30,7 @@ def match_post_to_personnel(post, personnel):
     matches = matcher.get_index_pairs_within_thresholds(decision)
     match_dict = dict(matches)
 
-    post.loc[:, "matched_uid"] = post.uid.map(lambda x: match_dict.get(x))
+    post.loc[:, "uid"] = post.uid.map(lambda x: match_dict.get(x))
     return post
 
 
@@ -38,5 +38,5 @@ if __name__ == "__main__":
     post = pd.read_csv(deba.data("clean/post_officer_history.csv"))
     personnel = pd.read_csv(deba.data("fuse/events_and_personnel.csv"))
     post = match_post_to_personnel(post, personnel)
-    post = post[["matched_uid", "history_id"]]
+    post = post[["uid", "history_id"]]
     post.to_csv(deba.data("match/post_officer_history.csv"), index=False)
