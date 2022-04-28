@@ -213,7 +213,7 @@ def check_for_duplicate_uids(df):
         else:
             raise ValueError("uid found in multiple history ids")
 
-    return df
+    return df[~((df.agency.fillna("") == ""))]
 
 
 def clean():
