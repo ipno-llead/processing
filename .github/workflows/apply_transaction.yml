@@ -7,17 +7,12 @@ on:
 jobs:
   apply-transaction:
     runs-on: cdi-runner
-    needs: process-data
     steps:
-      - uses: jwalton/gh-find-current-pr@v1
-        id: findPr
-        with:
-          state: open
       - name: Find transaction comment
         uses: peter-evans/find-comment@v2.0.0
         id: fc
         with:
-          issue-number: ${{ steps.findPr.outputs.pr }}
+          issue-number: ${{ github.event.number }}
           comment-author: github-actions[bot]
           body-includes: Review data changes at
           direction: last
@@ -66,7 +61,7 @@ jobs:
         if: ${{ steps.txURL.outputs.value != null && steps.txid.outputs.value != null }}
         uses: peter-evans/create-or-update-comment@v2
         with:
-          issue-number: ${{ steps.findPr.outputs.pr }}
+          issue-number: ${{ github.event.number }}
           body: |
             Transaction [tx/${{ steps.txid.outputs.value }}][1] applied.
 
