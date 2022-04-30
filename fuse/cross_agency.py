@@ -165,6 +165,8 @@ def cross_match_officers_between_agencies(personnel, events, constraints, post):
             DissimilarFilter("agency"),
             # don't match officers who are in the same repell constraint
             DissimilarFilter("repell_id", ignore_key_error=True),
+            # don't match officers who have only worked for one agency
+            DissimilarFilter("false_neg_id"),
             # don't match officers who appear in overlapping time ranges
             NonOverlappingFilter("min_timestamp", "max_timestamp"),
         ],

@@ -38,5 +38,5 @@ if __name__ == "__main__":
     post = pd.read_csv(deba.data("clean/post_officer_history.csv"))
     personnel = pd.read_csv(deba.data("fuse/events_and_personnel.csv"))
     post = match_post_to_personnel(post, personnel)
-    post = post[["uid", "history_id"]]
+    post = post[["uid", "history_id", "false_neg_id"]]
     post.to_csv(deba.data("match/post_officer_history.csv"), index=False)

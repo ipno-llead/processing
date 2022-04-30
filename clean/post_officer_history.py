@@ -1,12 +1,13 @@
+from enum import unique
 import deba
 import pandas as pd
 from lib.uid import gen_uid
 from lib.clean import names_to_title_case, clean_sexes, clean_names
 
 
-def clean_officer_names(df):
+def drop_rows_missing_names(df):
     df.loc[:, "officer_name"] = df.officer_name.fillna("")
-    return df[~((df.officer_name == ""))].drop_duplicates(subset=["officer_name"], keep="last")
+    return df[~((df.officer_name == ""))]
 
 
 def split_names(df):
@@ -169,12 +170,8 @@ def clean_post_agency_column(df):
     return df
 
 
-def drop_rows_with_only_one_agency(df):
-    return df[~((df.agency.notna()) & (df.agency_1.fillna("") == ""))]
-
-
-def drop_rows_missing_names(df):
-    return df[~((df.first_name == "") & (df.last_name == ""))]
+def drop_duplicates(df):
+    return df.drop_duplicates(subset=["first_name", "last_name"], keep="last")
 
 
 def generate_history_id(df):
@@ -206,9 +203,9 @@ def generate_history_id(df):
 def check_for_duplicate_uids(df):
     uids = df.groupby(["uid"])["history_id"].agg(list).reset_index()
 
-    for l in uids["history_id"]:
-        result = all(element == l[0] for element in l)
-        if result:
+    for row in uids["history_id"]:
+        unique = all(element == row[0] for element in row)
+        if unique:
             continue
         else:
             raise ValueError("uid found in multiple history ids")
@@ -216,10 +213,30 @@ def check_for_duplicate_uids(df):
     return df[~((df.agency.fillna("") == ""))]
 
 
+def generate_false_neg_id(df):
+    false_negs = [
+        ids == False for ids in df.duplicated(subset=["history_id"], keep=False)
+    ]
+    df.loc[:, "false_negatives"] = false_negs
+    df.loc[:, "false_negatives"] = df.astype(str).false_negatives.str.replace(
+        "False", "", regex=False
+    )
+
+    false_df = df.pipe(
+        gen_uid, ["false_negatives", "history_id"], "false_neg_id"
+    ).drop_duplicates(subset=["false_neg_id"], keep=False)
+    false_df = false_df[["false_neg_id", "history_id"]]
+
+    df = df.drop(columns=["false_neg_id"])
+    df = pd.merge(df, false_df, on="history_id", how="outer")
+
+    return df.drop(columns=["false_negatives"]).fillna("")
+
+
 def clean():
     df = (
         pd.read_csv(deba.data("raw/post/post_officer_history.csv"))
-        .pipe(clean_officer_names)
+        .pipe(drop_rows_missing_names)
         .rename(columns={"officer_sex": "sex"})
         .pipe(clean_sexes, ["sex"])
         .pipe(split_names)
@@ -241,11 +258,11 @@ def clean():
             ],
         )
         .pipe(clean_post_agency_column)
-        .pipe(drop_rows_with_only_one_agency)
-        .pipe(drop_rows_missing_names)
+        .pipe(drop_duplicates)
         .pipe(generate_history_id)
         .pipe(gen_uid, ["first_name", "middle_name", "last_name", "agency"])
         .pipe(check_for_duplicate_uids)
+        .pipe(generate_false_neg_id)
     )
     return df
 
