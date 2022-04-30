@@ -39,4 +39,4 @@ if __name__ == "__main__":
     agency = cprr.agency[0]
     post = load_for_agency(agency)
     cprr = match_cprr_and_post(cprr, post)
-    cprr.to_csv(deba.data("match/cprr_benton_pd_2015_2021.csv"))
+    cprr.to_csv(deba.data("match/cprr_benton_pd_2015_2021.csv"), index=False)
