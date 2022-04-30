@@ -3,7 +3,6 @@ import deba
 from lib import events
 from lib.columns import rearrange_allegation_columns, rearrange_event_columns
 from lib.personnel import fuse_personnel
-from lib.post import load_for_agency
 
 
 def fuse_events(cprr20, cprr19):

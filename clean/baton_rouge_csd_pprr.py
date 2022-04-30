@@ -89,6 +89,8 @@ def clean_rank_desc(df):
             "programmer and systems analyst",
             regex=True,
         )
+        .str.replace(r"\bpc\b", r"p.c.", regex=True)
+        .str.replace(r"\bwc\b", "w.c.", regex=True)
     )
     return df
 

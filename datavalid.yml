@@ -1,23 +1,23 @@
 files:
-  fuse/personnel.csv:
+  data/fuse/personnel.csv:
     schema: personnel
-  fuse/allegation.csv:
+  data/fuse/allegation.csv:
     schema: allegation
-  fuse/event.csv:
+  data/fuse/event.csv:
     schema: event
-  fuse/use_of_force.csv:
+  data/fuse/use_of_force.csv:
     schema: use_of_force
-  fuse/stop_and_search.csv:
+  data/fuse/stop_and_search.csv:
     schema: stop_and_search
-  fuse/appeals.csv:
+  data/fuse/appeals.csv:
     schema: appeal_hearing
-  fuse/brady.csv:
+  data/fuse/brady.csv:
     schema: brady
-  fuse/uof_citizen.csv:
+  data/fuse/uof_citizens.csv:
     schema: uof_citizen
-  fuse/uof_officer.csv:
+  data/fuse/uof_officers.csv:
     schema: uof_officer
-  fuse/awards.csv:
+  data/fuse/awards.csv:
     schema: award
 
 schemas:
@@ -71,17 +71,18 @@ schemas:
       - name: uid
         description: >
           accused officer's unique identifier. This references the `uid` column in personnel.csv
-      - name: tracking_number
+      - name: tracking_id
         description: >
-          internal affairs complaint tracking number from the agency the data originate from
+          internal affairs complaint tracking id from the agency the data originate from
       - name: case_number
         description: >
-          administrative complaint tracking number from the agency the data originate from
+          administrative complaint tracking id from the agency the data originate from
       - name: allegation_uid
         description: >
           complaint unique identifier
         unique: true
         no_na: true
+      - name: allegation
       - name: investigation_status
       - name: assigned_department
       - name: assigned_division
@@ -147,9 +148,6 @@ schemas:
       - name: department_desc
         description: >
           text description of the department the accused belonged to during the incident.
-      - name: rank_desc
-        description: >
-          text description of the accused's rank during the incident.
       - name: employment_status
         description: >
           whether the accused was fulltime or reserve during incident.
@@ -163,6 +161,11 @@ schemas:
       - name: investigating_department
         description: >
           small departments frequently turnover internal investigations to the sheriff's office
+      - name: referred_by
+      - name: incident_location
+      - name: disposition_desc
+        description: >
+          text description of aftermath of disposition, or reason for disposition.
   event:
     columns:
       - name: event_uid
@@ -190,7 +193,6 @@ schemas:
           - suspension_end
           - appeal_file
           - appeal_hearing
-          - appeal_hearing_2
           - appeal_receive
           - appeal_render
           - appeal_disposition
@@ -319,9 +321,9 @@ schemas:
           unique identifier of use of force report.
         unique: true
         no_na: true
-      - name: tracking_number
+      - name: tracking_id
         description: >
-          tracking number of use of force report from the originating agency.
+          tracking id of use of force report from the originating agency.
       - name: investigation_status
       - name: service_type
       - name: light_condition
@@ -392,7 +394,6 @@ schemas:
       - name: consent_form_completed
       - name: search_types
       - name: exit_vehicle
-      - name: rank_desc
       - name: first_name
       - name: middle_name
       - name: last_name
@@ -407,7 +408,7 @@ schemas:
     columns:
       - name: brady_uid
         description: >
-          unique brady uid 
+          unique brady uid
       - name: uid
       - name: tracking_number
       - name: allegation
@@ -448,13 +449,9 @@ schemas:
       - name: use_of_force_type
       - name: use_of_force_level
       - name: use_of_force_effective
-      - name: use_of_force_reason
       - name: age
       - name: years_of_service
       - name: officer_injured
-      - name: division
-      - name: division_level
-      - name: unit
       - name: agency
   award:
     columns:
@@ -463,7 +460,6 @@ schemas:
           unique identifier of award.
         unique: true
         no_na: true
-      - name: award_type
       - name: agency
 
-save_bad_rows_to: invalid_rows.csv
+save_bad_rows_to: data/invalid_rows.csv

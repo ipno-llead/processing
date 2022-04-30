@@ -71,7 +71,7 @@ if __name__ == "__main__":
     post = load_for_agency(agency)
     cb = pd.read_csv(deba.data("clean/cprr_codebook_shreveport_pd.csv"))
     cprr = match_cprr_codebook(cprr, cb).pipe(
-        gen_uid, ["agency", "tracking_number", "allegation"], "allegation_uid"
+        gen_uid, ["agency", "tracking_id", "allegation"], "allegation_uid"
     )
     cprr = match_cprr_post(cprr, post)
 

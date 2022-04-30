@@ -3,7 +3,6 @@ from datamatch import (
     ThresholdMatcher,
     JaroWinklerSimilarity,
     ColumnsIndex,
-    Swap,
     DateSimilarity,
 )
 import deba
@@ -18,7 +17,7 @@ def deduplicate_cprr_19_personnel(cprr):
             cprr.uid.notna(),
             ["employee_id", "first_name", "last_name", "middle_name", "uid"],
         ]
-        .drop_duplicates()
+        .drop_duplicates(subset=["uid"])
         .set_index("uid", drop=True)
     )
 
@@ -28,12 +27,11 @@ def deduplicate_cprr_19_personnel(cprr):
             "first_name": JaroWinklerSimilarity(),
             "last_name": JaroWinklerSimilarity(),
         },
-        df,
-        variator=Swap("first_name", "last_name"),
+        df
     )
     decision = 0.9
     matcher.save_clusters_to_excel(
-        deba.data("match/new_orleans_so_cprr_19_dedup.xlsx"), decision, decision
+        deba.data("match/deduplicate_new_orleans_so_cprr_19.xlsx"), decision, decision
     )
     clusters = matcher.get_index_clusters_within_thresholds(decision)
     return canonicalize_officers(cprr, clusters)
@@ -45,7 +43,7 @@ def deduplicate_cprr_20_personnel(cprr):
             cprr.uid.notna(),
             ["employee_id", "first_name", "last_name", "middle_name", "uid"],
         ]
-        .drop_duplicates()
+        .drop_duplicates(subset=["uid"])
         .set_index("uid", drop=True)
     )
 
@@ -55,17 +53,15 @@ def deduplicate_cprr_20_personnel(cprr):
             "first_name": JaroWinklerSimilarity(),
             "last_name": JaroWinklerSimilarity(),
         },
-        df,
-        variator=Swap("first_name", "last_name"),
+        df
     )
     decision = 0.9
     matcher.save_clusters_to_excel(
-        deba.data("match/new_orleans_so_cprr_20_dedup.xlsx"), decision, decision
+        deba.data("match/deduplicate_new_orleans_so_cprr_20.xlsx"), decision, decision
     )
     clusters = matcher.get_index_clusters_within_thresholds(decision)
     # canonicalize name and uid
-    canonicalize_officers(cprr, clusters)
-    return cprr
+    return canonicalize_officers(cprr, clusters)
 
 
 def assign_uid_19_from_pprr(cprr, pprr):
@@ -78,7 +74,7 @@ def assign_uid_19_from_pprr(cprr, pprr):
 
     dfb = (
         pprr[["uid", "first_name", "last_name"]]
-        .drop_duplicates()
+        .drop_duplicates(subset=["uid"])
         .set_index("uid", drop=True)
     )
     dfb.loc[:, "fc"] = dfb.first_name.fillna("").map(lambda x: x[:1])
@@ -114,7 +110,7 @@ def assign_uid_20_from_pprr(cprr, pprr):
 
     dfb = (
         pprr[["uid", "first_name", "last_name"]]
-        .drop_duplicates()
+        .drop_duplicates(subset=["uid"])
         .set_index("uid", drop=True)
     )
     dfb.loc[:, "fc"] = dfb.first_name.map(lambda x: x[:1])

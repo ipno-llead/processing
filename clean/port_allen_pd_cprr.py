@@ -2,7 +2,6 @@ from lib.columns import clean_column_names
 import deba
 from lib.uid import gen_uid
 from lib.clean import clean_names, clean_dates, standardize_desc_cols, float_to_int_str
-from lib.standardize import standardize_from_lookup_table
 from lib.rows import duplicate_row
 import pandas as pd
 import re
@@ -158,9 +157,9 @@ def clean19():
         "disposition",
         "occur_date",
         "occur_time",
-        "tracking_number",
+        "tracking_id",
     ]
-    df = df.drop(index=df[df.tracking_number.isna()].index).reset_index(drop=True)
+    df = df.drop(index=df[df.tracking_id.isna()].index).reset_index(drop=True)
     df = (
         df.pipe(standardize_desc_cols, ["rank_desc", "disposition"])
         .pipe(standardize_rank_desc)
@@ -176,7 +175,7 @@ def clean19():
         .pipe(gen_uid, ["agency", "first_name", "last_name", "badge_no"])
         .pipe(
             gen_uid,
-            ["agency", "tracking_number", "uid", "allegation"],
+            ["agency", "tracking_id", "uid", "allegation"],
             "allegation_uid",
         )
     )
@@ -207,7 +206,7 @@ def clean18():
         .pipe(clean_column_names)
         .rename(
             columns={
-                "case_number": "tracking_number",
+                "case_number": "tracking_id",
                 "date_notification": "notification_date",
                 "title": "rank_desc",
                 "f_name": "first_name",
@@ -226,8 +225,9 @@ def clean18():
         .pipe(assign_prod_year, "2018")
         .pipe(clean_names, ["first_name", "last_name"])
         .pipe(gen_uid, ["agency", "first_name", "last_name"])
-        .pipe(gen_uid, ["agency", "tracking_number", "uid"], "allegation_uid")
-        .dropna(subset=["tracking_number"])
+        .pipe(gen_uid, ["agency", "tracking_id", "uid"], "allegation_uid")
+        .dropna(subset=["tracking_id"])
+        .drop_duplicates(subset=["allegation_uid"])
     )
 
 
@@ -235,8 +235,9 @@ def clean16():
     return (
         pd.read_csv(deba.data("raw/port_allen_pd/port_allen_cprr_2015-2016_byhand.csv"))
         .pipe(clean_column_names)
+        .rename(columns={"tracking_number": "tracking_id"})
         .dropna(how="all")
-        .dropna(subset=["tracking_number"])
+        .dropna(subset=["tracking_id"])
         .rename(
             columns={
                 "f_name": "first_name",
@@ -264,7 +265,7 @@ def clean16():
         )
         .pipe(
             gen_uid,
-            ["agency", "tracking_number", "uid", "allegation"],
+            ["agency", "tracking_id", "uid", "allegation"],
             "allegation_uid",
         )
     )

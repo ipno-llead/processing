@@ -1,0 +1,22 @@
+apiVersion: actions.summerwind.dev/v1alpha1
+kind: RunnerDeployment
+metadata:
+  name: cdi-runner
+  namespace: cdi-runner
+spec:
+  replicas: 1
+  template:
+    spec:
+      repository: ppact/processing
+      labels:
+        - cdi-runner
+      env: []
+      # # uncomment when there's a need to inspect runner pod after job finished
+      # ephemeral: false
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: cdi-runner-data
+      volumeMounts:
+        - mountPath: /runner/_work/data
+          name: data

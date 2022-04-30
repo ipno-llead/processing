@@ -9,6 +9,7 @@ from lib.clean import (
     float_to_int_str,
     remove_future_dates,
     clean_date,
+    clean_sexes,
 )
 
 
@@ -308,3 +309,31 @@ class CleanDateTestCase(unittest.TestCase):
             ("02 11 2022", "2022", "2", "11"),
         ]:
             self.assertEqual(clean_date(value), (year, month, day))
+
+
+class CleanSexesTestCase(unittest.TestCase):
+    def test_clean_sexes(self):
+        columns = ["sex"]
+        assert_frame_equal(
+            clean_sexes(
+                pd.DataFrame(
+                    [
+                        ["m"],
+                        ["f"],
+                        ["femaale"],
+                        ["famale"],
+                    ],
+                    columns=columns,
+                ),
+                ["sex"],
+            ),
+            pd.DataFrame(
+                [
+                    ["male"],
+                    ["female"],
+                    ["female"],
+                    ["female"],
+                ],
+                columns=columns,
+            ),
+        )

@@ -8,14 +8,14 @@ __pycache__
 *.xlsx
 *.csv
 *.pdf
+data.d
+*.pem
 
 !.wrgl
 .wrgl/*
 !.wrgl/config.yaml
 
+data
 build
-data.d
-q
 .env
-
 .deba

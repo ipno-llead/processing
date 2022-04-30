@@ -98,13 +98,13 @@ def clean_docket_no(df):
     df.loc[:, "docket_no"] = (
         df.docket_no.fillna("")
         .str.strip()
-        .str.replace("11-10 12-1", "11-10")
-        .str.replace("0-01 10-03", "10-03")
-        .str.replace("08-05 \n8-11", "08-11")
-        .str.replace("11 LHE", "11-11")
+        .str.replace("11-10 12-1", "1110")
+        .str.replace("0-01 10-03", "1003")
+        .str.replace("08-05 \n8-11", "08-1")
+        .str.replace("11 LHE", "11")
         .str.replace("'", "")
-        .str.replace(r"^702$", "07-02")
         .map(replace)
+        .str.replace("-", "", regex=False)
     )
 
     return df

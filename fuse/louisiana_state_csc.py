@@ -73,6 +73,5 @@ if __name__ == "__main__":
     )
     per_df.to_csv(deba.data("fuse/per_louisiana_state_police.csv"), index=False)
     event_df.to_csv(deba.data("fuse/event_louisiana_state_police.csv"), index=False)
-    rearrange_appeal_hearing_columns(lprr).to_csv(
-        deba.data("fuse/app_louisiana_state_police.csv"), index=False
-    )
+    app_df = rearrange_appeal_hearing_columns(lprr)
+    app_df.to_csv(deba.data("fuse/app_louisiana_state_police.csv"), index=False)

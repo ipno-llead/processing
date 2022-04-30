@@ -13,8 +13,8 @@ def extract_receive_date(df):
     return df
 
 
-def clean_tracking_number(df):
-    df.loc[:, "tracking_number"] = df.atic_n_date_iad_numbes.str.replace(
+def clean_tracking_id(df):
+    df.loc[:, "tracking_id"] = df.atic_n_date_iad_numbes.str.replace(
         r"(.+) (20-.+) ", r"\2", regex=True
     ).str.replace("1A", "IA", regex=False)
     return df.drop(columns="atic_n_date_iad_numbes")
@@ -185,7 +185,7 @@ def clean_allegation_desc(df):
         .str.replace("spois", "spots", regex=False)
         .str.replace("tickeled", "ticketed", regex=False)
         .str.replace("trattic", "traffic", regex=False)
-        .str.replace("purauit", "pursuit", regex=False)
+        .str.replace(r"purs?a?uc?i?ti?", "pursuit", regex=False)
         .str.replace("invalving", "involving", regex=False)
         .str.replace("rudaness", "rudeness", regex=False)
         .str.replace(
@@ -209,49 +209,55 @@ def clean_allegation_desc(df):
         .str.replace(r"[ln]is", "his", regex=True)
         .str.replace("recaive", "receive", regex=False)
         .str.replace("jaid", "jail", regex=False)
-        .str.replace("suspecis", "suspects", regex=False)
         .str.replace("shat", "shut", regex=False)
         .str.replace("spesding", "spreading", regex=False)
         .str.replace("sicohol", "alcohol", regex=False)
         .str.replace(r"fa[il]ted", "failed", regex=True)
         .str.replace("unprofessionel", "unprofessional", regex=False)
         .str.replace("merked", "marked", regex=False)
+        .str.replace(r"\ble\b", "in", regex=True)
+        .str.replace(r"\bpursucti\b", "pursuit", regex=True)
+        .str.replace(r"\bpart\b", "park", regex=True)
+        .str.replace(r"\btrafte\b", "traffic", regex=True)
+        .str.replace(r"\bdesth\b", "death", regex=True)
+        .str.replace(r"\btocation\b", "location", regex=True)
+        .str.replace(r"\blicksts\b", "tickets", regex=True)
     )
     return df.drop(columns="synopsis")
 
 
 def assign_dispositions(df):
     df.loc[
-        (df.tracking_number == "20-IA-53") & (df.last_name == "morton"), "disposition"
+        (df.tracking_id == "20-IA-53") & (df.last_name == "morton"), "disposition"
     ] = "sustained"
     df.loc[
-        (df.tracking_number == "20-IA-53") & (df.last_name == "levy"), "disposition"
+        (df.tracking_id == "20-IA-53") & (df.last_name == "levy"), "disposition"
     ] = "unfounded"
     df.loc[
-        (df.tracking_number == "20-IA-53") & (df.last_name == "holmes"), "disposition"
+        (df.tracking_id == "20-IA-53") & (df.last_name == "holmes"), "disposition"
     ] = "exonerated"
     df.loc[
-        (df.tracking_number == "20-IA-58") & (df.last_name == "sproles"), "disposition"
+        (df.tracking_id == "20-IA-58") & (df.last_name == "sproles"), "disposition"
     ] = ""
     df.loc[
-        (df.tracking_number == "20-IA-58") & (df.last_name == "bridges"), "disposition"
+        (df.tracking_id == "20-IA-58") & (df.last_name == "bridges"), "disposition"
     ] = ""
     df.loc[
-        (df.tracking_number == "20-IA-38") & (df.last_name == "benjamin"), "disposition"
+        (df.tracking_id == "20-IA-38") & (df.last_name == "benjamin"), "disposition"
     ] = "sustained"
     df.loc[
-        (df.tracking_number == "20-IA-38") & (df.last_name == "deaveon"), "disposition"
+        (df.tracking_id == "20-IA-38") & (df.last_name == "deaveon"), "disposition"
     ] = "unfounded"
     return df
 
 
 def assign_action(df):
-    df.loc[(df.tracking_number == "20-IA-53"), "action"] = ""
+    df.loc[(df.tracking_id == "20-IA-53"), "action"] = ""
     df.loc[
-        (df.tracking_number == "20-IA-38") & (df.last_name == "benjamin"), "action"
+        (df.tracking_id == "20-IA-38") & (df.last_name == "benjamin"), "action"
     ] = "5 day suspension|loss of senority|loss of pay"
     df.loc[
-        (df.tracking_number == "20-IA-38") & (df.last_name == "deaveon"), "action"
+        (df.tracking_id == "20-IA-38") & (df.last_name == "deaveon"), "action"
     ] = ""
     return df
 
@@ -272,7 +278,7 @@ def clean():
             }
         )
         .pipe(extract_receive_date)
-        .pipe(clean_tracking_number)
+        .pipe(clean_tracking_id)
         .pipe(clean_complaint_type)
         .pipe(clean_allegations)
         .pipe(split_rows_with_multiple_allegations)
@@ -288,7 +294,7 @@ def clean():
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(
             gen_uid,
-            ["uid", "allegation", "disposition", "tracking_number", "action"],
+            ["uid", "allegation", "disposition", "tracking_id", "action"],
             "allegation_uid",
         )
         .pipe(

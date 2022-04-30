@@ -84,19 +84,19 @@ def clean():
     df = (
         pd.read_csv(deba.data("raw/washington_so/washington_so_cprr_2015_2020.csv"))
         .pipe(clean_column_names)
-        .rename(columns={"number": "tracking_number", "date": "receive_date"})
+        .rename(columns={"number": "tracking_id", "date": "receive_date"})
         .pipe(clean_dates, ["receive_date"])
         .pipe(clean_allegation)
         .pipe(extract_action_from_disposition)
         .pipe(clean_complainant_name)
         .pipe(clean_disposition)
         .pipe(split_names)
-        .pipe(standardize_desc_cols, ["tracking_number"])
+        .pipe(standardize_desc_cols, ["tracking_id"])
         .pipe(set_values, {"agency": "Washington SO"})
         .pipe(gen_uid, ["agency", "first_name", "last_name"])
         .pipe(
             gen_uid,
-            ["uid", "disposition", "tracking_number", "action"],
+            ["uid", "disposition", "tracking_id", "action"],
             "allegation_uid",
         )
     )

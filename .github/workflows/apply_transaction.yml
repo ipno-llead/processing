@@ -1,0 +1,68 @@
+on:
+  pull_request:
+    branches:
+      - main
+    types: [closed]
+
+jobs:
+  apply-transaction:
+    runs-on: cdi-runner
+    steps:
+      - name: Find transaction comment
+        uses: peter-evans/find-comment@v2.0.0
+        id: fc
+        with:
+          issue-number: ${{ github.event.number }}
+          comment-author: github-actions[bot]
+          body-includes: Review data changes at
+          direction: last
+      - name: Extract transaction url
+        if: ${{ steps.fc.outputs.comment-id != 0 }}
+        id: txURL
+        uses: ashley-taylor/regex-property-action@1.2
+        with:
+          value: ${{ steps.fc.outputs.comment-body }}
+          regex: |
+            .+(https://hub\.wrgl\.co\/@.+)
+          flags: "s"
+          replacement: $1
+      - name: Extract transaction id
+        if: ${{ steps.txURL.outputs.value != null }}
+        id: txid
+        uses: ashley-taylor/regex-property-action@1.2
+        with:
+          value: ${{ steps.txURL.outputs.value }}
+          regex: .+\/tx\/(.+)
+          flags: "" # Optional, defaults to "g"
+          replacement: $1
+      - name: Extract repo url
+        if: ${{ steps.txURL.outputs.value != null }}
+        id: repoURL
+        uses: ashley-taylor/regex-property-action@1.2
+        with:
+          value: ${{ steps.txURL.outputs.value }}
+          regex: |
+            https://hub\.wrgl\.co\/@(.+)\/r\/([^/]+).+
+          flags: "" # Optional, defaults to "g"
+          replacement: https://hub.wrgl.co/api/users/$1/repos/$2
+      - name: Apply transaction
+        if: ${{ steps.txid.outputs.value != null && steps.repoURL.outputs.value != null }}
+        run: |
+          echo "To ${REPO_URL}/transactions/${TXID}/"
+          curl --fail -XPOST ${REPO_URL}/transactions/${TXID}/ \
+          -H "Content-Type: application/json" \
+          -H "Authorization: Bearer ${WRGLHUB_TOKEN}" \
+          -d '{"commit":true}'
+        env:
+          WRGLHUB_TOKEN: ${{ secrets.WRGLHUB_TOKEN }}
+          TXID: ${{ steps.txid.outputs.value }}
+          REPO_URL: ${{ steps.repoURL.outputs.value }}
+      - name: Create comment
+        if: ${{ steps.txURL.outputs.value != null && steps.txid.outputs.value != null }}
+        uses: peter-evans/create-or-update-comment@v2
+        with:
+          issue-number: ${{ github.event.number }}
+          body: |
+            Transaction [tx/${{ steps.txid.outputs.value }}][1] applied.
+
+            [1]: ${{ steps.txURL.outputs.value }}

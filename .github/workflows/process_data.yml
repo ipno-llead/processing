@@ -1,0 +1,74 @@
+name: Process Data
+on:
+  pull_request:
+    branches:
+      - main
+jobs:
+  process-data:
+    runs-on: cdi-runner
+    steps:
+      - uses: actions/checkout@v3
+      - uses: jwalton/gh-find-current-pr@v1
+        id: findPr
+        with:
+          state: open
+      - uses: actions/setup-python@v3
+        with:
+          python-version: "3.9"
+          architecture: "x64"
+          cache: "pip"
+      - name: install make
+        run: |
+          curl http://archive.ubuntu.com/ubuntu/pool/main/m/make-dfsg/make_4.3-4ubuntu1_amd64.deb > ~/make_4.3-4ubuntu1_amd64.deb
+          sudo apt-get install ~/make_4.3-4ubuntu1_amd64.deb
+      - run: pip install -r requirements.txt
+      - name: install wrgl
+        run: sudo bash -c 'curl -L https://github.com/wrgl/wrgl/releases/latest/download/install.sh | bash'
+      - name: dvc pull
+        run: |
+          sed -iE 's/wdir\: data/wdir\: \/runner\/_work\/data\/data/g' raw.dvc
+          mkdir /runner/_work/data/dvc_cache || true
+          dvc cache dir --local /runner/_work/data/dvc_cache
+          dvc pull
+      - name: wrgl pull
+        run: |
+          wrgl config set --global user.email "gh-action@publicdata.works"
+          wrgl config set --global user.name "Github Action"
+          mkdir /runner/_work/data/.wrgl || true
+          cp .wrgl/config.yaml /runner/_work/data/.wrgl/
+          wrgl init --wrgl-dir /runner/_work/data/.wrgl || true
+          wrgl pull --wrgl-dir /runner/_work/data/.wrgl --all
+      - name: process data
+        run: |
+          sed -iE 's/dataDir\: data/dataDir\: \/runner\/_work\/data\/data/g' deba.yaml
+          echo "md5Dir: /runner/_work/data/md5" >> deba.yaml
+          make WRGL_FLAGS="--wrgl-dir /runner/_work/data/.wrgl"
+      - name: commit changes in transaction
+        id: transaction
+        run: |
+          cd /runner/_work/data
+          echo "${WRGLHUB_TOKEN}" > token.txt
+          wrgl credentials authenticate https://hub.wrgl.co/api --token-location token.txt
+          rm token.txt
+          wrgl transaction start | tr -d "[:space:]" > txid.txt
+          export newline=$'\n'
+          wrgl commit --all --txid $(cat txid.txt) "[PR #${PR}: ${PR_TITLE}][1]${newline}${newline}[1]: https://github.com/${GITHUB_REPOSITORY}/pull/${PR}"
+          ( wrgl transaction push origin $(cat txid.txt) && \
+            echo "::set-output name=txid::$(cat txid.txt)" && \
+            echo "::set-output name=txURL::https://hub.wrgl.co/$(wrgl remote -v | grep origin | sed -E 's/.+\/api\/users\/(.+)\/repos\/(.+)/@\1\/r\/\2/')/tx/$(cat txid.txt)" \
+          ) || true
+        env:
+          WRGLHUB_TOKEN: ${{ secrets.WRGLHUB_TOKEN }}
+          PR: ${{ steps.findPr.outputs.pr }}
+          PR_TITLE: ${{ steps.findPr.outputs.title }}
+      - name: Create comment
+        if: ${{ steps.transaction.outputs.txid != 0 }}
+        uses: peter-evans/create-or-update-comment@v2
+        with:
+          issue-number: ${{ steps.findPr.outputs.pr }}
+          body: |
+            Review data changes at [tx/${{ steps.transaction.outputs.txid }}][1]
+
+            When this PR is merged, this transaction will be applied.
+
+            [1]: ${{ steps.transaction.outputs.txURL }}

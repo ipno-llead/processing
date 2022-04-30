@@ -3,7 +3,6 @@ import deba
 from lib.columns import clean_column_names, set_values
 from lib.clean import (
     clean_names,
-    standardize_desc_cols,
     clean_races,
     clean_sexes,
     clean_dates,
@@ -23,11 +22,12 @@ def clean_rank_desc(df):
         df.rank_desc.str.lower()
         .str.strip()
         .fillna("")
-        .str.replace(r"(conf|pro[vb]) ?p?", "", regex=True)
+        .str.replace(r"(conf|pro[vb]|cmo) ?p?", "", regex=True)
         .str.replace("sgt", "sergeant", regex=False)
         .str.replace("lt", "lieutenant", regex=False)
         .str.replace(r"p?co", "communications officer", regex=True)
         .str.replace(r"^of?r?c?l?$", "officer", regex=True)
+        .str.replace(r"^ca$", "captain", regex=True)
     )
     return df
 

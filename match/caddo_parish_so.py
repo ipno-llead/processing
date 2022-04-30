@@ -95,3 +95,4 @@ if __name__ == "__main__":
     cprr_post_event.to_csv(
         deba.data("match/cprr_post_event_caddo_parish_so.csv"), index=False
     )
+    pprr.to_csv(deba.data("match/pprr_caddo_parish_so_2020.csv"), index=False)

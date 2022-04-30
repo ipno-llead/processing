@@ -130,7 +130,7 @@ def clean_disposition(df):
 def clean19():
     df = pd.read_csv(deba.data("raw/plaquemines_so/plaquemines_so_cprr_2019.csv"))
     df = clean_column_names(df)
-    df = df.rename(columns={"rule_violation": "allegation"})
+    df = df.rename(columns={"rule_violation": "allegation", "tracking_number": "tracking_id"})
     return (
         df.pipe(assign_agency)
         .pipe(clean_names, ["first_name", "last_name", "middle_name"])
@@ -138,7 +138,7 @@ def clean19():
             gen_uid,
             ["agency", "first_name", "last_name", "middle_name"],
         )
-        .pipe(gen_uid, ["agency", "tracking_number"], "allegation_uid")
+        .pipe(gen_uid, ["agency", "tracking_id"], "allegation_uid")
     )
 
 
@@ -149,12 +149,12 @@ def clean20():
         .drop(columns=["complainant"])
         .rename(
             columns={
-                "ppso_iad": "tracking_number",
+                "ppso_iad": "tracking_id",
             }
         )
         .pipe(split_row_with_multiple_names)
         .pipe(clean_and_split_names)
-        .pipe(standardize_desc_cols, ["tracking_number"])
+        .pipe(standardize_desc_cols, ["tracking_id"])
         .pipe(clean_receive_dates)
         .pipe(clean_dates, ["receive_date"])
         .pipe(clean_and_split_rows_with_multiple_allegations)
@@ -166,7 +166,7 @@ def clean20():
             gen_uid,
             ["first_name", "last_name", "middle_name", "agency"],
         )
-        .pipe(gen_uid, ["uid", "tracking_number", "allegation"], "allegation_uid")
+        .pipe(gen_uid, ["uid", "tracking_id", "allegation"], "allegation_uid")
     )
     return df
 

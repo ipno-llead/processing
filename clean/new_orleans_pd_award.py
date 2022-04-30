@@ -17,7 +17,10 @@ def extract_rank(df):
             r"group supervisor|supervisory special agent|s/t|tpr)"
         )
     )
-    df.loc[:, "rank_desc"] = ranks[0]
+    df.loc[:, "rank_desc"] = ranks[0]\
+        .str.replace(r"s\/t", "", regex=True)\
+        .str.replace(r"\bmag unit\b", "multi-agency gang unit", regex=True)\
+        .str.replace(r"\batf\b", "alcohol tobacco firearms and explosives", regex=True)
     return df
 
 
@@ -137,7 +140,10 @@ def remove_future_dates(df):
 
 
 def clean():
-    df = pd.read_csv(deba.data("raw/ipm/new_orleans_pd_commendations_2016_2021.csv"))
+    df = pd.read_csv(
+        deba.data("raw/ipm/new_orleans_pd_commendations_2016_2021.csv"),
+        encoding="cp1252",
+    )
     df = (
         df.pipe(clean_column_names)
         .drop(columns={"item_number"})

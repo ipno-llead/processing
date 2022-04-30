@@ -84,7 +84,7 @@ def clean():
     )
     df = df.rename(
         columns={
-            "fit_number": "uof_tracking_number",
+            "fit_number": "uof_tracking_id",
             "occurred_date": "occur_date",
             "month_occurred": "occur_month",
             "year_occurred": "occur_year",
@@ -163,7 +163,7 @@ def clean():
             gen_uid,
             [
                 "agency",
-                "uof_tracking_number",
+                "uof_tracking_id",
                 "officer_primary_key",
                 "citizen_primary_key",
                 "force_description",

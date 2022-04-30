@@ -43,7 +43,10 @@ def fix_review_date(df):
 
 def clean():
     df = (
-        pd.read_csv(deba.data("raw/west_monroe_pd/cprr_west_monroe_pd_2020_byhand.csv"))
+        pd.read_csv(
+            deba.data("raw/west_monroe_pd/cprr_west_monroe_pd_2020_byhand.csv"),
+            encoding="cp1252",
+        )
         .drop(columns="allegation_desc")
         .rename(
             columns={

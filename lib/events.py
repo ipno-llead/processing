@@ -35,6 +35,7 @@ INVESTIGATION_COMPLETE = "investigation_complete"
 SUSPENSION_START = "suspension_start"
 SUSPENSION_END = "suspension_end"
 INITIAL_ACTION = "initial_action"  # date on which the initial action was allocated
+DISPOSITION = "disposition"
 
 APPEAL_FILE = "appeal_file"
 APPEAL_HEARING = "appeal_hearing"
@@ -87,6 +88,7 @@ event_cat_type = CategoricalDtype(
         OFFICER_POST_DECERTIFICATION,
         INITIAL_ACTION,
         STOP_AND_SEARCH,
+        DISPOSITION, 
     ],
     ordered=True,
 )

@@ -1,8 +1,5 @@
-import sys
-
 from lib.clean import convert_dates
 
-sys.path.append("../")
 import pandas as pd
 import deba
 from lib.uid import gen_uid

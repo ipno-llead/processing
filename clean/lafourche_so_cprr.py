@@ -1,6 +1,3 @@
-import sys
-
-sys.path.append("../")
 import pandas as pd
 import deba
 from lib.clean import (
@@ -139,7 +136,7 @@ def clean():
     df = (
         pd.read_csv(deba.data("raw/lafourche_so/lafourche_so_cprr_2019_2021.csv"))
         .pipe(clean_column_names)
-        .rename(columns={"case": "tracking_number"})
+        .rename(columns={"case": "tracking_id"})
         .drop(columns=["complainant", "race_sex"])
         .pipe(split_rows_with_multiple_officers)
         .pipe(split_officer_names)
@@ -150,7 +147,7 @@ def clean():
         .pipe(extract_disposition)
         .pipe(clean_actions)
         .pipe(clean_allegation)
-        .pipe(standardize_desc_cols, ["action", "tracking_number", "allegation"])
+        .pipe(standardize_desc_cols, ["action", "tracking_id", "allegation"])
         .pipe(clean_races, ["race"])
         .pipe(clean_sexes, ["sex"])
         .pipe(clean_names, ["first_name", "middle_name", "last_name"])
@@ -158,7 +155,7 @@ def clean():
         .pipe(gen_uid, ["first_name", "middle_name", "last_name", "agency"])
         .pipe(
             gen_uid,
-            ["uid", "tracking_number", "allegation", "disposition", "action"],
+            ["uid", "tracking_id", "allegation", "disposition", "action"],
             "allegation_uid",
         )
     )

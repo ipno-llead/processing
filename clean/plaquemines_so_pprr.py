@@ -46,6 +46,7 @@ def clean_rank_desc(df):
         .str.replace("code enforcement", "code enforcer", regex=False)
         .str.replace("communications", "", regex=False)
         .str.replace(r"operator$", "dispatcher", regex=True)
+        .str.replace(r"^it$", "i.t.", regex=True)
     )
     return df.drop(columns="position")
 

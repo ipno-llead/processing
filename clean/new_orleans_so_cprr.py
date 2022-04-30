@@ -1,7 +1,13 @@
 import pandas as pd
 from lib.columns import clean_column_names, set_values
 import deba
-from lib.clean import clean_names, float_to_int_str, standardize_desc_cols
+from lib.clean import (
+    clean_names,
+    float_to_int_str,
+    standardize_desc_cols,
+    clean_dates,
+    clean_names,
+)
 from lib.uid import gen_uid
 from lib.standardize import standardize_from_lookup_table
 
@@ -304,7 +310,7 @@ def clean_action_19(df):
     return df
 
 
-def split_rows_with_multiple_alllegations_19(df):
+def split_rows_with_multiple_allegations_19(df):
     df.loc[:, "allegation"] = (
         df.charges.str.lower()
         .str.strip()
@@ -334,11 +340,9 @@ def split_rows_with_multiple_alllegations_19(df):
 def clean_allegations_19(df):
     df.loc[:, "allegation"] = (
         df.allegation.fillna("")
-        .str.replace(r"\"(\w+)\"", "", regex=True)
-        .str.replace("responsibilities", "responsibility", regex=False)
-        .str.replace(r"porfessionalism", "professionalism", regex=True)
+        .str.replace("respnsibilities", "responsibilities", regex=False)
+        .str.replace(r"pr?o?r?fessioa?n?a?lism", "professionalism", regex=True)
         .str.replace(r"duty (\w+)", r"duty-\1", regex=True)
-        .str.replace(r"\(|\)", "", regex=True)
         .str.replace("fo", "of", regex=False)
         .str.replace("proceudres", "procedures", regex=False)
         .str.replace("beofre", "before", regex=False)
@@ -346,6 +350,14 @@ def clean_allegations_19(df):
         .str.replace(r"\- (\w+)", r"-\1", regex=True)
         .str.replace("neglct", "neglect", regex=False)
         .str.replace("supervisory", "supervisor", regex=False)
+        .str.replace("ofr", "for", regex=False)
+        .str.replace(r"\bo\b", "to", regex=True)
+        .str.replace("failkure", "failure", regex=False)
+        .str.replace(r"\"(\w+)\" \"(\w+)\"", r'"\1", "\2"', regex=True)
+        .str.replace(r"(\w+) \"(\w+)\"", r'\1: "\2"', regex=True)
+        .str.replace(r"3 counts each$", "(3 counts each)", regex=True)
+        .str.replace(r"2 counts$", "(2 counts)", regex=True)
+        .str.replace(r"^instr?ucti?ons", "instructions", regex=True)
     )
     return df
 
@@ -409,6 +421,7 @@ def fix_date_typos(df, cols):
 def split_investigating_supervisor(df):
     df.loc[:, "investigating_supervisor"] = (
         df.investigating_supervisor.fillna("")
+        .str.replace(r"([A-Z][a-z]+)([A-Z][a-z]+)", r"\1 \2", regex=True)
         .str.strip()
         .str.lower()
         .str.replace(
@@ -423,7 +436,6 @@ def split_investigating_supervisor(df):
         )
         .str.replace("ms", "", regex=False)
         .str.replace("augusuts", "augustus", regex=False)
-        .str.replace("karengant", "karen gant", regex=False)
         .str.replace(r"^(\w+)  (\w+)", r"\1 \2", regex=True)
         .str.replace(r"^ (\w+)", r"\1", regex=True)
         .str.replace(r"^sergeant$", "", regex=True)
@@ -639,6 +651,7 @@ def clean_allegations_20(df):
         .str.replace(r"(\w+) physical", r"\1/physical", regex=True)
         .str.replace("courtesy intimidation", "courtesy/intimidation", regex=False)
         .str.replace("unfounded", "", regex=False)
+        .str.replace("posession", "possession", regex=False)
         .str.replace(r"/$", "", regex=True)
         .str.replace(r"  +", "", regex=True)
     )
@@ -715,6 +728,22 @@ def clean_allegation_desc(df):
         .str.replace(r"(\w+)$", r"\1.", regex=True)
         .str.replace(r"sgt\.?", "sergeant", regex=True)
         .str.replace("iad", "internal affairs")
+        .str.replace(r"\binformtaion\b", "information", regex=True)
+        .str.replace(r"\brestircted\b", "restricted", regex=True)
+        .str.replace(r"alieutenantercation", "altercation", regex=False)
+        .str.replace(r"\bcloking\b", "clocking", regex=True)
+        .str.replace("resulieutenant", "result", regex=False)
+        .str.replace(r"chane(.+)", "", regex=True)
+        .str.replace(r"\bposs\b", "possession", regex=True)
+        .str.replace("waas", "was", regex=False)
+        .str.replace(r"{", "\\", regex=True)
+        .str.replace("}", "/", regex=False)
+        .str.replace("mulieutenantiple", "multiple", regex=False)
+        .str.replace("didn�t", "didnt", regex=False)
+        .str.replace(r"\bdep\b", "deputy", regex=True)
+        .str.replace("faiiled", "failed", regex=False)
+        .str.replace("assingment", "assignment", regex=False)
+        .str.replace(r"  +", " ", regex=True)
     )
     return df
 
@@ -840,6 +869,58 @@ def add_left_reason_column(df):
     )
 
 
+def clean_rank_desc_19(df):
+    df.loc[:, "rank_desc"] = (
+        df.job_title.str.lower().str.strip().str.replace(r"mr\.", "", regex=True)
+    )
+    return df
+
+
+def clean_referred_by(df):
+    df.loc[:, "referred_by"] = (
+        df.referred_by.str.lower()
+        .str.strip()
+        .fillna("")
+        .str.replace(r"^mainten ?(ance)?$", "maintenance", regex=True)
+        .str.replace(r"^ad?ministrativ? (\w+)", "admin", regex=True)
+        .str.replace(r"^mechani c$", "mechanic", regex=True)
+        .str.replace(r"(^ccs (.+)|deputy (.+))", "", regex=True)
+        .str.replace(
+            r"^planning , complai nce, and grants$",
+            "planning, compliance, grants",
+            regex=True,
+        )
+        .str.replace("grievnce", "grievance", regex=False)
+        .str.replace(r"^hr$", "human resources", regex=True)
+        .str.replace(
+            r"^iad-? ?(crimi?n?a?l?)",
+            "internal affairs department - criminal",
+            regex=True,
+        )
+    )
+    return df
+
+
+def clean_initial_action(df):
+    df.loc[:, "initial_action"] = (
+        df.intial_action.str.lower()
+        .str.strip()
+        .fillna("")
+        .str.replace(r"\bdn\b", "dm", regex=True)
+        .str.replace("--", "-", regex=False)
+        .str.replace(r"(^dm-!$|`)", "", regex=True)
+        .str.replace(r"^dm1$", "dm-1", regex=True)
+    )
+    return df.drop(columns=["intial_action"])
+
+def clean_disposition_19(df):
+    dispositions = df.disposition.str.lower().str.strip()\
+        .str.extract(r"(non-? ?sustained|sustained|exonerated|terminated all charges|unfounded)")
+    
+    df.loc[:, "disposition"] = dispositions[0]\
+        .str.replace(r"non ?sustained", "non-sustained", regex=True)
+    return df 
+
 def clean19():
     df = pd.read_csv(
         deba.data("raw/new_orleans_so/new_orleans_so_cprr_2019_tabula.csv")
@@ -854,17 +935,14 @@ def clean19():
                 "numb_er_of_cases",
                 "related_item_number",
                 "a_i",
-                "intial_action",
                 "inmate_grievance",
-                "referred_by",
                 "date_of_board",
             ]
         )
         .rename(
             columns={
                 "date_received": "receive_date",
-                "case_number": "tracking_number",
-                "job_title": "rank_desc",
+                "case_number": "tracking_id",
                 "charge_disposition": "disposition",
                 "location_or_facility": "department_desc",
                 "assigned_agent": "investigating_supervisor",
@@ -875,40 +953,30 @@ def clean19():
                 "summary": "allegation_desc",
             }
         )
-        .pipe(split_rows_with_multiple_alllegations_19)
-        .pipe(clean_allegations_19)
         .pipe(
             remove_carriage_return,
             [
                 "name_of_accused",
                 "disposition",
-                "allegation",
                 "allegation_desc",
                 "investigating_supervisor",
                 "action",
                 "department_desc",
-                "rank_desc",
+                "charges",
+                "job_title",
+                "referred_by",
             ],
         )
+        .pipe(clean_rank_desc_19)
+        .pipe(split_rows_with_multiple_allegations_19)
+        .pipe(clean_allegations_19)
         .pipe(clean_department_desc)
-        .pipe(standardize_desc_cols, ["rank_desc"])
         .pipe(split_name_19)
         .pipe(clean_names, ["first_name", "last_name", "middle_name"])
         .pipe(clean_action_19)
-        .pipe(set_values, {"agency": "New Orleans SO", "data_production_year": "2019"})
+        .pipe(set_values, {"agency": "New Orleans SO"})
         .pipe(process_disposition)
-        .pipe(
-            fix_date_typos,
-            ["receive_date", "investigation_start_date", "investigation_complete_date"],
-        )
-        .pipe(
-            gen_uid,
-            ["agency", "employee_id", "first_name", "last_name", "middle_name"],
-        )
-        .pipe(set_empty_uid_for_anonymous_officers)
-        .pipe(gen_uid, ["agency", "tracking_number", "uid"], "allegation_uid")
-        .sort_values(["tracking_number", "investigation_complete_date"])
-        .drop_duplicates(subset=["allegation_uid"], keep="last", ignore_index=True)
+        .pipe(clean_disposition_19)
         .pipe(split_investigating_supervisor)
         .pipe(clean_allegation_desc)
         .pipe(extract_arrest_date)
@@ -917,13 +985,42 @@ def clean19():
         .pipe(extract_suspension_end_date)
         .pipe(extract_termination_date)
         .pipe(add_left_reason_column)
+        .pipe(
+            fix_date_typos,
+            ["receive_date", "investigation_start_date", "investigation_complete_date"],
+        )
+        .pipe(
+            clean_dates,
+            [
+                "receive_date",
+                "investigation_start_date",
+                "investigation_complete_date",
+                "termination_date",
+                "resignation_date",
+                "suspension_start_date",
+                "suspension_end_date",
+                "arrest_date",
+            ],
+        )
+        .pipe(
+            gen_uid,
+            ["agency", "employee_id", "first_name", "last_name", "middle_name"],
+        )
+        .pipe(gen_uid, ["agency", "tracking_id", "uid"], "allegation_uid")
+        .pipe(set_empty_uid_for_anonymous_officers)
+        .sort_values(["tracking_id"])
+        .drop_duplicates(subset=["allegation_uid"], keep="last", ignore_index=True)
+        .pipe(clean_referred_by)
+        .pipe(clean_initial_action)
+        .pipe(standardize_desc_cols, ["referred_by", "allegation", "action", "allegation_desc"])
+        .pipe(clean_names, ["first_name", "middle_name", "last_name"])
     )
     return df
 
 
 def clean20():
     df = pd.read_csv(
-        deba.data("raw/new_orleans_so/new_orleans_so_cprr_2020.csv")
+        deba.data("raw/new_orleans_so/new_orleans_so_cprr_2020.csv"), encoding="cp1252"
     ).dropna(how="all")
     df = clean_column_names(df)
     df = (
@@ -931,7 +1028,6 @@ def clean20():
             columns=[
                 "month",
                 "quarter",
-                "intial_action",
                 "number_of_cases",
                 "date_of_board",
                 "a_i",
@@ -942,7 +1038,7 @@ def clean20():
         .drop(columns=["referred_by"])
         .rename(
             columns={
-                "case_number": "tracking_number",
+                "case_number": "tracking_id",
                 "job_title": "rank_desc",
                 "charge_disposition": "disposition",
                 "location_or_facility": "department_desc",
@@ -978,22 +1074,36 @@ def clean20():
         .pipe(extract_resignation_date)
         .pipe(extract_arrest_date)
         .pipe(extract_termination_date)
-        .pipe(standardize_desc_cols, ["action", "allegation_desc"])
+        .pipe(standardize_desc_cols, ["action", "allegation_desc", "allegation"])
         .pipe(split_investigating_supervisor)
         .pipe(process_disposition)
         .pipe(clean_department_desc)
-        .pipe(set_values, {"agency": "New Orleans SO", "data_production_year": "2020"})
         .pipe(float_to_int_str, ["employee_id"])
+        .pipe(set_values, {"agency": "New Orleans SO"})
         .pipe(
             gen_uid, ["agency", "first_name", "middle_name", "last_name", "employee_id"]
         )
         .pipe(
             gen_uid,
-            ["tracking_number", "allegation", "action", "employee_id"],
+            ["tracking_id", "allegation", "action", "employee_id"],
             "allegation_uid",
         )
         .pipe(add_left_reason_column)
         .pipe(drop_rows_missing_names)
+        .pipe(
+            clean_dates,
+            [
+                "receive_date",
+                "investigation_start_date",
+                "investigation_complete_date",
+                "termination_date",
+                "resignation_date",
+                "suspension_start_date",
+                "suspension_end_date",
+                "arrest_date",
+            ],
+        )
+        .pipe(clean_initial_action)
     )
     return df
 

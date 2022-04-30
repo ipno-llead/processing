@@ -7,7 +7,7 @@ from datavalid import load_config
 from .clean import float_to_int_str, names_to_title_case
 
 
-datavalid_config = load_config(os.path.join(os.path.dirname(__file__), "../data"))
+datavalid_config = load_config(os.path.join(os.path.dirname(__file__), ".."))
 
 
 def clean_column_names(df: pd.DataFrame) -> pd.DataFrame:
@@ -76,7 +76,7 @@ def rearrange_personnel_columns(df: pd.DataFrame) -> pd.DataFrame:
         .drop_duplicates(subset=["uid"])
         .pipe(
             names_to_title_case,
-            ["first_name", "last_name", "middle_name", "middle_initial"],
+            ["first_name", "last_name", "middle_name", "middle_initial", "rank_desc"],
         )
         .pipe(float_to_int_str, ["birth_year", "birth_month", "birth_day"])
         .sort_values("uid"),
@@ -133,9 +133,9 @@ def rearrange_allegation_columns(df):
     """
     return datavalid_config.rearrange_columns(
         "allegation",
-        df.pipe(float_to_int_str, ["paragraph_code"]).sort_values(
-            ["agency", "allegation_uid"]
-        ),
+        df[~((df.allegation_uid.fillna("") == ""))]
+        .pipe(float_to_int_str, ["paragraph_code"])
+        .sort_values(["agency", "allegation_uid"]),
     )
 
 
