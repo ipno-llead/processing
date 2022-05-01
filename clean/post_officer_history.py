@@ -1,4 +1,3 @@
-from enum import unique
 import deba
 import pandas as pd
 from lib.uid import gen_uid
@@ -11,16 +10,12 @@ def drop_rows_missing_names(df):
 
 
 def split_names(df):
-    names = (
-        df.officer_name.str.lower()
-        .str.strip()
-        .str.extract(r"(\w+(?:'\w+)?),? (\w+)(?: (\w+))?")
-    )
+    names = df.officer_name.str.strip().str.extract(r"(\w+(?:'\w+)?),? (\w+)(?: (\w+))?")
 
     df.loc[:, "last_name"] = names[0]
     df.loc[:, "first_name"] = names[1]
     df.loc[:, "middle_name"] = names[2]
-    return df.drop(columns=["officer_name"])
+    return df.drop(columns=["officer_name"]).pipe(names_to_title_case, ["first_name", "middle_name", "last_name"])
 
 
 def clean_post_agency_row(df):
@@ -213,24 +208,9 @@ def check_for_duplicate_uids(df):
     return df[~((df.agency.fillna("") == ""))]
 
 
-def generate_false_neg_id(df):
-    false_negs = [
-        ids == False for ids in df.duplicated(subset=["history_id"], keep=False)
-    ]
-    df.loc[:, "false_negatives"] = false_negs
-    df.loc[:, "false_negatives"] = df.astype(str).false_negatives.str.replace(
-        "False", "", regex=False
-    )
-
-    false_df = df.pipe(
-        gen_uid, ["false_negatives", "history_id"], "false_neg_id"
-    ).drop_duplicates(subset=["false_neg_id"], keep=False)
-    false_df = false_df[["false_neg_id", "history_id"]]
-
-    df = df.drop(columns=["false_neg_id"])
-    df = pd.merge(df, false_df, on="history_id", how="outer")
-
-    return df.drop(columns=["false_negatives"]).fillna("")
+def switched_job(df):
+    df.loc[:, "switched_job"] = df.duplicated(subset=["history_id"], keep=False)
+    return df
 
 
 def clean():
@@ -240,7 +220,6 @@ def clean():
         .rename(columns={"officer_sex": "sex"})
         .pipe(clean_sexes, ["sex"])
         .pipe(split_names)
-        .pipe(clean_names, ["first_name", "middle_name", "last_name"])
         .pipe(clean_post_agency_row)
         .pipe(extract_agency)
         .pipe(
@@ -262,7 +241,7 @@ def clean():
         .pipe(generate_history_id)
         .pipe(gen_uid, ["first_name", "middle_name", "last_name", "agency"])
         .pipe(check_for_duplicate_uids)
-        .pipe(generate_false_neg_id)
+        .pipe(switched_job)
     )
     return df
 

@@ -110,9 +110,23 @@ def cross_match_officers_between_agencies(personnel, events, constraints, post):
     per = discard_rows(
         per, per.agency != "", "officers not linked to any event", reset_index=True
     )
+
+    per = pd.merge(
+        per,
+        post,
+        on=["uid", "first_name", "last_name", "agency"],
+        how="outer",
+        suffixes=("", "_r"),
+    )
+    per.columns.drop(list(per.filter(regex="_r")))
+    per = discard_rows(
+        per, per.switched_job.fillna(True), "officers who have not switched jobs"
+    )
+    per.drop(columns=["switched_job"])
+    per = per.drop_duplicates(subset=["uid"])
+
     per = per.set_index("uid")
     per = per.join(constraints)
-    per = per.join(post)
 
     # aggregating min/max date
     events = events.set_index(["uid", "event_uid"])
@@ -120,7 +134,6 @@ def cross_match_officers_between_agencies(personnel, events, constraints, post):
     assign_max_col(events, per, "date")
     assign_min_col(events, per, "timestamp")
     assign_max_col(events, per, "timestamp")
-    per = discard_rows(per, per.min_date.notna(), "officers with no event")
 
     # concatenate first name and last name to get a series of full names
     full_names = per.first_name.str.cat(per.last_name, sep=" ")
@@ -165,8 +178,6 @@ def cross_match_officers_between_agencies(personnel, events, constraints, post):
             DissimilarFilter("agency"),
             # don't match officers who are in the same repell constraint
             DissimilarFilter("repell_id", ignore_key_error=True),
-            # don't match officers who have only worked for one agency
-            DissimilarFilter("false_neg_id"),
             # don't match officers who appear in overlapping time ranges
             NonOverlappingFilter("min_timestamp", "max_timestamp"),
         ],

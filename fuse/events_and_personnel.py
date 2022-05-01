@@ -12,6 +12,7 @@ def join():
         how="outer",
         on="uid",
     )
+
     df = df.dropna().drop_duplicates(subset=["uid"])
     return df
 
