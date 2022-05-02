@@ -107,9 +107,7 @@ def cross_match_officers_between_agencies(personnel, events, constraints, post):
         .agency.to_dict()
     )
     per.loc[:, "agency"] = per.uid.map(lambda x: agency_dict.get(x, ""))
-    per = discard_rows(
-        per, per.agency != "", "officers not linked to any event", reset_index=True
-    )
+    per = discard_rows(per, per.agency != "", "officers not linked to any event", reset_index=True)
 
     per = pd.merge(
         per,
@@ -117,13 +115,18 @@ def cross_match_officers_between_agencies(personnel, events, constraints, post):
         on=["uid", "first_name", "last_name", "agency"],
         how="outer",
         suffixes=("", "_r"),
+    ).rename(
+        columns={
+            "first_name_r": "first_name",
+            "last_name_r": "last_name",
+            "agency_r": "agency",
+        }
     )
-    per.columns.drop(list(per.filter(regex="_r")))
+
     per = discard_rows(
         per, per.switched_job.fillna(True), "officers who have not switched jobs"
     )
-    per.drop(columns=["switched_job"])
-    per = per.drop_duplicates(subset=["uid"])
+    per = per.drop(columns=["switched_job"]).drop_duplicates(subset=["uid"])
 
     per = per.set_index("uid")
     per = per.join(constraints)
@@ -134,6 +137,7 @@ def cross_match_officers_between_agencies(personnel, events, constraints, post):
     assign_max_col(events, per, "date")
     assign_min_col(events, per, "timestamp")
     assign_max_col(events, per, "timestamp")
+    per = discard_rows(per, per.min_date.notna(), "officers with no event")
 
     # concatenate first name and last name to get a series of full names
     full_names = per.first_name.str.cat(per.last_name, sep=" ")
