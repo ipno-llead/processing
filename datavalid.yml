@@ -316,6 +316,7 @@ schemas:
             day_column: day
   use_of_force:
     columns:
+      - name: uid
       - name: uof_uid
         description: >
           unique identifier of use of force report.
