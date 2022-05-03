@@ -116,13 +116,6 @@ def cross_match_officers_between_agencies(personnel, events, constraints, post):
         post,
         on=["uid", "first_name", "last_name", "agency"],
         how="outer",
-        suffixes=("", "_r"),
-    ).rename(
-        columns={
-            "first_name_r": "first_name",
-            "last_name_r": "last_name",
-            "agency_r": "agency",
-        }
     )
 
     per = discard_rows(
