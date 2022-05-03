@@ -107,7 +107,9 @@ def cross_match_officers_between_agencies(personnel, events, constraints, post):
         .agency.to_dict()
     )
     per.loc[:, "agency"] = per.uid.map(lambda x: agency_dict.get(x, ""))
-    per = discard_rows(per, per.agency != "", "officers not linked to any event", reset_index=True)
+    per = discard_rows(
+        per, per.agency != "", "officers not linked to any event", reset_index=True
+    )
 
     per = pd.merge(
         per,
