@@ -14,7 +14,7 @@ from lib.clean import full_year_str, swap_month_day
 
 
 def open_dvc_files(dir_name: str) -> typing.List[typing.Dict]:
-    with open(deba.data("%s.dvc" % dir_name), "r") as f:
+    with open("%s.dvc" % dir_name, "r") as f:
         raw_dir_dvc = yaml.load(f, Loader=yaml.Loader)
     dir_hash = raw_dir_dvc["outs"][0]["md5"]
     dir_path = pathlib.Path(os.path.realpath(__file__)).parent.parent / (

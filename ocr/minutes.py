@@ -40,8 +40,14 @@ def process_pdf(df: pd.DataFrame) -> pd.DataFrame:
         texts.append(pages)
 
     df.loc[:, "text"] = pd.Series(texts, index=df.index)
-    df.loc[:, "pageno"] = df.loc[:, "text"].map(lambda x: list(range(1, len(x) + 1)))
-    return df.explode(("text", "pageno"))
+    df = df.explode("text").reset_index(drop=True)
+    print(df)
+    print(df.groupby("fileid").cumcount())
+    df.loc[:, "pageno"] = df.groupby("fileid").cumcount() + 1
+    print(df.loc[:, ["fileid", "pageno"]])
+    return df
+    # df.loc[:, "pageno"] = df.loc[:, "text"].map(lambda x: list(range(1, len(x) + 1)))
+    # return df.explode(["text", "pageno"])
 
 
 def process_all_pdfs() -> pd.DataFrame:

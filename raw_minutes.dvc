@@ -3,3 +3,4 @@ outs:
   size: 1197649478
   nfiles: 1456
   path: raw_minutes
+wdir: data

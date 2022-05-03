@@ -7,6 +7,8 @@ patterns:
 stages:
   - name: meta
   - name: ocr
+  - name: features
+  - name: classify
   - name: clean
     ignoredTargets:
       - duplicates.csv
