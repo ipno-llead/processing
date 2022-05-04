@@ -1057,6 +1057,8 @@ branch:
     merge: refs/heads/use-of-force-officers
     file: data/fuse/uof_officers.csv
     primaryKey:
+      - uid
+    primaryKey:
       - uof_uid
   use-of-force-citizens:
     remote: origin
