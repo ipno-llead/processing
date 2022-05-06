@@ -268,7 +268,7 @@ branch:
       - allegation_uid
   com-pineville-pd:
     remote: origin
-    merge: refs/heads/main
+    merge: refs/heads/com-pineville-pd
     file: data/fuse/com_pineville_pd.csv
     primaryKey:
       - allegation_uid
@@ -988,7 +988,7 @@ branch:
       - uid
   per-pineville-pd:
     remote: origin
-    merge: refs/heads/main
+    merge: refs/heads/per-pineville-pd
     file: data/fuse/per_pineville_pd.csv
     primaryKey:
       - uid
