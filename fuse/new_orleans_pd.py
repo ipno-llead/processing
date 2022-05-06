@@ -89,7 +89,7 @@ def fuse_events(pprr_ipm, pprr_csd, cprr, uof, award, lprr, sas):
         {
             events.UOF_INCIDENT: {"prefix": "occur", "parse_date": True},
         },
-        ["uid", "uof_uid"],
+        ["uof_uid"],
     )
     builder.extract_events(
         award,

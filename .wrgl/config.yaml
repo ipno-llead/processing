@@ -267,8 +267,8 @@ branch:
     primaryKey:
       - allegation_uid
   com-pineville-pd:
-    remote: com-pineville-pd
-    merge: refs/heads/main
+    remote: origin
+    merge: refs/heads/com-pineville-pd
     file: data/fuse/com_pineville_pd.csv
     primaryKey:
       - allegation_uid
@@ -987,8 +987,8 @@ branch:
     primaryKey:
       - uid
   per-pineville-pd:
-    remote: per-pineville-pd
-    merge: refs/heads/main
+    remote: origin
+    merge: refs/heads/per-pineville-pd
     file: data/fuse/per_pineville_pd.csv
     primaryKey:
       - uid
@@ -1057,6 +1057,7 @@ branch:
     merge: refs/heads/use-of-force-officers
     file: data/fuse/uof_officers.csv
     primaryKey:
+      - uid
       - uof_uid
   use-of-force-citizens:
     remote: origin
