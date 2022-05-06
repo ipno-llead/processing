@@ -1,6 +1,6 @@
 outs:
-- md5: cebe050f49c5881a4665d26d340d79bb.dir
-  size: 1197649478
-  nfiles: 1456
+- md5: 97f0d1f6f474f31aaa561bc23c47e00e.dir
+  size: 1229536973
+  nfiles: 1585
   path: raw_minutes
 wdir: data

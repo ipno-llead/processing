@@ -1,0 +1,6 @@
+wdir: data
+outs:
+- md5: ec2a74ab8d00f88c12e08801d8ddbc53.dir
+  size: 18691983
+  nfiles: 1024
+  path: ocr_cache

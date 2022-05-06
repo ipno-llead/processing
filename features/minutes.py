@@ -1,4 +1,5 @@
 import operator
+import re
 from functools import reduce
 
 import deba
@@ -108,45 +109,50 @@ def split_lines(df: pd.DataFrame):
     return df
 
 
-# def get_page_features(lines: pd.DataFrame):
-#     page_fts = lines[["fileid", "pageno", "lineno", "text"]].set_index(
-#         ["fileid", "pageno", "lineno"], drop=False
-#     )
-#     page_fts.loc[:, "hd"] = page_fts.lineno <= 3
-#     linenos = (
-#         lines[["fileid", "pageno", "lineno"]]
-#         .groupby(["fileid", "pageno"])
-#         .max()
-#         .join(page_fts.lineno.to_frame(), how="right", lsuffix="_max")
-#     )
-#     page_fts.loc[:, "ft"] = linenos.lineno == linenos.lineno_max
+def extract_page_features(lines: pd.DataFrame):
+    page_fts = lines[["fileid", "pageno", "lineno", "text"]].set_index(
+        ["fileid", "pageno", "lineno"], drop=False
+    )
+    page_fts.loc[:, "hd"] = page_fts.lineno <= 3
+    linenos = (
+        lines[["fileid", "pageno", "lineno"]]
+        .groupby(["fileid", "pageno"])
+        .max()
+        .join(page_fts.lineno.to_frame(), how="right", lsuffix="_max")
+    )
+    page_fts.loc[:, "ft"] = linenos.lineno == linenos.lineno_max
 
-#     for col_name, pattern in [
-#         ("re_frontpage_1", r"page 1$"),
-#         ("re_frontpage_2", r"^1$"),
-#         ("re_contpage_1", r"page ([2-9]|1[0-9])"),
-#         ("re_contpage_2", r"^([2-9]|1[0-9])$"),
-#     ]:
-#         page_fts.loc[:, col_name] = (
-#             (page_fts.hd | page_fts.ft)
-#             & page_fts.text.str.match(pattern, flags=re.IGNORECASE)
-#         ).astype(int)
+    re_map = {
+        "frontpage": [re.compile(s) for s in [r"page 1$", r"^1$"]],
+        "contpage": [
+            re.compile(s) for s in [r"page ([2-9]|1[0-9])", r"^([2-9]|1[0-9])$"]
+        ],
+    }
 
-#     page_fts = (
-#         page_fts.reset_index(drop=True)[
-#             ["fileid", "pageno"]
-#             + [col for col in page_fts.columns if col.startswith("re_")]
-#         ]
-#         .groupby(["fileid", "pageno"])
-#         .max()
-#     )
+    def text_match_one_of(row: pd.DataFrame, patterns):
+        if pd.isna(row.text):
+            return False
+        return reduce(
+            operator.or_,
+            [pattern.match(row.text) is not None for pattern in patterns],
+            False,
+        )
 
-#     return page_fts
+    for feat, patterns in re_map.items():
+        page_fts.loc[:, feat] = page_fts.apply(
+            text_match_one_of, axis=1, args=(patterns,)
+        )
+
+    page_fts = (
+        page_fts.reset_index(drop=True)[["fileid", "pageno"] + list(re_map.keys())]
+        .groupby(["fileid", "pageno"])
+        .max()
+    )
+
+    return page_fts
 
 
-def get_header_features(df: pd.DataFrame):
-    lines = split_lines(df)
-
+def extract_doctype_feats(lines: pd.DataFrame):
     feats = lines.loc[
         lines.lineno <= 8, ["region", "fileid", "pageno", "lineno", "text"]
     ].set_index(["fileid", "pageno", "lineno"])
@@ -166,12 +172,18 @@ def get_header_features(df: pd.DataFrame):
     feats = feats.groupby("region").apply(match)
     feat_cols = ["mtg", "hrg", "agd"]
     feats.loc[:, feat_cols] = feats[feat_cols].fillna(False)
+    return feats.reset_index(drop=False).groupby(["fileid", "pageno"])[feat_cols].max()
+
+
+def get_header_features(df: pd.DataFrame):
+    lines = split_lines(df)
+    doctype_feats = extract_doctype_feats(lines)
+    page_feats = extract_page_features(lines)
 
     return (
         df.set_index(["fileid", "pageno"])
-        .join(
-            feats.reset_index(drop=False).groupby(["fileid", "pageno"])[feat_cols].max()
-        )
+        .join(doctype_feats)
+        .join(page_feats)
         .reset_index()
     )
 

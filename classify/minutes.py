@@ -11,6 +11,7 @@ def classify():
         ("agd", "agenda"),
     ]:
         df.loc[df[col_name], "pagetype"] = pt
+    df.loc[df.contpage, "pagetype"] = "continuation"
     return df.drop(columns=["mtg", "hrg", "agd"])
 
 
