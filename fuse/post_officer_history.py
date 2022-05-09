@@ -34,18 +34,14 @@ def fuse_events(pprr):
 
 
 if __name__ == "__main__":
-    post = pd.read_csv(deba.data("match/post_officer_history.csv")).drop_duplicates(
-        subset=["uid"]
-    )
-    events_pre_post = pd.read_csv(deba.data("fuse/event_pre_post.csv")).drop_duplicates(
-        subset=["uid"]
-    )
+    post = pd.read_csv(deba.data("match/post_officer_history.csv"))
+    events_pre_post = pd.read_csv(deba.data("fuse/event_pre_post.csv"))
     per_pre_post = pd.read_csv(deba.data("fuse/personnel_pre_post.csv"))
 
     post_events = fuse_events(post)
     event_df = rearrange_event_columns(
-        pd.concat([post_events, events_pre_post])
-    ).drop_duplicates(subset=["uid"])
+        pd.concat([post_events, events_pre_post]).drop_duplicates(subset=["uid"])
+    )
     per_df = rearrange_personnel_columns(pd.concat([per_pre_post, post]))
 
     per_df.to_csv(deba.data("fuse/personnel.csv"), index=False)
