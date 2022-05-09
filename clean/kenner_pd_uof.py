@@ -74,25 +74,54 @@ def assign_agency(df):
     return df
 
 
-def clean():
+def clean_uof():
     df = (
         pd.read_csv(deba.data("raw/kenner_pd/kenner_pd_uof_2005_2021.csv"))
         .pipe(clean_column_names)
         .rename(columns={"date": "incident_date", "address": "location"})
         .pipe(clean_dates, ["incident_date"])
-        .pipe(split_name)
         .pipe(assign_action)
         .pipe(clean_disposition)
         .pipe(clean_charges)
         .pipe(assign_agency)
-        .pipe(gen_uid, ["first_name", "middle_name", "last_name", "agency"])
         .pipe(
-            gen_uid, ["uid", "disposition", "action", "charges", "location"], "uof_uid"
+            gen_uid,
+            [
+                "disposition",
+                "action",
+                "charges",
+                "location",
+                "incident_year",
+                "incident_month",
+                "incident_day",
+            ],
+            "uof_uid",
         )
     )
     return df
 
 
+def extract_officer(uof):
+    df = (
+        uof.loc[
+            :,
+            [
+                "officer",
+                "agency",
+                "uof_uid",
+            ],
+        ]
+        .pipe(split_name)
+        .pipe(gen_uid, ["first_name", "middle_name", "last_name", "agency"])
+    )
+    uof = uof.drop(columns=["officer"])
+    return df, uof
+
+
 if __name__ == "__main__":
-    df = clean()
-    df.to_csv(deba.data("clean/uof_kenner_pd_2005_2021.csv"), index=False)
+    uof = clean_uof()
+    uof_officer, uof = extract_officer(uof)
+    uof.to_csv(deba.data("clean/uof_kenner_pd_2005_2021.csv"), index=False)
+    uof_officer.to_csv(
+        deba.data("clean/uof_officers_kenner_pd_2005_2021.csv"), index=False
+    )

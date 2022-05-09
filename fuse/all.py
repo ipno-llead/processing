@@ -236,9 +236,10 @@ def fuse_uof_officers():
     return rearrange_uof_officer_columns(
         pd.concat(
             [
+                pd.read_csv(deba.data("fuse/uof_officers_new_orleans_pd.csv")),
                 pd.read_csv(
-                    deba.data("fuse/uof_officers_new_orleans_pd.csv"),
-                )
+                    deba.data("fuse/uof_officers_kenner_pd.csv"),
+                ),
             ]
         )
     ).sort_values(["agency", "uid"])

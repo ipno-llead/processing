@@ -13,6 +13,8 @@ stages:
     ignoredTargets:
       - duplicates.csv
       - fuse/person.csv
+    commonPrerequisites:
+      - datavalid.yml
 targets:
   - fuse/personnel.csv
   - fuse/allegation.csv
