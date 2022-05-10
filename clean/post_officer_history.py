@@ -140,11 +140,12 @@ def clean_agency(df):
         )
         .str.replace(r"^Deptpublic Safety$", "Department Of Public Safety", regex=True)
         .str.replace(r"^W\b ", "West ", regex=True)
-        .str.replace(r"^E jefferson levee pd", "East Jefferson Levee PD", regex=True)
         .str.replace(r"^E\b ", "", regex=True)
         .str.replace(r"^Univ PDxavier", "Xavier University PD", regex=True)
         .str.replace(r"La State Police", "Louisiana State PD", regex=True)
-        .str.replace(r"^Univ PDlsuhscno$", "LSUHSC - No University PD", regex=True)
+        .str.replace(
+            r"^Univ PDlsuhscno$", "LSUHSC - New Orleans University PD", regex=True
+        )
         .str.replace(
             r"^Univ PDdelgado Cc$",
             "Delgado Community College University PD",
@@ -159,7 +160,7 @@ def clean_agency(df):
         .str.replace(r"\bLsu\b", "LSU", regex=True)
         .str.replace(
             r"Univ PDsouthernno",
-            "Southern University PD - New Orleans ",
+            "Southern University PD",
             regex=True,
         )
         .str.replace(r" Par ", "", regex=True)
@@ -188,6 +189,10 @@ def clean_agency(df):
         .str.replace(r"^Lafayette$", "Lafayette PD", regex=True)
         .str.replace(r"^Louisiana State$", "Louisiana State PD", regex=True)
         .str.replace(r"^Caddo Parish$", "Caddo SO", regex=True)
+        .str.replace(r"^22Nd", "22nd", regex=True)
+        .str.replace(r" Decease$", "", regex=True)
+        .str.replace(r" \bParish\b ", " ", regex=True)
+        .str.replace(r"^Jefferson Levee PD$", "East Jefferson Levee PD", regex=True)
     )
     return df
 

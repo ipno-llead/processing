@@ -1,3 +1,4 @@
+import warnings
 import deba
 import pandas as pd
 from datamatch import (
@@ -34,8 +35,20 @@ def match_post_to_personnel(post, personnel):
     return post
 
 
+def post_agency_is_per_agency_subset(personnel, post):
+    missing_agency = post[~post["agency"].isin(personnel["agency"])]
+    missing_agency = missing_agency[["agency"]].drop_duplicates().dropna()
+
+    if len(missing_agency["agency"]) != 0:
+        warnings.warn(
+            "Agency not in Personnel DF: %s" % missing_agency["agency"].tolist()
+        )
+    return post
+
+
 if __name__ == "__main__":
     post = pd.read_csv(deba.data("clean/post_officer_history.csv"))
     personnel = pd.read_csv(deba.data("fuse/personnel_pre_post.csv"))
+    post = post_agency_is_per_agency_subset(personnel, post)
     post = match_post_to_personnel(post, personnel)
     post.to_csv(deba.data("match/post_officer_history.csv"), index=False)
