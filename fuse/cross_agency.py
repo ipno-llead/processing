@@ -69,9 +69,7 @@ def read_constraints():
 
 def read_post():
     post = pd.read_csv(deba.data("match/post_officer_history.csv"))
-    post = post.drop(columns=["first_name", "last_name"]).drop_duplicates(
-        subset=["uid"]
-    )
+    post = post.drop_duplicates(subset=["uid"])
     print("read post officer history file (%d rows)" % post.shape[0])
     return post
 
@@ -114,12 +112,14 @@ def cross_match_officers_between_agencies(personnel, events, constraints, post):
         per, per.agency != "", "officers not linked to any event", reset_index=True
     )
 
-    per = pd.merge(per, post, on=["uid"], how="outer")
+    per = pd.concat([per, post], axis=0)
 
     per = discard_rows(
         per, per.switched_job.fillna(True), "officers who have not switched jobs"
     )
-    per = per.drop(columns=["switched_job"]).drop_duplicates(subset=["uid"])
+    per = per.drop(columns=["switched_job"]).drop_duplicates(
+        subset=["uid"], keep="last"
+    )
 
     per = per.set_index("uid")
     per = per.join(constraints)
