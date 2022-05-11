@@ -385,6 +385,9 @@ def extract_citizen(uof):
                 "citizen_influencing_factors",
                 "citizen_build",
                 "citizen_height",
+                "citizen_race",
+                "citizen_sex",
+                "uof_uid",
             ],
             "uof_citizen_uid",
         )
