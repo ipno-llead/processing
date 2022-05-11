@@ -309,7 +309,7 @@ if __name__ == "__main__":
     award_df = fuse_award()
     brady_df = fuse_brady()
 
-    per_df.to_csv(deba.data("fuse/personnel.csv"), index=False)
+    per_df.to_csv(deba.data("fuse/personnel_pre_post.csv"), index=False)
     allegation_df.to_csv(deba.data("fuse/allegation.csv"), index=False)
     uof_df.to_csv(deba.data("fuse/use_of_force.csv"), index=False)
     sas_df.to_csv(deba.data("fuse/stop_and_search.csv"), index=False)
@@ -319,8 +319,8 @@ if __name__ == "__main__":
     award_df.to_csv(deba.data("fuse/awards.csv"), index=False)
     brady_df.to_csv(deba.data("fuse/brady.csv"), index=False)
 
-    post_event_df = pd.read_csv(deba.data("fuse/events_post.csv"))
+    post_event_df = pd.read_csv(deba.data("fuse/event_post.csv"))
     missing_agency_df = find_event_agency_if_missing_from_post(event_df, post_event_df)
     post_event_df = post_event_df[~post_event_df["agency"].isin(event_df["agency"])]
     event_df = pd.concat([event_df, post_event_df], ignore_index=True)
-    event_df.to_csv(deba.data("fuse/event.csv"), index=False)
+    event_df.to_csv(deba.data("fuse/event_pre_post.csv"), index=False)
