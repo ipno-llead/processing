@@ -391,6 +391,7 @@ def extract_citizen(uof):
             ],
             "uof_citizen_uid",
         )
+        .drop_duplicates(subset=["uof_citizen_uid", "uof_uid"])
     )
     uof = uof.drop(
         columns=[
@@ -451,6 +452,7 @@ def extract_officer(uof):
         )
         .pipe(set_values, {"agency": "New Orleans PD"})
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
+        .drop_duplicates(subset=["uid", "uof_uid"])
     )
     uof = uof.drop(
         columns=[
