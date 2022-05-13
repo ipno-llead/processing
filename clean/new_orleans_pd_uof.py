@@ -106,7 +106,7 @@ def split_citizen_rows(df):
             "citizen_age",
             "citizen_arrested",
             "citizen_arrest_charges",
-            "uof_uid"
+            "uof_uid",
         ],
         "uof_citizen_uid",
     )
@@ -126,7 +126,7 @@ def split_citizen_rows(df):
     )
 
     df = pd.merge(df, citizen_df, on="uof_uid")
-    return df.drop_duplicates(subset=["uof_uid", "uof_citizen_uid"])
+    return df
 
 
 def clean_tracking_id(df):
@@ -398,7 +398,9 @@ def clean_uof():
         .pipe(split_officer_names)
         .pipe(clean_names, ["last_name", "first_name"])
         .pipe(set_values, {"agency": "New Orleans PD"})
-        .pipe(gen_uid, ["first_name", "last_name", "agency"]).drop_duplicates(subset=["uid", "uof_uid"])
+        .pipe(gen_uid, ["first_name", "last_name", "agency"])
+        .drop_duplicates(subset=["uid", "uof_uid"])
+        .drop_duplicates(subset=["uof_citizen_uid", "uof_uid"])
     )
     return df
 
