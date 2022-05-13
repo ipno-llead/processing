@@ -5,16 +5,18 @@ from lib.clean import clean_sexes, standardize_desc_cols
 from lib.columns import set_values, clean_column_names
 from lib.clean import clean_races, clean_names
 from lib.uid import gen_uid
+import sys
 
 
 def split_officer_rows(df):
+    df.loc[:, "race"] = df.race.str.replace(r"(\w+); (\w+)", r"\1 | \2", regex=True)
     officer_columns = [
         "officer_name",
         "race",
         "sex",
         "age",
         "years_of_service",
-        "use_of_force_type",
+        "use_of_force_description",
         "use_of_force_level",
         "use_of_force_effective",
         "officer_injured",
@@ -37,11 +39,25 @@ def split_officer_rows(df):
             raise
 
     officer_series = df.apply(create_officer_lists, axis=1)
-    df = pd.DataFrame(
+    officer_df = pd.DataFrame(
         [element for list_ in officer_series for element in list_],
         columns=["uof_uid"] + officer_columns,
     )
 
+    df = df.drop(
+        columns=[
+            "officer_name",
+            "race",
+            "sex",
+            "age",
+            "years_of_service",
+            "use_of_force_description",
+            "use_of_force_level",
+            "use_of_force_effective",
+            "officer_injured",
+        ]
+    )
+    df = pd.merge(df, officer_df, on="uof_uid")
     return df
 
 
@@ -61,8 +77,6 @@ def split_citizen_rows(df):
         "citizen_influencing_factors",
         "citizen_distance_from_officer",
         "citizen_age",
-        "citizen_build",
-        "citizen_height",
         "citizen_arrested",
         "citizen_arrest_charges",
     ]
@@ -77,12 +91,42 @@ def split_citizen_rows(df):
         ]
 
     citizen_series = df.apply(create_citizen_lists, axis=1)
-    df = pd.DataFrame(
+    citizen_df = pd.DataFrame(
         [element for list_ in citizen_series for element in list_],
         columns=["uof_uid"] + citizen_columns,
+    ).pipe(
+        gen_uid,
+        [
+            "citizen_race",
+            "citizen_sex",
+            "citizen_hospitalized",
+            "citizen_injured",
+            "citizen_influencing_factors",
+            "citizen_distance_from_officer",
+            "citizen_age",
+            "citizen_arrested",
+            "citizen_arrest_charges",
+            "uof_uid"
+        ],
+        "uof_citizen_uid",
     )
 
-    return df
+    df = df.drop(
+        columns=[
+            "citizen_race",
+            "citizen_sex",
+            "citizen_hospitalized",
+            "citizen_injured",
+            "citizen_influencing_factors",
+            "citizen_distance_from_officer",
+            "citizen_age",
+            "citizen_arrested",
+            "citizen_arrest_charges",
+        ]
+    )
+
+    df = pd.merge(df, citizen_df, on="uof_uid")
+    return df.drop_duplicates(subset=["uof_uid", "uof_citizen_uid"])
 
 
 def clean_tracking_id(df):
@@ -242,9 +286,9 @@ def clean_use_of_force_reason(df):
     return df
 
 
-def clean_use_of_force_type(df):
-    df.loc[:, "use_of_force_type"] = (
-        df.use_of_force_type.str.lower()
+def clean_use_of_force_description(df):
+    df.loc[:, "use_of_force_description"] = (
+        df.use_of_force_description.str.lower()
         .str.strip()
         .fillna("")
         .str.replace("nontrad", "non traditional", regex=False)
@@ -283,11 +327,26 @@ def clean_uof():
     df = (
         pd.read_csv(deba.data("raw/new_orleans_pd/new_orleans_pd_uof_2016_2021.csv"))
         .pipe(clean_column_names)
+        .drop(columns=["subject_height", "subject_build"])
         .rename(
             columns={
                 "filenum": "tracking_id",
                 "occurred_date": "occur_date",
                 "shift": "shift_time",
+                "subject_ethnicity": "citizen_race",
+                "subject_gender": "citizen_sex",
+                "subject_hospitalized": "citizen_hospitalized",
+                "subject_injured": "citizen_injured",
+                "subject_distance_from_officer": "citizen_distance_from_officer",
+                "subject_arrested": "citizen_arrested",
+                "subject_arrest_charges": "citizen_arrest_charges",
+                "subject_influencing_factors": "citizen_influencing_factors",
+                "subject_age": "citizen_age",
+                "officer_race_ethnicity": "race",
+                "officer_gender": "sex",
+                "officer_age": "age",
+                "officer_years_of_service": "years_of_service",
+                "use_of_force_type": "use_of_force_description",
             }
         )
         .pipe(clean_weather_condition)
@@ -300,7 +359,20 @@ def clean_uof():
         .pipe(clean_division_level)
         .pipe(clean_unit)
         .pipe(clean_tracking_id)
-        .pipe(set_values, {"agency": "New Orleans PD"})
+        .pipe(
+            standardize_desc_cols,
+            [
+                "citizen_hospitalized",
+                "citizen_injured",
+                "citizen_distance_from_officer",
+                "citizen_age",
+                "citizen_arrested",
+                "citizen_influencing_factors",
+                "use_of_force_description",
+                "use_of_force_level",
+                "use_of_force_effective",
+            ],
+        )
         .pipe(
             gen_uid,
             [
@@ -316,155 +388,90 @@ def clean_uof():
             ],
             "uof_uid",
         )
+        .pipe(split_officer_rows)
+        .pipe(split_citizen_rows)
+        .pipe(clean_use_of_force_description)
+        .pipe(clean_citizen_arrest_charges)
+        .pipe(clean_citizen_age)
+        .pipe(clean_races, ["citizen_race", "race"])
+        .pipe(clean_sexes, ["citizen_sex", "sex"])
+        .pipe(split_officer_names)
+        .pipe(clean_names, ["last_name", "first_name"])
+        .pipe(set_values, {"agency": "New Orleans PD"})
+        .pipe(gen_uid, ["first_name", "last_name", "agency"]).drop_duplicates(subset=["uid", "uof_uid"])
     )
     return df
 
 
 def extract_citizen(uof):
-    df = (
-        uof.loc[
-            :,
-            [
-                "subject_ethnicity",
-                "subject_gender",
-                "subject_hospitalized",
-                "subject_injured",
-                "subject_influencing_factors",
-                "subject_distance_from_officer",
-                "subject_age",
-                "subject_build",
-                "subject_height",
-                "subject_arrested",
-                "subject_arrest_charges",
-                "uof_uid",
-            ],
-        ]
-        .pipe(clean_column_names)
-        .rename(
-            columns={
-                "subject_ethnicity": "citizen_race",
-                "subject_gender": "citizen_sex",
-                "subject_hospitalized": "citizen_hospitalized",
-                "subject_injured": "citizen_injured",
-                "subject_distance_from_officer": "citizen_distance_from_officer",
-                "subject_arrested": "citizen_arrested",
-                "subject_arrest_charges": "citizen_arrest_charges",
-                "subject_influencing_factors": "citizen_influencing_factors",
-                "subject_build": "citizen_build",
-                "subject_age": "citizen_age",
-                "subject_height": "citizen_height",
-            }
-        )
-        .pipe(split_citizen_rows)
-        .pipe(clean_citizen_arrest_charges)
-        .pipe(clean_citizen_age)
-        .pipe(clean_races, ["citizen_race"])
-        .pipe(clean_sexes, ["citizen_sex"])
-        .pipe(
-            standardize_desc_cols,
-            [
-                "citizen_hospitalized",
-                "citizen_injured",
-                "citizen_distance_from_officer",
-                "citizen_age",
-                "citizen_arrested",
-                "citizen_influencing_factors",
-                "citizen_build",
-                "citizen_height",
-            ],
-        )
-        .pipe(set_values, {"agency": "New Orleans PD"})
-        .pipe(
-            gen_uid,
-            [
-                "citizen_hospitalized",
-                "citizen_injured",
-                "citizen_distance_from_officer",
-                "citizen_age",
-                "citizen_arrested",
-                "citizen_influencing_factors",
-                "citizen_build",
-                "citizen_height",
-                "citizen_race",
-                "citizen_sex",
-                "uof_uid",
-            ],
+    df = uof.loc[
+        :,
+        [
+            "citizen_sex",
+            "citizen_hospitalized",
+            "citizen_injured",
+            "citizen_influencing_factors",
+            "citizen_distance_from_officer",
+            "citizen_age",
+            "citizen_arrested",
+            "citizen_arrest_charges",
+            "citizen_race",
+            "use_of_force_reason",
+            "use_of_force_description",
+            "agency",
             "uof_citizen_uid",
-        )
-        .drop_duplicates(subset=["uof_citizen_uid", "uof_uid"])
-    )
+            "uof_uid",
+        ],
+    ]
     uof = uof.drop(
         columns=[
-            "subject_ethnicity",
-            "subject_gender",
-            "subject_hospitalized",
-            "subject_injured",
-            "subject_distance_from_officer",
-            "subject_arrested",
-            "subject_arrest_charges",
-            "subject_influencing_factors",
-            "subject_build",
-            "subject_age",
-            "subject_height",
+            "citizen_race",
+            "citizen_sex",
+            "citizen_hospitalized",
+            "citizen_injured",
+            "citizen_influencing_factors",
+            "citizen_distance_from_officer",
+            "citizen_arrest_charges",
+            "citizen_arrested",
+            "uof_citizen_uid",
         ]
     )
     return df, uof
 
 
 def extract_officer(uof):
-    df = (
-        uof.loc[
-            :,
-            [
-                "officer_race_ethnicity",
-                "officer_gender",
-                "officer_age",
-                "officer_years_of_service",
-                "officer_name",
-                "use_of_force_type",
-                "use_of_force_level",
-                "use_of_force_effective",
-                "officer_injured",
-                "uof_uid",
-            ],
-        ]
-        .rename(
-            columns={
-                "officer_race_ethnicity": "race",
-                "officer_gender": "sex",
-                "officer_age": "age",
-                "officer_years_of_service": "years_of_service",
-            }
-        )
-        .pipe(split_officer_rows)
-        .pipe(split_officer_names)
-        .pipe(clean_use_of_force_type)
-        .pipe(clean_races, ["race"])
-        .pipe(clean_sexes, ["sex"])
-        .pipe(clean_names, ["last_name", "first_name"])
-        .pipe(
-            standardize_desc_cols,
-            [
-                "use_of_force_type",
-                "use_of_force_level",
-                "use_of_force_effective",
-            ],
-        )
-        .pipe(set_values, {"agency": "New Orleans PD"})
-        .pipe(gen_uid, ["first_name", "last_name", "agency"])
-        .drop_duplicates(subset=["uid", "uof_uid"])
-    )
-    uof = uof.drop(
-        columns=[
-            "officer_race_ethnicity",
-            "officer_gender",
-            "officer_age",
-            "officer_years_of_service",
-            "officer_name",
-            "use_of_force_type",
+    df = uof.loc[
+        :,
+        [
+            "race",
+            "sex",
+            "age",
+            "years_of_service",
+            "first_name",
+            "last_name",
+            "use_of_force_reason",
+            "use_of_force_description",
             "use_of_force_level",
             "use_of_force_effective",
             "officer_injured",
+            "citizen_age",
+            "agency",
+            "uid",
+            "uof_uid",
+        ],
+    ]
+    uof = uof.drop(
+        columns=[
+            "race",
+            "sex",
+            "age",
+            "years_of_service",
+            "first_name",
+            "last_name",
+            "use_of_force_level",
+            "use_of_force_effective",
+            "officer_injured",
+            "uid",
         ]
     )
     return df, uof
