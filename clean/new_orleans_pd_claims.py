@@ -4,8 +4,6 @@ from lib.uid import gen_uid
 from lib.columns import clean_column_names, set_values
 from lib.clean import clean_dates, standardize_desc_cols
 
-### re-push table from db to dvc
-
 
 def drop_rows_missing_names(df):
     df.loc[:, "police_officer"] = df.police_officer.fillna("")
@@ -106,7 +104,7 @@ def clean():
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(
             gen_uid,
-            ["uid", "claim_id"],
+            ["claim_id", "agency"],
             "property_claims_uid",
         )
     )
