@@ -471,7 +471,7 @@ schemas:
     columns:
       - name: property_claims_uid
         description: >
-          unique identifier of award.
+          unique identifier of property claim.
         unique: true
         no_na: true
       - name: uid
@@ -481,14 +481,6 @@ schemas:
       - name: accident_desc
       - name: accident_location
       - name: total_paid
-      - name: claim_day
-      - name: claim_month
-      - name: claim_year
-      - name: receive_day
-      - name: receive_month
-      - name: close_day
-      - name: close_month
-      - name: close_year
       - name: department_desc
       - name: property_damage_current
       - name: property_damage_paid

@@ -106,7 +106,7 @@ def clean():
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(
             gen_uid,
-            ["uid", "claim_id", "accident_desc", "total_paid"],
+            ["uid", "claim_id"],
             "property_claims_uid",
         )
     )
