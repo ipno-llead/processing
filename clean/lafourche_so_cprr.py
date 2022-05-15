@@ -132,7 +132,121 @@ def clean_allegation(df):
     return df.drop(columns=["outcome"])
 
 
-def clean():
+def strip_leading_commas(df):
+    for col in df.columns:
+        df[col] = df[col].str.replace(r"\'", "", regex=True)
+    return df
+
+
+def extract_action(df):
+    actions = df.outcome.str.lower().str.strip().str.extract(r"(terminated)")
+
+    df.loc[:, "action"] = actions[0].fillna("")
+    return df
+
+
+def clean_disposition15(df):
+    df.loc[:, "disposition"] = (
+        df.outcome.str.lower()
+        .str.strip()
+        .str.replace(r"resign\b", "resigned", regex=True)
+        .str.replace(r"(\/|\,)", "; ", regex=True)
+        .str.replace(r";? ?terminated", "", regex=True)
+        .str.replace(r"\breff?e?r?e?d?\b", "referred", regex=True)
+        .str.replace(r"capt\b", "captain", regex=True)
+        .str.replace("accidental discharge", "", regex=False)
+        .str.replace("crim", "criminal", regex=False)
+        .str.replace("earley", "early", regex=False)
+        .str.replace(r"^sus-appeal-.+", "sustained", regex=True)
+        .str.replace(r"\bda\b", "district attorney's", regex=True)
+        .str.replace("tran", "transferred", regex=False)
+        .str.replace(
+            r" (before)? ?(prior)? ?(to)? ?com(plete)?",
+            " before completion",
+            regex=True,
+        )
+        .str.replace(r"completionmander", "completion", regex=False)
+        .str.replace(r"resigned; before", "resigned before", regex=False)
+        .str.replace(r"  +", " ", regex=True)
+    )
+
+    return df.drop(columns=["outcome"])
+
+
+def split_rows_with_multiple_officers15(df):
+    df.loc[:, "officer"] = df.officer.str.replace(r"\,", r"/ ", regex=True).str.replace(
+        r"See #8.+", "", regex=True
+    )
+
+    i = 0
+    for idx in df[df.officer.str.contains("/")].index:
+        s = df.loc[idx + i, "officer"]
+        parts = re.split(r"\/", s)
+        df = duplicate_row(df, idx + i, len(parts))
+        for j, name in enumerate(parts):
+            df.loc[idx + i + j, "officer"] = name
+        i += len(parts) - 1
+    return df
+
+
+def drop_rows_missing_allegations(df):
+    df.loc[:, "allegation"] = (
+        df.allegation.str.lower().str.strip().str.replace(r"na", "", regex=True)
+    )
+    return df[~((df.allegation == ""))]
+
+
+def split_rows_with_multiple_allegations15(df):
+    df = (
+        df.drop("allegation", axis=1)
+        .join(
+            df["allegation"]
+            .str.split(",", expand=True)
+            .stack()
+            .reset_index(level=1, drop=True)
+            .rename("allegation"),
+            how="outer",
+        )
+        .reset_index(drop=True)
+    )
+    return df
+
+
+def split_names(df):
+    names = (
+        df.officer.str.lower()
+        .str.strip()
+        .str.replace(r"6?-?(lspo|twp\b).+", "", regex=True)
+        .str.replace(r"^ +", "", regex=True)
+        .str.replace(r" +$", "", regex=True)
+        .str.extract(r"(\w+) (\w+) ?(\w+)?")
+    )
+
+    df.loc[:, "first_name"] = names[0].fillna("")
+    df.loc[:, "last_name"] = names[1].fillna("")
+    df.loc[:, "suffix"] = names[2].fillna("")
+    return df[~((df.first_name == "") & (df.last_name == ""))].drop(columns=["officer"])
+
+
+def allegation_dict():
+    df = pd.read_csv(deba.data("raw/lafourche_so/allegation_dict.csv"))
+    df.loc[:, "code"] = df.code.str.lower().str.strip().replace(r"^\. ", "", regex=True)
+    df.loc[:, "description"] = (
+        df.description.str.lower().str.strip().str.replace(r"^art\. ", "", regex=True)
+    )
+
+    allegation_dict = dict(zip(df.code, df.description))
+    return allegation_dict
+
+
+def map_allegation_desc(df):
+    allegations = allegation_dict()
+    df.loc[:, "allegation"] = df.allegation.map(allegations)
+    df.loc[:, "allegation"] = df.allegation.str.replace(r"^ ", "", regex=True)
+    return df
+
+
+def clean21():
     df = (
         pd.read_csv(deba.data("raw/lafourche_so/lafourche_so_cprr_2019_2021.csv"))
         .pipe(clean_column_names)
@@ -163,11 +277,30 @@ def clean():
 
 
 def clean15():
-    df = pd.read_csv(deba.data("raw/lafourche_so/lafourche_so_cprr_2015_2018"))\
+    df = (
+        pd.read_csv(deba.data("raw/lafourche_so/lafourche_so_cprr_2015_2018.csv"))
         .pipe(clean_column_names)
+        .drop(columns=["ia"])
+        .rename(columns={"date": "receive_date", "case": "tracking_id"})
+        .pipe(strip_leading_commas)
+        .pipe(clean_dates, ["receive_date"])
+        .pipe(extract_action)
+        .pipe(clean_disposition15)
+        .pipe(split_rows_with_multiple_officers15)
+        .pipe(split_names)
+        .pipe(drop_rows_missing_allegations)
+        .pipe(split_rows_with_multiple_allegations15)
+        .pipe(map_allegation_desc)
+        .pipe(set_values, {"agency": "Lafourche SO"})
+        .pipe(gen_uid, ["first_name", "last_name", "agency"])
+        .pipe(gen_uid, ["uid", "allegation", "disposition", "action"], "allegation_uid")
+        .drop_duplicates(subset=["allegation_uid"], keep="first")
+    )
     return df
 
 
 if __name__ == "__main__":
-    df = clean()
-    df.to_csv(deba.data("clean/cprr_lafourche_so_2019_2021.csv"), index=False)
+    df21 = clean21()
+    df15 = clean15()
+    df21.to_csv(deba.data("clean/cprr_lafourche_so_2019_2021.csv"), index=False)
+    df15.to_csv(deba.data("clean/cprr_lafourche_so_2015_2018.csv"), index=False)
