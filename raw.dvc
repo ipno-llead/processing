@@ -1,6 +1,6 @@
 outs:
-- md5: 212a2ccb98bad32f699bf9365aba631d.dir
-  size: 487302413
-  nfiles: 177
+- md5: d5eb93380618164f6daceab53157ab55.dir
+  size: 487099798
+  nfiles: 172
   path: raw
 wdir: data
