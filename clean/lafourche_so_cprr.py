@@ -162,6 +162,12 @@ def clean():
     return df
 
 
+def clean15():
+    df = pd.read_csv(deba.data("raw/lafourche_so/lafourche_so_cprr_2015_2018"))\
+        .pipe(clean_column_names)
+    return df
+
+
 if __name__ == "__main__":
     df = clean()
     df.to_csv(deba.data("clean/cprr_lafourche_so_2019_2021.csv"), index=False)
