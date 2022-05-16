@@ -40,7 +40,7 @@ if __name__ == "__main__":
 
     post_events = fuse_events(post)
     event_df = rearrange_event_columns(
-        pd.concat([post_events, events_pre_post]).drop_duplicates(subset=["uid"])
+        pd.concat([post_events, events_pre_post]).drop_duplicates(subset=["event_uid"])
     )
     per_df = rearrange_personnel_columns(pd.concat([per_pre_post, post]))
 
