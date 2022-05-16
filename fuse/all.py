@@ -5,6 +5,7 @@ from lib.columns import (
     rearrange_personnel_columns,
     rearrange_event_columns,
     rearrange_allegation_columns,
+    rearrange_property_claims_columns,
     rearrange_stop_and_search_columns,
     rearrange_use_of_force,
     rearrange_award_columns,
@@ -296,6 +297,12 @@ def fuse_brady():
     ).sort_values("brady_uid", ignore_index=True)
 
 
+def fuse_property_claims():
+    return rearrange_property_claims_columns(
+        pd.concat([pd.read_csv(deba.data("fuse/pclaims_new_orleans_pd.csv"))])
+    ).sort_values("property_claims_uid", ignore_index=True)
+
+
 if __name__ == "__main__":
     per_df = fuse_personnel()
     ensure_uid_unique(per_df, "uid")
@@ -311,6 +318,7 @@ if __name__ == "__main__":
     uof_officer_df = fuse_uof_officers()
     award_df = fuse_award()
     brady_df = fuse_brady()
+    property_claims_df = fuse_property_claims()
 
     per_df.to_csv(deba.data("fuse/personnel_pre_post.csv"), index=False)
     allegation_df.to_csv(deba.data("fuse/allegation.csv"), index=False)
@@ -327,3 +335,5 @@ if __name__ == "__main__":
     post_event_df = post_event_df[~post_event_df["agency"].isin(event_df["agency"])]
     event_df = pd.concat([event_df, post_event_df], ignore_index=True)
     event_df.to_csv(deba.data("fuse/event_pre_post.csv"), index=False)
+    property_claims_df.to_csv(deba.data("fuse/property_claims.csv"), index=False)
+    
