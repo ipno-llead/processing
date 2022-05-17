@@ -9,6 +9,7 @@ from lib.columns import (
     rearrange_use_of_force,
     rearrange_event_columns,
     rearrange_uof_officer_columns,
+    rearrange_property_claims_columns,
 )
 from lib.clean import float_to_int_str
 from lib.personnel import fuse_personnel
@@ -34,7 +35,7 @@ def fuse_cprr(cprr, actions, officer_number_dict):
     return rearrange_allegation_columns(cprr)
 
 
-def fuse_events(pprr_ipm, pprr_csd, cprr, uof, award, lprr, sas):
+def fuse_events(pprr_ipm, pprr_csd, cprr, uof, award, lprr, sas, pclaims):
     builder = events.Builder()
     builder.extract_events(
         pprr_ipm,
@@ -135,6 +136,28 @@ def fuse_events(pprr_ipm, pprr_csd, cprr, uof, award, lprr, sas):
         },
         ["uid", "stop_and_search_uid"],
     )
+    builder.extract_events(
+        pclaims,
+        {
+            events.CLAIM_MADE: {
+                "prefix": "claim_made",
+                "keep": ["uid", "agency", "claim_uid"],
+            },
+            events.CLAIM_RECIEVE: {
+                "prefix": "claim_receive",
+                "keep": ["uid", "agency", "claim_uid"],
+            },
+            events.CLAIM_CLOSED: {
+                "prefix": "claim_close",
+                "keep": ["uid", "agency", "claim_uid"],
+            },
+            events.CLAIM_OCCUR: {
+                "prefix": "claim_occur",
+                "keep": ["uid", "agency", "claim_uid"],
+            },
+        },
+        ["uid", "property_claims_uid"],
+    )
     return builder.to_frame(True)
 
 
@@ -156,11 +179,14 @@ if __name__ == "__main__":
     lprr = pd.read_csv(deba.data("match/lprr_new_orleans_csc_2000_2016.csv"))
     sas = pd.read_csv(deba.data("match/sas_new_orleans_pd_2017_2021.csv"))
     brady = pd.read_csv(deba.data("match/brady_new_orleans_da_2021.csv"))
+    pclaims = pd.read_csv(deba.data("match/pclaims_new_orleans_pd_2020.csv"))
     brady = brady.loc[brady.agency == "New Orleans PD"]
 
     complaints = fuse_cprr(cprr, actions, officer_number_dict)
-    personnel = fuse_personnel(pprr_ipm, lprr, pprr_csd, sas, uof_officers, brady)
-    events_df = fuse_events(pprr_ipm, pprr_csd, cprr, uof, award, lprr, sas)
+    personnel = fuse_personnel(
+        pprr_ipm, lprr, pprr_csd, sas, uof_officers, brady, pclaims
+    )
+    events_df = fuse_events(pprr_ipm, pprr_csd, cprr, uof, award, lprr, sas, pclaims)
     events_df = rearrange_event_columns(pd.concat([post_event, events_df]))
     sas_df = rearrange_stop_and_search_columns(sas)
     lprr_df = rearrange_appeal_hearing_columns(lprr)
@@ -168,6 +194,7 @@ if __name__ == "__main__":
     uof_citizen_df = rearrange_uof_citizen_columns(uof_citizens)
     uof_df = rearrange_use_of_force(uof)
     brady_df = rearrange_brady_columns(brady)
+    pclaims_df = rearrange_property_claims_columns(pclaims)
     complaints.to_csv(deba.data("fuse/com_new_orleans_pd.csv"), index=False)
     personnel.to_csv(deba.data("fuse/per_new_orleans_pd.csv"), index=False)
     events_df.to_csv(deba.data("fuse/event_new_orleans_pd.csv"), index=False)
@@ -181,3 +208,4 @@ if __name__ == "__main__":
         deba.data("fuse/uof_citizens_new_orleans_pd.csv"), index=False
     )
     brady_df.to_csv(deba.data("fuse/brady_new_orleans_pd.csv"), index=False)
+    pclaims_df.to_csv(deba.data("fuse/pclaims_new_orleans_pd.csv"), index=False)
