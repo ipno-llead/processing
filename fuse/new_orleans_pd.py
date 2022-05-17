@@ -90,7 +90,7 @@ def fuse_events(pprr_ipm, pprr_csd, cprr, uof, award, lprr, sas, pclaims):
         {
             events.UOF_INCIDENT: {"prefix": "uof_occur", "keep": ["uid", "uof_uid"]},
         },
-        ["uid", "uof_uid"],
+        ["uid", "uof_uid", "agency"],
     )
     builder.extract_events(
         award,
