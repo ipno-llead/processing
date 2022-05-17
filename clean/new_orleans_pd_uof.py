@@ -359,6 +359,8 @@ def clean_uof():
         .pipe(clean_division_level)
         .pipe(clean_unit)
         .pipe(clean_tracking_id)
+        .pipe(clean_service_type)
+        .pipe(clean_working_status)
         .pipe(
             standardize_desc_cols,
             [
