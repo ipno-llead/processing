@@ -19,7 +19,8 @@ files:
     schema: uof_officer
   data/fuse/awards.csv:
     schema: award
-
+  data/fuse/property_claims.csv:
+    schema: property_claims
 schemas:
   personnel:
     columns:
@@ -207,6 +208,10 @@ schemas:
           - award_recommended
           - initial_action
           - stop_and_search
+          - claim_made
+          - claim_receive
+          - claim_occur
+          - claim_closed
         no_na: true
       - name: year
         integer: true
@@ -462,5 +467,25 @@ schemas:
         unique: true
         no_na: true
       - name: agency
+  property_claims:
+    columns:
+      - name: property_claims_uid
+        description: >
+          unique identifier of property claim.
+        unique: true
+        no_na: true
+      - name: uid
+      - name: agency
+      - name: claim_id
+      - name: jurisdiction
+      - name: accident_desc
+      - name: accident_location
+      - name: total_paid
+      - name: department_desc
+      - name: property_damage_current
+      - name: property_damage_paid
+      - name: property_damage_open
+      - name: property_damage_incurred
+      - name: property_damage_sub
 
 save_bad_rows_to: data/invalid_rows.csv
