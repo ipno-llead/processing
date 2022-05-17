@@ -198,7 +198,7 @@ schemas:
           - appeal_receive
           - appeal_render
           - appeal_disposition
-          - uof_incident
+          - uof_occur
           - uof_receive
           - uof_assigned
           - uof_completed

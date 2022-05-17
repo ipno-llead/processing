@@ -43,7 +43,7 @@ APPEAL_HEARING_2 = "appeal_hearing_2"
 APPEAL_RECEIVE = "appeal_receive"
 APPEAL_DISPOSITION = "appeal_disposition"
 
-UOF_INCIDENT = "uof_incident"
+UOF_INCIDENT = "uof_occur"
 UOF_RECEIVE = "uof_receive"
 UOF_ASSIGNED = "uof_assigned"
 UOF_COMPLETED = "uof_completed"
