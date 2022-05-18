@@ -88,9 +88,12 @@ def fuse_events(pprr_ipm, pprr_csd, cprr, uof, award, lprr, sas, pclaims):
     builder.extract_events(
         uof,
         {
-            events.UOF_INCIDENT: {"prefix": "uof_occur", "keep": ["uid", "uof_uid"]},
+            events.UOF_INCIDENT: {
+                "prefix": "uof_occur",
+                "keep": ["uid", "uof_uid", "agency"],
+            },
         },
-        ["uid", "uof_uid", "agency"],
+        ["uid", "uof_uid"],
     )
     builder.extract_events(
         award,
@@ -141,19 +144,19 @@ def fuse_events(pprr_ipm, pprr_csd, cprr, uof, award, lprr, sas, pclaims):
         {
             events.CLAIM_MADE: {
                 "prefix": "claim_made",
-                "keep": ["uid", "accident_desc", "total_paid", "agency", "claim_uid"],
+                "keep": ["uid", "agency", "claim_uid"],
             },
             events.CLAIM_RECIEVE: {
                 "prefix": "claim_receive",
-                "keep": ["uid", "accident_desc", "total_paid", "agency", "claim_uid"],
+                "keep": ["uid", "agency", "claim_uid"],
             },
             events.CLAIM_CLOSED: {
                 "prefix": "claim_close",
-                "keep": ["uid", "accident_desc", "total_paid", "agency", "claim_uid"],
+                "keep": ["uid", "agency", "claim_uid"],
             },
             events.CLAIM_OCCUR: {
                 "prefix": "claim_occur",
-                "keep": ["uid", "accident_desc", "total_paid", "agency", "claim_uid"],
+                "keep": ["uid", "agency", "claim_uid"],
             },
         },
         ["uid", "property_claims_uid"],
