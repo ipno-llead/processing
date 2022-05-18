@@ -3,7 +3,7 @@ import pandas as pd
 
 from lib.clean import clean_sexes, standardize_desc_cols
 from lib.columns import set_values, clean_column_names
-from lib.clean import clean_races, clean_names
+from lib.clean import clean_races, clean_names, clean_dates
 from lib.uid import gen_uid
 
 
@@ -286,7 +286,7 @@ def clean_uof():
         .rename(
             columns={
                 "filenum": "tracking_id",
-                "occurred_date": "occur_date",
+                "occurred_date": "uof_occur_date",
                 "shift": "shift_time",
             }
         )
@@ -300,6 +300,7 @@ def clean_uof():
         .pipe(clean_division_level)
         .pipe(clean_unit)
         .pipe(clean_tracking_id)
+        .pipe(clean_dates, ["uof_occur_date"])
         .pipe(set_values, {"agency": "New Orleans PD"})
         .pipe(
             gen_uid,
@@ -307,7 +308,9 @@ def clean_uof():
                 "weather_condition",
                 "light_condition",
                 "disposition",
-                "occur_date",
+                "uof_occur_year",
+                "uof_occur_month",
+                "uof_occur_day",
                 "use_of_force_reason",
                 "division",
                 "division_level",

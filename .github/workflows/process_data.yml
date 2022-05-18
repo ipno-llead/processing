@@ -53,10 +53,9 @@ jobs:
           wrgl transaction start | tr -d "[:space:]" > txid.txt
           export newline=$'\n'
           wrgl commit --all --txid $(cat txid.txt) "[PR #${PR}: ${PR_TITLE}][1]${newline}${newline}[1]: https://github.com/${GITHUB_REPOSITORY}/pull/${PR}"
-          ( wrgl transaction push origin $(cat txid.txt) && \
+          wrgl transaction push origin $(cat txid.txt) && \
             echo "::set-output name=txid::$(cat txid.txt)" && \
-            echo "::set-output name=txURL::https://hub.wrgl.co/$(wrgl remote -v | grep origin | sed -E 's/.+\/api\/users\/(.+)\/repos\/(.+)/@\1\/r\/\2/')/tx/$(cat txid.txt)" \
-          ) || true
+            echo "::set-output name=txURL::https://hub.wrgl.co/$(wrgl remote -v | grep origin | sed -E 's/.+\/api\/users\/(.+)\/repos\/(.+)/@\1\/r\/\2/')/tx/$(cat txid.txt)"
         env:
           WRGLHUB_TOKEN: ${{ secrets.WRGLHUB_TOKEN }}
           PR: ${{ steps.findPr.outputs.pr }}
