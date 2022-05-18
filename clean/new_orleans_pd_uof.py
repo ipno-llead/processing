@@ -3,7 +3,7 @@ import pandas as pd
 
 from lib.clean import clean_sexes, standardize_desc_cols
 from lib.columns import set_values, clean_column_names
-from lib.clean import clean_races, clean_names
+from lib.clean import clean_races, clean_names, clean_dates
 from lib.uid import gen_uid
 import sys
 
@@ -331,7 +331,7 @@ def clean_uof():
         .rename(
             columns={
                 "filenum": "tracking_id",
-                "occurred_date": "occur_date",
+                "occurred_date": "uof_occur_date",
                 "shift": "shift_time",
                 "subject_ethnicity": "citizen_race",
                 "subject_gender": "citizen_sex",
@@ -359,29 +359,17 @@ def clean_uof():
         .pipe(clean_division_level)
         .pipe(clean_unit)
         .pipe(clean_tracking_id)
-        .pipe(clean_service_type)
-        .pipe(clean_working_status)
-        .pipe(
-            standardize_desc_cols,
-            [
-                "citizen_hospitalized",
-                "citizen_injured",
-                "citizen_distance_from_officer",
-                "citizen_age",
-                "citizen_arrested",
-                "citizen_influencing_factors",
-                "use_of_force_description",
-                "use_of_force_level",
-                "use_of_force_effective",
-            ],
-        )
+        .pipe(clean_dates, ["uof_occur_date"])
+        .pipe(set_values, {"agency": "New Orleans PD"})
         .pipe(
             gen_uid,
             [
                 "weather_condition",
                 "light_condition",
                 "disposition",
-                "occur_date",
+                "uof_occur_year",
+                "uof_occur_month",
+                "uof_occur_day",
                 "use_of_force_reason",
                 "division",
                 "division_level",
