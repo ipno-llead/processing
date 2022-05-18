@@ -181,7 +181,7 @@ def extract_allegation_desc(df):
     allegation_desc = (
         df.disposition.str.lower()
         .str.strip()
-        .str.replace(r"(1\)|\(a\)|\(b\)|\(c\))", "", regex=True)
+        .str.replace(r"[bc1-3]\)", "", regex=True)
         .str.extract(r"\((.+)\)")
     )
 
