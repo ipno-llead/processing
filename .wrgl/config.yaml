@@ -1022,6 +1022,12 @@ branch:
     file: data/fuse/uof_officers_new_orleans_pd.csv
     primaryKey:
       - uid
+  pclaims-new-orleans-pd:
+    remote: origin
+    merge: refs/heads/pclaims-new-orleans-pd
+    file: data/fuse/pclaims_new_orleans_pd.csv
+    primaryKey:
+      - property_claims_uid
   person:
     remote: origin
     merge: refs/heads/person
@@ -1083,6 +1089,12 @@ branch:
     file: data/fuse/uof_citizens.csv
     primaryKey:
       - uof_citizen_uid
+  property-claims:
+    remote: origin
+    merge: refs/heads/property_claims
+    file: data/fuse/property_claims.csv
+    primaryKey:
+      - property_claims_uid
 merge:
   fastForward: only
 pack:
