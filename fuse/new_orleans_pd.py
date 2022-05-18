@@ -141,19 +141,19 @@ def fuse_events(pprr_ipm, pprr_csd, cprr, uof, award, lprr, sas, pclaims):
         {
             events.CLAIM_MADE: {
                 "prefix": "claim_made",
-                "keep": ["uid", "agency", "claim_uid"],
+                "keep": ["uid", "accident_desc", "total_paid", "agency", "claim_uid"],
             },
             events.CLAIM_RECIEVE: {
                 "prefix": "claim_receive",
-                "keep": ["uid", "agency", "claim_uid"],
+                "keep": ["uid", "accident_desc", "total_paid", "agency", "claim_uid"],
             },
             events.CLAIM_CLOSED: {
                 "prefix": "claim_close",
-                "keep": ["uid", "agency", "claim_uid"],
+                "keep": ["uid", "accident_desc", "total_paid", "agency", "claim_uid"],
             },
             events.CLAIM_OCCUR: {
                 "prefix": "claim_occur",
-                "keep": ["uid", "agency", "claim_uid"],
+                "keep": ["uid", "accident_desc", "total_paid", "agency", "claim_uid"],
             },
         },
         ["uid", "property_claims_uid"],
