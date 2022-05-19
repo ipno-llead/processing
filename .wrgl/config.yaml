@@ -267,9 +267,15 @@ branch:
     primaryKey:
       - allegation_uid
   com-pineville-pd:
-    remote: com-pineville-pd
-    merge: refs/heads/main
+    remote: origin
+    merge: refs/heads/com-pineville-pd
     file: data/fuse/com_pineville_pd.csv
+    primaryKey:
+      - allegation_uid
+  com-st-james-so:
+    remote: origin
+    merge: refs/heads/com-st-james-so
+    file: data/fuse/com_st_james_so.csv
     primaryKey:
       - allegation_uid
   event:
@@ -618,6 +624,12 @@ branch:
     remote: origin
     merge: refs/heads/event-pineville-pd
     file: data/fuse/event_pineville_pd.csv
+    primaryKey:
+      - event_uid
+  event-st-james-so:
+    remote: origin
+    merge: refs/heads/event-st-james-so
+    file: data/fuse/event_st_james_so.csv
     primaryKey:
       - event_uid
   per-abbeville-pd:
@@ -987,9 +999,15 @@ branch:
     primaryKey:
       - uid
   per-pineville-pd:
-    remote: per-pineville-pd
-    merge: refs/heads/main
+    remote: origin
+    merge: refs/heads/per-pineville-pd
     file: data/fuse/per_pineville_pd.csv
+    primaryKey:
+      - uid
+  per-st-james-so:
+    remote: origin
+    merge: refs/heads/per-st-james-so
+    file: data/fuse/per_st_james_so.csv
     primaryKey:
       - uid
   uof-citizens-new-orleans-pd:
@@ -1004,6 +1022,12 @@ branch:
     file: data/fuse/uof_officers_new_orleans_pd.csv
     primaryKey:
       - uid
+  pclaims-new-orleans-pd:
+    remote: origin
+    merge: refs/heads/pclaims-new-orleans-pd
+    file: data/fuse/pclaims_new_orleans_pd.csv
+    primaryKey:
+      - property_claims_uid
   person:
     remote: origin
     merge: refs/heads/person
@@ -1057,6 +1081,7 @@ branch:
     merge: refs/heads/use-of-force-officers
     file: data/fuse/uof_officers.csv
     primaryKey:
+      - uid
       - uof_uid
   use-of-force-citizens:
     remote: origin
@@ -1064,6 +1089,12 @@ branch:
     file: data/fuse/uof_citizens.csv
     primaryKey:
       - uof_citizen_uid
+  property-claims:
+    remote: origin
+    merge: refs/heads/property_claims
+    file: data/fuse/property_claims.csv
+    primaryKey:
+      - property_claims_uid
 merge:
   fastForward: only
 pack:

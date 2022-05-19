@@ -19,7 +19,8 @@ files:
     schema: uof_officer
   data/fuse/awards.csv:
     schema: award
-
+  data/fuse/property_claims.csv:
+    schema: property_claims
 schemas:
   personnel:
     columns:
@@ -58,6 +59,7 @@ schemas:
         options:
           - female
           - male
+      - name: agency
     validation_tasks:
       - name: birth dates should be valid
         valid_date:
@@ -196,7 +198,7 @@ schemas:
           - appeal_receive
           - appeal_render
           - appeal_disposition
-          - uof_incident
+          - uof_occur
           - uof_receive
           - uof_assigned
           - uof_completed
@@ -206,6 +208,10 @@ schemas:
           - award_recommended
           - initial_action
           - stop_and_search
+          - claim_made
+          - claim_receive
+          - claim_occur
+          - claim_closed
         no_na: true
       - name: year
         integer: true
@@ -427,7 +433,7 @@ schemas:
           unique identifier of citizen.
       - name: uof_uid
         description: >
-          unique iidentifer of use of force report.
+          unique identifer of use of force report.
       - name: citizen_influencing_factors
       - name: citizen_distance_from_officer
       - name: citizen_arrested
@@ -461,5 +467,25 @@ schemas:
         unique: true
         no_na: true
       - name: agency
+  property_claims:
+    columns:
+      - name: property_claims_uid
+        description: >
+          unique identifier of property claim.
+        unique: true
+        no_na: true
+      - name: uid
+      - name: agency
+      - name: claim_id
+      - name: jurisdiction
+      - name: accident_desc
+      - name: accident_location
+      - name: total_paid
+      - name: department_desc
+      - name: property_damage_current
+      - name: property_damage_paid
+      - name: property_damage_open
+      - name: property_damage_incurred
+      - name: property_damage_sub
 
 save_bad_rows_to: data/invalid_rows.csv

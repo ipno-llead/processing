@@ -43,7 +43,7 @@ APPEAL_HEARING_2 = "appeal_hearing_2"
 APPEAL_RECEIVE = "appeal_receive"
 APPEAL_DISPOSITION = "appeal_disposition"
 
-UOF_INCIDENT = "uof_incident"
+UOF_INCIDENT = "uof_occur"
 UOF_RECEIVE = "uof_receive"
 UOF_ASSIGNED = "uof_assigned"
 UOF_COMPLETED = "uof_completed"
@@ -54,6 +54,12 @@ AWARD_RECEIVE = "award_receive"
 AWARD_RECOMMENDED = "award_recommended"
 
 STOP_AND_SEARCH = "stop_and_search"  # date on which stop and search occured
+
+CLAIM_MADE = "claim_made"
+CLAIM_RECIEVE = "claim_receive"
+CLAIM_CLOSED = "claim_closed"
+CLAIM_OCCUR = "claim_occur"
+
 
 event_cat_type = CategoricalDtype(
     categories=[
@@ -88,7 +94,11 @@ event_cat_type = CategoricalDtype(
         OFFICER_POST_DECERTIFICATION,
         INITIAL_ACTION,
         STOP_AND_SEARCH,
-        DISPOSITION, 
+        DISPOSITION,
+        CLAIM_MADE,
+        CLAIM_RECIEVE,
+        CLAIM_CLOSED,
+        CLAIM_OCCUR,
     ],
     ordered=True,
 )

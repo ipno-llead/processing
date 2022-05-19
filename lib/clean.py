@@ -111,7 +111,11 @@ def clean_dates(df: pd.DataFrame, cols: list[str], expand: bool = True) -> pd.Da
     for col in cols:
         assert col.endswith("_date")
         dates = pd.DataFrame.from_records(
-            df[col].str.strip().str.replace(r"//", r"/", regex=False).map(clean_date)
+            df[col]
+            .str.strip()
+            .str.replace(r"//", r"/", regex=False)
+            .str.replace(r"'", "", regex=False)
+            .map(clean_date)
         )
         if expand:
             prefix = col[:-5]
@@ -797,6 +801,43 @@ def convert_dates(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
                 ["10", "october"],
                 ["11", "november"],
                 ["12", "december"],
+            ],
+        )
+    return df
+
+
+def clean_ranks(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
+    """Cleans and standardize rank_ columns
+
+    Args:
+        df (pd.DataFrame):
+            the frame to process
+        cols (list of str):
+            rank columns
+
+    Returns:
+        the updated frame
+    """
+    for col in cols:
+        # replacing one-letter race because they are too short
+        # to use with standardize_from_lookup_table safely
+        df.loc[:, col] = (
+            df[col].str.strip().str.lower().str.replace(r"\.", "", regex=True)
+        )
+        df = standardize_from_lookup_table(
+            df,
+            col,
+            [
+                [
+                    "deputy",
+                    "dty",
+                ],
+                ["captain", "capt"],
+                ["sergeant", "sgt"],
+                [
+                    "lieutenant",
+                    "lt",
+                ],
             ],
         )
     return df

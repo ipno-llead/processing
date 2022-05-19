@@ -299,3 +299,24 @@ def rearrange_brady_columns(df):
         "brady",
         df.sort_values(["agency", "brady_uid"]),
     )
+
+
+def rearrange_property_claims_columns(df):
+    """Performs final processing step for a property claims table
+
+    This performs the following tasks:
+    - discard columns not present in property claims schema
+    - drop row duplicates
+    - convert numeric columns to int or str
+
+    Args:
+        df (pd.DataFrame):
+            the frame to process
+
+    Returns:
+        the updated frame
+    """
+    return datavalid_config.rearrange_columns(
+        "property_claims",
+        df.sort_values(["agency", "property_claims_uid"]),
+    )

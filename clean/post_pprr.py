@@ -56,6 +56,25 @@ def standardize_agency(df):
         .str.replace(r" $", "", regex=True)
         .str.replace("Plaquemines Par ", "Plaquemines ", regex=False)
         .str.replace(r"\bDistrict Attorney\b", "DA", regex=False)
+        .str.replace(r"^Uno", "UNO", regex=True)
+        .str.replace(
+            r"^Medical Center Of La - No$",
+            "Medical Center Of Louisiana - New Orleans PD",
+            regex=True,
+        )
+        .str.replace(
+            r"^LSUHSC - No University PD$", "LSUHSC - New Orleans University PD"
+        )
+        .str.replace(
+            r"^New Orleans Housing Authority$",
+            "Housing Authority of New Orleans",
+            regex=True,
+        )
+        .str.replace(r"West\. ", "West ", regex=True)
+        .str.replace(" Par ", " ", regex=False)
+        .str.replace("1St", "First", regex=False)
+        .str.replace(r"Coroner\'S", "Coroners", regex=True)
+        .str.replace(r"^Alcohol & Tobacco", "Alcohol Tobacco", regex=True)
     )
     return df
 
