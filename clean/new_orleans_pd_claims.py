@@ -24,7 +24,8 @@ def clean_accident_desc(df):
     df.loc[:, "accident_desc"] = (
         df.accident_desc.str.lower()
         .str.strip()
-        .str.replace(r"\biv\b", "insured vehicle", regex=True)
+        .str.replace(r"\bunit\b", "vehicle", regex=True)
+        .str.replace(r"(\biv\b|\binsured vehicle\b)", "insured/new orleans police department vehicle", regex=True)
     )
     return df
 

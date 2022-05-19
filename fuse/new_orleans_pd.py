@@ -35,7 +35,7 @@ def fuse_cprr(cprr, actions, officer_number_dict):
     return rearrange_allegation_columns(cprr)
 
 
-def fuse_events(pprr_ipm, pprr_csd, cprr, uof, award, lprr, sas, pclaims):
+def fuse_events(pprr_ipm, pprr_csd, cprr, uof, award, lprr, pclaims):
     builder = events.Builder()
     builder.extract_events(
         pprr_ipm,
@@ -127,33 +127,23 @@ def fuse_events(pprr_ipm, pprr_csd, cprr, uof, award, lprr, sas, pclaims):
         ["uid", "appeal_uid"],
     )
     builder.extract_events(
-        sas,
-        {
-            events.STOP_AND_SEARCH: {
-                "prefix": "stop_and_search",
-                "keep": ["uid", "agency", "stop_and_search_uid"],
-            }
-        },
-        ["uid", "stop_and_search_uid"],
-    )
-    builder.extract_events(
         pclaims,
         {
             events.CLAIM_MADE: {
                 "prefix": "claim_made",
-                "keep": ["uid", "agency", "claim_uid"],
+                "keep": ["uid", "accident_desc", "total_paid", "agency", "claim_uid"],
             },
             events.CLAIM_RECIEVE: {
                 "prefix": "claim_receive",
-                "keep": ["uid", "agency", "claim_uid"],
+                "keep": ["uid", "accident_desc", "total_paid", "agency", "claim_uid"],
             },
             events.CLAIM_CLOSED: {
                 "prefix": "claim_close",
-                "keep": ["uid", "agency", "claim_uid"],
+                "keep": ["uid", "accident_desc", "total_paid", "agency", "claim_uid"],
             },
             events.CLAIM_OCCUR: {
                 "prefix": "claim_occur",
-                "keep": ["uid", "agency", "claim_uid"],
+                "keep": ["uid", "accident_desc", "total_paid", "agency", "claim_uid"],
             },
         },
         ["uid", "property_claims_uid"],
@@ -183,10 +173,8 @@ if __name__ == "__main__":
     brady = brady.loc[brady.agency == "New Orleans PD"]
 
     complaints = fuse_cprr(cprr, actions, officer_number_dict)
-    personnel = fuse_personnel(
-        pprr_ipm, lprr, pprr_csd, sas, uof_officers, brady, pclaims
-    )
-    events_df = fuse_events(pprr_ipm, pprr_csd, cprr, uof, award, lprr, sas, pclaims)
+    personnel = fuse_personnel(pprr_ipm, lprr, pprr_csd, uof_officers, brady, pclaims)
+    events_df = fuse_events(pprr_ipm, pprr_csd, cprr, uof, award, lprr, pclaims)
     events_df = rearrange_event_columns(pd.concat([post_event, events_df]))
     sas_df = rearrange_stop_and_search_columns(sas)
     lprr_df = rearrange_appeal_hearing_columns(lprr)
