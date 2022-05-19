@@ -469,8 +469,8 @@ def extract_officer(uof):
             "officer_name",
             "use_of_force_description",
             "use_of_force_level",
-            "use_of_force_effective",
             "officer_injured",
+            "use_of_force_effective"
         ]
     )
     return df, uof
