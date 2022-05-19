@@ -127,16 +127,6 @@ def fuse_events(pprr_ipm, pprr_csd, cprr, uof, award, lprr, pclaims):
         ["uid", "appeal_uid"],
     )
     builder.extract_events(
-        sas,
-        {
-            events.STOP_AND_SEARCH: {
-                "prefix": "stop_and_search",
-                "keep": ["uid", "agency", "stop_and_search_uid"],
-            }
-        },
-        ["uid", "stop_and_search_uid"],
-    )
-    builder.extract_events(
         pclaims,
         {
             events.CLAIM_MADE: {
