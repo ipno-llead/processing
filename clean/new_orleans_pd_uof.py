@@ -14,7 +14,7 @@ def split_officer_rows(df):
         "sex",
         "age",
         "years_of_service",
-        "use_of_force_type",
+        "use_of_force_description",
         "use_of_force_level",
         "use_of_force_effective",
         "officer_injured",
@@ -242,9 +242,9 @@ def clean_use_of_force_reason(df):
     return df
 
 
-def clean_use_of_force_type(df):
-    df.loc[:, "use_of_force_type"] = (
-        df.use_of_force_type.str.lower()
+def clean_use_of_force_description(df):
+    df.loc[:, "use_of_force_description"] = (
+        df.use_of_force_description.str.lower()
         .str.strip()
         .fillna("")
         .str.replace("nontrad", "non traditional", regex=False)
@@ -288,6 +288,7 @@ def clean_uof():
                 "filenum": "tracking_id",
                 "occurred_date": "uof_occur_date",
                 "shift": "shift_time",
+                "use_of_force_type": "use_of_force_description"
             }
         )
         .pipe(clean_weather_condition)
@@ -300,6 +301,8 @@ def clean_uof():
         .pipe(clean_division_level)
         .pipe(clean_unit)
         .pipe(clean_tracking_id)
+        .pipe(clean_service_type)
+        .pipe(clean_working_status)
         .pipe(clean_dates, ["uof_occur_date"])
         .pipe(set_values, {"agency": "New Orleans PD"})
         .pipe(
@@ -424,7 +427,7 @@ def extract_officer(uof):
                 "officer_age",
                 "officer_years_of_service",
                 "officer_name",
-                "use_of_force_type",
+                "use_of_force_description",
                 "use_of_force_level",
                 "use_of_force_effective",
                 "officer_injured",
@@ -441,14 +444,14 @@ def extract_officer(uof):
         )
         .pipe(split_officer_rows)
         .pipe(split_officer_names)
-        .pipe(clean_use_of_force_type)
+        .pipe(clean_use_of_force_description)
         .pipe(clean_races, ["race"])
         .pipe(clean_sexes, ["sex"])
         .pipe(clean_names, ["last_name", "first_name"])
         .pipe(
             standardize_desc_cols,
             [
-                "use_of_force_type",
+                "use_of_force_description",
                 "use_of_force_level",
                 "use_of_force_effective",
             ],
@@ -464,10 +467,10 @@ def extract_officer(uof):
             "officer_age",
             "officer_years_of_service",
             "officer_name",
-            "use_of_force_type",
+            "use_of_force_description",
             "use_of_force_level",
-            "use_of_force_effective",
             "officer_injured",
+            "use_of_force_effective"
         ]
     )
     return df, uof
