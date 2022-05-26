@@ -442,6 +442,7 @@ schemas:
       - name: citizen_hospitalized
       - name: citizen_injured
       - name: citizen_age
+      - name: citizen_race
       - name: citizen_sex
       - name: agency
   uof_officer:
