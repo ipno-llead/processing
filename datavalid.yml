@@ -477,7 +477,7 @@ schemas:
         no_na: true
       - name: uid
       - name: agency
-      - name: claim_id
+      - name: tracking_id
       - name: jurisdiction
       - name: accident_desc
       - name: accident_location

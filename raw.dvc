@@ -1,6 +1,6 @@
 outs:
-- md5: f38e8ed5b8a35c98de9c00e86fc6c324.dir
-  size: 487304299
-  nfiles: 178
+- md5: 043889177cbfbfa3cf0b4322f0a80623.dir
+  size: 304207932
+  nfiles: 177
   path: raw
 wdir: data
