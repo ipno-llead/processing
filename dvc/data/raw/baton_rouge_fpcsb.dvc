@@ -1,0 +1,6 @@
+wdir: ../../../data/raw
+outs:
+- md5: 8e2f6072101263fea79ca4dccfa0e463.dir
+  size: 32164
+  nfiles: 1
+  path: baton_rouge_fpcsb

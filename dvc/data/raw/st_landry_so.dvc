@@ -1,0 +1,6 @@
+wdir: ../../../data/raw
+outs:
+- md5: 3c6ed07702967fef4122afb0ecebea01.dir
+  size: 8585
+  nfiles: 1
+  path: st_landry_so

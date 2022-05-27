@@ -1,0 +1,6 @@
+wdir: ../../../data/raw
+outs:
+- md5: 1980702e22218ca17e555f31b2bdd973.dir
+  size: 2504562
+  nfiles: 2
+  path: baton_rouge_csd

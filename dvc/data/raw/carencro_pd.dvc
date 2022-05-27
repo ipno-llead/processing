@@ -1,0 +1,6 @@
+wdir: ../../../data/raw
+outs:
+- md5: 21df67b1046cca31d6be7af269dab9a7.dir
+  size: 1274
+  nfiles: 1
+  path: carencro_pd

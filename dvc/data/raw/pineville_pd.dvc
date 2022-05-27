@@ -1,0 +1,6 @@
+wdir: ../../../data/raw
+outs:
+- md5: 851fda3f030988e71c3fe8d8f746dec2.dir
+  size: 1490
+  nfiles: 1
+  path: pineville_pd

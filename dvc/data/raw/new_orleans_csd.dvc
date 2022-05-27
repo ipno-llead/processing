@@ -1,0 +1,6 @@
+wdir: ../../../data/raw
+outs:
+- md5: d5b493ffbd313c2c0626fb33cfb4c7ff.dir
+  size: 624461
+  nfiles: 2
+  path: new_orleans_csd

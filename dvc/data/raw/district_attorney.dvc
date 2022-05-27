@@ -1,0 +1,6 @@
+wdir: ../../../data/raw
+outs:
+- md5: a6417cadb05ac016a8237d9ac1457811.dir
+  size: 4054622
+  nfiles: 1
+  path: district_attorney

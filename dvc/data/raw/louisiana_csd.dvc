@@ -1,0 +1,6 @@
+wdir: ../../../data/raw
+outs:
+- md5: 4f3be4710c388d983e956f547e28ef63.dir
+  size: 2181051
+  nfiles: 2
+  path: louisiana_csd

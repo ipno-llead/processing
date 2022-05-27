@@ -1,0 +1,6 @@
+wdir: ../../../data/raw
+outs:
+- md5: 6439360171b67bcc0b6a518936bbe0f3.dir
+  size: 28576
+  nfiles: 4
+  path: hammond_pd

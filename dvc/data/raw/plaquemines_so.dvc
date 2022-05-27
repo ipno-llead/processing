@@ -1,0 +1,6 @@
+wdir: ../../../data/raw
+outs:
+- md5: cf6e115131e420cf10e3d0dd6b6e75b3.dir
+  size: 33128
+  nfiles: 3
+  path: plaquemines_so

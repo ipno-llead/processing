@@ -1,0 +1,6 @@
+wdir: ../../../data/raw
+outs:
+- md5: a3db73842fede111d1366e8e317c1aba.dir
+  size: 677
+  nfiles: 1
+  path: maurice_pd

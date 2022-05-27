@@ -1,0 +1,6 @@
+wdir: ../../../data/raw
+outs:
+- md5: 5c6cd909f66e8f825942423e541df8ea.dir
+  size: 667
+  nfiles: 1
+  path: harahan_pd
