@@ -1,0 +1,6 @@
+wdir: ../../../data/raw
+outs:
+- md5: 110684c89df6c2684ddf03ab38e136d5.dir
+  size: 754
+  nfiles: 1
+  path: eunice_pd

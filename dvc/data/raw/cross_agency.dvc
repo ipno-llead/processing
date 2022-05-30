@@ -1,0 +1,6 @@
+wdir: ../../../data/raw
+outs:
+- md5: bc4b4535e0d2d7d1165aa9e20af5616b.dir
+  size: 41021
+  nfiles: 1
+  path: cross_agency

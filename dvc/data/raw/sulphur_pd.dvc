@@ -1,0 +1,6 @@
+wdir: ../../../data/raw
+outs:
+- md5: 036a7b6682f41cbf0a0644225f156450.dir
+  size: 1949
+  nfiles: 1
+  path: sulphur_pd

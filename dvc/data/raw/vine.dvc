@@ -1,0 +1,6 @@
+wdir: ../../../data/raw
+outs:
+- md5: 6d241c15986c2a328eb434a87c58d457.dir
+  size: 2829
+  nfiles: 1
+  path: vine

@@ -1,0 +1,6 @@
+wdir: ../../../data/raw
+outs:
+- md5: 5373c240383fbf235afa7ce353337088.dir
+  size: 5821
+  nfiles: 2
+  path: ascension_so

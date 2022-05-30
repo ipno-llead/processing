@@ -1,0 +1,6 @@
+wdir: ../../../data/raw
+outs:
+- md5: 92bb6010f1cd0bb322343cb27d8b3b99.dir
+  size: 158063
+  nfiles: 5
+  path: cameron_so

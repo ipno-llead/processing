@@ -1,0 +1,6 @@
+wdir: ../../../data/raw
+outs:
+- md5: 0cb86cccd7455a8b25e085d4c65c7cce.dir
+  size: 1990
+  nfiles: 1
+  path: vivian_csd

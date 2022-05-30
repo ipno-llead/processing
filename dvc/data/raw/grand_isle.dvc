@@ -1,0 +1,6 @@
+wdir: ../../../data/raw
+outs:
+- md5: 0ac4442a7010adb2d53c12f19e9165e6.dir
+  size: 1189
+  nfiles: 1
+  path: grand_isle

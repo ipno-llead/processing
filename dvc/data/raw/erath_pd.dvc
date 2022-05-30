@@ -1,0 +1,6 @@
+wdir: ../../../data/raw
+outs:
+- md5: 4e7c53e255f8c0e13797175d7a90ccd4.dir
+  size: 451
+  nfiles: 1
+  path: erath_pd

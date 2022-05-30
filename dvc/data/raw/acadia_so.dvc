@@ -1,0 +1,6 @@
+wdir: ../../../data/raw
+outs:
+- md5: 5e2913249edeb28f37647d358e757ffa.dir
+  size: 3158
+  nfiles: 1
+  path: acadia_so
