@@ -1,0 +1,6 @@
+wdir: ../../../data/raw
+outs:
+- md5: 9bc943364744cbc04d0552d4a8a4277a.dir
+  size: 16283
+  nfiles: 2
+  path: harahan_csd

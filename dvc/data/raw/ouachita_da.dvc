@@ -1,0 +1,6 @@
+wdir: ../../../data/raw
+outs:
+- md5: a4ad8b1b4c66d4896a235d24abd9768e.dir
+  size: 920
+  nfiles: 1
+  path: ouachita_da

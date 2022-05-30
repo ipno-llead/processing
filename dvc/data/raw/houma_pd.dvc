@@ -1,0 +1,6 @@
+wdir: ../../../data/raw
+outs:
+- md5: 74a90e856c807ca7582b0deaa8038005.dir
+  size: 17052
+  nfiles: 2
+  path: houma_pd

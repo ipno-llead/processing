@@ -1,0 +1,6 @@
+wdir: ../../../data/raw
+outs:
+- md5: 9772e53b604b0ee837bfccdd799cde59.dir
+  size: 4791
+  nfiles: 1
+  path: central_csd

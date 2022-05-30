@@ -1,0 +1,6 @@
+wdir: ../../../data/raw
+outs:
+- md5: 60ce90d36602c251265b7782d9488ab5.dir
+  size: 5578
+  nfiles: 1
+  path: gonzales_pd

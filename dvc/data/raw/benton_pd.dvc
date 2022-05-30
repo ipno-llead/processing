@@ -1,0 +1,6 @@
+wdir: ../../../data/raw
+outs:
+- md5: 7fd2b4c5fec808ffea119c881440c134.dir
+  size: 5961
+  nfiles: 2
+  path: benton_pd

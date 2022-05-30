@@ -1,0 +1,6 @@
+wdir: ../../../data/raw
+outs:
+- md5: 4bd818c541f84c898d6ed5e0594df024.dir
+  size: 4921
+  nfiles: 3
+  path: scott_pd

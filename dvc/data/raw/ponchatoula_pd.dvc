@@ -1,0 +1,6 @@
+wdir: ../../../data/raw
+outs:
+- md5: efbb3d20e96b216b780c6843d9968224.dir
+  size: 10066
+  nfiles: 2
+  path: ponchatoula_pd

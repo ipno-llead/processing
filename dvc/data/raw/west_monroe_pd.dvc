@@ -1,0 +1,6 @@
+wdir: ../../../data/raw
+outs:
+- md5: a38e6234c6f9d73dfeb4339cd4631a31.dir
+  size: 12179
+  nfiles: 2
+  path: west_monroe_pd

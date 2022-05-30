@@ -26,7 +26,7 @@ jobs:
         run: sudo bash -c 'curl -L https://github.com/wrgl/wrgl/releases/latest/download/install.sh | bash'
       - name: dvc pull
         run: |
-          sed -iE 's/wdir\: data/wdir\: \/runner\/_work\/data\/data/g' raw.dvc
+          find dvc/data/raw -type f | xargs -I{} sed -iE 's/wdir\: ..\/..\/..\/data\/raw/wdir\: \/runner\/_work\/data\/data\/raw/g' {}
           mkdir /runner/_work/data/dvc_cache || true
           dvc cache dir --local /runner/_work/data/dvc_cache
           dvc pull

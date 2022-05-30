@@ -1,0 +1,6 @@
+wdir: ../../../data/raw
+outs:
+- md5: 03990c0176334afc6a3c4cd79b5d5232.dir
+  size: 2340
+  nfiles: 1
+  path: sterlington_pd

@@ -1,0 +1,6 @@
+wdir: ../../../data/raw
+outs:
+- md5: a1d3e698aa0b5d324fd9086d7b3e06ba.dir
+  size: 64222
+  nfiles: 2
+  path: post
