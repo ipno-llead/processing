@@ -37,7 +37,7 @@ def match_brady_to_personnel(brady, per):
 
 
 if __name__ == "__main__":
-    per = pd.read_csv(deba.data("raw/fused/personnel.csv"))
+    per = pd.read_csv(deba.data("fuse/personnel.csv"))
     brady = pd.read_csv(deba.data("clean/brady_tangipahoa_da_2021.csv"))
     brady = match_brady_to_personnel(brady, per)
     brady.to_csv(deba.data("match/brady_tangipahoa_da_2021.csv"), index=False)
