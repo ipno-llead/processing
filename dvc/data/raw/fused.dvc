@@ -1,6 +1,6 @@
 wdir: ../../../data/raw
 outs:
-- md5: e8e1e77623d909fa608b21494d5296db.dir
-  size: 183132862
-  nfiles: 2
+- md5: d751713988987e9331980363e24189ce.dir
+  size: 0
+  nfiles: 0
   path: fused
