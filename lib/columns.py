@@ -320,3 +320,27 @@ def rearrange_property_claims_columns(df):
         "property_claims",
         df.sort_values(["agency", "property_claims_uid"]),
     )
+
+
+
+
+def rearrange_post_columns(df):
+    """Performs final processing step for an appeal hearing table
+
+    This performs the following tasks:
+    - discard columns not present in APPEAL_HEARING_COLUMNS
+    - drop row duplicates
+    - convert counsel name to title case
+
+    Args:
+        df (pd.DataFrame):
+            the frame to process
+
+    Returns:
+        the updated frame
+    """
+    return datavalid_config.rearrange_columns(
+        "post",
+        df.pipe(names_to_title_case, ["first_name", "middle_name", "last_name"]))
+
+

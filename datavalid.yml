@@ -21,6 +21,8 @@ files:
     schema: award
   data/fuse/property_claims.csv:
     schema: property_claims
+  data/fuse/post_officer_history.csv:
+    schema: post_officer_history
 schemas:
   personnel:
     columns:
@@ -488,5 +490,74 @@ schemas:
       - name: property_damage_open
       - name: property_damage_incurred
       - name: property_damage_sub
+  post_officer_history:
+    columns:
+      - name: first_name
+      - name: last_name
+      - name: officer_name
+      - name: officer_sex
+      - name: agency
+      - name: employment_status
+      - name: hire_date
+      - name: left_date
+      - name: left_reason
+      - name: agency_1
+      - name: employment_status_1
+      - name: hire_date_1
+      - name: left_date_1
+      - name: left_reason_1
+      - name: agency_2
+      - name: employment_status_2
+      - name: hire_date_2
+      - name: left_date_2
+      - name: left_reason_2
+      - name: agency_3
+      - name: employment_status_3
+      - name: hire_date_3
+      - name: left_date_3
+      - name: left_reason_3
+      - name: agency_4
+      - name: employment_status_4
+      - name: hire_date_4
+      - name: left_date_4
+      - name: left_reason_4
+      - name: agency_5
+      - name: employment_status_5
+      - name: hire_date_5
+      - name: left_date_5
+      - name: left_reason_5
+      - name: agency_6
+      - name: employment_status_6
+      - name: hire_date_6
+      - name: left_date_6
+      - name: left_reason_6
+      - name: agency_7
+      - name: employment_status_7
+      - name: hire_date_7
+      - name: left_date_7
+      - name: left_reason_7
+      - name: agency_8
+      - name: employment_status_8
+      - name: hire_date_8
+      - name: left_date_8
+      - name: left_reason_8
+      - name: uid
+      - name: uid_1
+      - name: uid_2
+      - name: uid_3
+      - name: uid_4
+      - name: uid_5
+      - name: uid_6
+      - name: uid_7
+      - name: uid_8
+      - name: matched_uid
+      - name: matched_uid_1
+      - name: matched_uid_2
+      - name: matched_uid_3
+      - name: matched_uid_4
+      - name: matched_uid_5
+      - name: matched_uid_6
+      - name: matched_uid_7
+      - name: matched_uid_8
 
 save_bad_rows_to: data/invalid_rows.csv
