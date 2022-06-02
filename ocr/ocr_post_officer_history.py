@@ -7,6 +7,7 @@ import pyocr.builders
 import pandas as pd
 import deba
 
+
 def ocr_pdfs():
     pyocr.tesseract.TESSERACT_CMD = r"C:/Program Files/Tesseract-OCR/tesseract.exe"
     dir_path = os.chdir(deba.data("raw/post/post_officer_history/input"))
@@ -54,4 +55,4 @@ def ocr_pdfs():
 
 if __name__ == "__main__":
     df, file_name = ocr_pdfs()
-    df.to_csv(deba.data("ocr/post_officer_history/") + file_name)
+    df.to_csv(deba.data("ocr/post/post_officer_history/output/") + file_name)

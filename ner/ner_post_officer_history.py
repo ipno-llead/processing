@@ -10,11 +10,13 @@ import deba
 
 
 def model():
-    directory = os.chdir(deba.data("ocr/post/"))
+    directory = os.chdir(deba.data("ocr/post/post_officer_history/output/"))
 
     #  import labeled data that has been exported from doccano
     labeled_data = []
-    with open(deba.data("raw/ner/post/ayyub.jsonl"), "r") as labels:
+    with open(
+        deba.data("raw/ner/post/post_officer_history/ayyub.jsonl"), "r"
+    ) as labels:
         for label in labels:
             data = json.loads(label)
             labeled_data.append(data)
@@ -47,7 +49,7 @@ def model():
                 nlp.update([example], sgd=optimizer, losses=losses, drop=0.2)
         print(losses)
 
-    nlp.to_disk(deba.data("spacy/model/post_officer_history/padme.model"))
+    nlp.to_disk(deba.data("spacy/post_officer_history/padme.model"))
 
     #  run Spacy model
     for file in directory:
@@ -90,7 +92,4 @@ if __name__ == "__main__":
     ner, file_name = model()
     ner.to_csv(deba.data("ner/post/post_officer_history/") + file_name, index=False)
     df = fuse()
-    df.to_csv(
-        deba.data("raw/post/post_officer_history_6_2_2022.csv"),
-        index=False,
-    )
+    df.to_csv(deba.data("ner/post/post_officer_history_6_2_2022.csv"), index=False)
