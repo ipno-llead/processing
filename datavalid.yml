@@ -168,6 +168,7 @@ schemas:
       - name: disposition_desc
         description: >
           text description of aftermath of disposition, or reason for disposition.
+      - name: item_number
   event:
     columns:
       - name: event_uid
@@ -259,6 +260,8 @@ schemas:
       - name: division_desc
       - name: sub_division_a_desc
       - name: sub_division_b_desc
+      - name: unit_desc
+      - name: unit_sub_desc
       - name: current_supervisor
       - name: employee_class
         description: >

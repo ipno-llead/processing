@@ -407,6 +407,7 @@ if __name__ == "__main__":
     uof_officers = pd.read_csv(
         deba.data("clean/uof_officers_new_orleans_pd_2016_2021.csv")
     )
+    cprr = pd.read_csv(deba.data("clean/cprr_new_orleans_da_2016_2020.csv"))
     award = deduplicate_award(award)
     event_df = match_pprr_against_post(pprr_ipm, post)
     award = match_award_to_pprr_ipm(award, pprr_ipm)
@@ -416,6 +417,7 @@ if __name__ == "__main__":
     uof_officers = match_use_of_force_to_pprr(uof_officers, pprr_ipm)
     pclaims20 = match_pclaims20_to_pprr(pclaims20, pprr_ipm)
     pclaims21 = match_pclaims21_to_pprr(pclaims21, pprr_ipm)
+    cprr = match_cprr_to_pprr(cprr, pprr_ipm)
     award.to_csv(deba.data("match/award_new_orleans_pd_2016_2021.csv"), index=False)
     event_df.to_csv(deba.data("match/post_event_new_orleans_pd.csv"), index=False)
     lprr.to_csv(deba.data("match/lprr_new_orleans_csc_2000_2016.csv"), index=False)
@@ -431,3 +433,4 @@ if __name__ == "__main__":
     )
     pclaims20.to_csv(deba.data("match/pclaims_new_orleans_pd_2020.csv"), index=False)
     pclaims21.to_csv(deba.data("match/pclaims_new_orleans_pd_2021.csv"), index=False)
+    cprr.to_csv(deba.data("match/cprr_new_orleans_da_2016_2020.csv"), index=False)
