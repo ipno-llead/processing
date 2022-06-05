@@ -1,24 +1,27 @@
 import json
 import random
 import spacy
-from spacy.util import minibatch, compounding, decaying
-from spacy.training import example
+from spacy.util import minibatch, compounding
+from spacy.training import Example
 import pandas as pd
-from lib.columns import clean_column_names, rearrange_post_columns
+import zipfile
 import os
-import deba
 
 
-def model():
-    directory = os.chdir(deba.data("ocr/post/post_officer_history/output/"))
+### unzip folder containing pre-trained model downloaded from DropBox
+# with zipfile.ZipFile("data/ner/post/post_officer_history/model/padme.model.zip", 'r') as zip_ref:
+#     zip_ref.extractall("data/ner/post/post_officer_history/model/padme.model")
 
-    #  import labeled data that has been exported from doccano
+
+def spacy_model():
+    ###  import labeled data that has been exported from doccano
+
     labeled_data = []
     with open(
-        deba.data("raw/ner/post/post_officer_history/ayyub.jsonl"), "r"
-    ) as labels:
-        for label in labels:
-            data = json.loads(label)
+        r"data/ner/post/post_officer_history/training_data/ayyub.jsonl", "rb"
+    ) as read_file:
+        for line in read_file:
+            data = json.loads(line)
             labeled_data.append(data)
 
     TRAINING_DATA = []
@@ -29,6 +32,10 @@ def model():
         spacy_entry = (entry["data"], {"entities": entities})
         TRAINING_DATA.append(spacy_entry)
 
+    ### load trained model: nlp = spacy.load("padme.model") or .
+    ### train model
+
+    # nlp = spacy.load("data/ner/post/post_officer_history/model/padme.model")
     nlp = spacy.blank("en")
     ner = nlp.create_pipe("ner")
     nlp.add_pipe("ner")
@@ -41,18 +48,20 @@ def model():
         random.shuffle(TRAINING_DATA)
         losses = {}
         for batch in spacy.util.minibatch(
-            TRAINING_DATA, size=compounding(2.0, 32.0, 1.001)
+            TRAINING_DATA, size=compounding(3.0, 2.0, 1.001)
         ):
             for text, annotations in batch:
                 doc = nlp.make_doc(text)
                 example = Example.from_dict(doc, annotations)
-                nlp.update([example], sgd=optimizer, losses=losses, drop=0.2)
+                nlp.update([example], sgd=optimizer, losses=losses, drop=0.4)
         print(losses)
 
-    nlp.to_disk(deba.data("spacy/post_officer_history/padme.model"))
+    # save model to disk:
+    # nlp.to_disk("data/ner/post/post_officer_history/model/padmes.model")
+    dir_path = os.chdir("data/ocr/post/post_officer_history/output")
 
-    #  run Spacy model
-    for file in directory:
+    ###  apply model to data
+    for file in os.listdir(dir_path):
         if file.endswith(".txt"):
             open_file = open(file, "r")
             read_file = open_file.read()
@@ -64,32 +73,10 @@ def model():
 
             df = pd.DataFrame(ents, columns=[ents.label_ for ents in docs.ents])
             file_name = file + ".csv"
-
-            return df, file_name
-
-
-def fuse():
-    directory = os.chdir(deba.data("ner/post/post_officer_history/"))
-    for file in directory:
-        try:
-            df = rearrange_post_columns(
-                pd.concat(
-                    [
-                        pd.read_csv(file, keep_default_na=False).pipe(
-                            clean_column_names
-                        )
-                        for file in directory
-                        if file.endswith(".csv")
-                    ]
-                )
-            )
-        except:
-            print(f"cannot fuse {file}")
-        return df
+            path = r"../../../../ner/post/post_officer_history/output/"
+            df.to_csv(path + file_name, index=False)
+    return df
 
 
 if __name__ == "__main__":
-    ner, file_name = model()
-    ner.to_csv(deba.data("ner/post/post_officer_history/") + file_name, index=False)
-    df = fuse()
-    df.to_csv(deba.data("ner/post/post_officer_history_6_2_2022.csv"), index=False)
+    ner = spacy_model()
