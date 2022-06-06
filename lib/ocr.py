@@ -37,7 +37,7 @@ def process_pdf(df: pd.DataFrame, dir_name: str) -> pd.DataFrame:
     adding new files, please run the following commands to share the
     OCR cache with others:
 
-        dvc add --file ocr_cache.dvc data/ocr_cache
+        scripts/dvc_add.sh
         dvc push
 
     Args:
@@ -86,7 +86,7 @@ def process_pdf(df: pd.DataFrame, dir_name: str) -> pd.DataFrame:
                 [
                     "New OCR content detected, please run the following commands to share the OCR cache with others:",
                     "",
-                    "    dvc add --file ocr_cache.dvc data/ocr_cache",
+                    "    scripts/dvc_add.sh",
                     "    dvc push",
                     "",
                 ]
