@@ -165,6 +165,13 @@ def files_meta_frame(
 ) -> pd.DataFrame:
     """Reads files from a DVC tracked folder and returns their metadata as a frame
 
+    The returned metadata frame will have 1 row per file, with the following columns:
+
+    - filepath: file path relative to the DVC-tracked folder
+    - filesha1: SHA1 hash of the file
+    - md5:      MD5 hash of the file
+    - fileid:   unique identifier of the file
+
     Args:
         dvc_file_path (str):
             path to the DVC file that track a folder
