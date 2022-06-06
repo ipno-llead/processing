@@ -5,6 +5,8 @@ patterns:
   targets:
     - "`*`.to_csv(deba.data(r'.+\\.csv'))"
 stages:
+  - name: meta
+  - name: ocr
   - name: clean
     ignoredTargets:
       - duplicates.csv
@@ -22,3 +24,10 @@ targets:
   - fuse/stop_and_search.csv
   - fuse/appeals.csv
   - fuse/event.csv
+overrides:
+  - target:
+      - meta/minutes_files.csv
+    prerequisites:
+      - $(DEBA_MD5_DIR)/meta/minutes.py.md5
+      - $(DEBA_MD5_DIR)/raw_minutes.dvc.md5
+    recipe: "$(call deba_execute,meta/minutes.py)"
