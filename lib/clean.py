@@ -1,13 +1,27 @@
 import sys
 import re
 import json
-from typing import List
+from typing import List, Tuple
 import pandas as pd
 import numpy as np
 import datetime
 
 from lib.date import combine_date_columns, combine_datetime_columns
 from lib.standardize import standardize_from_lookup_table
+
+
+def full_year_str(yr: str) -> str:
+    if len(yr) == 4:
+        return yr
+    if yr[0] in ["1", "2", "0"]:
+        return "20" + yr
+    return "19" + yr
+
+
+def swap_month_day(month: str, day: str) -> Tuple[str, str]:
+    if int(month) > 12 and int(day) <= 12:
+        return day, month
+    return month, day
 
 
 mdy_date_pattern_1 = re.compile(r"^\d{1,2}/\d{1,2}/\d{2}$")
@@ -19,7 +33,7 @@ year_month_pattern = re.compile(r"^(19|20)\d{4}$")
 month_day_pattern = re.compile(r"^[A-Z][a-z]{2}-\d{1,2}$")
 
 
-def clean_date(val) -> tuple[str, str, str]:
+def clean_date(val: str) -> tuple[str, str, str]:
     """Try parsing date with a few known patterns
 
     Args:
@@ -35,51 +49,47 @@ def clean_date(val) -> tuple[str, str, str]:
     """
     if val == "" or pd.isnull(val):
         return "", "", ""
+
     m = mdy_date_pattern_2.match(val)
     if m is not None:
         [month, day, year] = val.split("/")
-        if int(month) > 12 and int(day) <= 12:
-            month, day = day, month
+        month, day = swap_month_day(month, day)
         return year, month.lstrip("0"), day.lstrip("0")
+
     m = mdy_date_pattern_1.match(val)
     if m is not None:
         [month, day, year] = val.split("/")
-        if year[0] in ["1", "2", "0"]:
-            year = "20" + year
-        else:
-            year = "19" + year
-        if int(month) > 12 and int(day) <= 12:
-            month, day = day, month
+        year = full_year_str(year)
+        month, day = swap_month_day(month, day)
         return year, month.lstrip("0"), day.lstrip("0")
+
     m = mdy_date_pattern_3.match(val)
     if m is not None:
         [month, day, year] = val.split("-")
-        if year[0] in ["1", "2", "0"]:
-            year = "20" + year
-        else:
-            year = "19" + year
-        if int(month) > 12 and int(day) <= 12:
-            month, day = day, month
+        year = full_year_str(year)
+        month, day = swap_month_day(month, day)
         return year, month.lstrip("0"), day.lstrip("0")
+
     m = dmy_date_pattern.match(val)
     if m is not None:
         [day, month, year] = val.split("-")
         month = str(datetime.datetime.strptime(month, "%b").month)
-        if year[0] in ["1", "2", "0"]:
-            year = "20" + year
-        else:
-            year = "19" + year
+        year = full_year_str(year)
         return year, month, day
+
     m = year_month_pattern.match(val)
     if m is not None:
-        return val[:4], val[4:], ""
+        return val[:4], val[4:].lstrip("0"), ""
+
     m = year_pattern.match(val)
     if m is not None:
         return val, "", ""
+
     m = month_day_pattern.match(val)
     if m is not None:
         dt = datetime.datetime.strptime(val, "%b-%d")
         return "", str(dt.month).zfill(2), str(dt.day).zfill(2)
+
     raise ValueError('unknown date format "%s"' % val)
 
 
