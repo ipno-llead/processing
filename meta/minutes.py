@@ -11,77 +11,7 @@ import deba
 import pandas as pd
 
 from lib.clean import full_year_str, swap_month_day
-
-
-def open_dvc_files(dir_name: str) -> typing.List[typing.Dict]:
-    with open("%s.dvc" % dir_name, "r") as f:
-        raw_dir_dvc = yaml.load(f, Loader=yaml.Loader)
-    dir_hash = raw_dir_dvc["outs"][0]["md5"]
-    dir_path = pathlib.Path(os.path.realpath(__file__)).parent.parent / (
-        ".dvc/cache/%s/%s" % (dir_hash[:2], dir_hash[2:])
-    )
-    with open(dir_path, "r") as f:
-        dvc_files = json.load(f)
-    ensure_no_file_duplications(dir_name, dvc_files)
-    return dvc_files
-
-
-def ensure_no_file_duplications(
-    dir_name: str, dvc_files: typing.List[typing.Dict]
-) -> None:
-    files = dict()
-    duplications: typing.List[typing.Tuple[str, str]] = []
-    for obj in dvc_files:
-        if obj["md5"] in files:
-            duplications.append(
-                (
-                    str(deba.data("%s/%s" % (dir_name, obj["relpath"]))),
-                    str(deba.data("%s/%s" % (dir_name, files[obj["md5"]]))),
-                )
-            )
-            continue
-        files[obj["md5"]] = obj["relpath"]
-    if len(duplications) > 0:
-        rm_files = []
-        for file1, file2 in duplications:
-            name1 = re.sub(r"(\.\w{3})+$", "", file1)
-            name2 = re.sub(r"(\.\w{3})+$", "", file2)
-            if name1.startswith(name2):
-                rm_files.append(re.sub(r"( |\(|\))", r"\\\1", file1))
-            if name2.startswith(name1):
-                rm_files.append(re.sub(r"( |\(|\))", r"\\\1", file2))
-        rm_text = ""
-        if len(rm_files) > 0:
-            rm_text = (
-                "\nRemove the duplications to continue:\n    rm "
-                + " \\\n       ".join(rm_files)
-            )
-
-        raise ValueError(
-            "Found files with same md5:\n%s%s"
-            % (
-                "\n".join(
-                    [
-                        "    %s == %s" % (json.dumps(file1), json.dumps(file2))
-                        for file1, file2 in duplications
-                    ]
-                ),
-                rm_text,
-            )
-        )
-
-
-def gen_sha1(
-    df: pd.DataFrame,
-) -> pd.DataFrame:
-    def digest(filepath: str) -> str:
-        hash = hashlib.sha1(usedforsecurity=False)
-        with open(deba.data("raw_minutes/" + filepath), "rb") as f:
-            hash.update(f.read())
-        return hash.hexdigest()
-
-    df.loc[:, "filesha1"] = df.filepath.map(digest)
-    return df
+from lib.dvc import files_meta_frame
 
 
 def sanitize_date(month: str, day: str, year: str) -> typing.Tuple[str, str, str]:
@@ -181,11 +111,6 @@ def split_filepath(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def set_fileid(df: pd.DataFrame) -> pd.DataFrame:
-    df.loc[:, "fileid"] = df.filesha1.map(lambda v: v[:7])
-    return df
-
-
 def set_file_category(df: pd.DataFrame) -> pd.DataFrame:
     column = "file_category"
     df.loc[:, column] = "other"
@@ -225,12 +150,9 @@ def set_file_category(df: pd.DataFrame) -> pd.DataFrame:
 
 def clean_minutes() -> pd.DataFrame:
     return (
-        pd.DataFrame.from_records(open_dvc_files("raw_minutes"))
-        .rename(columns={"relpath": "filepath"})
-        .pipe(gen_sha1)
+        files_meta_frame("raw_minutes.dvc")
         .pipe(set_filetype)
         .pipe(split_filepath)
-        .pipe(set_fileid)
         .pipe(set_file_category)
         .pipe(parse_date)[
             [
