@@ -214,7 +214,21 @@ To create a new OCR script, follow these steps:
       df.to_csv(deba.data("meta/<something>_files.csv"), index=False)
    ```
 
-5. Create an OCR script `ocr/<something>.py` with the following content:
+5. Add a new entry under `overrides` section of `deba.yaml` to add a rule that generates the meta file (Deba does not generate any rule for a meta script because a meta script only takes a DVC file as its input):
+
+   ```yaml
+   // deba.yaml
+   overrides:
+      ...
+      - target:
+          - meta/<something>_files.csv
+        prerequisites:
+          - $(DEBA_MD5_DIR)/meta/<something>.py.md5
+          - $(DEBA_MD5_DIR)/<something>.dvc.md5
+        recipe: "$(call deba_execute,meta/<something>.py)"
+   ```
+
+6. Create an OCR script `ocr/<something>.py` with the following content:
 
    ```python
    from lib.dvc import real_dir_path
@@ -232,5 +246,5 @@ To create a new OCR script, follow these steps:
       df.to_csv(deba.data("ocr/<something>_pdfs.csv"), index=False)
    ```
 
-6. Run `make data/ocr/<something>_pdfs.csv` to make sure everything works.
-7. Run `scripts/dvc_add.sh && dvc push` to make sure raw files and OCR cache are kept track of and pushed.
+7. Run `make data/ocr/<something>_pdfs.csv` to make sure everything works.
+8. Run `scripts/dvc_add.sh && dvc push` to make sure raw files and OCR cache are kept track of and pushed.
