@@ -1,0 +1,6 @@
+wdir: ../../../data/raw
+outs:
+- md5: 5e532b7537606f5b885d22df2e75a852.dir
+  size: 70188
+  nfiles: 6
+  path: lafayette_so

@@ -1,0 +1,6 @@
+wdir: ../../../data/raw
+outs:
+- md5: abdda8ea670357e23bd208918d4845b6.dir
+  size: 282479128
+  nfiles: 11
+  path: ipm

@@ -343,6 +343,7 @@ schemas:
       - name: agency
         description: >
           the police department this report originate from.
+      - name: use_of_force_reason
   appeal_hearing:
     columns:
       - name: appeal_uid
@@ -440,8 +441,8 @@ schemas:
       - name: citizen_arrest_charges
       - name: citizen_hospitalized
       - name: citizen_injured
-      - name: citizen_build
-      - name: citizen_height
+      - name: citizen_age
+      - name: citizen_race
       - name: citizen_sex
       - name: agency
   uof_officer:
@@ -452,7 +453,7 @@ schemas:
       - name: uof_uid
         description: >
           unique identifier of use of force report.
-      - name: use_of_force_type
+      - name: use_of_force_description
       - name: use_of_force_level
       - name: use_of_force_effective
       - name: age
@@ -476,7 +477,7 @@ schemas:
         no_na: true
       - name: uid
       - name: agency
-      - name: claim_id
+      - name: tracking_id
       - name: jurisdiction
       - name: accident_desc
       - name: accident_location

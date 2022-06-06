@@ -1,0 +1,6 @@
+wdir: ../../../data/raw
+outs:
+- md5: f44e5ecd449ddae643c6a5920a681f88.dir
+  size: 3231
+  nfiles: 2
+  path: abbeville_pd

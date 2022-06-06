@@ -1,0 +1,6 @@
+wdir: ../../../data/raw
+outs:
+- md5: 8a9af67a63aa74716caf973fbd40d0da.dir
+  size: 6032
+  nfiles: 2
+  path: mandeville_pd

@@ -1,0 +1,6 @@
+wdir: ../../../data/raw
+outs:
+- md5: 2713198aa622699dd7d288914765ff76.dir
+  size: 138948
+  nfiles: 1
+  path: caddo_parish_so

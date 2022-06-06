@@ -1,0 +1,6 @@
+wdir: ../../../data/raw
+outs:
+- md5: 1c8c375e22bd1ca0c0da6df2ba79db99.dir
+  size: 16549
+  nfiles: 2
+  path: louisiana_state_csc

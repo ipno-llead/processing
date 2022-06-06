@@ -1,0 +1,6 @@
+wdir: ../../../data/raw
+outs:
+- md5: 41264944774ff72aeecf5f3b1193f3dd.dir
+  size: 2457
+  nfiles: 3
+  path: madisonville_pd

@@ -1,0 +1,6 @@
+wdir: ../../../data/raw
+outs:
+- md5: 3cf4a6d6a257970c88ceba8a6f13afec.dir
+  size: 5252
+  nfiles: 1
+  path: port_allen_csd

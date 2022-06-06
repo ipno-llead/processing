@@ -1,0 +1,6 @@
+wdir: ../../../data/raw
+outs:
+- md5: 3cff5dac15bcb1e2603315f9c3e15bf0.dir
+  size: 39493
+  nfiles: 1
+  path: new_orleans_da

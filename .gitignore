@@ -16,7 +16,9 @@ data.d
 !.wrgl/config.yaml
 
 data
+!dvc/data
 build
 .env
 .deba
+
 *.log
