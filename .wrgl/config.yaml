@@ -2,7 +2,7 @@ remote:
   origin:
     url: https://hub.wrgl.co/api/users/ipno/repos/data
     fetch:
-      - +refs/heads/*:refs/remotes/data/*
+      - +refs/heads/*:refs/remotes/origin/*
 branch:
   allegation:
     remote: origin

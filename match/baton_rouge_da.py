@@ -25,9 +25,9 @@ def match_brady_to_personnel(brady, per):
         dfa,
         dfb,
     )
-    decision = 0.948
+    decision = 0.96
     matcher.save_pairs_to_excel(
-        deba.data("match/brady_baton_da_2021_v_personnel.xlsx"),
+        deba.data("match/brady_baton_da_2021_v_pprr_2021.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
@@ -38,7 +38,7 @@ def match_brady_to_personnel(brady, per):
 
 
 if __name__ == "__main__":
-    per = pd.read_csv(deba.data("fuse/personnel.csv"))
+    pprr = pd.read_csv(deba.data("match/pprr_baton_rouge_pd_2021.csv"))
     brady = pd.read_csv(deba.data("clean/brady_baton_rouge_da_2021.csv"))
-    brady = match_brady_to_personnel(brady, per)
+    brady = match_brady_to_personnel(brady, pprr)
     brady.to_csv(deba.data("match/brady_baton_rouge_da_2021.csv"), index=False)
