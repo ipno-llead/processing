@@ -393,6 +393,40 @@ def match_pclaims21_to_pprr(pclaims, pprr_ipm):
     pclaims.loc[:, "uid"] = pclaims.uid.map(lambda x: match_dict.get(x, x))
     return pclaims
 
+def match_pprr_separations_to_pprr(pprr_seps, pprr_ipm):
+    dfa = pprr_seps[["uid", "first_name", "last_name"]]
+    dfa.loc[:, "fc"] = dfa.first_name.fillna("").map(lambda x: x[:1])
+    dfa.loc[:, "lc"] = dfa.last_name.fillna("").map(lambda x: x[:1])
+    dfa = dfa.drop_duplicates(subset=["uid"]).set_index("uid")
+
+    dfb = pprr_ipm[["uid", "first_name", "last_name"]]
+    dfb.loc[:, "fc"] = dfb.first_name.fillna("").map(lambda x: x[:1])
+    dfb.loc[:, "lc"] = dfb.last_name.fillna("").map(lambda x: x[:1])
+    dfb = dfb.drop_duplicates(subset=["uid"]).set_index("uid")
+
+    matcher = ThresholdMatcher(
+        ColumnsIndex(["fc", "lc"]),
+        {
+            "first_name": JaroWinklerSimilarity(),
+            "last_name": JaroWinklerSimilarity(),
+        },
+        dfa,
+        dfb,
+        show_progress=True,
+    )
+    decision = 0.931
+
+    matcher.save_pairs_to_excel(
+        deba.data(
+            "match/pprr_seps_new_orleans_pd_2019-21_v_pprr_new_orleans_pd_1946_2018.xlsx"
+        ),
+        decision,
+    )
+    matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
+    match_dict = dict(matches)
+
+    pprr_seps.loc[:, "uid"] = pprr_seps.uid.map(lambda x: match_dict.get(x, x))
+    return pprr_seps
 
 if __name__ == "__main__":
     pprr_ipm = pd.read_csv(deba.data("clean/pprr_new_orleans_ipm_iapro_1946_2018.csv"))
@@ -407,6 +441,7 @@ if __name__ == "__main__":
     uof_officers = pd.read_csv(
         deba.data("clean/uof_officers_new_orleans_pd_2016_2021.csv")
     )
+    pprr_separations = pd.read_csv(deba.data("clean/pprr_seps_new_orleans_pd_2019_2021.csv"))
     award = deduplicate_award(award)
     event_df = match_pprr_against_post(pprr_ipm, post)
     award = match_award_to_pprr_ipm(award, pprr_ipm)
@@ -416,6 +451,7 @@ if __name__ == "__main__":
     uof_officers = match_use_of_force_to_pprr(uof_officers, pprr_ipm)
     pclaims20 = match_pclaims20_to_pprr(pclaims20, pprr_ipm)
     pclaims21 = match_pclaims21_to_pprr(pclaims21, pprr_ipm)
+    pprr_separations = match_pprr_separations_to_pprr(pprr_separations, pprr_ipm)
     award.to_csv(deba.data("match/award_new_orleans_pd_2016_2021.csv"), index=False)
     event_df.to_csv(deba.data("match/post_event_new_orleans_pd.csv"), index=False)
     lprr.to_csv(deba.data("match/lprr_new_orleans_csc_2000_2016.csv"), index=False)
@@ -431,3 +467,4 @@ if __name__ == "__main__":
     )
     pclaims20.to_csv(deba.data("match/pclaims_new_orleans_pd_2020.csv"), index=False)
     pclaims21.to_csv(deba.data("match/pclaims_new_orleans_pd_2021.csv"), index=False)
+    pprr_separations.to_csv(deba.data("match/pprr_seps_new_orleans_pd_2019_2021.csv"), index=False)

@@ -60,6 +60,10 @@ schemas:
           - female
           - male
       - name: agency
+      - name: class_id
+      - name: assignment_id 
+      - name: years_of_service
+      - name: rank_desc 
     validation_tasks:
       - name: birth dates should be valid
         valid_date:
@@ -301,6 +305,7 @@ schemas:
         description: >
           further description of the award
       - name: left_reason
+      - name: left_reason_desc
     validation_tasks:
       - name: event dates should be valid
         valid_date:

@@ -1,6 +1,6 @@
 wdir: ../../../data/raw
 outs:
-- md5: 92786ca0709ad1752bc16200d2a28014.dir
-  size: 1406516
-  nfiles: 4
+- md5: be68172a6dcd1760d43bc4300b7e1531.dir
+  size: 3915622
+  nfiles: 6
   path: new_orleans_pd
