@@ -15,7 +15,7 @@ def clean_rank_desc(df):
 def clean_allegation_desc(df):
     df.loc[:, "allegation_desc"] = df.allegation_desc.str.replace(
         r"\biinformation\b", "information", regex=True
-    )
+    ).str.replace(r"\n", " ", regex=True)
     return df
 
 
@@ -49,6 +49,7 @@ def clean14():
         .pipe(standardize_desc_cols, ["rank_desc"])
         .pipe(clean_disposition14)
         .pipe(standardize_desc_cols, ["allegation_desc"])
+        .pipe(clean_allegation_desc)
         .pipe(set_values, {"agency": "Benton PD"})
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(gen_uid, ["allegation_desc", "disposition", "uid"], "allegation_uid")
