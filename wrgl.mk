@@ -1,7 +1,7 @@
 WRGL := wrgl
 
 pull_person: | $(BUILD_DIR)
-	@if [[ ! -f $(BUILD_DIR)/person.csv || "$(shell $(WRGL) pull $(WRGL_FLAGS) person)" != *"Already up to date."* ]]; then \
+	@if [[ ! -f $(BUILD_DIR)/person.csv || "$(shell $(WRGL) pull person origin +refs/heads/person:refs/remotes/origin/person $(WRGL_FLAGS))" != *"Already up to date."* ]]; then \
 		$(WRGL) export $(WRGL_FLAGS) person > $(BUILD_DIR)/person.csv && \
 		echo 'exported person branch to file $(BUILD_DIR)/person.csv'; \
 	else \
