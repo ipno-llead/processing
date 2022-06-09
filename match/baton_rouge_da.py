@@ -3,7 +3,7 @@ from datamatch import ColumnsIndex, JaroWinklerSimilarity, ThresholdMatcher
 import pandas as pd
 
 
-def match_brady_to_personnel(brady, per):
+def match_brady_to_post(brady, per):
     dfa = brady[["uid", "first_name", "last_name"]]
     dfa.loc[:, "fc"] = dfa.first_name.fillna("").map(lambda x: x[:1])
     dfa.loc[:, "lc"] = dfa.last_name.fillna("").map(lambda x: x[:1])
@@ -25,9 +25,9 @@ def match_brady_to_personnel(brady, per):
         dfa,
         dfb,
     )
-    decision = 0.96
+    decision = 0.948
     matcher.save_pairs_to_excel(
-        deba.data("match/brady_baton_da_2021_v_pprr_2021.xlsx"),
+        deba.data("match/brady_baton_da_2021_v_post.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
@@ -38,7 +38,7 @@ def match_brady_to_personnel(brady, per):
 
 
 if __name__ == "__main__":
-    pprr = pd.read_csv(deba.data("match/pprr_baton_rouge_pd_2021.csv"))
+    post = pd.read_csv(deba.data("clean/pprr_post_2020_11_06.csv"))
     brady = pd.read_csv(deba.data("clean/brady_baton_rouge_da_2021.csv"))
-    brady = match_brady_to_personnel(brady, pprr)
+    brady = match_brady_to_post(brady, post)
     brady.to_csv(deba.data("match/brady_baton_rouge_da_2021.csv"), index=False)

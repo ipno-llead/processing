@@ -5,7 +5,7 @@ import pandas as pd
 from lib.post import load_for_agency
 
 
-def match_brady_to_personnel(brady, post):
+def match_brady_to_post(brady, post):
     dfa = brady[["uid", "first_name", "last_name"]]
     dfa.loc[:, "fc"] = dfa.first_name.fillna("").map(lambda x: x[:1])
     dfa.loc[:, "lc"] = dfa.last_name.fillna("").map(lambda x: x[:1])
@@ -29,7 +29,7 @@ def match_brady_to_personnel(brady, post):
     )
     decision = 1
     matcher.save_pairs_to_excel(
-        deba.data("match/brady_ouachita_da_2021_v_post_pprr.xlsx"),
+        deba.data("match/brady_ouachita_da_2021_v_post.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
@@ -40,7 +40,7 @@ def match_brady_to_personnel(brady, post):
 
 
 if __name__ == "__main__":
-    post = load_for_agency("Ouachita SO")
+    post = pd.read_csv(deba.data("clean/pprr_post_2020_11_06.csv"))
     brady = pd.read_csv(deba.data("clean/brady_ouachita_da_2021.csv"))
-    brady = match_brady_to_personnel(brady, post)
+    brady = match_brady_to_post(brady, post)
     brady.to_csv(deba.data("match/brady_ouachita_da_2021.csv"), index=False)
