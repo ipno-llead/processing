@@ -72,6 +72,8 @@ def clean_left_reason_desc(df):
         )
         .str.replace(r"(\w+)\, (\w+)", r"\1/\2", regex=True)
         .str.replace(r"(\w+)job", r"\1 job", regex=True)
+        .str.replace(r"unsatifactory", "unsatisfactory", regex=False)
+        .str.replace(r"city unknown", "city/unknown", regex=False)
     )
     return df.drop(columns=["resignation_reason"])
 
