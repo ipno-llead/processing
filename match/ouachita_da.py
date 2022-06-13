@@ -40,7 +40,7 @@ def match_brady_to_post(brady, post):
 
 
 if __name__ == "__main__":
-    post = pd.read_csv(deba.data("clean/pprr_post_2020_11_06.csv"))
+    post = load_for_agency("Ouachita SO")
     brady = pd.read_csv(deba.data("clean/brady_ouachita_da_2021.csv"))
     brady = match_brady_to_post(brady, post)
     brady.to_csv(deba.data("match/brady_ouachita_da_2021.csv"), index=False)
