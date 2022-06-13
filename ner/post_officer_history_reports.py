@@ -56,11 +56,11 @@ def spacy_model(pdfs):
     # save model to disk:
     # nlp.to_disk("../data/raw/post/post_officer_history/model/post_officer_history_v2.model")
  
-    entities_ = []
+    entities = []
     for row in pdfs["text"].apply(nlp):
-        text_ = [text.text for text in row.ents]
-        labels_ = [labels.label_ for labels in row.ents]
-        ents = list(zip(labels_, text_))
+        text = [text.text for text in row.ents]
+        labels = [labels.label_ for labels in row.ents]
+        ents = list(zip(labels, text))
         
         tuples = [i[0] for i in ents]
         counts = {key: tuples.count(key) for key in [i[0] for i in ents]}
@@ -72,9 +72,9 @@ def spacy_model(pdfs):
                         tuples.insert(idx+num, key+ "_" + str(num+1))
         
         renamed_ents = dict(zip(tuples,[i[1] for i in ents]))
-        entities_.append(renamed_ents)
+        entities.append(renamed_ents)
     
-    ner = pd.DataFrame(entities_)
+    ner = pd.DataFrame(entities)
     pdfs = pdfs.join(ner)
     return ner, pdfs
 
