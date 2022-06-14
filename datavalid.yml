@@ -60,8 +60,6 @@ schemas:
           - female
           - male
       - name: agency
-      - name: class_id
-      - name: assignment_id 
       - name: years_of_service
       - name: rank_desc 
     validation_tasks:

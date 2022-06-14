@@ -79,10 +79,14 @@ def clean_left_reason_desc21(df):
 
 
 def extract_left_reason_desc18(df):
-    df.loc[:, "left_reason_desc"] = df.reason.str.lower().str.strip()\
-        .str.replace(r"(\w+)-? ?(.+)", r"\2", regex=True)\
+    df.loc[:, "left_reason_desc"] = (
+        df.reason.str.lower()
+        .str.strip()
+        .str.replace(r"(\w+)-? ?(.+)", r"\2", regex=True)
         .str.replace(r"w\/", "with", regex=True)
+    )
     return df
+
 
 def clean_left_reason(df):
     reasons = (
@@ -110,7 +114,13 @@ def clean21():
     df = (
         pd.read_csv(deba.data("raw/new_orleans_pd/nopd_cprr_separations_2019-2021.csv"))
         .pipe(clean_column_names)
-        .rename(columns={"class": "class_id", "assignment": "assignment_id", "date": "left_date"})
+        .rename(
+            columns={
+                "class": "class_id",
+                "assignment": "assignment_id",
+                "date": "left_date",
+            }
+        )
         .pipe(strip_leading_commas)
         .pipe(split_names)
         .pipe(clean_rank_desc)
@@ -127,16 +137,33 @@ def clean21():
 
 
 def clean18():
-    df = pd.read_csv(deba.data("raw/new_orleans_pd/new_orleans_pd_separations_2018.csv"))\
-        .pipe(clean_column_names)\
-        .rename(columns={"class": "class_id", "assign": "assigment_id", "date": "left_date"})\
-        .pipe(extract_left_reason_desc18)\
+    df = (
+        pd.read_csv(deba.data("raw/new_orleans_pd/new_orleans_pd_separations_2018.csv"))
+        .pipe(clean_column_names)
+        .rename(
+            columns={
+                "class": "class_id",
+                "assign": "assignment_id",
+                "date": "left_date",
+            }
+        )
+        .pipe(extract_left_reason_desc18)
+        .pipe(clean_left_reason)
         .pipe(clean_dates, ["hire_date", "left_date"])
-    return df 
+        .pipe(standardize_desc_cols, ["class_id", "assignment_id"])
+        .pipe(set_values, {"agency": "New Orleans PD"})
+        .pipe(gen_uid, ["first_name", "last_name", "agency"])
+    )
+    return df
+
+
+def clean(df18, df21):
+    df = pd.concat([df18, df21], axis=0)
+    return df
 
 
 if __name__ == "__main__":
-    df21 = clean21()
     df18 = clean18()
-    df18.to_csv(deba.data("clean/pprr_seps_new_orleans_pd_2018.csv"), index=False)
-    df21.to_csv(deba.data("clean/pprr_seps_new_orleans_pd_2019_2021.csv"), index=False)
+    df21 = clean21()
+    df = clean(df18, df21)
+    df.to_csv(deba.data("clean/pprr_seps_new_orleans_pd_2018_2021.csv"), index=False)

@@ -393,6 +393,7 @@ def match_pclaims21_to_pprr(pclaims, pprr_ipm):
     pclaims.loc[:, "uid"] = pclaims.uid.map(lambda x: match_dict.get(x, x))
     return pclaims
 
+
 def match_pprr_separations_to_pprr(pprr_seps, pprr_ipm):
     dfa = pprr_seps[["uid", "first_name", "last_name"]]
     dfa.loc[:, "fc"] = dfa.first_name.fillna("").map(lambda x: x[:1])
@@ -428,6 +429,7 @@ def match_pprr_separations_to_pprr(pprr_seps, pprr_ipm):
     pprr_seps.loc[:, "uid"] = pprr_seps.uid.map(lambda x: match_dict.get(x, x))
     return pprr_seps
 
+
 if __name__ == "__main__":
     pprr_ipm = pd.read_csv(deba.data("clean/pprr_new_orleans_ipm_iapro_1946_2018.csv"))
     pprr_csd = pd.read_csv(deba.data("clean/pprr_new_orleans_csd_2014.csv"))
@@ -441,7 +443,9 @@ if __name__ == "__main__":
     uof_officers = pd.read_csv(
         deba.data("clean/uof_officers_new_orleans_pd_2016_2021.csv")
     )
-    pprr_separations = pd.read_csv(deba.data("clean/pprr_seps_new_orleans_pd_2019_2021.csv"))
+    pprr_separations = pd.read_csv(
+        deba.data("clean/pprr_seps_new_orleans_pd_2018_2021.csv")
+    )
     award = deduplicate_award(award)
     event_df = match_pprr_against_post(pprr_ipm, post)
     award = match_award_to_pprr_ipm(award, pprr_ipm)
@@ -467,4 +471,6 @@ if __name__ == "__main__":
     )
     pclaims20.to_csv(deba.data("match/pclaims_new_orleans_pd_2020.csv"), index=False)
     pclaims21.to_csv(deba.data("match/pclaims_new_orleans_pd_2021.csv"), index=False)
-    pprr_separations.to_csv(deba.data("match/pprr_seps_new_orleans_pd_2019_2021.csv"), index=False)
+    pprr_separations.to_csv(
+        deba.data("match/pprr_seps_new_orleans_pd_2018_2021.csv"), index=False
+    )
