@@ -46,7 +46,7 @@ def clean_rank_desc(df):
     return df.drop(columns=["job_title"])
 
 
-def clean_left_reason_desc(df):
+def clean_left_reason_desc21(df):
     df.loc[:, "left_reason_desc"] = df.reason.str.cat(df.resignation_reason, sep=" ")
     df.loc[:, "left_reason_desc"] = (
         df.left_reason_desc.str.lower()
@@ -78,6 +78,12 @@ def clean_left_reason_desc(df):
     return df.drop(columns=["resignation_reason"])
 
 
+def extract_left_reason_desc18(df):
+    df.loc[:, "left_reason_desc"] = df.reason.str.lower().str.strip()\
+        .str.replace(r"(\w+)-? ?(.+)", r"\2", regex=True)\
+        .str.replace(r"w\/", "with", regex=True)
+    return df
+
 def clean_left_reason(df):
     reasons = (
         df.reason.str.lower()
@@ -100,15 +106,15 @@ def clean_left_reason(df):
     return df.drop(columns=["reason"])
 
 
-def clean():
+def clean21():
     df = (
         pd.read_csv(deba.data("raw/new_orleans_pd/nopd_cprr_separations_2019-2021.csv"))
         .pipe(clean_column_names)
-        .rename(columns={"class": "class_id", "assignment": "assignment_id"})
+        .rename(columns={"class": "class_id", "assignment": "assignment_id", "date": "left_date"})
         .pipe(strip_leading_commas)
         .pipe(split_names)
         .pipe(clean_rank_desc)
-        .pipe(clean_left_reason_desc)
+        .pipe(clean_left_reason_desc21)
         .pipe(clean_left_reason)
         .pipe(sanitize_dates)
         .pipe(clean_dates, ["hire_date", "left_date"])
@@ -120,6 +126,17 @@ def clean():
     return df
 
 
+def clean18():
+    df = pd.read_csv(deba.data("raw/new_orleans_pd/new_orleans_pd_separations_2018.csv"))\
+        .pipe(clean_column_names)\
+        .rename(columns={"class": "class_id", "assign": "assigment_id", "date": "left_date"})\
+        .pipe(extract_left_reason_desc18)\
+        .pipe(clean_dates, ["hire_date", "left_date"])
+    return df 
+
+
 if __name__ == "__main__":
-    df = clean()
-    df.to_csv(deba.data("clean/pprr_seps_new_orleans_pd_2019_2021.csv"), index=False)
+    df21 = clean21()
+    df18 = clean18()
+    df18.to_csv(deba.data("clean/pprr_seps_new_orleans_pd_2018.csv"), index=False)
+    df21.to_csv(deba.data("clean/pprr_seps_new_orleans_pd_2019_2021.csv"), index=False)
