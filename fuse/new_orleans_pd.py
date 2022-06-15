@@ -53,7 +53,6 @@ def fuse_events(
                     "salary_freq",
                 ],
             },
-            events.OFFICER_LEFT: {"prefix": "left"},
             events.OFFICER_DEPT: {"prefix": "dept"},
         },
         ["uid"],
@@ -72,7 +71,6 @@ def fuse_events(
                     "salary_freq",
                 ],
             },
-            events.OFFICER_LEFT: {"prefix": "term"},
             events.OFFICER_PAY_PROG_START: {"prefix": "pay_prog_start"},
         },
         ["uid"],
@@ -182,10 +180,6 @@ def fuse_events(
     builder.extract_events(
         pprr_separations,
         {
-            events.OFFICER_HIRE: {
-                "prefix": "hire",
-                "keep": ["uid", "agency"],
-            },
             events.OFFICER_LEFT: {
                 "prefix": "left",
                 "keep": [
@@ -197,7 +191,7 @@ def fuse_events(
                 ],
             },
         },
-        ["uid", "property_claims_uid"],
+        ["uid"],
     )
     return builder.to_frame(True)
 

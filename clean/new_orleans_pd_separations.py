@@ -151,6 +151,7 @@ def clean18():
         .pipe(clean_left_reason)
         .pipe(clean_dates, ["hire_date", "left_date"])
         .pipe(standardize_desc_cols, ["class_id", "assignment_id"])
+        .pipe(clean_names, ["first_name", "last_name"])
         .pipe(set_values, {"agency": "New Orleans PD"})
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
     )
