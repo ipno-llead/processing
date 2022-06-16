@@ -415,7 +415,7 @@ def match_pprr_separations_to_pprr(pprr_seps, pprr_ipm):
         dfb,
         show_progress=True,
     )
-    decision = 0.931
+    decision = 0.985
 
     matcher.save_pairs_to_excel(
         deba.data(

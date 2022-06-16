@@ -53,6 +53,17 @@ def fuse_events(
                     "salary_freq",
                 ],
             },
+            events.OFFICER_LEFT: {
+                "prefix": "left",
+                "keep": [
+                    "uid",
+                    "agency",
+                    "rank_code",
+                    "rank_desc",
+                    "salary",
+                    "salary_freq",
+                ],
+            },
             events.OFFICER_DEPT: {"prefix": "dept"},
         },
         ["uid"],
@@ -62,6 +73,17 @@ def fuse_events(
         {
             events.OFFICER_HIRE: {
                 "prefix": "hire",
+                "keep": [
+                    "uid",
+                    "agency",
+                    "rank_code",
+                    "rank_desc",
+                    "salary",
+                    "salary_freq",
+                ],
+            },
+            events.OFFICER_LEFT: {
+                "prefix": "term",
                 "keep": [
                     "uid",
                     "agency",
@@ -182,6 +204,7 @@ def fuse_events(
         {
             events.OFFICER_LEFT: {
                 "prefix": "left",
+                "parse_date": True,
                 "keep": [
                     "uid",
                     "agency",
@@ -191,7 +214,7 @@ def fuse_events(
                 ],
             },
         },
-        ["uid"],
+        ["uid", "separation_uid"],
     )
     return builder.to_frame(True)
 

@@ -127,11 +127,14 @@ def clean21():
         .pipe(clean_left_reason_desc21)
         .pipe(clean_left_reason)
         .pipe(sanitize_dates)
-        .pipe(clean_dates, ["hire_date", "left_date"])
+        .pipe(clean_dates, ["hire_date"])
         .pipe(standardize_desc_cols, ["employee_id", "rank_desc", "assignment_id"])
         .pipe(clean_names, ["first_name", "last_name"])
         .pipe(set_values, {"agency": "New Orleans PD"})
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
+        .pipe(
+            gen_uid, ["left_reason", "left_reason_desc", "left_date"], "separation_uid"
+        )
     )
     return df
 
@@ -149,17 +152,20 @@ def clean18():
         )
         .pipe(extract_left_reason_desc18)
         .pipe(clean_left_reason)
-        .pipe(clean_dates, ["hire_date", "left_date"])
+        .pipe(clean_dates, ["hire_date"])
         .pipe(standardize_desc_cols, ["class_id", "assignment_id"])
         .pipe(clean_names, ["first_name", "last_name"])
         .pipe(set_values, {"agency": "New Orleans PD"})
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
+        .pipe(
+            gen_uid, ["left_reason", "left_reason_desc", "left_date"], "separation_uid"
+        )
     )
     return df
 
 
 def clean(df18, df21):
-    df = pd.concat([df18, df21], axis=0)
+    df = pd.concat([df18, df21], axis=0).drop_duplicates(subset=["uid"])
     return df
 
 
