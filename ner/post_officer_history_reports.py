@@ -17,7 +17,10 @@ def spacy_model(pdfs):
     ###  import labeled_data that has been exported from doccano
 
     labeled_data = []
-    with open(r"data/raw/post/post_officer_history/training_data/post_officer_history.jsonl", "r") as read_file:
+    with open(
+        r"data/raw/post/post_officer_history/training_data/post_officer_history.jsonl",
+        "r",
+    ) as read_file:
         for line in read_file:
             data = json.loads(line)
             labeled_data.append(data)
@@ -46,7 +49,8 @@ def spacy_model(pdfs):
         random.shuffle(TRAINING_DATA)
         losses = {}
         for batch in spacy.util.minibatch(
-            TRAINING_DATA, size=compounding(3.0, 2.0, 1.001)):
+            TRAINING_DATA, size=compounding(3.0, 2.0, 1.001)
+        ):
             for text, annotations in batch:
                 doc = nlp.make_doc(text)
                 example = Example.from_dict(doc, annotations)
@@ -55,32 +59,30 @@ def spacy_model(pdfs):
 
     # save model to disk:
     # nlp.to_disk("../data/raw/post/post_officer_history/model/post_officer_history_v2.model")
- 
+
     entities = []
     for row in pdfs["text"].apply(nlp):
         text = [text.text for text in row.ents]
         labels = [labels.label_ for labels in row.ents]
         ents = list(zip(labels, text))
-        
+
         tuples = [i[0] for i in ents]
         counts = {key: tuples.count(key) for key in [i[0] for i in ents]}
         for idx, key in enumerate(tuples):
             if counts.get(key) and counts.get(key) > 1:
                 for num in range(counts[key]):
-                    if key+str(num+1) not in tuples:
-                        tuples.remove(key) 
-                        tuples.insert(idx+num, key+ "_" + str(num+1))
-        
-        renamed_ents = dict(zip(tuples,[i[1] for i in ents]))
+                    if key + str(num + 1) not in tuples:
+                        tuples.remove(key)
+                        tuples.insert(idx + num, key + "_" + str(num + 1))
+
+        renamed_ents = dict(zip(tuples, [i[1] for i in ents]))
         entities.append(renamed_ents)
-    
+
     ner = pd.DataFrame(entities)
-    pdfs = pdfs.join(ner)
-    return ner, pdfs
+    return ner
 
 
 if __name__ == "__main__":
     pdfs = read_pdfs()
-    ner, pdfs = spacy_model(pdfs)
+    ner = spacy_model(pdfs)
     ner.to_csv(deba.data("ner/post_officer_history_reports.csv"), index=False)
-    pdfs.to_csv(deba.data("ner/post_officer_history_reports_pdfs.csv"), index=False)
