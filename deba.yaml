@@ -7,6 +7,7 @@ patterns:
 stages:
   - name: meta
   - name: ocr
+  - name: ner
   - name: clean
     ignoredTargets:
       - duplicates.csv
@@ -31,3 +32,9 @@ overrides:
       - $(DEBA_MD5_DIR)/meta/minutes.py.md5
       - $(DEBA_MD5_DIR)/raw_minutes.dvc.md5
     recipe: "$(call deba_execute,meta/minutes.py)"
+  - target:
+      - meta/post_officer_history_reports_files.csv
+    prerequisites:
+      - $(DEBA_MD5_DIR)/meta/post_officer_history_reports.py.md5
+      - $(DEBA_MD5_DIR)/raw_post_officer_history_reports.dvc.md5 
+    recipe: "$(call deba_execute,meta/post_officer_history_reports.py)"

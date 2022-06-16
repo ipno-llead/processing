@@ -27,7 +27,7 @@ def deduplicate_brady(cprr):
     return canonicalize_officers(cprr, clusters)
 
 
-def match_brady_to_personnel(brady, per):
+def match_brady_to_pprr(brady, per):
     dfa = brady[["uid", "first_name", "last_name"]]
     dfa.loc[:, "fc"] = dfa.first_name.fillna("").map(lambda x: x[:1])
     dfa.loc[:, "lc"] = dfa.last_name.fillna("").map(lambda x: x[:1])
@@ -51,7 +51,7 @@ def match_brady_to_personnel(brady, per):
     )
     decision = 1
     matcher.save_pairs_to_excel(
-        deba.data("match/brady_new_orleans_da_2021_v_ipm_pprr.xlsx"),
+        deba.data("match/brady_new_orleans_da_2021_v_pprr_new_orleans_ipm_iapro_1946_2018.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
@@ -62,8 +62,8 @@ def match_brady_to_personnel(brady, per):
 
 
 if __name__ == "__main__":
-    pprr_ipm = pd.read_csv(deba.data("match/pprr_new_orleans_ipm_iapro_1946_2018.csv"))
+    pprr = pd.read_csv(deba.data("match/pprr_new_orleans_ipm_iapro_1946_2018.csv"))
     brady = pd.read_csv(deba.data("clean/brady_new_orleans_da_2021.csv"))
     brady = deduplicate_brady(brady)
-    brady = match_brady_to_personnel(brady, pprr_ipm)
+    brady = match_brady_to_pprr(brady, pprr)
     brady.to_csv(deba.data("match/brady_new_orleans_da_2021.csv"), index=False)
