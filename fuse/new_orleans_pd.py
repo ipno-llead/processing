@@ -35,7 +35,9 @@ def fuse_cprr(cprr, actions, officer_number_dict):
     return rearrange_allegation_columns(cprr)
 
 
-def fuse_events(pprr_ipm, pprr_csd, cprr, uof, award, lprr, pclaims20, pclaims21):
+def fuse_events(
+    pprr_ipm, pprr_csd, cprr, uof, award, lprr, pclaims20, pclaims21, pprr_separations
+):
     builder = events.Builder()
     builder.extract_events(
         pprr_ipm,
@@ -51,7 +53,17 @@ def fuse_events(pprr_ipm, pprr_csd, cprr, uof, award, lprr, pclaims20, pclaims21
                     "salary_freq",
                 ],
             },
-            events.OFFICER_LEFT: {"prefix": "left"},
+            events.OFFICER_LEFT: {
+                "prefix": "left",
+                "keep": [
+                    "uid",
+                    "agency",
+                    "rank_code",
+                    "rank_desc",
+                    "salary",
+                    "salary_freq",
+                ],
+            },
             events.OFFICER_DEPT: {"prefix": "dept"},
         },
         ["uid"],
@@ -70,7 +82,17 @@ def fuse_events(pprr_ipm, pprr_csd, cprr, uof, award, lprr, pclaims20, pclaims21
                     "salary_freq",
                 ],
             },
-            events.OFFICER_LEFT: {"prefix": "term"},
+            events.OFFICER_LEFT: {
+                "prefix": "term",
+                "keep": [
+                    "uid",
+                    "agency",
+                    "rank_code",
+                    "rank_desc",
+                    "salary",
+                    "salary_freq",
+                ],
+            },
             events.OFFICER_PAY_PROG_START: {"prefix": "pay_prog_start"},
         },
         ["uid"],
@@ -177,6 +199,23 @@ def fuse_events(pprr_ipm, pprr_csd, cprr, uof, award, lprr, pclaims20, pclaims21
         },
         ["uid", "property_claims_uid"],
     )
+    builder.extract_events(
+        pprr_separations,
+        {
+            events.OFFICER_LEFT: {
+                "prefix": "left",
+                "parse_date": True,
+                "keep": [
+                    "uid",
+                    "agency",
+                    "left_reason",
+                    "left_reason_desc",
+                    "years_of_service",
+                ],
+            },
+        },
+        ["uid", "separation_uid"],
+    )
     return builder.to_frame(True)
 
 
@@ -200,14 +239,32 @@ if __name__ == "__main__":
     brady = pd.read_csv(deba.data("match/brady_new_orleans_da_2021.csv"))
     pclaims20 = pd.read_csv(deba.data("match/pclaims_new_orleans_pd_2020.csv"))
     pclaims21 = pd.read_csv(deba.data("match/pclaims_new_orleans_pd_2021.csv"))
+    pprr_separations = pd.read_csv(
+        deba.data("match/pprr_seps_new_orleans_pd_2018_2021.csv")
+    )
     brady = brady.loc[brady.agency == "New Orleans PD"]
 
     complaints = fuse_cprr(cprr, actions, officer_number_dict)
     personnel = fuse_personnel(
-        pprr_ipm, lprr, pprr_csd, uof_officers, brady, pclaims20, pclaims21
+        pprr_ipm,
+        lprr,
+        pprr_csd,
+        uof_officers,
+        brady,
+        pclaims20,
+        pclaims21,
+        pprr_separations,
     )
     events_df = fuse_events(
-        pprr_ipm, pprr_csd, cprr, uof, award, lprr, pclaims20, pclaims21
+        pprr_ipm,
+        pprr_csd,
+        cprr,
+        uof,
+        award,
+        lprr,
+        pclaims20,
+        pclaims21,
+        pprr_separations,
     )
     events_df = rearrange_event_columns(pd.concat([post_event, events_df]))
     sas_df = rearrange_stop_and_search_columns(sas)

@@ -301,6 +301,10 @@ schemas:
         description: >
           further description of the award
       - name: left_reason
+      - name: left_reason_desc
+        description: >
+          narrative summary of the officer's reason for leaving
+      - name: years_of_service
     validation_tasks:
       - name: event dates should be valid
         valid_date:
