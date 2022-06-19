@@ -1,0 +1,6 @@
+wdir: ../../../data/raw
+outs:
+- md5: 43d5c9ca303e4eccba73044b10eef279.dir
+  size: 262617
+  nfiles: 1
+  path: ner

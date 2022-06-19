@@ -198,7 +198,8 @@ def clean_agency(df):
 
 
 def clean_hire_date(df):
-    df.loc[:, "hire_date"] = df.hire_date.str.replace(r"^d(\w{1})", r"\1", regex=True)
+    df.loc[:, "hire_date"] = df.hire_date.str.replace(r"^d(\w{1})", r"\1", regex=True)\
+        .str.replace(r"^t/vt/1995$", "", regex=True)
     return df
 
 
@@ -231,7 +232,7 @@ def switched_job(df):
 
 def clean():
     df = (
-        pd.read_csv(deba.data("raw/post/post_officer_history.csv"))
+        pd.read_csv(deba.data("ner/post_officer_history_reports.csv"))
         .pipe(drop_rows_missing_names)
         .rename(columns={"officer_sex": "sex"})
         .pipe(clean_sexes, ["sex"])
