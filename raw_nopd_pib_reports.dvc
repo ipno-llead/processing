@@ -1,0 +1,6 @@
+wdir: data
+outs:
+- md5: 97ddcf8bb19616b6ebaaf2255affe3ac.dir
+  size: 3637499
+  nfiles: 6
+  path: raw_nopd_pib_reports

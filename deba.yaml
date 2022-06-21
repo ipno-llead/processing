@@ -38,3 +38,9 @@ overrides:
       - $(DEBA_MD5_DIR)/meta/post_officer_history_reports.py.md5
       - $(DEBA_MD5_DIR)/raw_post_officer_history_reports.dvc.md5 
     recipe: "$(call deba_execute,meta/post_officer_history_reports.py)"
+  - target:
+      - meta/nopd_pib_reports_files_2014_2019.csv
+    prerequisites:
+      - $(DEBA_MD5_DIR)/meta/nopd_pib_reports.py.md5
+      - $(DEBA_MD5_DIR)/raw_nopd_pib_reports.dvc.md5 
+    recipe: "$(call deba_execute,meta/nopd_pib_reports.py)"

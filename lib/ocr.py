@@ -65,7 +65,7 @@ def process_pdf(df: pd.DataFrame, dir_name: str) -> pd.DataFrame:
 
         pages = []
         with tempfile.TemporaryDirectory() as path:
-            images = convert_from_path(pdfpath, dpi=300, output_folder=path)
+            images = convert_from_path(pdfpath, dpi=500, output_folder=path)
             for image in tqdm(
                 images,
                 desc="processing %s" % os.path.relpath(pdfpath, str(root_dir)),
