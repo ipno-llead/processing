@@ -16,46 +16,46 @@ def read_pdfs():
 def spacy_model(pdfs):
     ###  import labeled_data that has been exported from doccano
 
-    labeled_data = []
-    with open(
-        r"data/raw/new_orleans_pd/training_data/nopd_pib_reports.jsonl",
-        "r",
-    ) as read_file:
-        for line in read_file:
-            data = json.loads(line)
-            labeled_data.append(data)
+    # labeled_data = []
+    # with open(
+    #     r"data/raw/new_orleans_pd/training_data/nopd_pib_reports.jsonl",
+    #     "r",
+    # ) as read_file:
+    #     for line in read_file:
+    #         data = json.loads(line)
+    #         labeled_data.append(data)
 
-    TRAINING_DATA = []
-    for entry in labeled_data:
-        entities = []
-        for e in entry["label"]:
-            entities.append((e[0], e[1], e[2]))
-        spacy_entry = (entry["data"], {"entities": entities})
-        TRAINING_DATA.append(spacy_entry)
+    # TRAINING_DATA = []
+    # for entry in labeled_data:
+    #     entities = []
+    #     for e in entry["label"]:
+    #         entities.append((e[0], e[1], e[2]))
+    #     spacy_entry = (entry["data"], {"entities": entities})
+    #     TRAINING_DATA.append(spacy_entry)
 
     ### train model
 
-    # nlp = spacy.load("data/ner/post/post_officer_history/model/post_officer_history.model")
-    nlp = spacy.blank("en")
-    ner = nlp.create_pipe("ner")
-    nlp.add_pipe("ner")
-    ner.add_label("allegation")
+    nlp = spacy.load(deba.data("raw/new_orleans_pd/model/nopd_pib_reports.model"))
+    # nlp = spacy.blank("en")
+    # ner = nlp.create_pipe("ner")
+    # nlp.add_pipe("ner")
+    # ner.add_label("allegation")
 
-    optimizer = nlp.begin_training()
-    for itn in range(100):
-        random.shuffle(TRAINING_DATA)
-        losses = {}
-        for batch in spacy.util.minibatch(
-            TRAINING_DATA, size=compounding(3.0, 1.5, 1.001)
-        ):
-            for text, annotations in batch:
-                doc = nlp.make_doc(text)
-                example = Example.from_dict(doc, annotations)
-                nlp.update([example], sgd=optimizer, losses=losses, drop=0.4)
-                print(losses)
+    # optimizer = nlp.begin_training()
+    # for itn in range(100):
+    #     random.shuffle(TRAINING_DATA)
+    #     losses = {}
+    #     for batch in spacy.util.minibatch(
+    #         TRAINING_DATA, size=compounding(3.0, 1.5, 1.001)
+    #     ):
+    #         for text, annotations in batch:
+    #             doc = nlp.make_doc(text)
+    #             example = Example.from_dict(doc, annotations)
+    #             nlp.update([example], sgd=optimizer, losses=losses, drop=0.4)
+    #             print(losses)
 
     # save model to disk:
-    nlp.to_disk(deba.data("raw/new_orleans_pd/model/nopd_pib_reports.model"))
+    # nlp.to_disk(deba.data("raw/new_orleans_pd/model/nopd_pib_reports.model"))
 
     entities = []
     for row in pdfs["text"].apply(nlp):
