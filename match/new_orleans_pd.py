@@ -430,6 +430,29 @@ def match_pprr_separations_to_pprr(pprr_seps, pprr_ipm):
     return pprr_seps
 
 
+def join_pib_and_ipm():
+    pib = pd.read_csv(
+        deba.data("clean/cprr_new_orleans_pd_pib_reports_2014_2019.csv")
+    ).drop_duplicates(subset=["tracking_id"], keep=False)
+    ipm = pd.read_csv(
+        deba.data("clean/cprr_new_orleans_pd_1931_2020.csv")
+    ).drop_duplicates(subset=["tracking_id"], keep=False)
+
+    df = pd.merge(pib, ipm, on="tracking_id", how="outer")
+    df = df[~((df.allegation_desc.fillna("") == ""))]
+    return (
+        df[~((df.officer_primary_key.fillna("") == ""))]
+        .drop(columns=["allegation_x", "disposition_y", "agency_y"])
+        .rename(
+            columns={
+                "agency_x": "agency",
+                "disposition_x": "disposition",
+                "allegation_y": "allegation",
+            }
+        )
+    )
+
+
 if __name__ == "__main__":
     pprr_ipm = pd.read_csv(deba.data("clean/pprr_new_orleans_ipm_iapro_1946_2018.csv"))
     pprr_csd = pd.read_csv(deba.data("clean/pprr_new_orleans_csd_2014.csv"))
@@ -446,6 +469,7 @@ if __name__ == "__main__":
     pprr_separations = pd.read_csv(
         deba.data("clean/pprr_seps_new_orleans_pd_2018_2021.csv")
     )
+    pib = join_pib_and_ipm()
     award = deduplicate_award(award)
     event_df = match_pprr_against_post(pprr_ipm, post)
     award = match_award_to_pprr_ipm(award, pprr_ipm)
@@ -473,4 +497,7 @@ if __name__ == "__main__":
     pclaims21.to_csv(deba.data("match/pclaims_new_orleans_pd_2021.csv"), index=False)
     pprr_separations.to_csv(
         deba.data("match/pprr_seps_new_orleans_pd_2018_2021.csv"), index=False
+    )
+    pib.to_csv(
+        deba.data("match/cprr_new_orleans_pib_reports_2014_2019.csv"), index=False
     )

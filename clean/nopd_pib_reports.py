@@ -1,5 +1,6 @@
 import deba
 import pandas as pd
+from lib.clean import names_to_title_case
 from lib.columns import set_values
 from lib.uid import gen_uid
 
@@ -95,7 +96,7 @@ def extract_disposition(df):
         .str.extract(
             r"(sustained|di-2|no formal investigation merited|\bnot sustained\b|"
             r"exonerated|mediation|negotiated settlement|pending\b;? ?(investigation)?|"
-            r"unfounded|duplicate investigation|withdrawn|rui|resigned under investigation"
+            r"unfounded|duplicate investigation|withdrawn|rui\b|resigned under investigation"
             r"\bprescribed-sustained\b|greviance|investigation pending|cancelled|no disposition)"
         )
     )
@@ -237,6 +238,7 @@ def clean():
         .pipe(extract_allegation_made)
         .pipe(extract_investigation_status)
         .pipe(merge_2019_data)
+        .pipe(names_to_title_case, ["tracking_id"])
         .pipe(set_values, {"agency": "New Orleans PD"})
     )
     return df
@@ -244,4 +246,4 @@ def clean():
 
 if __name__ == "__main__":
     df = clean()
-    df.to_csv(deba.data("clean/cprr_new_orleans_pd_pib_reports.csv"), index=False)
+    df.to_csv(deba.data("clean/cprr_new_orleans_pd_pib_reports_2014_2019.csv"), index=False)
