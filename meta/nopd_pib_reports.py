@@ -31,4 +31,4 @@ def fetch_reports() -> pd.DataFrame:
 
 if __name__ == "__main__":
     df = fetch_reports()
-    df.to_csv(deba.data("meta/nopd_pib_reports_files_2014_2019.csv"), index=False)
+    df.to_csv(deba.data("meta/nopd_pib_report_files_2014_2019.csv"), index=False)
