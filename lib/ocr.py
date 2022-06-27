@@ -65,7 +65,7 @@ def process_pdf(df: pd.DataFrame, dir_name: str) -> pd.DataFrame:
 
         pages = []
         with tempfile.TemporaryDirectory() as path:
-            images = convert_from_path(pdfpath, dpi=500, output_folder=path)
+            images = convert_from_path(pdfpath, dpi=100, output_folder=path, fmt="pdf")
             for image in tqdm(
                 images,
                 desc="processing %s" % os.path.relpath(pdfpath, str(root_dir)),
@@ -74,6 +74,8 @@ def process_pdf(df: pd.DataFrame, dir_name: str) -> pd.DataFrame:
             ):
                 txt = pytesseract.image_to_string(image)
                 pages.append(txt)
+            image.close()
+            del image
 
         with open(ocr_cachefile, "w") as f:
             json.dump(pages, f)
