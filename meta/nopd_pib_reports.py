@@ -22,7 +22,7 @@ def set_file_category(df: pd.DataFrame) -> pd.DataFrame:
 
 def fetch_reports() -> pd.DataFrame:
     return (
-        files_meta_frame("raw_nopd_pib_reports.dvc")
+        files_meta_frame("raw_post_officer_history_reports.dvc")
         .pipe(set_filetype)
         .pipe(split_filepath)
         .pipe(set_file_category)
