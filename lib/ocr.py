@@ -74,8 +74,6 @@ def process_pdf(df: pd.DataFrame, dir_name: str) -> pd.DataFrame:
             ):
                 txt = pytesseract.image_to_string(image)
                 pages.append(txt)
-            image.close()
-            del image
 
         with open(ocr_cachefile, "w") as f:
             json.dump(pages, f)
