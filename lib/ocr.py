@@ -16,7 +16,12 @@ def _root_dir() -> pathlib.Path:
     return pathlib.Path(os.path.realpath(__file__)).parent.parent
 
 
-def process_pdf(df: pd.DataFrame, dir_name: str) -> pd.DataFrame:
+def process_pdf(
+    df: pd.DataFrame,
+    dir_name: str,
+    output_images_to_tempdir: bool = True,
+    ignore_cache: bool = False,
+) -> pd.DataFrame:
     """Reads and returns PDF content as text
 
     This function expect a dataframe, each row containing metadata
@@ -45,6 +50,12 @@ def process_pdf(df: pd.DataFrame, dir_name: str) -> pd.DataFrame:
             a frame containing PDFs metadata
         dir_name (str):
             the parent directory of all PDF files
+        output_images_to_tempdir (bool):
+            output PDF images to a tempdir. If set to False, keep images
+            in memory instead.
+        ignore_cache (bool):
+            if set to True, don't read from or write to OCR cache.
+            Useful for testing new OCR configs.
 
     Returns:
         exploded frame with 1 row per page
@@ -55,28 +66,39 @@ def process_pdf(df: pd.DataFrame, dir_name: str) -> pd.DataFrame:
     new_file_detected = False
     for _, row in tqdm(df.iterrows(), desc="OCR pdf", total=df.shape[0], position=0):
         pdfpath = "%s/%s" % (dir_name, row.filepath)
-        ocr_cachefile: Path = cache_root_dir / (row.filesha1 + ".json")
-        ocr_cachefile.parent.mkdir(parents=True, exist_ok=True)
 
-        if ocr_cachefile.is_file():
-            with open(ocr_cachefile, "r") as f:
-                texts.append(json.load(f))
-            continue
+        if not ignore_cache:
+            ocr_cachefile: Path = cache_root_dir / (row.filesha1 + ".json")
+            ocr_cachefile.parent.mkdir(parents=True, exist_ok=True)
+
+            if ocr_cachefile.is_file():
+                with open(ocr_cachefile, "r") as f:
+                    texts.append(json.load(f))
+                continue
 
         pages = []
-        with tempfile.TemporaryDirectory() as path:
-            images = convert_from_path(pdfpath, dpi=100, output_folder=path, fmt="pdf")
-            for image in tqdm(
-                images,
-                desc="processing %s" % os.path.relpath(pdfpath, str(root_dir)),
-                position=1,
-                leave=False,
-            ):
-                txt = pytesseract.image_to_string(image)
-                pages.append(txt)
+        kwargs = {"dpi": 100, "fmt": "pdf"}
+        if output_images_to_tempdir:
+            tempdir = tempfile.TemporaryDirectory()
+            kwargs["output_folder"] = tempdir.name
 
-        with open(ocr_cachefile, "w") as f:
-            json.dump(pages, f)
+        images = convert_from_path(pdfpath, **kwargs)
+        for image in tqdm(
+            images,
+            desc="processing %s" % os.path.relpath(pdfpath, str(root_dir)),
+            position=1,
+            leave=False,
+        ):
+            txt = pytesseract.image_to_string(image)
+            pages.append(txt)
+
+        if output_images_to_tempdir:
+            tempdir.cleanup()
+
+        if not ignore_cache:
+            with open(ocr_cachefile, "w") as f:
+                json.dump(pages, f)
+
         texts.append(pages)
         new_file_detected = True
 
