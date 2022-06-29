@@ -88,7 +88,7 @@ def clean_date(val: str) -> tuple[str, str, str]:
     m = month_day_pattern.match(val)
     if m is not None:
         dt = datetime.datetime.strptime(val, "%b-%d")
-        return "", str(dt.month), str(dt.day)
+        return "", str(dt.month).zfill(2), str(dt.day).zfill(2)
 
     raise ValueError('unknown date format "%s"' % val)
 

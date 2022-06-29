@@ -1,0 +1,6 @@
+wdir: data
+outs:
+- md5: efb6839f3596f9fb771afbb304b339ff.dir
+  size: 80887002
+  nfiles: 503
+  path: raw_post_officer_history_reports

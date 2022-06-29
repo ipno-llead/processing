@@ -13,11 +13,20 @@ def clean_rank_desc(df):
 
 
 def clean_allegation_desc(df):
-    df.loc[:, "allegation_desc"] = df.allegation_desc.str.replace(r"\biinformation\b", "information", regex=True)
-    return df 
+    df.loc[:, "allegation_desc"] = df.allegation_desc.str.replace(
+        r"\biinformation\b", "information", regex=True
+    ).str.replace(r"\n", " ", regex=True)
+    return df
 
 
-def clean():
+def clean_disposition14(df):
+    df.loc[:, "disposition"] = df.disposition.fillna("").str.replace(
+        r"unsubstantiated", "un-substantiated", regex=False
+    )
+    return df
+
+
+def clean21():
     df = (
         pd.read_csv(deba.data("raw/benton_pd/benton_pd_cprr_2015_2021_byhand.csv"))
         .pipe(clean_column_names)
@@ -33,6 +42,23 @@ def clean():
     return df
 
 
+def clean14():
+    df = (
+        pd.read_csv(deba.data("raw/benton_pd/benton_pd_cprr_2009_2014_byhand.csv"))
+        .pipe(clean_dates, ["receive_date"])
+        .pipe(standardize_desc_cols, ["rank_desc"])
+        .pipe(clean_disposition14)
+        .pipe(standardize_desc_cols, ["allegation_desc"])
+        .pipe(clean_allegation_desc)
+        .pipe(set_values, {"agency": "Benton PD"})
+        .pipe(gen_uid, ["first_name", "last_name", "agency"])
+        .pipe(gen_uid, ["allegation_desc", "disposition", "uid"], "allegation_uid")
+    )
+    return df
+
+
 if __name__ == "__main__":
-    df = clean()
-    df.to_csv(deba.data("clean/cprr_benton_pd_2015_2021.csv"), index=False)
+    df21 = clean21()
+    df14 = clean14()
+    df21.to_csv(deba.data("clean/cprr_benton_pd_2015_2021.csv"), index=False)
+    df14.to_csv(deba.data("clean/cprr_benton_pd_2009_2014.csv"), index=False)
