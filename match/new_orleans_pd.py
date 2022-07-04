@@ -432,7 +432,7 @@ def match_pprr_separations_to_pprr(pprr_seps, pprr_ipm):
 
 def join_pib_and_ipm():
     pib = pd.read_csv(
-        deba.data("clean/cprr_new_orleans_pd_pib_reports_2014_2019.csv")
+        deba.data("clean/cprr_new_orleans_pd_pib_reports_2014_2020.csv")
     ).drop_duplicates(subset=["tracking_id"], keep=False)
     ipm = pd.read_csv(
         deba.data("clean/cprr_new_orleans_pd_1931_2020.csv")
@@ -499,5 +499,5 @@ if __name__ == "__main__":
         deba.data("match/pprr_seps_new_orleans_pd_2018_2021.csv"), index=False
     )
     pib.to_csv(
-        deba.data("match/cprr_new_orleans_pib_reports_2014_2019.csv"), index=False
+        deba.data("match/cprr_new_orleans_pib_reports_2014_2020.csv"), index=False
     )

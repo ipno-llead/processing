@@ -22,7 +22,7 @@ def set_file_category(df: pd.DataFrame) -> pd.DataFrame:
 
 def fetch_reports() -> pd.DataFrame:
     return (
-        files_meta_frame("raw_post_officer_history_reports.dvc")
+        files_meta_frame("raw_nopd_pib_reports.dvc")
         .pipe(set_filetype)
         .pipe(split_filepath)
         .pipe(set_file_category)
@@ -31,4 +31,4 @@ def fetch_reports() -> pd.DataFrame:
 
 if __name__ == "__main__":
     df = fetch_reports()
-    df.to_csv(deba.data("meta/nopd_pib_report_files_2014_2019.csv"), index=False)
+    df.to_csv(deba.data("meta/nopd_pib_report_files_2014_2020.csv"), index=False)

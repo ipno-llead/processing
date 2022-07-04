@@ -1,0 +1,6 @@
+wdir: ../../../data/raw
+outs:
+- md5: b8bc7e6f1d623ce5f582a781dcabded2.dir
+  size: 256033
+  nfiles: 1
+  path: post_officer_history

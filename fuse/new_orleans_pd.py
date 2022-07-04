@@ -250,7 +250,7 @@ if __name__ == "__main__":
     pprr_separations = pd.read_csv(
         deba.data("match/pprr_seps_new_orleans_pd_2018_2021.csv")
     )
-    pib = pd.read_csv(deba.data("match/cprr_new_orleans_pib_reports_2014_2019.csv"))
+    pib = pd.read_csv(deba.data("match/cprr_new_orleans_pib_reports_2014_2020.csv"))
     brady = brady.loc[brady.agency == "New Orleans PD"]
 
     complaints = fuse_cprr(cprr, actions, officer_number_dict)

@@ -74,8 +74,8 @@ def clean_allegation(df):
 
 def extract_tracking_id(df):
     tracking = df.allegation.str.replace(
-        r"(complaint tracking number:?|control number:?)", "", regex=True
-    ).str.extract(r"(201[456789]-\w{4}[\.-]\w)[:_]?")
+        r"(complaint tracking number:?|control number:? ?)", "", regex=True
+    ).str.extract(r"(20[12][4567890]-\w{4}[\.-]\w)[:_]?")
     df.loc[:, "tracking_id"] = tracking[0]
     return df
 
@@ -166,30 +166,28 @@ def extract_allegation_made(df):
 ## before merge, make sure that tracking_id is effeciently extracted
 
 
-def merge_2019_data(df):
-    og_df = df[~df["tracking_id"].str.contains("2019")]
+def merge_split_tables(df):
+    og_df = df[~df["tracking_id"].str.contains("2019|2020")]
 
-    df_2019 = df[df["tracking_id"].str.contains("2019")]
-
-    dfa = df_2019[~((df_2019.investigation_status.fillna("") == ""))]
+    df_2019_20 = df[df["tracking_id"].str.contains("2019|2020")]
+    dfa = df_2019_20[~((df_2019_20.investigation_status.fillna("") == ""))]
     dfa.loc[:, "receive_date"] = dfa.receive_date.fillna("")
     dfa.loc[:, "tracking_id"] = df.tracking_id.str.replace(r"-o", "-0", regex=False)
-
     badges = dfa.allegation.str.replace(
         r"(\w+)  +(\w+)", r"\1 \2", regex=True
     ).str.extract(
         r"(\w{3,5}) (di-2|not|sustained|exonerated|none"
         r"|greviance|rui|negotiated|unfounded|cancelled|duplicate|case|withdrawn)"
     )
+    dfa.loc[:, "badge_no"] = badges[0].str.replace(
+        r"(r?_|[(.+)aineduionhrwtgvclxfps(.+)])", "", regex=True
+    )
 
-    dfa.loc[:, "badge_no"] = badges[0]
+    dfb = df_2019_20[~((df_2019_20.receive_date == ""))]
 
-    dfb = df_2019[~((df_2019.receive_date == ""))]
-
-    clean_df_2019 = pd.merge(dfa, dfb, on="tracking_id", how="outer")
-
-    clean_df_2019 = (
-        clean_df_2019.drop(
+    clean_df_2019_20 = pd.merge(dfa, dfb, on="tracking_id", how="outer")
+    clean_df_2019_20 = (
+        clean_df_2019_20.drop(
             columns=[
                 "investigation_status_y",
                 "allegation_x",
@@ -215,9 +213,9 @@ def merge_2019_data(df):
         .drop_duplicates(subset=["tracking_id", "badge_no"])
     )
 
-    clean_df_2019 = clean_df_2019[~((clean_df_2019.badge_no.fillna("") == ""))]
+    clean_df_2019_20 = clean_df_2019_20[~((clean_df_2019_20.badge_no.fillna("") == ""))]
 
-    df = pd.concat([og_df, clean_df_2019], axis=0)
+    df = pd.concat([og_df, clean_df_2019_20], axis=0)
     return (
         df.drop(columns=["allegation"])
         .rename(columns={"allegation_made": "allegation"})
@@ -227,7 +225,7 @@ def merge_2019_data(df):
 
 def clean():
     df = (
-        pd.read_csv(deba.data("ner/nopd_pib_reports_2014_2019.csv"))
+        pd.read_csv(deba.data("ner/nopd_pib_reports_2014_2020.csv"))
         .pipe(stack_df)
         .pipe(clean_allegation)
         .pipe(extract_tracking_id)
@@ -237,7 +235,7 @@ def clean():
         .pipe(extract_allegation_desc)
         .pipe(extract_allegation_made)
         .pipe(extract_investigation_status)
-        .pipe(merge_2019_data)
+        .pipe(merge_split_tables)
         .pipe(names_to_title_case, ["tracking_id"])
         .pipe(set_values, {"agency": "New Orleans PD"})
     )
@@ -246,4 +244,6 @@ def clean():
 
 if __name__ == "__main__":
     df = clean()
-    df.to_csv(deba.data("clean/cprr_new_orleans_pd_pib_reports_2014_2019.csv"), index=False)
+    df.to_csv(
+        deba.data("clean/cprr_new_orleans_pd_pib_reports_2014_2020.csv"), index=False
+    )
