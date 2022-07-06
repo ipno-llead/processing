@@ -8,7 +8,7 @@ from datamatch import (
 )
 from lib.post import extract_events_from_post, load_for_agency
 import pandas as pd
-from lib.clean import canonicalize_officers
+from lib.clean import canonicalize_officers, float_to_int_str
 
 
 def deduplicate_pprr(pprr):
@@ -450,6 +450,7 @@ def join_pib_and_ipm():
                 "allegation_y": "allegation",
             }
         )
+        .pipe(float_to_int_str, ["officer_primary_key"])
     )
 
 

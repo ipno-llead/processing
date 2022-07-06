@@ -36,8 +36,8 @@ def fuse_cprr(cprr, actions, officer_number_dict):
 
 
 def fuse_pib(pib, officer_number_dict):
-    pib = float_to_int_str(cprr, ["officer_primary_key"])
-    pib.loc[:, "uid"] = cprr.officer_primary_key.map(
+    pib = float_to_int_str(pib, ["officer_primary_key"])
+    pib.loc[:, "uid"] = pib.officer_primary_key.map(
         lambda x: officer_number_dict.get(x, "")
     )
     return pib
