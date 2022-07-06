@@ -32,7 +32,15 @@ def fuse_cprr(cprr, actions, officer_number_dict):
     )
     # cprr.loc[:, 'action'] = cprr.allegation_primary_key.map(
     #     lambda x: actions_dict.get(x, ''))
-    return rearrange_allegation_columns(cprr)
+    return cprr
+
+
+def fuse_pib(pib, officer_number_dict):
+    pib = float_to_int_str(pib, ["officer_primary_key"])
+    pib.loc[:, "uid"] = pib.officer_primary_key.map(
+        lambda x: officer_number_dict.get(x, "")
+    )
+    return pib
 
 
 def fuse_events(
@@ -242,9 +250,12 @@ if __name__ == "__main__":
     pprr_separations = pd.read_csv(
         deba.data("match/pprr_seps_new_orleans_pd_2018_2021.csv")
     )
+    pib = pd.read_csv(deba.data("match/cprr_new_orleans_pib_reports_2014_2020.csv"))
     brady = brady.loc[brady.agency == "New Orleans PD"]
 
     complaints = fuse_cprr(cprr, actions, officer_number_dict)
+    pib = fuse_pib(pib, officer_number_dict)
+    com = rearrange_allegation_columns(pd.concat([complaints, pib]).drop_duplicates(subset=["allegation_uid"], keep="last"))
     personnel = fuse_personnel(
         pprr_ipm,
         lprr,
@@ -274,7 +285,7 @@ if __name__ == "__main__":
     uof_df = rearrange_use_of_force(uof)
     brady_df = rearrange_brady_columns(brady)
     pclaims_df = rearrange_property_claims_columns(pd.concat([pclaims20, pclaims21]))
-    complaints.to_csv(deba.data("fuse/com_new_orleans_pd.csv"), index=False)
+    com.to_csv(deba.data("fuse/com_new_orleans_pd.csv"), index=False)
     personnel.to_csv(deba.data("fuse/per_new_orleans_pd.csv"), index=False)
     events_df.to_csv(deba.data("fuse/event_new_orleans_pd.csv"), index=False)
     lprr_df.to_csv(deba.data("fuse/app_new_orleans_csc.csv"), index=False)
