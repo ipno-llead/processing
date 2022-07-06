@@ -255,7 +255,7 @@ if __name__ == "__main__":
 
     complaints = fuse_cprr(cprr, actions, officer_number_dict)
     pib = fuse_pib(pib, officer_number_dict)
-    com = rearrange_allegation_columns(pd.concat([complaints, pib]))
+    com = rearrange_allegation_columns(pd.concat([complaints, pib]).drop_duplicates(subset=["allegation_uid"], keep="last"))
     personnel = fuse_personnel(
         pprr_ipm,
         lprr,

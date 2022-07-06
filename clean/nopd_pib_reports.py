@@ -1,6 +1,6 @@
 import deba
 import pandas as pd
-from lib.clean import names_to_title_case
+from lib.clean import names_to_title_case, standardize_desc_cols
 from lib.columns import set_values
 from lib.uid import gen_uid
 
@@ -236,6 +236,17 @@ def clean():
         .pipe(extract_allegation_made)
         .pipe(extract_investigation_status)
         .pipe(merge_split_tables)
+        .pipe(
+            standardize_desc_cols,
+            [
+                "allegation_desc",
+                "allegation",
+                "tracking_id",
+                "action",
+                "badge_no",
+                "disposition",
+            ],
+        )
         .pipe(names_to_title_case, ["tracking_id"])
         .pipe(set_values, {"agency": "New Orleans PD"})
     )
