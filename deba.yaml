@@ -2,6 +2,8 @@ dataDir: data
 patterns:
   prerequisites:
     - pd.read_csv(deba.data(r'.+\.csv'))
+  references:
+    - files_meta_frame(r'.+\.dvc')
   targets:
     - "`*`.to_csv(deba.data(r'.+\\.csv'))"
 stages:
@@ -25,16 +27,3 @@ targets:
   - fuse/stop_and_search.csv
   - fuse/appeals.csv
   - fuse/event.csv
-overrides:
-  - target:
-      - meta/minutes_files.csv
-    prerequisites:
-      - $(DEBA_MD5_DIR)/meta/minutes.py.md5
-      - $(DEBA_MD5_DIR)/raw_minutes.dvc.md5
-    recipe: "$(call deba_execute,meta/minutes.py)"
-  - target:
-      - meta/post_officer_history_reports_files.csv
-    prerequisites:
-      - $(DEBA_MD5_DIR)/meta/post_officer_history_reports.py.md5
-      - $(DEBA_MD5_DIR)/raw_post_officer_history_reports.dvc.md5 
-    recipe: "$(call deba_execute,meta/post_officer_history_reports.py)"
