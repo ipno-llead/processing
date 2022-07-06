@@ -263,4 +263,4 @@ if __name__ == "__main__":
     df21 = clean21()
     df22 = clean22()
     df = clean(df18, df21, df22)
-    df.to_csv(deba.data("clean/pprr_seps_new_orleans_pd_2018_2021.csv"), index=False)
+    df.to_csv(deba.data("clean/pprr_seps_new_orleans_pd_2018_2022.csv"), index=False)
