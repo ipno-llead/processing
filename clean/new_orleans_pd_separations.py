@@ -12,7 +12,7 @@ def split_names(df):
         .str.replace(r"(\w+)\.(\w+)", r"\1\2", regex=True)
         .str.replace(r"(\w+?\'?\.?\w+) \, \'(\w+)", r"\2 \1", regex=True)
         .str.replace(r"(\w+) $", r"\1", regex=True)
-        .str.extract(r"(\w+) ?(\w+?-?\'?\w+)? ?(iv|los angeles|charles)?")
+        .str.extract(r"(\w+) ?(\w+?-?\'?\w+)? ?-?(iv|los angeles|charles|ortiz)?")
     )
 
     df.loc[:, "first_name"] = names[0]
@@ -41,7 +41,7 @@ def sanitize_dates(df):
 
 def clean_rank_desc(df):
     df.loc[:, "rank_desc"] = (
-        df.job_title.str.lower().str.strip().str.replace(r" ?police ", " ", regex=True)
+        df.job_title.str.lower().str.strip().str.replace(r" ?police ?", " ", regex=True)
     )
     return df.drop(columns=["job_title"])
 
@@ -110,6 +110,62 @@ def clean_left_reason(df):
     return df.drop(columns=["reason"])
 
 
+def clean_rank_desc22(df):
+    df.loc[:, "rank_desc"] = (
+        df.job_title.str.lower()
+        .str.strip()
+        .str.replace("police", "", regex=True)
+        .str.replace(r"(\w+) +(\w+)", r"\1 \2", regex=True)
+        .str.replace(r"(\w+) +$", r"\1", regex=True)
+        .str.replace(r"^ +(\w+)", r"\1", regex=True)
+        .str.replace(r"(\w+) senior$", r"\1", regex=True)
+        .str.replace(r"supt\. of", "superintendant", regex=True)
+    )
+    return df.drop(columns=["job_title"])
+
+
+def correct_dates_2022(df):
+    df.loc[:, "hire_date"] = df.hire_date.str.replace(
+        r"12\/13\/015", r"12/13/2015", regex=True
+    )
+    return df
+
+
+def clean_left_reason22(df):
+    df.loc[:, "left_reason"] = (
+        df.reason.str.lower()
+        .str.strip()
+        .str.replace(r"(\w+) +$", r"\1", regex=True)
+        .str.replace(r"deceas", "deceased", regex=False)
+        .str.replace(r"^retirement$", "retired", regex=True)
+        .str.replace(r"\/", "; ", regex=True)
+    )
+    return df.drop(columns=["reason"])
+
+
+def clean_left_reason_desc22(df):
+    df.loc[:, "left_reason_desc"] = (
+        df.reason_1.str.lower()
+        .str.strip()
+        .str.replace(r"job d$", "job", regex=True)
+        .str.replace(r"(\/|\,)", "; ", regex=True)
+        .str.replace(r"relocation better", "relocation; better", regex=False)
+        .str.replace(r"^better job better job\,?$", "better job", regex=True)
+    )
+    return df.drop(columns=["reason_1"])
+
+
+def clean_years_of_service(df):
+    df.loc[:, "years_of_service"] = (
+        df.years_of_service.str.lower()
+        .str.strip()
+        .str.replace(r"(\w+)(yrs?|mos?)", r"\1 \2", regex=True)
+        .str.replace(r"yrs?\.?", "years", regex=True)
+        .str.replace(r"mos?", "months", regex=True)
+    )
+    return df
+
+
 def clean21():
     df = (
         pd.read_csv(deba.data("raw/new_orleans_pd/nopd_cprr_separations_2019-2021.csv"))
@@ -164,13 +220,47 @@ def clean18():
     return df
 
 
-def clean(df18, df21):
-    df = pd.concat([df18, df21], axis=0).drop_duplicates(subset=["uid"])
+def clean22():
+    df = (
+        pd.read_csv(deba.data("raw/new_orleans_pd/nopd_cprr_separations_2022.csv"))
+        .pipe(clean_column_names)
+        .rename(columns={"separation_date": "left_date"})
+        .pipe(strip_leading_commas)
+        .pipe(correct_dates_2022)
+        .pipe(split_names)
+        .pipe(clean_dates, ["hire_date"])
+        .pipe(clean_rank_desc22)
+        .pipe(clean_left_reason22)
+        .pipe(clean_left_reason_desc22)
+        .pipe(clean_years_of_service)
+        .pipe(
+            standardize_desc_cols,
+            [
+                "left_reason",
+                "left_reason_desc",
+                "years_of_service",
+                "employee_id",
+                "rank_desc",
+                "left_date",
+            ],
+        )
+        .pipe(set_values, {"agency": "New Orleans PD"})
+        .pipe(gen_uid, ["first_name", "last_name", "agency"])
+        .pipe(
+            gen_uid, ["left_reason", "left_reason_desc", "left_date"], "separation_uid"
+        )
+    )
+    return df
+
+
+def clean(df18, df21, df22):
+    df = pd.concat([df18, df21, df22], axis=0).drop_duplicates(subset=["uid"])
     return df
 
 
 if __name__ == "__main__":
     df18 = clean18()
     df21 = clean21()
-    df = clean(df18, df21)
-    df.to_csv(deba.data("clean/pprr_seps_new_orleans_pd_2018_2021.csv"), index=False)
+    df22 = clean22()
+    df = clean(df18, df21, df22)
+    df.to_csv(deba.data("clean/pprr_seps_new_orleans_pd_2018_2022.csv"), index=False)

@@ -419,7 +419,7 @@ def match_pprr_separations_to_pprr(pprr_seps, pprr_ipm):
 
     matcher.save_pairs_to_excel(
         deba.data(
-            "match/pprr_seps_new_orleans_pd_2019-21_v_pprr_new_orleans_pd_1946_2018.xlsx"
+            "match/pprr_seps_new_orleans_pd_2019-22_v_pprr_new_orleans_pd_1946_2018.xlsx"
         ),
         decision,
     )
@@ -468,7 +468,7 @@ if __name__ == "__main__":
         deba.data("clean/uof_officers_new_orleans_pd_2016_2021.csv")
     )
     pprr_separations = pd.read_csv(
-        deba.data("clean/pprr_seps_new_orleans_pd_2018_2021.csv")
+        deba.data("clean/pprr_seps_new_orleans_pd_2018_2022.csv")
     )
     pib = join_pib_and_ipm()
     award = deduplicate_award(award)
@@ -497,7 +497,7 @@ if __name__ == "__main__":
     pclaims20.to_csv(deba.data("match/pclaims_new_orleans_pd_2020.csv"), index=False)
     pclaims21.to_csv(deba.data("match/pclaims_new_orleans_pd_2021.csv"), index=False)
     pprr_separations.to_csv(
-        deba.data("match/pprr_seps_new_orleans_pd_2018_2021.csv"), index=False
+        deba.data("match/pprr_seps_new_orleans_pd_2018_2022.csv"), index=False
     )
     pib.to_csv(
         deba.data("match/cprr_new_orleans_pib_reports_2014_2020.csv"), index=False
