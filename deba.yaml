@@ -10,6 +10,8 @@ stages:
   - name: meta
   - name: ocr
   - name: features
+    ignoredScripts:
+      - "*.spot-check.py"
   - name: classify
   - name: ner
   - name: clean
