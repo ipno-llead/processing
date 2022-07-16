@@ -10,10 +10,40 @@ import pytesseract
 from tqdm import tqdm
 import deba
 import pandas as pd
+from langdetect import detect
+from langdetect.lang_detect_exception import LangDetectException
 
 
 def _root_dir() -> pathlib.Path:
     return pathlib.Path(os.path.realpath(__file__)).parent.parent
+
+
+def detect_non_english(df: pd.DataFrame) -> pd.DataFrame:
+    """Detect documents whose OCR text is not english
+
+    This is mainly useful to detect PDF with incorrect rotation
+
+    Args:
+        df (pd.DataFrame)
+            the frame already piped through lib.ocr.process_pdf
+
+    Returns:
+        unmodified frame
+    """
+    fileset = set()
+
+    def detect_lang(row: pd.Series):
+        try:
+            lang = detect(row.text)
+        except LangDetectException:
+            return row
+        if lang != "en" and row.fileid not in fileset:
+            fileset.add(row.fileid)
+            print("detected lang %s for %s" % (lang, row.filepath))
+        return row
+
+    df.loc[df.text != "", :].apply(detect_lang, axis=1)
+    return df
 
 
 def process_pdf(
@@ -83,11 +113,13 @@ def process_pdf(
             kwargs["output_folder"] = tempdir.name
 
         images = convert_from_path(pdfpath, **kwargs)
-        for image in tqdm(
-            images,
-            desc="processing %s" % os.path.relpath(pdfpath, str(root_dir)),
-            position=1,
-            leave=False,
+        for ind, image in enumerate(
+            tqdm(
+                images,
+                desc="processing %s" % os.path.relpath(pdfpath, str(root_dir)),
+                position=1,
+                leave=False,
+            )
         ):
             txt = pytesseract.image_to_string(image)
             pages.append(txt)
@@ -108,7 +140,7 @@ def process_pdf(
                 [
                     "New OCR content detected, please run the following commands to share the OCR cache with others:",
                     "",
-                    "    scripts/dvc_add.sh",
+                    "    dvc add --file ocr_cache.dvc data/ocr_cache",
                     "    dvc push",
                     "",
                 ]
