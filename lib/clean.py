@@ -27,6 +27,7 @@ def swap_month_day(month: str, day: str) -> Tuple[str, str]:
 mdy_date_pattern_1 = re.compile(r"^\d{1,2}/\d{1,2}/\d{2}$")
 mdy_date_pattern_2 = re.compile(r"^\d{1,2}/\d{1,2}/\d{4}$")
 mdy_date_pattern_3 = re.compile(r"^\d{1,2}-\d{1,2}-\d{2}$")
+mdy_date_pattern_4 = re.compile(r"^\d{1,2} \d{1,2} \d{4}$")
 dmy_date_pattern = re.compile(r"^\d{1,2}-\w{3}-\d{2}$")
 year_pattern = re.compile(r"^(19|20)\d{2}$")
 year_month_pattern = re.compile(r"^(19|20)\d{4}$")
@@ -70,12 +71,19 @@ def clean_date(val: str) -> tuple[str, str, str]:
         month, day = swap_month_day(month, day)
         return year, month.lstrip("0"), day.lstrip("0")
 
+    m = mdy_date_pattern_4.match(val)
+    if m is not None:
+        [month, day, year] = val.split(" ")
+        year = full_year_str(year)
+        month, day = swap_month_day(month, day)
+        return year, month.lstrip("0"), day.lstrip("0")
+
     m = dmy_date_pattern.match(val)
     if m is not None:
         [day, month, year] = val.split("-")
         month = str(datetime.datetime.strptime(month, "%b").month)
         year = full_year_str(year)
-        return year, month, day
+        return year, month, day.lstrip("0")
 
     m = year_month_pattern.match(val)
     if m is not None:
@@ -88,7 +96,7 @@ def clean_date(val: str) -> tuple[str, str, str]:
     m = month_day_pattern.match(val)
     if m is not None:
         dt = datetime.datetime.strptime(val, "%b-%d")
-        return "", str(dt.month).zfill(2), str(dt.day).zfill(2)
+        return "", str(dt.month), str(dt.day)
 
     raise ValueError('unknown date format "%s"' % val)
 
