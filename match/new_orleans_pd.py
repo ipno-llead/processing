@@ -8,7 +8,7 @@ from datamatch import (
 )
 from lib.post import extract_events_from_post, load_for_agency
 import pandas as pd
-from lib.clean import canonicalize_officers
+from lib.clean import canonicalize_officers, float_to_int_str
 
 
 def deduplicate_pprr(pprr):
@@ -419,7 +419,7 @@ def match_pprr_separations_to_pprr(pprr_seps, pprr_ipm):
 
     matcher.save_pairs_to_excel(
         deba.data(
-            "match/pprr_seps_new_orleans_pd_2019-21_v_pprr_new_orleans_pd_1946_2018.xlsx"
+            "match/pprr_seps_new_orleans_pd_2019-22_v_pprr_new_orleans_pd_1946_2018.xlsx"
         ),
         decision,
     )
@@ -428,6 +428,30 @@ def match_pprr_separations_to_pprr(pprr_seps, pprr_ipm):
 
     pprr_seps.loc[:, "uid"] = pprr_seps.uid.map(lambda x: match_dict.get(x, x))
     return pprr_seps
+
+
+def join_pib_and_ipm():
+    pib = pd.read_csv(
+        deba.data("clean/cprr_new_orleans_pd_pib_reports_2014_2020.csv")
+    ).drop_duplicates(subset=["tracking_id"], keep=False)
+    ipm = pd.read_csv(
+        deba.data("clean/cprr_new_orleans_pd_1931_2020.csv")
+    ).drop_duplicates(subset=["tracking_id"], keep=False)
+
+    df = pd.merge(pib, ipm, on="tracking_id", how="outer")
+    df = df[~((df.allegation_desc.fillna("") == ""))]
+    return (
+        df[~((df.officer_primary_key.fillna("") == ""))]
+        .drop(columns=["allegation_x", "disposition_y", "agency_y"])
+        .rename(
+            columns={
+                "agency_x": "agency",
+                "disposition_x": "disposition",
+                "allegation_y": "allegation",
+            }
+        )
+        .pipe(float_to_int_str, ["officer_primary_key"])
+    )
 
 
 if __name__ == "__main__":
@@ -444,8 +468,9 @@ if __name__ == "__main__":
         deba.data("clean/uof_officers_new_orleans_pd_2016_2021.csv")
     )
     pprr_separations = pd.read_csv(
-        deba.data("clean/pprr_seps_new_orleans_pd_2018_2021.csv")
+        deba.data("clean/pprr_seps_new_orleans_pd_2018_2022.csv")
     )
+    pib = join_pib_and_ipm()
     award = deduplicate_award(award)
     event_df = match_pprr_against_post(pprr_ipm, post)
     award = match_award_to_pprr_ipm(award, pprr_ipm)
@@ -472,5 +497,8 @@ if __name__ == "__main__":
     pclaims20.to_csv(deba.data("match/pclaims_new_orleans_pd_2020.csv"), index=False)
     pclaims21.to_csv(deba.data("match/pclaims_new_orleans_pd_2021.csv"), index=False)
     pprr_separations.to_csv(
-        deba.data("match/pprr_seps_new_orleans_pd_2018_2021.csv"), index=False
+        deba.data("match/pprr_seps_new_orleans_pd_2018_2022.csv"), index=False
+    )
+    pib.to_csv(
+        deba.data("match/cprr_new_orleans_pib_reports_2014_2020.csv"), index=False
     )
