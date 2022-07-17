@@ -1,5 +1,10 @@
+from functools import reduce
+import operator
+
 import deba
 import pandas as pd
+from pandas.core.groupby.generic import DataFrameGroupBy
+import numpy as np
 
 
 def only_minutes(df: pd.DataFrame):
@@ -16,172 +21,85 @@ def split_lines(df: pd.DataFrame):
         df.text.str.lower().str.replace(r"\n\s+", "\n", regex=True).str.split("\n")
     )
     df = df.explode("text")
-    df.loc[:, "text"] = df.text.str.strip().str.replace(r"\s+", " ", regex=True)
+    df.loc[:, "text"] = (
+        df.text.str.strip().str.replace(r"\s+", " ", regex=True).fillna("")
+    )
     df = df[df.text != ""].reset_index(drop=True)
     df.loc[:, "lineno"] = df.groupby(["fileid", "pageno"]).cumcount()
-    df.loc[:, "maxline"] = df.lineno.mask(
-        df.duplicated(["fileid", "pageno"], keep="last")
-    ).bfill()
     return df
 
 
 def extract_pagetype(df: pd.DataFrame):
     pagetypes = {
-        "meeting": (
-            (df.region == "westwego")
-            & (df.text.str.match(r"^the city of westwego municipal"))
-        )
-        | (
-            (df.region == "east_baton_rouge")
-            & (
-                df.text.str.match(r"^municipal fire (and|&) police")
-                | df.text.str.match(r"civil service board$")
-                | df.text.str.match(r"minutes of the meeting")
-                | df.text.str.match(r"council chambers")
-            )
-        )
-        | (
-            (df.region == "louisiana_state")
-            & (
-                df.text.str.match(r"^minutes$")
-                | df.text.str.match(r"state police commission")
-                | df.text.str.match(r"louisiana state police commission")
-                | df.text.str.match(r"general business meeting")
-                | df.text.str.match(r"minutes/actions")
-            )
-        )
-        | (
-            (df.region == "vivian")
-            & (
-                df.text.str.match(r"town hall meeting")
-                | df.text.str.match(r"council meeting$")
-                | df.text.str.match(r"^minutes of")
-            )
-        )
-        | (
-            (df.region == "mandeville")
-            & (
-                df.text.str.match(r"^city of mandeville$")
-                | df.text.str.match(r"^minutes of meeting$")
-                | df.text.str.match(r"^municipal police employees")
-                | df.text.str.match(r"civil service board$")
-                | df.text.str.match(r"^municipal police employees")
-            )
-        )
-        | (
-            (df.region == "kenner")
-            & (
-                df.text.str.match(r"^minutes of the kenner")
-                | df.text.str.match(r"^meeting minutes$")
-            )
-        )
-        | (
-            (df.region == "addis")
-            & (
-                df.text.str.match(r"town of addis")
-                | df.text.str.match(r"minutes")
-                | df.text.str.match(
-                    r"the regular meeting of the mayor and town council"
-                )
-                | df.text.str.match(r"town of addis minutes")
-            )
-        )
-        | (
-            (df.region == "orleans")
-            & (
-                df.text.str.match(r"^civil service")
-                | df.text.str.match(r"service commission$")
-                | df.text.str.match(r"regular monthly meeting")
-                | df.text.str.match(r"special meeting")
-            )
-        )
-        | (
-            (df.region == "broussard")
-            & (
-                df.text.str.match(r"^broussard municipal fire")
-                | df.text.str.match(r"fire and police civil service board$")
-            )
-        )
-        | (
-            (df.region == "carencro")
-            & (
-                df.text.str.match(r"^carencro municipal fire")
-                | df.text.str.match(r"fire and police civil service board$")
-                | df.text.str.match(r"^meeting held on")
-            )
-        )
-        | (
-            (df.region == "harahan")
-            & (
-                df.text.str.match(r"^harahan municipal fire")
-                | df.text.str.match(r"fire & police civil service board$")
-            )
-        )
-        | (
-            (df.region == "lake_charles")
-            & (
-                df.text.str.match(r"board met")
-                | df.text.str.match(r"^regular meeting minutes")
-                | df.text.str.match(r"^lake charles municipal")
-                | df.text.str.match(r"fire and police civil service board$")
-            )
-        )
-        | ((df.region == "youngsville") & df.text.str.match(r"^minutes of the"))
-        | ((df.region == "shreveport") & df.text.str.match(r"minutes"))
-        | ((df.region == "iberia") & df.text.str.match(r"^minutes of"))
-        | (
-            (df.region == "slidell")
-            & df.text.str.match(r"^board members (present|absent)")
-        ),
-        "hearing": (
-            (df.region == "westwego")
-            & (
-                df.text.str.match(r"^westwego municipal fire and police")
-                | df.text.str.match(r"^hearing of appeal")
-            )
-        )
-        | ((df.region == "kenner") & df.text.str.match(r"^hearing of appeal$"))
-        | ((df.region == "sulphur") & df.text.str.match(r"special meeting .+ appeal")),
-        "agenda": ((df.region == "kenner") & df.text.str.match(r"^agenda$"))
-        | ((df.region == "sulphur") & df.text.str.match(r"agenda"))
-        | (
-            (df.region == "lake_charles")
-            & (df.text.str.match(r"^notice$") | df.text.str.match(r"board will meet"))
-        )
-        | ((df.region == "slidell") & df.text.str.match(r"^meeting agenda$")),
+        "meeting": [
+            r".*\b(special )?(meeting|session) of the\b.*",
+            r".+ met in special session.*",
+            r"(meeting held on|minutes of) .+",
+            r"(meeting |actions?/)?minutes",
+            r".+ minutes",
+            r"special .*\bmeeting",
+            r".*\bapproved",
+        ],
+        "agenda": [r"(meeting )?agenda"],
+        "notice": [r"notice"],
+        "hearing": [r"hearing of ", r"special meeting .+ appeal"],
     }
-    df.loc[:, "pagetype"] = ""
-    for pt, index in pagetypes.items():
-        df.loc[index, "pagetype"] = pt
-    return df
+    # for each key of pagetypes, create a column of the same name
+    # with the value being line number where such pattern is detected
+    for key, patterns in pagetypes.items():
+        df.loc[:, key] = np.NaN
+        df.loc[
+            df.text.notna()
+            & reduce(
+                operator.or_, [df.text.str.match(pattern) for pattern in patterns]
+            ),
+            key,
+        ] = df.lineno
 
-
-def extract_contpage(df: pd.DataFrame):
-    df.loc[:, "contpage"] = False
-    df.loc[:, "frontpage"] = False
-    df.loc[
-        ((df.lineno == 0) | (df.lineno == df.maxline))
-        & (
-            df.text.str.match(r".*\bpage ([2-9]|1[0-9])(?: of \d+)?")
-            | df.text.str.match(r"^([2-9]|1[0-9])$")
-        ),
-        "contpage",
-    ] = True
-    df.loc[
-        ((df.lineno == 0) | (df.lineno == df.maxline))
-        & (df.text.str.match(r".*\bpage 1(?: of \d+)?$") | df.text.str.match(r"^1$")),
-        "frontpage",
-    ] = True
-    return df
-
-
-def aggregate_feats(df: pd.DataFrame):
+    # aggregate pagetype columns to the smallest value in each page
+    # in effect, the pagetype columns point to the earliest occurrence in a page
     grouped = df.groupby(["fileid", "pageno"])
-    for feat in ["pagetype", "contpage", "frontpage"]:
-        df.loc[:, feat] = grouped[feat].transform(lambda x: x.max())
-    return df[
-        ["fileid", "pageno", "region", "pagetype", "frontpage", "contpage"]
-    ].drop_duplicates()
+    pagetype_cols = pagetypes.keys()
+    for feat in pagetype_cols:
+        df.loc[:, feat] = grouped[feat].transform(lambda x: x.min())
+
+    # aggregate the new pagetype columns under a single column "pagetype"
+    # selecting the pagetype with the smallest line number in each page
+    df = df.set_index(["fileid", "pageno"], drop=True)
+    pagetype_df = (
+        df[pagetype_cols]
+        .stack()
+        .sort_values()
+        .reset_index(drop=False)
+        .drop_duplicates(["fileid", "pageno"], keep="first")
+    )
+    pagetype_df.columns = ["fileid", "pageno", "pagetype", "lineno"]
+    pagetype_df = pagetype_df[["fileid", "pageno", "pagetype"]].set_index(
+        ["fileid", "pageno"], drop=True
+    )
+    return df.join(pagetype_df).reset_index(drop=False).drop(columns=pagetype_cols)
+
+
+def extract_docpageno(df: pd.DataFrame):
+    df.loc[:, "docpageno"] = np.NaN
+    for ind, pat in [
+        (
+            df.text.str.match(r"^(?:.*\bpage )([1-9]\d*)(?: of \d+)?$")
+            & ~df.text.str.match(r".*\bon page \d+.*"),
+            r"^(?:.*\bpage )([1-9]\d*)(?: of \d+)?$",
+        ),
+        (df.text.str.match(r"^-([1-9]\d*)-$"), r"^-([1-9]\d*)-$"),
+        (df.text.str.match(r"^([1-9]\d*)$"), r"^([1-9]\d*)$"),
+    ]:
+        ind = ind & df.docpageno.isna()
+        values = df.loc[ind, "text"].str.extract(pat, expand=False).astype(float)
+        # eliminate values >= 1000 (probably captured year number)
+        ind = ind & (values < 1000)
+        df.loc[ind, "docpageno"] = values.loc[ind]
+    df.loc[:, "docpageno"] = df.groupby(["fileid", "pageno"])["docpageno"].transform(
+        lambda x: x.min()
+    )
+    return df
 
 
 def minutes_features():
@@ -190,8 +108,21 @@ def minutes_features():
         df.pipe(discard_empty_pages)
         .pipe(split_lines)
         .pipe(extract_pagetype)
-        .pipe(extract_contpage)
-        .pipe(aggregate_feats)
+        .pipe(extract_docpageno)
+        .drop(
+            columns=[
+                "lineno",
+                "text",
+                "filesha1",
+                "filepath",
+                "filetype",
+                "file_category",
+                "year",
+                "month",
+                "day",
+            ]
+        )
+        .drop_duplicates()
         .merge(df[["fileid", "pageno", "text"]], on=["fileid", "pageno"])
     )
 
