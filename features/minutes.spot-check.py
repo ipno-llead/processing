@@ -10,7 +10,8 @@ import deba
 deba.set_root(os.path.dirname(os.path.dirname(__file__)))
 
 data = pd.read_csv(deba.data("features/minutes.csv"))
-data = data.loc[data.docpageno.notna()]
+# data = data.loc[(data.pageno == 1) & (data.pagetype.isna())]
+data = data.loc[data.docpageno.notna() & (data.docpageno > 1) & data.pagetype.notna()]
 
 metadata = pd.read_csv(deba.data("meta/minutes_files.csv"))
 

@@ -1,10 +1,12 @@
 from functools import reduce
+import hashlib
 import operator
 
 import deba
 import pandas as pd
-from pandas.core.groupby.generic import DataFrameGroupBy
 import numpy as np
+
+from lib.clean import float_to_int_str
 
 
 def only_minutes(df: pd.DataFrame):
@@ -32,17 +34,26 @@ def split_lines(df: pd.DataFrame):
 def extract_pagetype(df: pd.DataFrame):
     pagetypes = {
         "meeting": [
-            r".*\b(special )?(meeting|session) of the\b.*",
-            r".+ met in special session.*",
-            r"(meeting held on|minutes of) .+",
-            r"(meeting |actions?/)?minutes",
-            r".+ minutes",
-            r"special .*\bmeeting",
-            r".*\bapproved",
+            r"^.*\b(special )?(meeting|session) of the\b.*$",
+            r"^.+ met in special session.*$",
+            r"^(meeting held on|minutes of) .+$",
+            r".*\bheld a special meeting\b.*",
+            r".*\bactions?/minutes\b.*",
+            r".*\bminutes/actions\b.*",
+            r"^(meeting )?minutes$",
+            r"^minutes to be approved$",
+            r"^.+ minutes$",
+            r"^civil service .*\bmeeting$",
+            r"^special .*\bmeeting( in)?$",
+            r"^(1\. )?roll call\b.*",
         ],
-        "agenda": [r"(meeting )?agenda"],
-        "notice": [r"notice"],
-        "hearing": [r"hearing of ", r"special meeting .+ appeal"],
+        "agenda": [r"^(meeting )?agenda$"],
+        "notice": [r"^(public )?notice$", r"^notice of .+"],
+        "hearing": [
+            r"^hearing of .+$",
+            r"^special meeting .+ appeal$",
+            r".*\bwould like to file a formal appeal\b.*",
+        ],
     }
     # for each key of pagetypes, create a column of the same name
     # with the value being line number where such pattern is detected
@@ -80,7 +91,7 @@ def extract_pagetype(df: pd.DataFrame):
     return df.join(pagetype_df).reset_index(drop=False).drop(columns=pagetype_cols)
 
 
-def extract_docpageno(df: pd.DataFrame):
+def extract_docpageno(df: pd.DataFrame) -> pd.DataFrame:
     df.loc[:, "docpageno"] = np.NaN
     for ind, pat in [
         (
@@ -102,13 +113,31 @@ def extract_docpageno(df: pd.DataFrame):
     return df
 
 
+def generate_docid(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.sort_values(["fileid", "pageno"])
+
+    def gen_docid(row: pd.Series):
+        hash = hashlib.sha1(usedforsecurity=False)
+        hash.update(".".join([row.fileid, "%04d" % row.pageno]).encode("utf8"))
+        return hash.hexdigest()[:8]
+
+    df.loc[
+        (df.docpageno == 1.0) | (df.docpageno.isna() & df.pagetype.notna()), "docid"
+    ] = df.apply(gen_docid, axis=1)
+    df.loc[:, "docid"] = df.groupby("fileid").docid.fillna(method="ffill")
+    print(df.loc[:, ["fileid", "pageno", "docid", "docpageno", "pagetype"]].iloc[60:90])
+    return df
+
+
 def minutes_features():
     df = pd.read_csv(deba.data("ocr/minutes_pdfs.csv")).pipe(only_minutes)
     return (
         df.pipe(discard_empty_pages)
         .pipe(split_lines)
+        # extract features from each line
         .pipe(extract_pagetype)
         .pipe(extract_docpageno)
+        # aggregate lines back into pages
         .drop(
             columns=[
                 "lineno",
@@ -123,7 +152,9 @@ def minutes_features():
             ]
         )
         .drop_duplicates()
+        .pipe(generate_docid)
         .merge(df[["fileid", "pageno", "text"]], on=["fileid", "pageno"])
+        .pipe(float_to_int_str, ["docpageno"])
     )
 
 
