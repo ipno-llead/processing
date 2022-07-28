@@ -1,8 +1,5 @@
-import json
 import os
 import pathlib
-import subprocess
-import tempfile
 
 import pandas as pd
 import deba
@@ -16,48 +13,43 @@ data = data.loc[data.docpageno.notna() & (data.docpageno > 1) & data.pagetype.no
 metadata = pd.read_csv(deba.data("meta/minutes_files.csv"))
 
 
-def resolve_source_path(row):
-    filepath = metadata.loc[metadata.fileid == row["fileid"], "filepath"].iloc[0]
+def resolve_source_path(row: pd.Series):
+    filepath = metadata.loc[metadata.fileid == row.fileid, "filepath"].iloc[0]
     return pathlib.Path(__file__).parent.parent / "data/raw_minutes" / filepath
 
 
-def resolve_pageno(row):
-    return row["pageno"]
+def resolve_pageno(row: pd.Series):
+    return row.pageno
 
 
 if __name__ == "__main__":
+    import random
+    import json
 
-    # def resolve_filepath(file):
-    #     while file.is_symlink():
-    #         file = (file.parent / file.readlink()).resolve()
-    #     return file
-
-    # data_file = resolve_filepath(data_file)
-
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".csv") as f:
-        data.to_csv(f, index=False)
-
-    try:
-        result = subprocess.run(
-            ["/Users/khoipham/go/bin/taste", os.path.realpath(f.name), "-n", "100"],
-            capture_output=True,
-            check=True,
-            cwd=os.path.dirname(__file__),
-            encoding="utf-8",
-        )
-    except subprocess.CalledProcessError as err:
-        print(err.stderr)
-        raise
+    random.seed()
+    total = len(data)
+    n = min(total, 100)
+    indices = set()
+    while True:
+        for i in range(0, 5):
+            v = random.randint(0, total - 1)
+            if v not in indices:
+                indices.add(v)
+                break
+        else:
+            break
+        if len(indices) >= n:
+            break
+    indices = sorted(indices)
     print(
         json.dumps(
             [
                 {
                     "sourcePath": str(resolve_source_path(row)),
                     "pageNumber": resolve_pageno(row),
-                    "record": row,
+                    "record": row.to_dict(),
                 }
-                for row in json.loads(result.stdout.strip())
+                for _, row in data.iloc[indices].iterrows()
             ]
         )
     )
-    os.remove(f.name)
