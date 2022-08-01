@@ -7,19 +7,17 @@ import deba
 import pandas as pd
 import numpy as np
 
-from lib.clean import float_to_int_str
-
 
 def only_minutes(df: pd.DataFrame):
     return df.loc[df.file_category == "minutes"].reset_index(drop=True)
 
 
-def discard_empty_pages(df: pd.DataFrame):
-    df.loc[:, "text"] = df.text.str.strip()
-    return df.loc[df.text != ""].reset_index(drop=True)
-
-
 def split_lines(df: pd.DataFrame):
+    # discard empty pages
+    df.loc[:, "text"] = df.text.str.strip()
+    df = df.loc[df.text != ""].reset_index(drop=True)
+
+    # split text into lines
     df.loc[:, "text"] = df.text.str.replace(r"\n\s+", "\n", regex=True).str.split("\n")
     df = df.explode("text")
     df.loc[:, "text"] = (
@@ -137,58 +135,14 @@ def generate_docid(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def extract_east_baton_rouge_hrg_text(df: pd.DataFrame) -> pd.DataFrame:
-    for pat in [
-        r"^([A-Za-z,’\. ]+) VS?\. (?:BRPD|BATON ROUGE POLICE DEPARTMENT)",
-        r"^(?:\d+\. )?(?:CONTINUATION OF )?APPEALS? (?:HEARINGS? )?(?:FOR|-|ON) (?:OFFICER )?([A-Za-z,’\. ]+)(?: \(.+)?$",
-        r"^([A-Za-z,’\. ]+) APPEALS? HEARINGS? \(Resumed\)",
-        r"^REQUEST BY ([A-Za-z,’\. ]+), BRPD, (?:TO APPEAL|APPEALING).*",
-    ]:
-        extracted = df.text.str.extract(pat, expand=False)
-        df.loc[
-            (df.region == "east_baton_rouge") & extracted.notna(), "accused"
-        ] = extracted.str.strip()
-    df.loc[
-        (df.region == "east_baton_rouge") & df.text.str.contains("APPEAL"),
-        "appeal_header",
-    ] = df.text
-    return df
-
-
-def extract_hrg_text(df: pd.DataFrame) -> pd.DataFrame:
-    return df.pipe(extract_east_baton_rouge_hrg_text)
-
-
-def minutes_features():
-    df = pd.read_csv(deba.data("ocr/minutes_pdfs.csv")).pipe(only_minutes)
-    return (
-        df.pipe(discard_empty_pages)
+if __name__ == "__main__":
+    df = (
+        pd.read_csv(deba.data("ocr/minutes_pdfs.csv"))
+        .pipe(only_minutes)
         .pipe(split_lines)
-        # extract features from each line
         .pipe(extract_pagetype)
         .pipe(extract_docpageno)
         .pipe(generate_docid)
-        .pipe(extract_hrg_text)
-        # aggregate lines back into pages
-        .drop(
-            columns=[
-                "lineno",
-                "text",
-                "filesha1",
-                "filepath",
-                "filetype",
-                "file_category",
-                "year",
-                "month",
-                "day",
-            ]
-        )
-        .drop_duplicates()
-        .merge(df[["fileid", "pageno", "text"]], on=["fileid", "pageno"])
-        .pipe(float_to_int_str, ["docpageno"])
     )
 
-
-if __name__ == "__main__":
-    df = minutes_features()
-    df.to_csv(deba.data("features/minutes.csv"), index=False)
+    df.to_csv(deba.data("features/minutes_docid.csv"), index=False)
