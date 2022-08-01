@@ -1,11 +1,13 @@
 import datetime
 import os
 import re
-from typing import Any, Callable, Dict, List, Set, Tuple, Union
+from typing import Any, Callable, Dict, List, Tuple, Union
 
 import deba
 import pandas as pd
 import numpy as np
+
+from lib.transform import first_valid_value
 
 
 def extract_text(df: pd.DataFrame, columns: Dict[str, List[str]]) -> pd.DataFrame:
@@ -51,6 +53,7 @@ def extract_east_baton_rouge_hearing_text(df: pd.DataFrame) -> pd.DataFrame:
             ]
         },
     )
+    df.loc[:, "title"] = df.text.loc[df.accused.notna()]
     df.loc[:, "new_accused"] = df.accused.notna().astype(int)
     df.loc[:, "accused"] = df.accused.str.replace(
         r" is continued", "", regex=True, flags=re.IGNORECASE
@@ -62,18 +65,22 @@ def extract_east_baton_rouge_hearing_text(df: pd.DataFrame) -> pd.DataFrame:
         .map(lambda x: np.NaN if x == 0.0 else x - 1)
     )
     gb = df.groupby(["docid", "hrg_no"])
-    accused = gb.accused.first()
     hrg_text = gb.apply(
         lambda x: pd.Series(
             {
                 "hrg_text": "\n".join(x.text),
                 "start_pageno": x.pageno.min(),
                 "end_pageno": x.pageno.max(),
+                "parsed_date": first_valid_value(x.parsed_date),
             },
-            index=["hrg_text", "start_pageno", "end_pageno"],
+            index=["hrg_text", "start_pageno", "end_pageno", "parsed_date"],
         )
     )
-    return hrg_text.join(pd.DataFrame(accused, columns=["accused"]))
+    return hrg_text.join(
+        pd.concat(
+            [gb.accused.first(), gb.title.first()], axis=1, keys=["accused", "title"]
+        )
+    )
 
 
 def extract_kenner_hearing_text(df: pd.DataFrame) -> pd.DataFrame:
@@ -139,43 +146,64 @@ def extract_kenner_hearing_text(df: pd.DataFrame) -> pd.DataFrame:
                 "hrg_text": "\n".join(x.text),
                 "start_pageno": x.pageno.min(),
                 "end_pageno": x.pageno.max(),
+                "parsed_date": first_valid_value(x.parsed_date),
             },
-            index=["hrg_text", "start_pageno", "end_pageno"],
+            index=["hrg_text", "start_pageno", "end_pageno", "parsed_date"],
         )
     )
-    accused = (
-        df.join(pd.DataFrame(accused, columns=["accused"]), how="left")
-        .groupby(["docid", "hrg_no"])
-        .accused.first()
+    df = (
+        pd.concat(
+            [
+                df.hrg_no,
+                accused,
+                agenda_item_title.loc[agenda_item_title.notna()].map(
+                    lambda l: "\n".join(l)
+                ),
+            ],
+            axis=1,
+            keys=["hrg_no", "accused", "title"],
+        )
+        .reset_index()
+        .drop_duplicates()
     )
-    return hrg_text.join(pd.DataFrame(accused, columns=["accused"]))
+    return hrg_text.join(
+        df.loc[df.hrg_no.notna()]
+        .drop(columns="kenner_agenda_item")
+        .set_index(["docid", "hrg_no"])
+    )
 
 
-def extract_hearing_text(df: pd.DataFrame) -> pd.DataFrame:
+def extract_hearing_text() -> pd.DataFrame:
     """Extracts `hrg_text` and `accused` columns
 
     The frame is split by `region` and passed to functions as mapped.
     Each function must return a dataframe with
-        columns=['hrg_text', 'start_pageno', 'end_pageno', 'accused'] and
+        columns=['hrg_text', 'start_pageno', 'end_pageno', 'accused', 'title'] and
         index=['docid', 'hrg_no']
-    (this shape will be enforced automatically)
     """
-    df = df.pipe(
-        mapped_apply,
+    df = pd.read_csv(deba.data("features/minutes_docid.csv"))
+    hrg_text_df = mapped_apply(
+        df,
         "region",
         {
             "east_baton_rouge": extract_east_baton_rouge_hearing_text,
             "kenner": extract_kenner_hearing_text,
         },
     )
-    df.loc[:, "accused"] = df.accused.map(
+    hrg_text_df.loc[:, "accused"] = hrg_text_df.accused.map(
         lambda l: np.NaN
         if pd.isna(l)
-        else tuple(
-            v for s in l for v in s.lower().replace(r" and ", " & ").split(" & ")
+        else " & ".join(
+            tuple(v for s in l for v in s.lower().replace(r" and ", " & ").split(" & "))
         )
     )
-    return df.reset_index()
+    return (
+        hrg_text_df.reset_index()
+        .set_index("docid", drop=True)
+        .join(df.set_index("docid")[["fileid"]])
+        .drop_duplicates()
+        .reset_index()
+    )
 
 
 def print_samples(df: pd.DataFrame):
@@ -194,13 +222,8 @@ def print_samples(df: pd.DataFrame):
 
 if __name__ == "__main__":
     deba.set_root(os.path.dirname(os.path.dirname(__file__)))
-    df = pd.read_csv(deba.data("features/minutes_docid.csv"))
-    hrg_text_df = (
-        extract_hearing_text(df)
-        .set_index("docid", drop=True)
-        .join(df.set_index("docid")[["fileid"]])
-    )
+    df = extract_hearing_text()
 
-    print_samples(hrg_text_df)
+    print_samples(df)
 
-    hrg_text_df.to_csv(deba.data("features/minutes_hearing_text.csv"), index=False)
+    df.to_csv(deba.data("features/minutes_hearing_text.csv"), index=False)

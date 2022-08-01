@@ -1,3 +1,5 @@
+from datetime import datetime, date
+import os
 from functools import reduce
 import hashlib
 import operator
@@ -6,6 +8,8 @@ import re
 import deba
 import pandas as pd
 import numpy as np
+
+from lib.transform import first_valid_value
 
 
 def only_minutes(df: pd.DataFrame):
@@ -104,6 +108,7 @@ def extract_docpageno(df: pd.DataFrame) -> pd.DataFrame:
         ),
         (df.text.str.match(r"^-([1-9]\d*)-$", flags=re.IGNORECASE), r"^-([1-9]\d*)-$"),
         (df.text.str.match(r"^([1-9]\d*)$", flags=re.IGNORECASE), r"^([1-9]\d*)$"),
+        (df.text.str.match(r".*\bpg\. ([1-9]\d*)\b$"), r".*\bpg\. ([1-9]\d*)\b$"),
     ]:
         ind = ind & df.docpageno.isna()
         values = (
@@ -118,6 +123,52 @@ def extract_docpageno(df: pd.DataFrame) -> pd.DataFrame:
         lambda x: x.min()
     )
     return df
+
+
+def extract_date(df: pd.DataFrame) -> pd.DataFrame:
+    """Extracts date from the first 4 lines and the last 4 lines of each page"""
+    full_months = [date(1, x, 1).strftime("%B").lower() for x in range(1, 13)]
+    df = df.set_index(["fileid", "pageno", "lineno"]).sort_index()
+
+    df.loc[:, "parsed_date"] = np.NaN
+
+    def extract_full_date(sr: pd.Series) -> pd.Series:
+        return sr.str.extract(
+            pat,
+            expand=False,
+            flags=re.IGNORECASE,
+        )
+
+    def parse_date(x):
+        if pd.isna(x):
+            return np.NaN
+        try:
+            v = parse_func(x)
+            if v.year > 2100:
+                return np.NaN
+            return v
+        except ValueError:
+            return np.NaN
+
+    for pat, parse_func in [
+        (
+            r".*\b((?:%s) \d{1,2},? \d{4})\b.*" % "|".join(full_months),
+            lambda x: datetime.strptime(x.replace(",", ""), "%B %d %Y"),
+        ),
+        (
+            r".*\b(\d{1,2}/\d{1,2}/\d{4})\b.*",
+            lambda x: datetime.strptime(x, "%m/%d/%Y"),
+        ),
+        (r".*\b(\d{4}-\d{2}-\d{2})\b.*", lambda x: datetime.strptime(x, "%Y-%m-%d")),
+    ]:
+        gb = df.loc[df.parsed_date.isna()].groupby(["fileid", "pageno"])
+        df.loc[df.parsed_date.isna(), "parsed_date"] = (
+            gb.head(4)
+            .text.transform(extract_full_date)
+            .combine_first(gb.tail(4).text.transform(extract_full_date))
+            .map(parse_date)
+        )
+    return df.reset_index()
 
 
 def generate_docid(df: pd.DataFrame) -> pd.DataFrame:
@@ -135,14 +186,48 @@ def generate_docid(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
+def print_samples(df: pd.DataFrame):
+    import vscodeSpotCheck
+    import pathlib
+
+    metadata = pd.read_csv(deba.data("meta/minutes_files.csv"))
+    df = (
+        df.set_index(["fileid", "pageno"])
+        .sort_index()
+        .groupby(["fileid", "pageno"])
+        .apply(
+            lambda x: pd.Series(
+                {
+                    "text": "\n".join(x.text),
+                    "parsed_date": first_valid_value(x.parsed_date),
+                    "docpageno": first_valid_value(x.docpageno),
+                },
+                index=["text", "parsed_date", "docpageno"],
+            )
+        )
+        .reset_index()
+    )
+    vscodeSpotCheck.print_samples(
+        df.loc[df.docpageno.isna()],
+        resolve_source_path=lambda row: pathlib.Path(__file__).parent.parent
+        / "data/raw_minutes"
+        / metadata.loc[metadata.fileid == row.fileid, "filepath"].iloc[0],
+        resolve_pageno=lambda row: row.pageno,
+    )
+
+
 if __name__ == "__main__":
+    deba.set_root(os.path.dirname(os.path.dirname(__file__)))
     df = (
         pd.read_csv(deba.data("ocr/minutes_pdfs.csv"))
         .pipe(only_minutes)
         .pipe(split_lines)
         .pipe(extract_pagetype)
         .pipe(extract_docpageno)
+        .pipe(extract_date)
         .pipe(generate_docid)
     )
+
+    print_samples(df)
 
     df.to_csv(deba.data("features/minutes_docid.csv"), index=False)
