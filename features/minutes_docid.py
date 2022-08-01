@@ -186,6 +186,34 @@ def generate_docid(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
+def region_to_agency(df: pd.DataFrame) -> pd.DataFrame:
+    df.loc[:, "agency"] = df.region.replace(
+        {
+            "youngsville": "Youngsville PD",
+            "shreveport": "Shreveport PD",
+            "mandeville": "Mandeville PD",
+            "broussard": "Broussard PD",
+            "greenwood": "Greenwood PD",
+            "carencro": "Carencro PD",
+            "louisiana_state": "Louisiana State PD",
+            "slidell": "Slidell PD",
+            "sulphur": "Sulphur PD",
+            "bossier": "Bossier SO",
+            "monroe": "Monroe PD",
+            "iberia": "New Iberia PD",
+            "kenner": "Kenner PD",
+            "westmonroe": "West Monroe PD",
+            "lake_charles": "Lake Charles PD",
+            "addis": "Addis PD",
+            "east_baton_rouge": "Baton Rouge PD",
+            "westwego": "Westwego PD",
+            "vivian": "Vivian PD",
+            "harahan": "Harahan PD",
+        }
+    )
+    return df.drop(columns=["region"])
+
+
 def print_samples(df: pd.DataFrame):
     import vscodeSpotCheck
     import pathlib
@@ -226,6 +254,7 @@ if __name__ == "__main__":
         .pipe(extract_docpageno)
         .pipe(extract_date)
         .pipe(generate_docid)
+        .pipe(region_to_agency)
     )
 
     print_samples(df)

@@ -176,18 +176,18 @@ def extract_kenner_hearing_text(df: pd.DataFrame) -> pd.DataFrame:
 def extract_hearing_text() -> pd.DataFrame:
     """Extracts `hrg_text` and `accused` columns
 
-    The frame is split by `region` and passed to functions as mapped.
+    The frame is split by `agency` and passed to functions as mapped.
     Each function must return a dataframe with
-        columns=['hrg_text', 'start_pageno', 'end_pageno', 'accused', 'title'] and
+        columns=['hrg_text', 'start_pageno', 'end_pageno', 'parsed_date', 'accused', 'title'] and
         index=['docid', 'hrg_no']
     """
     df = pd.read_csv(deba.data("features/minutes_docid.csv"))
     hrg_text_df = mapped_apply(
         df,
-        "region",
+        "agency",
         {
-            "east_baton_rouge": extract_east_baton_rouge_hearing_text,
-            "kenner": extract_kenner_hearing_text,
+            "Baton Rouge PD": extract_east_baton_rouge_hearing_text,
+            "Kenner PD": extract_kenner_hearing_text,
         },
     )
     hrg_text_df.loc[:, "accused"] = hrg_text_df.accused.map(
