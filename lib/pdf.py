@@ -37,7 +37,7 @@ def subset_pdf(
         total = reader.getNumPages()
         if page_to > total:
             raise PDFSubsetError(
-                "error subsetting %s: page_to (%d) must be less than total (%d)"
+                "error subsetting %s: page_to (%d) must be less than or equal to total (%d)"
                 % (input_filepath, page_to, total)
             )
         writer = PdfFileWriter()

@@ -1,3 +1,4 @@
+import sys
 from datetime import datetime, date
 import os
 from functools import reduce
@@ -8,8 +9,6 @@ import re
 import deba
 import pandas as pd
 import numpy as np
-
-from lib.transform import first_valid_value
 
 
 def only_minutes(df: pd.DataFrame):
@@ -214,41 +213,36 @@ def region_to_agency(df: pd.DataFrame) -> pd.DataFrame:
     return df.drop(columns=["region"])
 
 
-def print_samples(df: pd.DataFrame):
+def print_samples(ocr_pdfs: pd.DataFrame, df: pd.DataFrame):
     import vscodeSpotCheck
     import pathlib
 
-    metadata = pd.read_csv(deba.data("meta/minutes_files.csv"))
     df = (
-        df.set_index(["fileid", "pageno"])
-        .sort_index()
-        .groupby(["fileid", "pageno"])
-        .apply(
-            lambda x: pd.Series(
-                {
-                    "text": "\n".join(x.text),
-                    "parsed_date": first_valid_value(x.parsed_date),
-                    "docpageno": first_valid_value(x.docpageno),
-                },
-                index=["text", "parsed_date", "docpageno"],
-            )
-        )
-        .reset_index()
+        ocr_pdfs[["fileid", "filepath", "text", "pageno"]]
+        .merge(df[["fileid", "docid", "docpageno"]], on="fileid", how="left")
+        .sort_values(["fileid", "pageno"])
+    )
+    df = df.merge(
+        df.groupby("docid")
+        .agg(first_pageno=("pageno", "first"), last_pageno=("pageno", "last"))
+        .reset_index(),
+        on="docid",
+        how="left",
     )
     vscodeSpotCheck.print_samples(
-        df.loc[df.docpageno.isna()],
+        df,
         resolve_source_path=lambda row: pathlib.Path(__file__).parent.parent
         / "data/raw_minutes"
-        / metadata.loc[metadata.fileid == row.fileid, "filepath"].iloc[0],
+        / row.filepath,
         resolve_pageno=lambda row: row.pageno,
     )
 
 
 if __name__ == "__main__":
     deba.set_root(os.path.dirname(os.path.dirname(__file__)))
+    ocr_pdfs = pd.read_csv(deba.data("ocr/minutes_pdfs.csv"))
     df = (
-        pd.read_csv(deba.data("ocr/minutes_pdfs.csv"))
-        .pipe(only_minutes)
+        ocr_pdfs.pipe(only_minutes)
         .pipe(split_lines)
         .pipe(extract_pagetype)
         .pipe(extract_docpageno)
@@ -257,6 +251,6 @@ if __name__ == "__main__":
         .pipe(region_to_agency)
     )
 
-    print_samples(df)
+    print_samples(ocr_pdfs, df)
 
     df.to_csv(deba.data("features/minutes_docid.csv"), index=False)

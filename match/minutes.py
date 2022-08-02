@@ -68,4 +68,4 @@ if __name__ == "__main__":
     per = pd.read_csv(deba.data(r"fuse/personnel.csv"))
     mins = pd.read_csv(deba.data(r"features/minutes_hearing_text.csv"))
     matched_mins = match_minutes_accused_to_personnel(mins, per)
-    matched_mins.to_csv(deba.data(r"match/minutes_accused.csv"), index=False)
+    matched_mins.to_csv(deba.data(r"match/minutes_hearing_text.csv"), index=False)
