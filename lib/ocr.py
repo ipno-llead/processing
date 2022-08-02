@@ -1,17 +1,20 @@
 import os
 from pathlib import Path
 import pathlib
-import tempfile
 import json
 from typing import List
 
-from pdf2image import convert_from_path
-import pytesseract
+os.environ["USE_TORCH"] = "1"
 from tqdm import tqdm
 import deba
 import pandas as pd
 from langdetect import detect
 from langdetect.lang_detect_exception import LangDetectException
+
+import matplotlib.pyplot as plt
+
+from doctr.io import DocumentFile
+from doctr.models import ocr_predictor
 
 
 def _root_dir() -> pathlib.Path:
@@ -43,13 +46,11 @@ def detect_non_english(df: pd.DataFrame) -> pd.DataFrame:
         return row
 
     df.loc[df.text != "", :].apply(detect_lang, axis=1)
-    return df
 
 
 def process_pdf(
     df: pd.DataFrame,
     dir_name: str,
-    output_images_to_tempdir: bool = True,
     ignore_cache: bool = False,
 ) -> pd.DataFrame:
     """Reads and returns PDF content as text
@@ -80,9 +81,6 @@ def process_pdf(
             a frame containing PDFs metadata
         dir_name (str):
             the parent directory of all PDF files
-        output_images_to_tempdir (bool):
-            output PDF images to a tempdir. If set to False, keep images
-            in memory instead.
         ignore_cache (bool):
             if set to True, don't read from or write to OCR cache.
             Useful for testing new OCR configs.
@@ -94,8 +92,11 @@ def process_pdf(
     root_dir = _root_dir()
     cache_root_dir = deba.data("ocr_cache") / os.path.relpath(dir_name, str(root_dir))
     new_file_detected = False
+    predictor = ocr_predictor(pretrained=True)
     for _, row in tqdm(df.iterrows(), desc="OCR pdf", total=df.shape[0], position=0):
         pdfpath = "%s/%s" % (dir_name, row.filepath)
+        doc = DocumentFile.from_pdf(pdfpath)
+        result = predictor(doc)
 
         if not ignore_cache:
             ocr_cachefile: Path = cache_root_dir / (row.filesha1 + ".json")
@@ -106,26 +107,19 @@ def process_pdf(
                     texts.append(json.load(f))
                 continue
 
-        pages = []
-        kwargs = {"dpi": 100}
-        if output_images_to_tempdir:
-            tempdir = tempfile.TemporaryDirectory()
-            kwargs["output_folder"] = tempdir.name
+        doc = DocumentFile.from_pdf(pdfpath)
+        result = predictor(doc)
 
-        images = convert_from_path(pdfpath, **kwargs)
-        for ind, image in enumerate(
-            tqdm(
-                images,
-                desc="processing %s" % os.path.relpath(pdfpath, str(root_dir)),
-                position=1,
-                leave=False,
+        pages = [
+            "\n".join(
+                [
+                    " ".join([word.value for word in ln.words])
+                    for blk in pg.blocks
+                    for ln in blk.lines
+                ]
             )
-        ):
-            txt = pytesseract.image_to_string(image)
-            pages.append(txt)
-
-        if output_images_to_tempdir:
-            tempdir.cleanup()
+            for pg in result.pages
+        ]
 
         if not ignore_cache:
             with open(ocr_cachefile, "w") as f:
