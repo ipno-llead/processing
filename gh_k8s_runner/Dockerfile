@@ -16,3 +16,6 @@ RUN cd /tmp \
     && make \
     && sudo make install \
     && sudo rm -rf /tmp/make-4.3 /tmp/make-4.3.tar.gz
+
+RUN sudo update-alternatives --install /usr/bin/python python /usr/bin/python3.9 1 \
+    && sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.9 1

@@ -6,10 +6,7 @@ To ensure minimal reprocessing of data whenever the code change, this runner per
 
 1. Install [ARC](https://github.com/actions-runner-controller/actions-runner-controller#installation) with Kubectl
 2. Authenticate ARC using [Github App](https://github.com/actions-runner-controller/actions-runner-controller#deploying-using-github-app-authentication)
-3. `docker build -t ghrunner gh_k8s_runner`
-4. `docker tag ghrunner:latest gcr.io/{project_id}/ghrunner:$(docker images --format '{{.ID}}' ghrunner:latest)`
-5. `docker push gcr.io/{project_id}/ghrunner:$(docker images --format '{{.ID}}' ghrunner:latest)`
-6. `kustomize build gh_k8s_runner | sed "s/image: ghrunner/image: gcr.io\/{project_id}\/ghrunner:$(docker images --format '{{.ID}}' ghrunner:latest)/" | kubectl apply -f -`
+3. Run `gh_k8s_runner/install.sh <project_id>`
 
 ## Using this runner
 
