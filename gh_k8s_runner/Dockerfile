@@ -4,7 +4,7 @@ RUN sudo apt update -y \
     && sudo apt install -y software-properties-common \
     && sudo add-apt-repository ppa:deadsnakes/ppa \
     && sudo add-apt-repository ppa:alex-p/tesseract-ocr-devel \
-    && sudo apt install -y poppler-utils tesseract-ocr python3.9 \
+    && sudo apt install -y poppler-utils tesseract-ocr python3.9 python3.9-dev \
     && sudo rm -rf /var/lib/apt/lists/*
 
 ADD http://ftp.gnu.org/gnu/make/make-4.3.tar.gz /tmp/
