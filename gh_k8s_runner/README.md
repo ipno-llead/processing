@@ -11,3 +11,7 @@ To ensure minimal reprocessing of data whenever the code change, this runner per
 ## Using this runner
 
 Set `runs-on: cdi-runner` on any job that should run on this runner.
+
+## IMPORTANT
+
+Rerun `gh_k8s_runner/install.sh <project_id>` whenever `requirements.txt` is updated, otherwise Github runner will not be able to pick up new dependencies.

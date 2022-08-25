@@ -12,9 +12,6 @@ jobs:
         id: findPr
         with:
           state: open
-      - run: python -m pip install -r requirements.txt
-      - name: install wrgl
-        run: sudo bash -c 'curl -L https://github.com/wrgl/wrgl/releases/latest/download/install.sh | bash'
       - name: dvc pull
         run: |
           find dvc/data/raw -type f | xargs -I{} sed -iE 's/wdir\: ..\/..\/..\/data\/raw/wdir\: \/runner\/_work\/data\/data\/raw/g' {}

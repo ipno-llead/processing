@@ -19,3 +19,13 @@ RUN cd /tmp \
 
 RUN sudo update-alternatives --install /usr/bin/python python /usr/bin/python3.9 1 \
     && sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.9 1
+
+ADD requirements.txt /tmp
+
+RUN python -m pip install -r /tmp/requirements.txt
+
+ADD https://github.com/wrgl/wrgl/releases/download/v0.12.0/install.sh /tmp/install_wrgl.sh
+
+RUN sudo chmod +x /tmp/install_wrgl.sh \
+    && sudo /tmp/install_wrgl.sh \
+    && sudo rm /tmp/install_wrgl.sh /tmp/requirements.txt
