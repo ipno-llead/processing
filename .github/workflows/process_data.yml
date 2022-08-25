@@ -12,24 +12,6 @@ jobs:
         id: findPr
         with:
           state: open
-      - uses: actions/setup-python@v3
-        with:
-          python-version: "3.9"
-          architecture: "x64"
-          cache: "pip"
-      - name: install make
-        run: |
-          curl http://archive.ubuntu.com/ubuntu/pool/main/m/make-dfsg/make_4.3-4ubuntu1_amd64.deb > ~/make_4.3-4ubuntu1_amd64.deb
-          sudo apt-get install ~/make_4.3-4ubuntu1_amd64.deb
-      - name: install poppler-utils and tesseract
-        run: |
-          sudo apt update -y
-          sudo apt install -y poppler-utils
-          sudo add-apt-repository ppa:alex-p/tesseract-ocr-devel
-          sudo apt install -y tesseract-ocr
-      - run: pip install -r requirements.txt
-      - name: install wrgl
-        run: sudo bash -c 'curl -L https://github.com/wrgl/wrgl/releases/latest/download/install.sh | bash'
       - name: dvc pull
         run: |
           find dvc/data/raw -type f | xargs -I{} sed -iE 's/wdir\: ..\/..\/..\/data\/raw/wdir\: \/runner\/_work\/data\/data\/raw/g' {}
