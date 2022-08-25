@@ -19,10 +19,8 @@ jobs:
           cache: "pip"
       - name: install make
         run: |
-          sudo add-apt-repository 'deb https://mirrors.kernel.org/ubuntu impish main'
-          sudo apt update
-          sudo apt install make
-          make --version
+          curl https://mirrors.kernel.org/ubuntu/pool/main/m/make-dfsg/make_4.3-4ubuntu1_amd64.deb > ~/make_4.3-4ubuntu1_amd64.deb
+          sudo apt-get install ~/make_4.3-4ubuntu1_amd64.deb
       - name: install poppler-utils and tesseract
         run: |
           sudo apt update -y
