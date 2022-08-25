@@ -264,7 +264,6 @@ def fuse_appeal_hearing_logs():
     return rearrange_appeal_hearing_columns(
         pd.concat(
             [
-                pd.read_csv(deba.data("fuse/app_baton_rouge_pd.csv")),
                 pd.read_csv(deba.data("fuse/app_new_orleans_csc.csv")),
                 pd.read_csv(deba.data("fuse/app_louisiana_state_police.csv")),
             ]
@@ -336,4 +335,3 @@ if __name__ == "__main__":
     event_df = pd.concat([event_df, post_event_df], ignore_index=True)
     event_df.to_csv(deba.data("fuse/event_pre_post.csv"), index=False)
     property_claims_df.to_csv(deba.data("fuse/property_claims.csv"), index=False)
-    
