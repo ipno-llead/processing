@@ -11,7 +11,7 @@ def only_pdf(df: pd.DataFrame) -> pd.DataFrame:
 def process_all_pdfs() -> pd.DataFrame:
     dir_name = real_dir_path("raw_post_advocate_ohr.dvc")
     return (
-        pd.read_csv(deba.data("meta/advocate_post_ohr_files.csv      "))
+        pd.read_csv(deba.data("meta/advocate_post_ohr_files.csv"))
         .pipe(only_pdf)
         .pipe(process_pdf, dir_name)
     )

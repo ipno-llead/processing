@@ -7,13 +7,14 @@ from lib.columns import (
 from lib import events
 
 
-def fuse_events(pprr):
+def fuse_events(post, post_advocate):
     builder = events.Builder()
     builder.extract_events(
-        pprr,
+        post,
         {
             events.OFFICER_HIRE: {
                 "prefix": "hire",
+                "parse_dates": True,
                 "keep": [
                     "uid",
                     "agency",
@@ -21,6 +22,30 @@ def fuse_events(pprr):
             },
             events.OFFICER_LEFT: {
                 "prefix": "left",
+                "parse_dates": True,
+                "keep": [
+                    "uid",
+                    "left_reason",
+                    "agency",
+                ],
+            },
+        },
+        ["uid"],
+    )
+    builder.extract_events(
+        post_advocate,
+        {
+            events.OFFICER_HIRE: {
+                "prefix": "hire",
+                "parse_date": True,
+                "keep": [
+                    "uid",
+                    "agency",
+                ],
+            },
+            events.OFFICER_LEFT: {
+                "prefix": "left",
+                "parse_date": True,
                 "keep": [
                     "uid",
                     "left_reason",
@@ -35,10 +60,11 @@ def fuse_events(pprr):
 
 if __name__ == "__main__":
     post = pd.read_csv(deba.data("match/post_officer_history.csv"))
+    post_advocate = pd.read_csv(deba.data("match/advocate_post_officer_history.csv"))
     events_pre_post = pd.read_csv(deba.data("fuse/event_pre_post.csv"))
     per_pre_post = pd.read_csv(deba.data("fuse/personnel_pre_post.csv"))
 
-    post_events = fuse_events(post)
+    post_events = fuse_events(post, post_advocate)
     event_df = rearrange_event_columns(
         pd.concat([post_events, events_pre_post]).drop_duplicates(subset=["event_uid"])
     )

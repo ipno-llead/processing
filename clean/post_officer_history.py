@@ -255,7 +255,6 @@ def clean():
         )
         .pipe(clean_agency)
         .pipe(clean_hire_date)
-        .pipe(clean_dates, ["hire_date", "left_date"])
         .pipe(gen_uid, ["first_name", "last_name", "middle_name", "agency"])
         .pipe(drop_rows_missing_agency_and_duplicates)
         .pipe(check_for_duplicate_uids)
