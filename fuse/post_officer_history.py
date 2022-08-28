@@ -34,7 +34,7 @@ def fuse_events(post):
 
 
 if __name__ == "__main__":
-    post = pd.read_csv(deba.data("clean/post_officer_history.csv"))
+    post = pd.read_csv(deba.data("match/post_officer_history.csv"))
     events_pre_post = pd.read_csv(deba.data("fuse/event_pre_post.csv"))
     per_pre_post = pd.read_csv(deba.data("fuse/personnel_pre_post.csv"))
 
