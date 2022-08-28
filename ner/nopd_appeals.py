@@ -9,17 +9,16 @@ import pandas as pd
 
 
 def read_pdfs():
-    pdfs = pd.read_csv(deba.data("ocr/post_officer_history_reports_pdfs.csv"))
+    pdfs = pd.read_csv(deba.data("ocr/nopd_appeals_pdfs.csv"))
     return pdfs
 
 
 def spacy_model(pdfs):
     ###  import labeled_data that has been exported from doccano
-
     labeled_data = []
     with open(
-        r"data/raw/post/post_officer_history/training_data/post_officer_history.jsonl",
-        "r",
+        r"data/raw/new_orleans_pd/training_data/ayyub.jsonl",
+        "r", encoding="utf-8",
     ) as read_file:
         for line in read_file:
             data = json.loads(line)
@@ -28,34 +27,40 @@ def spacy_model(pdfs):
     TRAINING_DATA = []
     for entry in labeled_data:
         entities = []
-        for e in entry["label"]:
-            entities.append((e[0], e[1], e[2]))
-        spacy_entry = (entry["data"], {"entities": entities})
-        TRAINING_DATA.append(spacy_entry)
+        for e in entry["entities"]:
+            k, v = list(zip(*e.items()))
+            id, label, start, end = v
+            ents = start, end, label
+            entities.append(ents)
+        spacy_entry = (entry["text"], {"entities": entities})
+        TRAINING_DATA.append(spacy_entry)   
 
     ### load trained model: nlp = spacy.load("post_officer_history.model") or .
     ### train model
 
-    # nlp = spacy.load("data/ner/post/post_officer_history/model/post_officer_history.model")
+    # nlp = spacy.load("padme.model")
+    
     nlp = spacy.blank("en")
     ner = nlp.create_pipe("ner")
-    nlp.add_pipe("ner")
-    ner.add_label("officer_name")
-    ner.add_label("officer_sex")
-    ner.add_label("agency")
+    nlp.add_pipe('ner')
+    ner.add_label("accused_name")
+    ner.add_label("appeal_hearing_date")
+    ner.add_label("appeal_hearing_disposition")
+    ner.add_label("decision_notification_date")
+    ner.add_label("docket_number")
 
     optimizer = nlp.begin_training()
-    for itn in range(500):
+    for itn in range(100):
         random.shuffle(TRAINING_DATA)
         losses = {}
-        for batch in spacy.util.minibatch(
-            TRAINING_DATA, size=compounding(3.0, 2.0, 1.001)
-        ):
+        for batch in spacy.util.minibatch(TRAINING_DATA, size=2):
             for text, annotations in batch:
                 doc = nlp.make_doc(text)
                 example = Example.from_dict(doc, annotations)
-                nlp.update([example], sgd=optimizer, losses=losses, drop=0.4)
-                print(losses)
+                nlp.update([example], sgd=optimizer, losses=losses, drop=0.2)
+            print(losses)
+
+    nlp.to_disk("padme_2.model")
 
     # save model to disk:
     # nlp.to_disk("../data/raw/post/post_officer_history/model/post_officer_history_v2.model")
@@ -79,10 +84,11 @@ def spacy_model(pdfs):
         entities.append(renamed_ents)
 
     ner = pd.DataFrame(entities)
-    return ner
+    df = pd.concat([ner, pdfs], axis=1)
+    return df
 
 
 if __name__ == "__main__":
     pdfs = read_pdfs()
     ner = spacy_model(pdfs)
-    ner.to_csv(deba.data("ner/post_officer_history_reports.csv"), index=False)
+    ner.to_csv(deba.data("ner/nopd_appeals_pdfs.csv"), index=False)

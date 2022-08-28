@@ -1095,6 +1095,12 @@ branch:
     file: data/fuse/property_claims.csv
     primaryKey:
       - property_claims_uid
+  new-orleans-appeal-transcripts:
+    remote: origin
+    merge: refs/heads/new_orleans_appeal_transcripts
+    file: data/fuse/fuse/lprr_appeal_transcripts_new_orleans_csc_2000_2021.csv
+    primaryKey:
+      - appeal_uid
 merge:
   fastForward: only
 pack:

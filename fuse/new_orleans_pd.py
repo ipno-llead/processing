@@ -44,7 +44,7 @@ def fuse_pib(pib, officer_number_dict):
 
 
 def fuse_events(
-    pprr_ipm, pprr_csd, cprr, uof, award, lprr, pclaims20, pclaims21, pprr_separations
+    pprr_ipm, pprr_csd, cprr, uof, award, lprr, pclaims20, pclaims21, pprr_separations, lprr_transcripts
 ):
     builder = events.Builder()
     builder.extract_events(
@@ -224,6 +224,20 @@ def fuse_events(
         },
         ["uid", "separation_uid"],
     )
+    builder.extract_events(
+        lprr_transcripts,
+        {
+            events.APPEAL_HEARING: {
+                "prefix": "decision_notification",
+                "parse_date": True,
+                "keep": [
+                    "uid",
+                    "agency",
+                ],
+            },
+        },
+        ["uid", "appeal_uid"],
+    )
     return builder.to_frame(True)
 
 
@@ -243,6 +257,7 @@ if __name__ == "__main__":
     post_event = pd.read_csv(deba.data("match/post_event_new_orleans_pd.csv"))
     award = pd.read_csv(deba.data("match/award_new_orleans_pd_2016_2021.csv"))
     lprr = pd.read_csv(deba.data("match/lprr_new_orleans_csc_2000_2016.csv"))
+    lprr_transcripts = pd.read_csv(deba.data("match/lprr_appeal_transcripts_new_orleans_csc_2000_2021.csv"))
     sas = pd.read_csv(deba.data("match/sas_new_orleans_pd_2017_2021.csv"))
     brady = pd.read_csv(deba.data("match/brady_new_orleans_da_2021.csv"))
     pclaims20 = pd.read_csv(deba.data("match/pclaims_new_orleans_pd_2020.csv"))
@@ -265,6 +280,7 @@ if __name__ == "__main__":
         pclaims20,
         pclaims21,
         pprr_separations,
+        lprr_transcripts
     )
     events_df = fuse_events(
         pprr_ipm,
@@ -276,10 +292,12 @@ if __name__ == "__main__":
         pclaims20,
         pclaims21,
         pprr_separations,
+        lprr_transcripts
     )
     events_df = rearrange_event_columns(pd.concat([post_event, events_df]))
     sas_df = rearrange_stop_and_search_columns(sas)
     lprr_df = rearrange_appeal_hearing_columns(lprr)
+    lprr_transcripts_df = rearrange_appeal_hearing_columns(lprr_transcripts)
     uof_officer_df = rearrange_uof_officer_columns(uof_officers)
     uof_citizen_df = rearrange_uof_citizen_columns(uof_citizens)
     uof_df = rearrange_use_of_force(uof)
@@ -299,3 +317,4 @@ if __name__ == "__main__":
     )
     brady_df.to_csv(deba.data("fuse/brady_new_orleans_pd.csv"), index=False)
     pclaims_df.to_csv(deba.data("fuse/pclaims_new_orleans_pd.csv"), index=False)
+    lprr_transcripts.to_csv(deba.data("fuse/lprr_appeal_transcripts_new_orleans_csc_2000_2021.csv"))
