@@ -342,28 +342,22 @@ def drop_rows_missing_history_id(df):
 
 
 def clean():
-    dfa = pd.read_csv(deba.data("ner/advocate_post_officer_history_reports.csv")).drop(
-        columns=[
-            "officer_name_1",
-            "officer_name_2",
-            "officer_sex_1",
-            "officer_sex_2",
-        ]
-    )
-    dfb = pd.read_csv(deba.data("ner/post_officer_history_reports.csv")).drop(
-        columns=[
-            "officer_name_1",
-            "officer_name_2",
-            "officer_name_3",
-            "officer_name_4",
-            "officer_name_5",
-            "officer_name_6",
-            "officer_sex_1",
-            "officer_sex_2",
-        ]
-    )
+    dfa = pd.read_csv(deba.data("ner/advocate_post_officer_history_reports.csv"))
+    dfb = pd.read_csv(deba.data("ner/post_officer_history_reports.csv"))
     df = (
         pd.concat([dfa, dfb], axis=0)
+        .drop(
+            columns=[
+                "officer_name_1",
+                "officer_name_2",
+                "officer_name_3",
+                "officer_name_4",
+                "officer_name_5",
+                "officer_name_6",
+                "officer_sex_1",
+                "officer_sex_2",
+            ]
+        )
         .pipe(drop_rows_missing_names)
         .rename(columns={"officer_sex": "sex"})
         .pipe(clean_sexes, ["sex"])
