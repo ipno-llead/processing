@@ -195,10 +195,10 @@ def match_lprr_transcripts_to_pprr_ipm(lprr, pprr_ipm):
         dfb,
         show_progress=True,
     )
-    decision = 0.80
+    decision = 0.95
     matcher.save_pairs_to_excel(
         deba.data(
-            "match/new_orleans_lprr_transcripts_2015_2021_v_pprr_ipm_new_orleans_pd_1946_2018.xlsx"
+            "match/new_orleans_lprr_transcripts_2012_2022_v_pprr_ipm_new_orleans_pd_1946_2018.xlsx"
         ),
         decision,
     )
@@ -498,7 +498,9 @@ if __name__ == "__main__":
     post = load_for_agency(agency)
     award = pd.read_csv(deba.data("clean/award_new_orleans_pd_2016_2021.csv"))
     lprr = pd.read_csv(deba.data("clean/lprr_new_orleans_csc_2000_2016.csv"))
-    lprr_transcripts = pd.read_csv(deba.data("clean/lprr_appeal_transcripts_new_orleans_csc_2000_2021.csv"))
+    lprr_transcripts = pd.read_csv(
+        deba.data("clean/lprr_appeal_transcripts_new_orleans_csc_2012_2022.csv")
+    )
     sas = pd.read_csv(deba.data("clean/sas_new_orleans_pd_2017_2021.csv"))
     uof_officers = pd.read_csv(
         deba.data("clean/uof_officers_new_orleans_pd_2016_2021.csv")
@@ -539,4 +541,7 @@ if __name__ == "__main__":
     pib.to_csv(
         deba.data("match/cprr_new_orleans_pib_reports_2014_2020.csv"), index=False
     )
-    lprr_transcripts.to_csv(deba.data("match/lprr_appeal_transcripts_new_orleans_csc_2000_2021.csv"), index=False)
+    lprr_transcripts.to_csv(
+        deba.data("match/lprr_appeal_transcripts_new_orleans_csc_2012_2022.csv"),
+        index=False,
+    )

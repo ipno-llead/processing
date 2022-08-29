@@ -7,6 +7,57 @@ import pandas as pd
 import deba
 
 
+def train_spacy_model_for_dict_format(
+    df: pd.DataFrame, training_data: str
+) -> pd.DataFrame:
+    ###  import labeled_data that has been exported from doccano
+
+    labeled_data = []
+    with open(
+        training_data,
+        "r",
+    ) as read_file:
+        for line in read_file:
+            data = json.loads(line)
+            labeled_data.append(data)
+
+    TRAINING_DATA = []
+    for entry in labeled_data:
+        entities = []
+        for e in entry["entities"]:
+            k, v = list(zip(*e.items()))
+            id, label, start, end = v
+            ents = start, end, label
+            entities.append(ents)
+        spacy_entry = (entry["text"], {"entities": entities})
+        TRAINING_DATA.append(spacy_entry)
+
+    ### train model
+    nlp = spacy.blank("en")
+    ner = nlp.create_pipe("ner")
+    nlp.add_pipe("ner")
+    ner.add_label("accused_name")
+    ner.add_label("appeal_hearing_date")
+    ner.add_label("appeal_hearing_disposition")
+    ner.add_label("decision_notification_date")
+    ner.add_label("docket_number")
+
+    optimizer = nlp.begin_training()
+    for itn in range(200):
+        random.shuffle(TRAINING_DATA)
+        losses = {}
+        for batch in spacy.util.minibatch(
+            TRAINING_DATA, size=compounding(3.0, 2.0, 1.001)
+        ):
+            for text, annotations in batch:
+                doc = nlp.make_doc(text)
+                example = Example.from_dict(doc, annotations)
+                nlp.update([example], sgd=optimizer, losses=losses, drop=0.4)
+                print(losses)
+        entities = []
+    return nlp
+
+
 def train_spacy_model(df: pd.DataFrame, training_data: str) -> pd.DataFrame:
     ###  import labeled_data that has been exported from doccano
 
@@ -31,7 +82,10 @@ def train_spacy_model(df: pd.DataFrame, training_data: str) -> pd.DataFrame:
     nlp = spacy.blank("en")
     ner = nlp.create_pipe("ner")
     nlp.add_pipe("ner")
-    ner.add_label("allegation")
+    ner.add_label("accused_name")
+    ner.add_label("decision_notification_date")
+    ner.add_label("docket_number")
+    ner.add_label("appeal_hearing_disposition")
 
     optimizer = nlp.begin_training()
     for itn in range(200):
@@ -71,4 +125,5 @@ def apply_spacy_model(df: pd.DataFrame, spacy_model: str) -> pd.DataFrame:
         entities.append(renamed_ents)
 
     ner = pd.DataFrame(entities)
-    return ner
+    df = pd.concat([ner, df], axis=1)
+    return df

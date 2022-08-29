@@ -171,69 +171,101 @@ def clean():
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(gen_uid, ["uid", "docket_no"], "appeal_uid")
         .pipe(assign_final_appeal_hearing_date)
-        .pipe(clean_dates, ["appeal_hearing_date", "appeal_disposition_date", "appeal_receive_date"])
+        .pipe(
+            clean_dates,
+            ["appeal_hearing_date", "appeal_disposition_date", "appeal_receive_date"],
+        )
     )
     return df.astype(str)
-
-
 
 
 def drop_rows_missing_names(df):
     df.loc[:, "accused_name"] = df.accused_name.str.lower().str.strip()
     return df[~(df.accused_name.fillna("") == "")]
 
+
 def extract_doc_num(df):
-    docs = df.docket_number.str.lower().str.strip()\
-        .str.extract(r"(\w{4})$")
-    
+    docs = df.docket_number.str.lower().str.strip().str.extract(r"(\w{4})$")
+
     df.loc[:, "docket_no"] = docs[0]
-    return df.drop(columns=['docket_number'])
-    
-    
+    return df.drop(columns=["docket_number"])
+
 
 def split_name(df):
     names = df.accused_name.str.extract(r"(\w+) (\w+)")
 
     df.loc[:, "first_name"] = names[0]
     df.loc[:, "last_name"] = names[1]
-    return df.drop(columns=["accused_name"])[~((df.first_name == "") & (df.last_name == ""))]
+    return df.drop(columns=["accused_name"])[
+        ~((df.first_name == "") & (df.last_name == ""))
+    ][~((df.docket_no.fillna("") == ""))]
+
 
 def clean_notification_dates(df):
     df.loc[:, "decision_notification_date"] = df.decision_notification_date
     return df[~((df.decision_notification_date.fillna("") == ""))]
-    
+
 
 def clean_transcripts():
-    df = pd.read_csv(deba.data("ner/nopd_appeals_pdfs.csv"))\
-        .pipe(clean_column_names)\
-        .drop(columns=['docket_number_1',
-       'docket_number_2', 'docket_number_3', 'accused_name_1',  'accused_name_2',
-       'docket_number_4', 'accused_name_3', 'appeal_hearing_date_1', 'appeal_hearing_date_2', 
-       "appeal_hearing_date", 'appeal_hearing_disposition_1', 'appeal_hearing_disposition',
-       'appeal_hearing_disposition_2','appeal_hearing_disposition_3', 'accused_name_4'
-       ])\
-        .pipe(drop_rows_missing_names)\
-        .pipe(clean_notification_dates)\
-        .pipe(extract_doc_num)\
-        .pipe(split_name)\
-        .pipe(set_values, {"agency": "New Orleans PD"})\
-        .pipe(gen_uid, ["first_name", "last_name", "agency"])\
+    df = (
+        pd.read_csv(deba.data("ner/nopd_appeals_pdfs.csv"))
+        .pipe(clean_column_names)
+        .drop(
+            columns=[
+                "accused_name_1",
+                "accused_name_2",
+                "accused_name_3",
+                "appeal_hearing_date_1",
+                "appeal_hearing_date_2",
+                "appeal_hearing_date",
+                "appeal_hearing_disposition_1",
+                "appeal_hearing_disposition",
+                "appeal_hearing_disposition_2",
+                "appeal_hearing_disposition_3",
+                "accused_name_4",
+                "docket_number_1",
+                "docket_number_2",
+                "docket_number_3",
+                "docket_number_4",
+                "appeal_hearing_disposition_4",
+            ]
+        )
+        .pipe(drop_rows_missing_names)
+        .pipe(clean_notification_dates)
+        .pipe(extract_doc_num)
+        .pipe(split_name)
+        .pipe(set_values, {"agency": "New Orleans PD"})
+        .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(gen_uid, ["docket_no", "uid", "decision_notification_date"], "appeal_uid")
+    )
     return df.astype(str)
 
 
 def concat(dfa, dfb):
-    dfb = dfb[["docket_no",  'md5', 'filepath', 'filesha1', 'fileid',
-       'filetype', 'fn', 'file_category', 'text', 'pageno']]
+    dfb = dfb[
+        [
+            "docket_no",
+            "md5",
+            "filepath",
+            "filesha1",
+            "fileid",
+            "filetype",
+            "fn",
+            "file_category",
+            "text",
+            "pageno",
+        ]
+    ]
     df = pd.merge(dfa, dfb, on="docket_no", how="outer")
-    return df[~((df.first_name.fillna("") == "") & (df.last_name.fillna("") ==""))]
+    return df[~((df.first_name.fillna("") == "") & (df.last_name.fillna("") == ""))]
 
 
 if __name__ == "__main__":
-    dfa = clean()
-    dfb = clean_transcripts()
-    df = concat(dfa, dfb)
-    dfb.to_csv(deba.data("clean/lprr_appeal_transcripts_new_orleans_csc_2000_2021.csv"), index=False)
+    df_log = clean()
+    df_transcripts = clean_transcripts()
+    df = concat(df_log, df_transcripts)
+    df_transcripts.to_csv(
+        deba.data("clean/lprr_appeal_transcripts_new_orleans_csc_2012_2022.csv"),
+        index=False,
+    )
     df.to_csv(deba.data("clean/lprr_new_orleans_csc_2000_2016.csv"), index=False)
-
-
