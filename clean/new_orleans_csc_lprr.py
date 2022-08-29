@@ -206,6 +206,14 @@ def clean_notification_dates(df):
     return df[~((df.decision_notification_date.fillna("") == ""))]
 
 
+def extract_docket_no_from_transcripts():
+    df = (
+        pd.read_csv(deba.data("ner/nopd_appeals_pdfs.csv"))
+        .pipe(clean_column_names)
+        .pipe(extract_doc_num)
+    )
+    return df
+
 def clean_transcripts():
     df = (
         pd.read_csv(deba.data("ner/nopd_appeals_pdfs.csv"))
@@ -262,8 +270,10 @@ def concat(dfa, dfb):
 
 if __name__ == "__main__":
     df_log = clean()
+    df_docket_no = extract_docket_no_from_transcripts()
     df_transcripts = clean_transcripts()
-    df = concat(df_log, df_transcripts)
+
+    df = concat(df_log, df_docket_no)
     df_transcripts.to_csv(
         deba.data("clean/lprr_appeal_transcripts_new_orleans_csc_2012_2022.csv"),
         index=False,
