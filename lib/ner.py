@@ -73,4 +73,5 @@ def apply_spacy_model(df: pd.DataFrame, spacy_model: str) -> pd.DataFrame:
         entities.append(renamed_ents)
 
     ner = pd.DataFrame(entities)
-    return ner
+    df = pd.concat([ner, df], axis=1)
+    return df

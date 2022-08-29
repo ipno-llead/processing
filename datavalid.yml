@@ -21,6 +21,8 @@ files:
     schema: award
   data/fuse/property_claims.csv:
     schema: property_claims
+  data/fuse/post_officer_history.csv:
+    schema: post_officer_history
 schemas:
   personnel:
     columns:
@@ -492,5 +494,25 @@ schemas:
       - name: property_damage_open
       - name: property_damage_incurred
       - name: property_damage_sub
+  post_officer_history:
+    columns:
+      - name: history_id
+        description: >
+          unique identifier of post officer history report
+      - name: uid
+        description: >
+          unique identifier of officer
+        unique: true
+        no_na: true
+      - name: agency
+      - name: left_reason
+      - name: md5
+      - name: filepath
+      - name: filesha1
+      - name: fileid
+      - name: filetype
+      - name: fn
+      - name: file_category
+      - name: text
 
 save_bad_rows_to: data/invalid_rows.csv

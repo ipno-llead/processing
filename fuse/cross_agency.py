@@ -69,7 +69,18 @@ def read_constraints():
 
 def read_post():
     post = pd.read_csv(deba.data("match/post_officer_history.csv"))
-    post = post.drop_duplicates(subset=["uid"])
+    post = post.drop_duplicates(subset=["uid"]).drop(
+        columns=[
+            "md5",
+            "filepath",
+            "filesha1",
+            "fileid",
+            "filetype",
+            "fn",
+            "file_category",
+            "text",
+        ]
+    )
     print("read post officer history file (%d rows)" % post.shape[0])
     return post
 

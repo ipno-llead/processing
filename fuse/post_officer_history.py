@@ -3,6 +3,7 @@ import deba
 from lib.columns import (
     rearrange_personnel_columns,
     rearrange_event_columns,
+    rearrange_post_officer_history_columns,
 )
 from lib import events
 
@@ -43,6 +44,7 @@ if __name__ == "__main__":
         pd.concat([post_events, events_pre_post])
     ).drop_duplicates(subset=["event_uid"])
     per_df = rearrange_personnel_columns(pd.concat([per_pre_post, post]))
+    post = rearrange_post_officer_history_columns(post)
 
     per_df.to_csv(deba.data("fuse/personnel.csv"), index=False)
     event_df.to_csv(deba.data("fuse/event.csv"), index=False)

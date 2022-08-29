@@ -71,7 +71,21 @@ def generate_history_id(df):
     stacked_agency_df = stacked_agency_sr.reset_index().iloc[:, [0, 2]]
     stacked_agency_df.columns = ["history_id", "agency"]
 
-    names_df = df[["first_name", "last_name", "middle_name"]].reset_index()
+    names_df = df[
+        [
+            "first_name",
+            "last_name",
+            "middle_name",
+            "md5",
+            "filepath",
+            "filesha1",
+            "fileid",
+            "filetype",
+            "fn",
+            "file_category",
+            "text",
+        ]
+    ].reset_index()
     names_df = names_df.rename(columns={"index": "history_id"})
 
     stacked_agency_df = stacked_agency_df.merge(names_df, on="history_id", how="right")
@@ -270,7 +284,7 @@ def clean_hire_date(df):
         .str.replace(r"^(0|s)\/(.+)", "", regex=True)
         .str.replace(r"^in/i/i995$", "", regex=True)
     )
-    return df.fillna("")[~(df.hire_date == "")]
+    return df[~(df.hire_date.fillna("") == "")]
 
 
 def clean_left_date(df):
