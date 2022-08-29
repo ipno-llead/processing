@@ -76,14 +76,6 @@ def generate_history_id(df):
             "first_name",
             "last_name",
             "middle_name",
-            "md5",
-            "filepath",
-            "filesha1",
-            "fileid",
-            "filetype",
-            "fn",
-            "file_category",
-            "text",
         ]
     ].reset_index()
     names_df = names_df.rename(columns={"index": "history_id"})
