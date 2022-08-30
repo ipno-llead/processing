@@ -362,14 +362,6 @@ schemas:
       - name: appealed
       - name: agency
       - name: motions
-      - name: md5
-      - name: filepath
-      - name: filesha1
-      - name: fileid
-      - name: filetype
-      - name: fn
-      - name: file_category
-      - name: text
   stop_and_search:
     columns:
       - name: stop_and_search_uid

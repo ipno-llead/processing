@@ -253,15 +253,6 @@ def concat(dfa, dfb):
     dfb = dfb[
         [
             "docket_no",
-            "md5",
-            "filepath",
-            "filesha1",
-            "fileid",
-            "filetype",
-            "fn",
-            "file_category",
-            "text",
-            "pageno",
         ]
     ]
     df = pd.merge(dfa, dfb, on="docket_no", how="outer")
