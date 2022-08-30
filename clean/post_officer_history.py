@@ -147,10 +147,26 @@ def split_agency_column(df):
     df.loc[:, "employment_status"] = data[1].str.replace(
         r"^decease$", "deceased", regex=True
     )
-    df.loc[:, "hire_date"] = data[2].fillna("")
-    df.loc[:, "left_date"] = data[3].fillna("")
+    df.loc[:, "hire_date"] = (
+        data[2]
+        .fillna("")
+        .str.replace(r"^d(\w{1})", r"\1", regex=True)
+        .str.replace(r"^(0|s)\/(.+)", "", regex=True)
+        .str.replace(r"^in/i/i995$", "", regex=True)
+    )
+
+    df.loc[:, "left_date"] = (
+        data[3]
+        .fillna("")
+        .str.replace(r"^_4\/g(.+)", "", regex=True)
+        .str.replace(r"^(0|a|s|o)\/(.+)", "", regex=True)
+        .str.replace(r"^in/i/i995$", "", regex=True)
+        .str.replace(r"^7/51/2020", "", regex=True)
+        .str.replace(r"^4/g/2012$", "", regex=True)
+    )
     df.loc[:, "left_reason"] = data[4].fillna("")
-    return df
+
+    return df.pipe(clean_dates, ["hire_date", "left_date"])
 
 
 def clean_agency(df):
@@ -270,26 +286,6 @@ def clean_agency(df):
     return df
 
 
-def clean_hire_date(df):
-    df.loc[:, "hire_date"] = (
-        df.hire_date.str.replace(r"^d(\w{1})", r"\1", regex=True)
-        .str.replace(r"^(0|s)\/(.+)", "", regex=True)
-        .str.replace(r"^in/i/i995$", "", regex=True)
-    )
-    return df[~(df.hire_date.fillna("") == "")]
-
-
-def clean_left_date(df):
-    df.loc[:, "left_date"] = (
-        df.left_date.str.replace(r"^_4\/g(.+)", "", regex=True)
-        .str.replace(r"^(0|a)\/(.+)", "", regex=True)
-        .str.replace(r"^in/i/i995$", "", regex=True)
-        .str.replace(r"^7/51/2020", "", regex=True)
-        .str.replace(r"^4/g/2012$", "", regex=True)
-    )
-    return df
-
-
 def clean_left_reason(df):
     l_reasons = df.left_reason.str.replace(
         r"volumtary", "voluntary", regex=False
@@ -390,14 +386,11 @@ def clean():
             ],
         )
         .pipe(clean_agency)
-        .pipe(clean_hire_date)
-        .pipe(clean_left_date)
-        .pipe(clean_dates, ["hire_date", "left_date"])
         .pipe(clean_left_reason)
         .pipe(gen_uid, ["first_name", "last_name", "middle_name", "agency"])
         .pipe(drop_rows_missing_agency_and_duplicates)
         .pipe(check_for_duplicate_uids)
-        .pipe(switched_job) 
+        .pipe(switched_job)
         .pipe(drop_rows_missing_history_id)
     )
     return df
