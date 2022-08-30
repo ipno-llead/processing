@@ -1,7 +1,7 @@
 import deba
 import pandas as pd
 from lib.uid import gen_uid
-from lib.clean import names_to_title_case, clean_sexes, clean_dates, clean_names
+from lib.clean import names_to_title_case, clean_sexes, clean_dates
 
 
 def drop_rows_missing_names(df):
@@ -274,7 +274,6 @@ def clean_hire_date(df):
     df.loc[:, "hire_date"] = (
         df.hire_date.str.replace(r"^d(\w{1})", r"\1", regex=True)
         .str.replace(r"^(0|s)\/(.+)", "", regex=True)
-        .str.replace(r"^s/1/1999$", "", regex=True)
         .str.replace(r"^in/i/i995$", "", regex=True)
     )
     return df[~(df.hire_date.fillna("") == "")]
@@ -393,12 +392,12 @@ def clean():
         .pipe(clean_agency)
         .pipe(clean_hire_date)
         .pipe(clean_left_date)
+        .pipe(clean_dates, ["hire_date", "left_date"])
         .pipe(clean_left_reason)
         .pipe(gen_uid, ["first_name", "last_name", "middle_name", "agency"])
         .pipe(drop_rows_missing_agency_and_duplicates)
         .pipe(check_for_duplicate_uids)
-        .pipe(switched_job)
-        .pipe(clean_dates, ["hire_date", "left_date"])
+        .pipe(switched_job) 
         .pipe(drop_rows_missing_history_id)
     )
     return df
