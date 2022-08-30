@@ -274,6 +274,7 @@ def clean_hire_date(df):
     df.loc[:, "hire_date"] = (
         df.hire_date.str.replace(r"^d(\w{1})", r"\1", regex=True)
         .str.replace(r"^(0|s)\/(.+)", "", regex=True)
+        .str.replace(r"^s/1/1999$", "", regex=True)
         .str.replace(r"^in/i/i995$", "", regex=True)
     )
     return df[~(df.hire_date.fillna("") == "")]
