@@ -506,13 +506,5 @@ schemas:
         no_na: true
       - name: agency
       - name: left_reason
-      - name: md5
-      - name: filepath
-      - name: filesha1
-      - name: fileid
-      - name: filetype
-      - name: fn
-      - name: file_category
-      - name: text
 
 save_bad_rows_to: data/invalid_rows.csv
