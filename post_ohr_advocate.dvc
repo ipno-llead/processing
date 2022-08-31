@@ -1,0 +1,6 @@
+wdir: data
+outs:
+- md5: 3155a8783a0051e58e4a11f9a89c601c.dir
+  size: 290829449
+  nfiles: 295
+  path: raw_post_advocate_ohr
