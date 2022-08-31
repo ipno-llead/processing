@@ -158,6 +158,7 @@ def split_agency_column(df):
         .str.replace(r"^in/i/i995$", "", regex=True)
         .str.replace(r"(.+)?7209(.+)?", "", regex=True)
         .str.replace(r"^2\/31(.+)", "", regex=True)
+        .str.replace(r"^os/a7/2021$", "", regex=True)
     )
 
     df.loc[:, "left_date"] = (
@@ -168,10 +169,11 @@ def split_agency_column(df):
         .str.replace(r"^in/i/i995$", "", regex=True)
         .str.replace(r"^7/51/2020", "", regex=True)
         .str.replace(r"^4/g/2012$", "", regex=True)
+        .str.replace(r"^os/a7/2021$", "", regex=True)
     )
     df.loc[:, "left_reason"] = data[4].fillna("")
 
-    return df.pipe(clean_dates, ["hire_date", "left_date"])
+    return df
 
 
 def clean_agency(df):
@@ -302,13 +304,8 @@ def clean_left_reason(df):
     return df
 
 
-def drop_rows_missing_agency_and_duplicates(df):
-    df.loc[:, "agency"] = df.agency.str.replace(
-        r"^(\w{4}) ?(\w)?$", "", regex=True
-    ).str.replace(
-        r"(^St\. Tammany So Range 116$|^Jefferson So Range 106$)", "", regex=True
-    )
-    return df[~((df.agency.fillna("") == ""))].drop_duplicates(subset="uid")
+def drop_duplicates(df):
+    return df.drop_duplicates(subset="uid")
 
 
 def check_for_duplicate_uids(df):
@@ -327,11 +324,6 @@ def check_for_duplicate_uids(df):
 def switched_job(df):
     df.loc[:, "switched_job"] = df.duplicated(subset=["history_id"], keep=False)
     return df
-
-
-def drop_rows_missing_history_id(df):
-    df.loc[:, "history_id"] = df.history_id
-    return df[~(df.history_id.fillna("") == "")]
 
 
 def clean():
@@ -393,12 +385,11 @@ def clean():
         .pipe(clean_agency)
         .pipe(clean_left_reason)
         .pipe(gen_uid, ["first_name", "last_name", "middle_name", "agency"])
-        .pipe(drop_rows_missing_agency_and_duplicates)
+        .pipe(drop_duplicates)
         .pipe(check_for_duplicate_uids)
         .pipe(switched_job)
-        .pipe(drop_rows_missing_history_id)
     )
-    return df
+    return df.fillna("")
 
 
 if __name__ == "__main__":
