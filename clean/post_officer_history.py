@@ -333,13 +333,11 @@ def drop_bad_dates(df):
     df["hire_date"] = pd.to_datetime(df["hire_date"])
     df["left_date"] = pd.to_datetime(df["left_date"])
 
-    df.loc[df.duplicated(keep=False), "ind"] = "dup"
-    df["ind"] = np.where(
-        (df.ind.eq("dup")) & (df["left_date"] > df["hire_date"]), "Drop", "Keep"
-    )
+    df["ind"] = np.where((df["left_date"] < df["hire_date"]), "Drop", "Keep")
 
     df.loc[:, "hire_date"] = df.hire_date.dt.strftime("%m/%d/%Y")
     df.loc[:, "left_date"] = df.left_date.dt.strftime("%m/%d/%Y")
+    df = df[~((df.ind == "Drop"))]
     return df.drop(columns=["ind"])
 
 
@@ -409,10 +407,10 @@ def clean():
         .pipe(drop_duplicates)
         .pipe(check_for_duplicate_uids)
         .pipe(switched_job)
-        .pipe(drop_bad_dates)
         .pipe(drop_rows_missing_history_id)
+        .pipe(drop_bad_dates)
     )
-    return df.fillna("")
+    return df
 
 
 if __name__ == "__main__":
