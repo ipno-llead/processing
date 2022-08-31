@@ -1,7 +1,8 @@
-from lib.columns import clean_column_names
-from lib.clean import clean_dates, standardize_desc_cols, float_to_int_str
+from lib.columns import clean_column_names, set_values
+from lib.clean import clean_dates, standardize_desc_cols, float_to_int_str, clean_names
 from lib.uid import gen_uid
 from lib.standardize import standardize_from_lookup_table
+from lib.rows import duplicate_row
 import deba
 import pandas as pd
 import re
@@ -732,6 +733,257 @@ def assign_agency(df):
     return df
 
 
+
+def strip_leading_commas09(df):
+    for col in df.columns:
+        df = df.apply(lambda col: col.str.replace(r"\'", "", regex=True))
+    return df
+
+
+def sanitize_dates09(df):
+    df.loc[:, "receive_date"] = (
+        df.received.astype(str)
+        .fillna("")
+        .str.replace(r"^- ?$", "", regex=True)
+        .str.replace(r"nan", "", regex=True)
+    )
+
+    df.loc[:, "occur_date"] = (
+        df.occur_date.astype(str)
+        .fillna("")
+        .str.replace(r"^- ?$", "", regex=True)
+        .str.replace(r"nan", "", regex=True)
+    )
+    return df.drop(columns=["received"])
+
+
+def extract_allegation_desc09(df):
+    desc = df.complaint.str.lower().str.strip().str.extract(r"\((.+)\)")
+
+    df.loc[:, "allegation_desc"] = (
+        desc[0]
+        .str.replace(r"(\w+) ?- (\w+)", r"\1-\2", regex=True)
+        .str.replace(r"^h$", "", regex=True)
+    )
+    return df
+
+
+def clean_allegation09(df):
+    df.loc[:, "allegation"] = (
+        df.complaint.str.lower()
+        .str.strip()
+        .str.replace(r"\((.+)\)", "", regex=True)
+        .str.replace(r"(\w+) $", r"\1", regex=True)
+        .str.replace(r"^-$", "", regex=True)
+        .str.replace(r"carrying our", "carrying out", regex=False)
+        .str.replace(r"(\w+)- (\w+)", r"\1-\2", regex=True)
+        .str.replace(r"dept\.", "department", regex=True)
+        .str.replace(r"\bequi?p\b", "equipment", regex=True)
+        .str.replace(r"^brpd$", "", regex=True)
+        .str.replace(r"susp\b", "suspension", regex=True)
+        .str.replace(r"\.", "", regex=True)
+        .str.replace(
+            r"^conduct unbecoming$", "conduct unbecoming an officer", regex=True
+        )
+        .str.replace(r"viol\b", "violation", regex=True)
+        .str.replace(r"associationwith", "assocation with", regex=False)
+        .str.replace(r"alc\b", "alcohol", regex=True)
+        .str.replace(r"^s\b ", "", regex=True)
+        .str.replace(r"submof reqforms", "submission of forms", regex=False)
+        .str.replace(r"carryi?ny?g?\b", "carrying", regex=True)
+        .str.replace(r"prop$", "property", regex=True)
+        .str.replace(r"^carry\b", "carrying", regex=True)
+    )
+    return df.drop(columns=["complaint"])
+
+
+def clean_investigation_status09(df):
+    df.loc[:, "investigation_status"] = (
+        df.disposition.str.lower()
+        .str.strip()
+        .str.replace(r"^\/", "", regex=True)
+        .str.replace(r"admin(\.|\,)?", "administrative", regex=True)
+        .str.replace(r"lt\.?", "lieutenant", regex=True)
+        .str.replace(r"(\w+)\((.+)\)", r"\1 (\2)", regex=True)
+        .str.replace(r"capt\.?", "captain", regex=True)
+        .str.replace(r"(\w+) $", r"\1", regex=True)
+        .str.replace(r"pre- (\w+)", r"pre-\1", regex=True)
+        .str.replace(r"disp?c?\.?", "disciplinary", regex=True)
+        .str.replace(r"reiew", "review", regex=False)
+        .str.replace(r"administrativereview", "administrative review", regex=True)
+        .str.replace(r"(\w{2}) (a|@)", r"\1 at", regex=True)
+    )
+    return df.drop(columns=["disposition"])
+
+
+def extract_disposition09(df):
+    disp = (
+        df.action.str.lower()
+        .str.strip()
+        .str.replace(r"sustianed", "sustained", regex=False)
+        .str.replace(r"^sust\.?", "sustained", regex=True)
+        .str.replace(r"^sustained(.+)", r"sustained", regex=True)
+        .str.replace(r"^not sust\.?(.+)", "not sustained", regex=True)
+        .str.extract(
+            r"((.+)?resign(ed|ation)(.+)?|(.+)?terminated(.+)?|^sustained|^not sustained)"
+        )
+    )
+    df.loc[:, "disposition"] = disp[0]
+    return df
+
+
+def extract_res_term_dates09(df):
+    resignation_dates = df.disposition.str.replace(
+        r"(\w+) in lieu of termnation (.+)", r"\1 \2", regex=True
+    ).str.extract(r"resigned (\w{1,2}\/\w{2}\/\w{2})")
+    df.loc[:, "resignation_date"] = resignation_dates[0]
+
+    termination_dates = df.disposition.str.extract(
+        r"terminated (\w{1,2}\/\w{2}\/\w{2})"
+    )
+    df.loc[:, "termination_date"] = termination_dates[0]
+    return df
+
+
+def clean_disposition09(df):
+    df.loc[:, "disposition"] = (
+        df.disposition.fillna("")
+        .str.replace(r" (\w{1,2}\/\w{2}\/\w{2})", "", regex=True)
+        .str.replace(r"officer ", "", regex=False)
+        .str.replace(r"(\w+) (\w+)- (\w+)", r"\3-\1 \2", regex=True)
+        .str.replace(
+            r"^off.invest./resigned/in lieu of pre-disc$",
+            "resigned in lieu of pre-disciplinary",
+            regex=True,
+        )
+    )
+    return df
+
+
+def clean_action09(df):
+    df.loc[:, "action"] = (
+        df.action.str.lower()
+        .str.strip()
+        .str.replace(r" (\w{1,2}\/\w{1,2}\/\w{1,4})", "", regex=True)
+        .str.replace(r"^sust(ained)?\.?\/?(.+)", r"\2", regex=True)
+        .str.replace(r"(.+)terminated(.+)", "terminated", regex=True)
+        .str.replace(r"drv\.school", "driving school", regex=True)
+        .str.replace(r"susp\.?\b", "suspension", regex=True)
+        .str.replace(r"\blou\b", "loss of unit", regex=True)
+        .str.replace(r"(\w+) & (\w+)", r"\1;\2", regex=True)
+        .str.replace(r"\blor\b", "letter of reprimand", regex=True)
+        .str.replace(r"veh\b", "vehicle", regex=True)
+        .str.replace(r"(.+)?pending(.+)?", "pending", regex=True)
+        .str.replace(r"(\(|\))", "", regex=True)
+        .str.replace(r"2day", "2-day", regex=False)
+        .str.replace(r"(\w{1,2})- day", r"\1-day", regex=True)
+        .str.replace(r"(\w{1,2}) days?", r"\1-day", regex=True)
+        .str.replace(r"dernotion", "demotion", regex=True)
+        .str.replace(r"(\w{1,2})yr\b", r"\1-year", regex=True)
+        .str.replace(r"\/", ";", regex=True)
+        .str.replace(
+            r"suspensionovertumed by civil service",
+            "suspension overturned by civil service",
+            regex=False,
+        )
+        .str.replace(r"^ (\w+)", r"\1", regex=True)
+        .str.replace(r"\.", "", regex=True)
+        .str.replace(r"disps$", "disposition", regex=True)
+        .str.replace(r'not sustained chief"s office 05- original file', "", regex=True)
+        .str.replace(r"^(i?ai?ned|aing|pas);?", "", regex=True)
+        .str.replace(r"counselling", "counseling", regex=False)
+        .str.replace(
+            r"(loss of unit) (\w{1,2})-day", r"\1-day loss of unit", regex=True
+        )
+        .str.replace(r"vehicle\,", "", regex=True)
+        .str.replace(r"not sustainedresent to capt c clark", "", regex=False)
+        .str.replace(r" ?-? ?not susta?i?n?e?d?;?", "", regex=True)
+        .str.replace(r"kirst n;s; cullen n;s; edwards n;s", "", regex=False)
+        .str.replace(r"^;", "", regex=True)
+        .str.replace(r"^admin\b", "administrative", regex=True)
+        .str.replace(r"vehicle use(.+)-$", "", regex=True)
+        .str.replace(r"offi?c?e?r? ?", "", regex=True)
+        .str.replace(r"6mths\b", "6-months", regex=True)
+        .str.replace(r"\bloss of unit-day loss of unit$", "loss of unit", regex=True)
+        .str.replace(r"\bvac\b", "vacation", regex=True)
+        .str.replace(r"\btermnation\b", "termination", regex=True)
+        .str.replace(r"^resignation in lieu", "resigned in lieu", regex=True)
+        .str.replace(
+            r"^nvest;resigned;in lieu of pre-disc$",
+            "resigned in lieu of pre-disciplinary hearing",
+            regex=True,
+        )
+    )
+    return df
+
+
+def assign_action09(df):
+    df.loc[
+        ((df.last_name == "riley") & (df.occur_day == "27")), "action"
+    ] = "56-day suspension"
+    df.loc[
+        ((df.last_name == "johnson") & (df.occur_day == "27")), "action"
+    ] = "3-day suspension"
+    return df
+
+
+def split_rows_with_multiple_officers09(df):
+    i = 0
+    for idx in df[df.officer_name.str.contains("/")].index:
+        s = df.loc[idx + i, "officer_name"]
+        parts = re.split(r"\s*(?:\/)\s*", s)
+        df = duplicate_row(df, idx + i, len(parts))
+        for j, name in enumerate(parts):
+            df.loc[idx + i + j, "officer_name"] = name
+        i += len(parts) - 1
+    return df
+
+
+def split_names09(df):
+    names = (
+        df.officer_name.str.lower()
+        .str.strip()
+        .str.replace(r"^(\w+)\.(\w+)", r"\1. \2", regex=True)
+        .str.replace(r"al -(\w+)", r"al-\1", regex=True)
+        .str.replace(r" \(civ\.\)", "", regex=True)
+        .str.replace(r"^(\w{1}) (\w+) (\w+)", r"\2 \1 \3", regex=True)
+        .str.replace(r"\((.+)\)", "", regex=True)
+        .str.replace(r"(\w+) (\w)\. (\w+) resrv\.", r"reserve \1 \2 \3", regex=True)
+        .str.replace(r"^cpl\. (\w)\.", r"cpl. \1.", regex=True)
+        .str.replace(r"ft1$", "", regex=True)
+        .str.replace(r"(\w+) (\w+) co", r"co \1 \2", regex=True)
+        .str.replace(r" civ\.", "", regex=True)
+        .str.replace(r"sgt\.?", "sergeant", regex=True)
+        .str.replace(r"^(\w\.) (\w+) (\w+)$", r"\2 \1 \3", regex=True)
+        .str.extract(
+            r"(cpl\.?|lt\.?|sergeant|off?c?\.?|capt\.?|^co\b ?i?|det\.?|\bassi?s?t\.? chief\b|chief|reserve)? ?(\w+-?\w+|\w\.|\w\.\w\.) ?(\w+\.?)? (\w+-?\w+) ?(jr\.|sr\.|iii?)?$"
+        )
+    )
+
+    df.loc[:, "rank_desc"] = (
+        names[0]
+        .fillna("")
+        .str.replace(r"cpl\.?", "corporal", regex=True)
+        .str.replace(r"lt\.?", "lieutenant", regex=True)
+        .str.replace(r"off?c?\.?", "officer", regex=True)
+        .str.replace(r"^co\b ?i?", "communications officer", regex=True)
+        .str.replace(r"assi?s?t?\.? chief", "assistant chief", regex=True)
+        .str.replace(r"^chief", "chief", regex=True)
+        .str.replace(r"det\.?", "detective", regex=True)
+        .str.replace(r"^capt\.?", "captain", regex=True)
+    )
+    df.loc[:, "first_name"] = names[1].fillna("")
+    df.loc[:, "middle_name"] = names[2].fillna("").str.replace(r"\.", "", regex=True)
+    df.loc[:, "last_name"] = names[3].fillna("")
+    df.loc[:, "suffix"] = names[4].fillna("").str.replace(r"\.", "", regex=True)
+
+    df.loc[:, "last_name"] = df.last_name.fillna("").str.cat(
+        df.suffix.fillna(""), sep=" "
+    )
+    return df.drop(columns=["officer_name", "suffix"])
+
+
+
 def clean_18():
     df = realign_18()
     df = clean_column_names(df)
@@ -945,8 +1197,49 @@ def clean_21():
     return df
 
 
+def clean09():
+    df = (
+        pd.read_csv(
+            deba.data("raw/baton_rouge_pd/baton_rouge_pd_cprr_2004_2009.csv")
+        )
+        .pipe(clean_column_names)
+        .rename(columns={"ia_year": "investigation_year"})
+        .pipe(strip_leading_commas09)
+        .pipe(sanitize_dates09)
+        .pipe(extract_allegation_desc09)
+        .pipe(clean_allegation09)
+        .pipe(clean_investigation_status09)
+        .pipe(extract_disposition09)
+        .pipe(extract_res_term_dates09)
+        .pipe(clean_disposition09)
+        .pipe(clean_action09)
+        .pipe(split_rows_with_multiple_officers09)
+        .pipe(split_names09)
+        .pipe(clean_names, ["first_name", "middle_name", "last_name"])
+        .pipe(clean_dates, ["occur_date", "receive_date", "resignation_date", "termination_date"])
+        .pipe(assign_action09)
+        .pipe(
+            standardize_desc_cols,
+            [
+                "allegation_desc",
+                "investigation_year",
+                "allegation",
+                "action",
+                "disposition",
+            ],
+        )
+        .pipe(set_values, {"agency": "Baton Rouge PD"})
+        .pipe(gen_uid, ["first_name", "last_name", "middle_name", "agency"])
+        .pipe(gen_uid, ["action", "allegation_desc", "allegation", "investigation_status", "disposition", "occur_day", "occur_year", "occur_month", "uid", ], "allegation_uid")
+        .drop_duplicates(subset=["allegation_uid"])
+    )
+    return df
+
+
 if __name__ == "__main__":
+    df09 = clean09()
     df18 = clean_18()
     df21 = clean_21()
+    df09.to_csv(deba.data("clean/cprr_baton_rouge_pd_2004_2009.csv"), index=False)
     df18.to_csv(deba.data("clean/cprr_baton_rouge_pd_2018.csv"), index=False)
     df21.to_csv(deba.data("clean/cprr_baton_rouge_pd_2021.csv"), index=False)
