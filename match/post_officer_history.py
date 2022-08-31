@@ -27,7 +27,10 @@ def match_post_to_personnel(post, personnel):
         dfa,
         dfb,
     )
-    decision = 0.9
+    decision = 0.95
+    matcher.save_pairs_to_excel(
+        deba.data("match/cprr_post_ohr_personnel.xlsx"), decision
+    )
     matches = matcher.get_index_pairs_within_thresholds(decision)
     match_dict = dict(matches)
 
