@@ -49,9 +49,13 @@ def post_agency_is_per_agency_subset(personnel, post):
     return post
 
 
+def drop_rows_missing_hire_dates(df):
+    return df[~(df.hire_date.fillna("") == "")]
+
 if __name__ == "__main__":
     post = pd.read_csv(deba.data("clean/post_officer_history.csv"))
     personnel = pd.read_csv(deba.data("fuse/personnel_pre_post.csv"))
     post = post_agency_is_per_agency_subset(personnel, post)
     post = match_post_to_personnel(post, personnel)
+    post = post.pipe(drop_rows_missing_hire_dates)
     post.to_csv(deba.data("match/post_officer_history.csv"), index=False)
