@@ -159,6 +159,7 @@ def split_agency_column(df):
         .str.replace(r"(.+)?7209(.+)?", "", regex=True)
         .str.replace(r"^2\/31(.+)", "", regex=True)
         .str.replace(r"^os/a7/2021$", "", regex=True)
+        .str.replace(r"^9/2s/2014$", "", regex=True)
     )
 
     df.loc[:, "left_date"] = (
@@ -170,6 +171,7 @@ def split_agency_column(df):
         .str.replace(r"^7/51/2020", "", regex=True)
         .str.replace(r"^4/g/2012$", "", regex=True)
         .str.replace(r"^os/a7/2021$", "", regex=True)
+        .str.replace(r"^9/2s/2014$", "", regex=True)
     )
     df.loc[:, "left_reason"] = data[4].fillna("")
 
