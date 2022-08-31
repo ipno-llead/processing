@@ -156,6 +156,8 @@ def split_agency_column(df):
         .str.replace(r"^d(\w{1})", r"\1", regex=True)
         .str.replace(r"^(0|s)\/(.+)", "", regex=True)
         .str.replace(r"^in/i/i995$", "", regex=True)
+        .str.replace(r"(.+)?7209(.+)?", "", regex=True)
+        .str.replace(r"^2\/31(.+)", "", regex=True)
     )
 
     df.loc[:, "left_date"] = (
