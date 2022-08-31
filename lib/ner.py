@@ -31,7 +31,9 @@ def train_spacy_model(df: pd.DataFrame, training_data: str) -> pd.DataFrame:
     nlp = spacy.blank("en")
     ner = nlp.create_pipe("ner")
     nlp.add_pipe("ner")
-    ner.add_label("allegation")
+    ner.add_label("officer_name")
+    ner.add_label("officer_sex")
+    ner.add_label("agency")
 
     optimizer = nlp.begin_training()
     for itn in range(200):
