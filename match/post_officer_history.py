@@ -6,20 +6,21 @@ from datamatch import (
     ThresholdMatcher,
     ColumnsIndex,
 )
-from lib.clean import clean_dates
 
 
 def match_post_to_personnel(post, personnel):
     dfa = post[["uid", "first_name", "last_name", "middle_name", "agency"]]
     dfa = dfa.drop_duplicates(subset=["uid"]).set_index("uid")
     dfa.loc[:, "fc"] = dfa.first_name.fillna("").map(lambda x: x[:1])
+    dfa.loc[:, "lc"] = dfa.last_name.fillna("").map(lambda x: x[:1])
 
     dfb = personnel[["uid", "first_name", "last_name", "middle_name", "agency"]]
     dfb = dfb.drop_duplicates(subset=["uid"]).set_index("uid")
     dfb.loc[:, "fc"] = dfb.first_name.fillna("").map(lambda x: x[:1])
+    dfb.loc[:, "lc"] = dfb.last_name.fillna("").map(lambda x: x[:1])
 
     matcher = ThresholdMatcher(
-        ColumnsIndex(["fc", "agency"]),
+        ColumnsIndex(["fc", "lc", "agency"]),
         {
             "first_name": JaroWinklerSimilarity(),
             "last_name": JaroWinklerSimilarity(),
@@ -28,7 +29,7 @@ def match_post_to_personnel(post, personnel):
         dfa,
         dfb,
     )
-    decision = 0.95
+    decision = 1
     matcher.save_pairs_to_excel(
         deba.data("match/cprr_post_ohr_personnel.xlsx"), decision
     )
@@ -59,7 +60,5 @@ if __name__ == "__main__":
     personnel = pd.read_csv(deba.data("fuse/personnel_pre_post.csv"))
     post = post_agency_is_per_agency_subset(personnel, post)
     post = match_post_to_personnel(post, personnel)
-    post = post.pipe(drop_rows_missing_hire_dates).pipe(
-        clean_dates, ["hire_date", "left_date"]
-    )
+    post = post.pipe(drop_rows_missing_hire_dates)
     post.to_csv(deba.data("match/post_officer_history.csv"), index=False)

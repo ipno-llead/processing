@@ -2,6 +2,7 @@ import deba
 import pandas as pd
 from lib.uid import gen_uid
 from lib.clean import names_to_title_case, clean_sexes, clean_dates
+import numpy as np
 
 
 def drop_rows_missing_names(df):
@@ -328,6 +329,24 @@ def switched_job(df):
     return df
 
 
+def drop_bad_dates(df):
+    df["hire_date"] = pd.to_datetime(df["hire_date"])
+    df["left_date"] = pd.to_datetime(df["left_date"])
+
+    df.loc[df.duplicated(keep=False), "ind"] = "dup"
+    df["ind"] = np.where(
+        (df.ind.eq("dup")) & (df["left_date"] > df["hire_date"]), "Drop", "Keep"
+    )
+
+    df.loc[:, "hire_date"] = df.hire_date.dt.strftime("%m/%d/%Y")
+    df.loc[:, "left_date"] = df.left_date.dt.strftime("%m/%d/%Y")
+    return df.drop(columns=["ind"])
+
+
+def drop_rows_missing_history_id(df):
+    return df[~(df.history_id.fillna("") == "")]
+
+
 def clean():
     dfa = pd.read_csv(deba.data("ner/advocate_post_officer_history_reports.csv"))
     dfb = pd.read_csv(deba.data("ner/post_officer_history_reports.csv"))
@@ -390,6 +409,8 @@ def clean():
         .pipe(drop_duplicates)
         .pipe(check_for_duplicate_uids)
         .pipe(switched_job)
+        .pipe(drop_bad_dates)
+        .pipe(drop_rows_missing_history_id)
     )
     return df.fillna("")
 
