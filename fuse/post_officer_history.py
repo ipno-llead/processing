@@ -5,6 +5,7 @@ from lib.columns import (
     rearrange_event_columns,
     rearrange_post_officer_history_columns,
 )
+from lib.clean import clean_dates
 from lib import events
 
 
@@ -15,7 +16,6 @@ def fuse_events(post):
         {
             events.OFFICER_HIRE: {
                 "prefix": "hire",
-                "parse_date": True,
                 "keep": [
                     "uid",
                     "agency",
@@ -23,7 +23,6 @@ def fuse_events(post):
             },
             events.OFFICER_LEFT: {
                 "prefix": "left",
-                "parse_date": True,
                 "keep": [
                     "uid",
                     "left_reason",
@@ -37,7 +36,10 @@ def fuse_events(post):
 
 
 if __name__ == "__main__":
-    post = pd.read_csv(deba.data("match/post_officer_history.csv"))
+    post = pd.read_csv(deba.data("match/post_officer_history.csv")).pipe(
+        clean_dates, ["hire_date", "left_date"]
+    )
+
     events_pre_post = pd.read_csv(deba.data("fuse/event_pre_post.csv"))
     per_pre_post = pd.read_csv(deba.data("fuse/personnel_pre_post.csv"))
 
