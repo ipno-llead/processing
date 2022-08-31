@@ -10,7 +10,7 @@ from lib.columns import (
 from lib import events
 
 
-def fuse_events(csd_pprr_17, csd_pprr_19, cprr_18, cprr_21):
+def fuse_events(csd_pprr_17, csd_pprr_19, cprr_18, cprr_21, cprr_09):
     builder = events.Builder()
 
     builder.extract_events(
@@ -82,6 +82,28 @@ def fuse_events(csd_pprr_17, csd_pprr_19, cprr_18, cprr_21):
         },
         ["uid", "allegation_uid"],
     )
+    builder.extract_events(
+        cprr_09,
+        {
+            events.COMPLAINT_RECEIVE: {
+                "prefix": "receive",
+                "keep": ["uid", "agency", "allegation_uid"],
+            },
+            events.COMPLAINT_INCIDENT: {
+                "prefix": "occur",
+                "keep": ["uid", "agency", "allegation_uid"],
+            },
+            events.OFFICER_LEFT: {
+                "prefix": "resignation",
+                "keep": ["uid", "agency", "allegation_uid"],
+            },
+            events.OFFICER_LEFT: {
+                "prefix": "termination",
+                "keep": ["uid", "agency", "allegation_uid"],
+            },
+        },
+        ["uid", "allegation_uid"],
+    )
     return builder.to_frame()
 
 
@@ -93,6 +115,7 @@ if __name__ == "__main__":
     cprr_21 = pd.read_csv(deba.data("match/cprr_baton_rouge_pd_2021.csv"))
     pprr = pd.read_csv(deba.data("match/pprr_baton_rouge_pd_2021.csv"))
     brady = pd.read_csv(deba.data("match/brady_baton_rouge_da_2021.csv"))
+    cprr_09 = pd.read_csv(deba.data("match/cprr_baton_rouge_pd_2004_2009.csv"))
     brady = brady.loc[brady.agency == "Baton Rouge PD"]
 
     # limit csd data to just officers found in PD roster
@@ -109,11 +132,12 @@ if __name__ == "__main__":
         cprr_18,
         cprr_21,
         brady,
+        cprr_09
     )
 
-    events_df = fuse_events(csd_pprr_17, csd_pprr_19, cprr_18, cprr_21)
+    events_df = fuse_events(csd_pprr_17, csd_pprr_19, cprr_18, cprr_21, cprr_09)
     events_df = rearrange_event_columns(pd.concat([post_event, events_df]))
-    complaint_df = rearrange_allegation_columns(pd.concat([cprr_18, cprr_21]))
+    complaint_df = rearrange_allegation_columns(pd.concat([cprr_18, cprr_21, cprr_09]))
     brady_df = rearrange_brady_columns(brady)
 
     personnel_df.to_csv(deba.data("fuse/per_baton_rouge_pd.csv"), index=False)
