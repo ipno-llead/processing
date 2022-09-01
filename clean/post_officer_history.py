@@ -330,13 +330,16 @@ def switched_job(df):
 
 
 def drop_bad_dates(df):
-    df["hire_date"] = pd.to_datetime(df["hire_date"])
-    df["left_date"] = pd.to_datetime(df["left_date"])
+    df["hire_date"] = pd.to_datetime(df["hire_date"], errors="coerce")
+    df["left_date"] = pd.to_datetime(df["left_date"], errors="coerce")
 
     df["ind"] = np.where((df["left_date"] < df["hire_date"]), "Drop", "Keep")
 
     df.loc[:, "hire_date"] = df.hire_date.dt.strftime("%m/%d/%Y")
     df.loc[:, "left_date"] = df.left_date.dt.strftime("%m/%d/%Y")
+
+    df.loc[:, "hire_date"] = df.hire_date.astype(str)
+    df.loc[:, "left_date"] = df.hire_date.astype(str)
     df = df[~((df.ind == "Drop"))]
     return df.drop(columns=["ind"])
 
@@ -407,7 +410,6 @@ def clean():
         .pipe(drop_duplicates)
         .pipe(check_for_duplicate_uids)
         .pipe(switched_job)
-        .pipe(drop_rows_missing_history_id)
         .pipe(drop_bad_dates)
     )
     return df
