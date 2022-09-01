@@ -1095,6 +1095,12 @@ branch:
     file: data/fuse/property_claims.csv
     primaryKey:
       - property_claims_uid
+  post-officer-history:
+    remote: origin
+    merge: refs/heads/post_officer_history
+    file: data/fuse/post_officer_history.csv
+    primaryKey:
+      - uid
 merge:
   fastForward: only
 pack:
