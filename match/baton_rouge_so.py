@@ -92,15 +92,15 @@ def match_cprr_15_against_post(cprr, post):
 
 
 if __name__ == "__main__":
-    cprr15 = pd.read_csv(deba.data("clean/cprr_baton_rouge_so_2011_2015.csv"))
+    cprr_15 = pd.read_csv(deba.data("clean/cprr_baton_rouge_so_2011_2015.csv"))
     cprr18 = pd.read_csv(deba.data("clean/cprr_baton_rouge_so_2018.csv"))
     cprr20 = pd.read_csv(deba.data("clean/cprr_baton_rouge_so_2016_2020.csv"))
     agency = cprr20.agency[0]
     post = load_for_agency(agency)
-    cprr15 = match_cprr_15_against_post(cprr15, post)
+    cprr_15 = match_cprr_15_against_post(cprr_15, post)
     cprr18 = match_cprr_18_against_post(cprr18, post)
     cprr20 = match_cprr_20_against_post(cprr20, post)
 
-    cprr15.to_csv(deba.data("match/cprr_baton_rouge_so_2011_2015.csv"), index=False)
+    cprr_15.to_csv(deba.data("match/cprr_baton_rouge_so_2011_2015.csv"), index=False)
     cprr18.to_csv(deba.data("match/cprr_baton_rouge_so_2018.csv"), index=False)
     cprr20.to_csv(deba.data("match/cprr_baton_rouge_so_2016_2020.csv"), index=False)

@@ -6,8 +6,22 @@ from lib.post import load_for_agency
 from lib import events
 
 
-def fuse_events(cprr_18, cprr_21, post):
+def fuse_events(cprr_15, cprr_18, cprr_21, post):
     builder = events.Builder()
+    builder.extract_events(
+        cprr_15,
+        {
+            events.COMPLAINT_RECEIVE: {
+                "prefix": "receive",
+                "keep": ["uid", "agency", "allegation_uid"],
+            },
+            events.COMPLAINT_INCIDENT: {
+                "prefix": "occur",
+                "keep": ["uid", "agency", "allegation_uid"],
+            },
+        },
+        ["uid", "allegation_uid"],
+    )
     builder.extract_events(
         cprr_18,
         {
@@ -65,7 +79,7 @@ if __name__ == "__main__":
     agency = cprr_20.agency[0]
     post = load_for_agency(agency)
     personnel_df = fuse_personnel(cprr_15, cprr_18, cprr_20, post)
-    event_df = fuse_events(cprr_18, cprr_20, post)
+    event_df = fuse_events(cprr_15, cprr_18, cprr_20, post)
     complaint_df = rearrange_allegation_columns(pd.concat([cprr_15, cprr_18, cprr_20]))
     personnel_df.to_csv(deba.data("fuse/per_baton_rouge_so.csv"), index=False)
     event_df.to_csv(deba.data("fuse/event_baton_rouge_so.csv"), index=False)
