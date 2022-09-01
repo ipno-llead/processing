@@ -339,5 +339,5 @@ def rearrange_post_officer_history_columns(df):
     """
     return datavalid_config.rearrange_columns(
         "post_officer_history",
-        df.sort_values(["agency", "uid"]),
+        df.sort_values(["history_id", "uid"]),
     )
