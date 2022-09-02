@@ -170,6 +170,9 @@ schemas:
       - name: disposition_desc
         description: >
           text description of aftermath of disposition, or reason for disposition.
+      - name: investigation_desc
+        description: >
+          text description of investigation 
   event:
     columns:
       - name: event_uid

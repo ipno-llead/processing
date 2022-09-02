@@ -278,6 +278,12 @@ branch:
     file: data/fuse/com_st_james_so.csv
     primaryKey:
       - allegation_uid
+  com-natchitoches-so:
+    remote: origin
+    merge: refs/heads/com-natchitoches-so
+    file: data/fuse/com_natchitoches_so.csv
+    primaryKey:
+      - allegation_uid
   event:
     remote: origin
     merge: refs/heads/event
@@ -632,6 +638,12 @@ branch:
     file: data/fuse/event_st_james_so.csv
     primaryKey:
       - event_uid
+  event-natchitoches-so:
+    remote: origin
+    merge: refs/heads/event-natchitoches-so
+    file: data/fuse/event_natchitoches_so.csv
+    primaryKey:
+      - event_uid
   per-abbeville-pd:
     remote: origin
     merge: refs/heads/per-abbeville-pd
@@ -924,6 +936,12 @@ branch:
     remote: origin
     merge: refs/heads/per-benton-pd
     file: data/fuse/per_benton_pd.csv
+    primaryKey:
+      - uid
+  per-natchitoches-so:
+    remote: origin
+    merge: refs/heads/per-natchitoches-so
+    file: data/fuse/per_natchitoches_so.csv
     primaryKey:
       - uid
   brady-baton-rouge-pd:
