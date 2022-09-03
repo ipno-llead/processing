@@ -8,7 +8,7 @@ from datamatch import (
 )
 from lib.post import extract_events_from_post, load_for_agency
 import pandas as pd
-from lib.clean import canonicalize_officers
+from lib.clean import canonicalize_officers, float_to_int_str
 
 
 def deduplicate_pprr(pprr):
@@ -394,6 +394,66 @@ def match_pclaims21_to_pprr(pclaims, pprr_ipm):
     return pclaims
 
 
+def match_pprr_separations_to_pprr(pprr_seps, pprr_ipm):
+    dfa = pprr_seps[["uid", "first_name", "last_name"]]
+    dfa.loc[:, "fc"] = dfa.first_name.fillna("").map(lambda x: x[:1])
+    dfa.loc[:, "lc"] = dfa.last_name.fillna("").map(lambda x: x[:1])
+    dfa = dfa.drop_duplicates(subset=["uid"]).set_index("uid")
+
+    dfb = pprr_ipm[["uid", "first_name", "last_name"]]
+    dfb.loc[:, "fc"] = dfb.first_name.fillna("").map(lambda x: x[:1])
+    dfb.loc[:, "lc"] = dfb.last_name.fillna("").map(lambda x: x[:1])
+    dfb = dfb.drop_duplicates(subset=["uid"]).set_index("uid")
+
+    matcher = ThresholdMatcher(
+        ColumnsIndex(["fc", "lc"]),
+        {
+            "first_name": JaroWinklerSimilarity(),
+            "last_name": JaroWinklerSimilarity(),
+        },
+        dfa,
+        dfb,
+        show_progress=True,
+    )
+    decision = 0.985
+
+    matcher.save_pairs_to_excel(
+        deba.data(
+            "match/pprr_seps_new_orleans_pd_2019-22_v_pprr_new_orleans_pd_1946_2018.xlsx"
+        ),
+        decision,
+    )
+    matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
+    match_dict = dict(matches)
+
+    pprr_seps.loc[:, "uid"] = pprr_seps.uid.map(lambda x: match_dict.get(x, x))
+    return pprr_seps
+
+
+def join_pib_and_ipm():
+    pib = pd.read_csv(
+        deba.data("clean/cprr_new_orleans_pd_pib_reports_2014_2020.csv")
+    ).drop_duplicates(subset=["tracking_id"], keep=False)
+    ipm = pd.read_csv(
+        deba.data("clean/cprr_new_orleans_pd_1931_2020.csv")
+    ).drop_duplicates(subset=["tracking_id"], keep=False)
+
+    df = pd.merge(pib, ipm, on="tracking_id", how="outer")
+    df = df[~((df.allegation_desc.fillna("") == ""))]
+    return (
+        df[~((df.officer_primary_key.fillna("") == ""))]
+        .drop(columns=["allegation_x", "disposition_y", "agency_y"])
+        .rename(
+            columns={
+                "agency_x": "agency",
+                "disposition_x": "disposition",
+                "allegation_y": "allegation",
+            }
+        )
+        .pipe(float_to_int_str, ["officer_primary_key"])
+    )
+
+
 if __name__ == "__main__":
     pprr_ipm = pd.read_csv(deba.data("clean/pprr_new_orleans_ipm_iapro_1946_2018.csv"))
     pprr_csd = pd.read_csv(deba.data("clean/pprr_new_orleans_csd_2014.csv"))
@@ -408,6 +468,10 @@ if __name__ == "__main__":
         deba.data("clean/uof_officers_new_orleans_pd_2016_2021.csv")
     )
     cprr = pd.read_csv(deba.data("clean/cprr_new_orleans_da_2016_2020.csv"))
+    pprr_separations = pd.read_csv(
+        deba.data("clean/pprr_seps_new_orleans_pd_2018_2022.csv")
+    )
+    pib = join_pib_and_ipm()
     award = deduplicate_award(award)
     event_df = match_pprr_against_post(pprr_ipm, post)
     award = match_award_to_pprr_ipm(award, pprr_ipm)
@@ -418,6 +482,7 @@ if __name__ == "__main__":
     pclaims20 = match_pclaims20_to_pprr(pclaims20, pprr_ipm)
     pclaims21 = match_pclaims21_to_pprr(pclaims21, pprr_ipm)
     cprr = match_cprr_to_pprr(cprr, pprr_ipm)
+    pprr_separations = match_pprr_separations_to_pprr(pprr_separations, pprr_ipm)
     award.to_csv(deba.data("match/award_new_orleans_pd_2016_2021.csv"), index=False)
     event_df.to_csv(deba.data("match/post_event_new_orleans_pd.csv"), index=False)
     lprr.to_csv(deba.data("match/lprr_new_orleans_csc_2000_2016.csv"), index=False)
@@ -434,3 +499,9 @@ if __name__ == "__main__":
     pclaims20.to_csv(deba.data("match/pclaims_new_orleans_pd_2020.csv"), index=False)
     pclaims21.to_csv(deba.data("match/pclaims_new_orleans_pd_2021.csv"), index=False)
     cprr.to_csv(deba.data("match/cprr_new_orleans_da_2016_2020.csv"), index=False)
+    pprr_separations.to_csv(
+        deba.data("match/pprr_seps_new_orleans_pd_2018_2022.csv"), index=False
+    )
+    pib.to_csv(
+        deba.data("match/cprr_new_orleans_pib_reports_2014_2020.csv"), index=False
+    )

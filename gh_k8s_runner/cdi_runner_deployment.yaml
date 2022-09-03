@@ -8,6 +8,7 @@ spec:
   template:
     spec:
       repository: ppact/processing
+      image: ghrunner
       labels:
         - cdi-runner
       env: []

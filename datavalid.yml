@@ -21,6 +21,8 @@ files:
     schema: award
   data/fuse/property_claims.csv:
     schema: property_claims
+  data/fuse/post_officer_history.csv:
+    schema: post_officer_history
 schemas:
   personnel:
     columns:
@@ -304,6 +306,10 @@ schemas:
         description: >
           further description of the award
       - name: left_reason
+      - name: left_reason_desc
+        description: >
+          narrative summary of the officer's reason for leaving
+      - name: years_of_service
     validation_tasks:
       - name: event dates should be valid
         valid_date:
@@ -491,5 +497,17 @@ schemas:
       - name: property_damage_open
       - name: property_damage_incurred
       - name: property_damage_sub
+  post_officer_history:
+    columns:
+      - name: history_id
+        description: >
+          unique identifier of post officer history report
+      - name: uid
+        description: >
+          unique identifier of officer
+        unique: true
+        no_na: true
+      - name: agency
+      - name: left_reason
 
 save_bad_rows_to: data/invalid_rows.csv

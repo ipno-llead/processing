@@ -10,7 +10,7 @@ from lib.columns import (
 from lib import events
 
 
-def fuse_events(csd_pprr_17, csd_pprr_19, cprr_18, cprr_21, lprr):
+def fuse_events(csd_pprr_17, csd_pprr_19, cprr_18, cprr_21, cprr_09):
     builder = events.Builder()
 
     builder.extract_events(
@@ -83,18 +83,26 @@ def fuse_events(csd_pprr_17, csd_pprr_19, cprr_18, cprr_21, lprr):
         ["uid", "allegation_uid"],
     )
     builder.extract_events(
-        lprr,
+        cprr_09,
         {
-            events.APPEAL_HEARING: {
-                "prefix": "appeal_hearing",
-                "keep": ["uid", "agency", "appeal_uid"],
+            events.COMPLAINT_RECEIVE: {
+                "prefix": "receive",
+                "keep": ["uid", "agency", "allegation_uid"],
             },
-            events.APPEAL_DISPOSITION: {
-                "prefix": "appeal_disposition",
-                "keep": ["uid", "agency", "appeal_uid", "disposition_uid"],
+            events.COMPLAINT_INCIDENT: {
+                "prefix": "occur",
+                "keep": ["uid", "agency", "allegation_uid"],
+            },
+            events.OFFICER_LEFT: {
+                "prefix": "resignation",
+                "keep": ["uid", "agency", "allegation_uid"],
+            },
+            events.OFFICER_LEFT: {
+                "prefix": "termination",
+                "keep": ["uid", "agency", "allegation_uid"],
             },
         },
-        ["uid", "appeal_uid"],
+        ["uid", "allegation_uid"],
     )
     return builder.to_frame()
 
@@ -102,12 +110,12 @@ def fuse_events(csd_pprr_17, csd_pprr_19, cprr_18, cprr_21, lprr):
 if __name__ == "__main__":
     csd_pprr_17 = pd.read_csv(deba.data("match/pprr_baton_rouge_csd_2017.csv"))
     csd_pprr_19 = pd.read_csv(deba.data("match/pprr_baton_rouge_csd_2019.csv"))
-    lprr = pd.read_csv(deba.data("match/lprr_baton_rouge_fpcsb_1992_2012.csv"))
     post_event = pd.read_csv(deba.data("match/event_post_baton_rouge_pd.csv"))
     cprr_18 = pd.read_csv(deba.data("match/cprr_baton_rouge_pd_2018.csv"))
     cprr_21 = pd.read_csv(deba.data("match/cprr_baton_rouge_pd_2021.csv"))
     pprr = pd.read_csv(deba.data("match/pprr_baton_rouge_pd_2021.csv"))
     brady = pd.read_csv(deba.data("match/brady_baton_rouge_da_2021.csv"))
+    cprr_09 = pd.read_csv(deba.data("match/cprr_baton_rouge_pd_2004_2009.csv"))
     brady = brady.loc[brady.agency == "Baton Rouge PD"]
 
     # limit csd data to just officers found in PD roster
@@ -123,18 +131,16 @@ if __name__ == "__main__":
         csd_pprr_19.drop_duplicates(subset="uid", keep="last"),
         cprr_18,
         cprr_21,
-        lprr,
         brady,
+        cprr_09
     )
 
-    events_df = fuse_events(csd_pprr_17, csd_pprr_19, cprr_18, cprr_21, lprr)
+    events_df = fuse_events(csd_pprr_17, csd_pprr_19, cprr_18, cprr_21, cprr_09)
     events_df = rearrange_event_columns(pd.concat([post_event, events_df]))
-    complaint_df = rearrange_allegation_columns(pd.concat([cprr_18, cprr_21]))
-    lprr_df = rearrange_appeal_hearing_columns(lprr)
+    complaint_df = rearrange_allegation_columns(pd.concat([cprr_18, cprr_21, cprr_09]))
     brady_df = rearrange_brady_columns(brady)
 
     personnel_df.to_csv(deba.data("fuse/per_baton_rouge_pd.csv"), index=False)
     events_df.to_csv(deba.data("fuse/event_baton_rouge_pd.csv"), index=False)
     complaint_df.to_csv(deba.data("fuse/com_baton_rouge_pd.csv"), index=False)
-    lprr_df.to_csv(deba.data("fuse/app_baton_rouge_pd.csv"), index=False)
     brady_df.to_csv(deba.data("fuse/brady_baton_rouge_pd.csv"), index=False)

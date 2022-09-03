@@ -1,0 +1,6 @@
+wdir: data/ner/post/post_officer_history/model
+outs:
+- md5: 35fe009dbc341956c532c97e01aa3407.dir
+  size: 3968078
+  nfiles: 11
+  path: post_officer_history.model
