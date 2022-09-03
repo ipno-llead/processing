@@ -22,19 +22,6 @@ def create_officer_number_dict(pprr):
     return df.set_index("employee_id").uid.to_dict()
 
 
-def fuse_cprr(cprr, actions, officer_number_dict):
-    # actions.loc[:, 'allegation_primary_key'] = actions.allegation_primary_key\
-    #     .astype(str)
-    # actions_dict = actions.set_index('allegation_primary_key').action.to_dict()
-    cprr = float_to_int_str(cprr, ["officer_primary_key", "allegation_primary_key"])
-    cprr.loc[:, "uid"] = cprr.officer_primary_key.map(
-        lambda x: officer_number_dict.get(x, "")
-    )
-    # cprr.loc[:, 'action'] = cprr.allegation_primary_key.map(
-    #     lambda x: actions_dict.get(x, ''))
-    return cprr
-
-
 def fuse_pib(pib, officer_number_dict):
     pib = float_to_int_str(pib, ["officer_primary_key"])
     pib.loc[:, "uid"] = pib.officer_primary_key.map(
@@ -109,9 +96,18 @@ def fuse_events(
     builder.extract_events(
         cprr,
         {
-            events.COMPLAINT_RECEIVE: {"prefix": "receive"},
-            events.INVESTIGATION_COMPLETE: {"prefix": "investigation_complete"},
-            events.COMPLAINT_INCIDENT: {"prefix": "occur"},
+            events.COMPLAINT_RECEIVE: {
+                "prefix": "receive",
+                "keep": ["uid", "agency", "allegation_uid"],
+            },
+            events.INVESTIGATION_COMPLETE: {
+                "prefix": "investigation_complete",
+                "keep": ["uid", "agency", "allegation_uid"],
+            },
+            events.COMPLAINT_INCIDENT: {
+                "prefix": "occur",
+                "keep": ["uid", "agency", "allegation_uid"],
+            },
         },
         ["uid", "allegation_uid"],
     )
@@ -249,11 +245,11 @@ if __name__ == "__main__":
         deba.data("match/pprr_seps_new_orleans_pd_2018_2022.csv")
     )
     pib = pd.read_csv(deba.data("match/cprr_new_orleans_pib_reports_2014_2020.csv"))
+    cprr = pd.read_csv(deba.data("match/cprr_new_orleans_da_2016_2020.csv"))
     brady = brady.loc[brady.agency == "New Orleans PD"]
 
-    complaints = fuse_cprr(cprr, actions, officer_number_dict)
     pib = fuse_pib(pib, officer_number_dict)
-    com = rearrange_allegation_columns(pd.concat([complaints, pib]).drop_duplicates(subset=["allegation_uid"], keep="last"))
+    com = rearrange_allegation_columns(cprr)
     personnel = fuse_personnel(
         pprr_ipm,
         lprr,
