@@ -1,6 +1,0 @@
-wdir: data/raw/natchitoches_so
-outs:
-- md5: 472fc47304640ee293a85f86765afe79
-  size: 418
-  isexec: true
-  path: natchitoches_so_cprr_2018_2021.csv
