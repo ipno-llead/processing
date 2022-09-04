@@ -341,3 +341,24 @@ def rearrange_post_officer_history_columns(df):
         "post_officer_history",
         df.sort_values(["history_id", "uid"]),
     )
+
+
+def rearrange_settlement_columns(df):
+    """Performs final processing step for a settlement table
+
+    This performs the following tasks:
+    - discard columns not present in settlement schema
+    - drop row duplicates
+    - convert numeric columns to int or str
+
+    Args:
+        df (pd.DataFrame):
+            the frame to process
+
+    Returns:
+        the updated frame
+    """
+    return datavalid_config.rearrange_columns(
+        "settlement",
+        df.sort_values(["agency", "settlement_uid"]),
+    )

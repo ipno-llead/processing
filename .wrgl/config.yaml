@@ -1028,6 +1028,12 @@ branch:
     file: data/fuse/pclaims_new_orleans_pd.csv
     primaryKey:
       - property_claims_uid
+  settlements-new-orleans-pd:
+    remote: origin
+    merge: refs/heads/settlements-new-orleans-pd
+    file: data/fuse/settlements_new_orleans_pd.csv
+    primaryKey:
+      - settlement_uid
   person:
     remote: origin
     merge: refs/heads/person
@@ -1099,6 +1105,12 @@ branch:
     remote: origin
     merge: refs/heads/post_officer_history
     file: data/fuse/post_officer_history.csv
+    primaryKey:
+      - uid
+  settlements:
+    remote: origin
+    merge: refs/heads/settlements
+    file: data/fuse/settlements.csv
     primaryKey:
       - uid
 merge:
