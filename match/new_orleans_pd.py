@@ -93,7 +93,7 @@ def match_award_to_pprr(award, pprr):
         dfb,
         show_progress=True,
     )
-    decision = 0.956
+    decision = 1
     matcher.save_pairs_to_excel(
         deba.data("match/new_orleans_pd_award_2016_2021_v_pprr_nopd_2020.xlsx"),
         decision,
@@ -127,7 +127,7 @@ def match_lprr_to_pprr(lprr, pprr):
         dfb,
         show_progress=True,
     )
-    decision = 0.801
+    decision = 1
     matcher.save_pairs_to_excel(
         deba.data("match/new_orleans_lprr_2000_2016_v_pprr_nopd_2020.xlsx"),
         decision,
@@ -200,7 +200,7 @@ def match_stop_and_search_to_pprr(sas, pprr):
         dfb,
         show_progress=True,
     )
-    decision = 0.950
+    decision = 1
 
     matcher.save_pairs_to_excel(
         deba.data(
@@ -236,7 +236,7 @@ def match_use_of_force_to_pprr(uof, pprr):
         dfb,
         show_progress=True,
     )
-    decision = 0.915
+    decision = 1
 
     matcher.save_pairs_to_excel(
         deba.data("match/uof_new_orleans_pd_2016_2021_v_pprr_new_orleans_pd_2020.xlsx"),
@@ -270,7 +270,7 @@ def match_cprr_to_pprr(cprr, pprr):
         dfb,
         show_progress=True,
     )
-    decision = 0.958
+    decision = 1
 
     matcher.save_pairs_to_excel(
         deba.data("match/cprr_new_orleans_pd_v_pprr_new_orleans_pd_2020.xlsx"),
@@ -304,7 +304,7 @@ def match_pclaims20_to_pprr(pclaims, pprr):
         dfb,
         show_progress=True,
     )
-    decision = 0.940
+    decision = 1
 
     matcher.save_pairs_to_excel(
         deba.data("match/pclaims_new_orleans_pd_2020_v_pprr_new_orleans_pd_2020.xlsx"),
@@ -338,7 +338,7 @@ def match_pclaims21_to_pprr(pclaims, pprr):
         dfb,
         show_progress=True,
     )
-    decision = 0.940
+    decision = 1
 
     matcher.save_pairs_to_excel(
         deba.data("match/pclaims_new_orleans_pd_2020_v_pprr_new_orleans_pd_2020.xlsx"),
@@ -372,7 +372,7 @@ def match_pprr_separations_to_pprr(pprr_seps, pprr):
         dfb,
         show_progress=True,
     )
-    decision = 0.959
+    decision = 1
 
     matcher.save_pairs_to_excel(
         deba.data(
