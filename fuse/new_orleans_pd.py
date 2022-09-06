@@ -44,14 +44,27 @@ def fuse_pib(pib, officer_number_dict):
 
 
 def fuse_events(
-    pprr_ipm, pprr_csd, cprr, uof, award, lprr, pclaims20, pclaims21, pprr_separations
+    pprr, pprr_csd, cprr, uof, award, lprr, pclaims20, pclaims21, pprr_separations
 ):
     builder = events.Builder()
     builder.extract_events(
-        pprr_ipm,
+        pprr,
         {
-            events.OFFICER_HIRE: {
-                "prefix": "hire",
+            events.OFFICER_PAY_EFFECTIVE: {
+                "prefix": "salary",
+                "parse_date": True,
+                "keep": [
+                    "uid",
+                    "agency",
+                    "rank_desc",
+                    "salary",
+                    "salary_freq",
+                    "overtime_and_detail_annual_total",
+                ],
+            },
+            events.OFFICER_PAY_EFFECTIVE: {
+                "prefix": "overtime_and_detail",
+                "parse_date": True,
                 "keep": [
                     "uid",
                     "agency",
@@ -59,20 +72,9 @@ def fuse_events(
                     "rank_desc",
                     "salary",
                     "salary_freq",
+                    "overtime_and_detail_annual_total",
                 ],
             },
-            events.OFFICER_LEFT: {
-                "prefix": "left",
-                "keep": [
-                    "uid",
-                    "agency",
-                    "rank_code",
-                    "rank_desc",
-                    "salary",
-                    "salary_freq",
-                ],
-            },
-            events.OFFICER_DEPT: {"prefix": "dept"},
         },
         ["uid"],
     )
@@ -224,10 +226,11 @@ def fuse_events(
         },
         ["uid", "separation_uid"],
     )
-    return builder.to_frame(True)
+    return builder.to_frame()
 
 
 if __name__ == "__main__":
+    pprr = pd.read_csv(deba.data("clean/pprr_new_orleans_pd_2020.csv"))
     pprr_ipm = pd.read_csv(deba.data("match/pprr_new_orleans_ipm_iapro_1946_2018.csv"))
     pprr_csd = pd.read_csv(deba.data("match/pprr_new_orleans_csd_2014.csv"))
     officer_number_dict = create_officer_number_dict(pprr_ipm)
@@ -255,9 +258,13 @@ if __name__ == "__main__":
 
     complaints = fuse_cprr(cprr, actions, officer_number_dict)
     pib = fuse_pib(pib, officer_number_dict)
-    com = rearrange_allegation_columns(pd.concat([complaints, pib]).drop_duplicates(subset=["allegation_uid"], keep="last"))
+    com = rearrange_allegation_columns(
+        pd.concat([complaints, pib]).drop_duplicates(
+            subset=["allegation_uid"], keep="last"
+        )
+    )
     personnel = fuse_personnel(
-        pprr_ipm,
+        pprr,
         lprr,
         pprr_csd,
         uof_officers,
@@ -267,7 +274,7 @@ if __name__ == "__main__":
         pprr_separations,
     )
     events_df = fuse_events(
-        pprr_ipm,
+        pprr,
         pprr_csd,
         cprr,
         uof,
@@ -277,7 +284,9 @@ if __name__ == "__main__":
         pclaims21,
         pprr_separations,
     )
-    events_df = rearrange_event_columns(pd.concat([post_event, events_df]))
+    events_df = rearrange_event_columns(
+        pd.concat([post_event, events_df])
+    ).drop_duplicates(subset=["event_uid"], keep="first")
     sas_df = rearrange_stop_and_search_columns(sas)
     lprr_df = rearrange_appeal_hearing_columns(lprr)
     uof_officer_df = rearrange_uof_officer_columns(uof_officers)
