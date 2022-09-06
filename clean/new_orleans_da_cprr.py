@@ -36,7 +36,7 @@ def clean_complainant_type(df):
         .str.strip()
         .str.replace(" initiated", "", regex=False)
     )
-    return df
+    return df.drop(columns=["incident_type"])
 
 
 def clean_allegation(df):
@@ -149,10 +149,10 @@ def clean_employment_status(df):
         df.employment_status.str.lower()
         .str.strip()
         .str.replace(r"off duty", "off-duty", regex=True)
-        .str.replace(r"^not ?- ?nopd officer$", "not employed with nopd", regex=True)
+        .str.replace(r"^not ?- ?nopd officer$", "not an nopd officer", regex=True)
         .str.replace(r"(\w+)  (\w+)", r"\1 \2", regex=True)
         .str.replace(
-            R"^rui - resigned under investigation$",
+            r"^rui - resigned under investigation$",
             "resigned under investigation",
             regex=True,
         )
@@ -175,8 +175,13 @@ def clean_work_shift(df):
 def clean_allegation_sub_desc(df):
     df.loc[:, "allegation_sub_desc"] = (
         df.allegation_sub_desc.str.lower()
-        .str.lower()
+        .str.strip()
+        .fillna("")
         .str.replace(r"(.+)\((\w+)\)", r"\1 (\2)", regex=True)
+        .str.replace(r"(\w+)  +\((\w+)\)", r"\1 (\2)", regex=True)
+        .str.replace(r"\((\w+)\)  +\((\w+)\)", r"(\1) (\2)", regex=True)
+        .str.replace(r"(\w+)  +(\w+)", r"\1 \2", regex=True)
+        .str.replace(r"&", "and", regex=False)
     )
     return df
 
@@ -229,12 +234,12 @@ def clean():
                 "work_shift",
             ],
         )
+        .pipe(clean_races, ["race", "citizen_race"])
         .pipe(clean_sexes, ["sex", "citizen_sex"])
         .pipe(
             clean_dates, ["occur_date", "receive_date", "investigation_complete_date"]
         )
         .pipe(clean_names, ["first_name", "last_name"])
-        .pipe(clean_races, ["race", "citizen_race"])
         .pipe(set_values, {"agency": "New Orleans PD"})
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(
