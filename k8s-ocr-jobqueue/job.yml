@@ -1,0 +1,29 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: doctr
+spec:
+  template:
+    spec:
+      containers:
+        - name: doctr
+          image: doctr
+          env:
+            - name: GOOGLE_APPLICATION_CREDENTIALS
+              value: /etc/service_account/key.json
+          envFrom:
+            - configMapRef:
+                name: doctr-config
+          volumeMounts:
+            - name: service-account-key
+              mountPath: "/etc/service_account"
+              readOnly: true
+          resources:
+            requests:
+              memory: 4Gi
+              cpu: "1"
+      volumes:
+        - name: service-account-key
+          secret:
+            secretName: service-account-key
+      restartPolicy: OnFailure
