@@ -21,7 +21,7 @@ def combine_date_columns(
     """
     dates = df[[year_col, month_col, day_col]]
     dates.columns = ["year", "month", "day"]
-    return pd.to_datetime(dates)
+    return pd.to_datetime(dates, errors="coerce")
 
 
 def combine_datetime_columns(
