@@ -161,7 +161,10 @@ schemas:
       - name: shift_supervisor
       - name: allegation_desc
         description: >
-          text description of the allegation
+          narrative form text description of allegation
+      - name: allegation_sub_desc
+        description: >
+          policy/manual text description of allegation
       - name: investigating_department
         description: >
           small departments frequently turnover internal investigations to the sheriff's office

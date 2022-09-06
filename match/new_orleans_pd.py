@@ -8,7 +8,8 @@ from datamatch import (
 )
 from lib.post import extract_events_from_post, load_for_agency
 import pandas as pd
-from lib.clean import canonicalize_officers, float_to_int_str
+from lib.clean import canonicalize_officers, float_to_int_str, standardize_desc_cols
+from lib.uid import gen_uid
 
 
 def deduplicate_award(award):
@@ -273,7 +274,7 @@ def match_cprr_to_pprr(cprr, pprr):
     decision = 1
 
     matcher.save_pairs_to_excel(
-        deba.data("match/cprr_new_orleans_pd_v_pprr_new_orleans_pd_2020.xlsx"),
+        deba.data("match/cprr_new_orleans_da_v_pprr_new_orleans_pd_2020.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
@@ -387,28 +388,20 @@ def match_pprr_separations_to_pprr(pprr_seps, pprr):
     return pprr_seps
 
 
-def join_pib_and_ipm():
+def join_pib_and_da():
     pib = pd.read_csv(
         deba.data("clean/cprr_new_orleans_pd_pib_reports_2014_2020.csv")
     ).drop_duplicates(subset=["tracking_id"], keep=False)
-    ipm = pd.read_csv(
-        deba.data("clean/cprr_new_orleans_pd_1931_2020.csv")
-    ).drop_duplicates(subset=["tracking_id"], keep=False)
-
-    df = pd.merge(pib, ipm, on="tracking_id", how="outer")
-    df = df[~((df.allegation_desc.fillna("") == ""))]
-    return (
-        df[~((df.officer_primary_key.fillna("") == ""))]
-        .drop(columns=["allegation_x", "disposition_y", "agency_y"])
-        .rename(
-            columns={
-                "agency_x": "agency",
-                "disposition_x": "disposition",
-                "allegation_y": "allegation",
-            }
-        )
-        .pipe(float_to_int_str, ["officer_primary_key"])
+    pib = pib[["tracking_id", "allegation_desc"]].pipe(
+        standardize_desc_cols, ["tracking_id"]
     )
+    da = pd.read_csv(
+        deba.data("clean/cprr_new_orleans_da_2016_2020.csv")
+    ).drop_duplicates(subset=["tracking_id"], keep=False)
+    df = pd.merge(pib, da, on="tracking_id", how="outer")
+    df = df[~((df.allegation_desc.fillna("") == ""))]
+    df = df[~((df.uid.fillna("") == ""))]
+    return df
 
 
 if __name__ == "__main__":
@@ -428,7 +421,7 @@ if __name__ == "__main__":
     pprr_separations = pd.read_csv(
         deba.data("clean/pprr_seps_new_orleans_pd_2018_2022.csv")
     )
-    pib = join_pib_and_ipm()
+    pib = join_pib_and_da()
     award = deduplicate_award(award)
     event_df = match_pprr_against_post(pprr, post)
     award = match_award_to_pprr(award, pprr)

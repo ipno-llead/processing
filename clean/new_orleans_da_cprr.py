@@ -172,9 +172,9 @@ def clean_work_shift(df):
     return df.drop(columns=["shift_of_complainant"])
 
 
-def clean_allegation_desc(df):
-    df.loc[:, "allegation_desc"] = (
-        df.allegation_desc.str.lower()
+def clean_allegation_sub_desc(df):
+    df.loc[:, "allegation_sub_desc"] = (
+        df.allegation_sub_desc.str.lower()
         .str.lower()
         .str.replace(r"(.+)\((\w+)\)", r"\1 (\2)", regex=True)
     )
@@ -194,7 +194,7 @@ def clean():
                 "date_complaint_received_by_nopd_pib": "receive_date",
                 "date_complaint_investigation_complete": "investigation_complete_date",
                 "working_status_of_complainant": "employment_status",
-                "relevant_policy": "allegation_desc",
+                "relevant_policy": "allegation_sub_desc",
                 "officer_firstname": "first_name",
                 "officer_lastname": "last_name",
                 "officer_race_ethnicity": "race",
@@ -217,7 +217,7 @@ def clean():
         .pipe(clean_department_desc)
         .pipe(clean_unit_desc)
         .pipe(clean_employment_status)
-        .pipe(clean_allegation_desc)
+        .pipe(clean_allegation_sub_desc)
         .pipe(float_to_int_str, ["age", "years_of_service", "citizen_ae"])
         .pipe(
             standardize_desc_cols,
@@ -239,7 +239,7 @@ def clean():
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(
             gen_uid,
-            ["allegation", "allegation_desc", "disposition", "tracking_id", "uid"],
+            ["allegation", "allegation_sub_desc", "disposition", "tracking_id", "uid"],
             "allegation_uid",
         )
         .drop(
