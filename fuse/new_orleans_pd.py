@@ -16,33 +16,6 @@ from lib.personnel import fuse_personnel
 from lib import events
 
 
-def create_officer_number_dict(pprr):
-    df = pprr[["employee_id", "uid"]]
-    df.loc[:, "employee_id"] = df.employee_id.astype(str)
-    return df.set_index("employee_id").uid.to_dict()
-
-
-def fuse_cprr(cprr, actions, officer_number_dict):
-    # actions.loc[:, 'allegation_primary_key'] = actions.allegation_primary_key\
-    #     .astype(str)
-    # actions_dict = actions.set_index('allegation_primary_key').action.to_dict()
-    cprr = float_to_int_str(cprr, ["officer_primary_key", "allegation_primary_key"])
-    cprr.loc[:, "uid"] = cprr.officer_primary_key.map(
-        lambda x: officer_number_dict.get(x, "")
-    )
-    # cprr.loc[:, 'action'] = cprr.allegation_primary_key.map(
-    #     lambda x: actions_dict.get(x, ''))
-    return cprr
-
-
-def fuse_pib(pib, officer_number_dict):
-    pib = float_to_int_str(pib, ["officer_primary_key"])
-    pib.loc[:, "uid"] = pib.officer_primary_key.map(
-        lambda x: officer_number_dict.get(x, "")
-    )
-    return pib
-
-
 def fuse_events(
     pprr, pprr_csd, cprr, uof, award, lprr, pclaims20, pclaims21, pprr_separations
 ):
@@ -111,9 +84,18 @@ def fuse_events(
     builder.extract_events(
         cprr,
         {
-            events.COMPLAINT_RECEIVE: {"prefix": "receive"},
-            events.ALLEGATION_CREATE: {"prefix": "allegation_create"},
-            events.COMPLAINT_INCIDENT: {"prefix": "occur"},
+            events.COMPLAINT_RECEIVE: {
+                "prefix": "receive",
+                "keep": ["uid", "agency", "allegation_uid"],
+            },
+            events.INVESTIGATION_COMPLETE: {
+                "prefix": "investigation_complete",
+                "keep": ["uid", "agency", "allegation_uid"],
+            },
+            events.COMPLAINT_INCIDENT: {
+                "prefix": "occur",
+                "keep": ["uid", "agency", "allegation_uid"],
+            },
         },
         ["uid", "allegation_uid"],
     )
@@ -231,11 +213,7 @@ def fuse_events(
 
 if __name__ == "__main__":
     pprr = pd.read_csv(deba.data("clean/pprr_new_orleans_pd_2020.csv"))
-    pprr_ipm = pd.read_csv(deba.data("match/pprr_new_orleans_ipm_iapro_1946_2018.csv"))
     pprr_csd = pd.read_csv(deba.data("match/pprr_new_orleans_csd_2014.csv"))
-    officer_number_dict = create_officer_number_dict(pprr_ipm)
-    cprr = pd.read_csv(deba.data("clean/cprr_new_orleans_pd_1931_2020.csv"))
-    actions = pd.read_csv(deba.data("clean/cprr_actions_new_orleans_pd_1931_2020.csv"))
     uof_officers = pd.read_csv(
         deba.data("clean/uof_officers_new_orleans_pd_2016_2021.csv")
     )
@@ -248,21 +226,15 @@ if __name__ == "__main__":
     lprr = pd.read_csv(deba.data("match/lprr_new_orleans_csc_2000_2016.csv"))
     sas = pd.read_csv(deba.data("match/sas_new_orleans_pd_2017_2021.csv"))
     brady = pd.read_csv(deba.data("match/brady_new_orleans_da_2021.csv"))
+    brady = brady.loc[brady.agency == "New Orleans PD"]
     pclaims20 = pd.read_csv(deba.data("match/pclaims_new_orleans_pd_2020.csv"))
     pclaims21 = pd.read_csv(deba.data("match/pclaims_new_orleans_pd_2021.csv"))
     pprr_separations = pd.read_csv(
         deba.data("match/pprr_seps_new_orleans_pd_2018_2022.csv")
     )
-    pib = pd.read_csv(deba.data("match/cprr_new_orleans_pib_reports_2014_2020.csv"))
-    brady = brady.loc[brady.agency == "New Orleans PD"]
 
-    complaints = fuse_cprr(cprr, actions, officer_number_dict)
-    pib = fuse_pib(pib, officer_number_dict)
-    com = rearrange_allegation_columns(
-        pd.concat([complaints, pib]).drop_duplicates(
-            subset=["allegation_uid"], keep="last"
-        )
-    )
+    cprr = pd.read_csv(deba.data("match/cprr_new_orleans_da_2016_2020.csv"))
+    pib = pd.read_csv(deba.data("match/cprr_new_orleans_pib_reports_2014_2020.csv"))
     personnel = fuse_personnel(
         pprr,
         lprr,
@@ -272,6 +244,8 @@ if __name__ == "__main__":
         pclaims20,
         pclaims21,
         pprr_separations,
+        cprr,
+        pib,
     )
     events_df = fuse_events(
         pprr,
@@ -294,6 +268,8 @@ if __name__ == "__main__":
     uof_df = rearrange_use_of_force(uof)
     brady_df = rearrange_brady_columns(brady)
     pclaims_df = rearrange_property_claims_columns(pd.concat([pclaims20, pclaims21]))
+    com = pd.concat([cprr, pib]).drop_duplicates(subset=["allegation_uid"], keep="last")
+    com = rearrange_allegation_columns(com)
     com.to_csv(deba.data("fuse/com_new_orleans_pd.csv"), index=False)
     personnel.to_csv(deba.data("fuse/per_new_orleans_pd.csv"), index=False)
     events_df.to_csv(deba.data("fuse/event_new_orleans_pd.csv"), index=False)
