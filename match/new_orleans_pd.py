@@ -11,33 +11,6 @@ import pandas as pd
 from lib.clean import canonicalize_officers, float_to_int_str
 
 
-def deduplicate_pprr(pprr):
-    df = (
-        pprr.loc[
-            pprr.uid.notna(),
-            ["employee_id", "first_name", "last_name", "uid"],
-        ]
-        .drop_duplicates()
-        .set_index("uid", drop=True)
-    )
-    df.loc[:, "fc"] = df.first_name.fillna().map(lambda x: x[:1])
-
-    matcher = ThresholdMatcher(
-        ColumnsIndex("fc"),
-        {
-            "first_name": JaroWinklerSimilarity(),
-            "last_name": JaroWinklerSimilarity(),
-        },
-        df,
-    )
-    decision = 0.950
-    matcher.save_clusters_to_excel(
-        deba.data("match/deduplicate_pprr_new_orleans_pd.xlsx"), decision, decision
-    )
-    clusters = matcher.get_index_clusters_within_thresholds(decision)
-    return canonicalize_officers(pprr, clusters)
-
-
 def deduplicate_award(award):
     df = award[["uid", "first_name", "last_name", "middle_name"]]
     df = df.drop_duplicates(subset=["uid"]).set_index("uid")
@@ -60,13 +33,12 @@ def deduplicate_award(award):
     return canonicalize_officers(award, clusters)
 
 
-def match_pprr_against_post(pprr_ipm, post):
-    dfa = pprr_ipm[["uid", "first_name", "last_name"]]
+def match_pprr_against_post(pprr, post):
+    dfa = pprr[["uid", "first_name", "last_name"]]
     dfa.loc[:, "hire_date"] = combine_date_columns(
-        pprr_ipm, "hire_year", "hire_month", "hire_day"
+        pprr, "hire_year", "hire_month", "hire_day"
     )
     dfa.loc[:, "fc"] = dfa.first_name.fillna("").map(lambda x: x[:1])
-    dfa.loc[:, "lc"] = dfa.last_name.fillna("").map(lambda x: x[:1])
     dfa = dfa.drop_duplicates(subset=["uid"]).set_index("uid")
 
     dfb = post[["uid", "first_name", "last_name"]]
@@ -74,11 +46,10 @@ def match_pprr_against_post(pprr_ipm, post):
         post, "hire_year", "hire_month", "hire_day"
     )
     dfb.loc[:, "fc"] = dfb.first_name.fillna("").map(lambda x: x[:1])
-    dfb.loc[:, "lc"] = dfb.last_name.fillna("").map(lambda x: x[:1])
     dfb = dfb.drop_duplicates(subset=["uid"]).set_index("uid")
 
     matcher = ThresholdMatcher(
-        ColumnsIndex(["fc", "lc"]),
+        ColumnsIndex(["fc"]),
         {
             "first_name": JaroWinklerSimilarity(),
             "last_name": JaroWinklerSimilarity(),
@@ -88,11 +59,9 @@ def match_pprr_against_post(pprr_ipm, post):
         dfb,
         show_progress=True,
     )
-    decision = 0.803
+    decision = 1
     matcher.save_pairs_to_excel(
-        deba.data(
-            "match/pppr_ipm_new_orleans_pd_1946_2018_v_post_pprr_2020_11_06.xlsx"
-        ),
+        deba.data("match/pppr_new_orleans_pd_2020_v_post_pprr_2020_11_06.xlsx"),
         decision,
     )
 
@@ -100,7 +69,7 @@ def match_pprr_against_post(pprr_ipm, post):
     return extract_events_from_post(post, matches, "New Orleans PD")
 
 
-def match_award_to_pprr_ipm(award, pprr_ipm):
+def match_award_to_pprr(award, pprr):
     dfa = (
         award[["uid", "first_name", "last_name"]]
         .drop_duplicates()
@@ -110,7 +79,7 @@ def match_award_to_pprr_ipm(award, pprr_ipm):
     dfa.loc[:, "lc"] = dfa.last_name.fillna("").map(lambda x: x[:1])
 
     dfb = (
-        pprr_ipm[["uid", "first_name", "last_name"]]
+        pprr[["uid", "first_name", "last_name"]]
         .drop_duplicates()
         .set_index("uid", drop=True)
     )
@@ -124,11 +93,9 @@ def match_award_to_pprr_ipm(award, pprr_ipm):
         dfb,
         show_progress=True,
     )
-    decision = 0.93
+    decision = 1
     matcher.save_pairs_to_excel(
-        deba.data(
-            "match/new_orleans_pd_award_2016_2021_v_pprr_ipm_new_orleans_pd_1946_2018.xlsx"
-        ),
+        deba.data("match/new_orleans_pd_award_2016_2021_v_pprr_nopd_2020.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
@@ -138,13 +105,13 @@ def match_award_to_pprr_ipm(award, pprr_ipm):
     return award
 
 
-def match_lprr_to_pprr_ipm(lprr, pprr_ipm):
+def match_lprr_to_pprr(lprr, pprr):
     dfa = lprr[["uid", "first_name", "last_name", "middle_name"]]
     dfa.loc[:, "fc"] = dfa.first_name.fillna("").map(lambda x: x[:1])
     dfa.loc[:, "lc"] = dfa.last_name.fillna("").map(lambda x: x[:1])
     dfa = dfa.drop_duplicates(subset=["uid"]).set_index("uid")
 
-    dfb = pprr_ipm[["uid", "first_name", "last_name", "middle_name"]]
+    dfb = pprr[["uid", "first_name", "last_name", "middle_name"]]
     dfb.loc[:, "fc"] = dfb.first_name.fillna("").map(lambda x: x[:1])
     dfb.loc[:, "lc"] = dfb.last_name.fillna("").map(lambda x: x[:1])
     dfb = dfb.drop_duplicates(subset=["uid"]).set_index("uid")
@@ -160,11 +127,9 @@ def match_lprr_to_pprr_ipm(lprr, pprr_ipm):
         dfb,
         show_progress=True,
     )
-    decision = 0.80
+    decision = 1
     matcher.save_pairs_to_excel(
-        deba.data(
-            "match/new_orleans_lprr_2000_2016_v_pprr_ipm_new_orleans_pd_1946_2018.xlsx"
-        ),
+        deba.data("match/new_orleans_lprr_2000_2016_v_pprr_nopd_2020.xlsx"),
         decision,
     )
     matches = matcher.get_index_clusters_within_thresholds(lower_bound=decision)
@@ -174,7 +139,7 @@ def match_lprr_to_pprr_ipm(lprr, pprr_ipm):
     return lprr
 
 
-def match_pprr_csd_to_pprr_ipm(pprr_csd, pprr_ipm):
+def match_pprr_csd_to_pprr(pprr_csd, pprr):
     dfa = pprr_csd[["uid", "first_name", "last_name", "agency"]]
     dfa.loc[:, "hire_date"] = combine_date_columns(
         pprr_csd, "hire_year", "hire_month", "hire_day"
@@ -183,9 +148,9 @@ def match_pprr_csd_to_pprr_ipm(pprr_csd, pprr_ipm):
     dfa.loc[:, "lc"] = dfa.last_name.fillna("").map(lambda x: x[:1])
     dfa = dfa.drop_duplicates(subset=["uid"]).set_index("uid")
 
-    dfb = pprr_ipm[["uid", "first_name", "last_name", "agency"]]
+    dfb = pprr[["uid", "first_name", "last_name", "agency"]]
     dfb.loc[:, "hire_date"] = combine_date_columns(
-        pprr_ipm, "hire_year", "hire_month", "hire_day"
+        pprr, "hire_year", "hire_month", "hire_day"
     )
     dfb.loc[:, "fc"] = dfb.first_name.fillna("").map(lambda x: x[:1])
     dfb.loc[:, "lc"] = dfb.last_name.fillna("").map(lambda x: x[:1])
@@ -204,9 +169,7 @@ def match_pprr_csd_to_pprr_ipm(pprr_csd, pprr_ipm):
     )
     decision = 1
     matcher.save_pairs_to_excel(
-        deba.data(
-            "match/pprr_new_orleans_csd_2014_v_pprr_ipm_new_orleans_pd_1946_2018.xlsx"
-        ),
+        deba.data("match/pprr_new_orleans_csd_2014_v_pprr_nopd_2020.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
@@ -216,13 +179,13 @@ def match_pprr_csd_to_pprr_ipm(pprr_csd, pprr_ipm):
     return pprr_csd
 
 
-def match_stop_and_search_to_pprr(sas, pprr_ipm):
+def match_stop_and_search_to_pprr(sas, pprr):
     dfa = sas[["uid", "first_name", "last_name"]]
     dfa.loc[:, "fc"] = dfa.first_name.fillna("").map(lambda x: x[:1])
     dfa.loc[:, "lc"] = dfa.last_name.fillna("").map(lambda x: x[:1])
     dfa = dfa.drop_duplicates(subset=["uid"]).set_index("uid")
 
-    dfb = pprr_ipm[["uid", "first_name", "last_name"]]
+    dfb = pprr[["uid", "first_name", "last_name"]]
     dfb.loc[:, "fc"] = dfb.first_name.fillna("").map(lambda x: x[:1])
     dfb.loc[:, "lc"] = dfb.last_name.fillna("").map(lambda x: x[:1])
     dfb = dfb.drop_duplicates(subset=["uid"]).set_index("uid")
@@ -237,11 +200,11 @@ def match_stop_and_search_to_pprr(sas, pprr_ipm):
         dfb,
         show_progress=True,
     )
-    decision = 0.95
+    decision = 1
 
     matcher.save_pairs_to_excel(
         deba.data(
-            "match/stop_and_search_new_orleans_pd_v_pprr_new_orleans_pd_1946_2018.xlsx"
+            "match/stop_and_search_new_orleans_pd_v_pprr_new_orleans_pd_2020.xlsx"
         ),
         decision,
     )
@@ -252,13 +215,13 @@ def match_stop_and_search_to_pprr(sas, pprr_ipm):
     return sas
 
 
-def match_use_of_force_to_pprr(uof, pprr_ipm):
+def match_use_of_force_to_pprr(uof, pprr):
     dfa = uof[["uid", "first_name", "last_name"]]
     dfa.loc[:, "fc"] = dfa.first_name.fillna("").map(lambda x: x[:1])
     dfa.loc[:, "lc"] = dfa.last_name.fillna("").map(lambda x: x[:1])
     dfa = dfa.drop_duplicates(subset=["uid"]).set_index("uid")
 
-    dfb = pprr_ipm[["uid", "first_name", "last_name"]]
+    dfb = pprr[["uid", "first_name", "last_name"]]
     dfb.loc[:, "fc"] = dfb.first_name.fillna("").map(lambda x: x[:1])
     dfb.loc[:, "lc"] = dfb.last_name.fillna("").map(lambda x: x[:1])
     dfb = dfb.drop_duplicates(subset=["uid"]).set_index("uid")
@@ -273,12 +236,10 @@ def match_use_of_force_to_pprr(uof, pprr_ipm):
         dfb,
         show_progress=True,
     )
-    decision = 0.958
+    decision = 1
 
     matcher.save_pairs_to_excel(
-        deba.data(
-            "match/uof_new_orleans_pd_2016_2021_v_pprr_new_orleans_pd_1946_2018.xlsx"
-        ),
+        deba.data("match/uof_new_orleans_pd_2016_2021_v_pprr_new_orleans_pd_2020.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
@@ -288,13 +249,13 @@ def match_use_of_force_to_pprr(uof, pprr_ipm):
     return uof
 
 
-def match_cprr_to_pprr(cprr, pprr_ipm):
+def match_cprr_to_pprr(cprr, pprr):
     dfa = cprr[["uid", "first_name", "last_name"]]
     dfa.loc[:, "fc"] = dfa.first_name.fillna("").map(lambda x: x[:1])
     dfa.loc[:, "lc"] = dfa.last_name.fillna("").map(lambda x: x[:1])
     dfa = dfa.drop_duplicates(subset=["uid"]).set_index("uid")
 
-    dfb = pprr_ipm[["uid", "first_name", "last_name"]]
+    dfb = pprr[["uid", "first_name", "last_name"]]
     dfb.loc[:, "fc"] = dfb.first_name.fillna("").map(lambda x: x[:1])
     dfb.loc[:, "lc"] = dfb.last_name.fillna("").map(lambda x: x[:1])
     dfb = dfb.drop_duplicates(subset=["uid"]).set_index("uid")
@@ -309,10 +270,10 @@ def match_cprr_to_pprr(cprr, pprr_ipm):
         dfb,
         show_progress=True,
     )
-    decision = 0.958
+    decision = 1
 
     matcher.save_pairs_to_excel(
-        deba.data("match/cprr_new_orleans_pd_v_pprr_new_orleans_pd_1946_2018.xlsx"),
+        deba.data("match/cprr_new_orleans_pd_v_pprr_new_orleans_pd_2020.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
@@ -322,13 +283,13 @@ def match_cprr_to_pprr(cprr, pprr_ipm):
     return cprr
 
 
-def match_pclaims20_to_pprr(pclaims, pprr_ipm):
+def match_pclaims20_to_pprr(pclaims, pprr):
     dfa = pclaims[["uid", "first_name", "last_name"]]
     dfa.loc[:, "fc"] = dfa.first_name.fillna("").map(lambda x: x[:1])
     dfa.loc[:, "lc"] = dfa.last_name.fillna("").map(lambda x: x[:1])
     dfa = dfa.drop_duplicates(subset=["uid"]).set_index("uid")
 
-    dfb = pprr_ipm[["uid", "first_name", "last_name"]]
+    dfb = pprr[["uid", "first_name", "last_name"]]
     dfb.loc[:, "fc"] = dfb.first_name.fillna("").map(lambda x: x[:1])
     dfb.loc[:, "lc"] = dfb.last_name.fillna("").map(lambda x: x[:1])
     dfb = dfb.drop_duplicates(subset=["uid"]).set_index("uid")
@@ -343,12 +304,10 @@ def match_pclaims20_to_pprr(pclaims, pprr_ipm):
         dfb,
         show_progress=True,
     )
-    decision = 0.931
+    decision = 1
 
     matcher.save_pairs_to_excel(
-        deba.data(
-            "match/pclaims_new_orleans_pd_2020_v_pprr_new_orleans_pd_1946_2018.xlsx"
-        ),
+        deba.data("match/pclaims_new_orleans_pd_2020_v_pprr_new_orleans_pd_2020.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
@@ -358,13 +317,13 @@ def match_pclaims20_to_pprr(pclaims, pprr_ipm):
     return pclaims
 
 
-def match_pclaims21_to_pprr(pclaims, pprr_ipm):
+def match_pclaims21_to_pprr(pclaims, pprr):
     dfa = pclaims[["uid", "first_name", "last_name"]]
     dfa.loc[:, "fc"] = dfa.first_name.fillna("").map(lambda x: x[:1])
     dfa.loc[:, "lc"] = dfa.last_name.fillna("").map(lambda x: x[:1])
     dfa = dfa.drop_duplicates(subset=["uid"]).set_index("uid")
 
-    dfb = pprr_ipm[["uid", "first_name", "last_name"]]
+    dfb = pprr[["uid", "first_name", "last_name"]]
     dfb.loc[:, "fc"] = dfb.first_name.fillna("").map(lambda x: x[:1])
     dfb.loc[:, "lc"] = dfb.last_name.fillna("").map(lambda x: x[:1])
     dfb = dfb.drop_duplicates(subset=["uid"]).set_index("uid")
@@ -379,12 +338,10 @@ def match_pclaims21_to_pprr(pclaims, pprr_ipm):
         dfb,
         show_progress=True,
     )
-    decision = 0.931
+    decision = 1
 
     matcher.save_pairs_to_excel(
-        deba.data(
-            "match/pclaims_new_orleans_pd_2020_v_pprr_new_orleans_pd_1946_2018.xlsx"
-        ),
+        deba.data("match/pclaims_new_orleans_pd_2020_v_pprr_new_orleans_pd_2020.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
@@ -394,13 +351,13 @@ def match_pclaims21_to_pprr(pclaims, pprr_ipm):
     return pclaims
 
 
-def match_pprr_separations_to_pprr(pprr_seps, pprr_ipm):
+def match_pprr_separations_to_pprr(pprr_seps, pprr):
     dfa = pprr_seps[["uid", "first_name", "last_name"]]
     dfa.loc[:, "fc"] = dfa.first_name.fillna("").map(lambda x: x[:1])
     dfa.loc[:, "lc"] = dfa.last_name.fillna("").map(lambda x: x[:1])
     dfa = dfa.drop_duplicates(subset=["uid"]).set_index("uid")
 
-    dfb = pprr_ipm[["uid", "first_name", "last_name"]]
+    dfb = pprr[["uid", "first_name", "last_name"]]
     dfb.loc[:, "fc"] = dfb.first_name.fillna("").map(lambda x: x[:1])
     dfb.loc[:, "lc"] = dfb.last_name.fillna("").map(lambda x: x[:1])
     dfb = dfb.drop_duplicates(subset=["uid"]).set_index("uid")
@@ -415,11 +372,11 @@ def match_pprr_separations_to_pprr(pprr_seps, pprr_ipm):
         dfb,
         show_progress=True,
     )
-    decision = 0.985
+    decision = 1
 
     matcher.save_pairs_to_excel(
         deba.data(
-            "match/pprr_seps_new_orleans_pd_2019-22_v_pprr_new_orleans_pd_1946_2018.xlsx"
+            "match/pprr_seps_new_orleans_pd_2019-22_v_pprr_new_orleans_pd_2020.xlsx"
         ),
         decision,
     )
@@ -455,11 +412,11 @@ def join_pib_and_ipm():
 
 
 if __name__ == "__main__":
-    pprr_ipm = pd.read_csv(deba.data("clean/pprr_new_orleans_ipm_iapro_1946_2018.csv"))
+    pprr = pd.read_csv(deba.data("clean/pprr_new_orleans_pd_2020.csv"))
     pprr_csd = pd.read_csv(deba.data("clean/pprr_new_orleans_csd_2014.csv"))
     pclaims20 = pd.read_csv(deba.data("clean/pclaims_new_orleans_pd_2020.csv"))
     pclaims21 = pd.read_csv(deba.data("clean/pclaims_new_orleans_pd_2021.csv"))
-    agency = pprr_ipm.agency[0]
+    agency = pprr.agency[0]
     post = load_for_agency(agency)
     award = pd.read_csv(deba.data("clean/award_new_orleans_pd_2016_2021.csv"))
     lprr = pd.read_csv(deba.data("clean/lprr_new_orleans_csc_2000_2016.csv"))
@@ -473,16 +430,15 @@ if __name__ == "__main__":
     )
     pib = join_pib_and_ipm()
     award = deduplicate_award(award)
-    event_df = match_pprr_against_post(pprr_ipm, post)
-    award = match_award_to_pprr_ipm(award, pprr_ipm)
-    lprr = match_lprr_to_pprr_ipm(lprr, pprr_ipm)
-    sas = match_stop_and_search_to_pprr(sas, pprr_ipm)
-    pprr_csd_matched_with_ipm = match_pprr_csd_to_pprr_ipm(pprr_csd, pprr_ipm)
-    uof_officers = match_use_of_force_to_pprr(uof_officers, pprr_ipm)
-    pclaims20 = match_pclaims20_to_pprr(pclaims20, pprr_ipm)
-    pclaims21 = match_pclaims21_to_pprr(pclaims21, pprr_ipm)
-    cprr = match_cprr_to_pprr(cprr, pprr_ipm)
-    pprr_separations = match_pprr_separations_to_pprr(pprr_separations, pprr_ipm)
+    event_df = match_pprr_against_post(pprr, post)
+    award = match_award_to_pprr(award, pprr)
+    lprr = match_lprr_to_pprr(lprr, pprr)
+    sas = match_stop_and_search_to_pprr(sas, pprr)
+    pprr_csd_matched_with_ipm = match_pprr_csd_to_pprr(pprr_csd, pprr)
+    uof_officers = match_use_of_force_to_pprr(uof_officers, pprr)
+    pclaims20 = match_pclaims20_to_pprr(pclaims20, pprr)
+    pclaims21 = match_pclaims21_to_pprr(pclaims21, pprr)
+    pprr_separations = match_pprr_separations_to_pprr(pprr_separations, pprr)
     award.to_csv(deba.data("match/award_new_orleans_pd_2016_2021.csv"), index=False)
     event_df.to_csv(deba.data("match/post_event_new_orleans_pd.csv"), index=False)
     lprr.to_csv(deba.data("match/lprr_new_orleans_csc_2000_2016.csv"), index=False)
@@ -492,9 +448,6 @@ if __name__ == "__main__":
     sas.to_csv(deba.data("match/sas_new_orleans_pd_2017_2021.csv"), index=False)
     uof_officers.to_csv(
         deba.data("match/uof_new_orleans_pd_2016_2021.csv"), index=False
-    )
-    pprr_ipm.to_csv(
-        deba.data("match/pprr_new_orleans_ipm_iapro_1946_2018.csv"), index=False
     )
     pclaims20.to_csv(deba.data("match/pclaims_new_orleans_pd_2020.csv"), index=False)
     pclaims21.to_csv(deba.data("match/pclaims_new_orleans_pd_2021.csv"), index=False)

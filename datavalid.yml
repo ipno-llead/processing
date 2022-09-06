@@ -291,6 +291,9 @@ schemas:
         integer: true
       - name: salary
         float: true
+      - name: salary_year
+      - name: overtime_and_detail_annual_total
+      - name: overtime_and_detail_annual_year
       - name: salary_freq
         options:
           - hourly
