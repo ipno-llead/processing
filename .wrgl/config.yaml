@@ -281,7 +281,7 @@ branch:
   com-natchitoches-so:
     remote: origin
     merge: refs/heads/com-natchitoches-so
-    file: data/fuse/complaints_natchitoches_so.csv
+    file: data/fuse/com_natchitoches_so.csv
     primaryKey:
       - allegation_uid
   event:
@@ -641,7 +641,7 @@ branch:
   event-natchitoches-so:
     remote: origin
     merge: refs/heads/event-natchitoches-so
-    file: data/fuse/events_natchitoches_so.csv
+    file: data/fuse/event_natchitoches_so.csv
     primaryKey:
       - event_uid
   per-abbeville-pd:
@@ -941,7 +941,7 @@ branch:
   per-natchitoches-so:
     remote: origin
     merge: refs/heads/per-natchitoches-so
-    file: data/fuse/personnel_natchitoches_so.csv
+    file: data/fuse/per_natchitoches_so.csv
     primaryKey:
       - uid
   brady-baton-rouge-pd:
