@@ -48,12 +48,12 @@ def fuse_events(cprr, post):
 
 
 if __name__ == "__main__":
-    cprr = pd.read_csv(deba.data("match/cprr_natchitoches_so_2018_2021.csv"))
+    cprr = pd.read_csv(deba.data("match/cprr_natchitoches_so_2018_21.csv"))
     agency = cprr.agency[0]
     post = load_for_agency(agency)
     per_df = fuse_personnel(cprr, post)
     com_df = rearrange_allegation_columns(cprr)
     event_df = fuse_events(cprr, post)
-    event_df.to_csv(deba.data("fuse/event_natchitoches_so.csv"), index=False)
-    com_df.to_csv(deba.data("fuse/com_natchitoches_so.csv"), index=False)
-    per_df.to_csv(deba.data("fuse/per_natchitoches_so.csv"), index=False)
+    event_df.to_csv(deba.data("fuse/events_natchitoches_so.csv"), index=False)
+    com_df.to_csv(deba.data("fuse/complaints_natchitoches_so.csv"), index=False)
+    per_df.to_csv(deba.data("fuse/personnel_natchitoches_so.csv"), index=False)

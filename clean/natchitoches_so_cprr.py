@@ -71,7 +71,7 @@ def clean_split_names(df):
 
 def clean():
     df = (
-        pd.read_csv(deba.data("raw/so_natchitoches/cprr_natchitoches_so_2018_2021.csv"))
+        pd.read_csv(deba.data("raw/so_natchitoches/natchitoches_so_cprr_2018_2021.csv"))
         .pipe(clean_column_names)
         .rename(columns={"investigation_notes": "investigation_desc"})
         .pipe(strip_leading_commas)
@@ -91,4 +91,4 @@ def clean():
 
 if __name__ == "__main__":
     df = clean()
-    df.to_csv(deba.data("clean/cprr_natchitoches_so_2018_2021.csv"), index=False)
+    df.to_csv(deba.data("clean/cprr_natchitoches_so_2018_21.csv"), index=False)

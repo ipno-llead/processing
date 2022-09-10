@@ -35,8 +35,8 @@ def match_cprr_post(cprr, post):
 
 
 if __name__ == "__main__":
-    cprr = pd.read_csv(deba.data("clean/cprr_natchitoches_so_2018_2021.csv"))
+    cprr = pd.read_csv(deba.data("clean/cprr_natchitoches_so_2018_21.csv"))
     agency = cprr.agency[0]
     post = load_for_agency(agency)
     cprr = match_cprr_post(cprr, post)
-    cprr.to_csv(deba.data("match/cprr_natchitoches_so_2018_2021.csv"), index=False)
+    cprr.to_csv(deba.data("match/cprr_natchitoches_so_2018_21.csv"), index=False)
