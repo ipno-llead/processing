@@ -3,7 +3,9 @@ from pathlib import Path
 import pathlib
 import tempfile
 import json
-from typing import List
+from typing import List, Union
+import subprocess
+from distutils.spawn import find_executable
 
 from pdf2image import convert_from_path
 import pytesseract
@@ -119,3 +121,96 @@ def process_pdf(
     df = df.explode("text").reset_index(drop=True)
     df.loc[:, "pageno"] = df.groupby("fileid").cumcount() + 1
     return df
+
+
+def fetch_ocr_results(prefix: Union[str, None]) -> pd.DataFrame:
+    """Fetches OCR results from k8s-ocr-jobqueue
+
+    Args:
+        prefix (str):
+            fetch ocr results for files with this prefix
+
+    Returns:
+        a dataframe with the following columns:
+            filepath:
+                the original file path
+            pageno:
+                page number
+            result:
+                OCR result as produced by DocTR
+    """
+    cache_dir = pathlib.Path(__file__).parent.parent / "data/ocr_results"
+    bucket = "k8s-ocr-jobqueue-results"
+    src = "gs://%s" % bucket
+    dst = str(cache_dir.absolute())
+    if prefix is not None:
+        src = "%s/%s" % (src, prefix)
+        dst = os.path.abspath("%s/%s" % (dst, prefix))
+    os.makedirs(dst, exist_ok=True)
+
+    gsutil = find_executable(
+        "gsutil", str(pathlib.Path.home() / "google-cloud-sdk/bin")
+    )
+    if gsutil is None:
+        raise Exception("couldnt find gsutil in ~/google-cloud-sdk/bin")
+
+    subprocess.run(
+        [
+            gsutil,
+            "-m",
+            "rsync",
+            "-i",
+            "-J",
+            "-r",
+            src,
+            dst,
+        ],
+        capture_output=True,
+        check=True,
+    )
+
+    records = []
+    for root, _, files in tqdm(
+        list(os.walk(dst)), desc="loading files from %s" % json.dumps(dst), leave=False
+    ):
+        filepath = os.path.relpath(os.path.abspath(root), str(cache_dir))
+        for file in files:
+            pageno, _ = os.path.splitext(file)
+            pageno = int(pageno)
+
+            filename = pathlib.Path(root) / file
+            with filename.open("r") as f:
+                result = json.load(f)
+
+            records.append({"filepath": filepath, "pageno": pageno, "result": result})
+
+    return pd.DataFrame.from_records(records).sort_values(["filepath", "pageno"])
+
+
+def fetch_ocr_text(prefix: Union[str, None]) -> pd.DataFrame:
+    """Fetches OCR text from k8s-ocr-jobqueue
+
+    Args:
+        prefix (str):
+            fetch ocr results for files with this prefix
+
+    Returns:
+        a dataframe with the following columns:
+            filepath:
+                the original file path
+            pageno:
+                page number
+            text:
+                the combined text of the page
+    """
+    df = fetch_ocr_results(prefix)
+    df.loc[:, "text"] = df.result.map(
+        lambda pg: "\n".join(
+            [
+                " ".join([word["value"] for word in line["words"]])
+                for blk in pg["blocks"]
+                for line in blk["lines"]
+            ]
+        )
+    )
+    return df.drop(columns="result")

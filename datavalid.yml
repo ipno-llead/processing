@@ -164,7 +164,10 @@ schemas:
       - name: shift_supervisor
       - name: allegation_desc
         description: >
-          text description of the allegation
+          narrative form text description of allegation
+      - name: allegation_sub_desc
+        description: >
+          policy/manual text description of allegation
       - name: investigating_department
         description: >
           small departments frequently turnover internal investigations to the sheriff's office
@@ -173,6 +176,7 @@ schemas:
       - name: disposition_desc
         description: >
           text description of aftermath of disposition, or reason for disposition.
+      - name: item_number
   event:
     columns:
       - name: event_uid
@@ -264,6 +268,8 @@ schemas:
       - name: division_desc
       - name: sub_division_a_desc
       - name: sub_division_b_desc
+      - name: unit_desc
+      - name: unit_sub_desc
       - name: current_supervisor
       - name: employee_class
         description: >
@@ -291,6 +297,9 @@ schemas:
         integer: true
       - name: salary
         float: true
+      - name: salary_year
+      - name: overtime_and_detail_annual_total
+      - name: overtime_and_detail_annual_year
       - name: salary_freq
         options:
           - hourly
