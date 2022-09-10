@@ -10,7 +10,7 @@ from lib.ner import train_spacy_model, apply_spacy_model
 
 
 def read_pdfs():
-    pdfs = pd.read_csv(deba.data("ocr/advocate_post_ohr_pdfs.csv"))
+    pdfs = pd.read_csv(deba.data("ocr/post_officer_history_reports_advocate_pdfs.csv"))
     return pdfs
 
 
