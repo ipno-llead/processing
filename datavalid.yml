@@ -23,6 +23,9 @@ files:
     schema: property_claims
   data/fuse/post_officer_history.csv:
     schema: post_officer_history
+  data/fuse/settlements.csv:
+    schema: settlement
+
 schemas:
   personnel:
     columns:
@@ -515,5 +518,14 @@ schemas:
         no_na: true
       - name: agency
       - name: left_reason
+  settlement:
+    columns:
+      - name: settlement_uid
+        description: >
+          unique identifier of case
+      - name: case_number
+      - name: case_name
+      - name: original_judgment_principal
+      - name: agency
 
 save_bad_rows_to: data/invalid_rows.csv

@@ -12,6 +12,7 @@ from lib.columns import (
     rearrange_uof_citizen_columns,
     rearrange_uof_officer_columns,
     rearrange_brady_columns,
+    rearrange_settlement_columns,
 )
 from lib.uid import ensure_uid_unique
 
@@ -302,6 +303,12 @@ def fuse_property_claims():
     ).sort_values("property_claims_uid", ignore_index=True)
 
 
+def fuse_settlements():
+    return rearrange_settlement_columns(
+        pd.concat([pd.read_csv(deba.data("fuse/settlements_new_orleans_pd.csv"))])
+    ).sort_values("settlement_uid", ignore_index=True)
+
+
 if __name__ == "__main__":
     per_df = fuse_personnel()
     ensure_uid_unique(per_df, "uid")
@@ -318,6 +325,7 @@ if __name__ == "__main__":
     award_df = fuse_award()
     brady_df = fuse_brady()
     property_claims_df = fuse_property_claims()
+    settlements = fuse_settlements()
 
     per_df.to_csv(deba.data("fuse/personnel_pre_post.csv"), index=False)
     allegation_df.to_csv(deba.data("fuse/allegation.csv"), index=False)
@@ -328,6 +336,7 @@ if __name__ == "__main__":
     uof_officer_df.to_csv(deba.data("fuse/uof_officers.csv"), index=False)
     award_df.to_csv(deba.data("fuse/awards.csv"), index=False)
     brady_df.to_csv(deba.data("fuse/brady.csv"), index=False)
+    settlements.to_csv(deba.data("fuse/settlements.csv"), index=False)
 
     post_event_df = pd.read_csv(deba.data("fuse/event_post.csv"))
     missing_agency_df = find_event_agency_if_missing_from_post(event_df, post_event_df)
