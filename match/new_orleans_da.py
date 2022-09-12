@@ -62,7 +62,7 @@ def match_brady_to_pprr(brady, per):
 
 
 if __name__ == "__main__":
-    pprr = pd.read_csv(deba.data("match/pprr_new_orleans_ipm_iapro_1946_2018.csv"))
+    pprr = pd.read_csv(deba.data("clean/pprr_new_orleans_pd_2020.csv"))
     brady = pd.read_csv(deba.data("clean/brady_new_orleans_da_2021.csv"))
     brady = deduplicate_brady(brady)
     brady = match_brady_to_pprr(brady, pprr)
