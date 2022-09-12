@@ -278,12 +278,6 @@ branch:
     file: data/fuse/com_st_james_so.csv
     primaryKey:
       - allegation_uid
-  com-natchitoches-so:
-    remote: origin
-    merge: refs/heads/com-natchitoches-so
-    file: data/fuse/com_natchitoches_so.csv
-    primaryKey:
-      - allegation_uid
   event:
     remote: origin
     merge: refs/heads/event
@@ -638,12 +632,6 @@ branch:
     file: data/fuse/event_st_james_so.csv
     primaryKey:
       - event_uid
-  event-natchitoches-so:
-    remote: origin
-    merge: refs/heads/event-natchitoches-so
-    file: data/fuse/event_natchitoches_so.csv
-    primaryKey:
-      - event_uid
   per-abbeville-pd:
     remote: origin
     merge: refs/heads/per-abbeville-pd
@@ -938,12 +926,6 @@ branch:
     file: data/fuse/per_benton_pd.csv
     primaryKey:
       - uid
-  per-natchitoches-so:
-    remote: origin
-    merge: refs/heads/per-natchitoches-so
-    file: data/fuse/per_natchitoches_so.csv
-    primaryKey:
-      - uid
   brady-baton-rouge-pd:
     remote: origin
     merge: refs/heads/brady-baton-rouge-pd
@@ -1046,6 +1028,12 @@ branch:
     file: data/fuse/pclaims_new_orleans_pd.csv
     primaryKey:
       - property_claims_uid
+  settlements-new-orleans-pd:
+    remote: origin
+    merge: refs/heads/settlements-new-orleans-pd
+    file: data/fuse/settlements_new_orleans_pd.csv
+    primaryKey:
+      - settlement_uid
   person:
     remote: origin
     merge: refs/heads/person
@@ -1119,6 +1107,12 @@ branch:
     file: data/fuse/post_officer_history.csv
     primaryKey:
       - uid
+  settlements:
+    remote: origin
+    merge: refs/heads/settlements
+    file: data/fuse/settlements.csv
+    primaryKey:
+      - settlement_uid
 merge:
   fastForward: only
 pack:
