@@ -13,8 +13,10 @@ jobs:
         with:
           state: open
       - name: dvc pull
+        shell: bash -exo pipefail
         run: |
           find dvc/data/raw -type f | xargs -I{} sed -iE 's/wdir\: ..\/..\/..\/data\/raw/wdir\: \/runner\/_work\/data\/data\/raw/g' {}
+          cat dvc/data/raw/abbeville_pd.dvc
           mkdir /runner/_work/data/dvc_cache || true
           dvc cache dir --local /runner/_work/data/dvc_cache
           dvc pull
