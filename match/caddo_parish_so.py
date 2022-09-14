@@ -49,7 +49,7 @@ def match_pprr_against_post(pprr, post):
         deba.data("match/caddo_parish_so_pprr_2020_v_post.xlsx"), decision
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
-    return extract_events_from_post(post, matches, "Caddo SO")
+    return extract_events_from_post(post, matches, "caddo-so")
 
 
 def extract_cprr_post_events(pprr, cprr_post):
@@ -80,7 +80,7 @@ def extract_cprr_post_events(pprr, cprr_post):
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
-    return extract_events_from_cprr_post(cprr_post, matches, "Caddo SO")
+    return extract_events_from_cprr_post(cprr_post, matches, "caddo-so")
 
 
 if __name__ == "__main__":

@@ -28,7 +28,7 @@ def match_pprr_post(pprr, post):
         deba.data("match/grand_isle_pd_pprr_2021_v_post.xlsx"), decision
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
-    return extract_events_from_post(post, matches, "Grand Isle PD")
+    return extract_events_from_post(post, matches, "grand-isle-pd")
 
 
 if __name__ == "__main__":

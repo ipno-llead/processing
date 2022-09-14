@@ -112,7 +112,7 @@ def clean21():
                 "claim_type",
             ],
         )
-        .pipe(set_values, {"agency": "New Orleans PD"})
+        .pipe(set_values, {"agency": "new-orleans-pd"})
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(
             gen_uid,
@@ -177,7 +177,7 @@ def clean20():
                 "claim_type",
             ],
         )
-        .pipe(set_values, {"agency": "New Orleans PD"})
+        .pipe(set_values, {"agency": "new-orleans-pd"})
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(
             gen_uid,

@@ -119,7 +119,7 @@ def extract_salary(df):
 
 def assign_agency(df):
     df.loc[:, "data_production_year"] = 2021
-    df.loc[:, "agency"] = "Grand Isle PD"
+    df.loc[:, "agency"] = "grand-isle-pd"
     return df
 
 

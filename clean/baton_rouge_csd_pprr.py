@@ -13,7 +13,7 @@ import pandas as pd
 
 
 def assign_agency(df):
-    df.loc[:, "agency"] = "Baton Rouge CSD"
+    df.loc[:, "agency"] = "baton-rouge-pd"
     return df
 
 

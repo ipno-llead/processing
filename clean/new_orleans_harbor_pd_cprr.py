@@ -46,7 +46,7 @@ def clean_officer_sex(df):
 
 
 def assign_agency(df):
-    df.loc[:, "agency"] = "New Orleans Harbor PD"
+    df.loc[:, "agency"] = "new-orleans-harbor-pd"
     df.loc[:, "data_production_year"] = "2020"
     return df
 

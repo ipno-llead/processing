@@ -24,7 +24,7 @@ def clean():
                 ["military"],
             ],
         )
-        .pipe(set_values, {"agency": "Carencro PD"})
+        .pipe(set_values, {"agency": "carencro-pd"})
         .pipe(gen_uid, ["agency", "first_name", "last_name"])
         .pipe(clean_sexes, ["sex"])
         .pipe(clean_races, ["race"])

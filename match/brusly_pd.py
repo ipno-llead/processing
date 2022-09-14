@@ -96,7 +96,7 @@ def extract_post_events(pprr, post):
     matcher.save_pairs_to_excel(deba.data("match/brusly_pd_pprr_v_post.xlsx"), decision)
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
 
-    return extract_events_from_post(post, matches, "Brusly PD")
+    return extract_events_from_post(post, matches, "brusly-pd")
 
 
 if __name__ == "__main__":

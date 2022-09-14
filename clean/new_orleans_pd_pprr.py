@@ -235,7 +235,7 @@ def clean():
             set_values,
             {
                 "salary_freq": salary.YEARLY,
-                "agency": "New Orleans PD",
+                "agency": "new-orleans-pd",
                 "salary_date": "12/31/2020",
             },
         )

@@ -79,7 +79,7 @@ def clean():
         .pipe(clean_action)
         .pipe(split_names)
         .pipe(clean_names, ["first_name", "last_name"])
-        .pipe(set_values, {"agency": "St. Landry SO"})
+        .pipe(set_values, {"agency": "st-landry-so"})
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(
             gen_uid,

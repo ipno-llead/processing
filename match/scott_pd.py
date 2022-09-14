@@ -86,7 +86,7 @@ def extract_post_events(pprr, post):
         deba.data("match/scott_pd_pprr_2021_v_post_pprr_2020_11_06.xlsx"), decision
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
-    return extract_events_from_post(post, matches, "Scott PD")
+    return extract_events_from_post(post, matches, "scott-pd")
 
 
 if __name__ == "__main__":

@@ -66,7 +66,7 @@ def clean():
             clean_names,
             ["first_name", "last_name", "receiver_first_name", "receiver_last_name"],
         )
-        .pipe(set_values, {"agency": "West Monroe PD"})
+        .pipe(set_values, {"agency": "west-monroe-pd"})
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(gen_uid, ["uid", "action", "disposition"], "allegation_uid")
     )

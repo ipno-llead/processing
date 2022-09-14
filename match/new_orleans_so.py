@@ -253,7 +253,7 @@ def match_pprr_against_post(pprr, post):
     )
 
     matches = matcher.get_index_pairs_within_thresholds(decision)
-    return extract_events_from_post(post, matches, "New Orleans SO")
+    return extract_events_from_post(post, matches, "new-orleans-so")
 
 
 if __name__ == "__main__":

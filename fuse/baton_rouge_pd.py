@@ -116,12 +116,12 @@ if __name__ == "__main__":
     pprr = pd.read_csv(deba.data("match/pprr_baton_rouge_pd_2021.csv"))
     brady = pd.read_csv(deba.data("match/brady_baton_rouge_da_2021.csv"))
     cprr_09 = pd.read_csv(deba.data("match/cprr_baton_rouge_pd_2004_2009.csv"))
-    brady = brady.loc[brady.agency == "Baton Rouge PD"]
+    brady = brady.loc[brady.agency == "baton-rouge-pd"]
 
     # limit csd data to just officers found in PD roster
-    csd_pprr_17.loc[:, "agency"] = "Baton Rouge PD"
+    csd_pprr_17.loc[:, "agency"] = "baton-rouge-pd"
     csd_pprr_17 = csd_pprr_17.loc[csd_pprr_17.uid.isin(pprr.uid.unique())].reset_index()
-    csd_pprr_19.loc[:, "agency"] = "Baton Rouge PD"
+    csd_pprr_19.loc[:, "agency"] = "baton-rouge-pd"
     csd_pprr_19 = csd_pprr_19.loc[csd_pprr_19.uid.isin(pprr.uid.unique())].reset_index()
 
     uids = pprr.uid.unique().tolist()

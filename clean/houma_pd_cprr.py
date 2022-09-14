@@ -173,7 +173,7 @@ def clean21():
         .pipe(split_and_clean_investigator21)
         .pipe(split_and_clean_names)
         .pipe(standardize_desc_cols, ["tracking_id", "action"])
-        .pipe(set_values, ({"agency": "Houma PD"}))
+        .pipe(set_values, ({"agency": "houma-pd"}))
         .pipe(gen_uid, ["agency", "first_name", "last_name"])
         .pipe(
             gen_uid,
@@ -197,7 +197,7 @@ def clean18():
         .pipe(extract_action)
         .pipe(clean_disposition)
         .pipe(split_and_clean_investigator18)
-        .pipe(set_values, {"agency": "Houma PD"})
+        .pipe(set_values, {"agency": "houma-pd"})
         .pipe(gen_uid, ["agency", "first_name", "last_name"])
         .pipe(
             gen_uid,

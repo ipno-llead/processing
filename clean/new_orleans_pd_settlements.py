@@ -39,7 +39,7 @@ def clean():
         .pipe(strip_leading_commas)
         .pipe(filter_nopd_cases)
         .pipe(clean_case_names)
-        .pipe(set_values, {"agency": "New Orleans PD"})
+        .pipe(set_values, {"agency": "new-orleans-pd"})
         .pipe(
             gen_uid,
             ["case_number", "case_name", "original_judgment_principal"],

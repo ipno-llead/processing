@@ -51,7 +51,7 @@ if __name__ == "__main__":
     cprr16 = pd.read_csv(deba.data("match/cprr_port_allen_pd_2015_2016.csv"))
     post_event = pd.read_csv(deba.data("match/post_event_port_allen_pd.csv"))
     pprr = pd.read_csv(deba.data("match/pprr_port_allen_csd_2020.csv"))
-    pprr.loc[:, "agency"] = "Port Allen PD"
+    pprr.loc[:, "agency"] = "port-allen-pd"
     personnel_df = rearrange_personnel_columns(pprr)
     complaint_df = rearrange_allegation_columns(pd.concat([cprr16, cprr18, cprr19]))
     events_df = fuse_events(pprr, cprr16, cprr18, cprr19)

@@ -304,7 +304,7 @@ def clean_uof():
         .pipe(clean_service_type)
         .pipe(clean_working_status)
         .pipe(clean_dates, ["uof_occur_date"])
-        .pipe(set_values, {"agency": "New Orleans PD"})
+        .pipe(set_values, {"agency": "new-orleans-pd"})
         .pipe(
             gen_uid,
             [
@@ -379,7 +379,7 @@ def extract_citizen(uof):
                 "citizen_height",
             ],
         )
-        .pipe(set_values, {"agency": "New Orleans PD"})
+        .pipe(set_values, {"agency": "new-orleans-pd"})
         .pipe(
             gen_uid,
             [
@@ -456,7 +456,7 @@ def extract_officer(uof):
                 "use_of_force_effective",
             ],
         )
-        .pipe(set_values, {"agency": "New Orleans PD"})
+        .pipe(set_values, {"agency": "new-orleans-pd"})
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .drop_duplicates(subset=["uid", "uof_uid"])
     )

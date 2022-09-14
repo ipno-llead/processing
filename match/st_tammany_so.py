@@ -85,7 +85,7 @@ def match_pprr_and_post(pprr, post):
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
-    return extract_events_from_post(post, matches, "St. Tammany SO")
+    return extract_events_from_post(post, matches, "st-tammany-so")
 
 
 def match_cprr_and_post(cprr, post):
@@ -112,7 +112,7 @@ def match_cprr_and_post(cprr, post):
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
-    return extract_events_from_post(post, matches, "St. Tammany SO")
+    return extract_events_from_post(post, matches, "st-tammany-so")
 
 
 if __name__ == "__main__":

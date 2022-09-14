@@ -47,7 +47,7 @@ def clean():
         .pipe(clean_column_names)
         .pipe(clean_allegations)
         .pipe(extract_disposition)
-        .pipe(set_values, {"source_agency": "Baton Rouge DA"})
+        .pipe(set_values, {"source_agency": "east-baton-rouge-da"})
         .rename(columns={"status": "action"})
     )
     return (

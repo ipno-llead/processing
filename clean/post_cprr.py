@@ -41,15 +41,15 @@ def assign_action(df):
 
 def rename_agency(df):
     df.loc[:, "agency"] = (
-        df.agency.str.strip()
+        df.agency.str.strip().str.lower()
         .fillna("")
         .str.replace(r"(\w)\.\s*(\w)\.", r"\1\2", regex=True)
-        .str.replace(r"E\. Baton Rouge So", "Baton Rouge SO", regex=True)
-        .str.replace(r"E\. Jefferson Levee PD", "East Jefferson Levee PD", regex=True)
+        .str.replace(r"E\. Baton Rouge So", "east-baton-rouge-so", regex=True)
+        .str.replace(r"E\. Jefferson Levee PD", "east-jefferson-levee-PD", regex=True)
         .str.replace(r"^St ", "St. ", regex=True)
         .str.replace(r" ?Parish ?", " ", regex=True)
-        .str.replace(r"Pd$", "PD", regex=True)
-        .str.replace(r"So$", "SO", regex=True)
+        .str.replace(r"Pd$", "pd", regex=True)
+        .str.replace(r"So$", "so", regex=True)
         .str.replace(r"Dept\.?", "Department", regex=True)
         .str.replace(r"Univ\. Pd - (.+)", r"\1 University PD", regex=True)
         .str.replace(r"^Lsu\b", "LSU", regex=True)
@@ -86,6 +86,12 @@ def rename_agency(df):
         .str.replace("Plaquemines Par ", "Plaquemines ", regex=False)
         .str.replace("District Attorney", "DA", regex=False)
         .str.replace(r"^LSP$", "Louisiana State PD", regex=True)
+        .str.replace(r"\.", "", regex=True)\
+        .str.replace(r"\s+", "-", regex=True)\
+        .str.replace(r"\-+", "-", regex=True)\
+        .str.replace("&","-and-", regex=False)\
+        .str.replace(r"\/-bunkiepd", "/bunkie pd", regex=True)\
+        .str.replace(r"^e\-", "east-", regex=True)
     )
     return df
 

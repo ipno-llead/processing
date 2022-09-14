@@ -80,7 +80,7 @@ def clean_birth_year(df):
 
 
 def assign_agency(df):
-    df.loc[:, "agency"] = "Plaquemines SO"
+    df.loc[:, "agency"] = "plaquemines-so"
 
 
 def clean():
@@ -94,7 +94,7 @@ def clean():
         .pipe(split_name)
         .pipe(clean_dates, ["hire_date"])
         .pipe(standardize_desc_cols, ["employment_status", "rank_desc"])
-        .pipe(set_values, {"agency": "Plaquemines SO"})
+        .pipe(set_values, {"agency": "plaquemines-so"})
         .pipe(
             gen_uid,
             ["first_name", "middle_name", "last_name", "agency"],

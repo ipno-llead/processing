@@ -27,7 +27,7 @@ def clean():
         pd.read_csv(deba.data("raw/tangipahoa_da/tangipahoa_da_brady_2021.csv"))
         .pipe(clean_column_names)
         .pipe(split_name)
-        .pipe(set_values, {"agency": "Tangipahoa SO", "source_agency": "Tangipahoa DA"})
+        .pipe(set_values, {"agency": "tangipahoa-so", "source_agency": "tangipahoa-da"})
         .pipe(assign_agency)
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(gen_uid, ["uid", "source_agency"], "brady_uid")

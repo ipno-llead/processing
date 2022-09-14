@@ -144,7 +144,7 @@ def match_pprr_against_post(pprr, post):
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
-    return extract_events_from_post(post, matches, "Baton Rouge PD")
+    return extract_events_from_post(post, matches, "baton-rouge-pd")
 
 
 def match_pd_cprr_2009_v_pprr(cprr, pprr):

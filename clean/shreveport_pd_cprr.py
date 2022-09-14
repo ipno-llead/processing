@@ -124,7 +124,7 @@ def clean_cprr_disposition(disp_df, year):
         .pipe(
             set_values,
             {
-                "agency": "Shreveport PD",
+                "agency": "shreveport-pd",
                 "data_production_year": year,
             },
         )
@@ -184,7 +184,7 @@ def clean_cprr_names(cprr_df, year):
         .pipe(
             set_values,
             {
-                "agency": "Shreveport PD",
+                "agency": "shreveport-pd",
                 "data_production_year": year,
             },
         )

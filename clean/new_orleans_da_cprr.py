@@ -240,7 +240,7 @@ def clean():
             clean_dates, ["occur_date", "receive_date", "investigation_complete_date"]
         )
         .pipe(clean_names, ["first_name", "last_name"])
-        .pipe(set_values, {"agency": "New Orleans PD"})
+        .pipe(set_values, {"agency": "new-orleans-pd"})
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(
             gen_uid,

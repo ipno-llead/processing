@@ -45,7 +45,7 @@ def clean():
         .pipe(clean_dates, ["hire_date"])
         .pipe(clean_names, ["first_name", "last_name", "middle_name"])
         .pipe(clean_salaries, ["salary"])
-        .pipe(set_values, {"agency": "Hammond PD", "salary_freq": salary.YEARLY})
+        .pipe(set_values, {"agency": "hammond-pd", "salary_freq": salary.YEARLY})
         .pipe(gen_uid, ["first_name", "middle_name", "last_name", "agency"])
     )
     return df

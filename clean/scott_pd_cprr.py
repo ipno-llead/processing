@@ -87,7 +87,7 @@ def clean20():
         .pipe(standardize_desc_cols, ["rank_desc", "disposition_action"])
         .pipe(clean_allegations)
         .pipe(clean_rank)
-        .pipe(set_values, {"agency": "Scott PD"})
+        .pipe(set_values, {"agency": "scott-pd"})
         .pipe(split_disposition_action_20)
         .pipe(clean_dates, ["notification_date"])
         .rename(
@@ -120,7 +120,7 @@ def clean14():
         .pipe(split_disposition_action_14)
         .pipe(standardize_desc_cols, ["allegation"])
         .pipe(clean_dates, ["receive_date"])
-        .pipe(set_values, {"agency": "Scott PD"})
+        .pipe(set_values, {"agency": "scott-pd"})
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(gen_uid, ["uid", "allegation", "disposition", "action"], "allegation_uid")
     )

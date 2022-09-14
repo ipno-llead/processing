@@ -80,6 +80,8 @@ def fuse_personnel():
                 pd.read_csv(deba.data("fuse/per_pineville_pd.csv")),
                 pd.read_csv(deba.data("fuse/per_st_james_so.csv")),
                 pd.read_csv(deba.data("fuse/per_natchitoches_so.csv")),
+                pd.read_csv(deba.data("fuse/per_harahan_pd.csv")),
+                
             ]
         )
     ).sort_values("uid", ignore_index=True)
@@ -147,6 +149,7 @@ def fuse_event():
                 pd.read_csv(deba.data("fuse/event_pineville_pd.csv")),
                 pd.read_csv(deba.data("fuse/event_st_james_so.csv")),
                 pd.read_csv(deba.data("fuse/event_natchitoches_so.csv")),
+                pd.read_csv(deba.data("fuse/event_harahan_pd.csv")),
             ]
         )
     ).sort_values(["agency", "event_uid"], ignore_index=True)
@@ -329,6 +332,7 @@ if __name__ == "__main__":
     brady_df = fuse_brady()
     property_claims_df = fuse_property_claims()
     settlements = fuse_settlements()
+    event_df.to_csv("events.csv", index=False)
 
     per_df.to_csv(deba.data("fuse/personnel_pre_post.csv"), index=False)
     allegation_df.to_csv(deba.data("fuse/allegation.csv"), index=False)

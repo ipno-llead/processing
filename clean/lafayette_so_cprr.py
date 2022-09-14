@@ -214,7 +214,7 @@ def clean20():
         .pipe(
             set_values,
             {
-                "agency": "Lafayette SO",
+                "agency": "lafayette-so",
             },
         )
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
@@ -242,7 +242,7 @@ def clean14():
         .pipe(clean_disposition)
         .pipe(clean_action)
         .pipe(clean_department_desc)
-        .pipe(set_values, {"agency": "Lafayette SO"})
+        .pipe(set_values, {"agency": "lafayette-so"})
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(
             gen_uid,
@@ -268,7 +268,7 @@ def clean08():
         .pipe(clean_complete)
         .pipe(clean_level)
         .pipe(clean_action_08)
-        .pipe(set_values, {"agency": "Lafayette SO"})
+        .pipe(set_values, {"agency": "lafayette-so"})
         .pipe(gen_uid, ["agency", "first_name", "last_name"])
         .pipe(
             gen_uid,

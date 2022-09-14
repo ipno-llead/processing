@@ -77,7 +77,7 @@ def clean():
         .pipe(assign_agency)
         .pipe(clean_names, ["first_name", "middle_name", "last_name"])
         .pipe(names_to_title_case, ["charging_agency"])
-        .pipe(set_values, {"source_agency": "Ouachita DA"})
+        .pipe(set_values, {"source_agency": "ouachita-da"})
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(gen_uid, ["uid", "source_agency"], "brady_uid")
     )

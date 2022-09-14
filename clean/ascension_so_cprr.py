@@ -70,7 +70,7 @@ def clean():
         .pipe(split_rows_with_multiple_officers)
         .pipe(split_officer_names)
         .pipe(standardize_desc_cols, ["incident_location"])
-        .pipe(set_values, {"agency": "Ascension SO"})
+        .pipe(set_values, {"agency": "ascension-so"})
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(gen_uid, ["uid", "disposition", "tracking_id"], "allegation_uid")
     )

@@ -65,7 +65,7 @@ def clean_cprr():
             ],
         )
         .pipe(standardize_desc_cols, ["allegation", "action"])
-        .pipe(set_values, {"data_production_year": 2020, "agency": "Brusly PD"})
+        .pipe(set_values, {"data_production_year": 2020, "agency": "brusly-pd"})
     )
     return df
 
@@ -101,7 +101,7 @@ def clean_pprr():
         .pipe(clean_races, ["race"])
         .pipe(clean_sexes, ["sex"])
         .pipe(clean_position)
-        .pipe(set_values, {"data_production_year": 2020, "agency": "Brusly PD"})
+        .pipe(set_values, {"data_production_year": 2020, "agency": "brusly-pd"})
         .pipe(
             gen_uid,
             [
@@ -129,7 +129,7 @@ def clean_award():
                 "comments": "award_comments",
             }
         )
-        .pipe(set_values, {"data_production_year": 2021, "agency": "Brusly PD"})
+        .pipe(set_values, {"data_production_year": 2021, "agency": "brusly-pd"})
         .pipe(gen_uid, ["agency", "last_name", "first_name"])
     )
 

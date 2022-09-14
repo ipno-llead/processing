@@ -289,7 +289,7 @@ def clean_birth_year_20(df):
 
 
 def assign_agency(df):
-    df.loc[:, "agency"] = "Baton Rouge SO"
+    df.loc[:, "agency"] = "east-baton-rouge-so"
     return df
 
 
@@ -566,7 +566,7 @@ def clean15():
             standardize_desc_cols,
             ["tracking_id", "badge_no", "birth_year", "disposition"],
         )
-        .pipe(set_values, {"agency": "Baton Rouge SO"})
+        .pipe(set_values, {"agency": "east-baton-rouge-so"})
         .pipe(gen_uid, ["first_name", "middle_name", "last_name", "badge_no", "agency"])
         .pipe(
             gen_uid,

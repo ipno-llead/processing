@@ -15,7 +15,7 @@ def swap_names(df):
 
 def assign_agency(df):
     df.loc[:, "data_production_year"] = "2020"
-    df.loc[:, "agency"] = "Madisonville PD"
+    df.loc[:, "agency"] = "madisonville-pd"
     return df
 
 

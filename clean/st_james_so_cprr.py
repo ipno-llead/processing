@@ -70,7 +70,7 @@ def clean():
         .pipe(clean_action)
         .pipe(clean_ranks, ["rank_desc"])
         .pipe(standardize_desc_cols, ["allegation"])
-        .pipe(set_values, {"agency": "St. James SO"})
+        .pipe(set_values, {"agency": "st-james-so"})
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(gen_uid, ["allegation", "action", "disposition", "uid"], "allegation_uid")
     )

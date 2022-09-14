@@ -12,7 +12,7 @@ def clean():
         .pipe(clean_names, ["first_name", "last_name"])
         .pipe(standardize_desc_cols, ["initial_action", "action"])
         .pipe(clean_dates, ["investigation_start_date"])
-        .pipe(set_values, {"agency": "Erath PD"})
+        .pipe(set_values, {"agency": "erath-pd"})
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(
             gen_uid, ["uid", "allegation", "initial_action", "action"], "allegation_uid"

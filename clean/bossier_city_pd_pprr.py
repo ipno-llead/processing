@@ -74,7 +74,7 @@ def drop_rows_with_missing__firt_and_last_name(df):
 
 
 def assign_agency(df):
-    df.loc[:, "agency"] = "Bossier City PD"
+    df.loc[:, "agency"] = "bossier-city-pd"
     return df
 
 

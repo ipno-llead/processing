@@ -48,7 +48,7 @@ def clean():
         .pipe(clean_races, ["race"])
         .pipe(clean_salaries, ["salary"])
         .pipe(clean_dates, ["birth_date"])
-        .pipe(set_values, {"agency": "Sterlington PD", "salary_freq": salary.YEARLY})
+        .pipe(set_values, {"agency": "sterlington-pd", "salary_freq": salary.YEARLY})
         .pipe(gen_uid, ["agency", "first_name", "last_name"])
     )
 

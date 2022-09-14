@@ -92,7 +92,7 @@ def clean():
         .pipe(clean_disposition)
         .pipe(split_names)
         .pipe(standardize_desc_cols, ["tracking_id"])
-        .pipe(set_values, {"agency": "Washington SO"})
+        .pipe(set_values, {"agency": "washington-so"})
         .pipe(gen_uid, ["agency", "first_name", "last_name"])
         .pipe(
             gen_uid,
