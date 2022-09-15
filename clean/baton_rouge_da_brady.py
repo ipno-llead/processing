@@ -29,14 +29,15 @@ def clean_agency(df):
     df.loc[:, "agency"] = (
         df.agency.str.strip()
         .fillna("")
-        .str.replace("Baton Rouge Police Department", "Baton Rouge PD", regex=False)
-        .str.replace("East Baton Rouge Sheriff's Office", "Baton Rouge SO", regex=False)
-        .str.replace("Louisiana State Police", "Louisiana State PD", regex=False)
+        .str.replace("Baton Rouge Police Department", "baton-rouge-pd", regex=False)
+        .str.replace("East Baton Rouge Sheriff's Office", "east-baton-rouge-so", regex=False)
+        .str.replace("Louisiana State Police", "louisiana-state-[pd", regex=False)
         .str.replace(
             "Louisiana State University Police Department",
-            "LSU University PD",
+            "lsu-university-pd",
             regex=False,
         )
+        .str.replace(r"Department of Public Safety", "department-of-public-safety", regex=True)
     )
     return df
 

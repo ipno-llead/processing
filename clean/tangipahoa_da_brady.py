@@ -14,11 +14,11 @@ def split_name(df):
 def assign_agency(df):
     df.loc[
         (df.last_name == "gemar") & (df.first_name == "rodney"), "agency"
-    ] = "Hammond PD"
+    ] = "hammond-pd"
 
     df.loc[
         (df.last_name == "hampton") & (df.first_name == "mark"), "agency"
-    ] = "Hammond PD"
+    ] = "hammond-pd"
     return df
 
 
