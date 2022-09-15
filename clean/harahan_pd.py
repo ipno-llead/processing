@@ -21,7 +21,7 @@ def split_rank_date(df):
 
 def assign_agency(df):
     df.loc[:, "data_production_year"] = 2020
-    df.loc[:, "agency"] = "Harahan PD"
+    df.loc[:, "agency"] = "harahan-pd"
     return df
 
 

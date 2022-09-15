@@ -121,7 +121,7 @@ def clean_last_name(df):
 
 
 def assign_agency(df):
-    df.loc[:, "agency"] = "New Orleans PD"
+    df.loc[:, "agency"] = "new-orleans-pd"
     return df
 
 

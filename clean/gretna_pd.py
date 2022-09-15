@@ -25,7 +25,7 @@ def split_names(df):
 
 def assign_agency(df):
     df.loc[:, "data_production_year"] = 2018
-    df.loc[:, "agency"] = "Gretna PD"
+    df.loc[:, "agency"] = "gretna-pd"
     return df
 
 

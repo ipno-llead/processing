@@ -6,7 +6,7 @@ import pandas as pd
 
 
 def assign_agency(df, year):
-    agency_dict = {"EJLD": "East Jefferson Levee PD", "OLDP": "New Orleans Levee PD"}
+    agency_dict = {"EJLD": "east-jefferson-levee-pd", "OLDP": "orleans-levee-pd"}
     df.loc[:, "agency"] = df.ejld_oldp.str.strip().map(lambda x: agency_dict.get(x, x))
     df.loc[:, "data_production_year"] = year
     return df.drop(columns=["ejld_oldp"])
@@ -52,6 +52,11 @@ def remove_NA_values(df, cols):
     return df
 
 
+def clean_agency_19(df):
+    df.loc[:, "agency"] = df.agency.str.lower().str.strip()\
+        .str.replace(r"^harahan pd$", "harahan-pd", regex=True)
+    return df
+
 def clean19():
     return (
         pd.read_csv(deba.data("raw/levee_pd/levee_pd_cprr_2019.csv"))
@@ -76,6 +81,7 @@ def clean19():
         .reset_index(drop=True)
         .pipe(assign_agency, 2019)
         .pipe(split_name_19)
+        .pipe(clean_agency_19)
         .pipe(clean_names, ["first_name", "last_name"])
         .pipe(
             standardize_desc_cols,

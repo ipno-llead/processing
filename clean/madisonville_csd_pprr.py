@@ -44,7 +44,7 @@ def split_rows_by_salary(df):
 
 
 def assign_agency(df):
-    df.loc[:, "agency"] = "Madisonville CSD"
+    df.loc[:, "agency"] = "madisonville-pd"
     df.loc[:, "data_production_year"] = 2019
     return df
 

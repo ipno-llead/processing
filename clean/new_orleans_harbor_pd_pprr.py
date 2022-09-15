@@ -7,7 +7,7 @@ from lib import salary
 
 
 def assign_agency(df, year):
-    df.loc[:, "agency"] = "New Orleans Harbor PD"
+    df.loc[:, "agency"] = "new-orleans-harbor-pd"
     df.loc[:, "data_production_year"] = year
     return df
 

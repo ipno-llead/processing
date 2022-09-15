@@ -84,7 +84,7 @@ def clean():
         .pipe(split_rows_with_multiple_officers)
         .pipe(clean_names)
         .pipe(clean_allegation)
-        .pipe(set_values, {"agency": "Pineville PD"})
+        .pipe(set_values, {"agency": "pineville-pd"})
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(gen_uid, ["uid", "tracking_id", "allegation"], "allegation_uid")
     )

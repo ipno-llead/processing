@@ -87,7 +87,7 @@ def extract_post_events(pprr, post):
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
-    return extract_events_from_post(post, matches, "Rayne PD")
+    return extract_events_from_post(post, matches, "rayne-pd")
 
 
 

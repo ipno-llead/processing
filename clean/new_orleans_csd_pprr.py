@@ -63,7 +63,7 @@ def standardize_rank_2014(df):
 
 def assign_cols_2014(df):
     df.loc[:, "data_production_year"] = "2014"
-    df.loc[:, "agency"] = "New Orleans PD"
+    df.loc[:, "agency"] = "new-orleans-pd"
     return df
 
 
@@ -139,7 +139,7 @@ def standardize_rank_2009(df):
 
 def assign_cols_2009(df):
     df.loc[:, "data_production_year"] = "2009"
-    df.loc[:, "agency"] = "New Orleans CSD"
+    df.loc[:, "agency"] = "new-orleans-pd"
     return df
 
 

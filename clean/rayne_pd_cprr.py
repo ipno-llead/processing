@@ -283,7 +283,7 @@ def clean20():
             ],
         )
         .pipe(clean_dates, ["receive_date", "investigation_complete_date"])
-        .pipe(set_values, {"agency": "Rayne PD"})
+        .pipe(set_values, {"agency": "rayne-pd"})
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(
             gen_uid,
@@ -313,7 +313,7 @@ def clean14():
         .pipe(assign_dispositions14)
         .pipe(clean_disposition14)
         .pipe(split_investigator_names14)
-        .pipe(set_values, {"agency": "Rayne PD"})
+        .pipe(set_values, {"agency": "rayne-pd"})
         .pipe(
             gen_uid,
             ["investigator_first_name", "investigator_last_name", "agency"],

@@ -34,7 +34,7 @@ def extract_post_events(pprr, post):
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
 
-    return extract_events_from_post(post, matches, "Ponchatoula PD")
+    return extract_events_from_post(post, matches, "ponchatoula-pd")
 
 
 def match_cprr_and_pprr(cprr, pprr):
@@ -95,7 +95,7 @@ def extract_cprr_post_events(pprr, cprr_post):
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
-    return extract_events_from_cprr_post(cprr_post, matches, "Ponchatoula PD")
+    return extract_events_from_cprr_post(cprr_post, matches, "ponchatoula-pd")
 
 
 if __name__ == "__main__":

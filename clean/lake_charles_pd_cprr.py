@@ -321,7 +321,7 @@ def assign_first_names_from_post_20(df):
 
 
 def assign_agency(df):
-    df.loc[:, "agency"] = "Lake Charles PD"
+    df.loc[:, "agency"] = "lake-charles-pd"
     return df
 
 

@@ -59,7 +59,7 @@ def clean():
         .pipe(clean_sexes, ["sex"])
         .pipe(clean_races, ["race"])
         .pipe(clean_salaries, ["salary"])
-        .pipe(set_values, {"agency": "West Monroe PD", "salary_freq": salary.MONTHLY})
+        .pipe(set_values, {"agency": "west-monroe-pd", "salary_freq": salary.MONTHLY})
         .pipe(gen_uid, ["agency", "first_name", "last_name"])
     )
 

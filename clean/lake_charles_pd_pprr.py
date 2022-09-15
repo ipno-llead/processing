@@ -109,7 +109,7 @@ def clean():
         .pipe(standardize_desc_cols, ["rank_desc", "department_desc"])
         .pipe(clean_annual_salary)
         .pipe(clean_salaries, ["salary"])
-        .pipe(set_values, {"salary_freq": salary.YEARLY, "agency": "Lake Charles PD"})
+        .pipe(set_values, {"salary_freq": salary.YEARLY, "agency": "lake-charles-pd"})
         .pipe(gen_uid, ["employee_id", "agency", "first_name", "last_name"])
     )
     return df

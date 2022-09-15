@@ -265,7 +265,7 @@ def clean21():
         .pipe(clean_races, ["race"])
         .pipe(clean_sexes, ["sex"])
         .pipe(clean_names, ["first_name", "middle_name", "last_name"])
-        .pipe(set_values, {"agency": "Lafourche SO"})
+        .pipe(set_values, {"agency": "lafourche-so"})
         .pipe(gen_uid, ["first_name", "middle_name", "last_name", "agency"])
         .pipe(
             gen_uid,
@@ -291,7 +291,7 @@ def clean15():
         .pipe(drop_rows_missing_allegations)
         .pipe(split_rows_with_multiple_allegations15)
         .pipe(map_allegation_desc)
-        .pipe(set_values, {"agency": "Lafourche SO"})
+        .pipe(set_values, {"agency": "lafourche-so"})
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(gen_uid, ["uid", "allegation", "disposition", "action"], "allegation_uid")
         .drop_duplicates(subset=["allegation_uid"], keep="first")

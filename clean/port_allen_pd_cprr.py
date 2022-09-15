@@ -135,7 +135,7 @@ def combine_allegation_code_and_violation(df):
 
 
 def assign_agency(df):
-    df.loc[:, "agency"] = "Port Allen PD"
+    df.loc[:, "agency"] = "port-allen-pd"
     return df
 
 

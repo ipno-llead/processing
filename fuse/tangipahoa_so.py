@@ -49,7 +49,7 @@ if __name__ == "__main__":
     cprr21 = pd.read_csv(deba.data("match/cprr_tangipahoa_so_2015_2021.csv"))
     cprr13 = pd.read_csv(deba.data("match/tangipahoa_so_cprr_2013.csv"))
     brady = pd.read_csv(deba.data("match/brady_tangipahoa_da_2021.csv"))
-    brady = brady.loc[brady.agency == "Tangipahoa SO"]
+    brady = brady.loc[brady.agency == "tangipahoa-so"]
     agency = cprr21.agency[0]
     post = load_for_agency(agency)
     per = fuse_personnel(cprr21, cprr13, post, brady)

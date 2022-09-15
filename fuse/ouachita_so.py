@@ -24,7 +24,7 @@ def fuse_events(brady):
 
 if __name__ == "__main__":
     brady = pd.read_csv(deba.data("match/brady_ouachita_da_2021.csv"))
-    brady = brady.loc[brady.agency == "Ouachita SO"]
+    brady = brady.loc[brady.agency == "ouachita-so"]
     per_df = fuse_personnel(brady)
     event_df = fuse_events(brady)
     brady_df = rearrange_brady_columns(brady)

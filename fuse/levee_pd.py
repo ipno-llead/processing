@@ -58,7 +58,7 @@ def fuse_events(cprr, post):
 
 
 if __name__ == "__main__":
-    cprr = pd.read_csv(deba.data("match/cprr_levee_pd.csv"))
+    cprr = pd.read_csv(deba.data("clean/cprr_levee_pd.csv"))
     agency = cprr.agency[0]
     post = load_for_agency(agency)
     event_df = fuse_events(cprr, post)

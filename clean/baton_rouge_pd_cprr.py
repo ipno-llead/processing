@@ -729,7 +729,7 @@ def assign_prod_year(df, year):
 
 
 def assign_agency(df):
-    df.loc[:, "agency"] = "Baton Rouge PD"
+    df.loc[:, "agency"] = "baton-rouge-pd"
     return df
 
 
@@ -1228,7 +1228,7 @@ def clean09():
                 "disposition",
             ],
         )
-        .pipe(set_values, {"agency": "Baton Rouge PD"})
+        .pipe(set_values, {"agency": "baton-rouge-pd"})
         .pipe(gen_uid, ["first_name", "last_name", "middle_name", "agency"])
         .pipe(gen_uid, ["action", "allegation_desc", "allegation", "investigation_status", "disposition", "occur_day", "occur_year", "occur_month", "uid", ], "allegation_uid")
         .drop_duplicates(subset=["allegation_uid"])

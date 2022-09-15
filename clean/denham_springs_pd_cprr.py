@@ -148,7 +148,7 @@ def clean():
         .pipe(clean_action)
         .pipe(clean_dates, ["incident_date"])
         .pipe(standardize_desc_cols, ["tracking_id"])
-        .pipe(set_values, {"agency": "Denham Springs PD"})
+        .pipe(set_values, {"agency": "denham-springs-pd"})
         .pipe(gen_uid, ["agency", "first_name", "last_name"])
         .pipe(
             gen_uid,

@@ -40,7 +40,7 @@ def clean_pprr():
         .pipe(clean_department_desc)
         .pipe(clean_sexes, ["sex"])
         .pipe(clean_dates, ["hire_date"])
-        .pipe(set_values, {"agency": "Ponchatoula PD"})
+        .pipe(set_values, {"agency": "ponchatoula-pd"})
         .pipe(gen_uid, ["agency", "employee_id"])
     )
 
@@ -69,7 +69,7 @@ def clean_cprr():
         .rename(columns={"charges": "allegation"})
         .pipe(clean_allegation)
         .pipe(standardize_desc_cols, ["allegation", "disposition", "action"])
-        .pipe(set_values, {"agency": "Ponchatoula PD"})
+        .pipe(set_values, {"agency": "ponchatoula-pd"})
         .pipe(clean_names, ["first_name", "last_name"])
         .pipe(replace_names)
         .pipe(gen_uid, ["agency", "first_name", "last_name"])

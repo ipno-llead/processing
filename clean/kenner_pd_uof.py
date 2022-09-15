@@ -70,7 +70,7 @@ def clean_charges(df):
 
 
 def assign_agency(df):
-    df.loc[:, "agency"] = "Kenner PD"
+    df.loc[:, "agency"] = "kenner-pd"
     return df
 
 

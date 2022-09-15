@@ -291,7 +291,23 @@ def clean_agency(df):
         .str.replace(r"^Dillard$", "Dillard University PD", regex=True)
         .str.replace(r"^Bunice PD", "Eunice PD", regex=True)
         .str.replace(r"^New Orleans Da Office$", "New Orleans DA", regex=True)
-        .str.replace(r"^Crescent City Conn PD$", "Crescent City ConnPD.", regex=True)
+    )
+    return df
+
+def convert_agency_to_slug(df):
+    df.loc[:, "agency"] = (
+        df.agency.str.lower()
+        .str.strip()
+        .str.replace(r"\.", "", regex=True)
+        .str.replace(r"\s+", "-", regex=True)
+        .str.replace(r"&", "", regex=True)
+        .str.replace(r"\-+", "-", regex=True)
+        .str.replace(r"\.", "", regex=True)
+        .str.replace(r"\'", "", regex=True)
+        .str.replace(r"^baton-rouge-so$", "east-baton-rouge-so", regex=True)
+        .str.replace(
+            r"^univ\-pdbaton\-rouge\-cc$", "baton-rouge-cc-univ-pd", regex=True
+        )
     )
     return df
 
@@ -411,6 +427,7 @@ def clean():
         .pipe(check_for_duplicate_uids)
         .pipe(switched_job)
         .pipe(drop_bad_dates)
+        .pipe(convert_agency_to_slug)
     )
     return df
 

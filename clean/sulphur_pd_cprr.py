@@ -31,7 +31,7 @@ def clean():
             standardize_desc_cols,
             ["tracking_id", "complainant", "tracking_id", "rank_desc", "disposition"],
         )
-        .pipe(set_values, {"agency": "Sulphur PD"})
+        .pipe(set_values, {"agency": "sulphur-pd"})
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(
             gen_uid,

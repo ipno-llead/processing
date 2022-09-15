@@ -974,7 +974,7 @@ def clean19():
         .pipe(split_name_19)
         .pipe(clean_names, ["first_name", "last_name", "middle_name"])
         .pipe(clean_action_19)
-        .pipe(set_values, {"agency": "New Orleans SO"})
+        .pipe(set_values, {"agency": "new-orleans-so"})
         .pipe(process_disposition)
         .pipe(clean_disposition_19)
         .pipe(split_investigating_supervisor)
@@ -1079,7 +1079,7 @@ def clean20():
         .pipe(process_disposition)
         .pipe(clean_department_desc)
         .pipe(float_to_int_str, ["employee_id"])
-        .pipe(set_values, {"agency": "New Orleans SO"})
+        .pipe(set_values, {"agency": "new-orleans-so"})
         .pipe(
             gen_uid, ["agency", "first_name", "middle_name", "last_name", "employee_id"]
         )

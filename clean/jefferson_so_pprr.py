@@ -288,7 +288,7 @@ def clean():
         .pipe(clean_department_descriptions)
         .pipe(standardize_rank_descriptions)
         .pipe(clean_rank_descriptions)
-        .pipe(set_values, {"agency": "Jefferson SO"})
+        .pipe(set_values, {"agency": "jefferson-so"})
         .pipe(
             gen_uid, ["agency", "first_name", "middle_name", "last_name", "employee_id"]
         )

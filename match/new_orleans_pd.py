@@ -67,7 +67,7 @@ def match_pprr_against_post(pprr, post):
     )
 
     matches = matcher.get_index_pairs_within_thresholds(decision)
-    return extract_events_from_post(post, matches, "New Orleans PD")
+    return extract_events_from_post(post, matches, "new-orleans-pd")
 
 
 def match_award_to_pprr(award, pprr):

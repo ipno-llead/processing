@@ -67,7 +67,7 @@ def clean_demo():
             {
                 "salary_freq": salary.YEARLY,
                 "data_production_year": 2021,
-                "agency": "Louisiana State PD",
+                "agency": "louisiana-state-pd",
             },
         )
         .pipe(clean_ranks)
@@ -107,7 +107,7 @@ def clean_term():
             set_values,
             {
                 "data_production_year": 2021,
-                "agency": "Louisiana State PD",
+                "agency": "louisiana-state-pd",
             },
         )
         .pipe(gen_uid, ["agency", "first_name", "last_name"])

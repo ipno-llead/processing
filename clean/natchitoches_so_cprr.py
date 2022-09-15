@@ -82,7 +82,7 @@ def clean():
         .pipe(clean_split_names)
         .pipe(clean_dates, ["receive_date", "disposition_date"])
         .pipe(standardize_desc_cols, ["allegation", "investigation_desc"])
-        .pipe(set_values, {"agency": "Natchitoches SO"})
+        .pipe(set_values, {"agency": "natchitoches-so"})
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(gen_uid, ["allegation", "disposition", "action"], "allegation_uid")
     )

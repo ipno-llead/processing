@@ -49,7 +49,7 @@ def extract_occur_date(df):
 
 
 def assign_agency(df):
-    df.loc[:, "agency"] = "St. Tammany SO"
+    df.loc[:, "agency"] = "st-tammany-so"
     df.loc[:, "data_production_year"] = 2021
     return df
 

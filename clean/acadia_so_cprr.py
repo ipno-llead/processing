@@ -45,7 +45,7 @@ def clean():
         .pipe(clean_names, ["first_name", "middle_name", "last_name"])
         .pipe(clean_allegation)
         .pipe(clean_action)
-        .pipe(set_values, {"agency": "Acadia SO"})
+        .pipe(set_values, {"agency": "acadia-so"})
         .pipe(gen_uid, ["agency", "first_name", "middle_name", "last_name"])
         .pipe(
             gen_uid,

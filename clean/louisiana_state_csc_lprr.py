@@ -135,7 +135,7 @@ def clean_appeal_disposition(df):
 
 
 def assign_agency(df):
-    df.loc[:, "agency"] = "Louisiana State PD"
+    df.loc[:, "agency"] = "louisiana-state-pd"
     df.loc[:, "data_production_year"] = 2020
     return df
 

@@ -14,11 +14,11 @@ def split_name(df):
 def assign_agency(df):
     df.loc[
         (df.last_name == "gemar") & (df.first_name == "rodney"), "agency"
-    ] = "Hammond PD"
+    ] = "hammond-pd"
 
     df.loc[
         (df.last_name == "hampton") & (df.first_name == "mark"), "agency"
-    ] = "Hammond PD"
+    ] = "hammond-pd"
     return df
 
 
@@ -27,7 +27,7 @@ def clean():
         pd.read_csv(deba.data("raw/tangipahoa_da/tangipahoa_da_brady_2021.csv"))
         .pipe(clean_column_names)
         .pipe(split_name)
-        .pipe(set_values, {"agency": "Tangipahoa SO", "source_agency": "Tangipahoa DA"})
+        .pipe(set_values, {"agency": "tangipahoa-so", "source_agency": "tangipahoa-da"})
         .pipe(assign_agency)
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(gen_uid, ["uid", "source_agency"], "brady_uid")

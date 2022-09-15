@@ -44,7 +44,7 @@ def split_name(df):
 
 
 def assign_agency(df):
-    df.loc[:, "agency"] = "Central PD"
+    df.loc[:, "agency"] = "central-pd"
     return df
 
 

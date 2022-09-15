@@ -54,7 +54,7 @@ def clean():
         .pipe(standardize_desc_cols, ["tracking_id"])
         .pipe(clean_names, ["first_name", "last_name"])
         .pipe(drop_rows_missing_names)
-        .pipe(set_values, {"agency": "St. John SO"})
+        .pipe(set_values, {"agency": "st-john-so"})
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(gen_uid, ["uid", "tracking_id", "case_number"], "allegation_uid")
     )

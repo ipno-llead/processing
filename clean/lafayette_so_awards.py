@@ -28,7 +28,7 @@ def clean():
         .pipe(convert_dates, ["receive_month"])
         .pipe(
             set_values,
-            {"agency": "Lafayette SO", "receive_day": "1", "receive_year": "2017"},
+            {"agency": "lafayette-so", "receive_day": "1", "receive_year": "2017"},
         )
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(

@@ -150,7 +150,7 @@ def clean_pprr_09():
         .reset_index(drop=True)
         .pipe(standardize_desc_cols, ["rank_desc"])
         .pipe(clean_rank)
-        .pipe(set_values, {"agency": "Slidell PD"})
+        .pipe(set_values, {"agency": "slidell-pd"})
         .pipe(gen_uid, ["agency", "first_name", "last_name"])
     )
 
@@ -215,7 +215,7 @@ def clean_pprr_19():
             standardize_desc_cols, ["rank_desc", "department_desc", "employment_status"]
         )
         .pipe(clean_rank)
-        .pipe(set_values, {"agency": "Slidell PD"})
+        .pipe(set_values, {"agency": "slidell-pd"})
         .pipe(gen_uid, ["agency", "first_name", "last_name"])
     )
 
@@ -258,7 +258,7 @@ def clean_csd_pprr():
         .pipe(clean_sexes, ["sex"])
         .pipe(standardize_desc_cols, ["rank_desc"])
         .pipe(clean_rank)
-        .pipe(set_values, {"agency": "Slidell PD"})
+        .pipe(set_values, {"agency": "slidell-pd"})
         .pipe(gen_uid, ["agency", "first_name", "last_name"])
     )
 

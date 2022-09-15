@@ -348,7 +348,7 @@ def clean21():
         .pipe(clean_dates, ["receive_date"], expand=False)
         .pipe(clean_names, ["first_name", "last_name", "rank_desc"])
         .pipe(discard_impossible_dates)
-        .pipe(set_values, {"agency": "Tangipahoa SO", "data_production_year": "2021"})
+        .pipe(set_values, {"agency": "tangipahoa-so", "data_production_year": "2021"})
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .drop_duplicates(subset=["receive_date", "uid", "allegation"], keep="first")
         .pipe(gen_uid, ["receive_date", "uid", "allegation"], "allegation_uid")
@@ -392,7 +392,7 @@ def clean13():
         .pipe(clean_allegation)
         .pipe(split_rows_with_multiple_allegations_13)
         .pipe(split_names)
-        .pipe(set_values, {"agency": "Tangipahoa SO"})
+        .pipe(set_values, {"agency": "tangipahoa-so"})
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(
             gen_uid,

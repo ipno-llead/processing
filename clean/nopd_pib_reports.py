@@ -248,7 +248,7 @@ def clean():
             ],
         )
         .pipe(names_to_title_case, ["tracking_id"])
-        .pipe(set_values, {"agency": "New Orleans PD"})
+        .pipe(set_values, {"agency": "new-orleans-pd"})
     )
     return df
 

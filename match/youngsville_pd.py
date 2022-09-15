@@ -74,7 +74,7 @@ def match_pprr_and_post(pprr, post):
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
-    return extract_events_from_post(post, matches, "Youngsville PD")
+    return extract_events_from_post(post, matches, "youngsville-pd")
 
 
 if __name__ == "__main__":

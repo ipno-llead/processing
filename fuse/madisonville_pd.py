@@ -40,7 +40,7 @@ def fuse_events(pprr, cprr):
 if __name__ == "__main__":
     cprr = pd.read_csv(deba.data("match/cprr_madisonville_pd_2010_2020.csv"))
     pprr = pd.read_csv(deba.data("clean/pprr_madisonville_csd_2019.csv"))
-    pprr.loc[:, "agency"] = "Madisonville PD"
+    pprr.loc[:, "agency"] = "madisonville-pd"
     post_event = pd.read_csv(deba.data("match/post_event_madisonville_csd_2019.csv"))
     per = rearrange_personnel_columns(pprr)
     com = rearrange_allegation_columns(cprr)

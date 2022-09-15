@@ -38,7 +38,7 @@ def clean_allegations(df):
 def extract_agency_and_department_desc(df):
     agency = df.action.str.extract(r"(lsp)")
     df.loc[:, "agency"] = agency[0].str.replace(
-        "lsp", "Louisiana State PD", regex=False
+        "lsp", "louisiana-state-pd", regex=False
     )
 
     departments = df.action.str.extract(r"(troof f)")
@@ -56,10 +56,10 @@ def clean_action(df):
 
 
 def assign_agency(df):
-    df.loc[(df.last_name == "brown"), "agency"] = "Louisiana State PD"
-    df.loc[(df.last_name == "smith"), "agency"] = "Ouachita SO"
-    df.loc[(df.last_name == "desadier"), "agency"] = "Monroe PD"
-    df.loc[(df.last_name == "dickerson"), "agency"] = "Louisiana State PD"
+    df.loc[(df.last_name == "brown"), "agency"] = "louisiana-state-pd"
+    df.loc[(df.last_name == "smith"), "agency"] = "ouachita-so"
+    df.loc[(df.last_name == "desadier"), "agency"] = "monroe-pd"
+    df.loc[(df.last_name == "dickerson"), "agency"] = "louisiana-state-pd"
     return df
 
 
@@ -76,8 +76,7 @@ def clean():
         .pipe(clean_action)
         .pipe(assign_agency)
         .pipe(clean_names, ["first_name", "middle_name", "last_name"])
-        .pipe(names_to_title_case, ["charging_agency"])
-        .pipe(set_values, {"source_agency": "Ouachita DA"})
+        .pipe(set_values, {"source_agency": "ouachita-da"})
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(gen_uid, ["uid", "source_agency"], "brady_uid")
     )

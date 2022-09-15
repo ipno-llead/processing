@@ -74,7 +74,7 @@ def clean_pprr():
             {
                 "salary_freq": salary.YEARLY,
                 "data_production_year": "2021",
-                "agency": "Lafayette PD",
+                "agency": "lafayette-pd",
             },
         )
         .pipe(float_to_int_str, ["birth_year"])
@@ -499,7 +499,7 @@ def clean_cprr_20():
         )
         .pipe(split_rows_with_multiple_allegations)
         .pipe(split_action_from_disposition)
-        .pipe(set_values, {"data_production_year": 2020, "agency": "Lafayette PD"})
+        .pipe(set_values, {"data_production_year": 2020, "agency": "lafayette-pd"})
         .pipe(
             clean_names,
             [
@@ -1062,7 +1062,7 @@ def clean_cprr_14():
         .pipe(assign_correct_actions_14)
         .pipe(assign_correct_disposition_14)
         .pipe(drop_rows_missing_charges_disposition_and_action_14)
-        .pipe(set_values, {"agency": "Lafayette PD"})
+        .pipe(set_values, {"agency": "lafayette-pd"})
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(
             gen_uid,

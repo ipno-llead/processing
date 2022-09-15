@@ -7,7 +7,7 @@ import pandas as pd
 
 def fuse_events(pprr, cprr20, cprr14):
     builder = events.Builder()
-    pprr.loc[:, "agency"] = "Scott PD"
+    pprr.loc[:, "agency"] = "scott-pd"
     builder.extract_events(
         pprr,
         {

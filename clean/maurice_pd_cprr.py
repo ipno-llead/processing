@@ -37,7 +37,7 @@ def clean():
         .pipe(clean_action)
         .pipe(standardize_desc_cols, ["first_name", "last_name"])
         .pipe(clean_dates, ["incident_date"])
-        .pipe(set_values, {"agency": "Maurice PD"})
+        .pipe(set_values, {"agency": "maurice-pd"})
         .pipe(gen_uid, ["agency", "first_name", "last_name"])
         .pipe(
             gen_uid,
