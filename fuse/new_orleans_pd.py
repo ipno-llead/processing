@@ -227,7 +227,7 @@ if __name__ == "__main__":
     lprr = pd.read_csv(deba.data("match/lprr_new_orleans_csc_2000_2016.csv"))
     sas = pd.read_csv(deba.data("match/sas_new_orleans_pd_2017_2021.csv"))
     brady = pd.read_csv(deba.data("match/brady_new_orleans_da_2021.csv"))
-    brady = brady.loc[brady.agency == "New Orleans PD"]
+    brady = brady.loc[brady.agency == "new-orleans-pd"]
     pclaims20 = pd.read_csv(deba.data("match/pclaims_new_orleans_pd_2020.csv"))
     pclaims21 = pd.read_csv(deba.data("match/pclaims_new_orleans_pd_2021.csv"))
     pprr_separations = pd.read_csv(
