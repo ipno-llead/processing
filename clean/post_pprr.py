@@ -37,6 +37,7 @@ def clean_agency(df):
         .str.replace(r"\-police$", "-pd", regex=True)
         .str.replace(r"^orleans-so$", "new-orleans-so", regex=True)
         .str.replace(r"^w\-", "west-", regex=True)
+        .str.replace(r"dept$", "department", regex=True)
     )
     return df
 
