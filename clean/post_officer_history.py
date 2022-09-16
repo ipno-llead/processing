@@ -1,7 +1,7 @@
 import deba
 import pandas as pd
 from lib.uid import gen_uid
-from lib.clean import names_to_title_case, clean_sexes, clean_dates
+from lib.clean import names_to_title_case, clean_sexes, clean_dates, standardize_desc_cols
 import numpy as np
 
 
@@ -348,6 +348,8 @@ def convert_agency_to_slug(df):
         .str.replace(
             r"^new-orleans-coroners-office$", "orleans-coroners-office", regex=True
         )
+        .str.replace(r"^new-orleans-civil-so$", "orleans-civil-so", regex=True)
+        .str.replace(r"^new-orleans-constable$", "new-orleans-constables-office", regex=True)
     )
     return df
 
@@ -468,6 +470,7 @@ def clean():
         .pipe(switched_job)
         .pipe(drop_bad_dates)
         .pipe(convert_agency_to_slug)
+        .pipe(standardize_desc_cols, ["agency"])
     )
     return df
 

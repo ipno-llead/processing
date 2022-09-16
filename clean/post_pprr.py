@@ -59,7 +59,7 @@ def clean_agency(df):
             regex=True,
         )
         .str.replace(
-            r"lafayette-city-park-rec^$",
+            r"^lafayette-city-park-rec$",
             "lafayette-city-parks-and-recreation",
             regex=True,
         )
@@ -88,6 +88,17 @@ def clean_agency(df):
         )
         .str.replace(r"^$", "", regex=True)
         .str.replace(r"^$", "", regex=True)
+        .str.replace(
+            r"^office-of-youth-dev,-department-of-corrections$",
+            "office-of-youth-development-department-of-corrections",
+            regex=True,
+        )
+        .str.replace(
+            r"^new-orleans-criminal-court$", "orleans-criminal-court", regex=True
+        )
+        .str.replace(
+            r"^lsuhsc-no-university-pd$", "lsuhsc-new-orleans-university-pd", regex=True
+        )
     )
     return df
 
@@ -138,6 +149,7 @@ def clean():
         .drop_duplicates(
             subset=["hire_year", "hire_month", "hire_day", "uid"], keep="first"
         )
+        .pipe(standardize_desc_cols, ["agency"])
     )
     return df
 
