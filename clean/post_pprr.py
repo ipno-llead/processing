@@ -31,13 +31,63 @@ def clean_agency(df):
         )
         .str.replace(r"\’", "", regex=True)
         .str.replace(r"das-office$", "da", regex=True)
-        .str.replace(r"^univ\-pd\-(.+)", r"\1-university-pd", regex=True)\
+        .str.replace(r"^univ\-pd\-(.+)", r"\1-university-pd", regex=True)
         .str.replace(r"\-pari?s?h?\-", "-", regex=True)
         .str.replace(r"^la\-", "louisiana-", regex=True)
         .str.replace(r"\-police$", "-pd", regex=True)
         .str.replace(r"^orleans-so$", "new-orleans-so", regex=True)
         .str.replace(r"^w\-", "west-", regex=True)
-        .str.replace(r"dept$", "department", regex=True)
+        .str.replace(r"\bdept\b", "department", regex=True)
+        .str.replace(
+            r"^medical-center-of-la-no$",
+            "medical-center-of-louisiana-new-orleans-pd",
+            regex=True,
+        )
+        .str.replace(
+            r"office-of-youth-dev\,\-dept-of-corrections",
+            "office-of-youth-development-department-of-corrections",
+            regex=True,
+        )
+        .str.replace(
+            r"^louisiana-house-of-rep-sergeant-at-arms$",
+            "louisiana-house-of-representatives-sergeant-at-arms",
+            regex=True,
+        )
+        .str.replace(
+            r"^delgado-cc-university-pd$",
+            "delgado-community-college-university-pd",
+            regex=True,
+        )
+        .str.replace(
+            r"lafayette-city-park-rec^$",
+            "lafayette-city-parks-and-recreation",
+            regex=True,
+        )
+        .str.replace(r"^jefferson-1st-court$", "jefferson-first-court", regex=True)
+        .str.replace(
+            r"^housing-authority-of-no$", "housing-authority-of-new-orleans", regex=True
+        )
+        .str.replace(r"\buniv\b", "university", regex=True)
+        .str.replace(r"\b-cc-\b", "-community-college-", regex=True)
+        .str.replace(r"^city-park-pd-no$", "new-orleans-city-park-pd", regex=True)
+        .str.replace(r"-jdc-", "-judicial-district-court-", regex=True)
+        .str.replace(
+            r"^5th-jdc-district-attorneys-office$",
+            "5th-judicial-district-court-district-attorneys-office",
+            regex=True,
+        )
+        .str.replace(r"^29th-jdc-da$", "29th-judicial-district-court-da", regex=True)
+        .str.replace(r"jdc$", "judicial-district-court", regex=True)
+        .str.replace(
+            r"jdc-da$", "judicial-district-court-district-attorneys-office", regex=True
+        )
+        .str.replace(
+            r"^se-la-flood-protection-auth-e$",
+            "southeast-louisiana-flood-protection-authority",
+            regex=True,
+        )
+        .str.replace(r"^$", "", regex=True)
+        .str.replace(r"^$", "", regex=True)
     )
     return df
 

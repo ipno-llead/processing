@@ -294,6 +294,7 @@ def clean_agency(df):
     )
     return df
 
+
 def convert_agency_to_slug(df):
     df.loc[:, "agency"] = (
         df.agency.str.lower()
@@ -306,7 +307,46 @@ def convert_agency_to_slug(df):
         .str.replace(r"\'", "", regex=True)
         .str.replace(r"^baton-rouge-so$", "east-baton-rouge-so", regex=True)
         .str.replace(
-            r"^univ\-pdbaton\-rouge\-cc$", "baton-rouge-cc-univ-pd", regex=True
+            r"^univ\-pdbaton\-rouge\-cc$",
+            "baton-rouge-community-college-university-pd",
+            regex=True,
+        )
+        .str.replace(r"^retired$", "", regex=True)
+        .str.replace(r"jefferson-ist-court", "jefferson-first-court", regex=True)
+        .str.replace(
+            r"^dept-of-health-hospitals$", "department-of-health-hospitals", regex=True
+        )
+        .str.replace(r"-jdc-", "-judicial-district-court-", regex=True)
+        .str.replace(r"\buniv\b", "university", regex=True)
+        .str.replace(r"\b-cc-\b", "-community-college-", regex=True)
+        .str.replace(r"\bdept\b", "department", regex=True)
+        .str.replace(r"^w\-", "west-", regex=True)
+        .str.replace(r"^e\-", "east-", regex=True)
+        .str.replace(r"^delhl-pd$", "", regex=True)
+        .str.replace(
+            r"^(d?-?reserve|pox-la-pd|xc-stoula-pd|mandbville-pd|xavier|neveans-pd)$",
+            "",
+            regex=True,
+        )
+        .str.replace(r"^louisiana-tech$", "louisiana-tech-university-pd", regex=True)
+        .str.replace(
+            r"^(feliciana-so|hannon-pd|pearl-river-pd-deceased|houmap)$", "", regex=True
+        )
+        .str.replace(
+            r"^(houma|river-bridge-pd|oaparish-so|nc-oula-pd)$", "", regex=True
+        )
+        .str.replace(r"^scort-pd$", "scott-pd", regex=True)
+        .str.replace(
+            r"^probationparoleadult-fulltime$", "probation-parole-adult", regex=True
+        )
+        .str.replace(r"^houma-pl$", "houma-pd", regex=True)
+        .str.replace(r"^ponciatoula-pd$", "ponchatoula-pd", regex=True)
+        .str.replace(r"^jeeferson-so$", "jefferson-so", regex=True)
+        .str.replace(r"^loyola$", "loyola-university-pd", regex=True)
+        .str.replace(r"^new-orleans-da$", "orleans-da", regex=True)
+        .str.replace(r"^new-orleans-levee-pd$", "orleans-levee-pd", regex=True)
+        .str.replace(
+            r"^new-orleans-coroners-office$", "orleans-coroners-office", regex=True
         )
     )
     return df
