@@ -97,9 +97,6 @@ schemas:
       - name: body_worn_camera_available
       - name: app_used
       - name: citizen_arrested
-      - name: citizen
-        description: >
-          demographic info of the involved citizen
       - name: disposition
         description: >
           the final disposition for the complaint
@@ -177,6 +174,9 @@ schemas:
         description: >
           text description of aftermath of disposition, or reason for disposition.
       - name: item_number
+      - name: citizen_race
+      - name: citizen_sex
+      - name: citizen_age
   event:
     columns:
       - name: event_uid
@@ -281,7 +281,7 @@ schemas:
       - name: rank_desc
         description: >
           text description of the officer's rank at the time of the event.
-      - name: officer_employment_status
+      - name: employment_status
       #   description: >
       #     whether the officer is full time, part time, reserve, ... etc
       - name: sworn
@@ -319,6 +319,10 @@ schemas:
         description: >
           narrative summary of the officer's reason for leaving
       - name: years_of_service
+      - name: complainant_type
+      - name: citizen_race
+      - name: citizen_sex
+      - name: citizen_age
     validation_tasks:
       - name: event dates should be valid
         valid_date:
