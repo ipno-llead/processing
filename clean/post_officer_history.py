@@ -154,11 +154,10 @@ def split_agency_column(df):
         df.agency.fillna("")
         .str.lower()
         .str.strip()
-        .str.replace(r"(\w+)  +(\w+)", r"\1 \2", regex=True)
         .str.extract(
-            r"(\w+? ?\w+? ?\w+? ?\w+? ?\w+?) ?(?:(full-time|reserve|retired|part-time|deceased?) )?"
-            r"(\w{1,2}\/\w{1,2}\/?\w{4}?) ?(\w{1,2}\/?\w{1,2}\/?\w{4})? ?((.+)?termination(.+)?|"
-            r"(.+)?resig(nation|ned)(.+)?)?(.+)?$"
+            r"(\w+? ?\w+? ? ?\w+? ?\w+? ? ?\w+?) ?(?:(full-time|reserve|retired|part-time|deceased?) )? "
+            r"?(\w{1,2}\/\w{1,2}\/\w{4}) ?(\w{1,2}\/\w{1,2}\/\w{4})? ?((.+)?termi?n?a?t?i?o?n?(.+)?|"
+            r"(.+)?resig(nation|ned)(.+)?|(.+)?(retired)(.+)?)?(.+)?$"
         )
     )
 
@@ -170,33 +169,28 @@ def split_agency_column(df):
         data[2]
         .fillna("")
         .str.replace(r"^d(\w{1})", r"\1", regex=True)
-        .str.replace(r"^(0|s)\/(.+)", "", regex=True)
-        .str.replace(r"^in\/i\/i995$", "", regex=True)
+        .str.replace(r"^0\/(.+)", "", regex=True)
         .str.replace(r"(.+)?7209(.+)?", "", regex=True)
         .str.replace(r"^2\/31(.+)", "", regex=True)
+        .str.replace(r"^9/2s/2014$", "", regex=True)
         .str.replace(r"^(\w{1,2})\/(\w{1,2})(\w{4})", r"\1/\2/\3", regex=True)
-        .str.replace(r"^os/16/2002$", "", regex=True)
-        .str.replace(r"^v\/(.+)", "", regex=True)
         .str.replace(r"^1/1/1900$", "", regex=True)
+        .str.replace(r"(.+)?[a-z](.+)?", "", regex=True)
     )
 
     df.loc[:, "left_date"] = (
         data[3]
         .fillna("")
         .str.replace(r"^_4\/g(.+)", "", regex=True)
-        .str.replace(r"^(0|a|s|o)\/(.+)", "", regex=True)
-        .str.replace(r"^in/i/i995$", "", regex=True)
+        .str.replace(r"^0\/(.+)", "", regex=True)
         .str.replace(r"^7/51/2020", "", regex=True)
         .str.replace(r"^4/g/2012$", "", regex=True)
-        .str.replace(r"^os/a7/2021$", "", regex=True)
         .str.replace(r"^9/2s/2014$", "", regex=True)
-        .str.replace(r"^(\w+)\/(\w+)$", "", regex=True)
-        .str.replace(r"(\w{5,7})$", "", regex=True)
-        .str.replace(r"^(\w)$", "", regex=True)
+        .str.replace(r"(.+)?[a-z](.+)?", "", regex=True)
     )
-    df.loc[:, "left_reason"] = data[4]
+    df.loc[:, "left_reason"] = data[4].fillna("")
 
-    return df[~((df.hire_date.fillna("") == ""))]
+    return df[~((df.hire_date == ""))]
 
 
 def clean_agency(df):
