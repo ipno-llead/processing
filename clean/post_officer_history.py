@@ -1,7 +1,8 @@
 import deba
 import pandas as pd
 from lib.uid import gen_uid
-from lib.clean import names_to_title_case, clean_sexes, clean_dates, standardize_desc_cols
+from lib.clean import names_to_title_case, clean_sexes, standardize_desc_cols
+from lib.columns import set_values
 import numpy as np
 
 
@@ -24,7 +25,7 @@ def split_names(df):
     df.loc[:, "middle_name"] = names[2].fillna("")
     return df.pipe(names_to_title_case, ["first_name", "middle_name", "last_name"])[
         ~((df.first_name == "") & (df.last_name == ""))
-    ]
+    ].drop(columns=["officer_name"])
 
 
 def generate_history_id(df):
@@ -77,9 +78,7 @@ def generate_history_id(df):
 
     names_df = df[
         [
-            "first_name",
-            "last_name",
-            "middle_name",
+            "officer_name",
         ]
     ].reset_index()
     names_df = names_df.rename(columns={"index": "history_id"})
@@ -93,6 +92,7 @@ def clean_agency_pre_split(df):
     df.loc[:, "agency"] = (
         df.agency.str.strip()
         .str.lower()
+        .fillna("")
         .str.replace(r"(\w+) = (\w+)", r"\1 \2", regex=True)
         .str.replace(
             r"^orleans parish coroner\'s office",
@@ -111,7 +111,7 @@ def clean_agency_pre_split(df):
         .str.replace(r" & ", "", regex=True)
         .str.replace(r" - ", "", regex=True)
         .str.replace(r" _?â€\” ", "", regex=True)
-        .str.replace(r" _ ", "", regex=True)
+        .str.replace(r" \_ ", "", regex=True)
         .str.replace(r" = ", "", regex=True)
         .str.replace(r"^ (\w+)", r"\1", regex=True)
         .str.replace(r"^st (\w+)", r"st\1", regex=True)
@@ -123,7 +123,7 @@ def clean_agency_pre_split(df):
         .str.replace(r"(\.|\,)", "", regex=True)
         .str.replace(r"miss river", "river", regex=False)
         .str.replace(r" ~ ", "", regex=False)
-        .str.replace(r"(\w+) _ (\w+)", r"\1 \2", regex=True)
+        .str.replace(r"(\w+) \_ (\w+)", r"\1 \2", regex=True)
         .str.replace("new orleans harbor", "orleans harbor", regex=False)
         .str.replace(
             "probation & parcole - adult",
@@ -133,8 +133,20 @@ def clean_agency_pre_split(df):
         .str.replace(r"-time(\w+\/\w+\/\w+)", r"-time \1", regex=True)
         .str.replace(r"\'", "", regex=True)
         .str.replace(r"_(\w+)", r"\1", regex=True)
+        .str.replace(
+            r"^(\w+? ?\w+? ? ?\w+? ?\w+? ? ?\w+?) ?(full-time|reserve|retired|part-time|deceased)$",
+            "",
+            regex=True,
+        )
+        .str.replace(r"^(.+)?(pd|so)$", "", regex=True)
+        .str.replace(r"\—", "", regex=True)
+        .str.replace(r"‘", "", regex=False)
+        .str.replace(r"(.+)?(range|safety academy)(.+)?", "", regex=True)
+        .str.replace(r"$", "", regex=True)
+        .str.replace(r" Â«", " ", regex=True)
+        .str.replace(r"~\-", "", regex=True)
     )
-    return df
+    return df[~((df.agency == ""))]
 
 
 def split_agency_column(df):
@@ -142,8 +154,11 @@ def split_agency_column(df):
         df.agency.fillna("")
         .str.lower()
         .str.strip()
+        .str.replace(r"(\w+)  +(\w+)", r"\1 \2", regex=True)
         .str.extract(
-            r"(\w+? ?\w+? ? ?\w+? ?\w+? ? ?\w+?) ?(?:(full-time|reserve|retired|part-time|deceased?) )? ? ?(\w{1,2}\/\w{1,2}\/\w{4}) ? ?(\w{1,2}\/\w{1,2}\/\w{4})? ?((.+)?termi?n?a?t?i?o?n?(.+)?|(.+)?resig(nation|ned)(.+)?|(.+)?(retired)(.+)?)?(.+)?$"
+            r"(\w+? ?\w+? ?\w+? ?\w+? ?\w+?) ?(?:(full-time|reserve|retired|part-time|deceased?) )?"
+            r"(\w{1,2}\/\w{1,2}\/?\w{4}?) ?(\w{1,2}\/?\w{1,2}\/?\w{4})? ?((.+)?termination(.+)?|"
+            r"(.+)?resig(nation|ned)(.+)?)?(.+)?$"
         )
     )
 
@@ -156,11 +171,13 @@ def split_agency_column(df):
         .fillna("")
         .str.replace(r"^d(\w{1})", r"\1", regex=True)
         .str.replace(r"^(0|s)\/(.+)", "", regex=True)
-        .str.replace(r"^in/i/i995$", "", regex=True)
+        .str.replace(r"^in\/i\/i995$", "", regex=True)
         .str.replace(r"(.+)?7209(.+)?", "", regex=True)
         .str.replace(r"^2\/31(.+)", "", regex=True)
-        .str.replace(r"^os/a7/2021$", "", regex=True)
-        .str.replace(r"^9/2s/2014$", "", regex=True)
+        .str.replace(r"^(\w{1,2})\/(\w{1,2})(\w{4})", r"\1/\2/\3", regex=True)
+        .str.replace(r"^os/16/2002$", "", regex=True)
+        .str.replace(r"^v\/(.+)", "", regex=True)
+        .str.replace(r"^1/1/1900$", "", regex=True)
     )
 
     df.loc[:, "left_date"] = (
@@ -173,10 +190,13 @@ def split_agency_column(df):
         .str.replace(r"^4/g/2012$", "", regex=True)
         .str.replace(r"^os/a7/2021$", "", regex=True)
         .str.replace(r"^9/2s/2014$", "", regex=True)
+        .str.replace(r"^(\w+)\/(\w+)$", "", regex=True)
+        .str.replace(r"(\w{5,7})$", "", regex=True)
+        .str.replace(r"^(\w)$", "", regex=True)
     )
-    df.loc[:, "left_reason"] = data[4].fillna("")
+    df.loc[:, "left_reason"] = data[4]
 
-    return df
+    return df[~((df.hire_date.fillna("") == ""))]
 
 
 def clean_agency(df):
@@ -349,19 +369,28 @@ def convert_agency_to_slug(df):
             r"^new-orleans-coroners-office$", "orleans-coroners-office", regex=True
         )
         .str.replace(r"^new-orleans-civil-so$", "orleans-civil-so", regex=True)
-        .str.replace(r"^new-orleans-constable$", "new-orleans-constables-office", regex=True)
+        .str.replace(
+            r"^new-orleans-constable$", "new-orleans-constables-office", regex=True
+        )
+        .str.replace(r"^pearl-river-pd-deceased$", "pearl-river-pd", regex=True)
+        .str.replace(r"^xavier$", "xavier-university-pd", regex=True)
+        .str.replace(r"^i$", "", regex=True)
+        .str.replace(r"^acadia\-o$", "acadia-so", regex=True)
+        .str.replace(r"^agricultureforestry$", "agriculture-forestry", regex=True)
     )
     return df
 
 
 def clean_left_reason(df):
-    l_reasons = df.left_reason.str.replace(
-        r"volumtary", "voluntary", regex=False
-    ).str.extract(
-        r"(termination|involuntary resignation|voluntary resignation|resignation)"
+    l_reasons = (
+        df.left_reason.str.replace(r"volumtary", "voluntary", regex=False)
+        .str.replace(r"(\||=|_)", "", regex=True)
+        .str.extract(
+            r"( ?termination ?| ?involuntary resignation ?| ?voluntary resignation ?| ?resignation ?)"
+        )
     )
 
-    df.loc[:, "left_reason"] = l_reasons[0]
+    df.loc[:, "left_reason"] = l_reasons[0].str.replace(r"^ ", "", regex=True)
     return df
 
 
@@ -387,21 +416,6 @@ def switched_job(df):
     return df
 
 
-def drop_bad_dates(df):
-    df["hire_date"] = pd.to_datetime(df["hire_date"], errors="coerce")
-    df["left_date"] = pd.to_datetime(df["left_date"], errors="coerce")
-
-    df["ind"] = np.where((df["left_date"] < df["hire_date"]), "Drop", "Keep")
-
-    df.loc[:, "hire_date"] = df.hire_date.dt.strftime("%m/%d/%Y")
-    df.loc[:, "left_date"] = df.left_date.dt.strftime("%m/%d/%Y")
-
-    df.loc[:, "hire_date"] = df.hire_date.astype(str)
-    df.loc[:, "left_date"] = df.hire_date.astype(str)
-    df = df[~((df.ind == "Drop"))]
-    return df.drop(columns=["ind"])
-
-
 def drop_rows_missing_history_id(df):
     return df[~(df.history_id.fillna("") == "")]
 
@@ -410,56 +424,22 @@ def clean():
     dfa = pd.read_csv(deba.data("ner/advocate_post_officer_history_reports.csv"))
     dfb = pd.read_csv(deba.data("ner/post_officer_history_reports.csv"))
     df = (
-        pd.concat([dfa, dfb], axis=0)
+        pd.concat([dfa, dfb], axis=0, ignore_index=True)
         .pipe(drop_rows_missing_names)
-        .rename(columns={"officer_sex": "sex"})
+        .rename(
+            columns={
+                "officer_sex": "sex",
+            }
+        )
         .pipe(clean_sexes, ["sex"])
-        .pipe(split_names)
         .pipe(generate_history_id)
+        .pipe(split_names)
         .pipe(clean_agency_pre_split)
         .pipe(split_agency_column)
         .pipe(
             names_to_title_case,
             [
                 "agency",
-                "agency_1",
-                "agency_2",
-                "agency_3",
-                "agency_4",
-                "agency_5",
-                "agency_6",
-                "agency_7",
-                "agency_8",
-                "agency_9",
-                "agency_10",
-                "agency_11",
-                "agency_12",
-                "agency_13",
-                "agency_14",
-                "agency_15",
-                "agency_16",
-                "agency_17",
-                "agency_18",
-                "agency_19",
-                "agency_20",
-                "agency_21",
-                "agency_22",
-                "agency_23",
-                "agency_24",
-                "agency_25",
-                "agency_26",
-                "agency_27",
-                "agency_28",
-                "agency_29",
-                "agency_30",
-                "agency_31",
-                "agency_32",
-                "agency_33",
-                "agency_34",
-                "agency_35",
-                "agency_36",
-                "agency_36",
-                "agency_37",
             ],
         )
         .pipe(clean_agency)
@@ -468,8 +448,8 @@ def clean():
         .pipe(drop_duplicates)
         .pipe(check_for_duplicate_uids)
         .pipe(switched_job)
-        .pipe(drop_bad_dates)
         .pipe(convert_agency_to_slug)
+        .pipe(set_values, {"source_agency": "post"})
         .pipe(standardize_desc_cols, ["agency"])
     )
     return df
