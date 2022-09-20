@@ -1,5 +1,5 @@
 import deba
-from lib.columns import rearrange_appeal_hearing_columns, rearrange_event_columns
+from lib.columns import rearrange_appeal_hearing_columns, rearrange_event_columns, rearrange_settlement_columns
 from lib.personnel import fuse_personnel
 from lib import events
 import pandas as pd
@@ -67,11 +67,14 @@ if __name__ == "__main__":
     post_event = pd.read_csv(
         deba.data("match/post_event_louisiana_state_police_2020.csv")
     )
+    settlements = pd.read_csv(deba.data("clean/settlements_louisiana_state_pd_2015_2020.csv"))
     per_df = fuse_personnel(pprr, pprr_term, lprr)
     event_df = rearrange_event_columns(
         pd.concat([post_event, fuse_events(lprr, pprr, pprr_term)])
     )
+    settlements = rearrange_settlement_columns(settlements)
     per_df.to_csv(deba.data("fuse/per_louisiana_state_police.csv"), index=False)
     event_df.to_csv(deba.data("fuse/event_louisiana_state_police.csv"), index=False)
     app_df = rearrange_appeal_hearing_columns(lprr)
     app_df.to_csv(deba.data("fuse/app_louisiana_state_police.csv"), index=False)
+    settlements.to_csv(deba.data("fuse/settlements_louisiana_state_pd.csv"), index=False)

@@ -525,6 +525,8 @@ schemas:
           unique identifier of case
       - name: case_number
       - name: case_name
+      - name: case_status
+      - name: settlement_amount
       - name: original_judgment_principal
       - name: agency
 
