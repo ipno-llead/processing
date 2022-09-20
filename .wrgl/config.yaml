@@ -1028,6 +1028,12 @@ branch:
     file: data/fuse/per_natchitoches_so.csv
     primaryKey:
       - uid
+  per-harahan-pd:
+    remote: origin
+    merge: refs/heads/per-harahan-pd
+    file: data/fuse/per_harahan_pd.csv
+    primaryKey:
+      - uid
   uof-citizens-new-orleans-pd:
     remote: origin
     merge: refs/heads/uof-citizens-new-orleans-pd
