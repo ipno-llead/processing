@@ -81,7 +81,6 @@ def fuse_personnel():
                 pd.read_csv(deba.data("fuse/per_st_james_so.csv")),
                 pd.read_csv(deba.data("fuse/per_natchitoches_so.csv")),
                 pd.read_csv(deba.data("fuse/per_harahan_pd.csv")),
-                
             ]
         )
     ).sort_values("uid", ignore_index=True)
@@ -311,7 +310,12 @@ def fuse_property_claims():
 
 def fuse_settlements():
     return rearrange_settlement_columns(
-        pd.concat([pd.read_csv(deba.data("fuse/settlements_new_orleans_pd.csv"))])
+        pd.concat(
+            [
+                pd.read_csv(deba.data("fuse/settlements_new_orleans_pd.csv")),
+                pd.read_csv(deba.data("fuse/settlements_louisiana_state_pd.csv")),
+            ]
+        )
     ).sort_values("settlement_uid", ignore_index=True)
 
 
