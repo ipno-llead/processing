@@ -148,7 +148,7 @@ branch:
     file: data/fuse/com_new_orleans_so.csv
     primaryKey:
       - allegation_uid
-  com-plaquemines-pd:
+  com-plaquemines-so:
     remote: origin
     merge: refs/heads/com-plaquemines-pd
     file: data/fuse/com_plaquemines_so.csv
@@ -284,10 +284,10 @@ branch:
     file: data/fuse/com_natchitoches_so.csv
     primaryKey:
       - allegation_uid
-  com-louisiana-state-pd:
+  com-lake-charles-pd:
     remote: origin
-    merge: refs/heads/com-louisiana-state-pd
-    file: data/fuse/com_louisiana_state_pd.csv
+    merge: refs/heads/com-lake-charles-pd
+    file: data/fuse/com_lake_charles_pd.csv
     primaryKey:
       - allegation_uid
   event:
@@ -648,6 +648,12 @@ branch:
     remote: origin
     merge: refs/heads/event-natchitoches-so
     file: data/fuse/event_natchitoches_so.csv
+    primaryKey:
+      - event_uid
+  event-lake-charles-pd:
+    remote: origin
+    merge: refs/heads/event-lake-charles-pd
+    file: data/fuse/event_lake_charles_pd.csv
     primaryKey:
       - event_uid
   per-abbeville-pd:
@@ -1034,6 +1040,18 @@ branch:
     file: data/fuse/per_natchitoches_so.csv
     primaryKey:
       - uid
+  per-harahan-pd:
+    remote: origin
+    merge: refs/heads/per-harahan-pd
+    file: data/fuse/per_harahan_pd.csv
+    primaryKey:
+      - uid
+  per-lake-charles-pd:
+    remote: origin
+    merge: refs/heads/per-lake-charles-pd
+    file: data/fuse/per_lake_charles_pd.csv
+    primaryKey:
+      - uid
   uof-citizens-new-orleans-pd:
     remote: origin
     merge: refs/heads/uof-citizens-new-orleans-pd
@@ -1046,6 +1064,24 @@ branch:
     file: data/fuse/uof_officers_new_orleans_pd.csv
     primaryKey:
       - uid
+  uof-new-orleans-pd:
+    remote: origin
+    merge: refs/heads/uof-new-orleans-pd
+    file: data/fuse/uof_new_orleans_pd.csv
+    primaryKey:
+      - uof_uid
+  uof-officers-kenner-pd:
+    remote: origin
+    merge: refs/heads/uof-officers-kenner-pd
+    file: data/fuse/uof_officers_kenner_pd.csv
+    primaryKey:
+      - uid
+  uof-kenner-pd:
+    remote: origin
+    merge: refs/heads/uof-kenner-pd
+    file: data/fuse/uof_kenner_pd.csv
+    primaryKey:
+      - uof_uid
   pclaims-new-orleans-pd:
     remote: origin
     merge: refs/heads/pclaims-new-orleans-pd
@@ -1094,12 +1130,6 @@ branch:
     file: data/fuse/appeals.csv
     primaryKey:
       - appeal_uid
-  uof-new-orleans-pd:
-    remote: origin
-    merge: refs/heads/uof-new-orleans-pd
-    file: data/fuse/uof_new_orleans_pd.csv
-    primaryKey:
-      - uof_uid
   use-of-force:
     remote: origin
     merge: refs/heads/use-of-force
