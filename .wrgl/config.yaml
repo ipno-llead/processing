@@ -290,6 +290,10 @@ branch:
     file: data/fuse/com_lake_charles_pd.csv
     primaryKey:
       - allegation_uid
+  com-louisiana-state-pd:
+    remote: origin
+    merge: refs/heads/com-louisiana-state-pd
+    file: data/fuse/com_louisiana_state_pd.csv
   event:
     remote: origin
     merge: refs/heads/event
