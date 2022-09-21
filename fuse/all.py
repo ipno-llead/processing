@@ -31,7 +31,7 @@ def fuse_personnel():
                 pd.read_csv(deba.data("fuse/per_greenwood_pd.csv")),
                 pd.read_csv(deba.data("fuse/per_st_tammany_so.csv")),
                 pd.read_csv(deba.data("fuse/per_plaquemines_so.csv")),
-                pd.read_csv(deba.data("fuse/per_louisiana_state_police.csv")),
+                pd.read_csv(deba.data("fuse/per_louisiana_state_pd.csv")),
                 pd.read_csv(deba.data("fuse/per_caddo_parish_so.csv")),
                 pd.read_csv(deba.data("fuse/per_mandeville_pd.csv")),
                 pd.read_csv(deba.data("fuse/per_levee_pd.csv")),
@@ -100,7 +100,7 @@ def fuse_event():
                 pd.read_csv(deba.data("fuse/event_greenwood_pd.csv")),
                 pd.read_csv(deba.data("fuse/event_st_tammany_so.csv")),
                 pd.read_csv(deba.data("fuse/event_plaquemines_so.csv")),
-                pd.read_csv(deba.data("fuse/event_louisiana_state_police.csv")),
+                pd.read_csv(deba.data("fuse/event_louisiana_state_pd.csv")),
                 pd.read_csv(deba.data("fuse/event_caddo_parish_so.csv")),
                 pd.read_csv(deba.data("fuse/event_mandeville_pd.csv")),
                 pd.read_csv(deba.data("fuse/event_levee_pd.csv")),
@@ -202,6 +202,7 @@ def fuse_allegation():
                 pd.read_csv(deba.data("fuse/com_pineville_pd.csv")),
                 pd.read_csv(deba.data("fuse/com_st_james_so.csv")),
                 pd.read_csv(deba.data("fuse/com_natchitoches_so.csv")),
+                pd.read_csv(deba.data("fuse/com_louisiana_state_pd.csv")),
             ]
         )
     ).sort_values(["agency", "tracking_id"], ignore_index=True)
@@ -271,7 +272,7 @@ def fuse_appeal_hearing_logs():
         pd.concat(
             [
                 pd.read_csv(deba.data("fuse/app_new_orleans_csc.csv")),
-                pd.read_csv(deba.data("fuse/app_louisiana_state_police.csv")),
+                pd.read_csv(deba.data("fuse/app_louisiana_state_pd.csv")),
             ]
         )
     ).sort_values("uid", ignore_index=True)

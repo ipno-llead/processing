@@ -8,15 +8,6 @@ def drop_rows_missing_dates(df):
     return df[~((df.notification_date.fillna("") == ""))]
 
 
-def clean_tracking_id(df):
-    subject = "R", "r", "T", "t"
-    subjects = []
-    for index, row in df.iterrows():
-        if str(row).startswith(subject):
-            df["subjects"] = row
-    return df
-
-
 def extract_ids_and_subject(df):
     cols = [
         "accused_name_2",
@@ -112,10 +103,11 @@ def clean():
         .pipe(sanitize_dates)
         .pipe(set_values, {"agency": "louisiana-state-pd"})
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
+        .pipe(gen_uid, ["subject_of_letter", "uid", "notification_date"], "allegation_uid")
     )
     return df
 
 
 if __name__ == "__main__":
     df = clean()
-    df.to_csv(deba.data("clean/letters_louisiana_state_pd_2019.csv"), index=False)
+    df.to_csv(deba.data("clean/cprr_louisiana_state_pd_2019.csv"), index=False)
