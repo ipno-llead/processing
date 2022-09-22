@@ -950,28 +950,22 @@ branch:
     file: data/fuse/per_benton_pd.csv
     primaryKey:
       - uid
-  brady-baton-rouge-pd:
+  brady-baton-rouge-da:
     remote: origin
-    merge: refs/heads/brady-baton-rouge-pd
-    file: data/fuse/brady_baton_rouge_pd.csv
+    merge: refs/heads/brady-baton-rouge-da
+    file: data/fuse/brady_baton_rouge_da.csv
     primaryKey:
       - brady_uid
-  brady-new-orleans-pd:
+  brady-orleans-da:
     remote: origin
-    merge: refs/heads/brady-new-orleans-pd
-    file: data/fuse/brady_new_orleans_pd.csv
+    merge: refs/heads/brady-orleans-da
+    file: data/fuse/brady_orleans_da.csv
     primaryKey:
       - brady_uid
-  brady-ouachita-so:
+  brady-ouachita-da:
     remote: origin
-    merge: refs/heads/brady-ouachita-so
-    file: data/fuse/brady_ouachita_so.csv
-    primaryKey:
-      - brady_uid
-  brady-tangipahoa-so:
-    remote: origin
-    merge: refs/heads/brady-tangipahoa-so
-    file: data/fuse/brady_tangipahoa_so.csv
+    merge: refs/heads/brady-ouachita-da
+    file: data/fuse/brady_ouachita_da.csv
     primaryKey:
       - brady_uid
   per-eunice-pd:

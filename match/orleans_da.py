@@ -51,7 +51,7 @@ def match_brady_to_pprr(brady, per):
     )
     decision = 1
     matcher.save_pairs_to_excel(
-        deba.data("match/brady_new_orleans_da_2021_v_pprr_new_orleans_ipm_iapro_1946_2018.xlsx"),
+        deba.data("match/brady_orleans_da_2021_v_pprr_new_orleans_ipm_iapro_1946_2018.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
@@ -63,7 +63,7 @@ def match_brady_to_pprr(brady, per):
 
 if __name__ == "__main__":
     pprr = pd.read_csv(deba.data("clean/pprr_new_orleans_pd_2020.csv"))
-    brady = pd.read_csv(deba.data("clean/brady_new_orleans_da_2021.csv"))
+    brady = pd.read_csv(deba.data("clean/brady_orleans_da_2021.csv"))
     brady = deduplicate_brady(brady)
     brady = match_brady_to_pprr(brady, pprr)
-    brady.to_csv(deba.data("match/brady_new_orleans_da_2021.csv"), index=False)
+    brady.to_csv(deba.data("match/brady_orleans_da_2021.csv"), index=False)

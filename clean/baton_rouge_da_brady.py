@@ -31,7 +31,7 @@ def clean_agency(df):
         .fillna("")
         .str.replace("Baton Rouge Police Department", "baton-rouge-pd", regex=False)
         .str.replace("East Baton Rouge Sheriff's Office", "east-baton-rouge-so", regex=False)
-        .str.replace("Louisiana State Police", "louisiana-state-[pd", regex=False)
+        .str.replace("Louisiana State Police", "louisiana-state-pd", regex=False)
         .str.replace(
             "Louisiana State University Police Department",
             "lsu-university-pd",
