@@ -99,6 +99,12 @@ def clean_agency(df):
         .str.replace(
             r"^lsuhsc-no-university-pd$", "lsuhsc-new-orleans-university-pd", regex=True
         )
+        .str.replace(r"^vermilion-o$^", "vermilion-so", regex=True)
+        .str.replace(r"broussard-fd$", "broussard-fire-department", regex=True)
+        .str.replace(r"^my-shal$", "", regex=True)
+        .str.replace(r"^gretnapld$", "gretna-pd", regex=True)
+        .str.replace(r"^sthelena-so$", "st-helena-so", regex=True)
+        .str.replace(r"^ng-oaparish-so$", "", regex=True)
     )
     return df
 
