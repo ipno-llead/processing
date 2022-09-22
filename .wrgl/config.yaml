@@ -16,10 +16,10 @@ branch:
     file: data/fuse/app_baton_rouge_pd.csv
     primaryKey:
       - appeal_uid
-  app-louisiana-state-police:
+  app-louisiana-state-pd:
     remote: origin
-    merge: refs/heads/app-louisiana-state-police
-    file: data/fuse/app_louisiana_state_police.csv
+    merge: refs/heads/app-louisiana-state-pd
+    file: data/fuse/app_louisiana_state_pd.csv
     primaryKey:
       - appeal_uid
   app-new-orleans-pd:
@@ -290,6 +290,10 @@ branch:
     file: data/fuse/com_lake_charles_pd.csv
     primaryKey:
       - allegation_uid
+  com-louisiana-state-pd:
+    remote: origin
+    merge: refs/heads/com-louisiana-state-pd
+    file: data/fuse/com_louisiana_state_pd.csv
   event:
     remote: origin
     merge: refs/heads/event
@@ -428,10 +432,10 @@ branch:
     file: data/fuse/event_levee_pd.csv
     primaryKey:
       - event_uid
-  event-louisiana-state-police:
+  event-louisiana-state-pd:
     remote: origin
-    merge: refs/heads/event-louisiana-state-police
-    file: data/fuse/event_louisiana_state_police.csv
+    merge: refs/heads/event-louisiana-state-pd
+    file: data/fuse/event_louisiana_state_pd.csv
     primaryKey:
       - event_uid
   event-madisonville-pd:
@@ -788,10 +792,10 @@ branch:
     file: data/fuse/per_levee_pd.csv
     primaryKey:
       - uid
-  per-louisiana-state-police:
+  per-louisiana-state-pd:
     remote: origin
-    merge: refs/heads/per-louisiana-state-police
-    file: data/fuse/per_louisiana_state_police.csv
+    merge: refs/heads/per-louisiana-state-pd
+    file: data/fuse/per_louisiana_state_pd.csv
     primaryKey:
       - uid
   per-madisonville-pd:

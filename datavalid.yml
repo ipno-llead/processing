@@ -177,6 +177,9 @@ schemas:
       - name: citizen_race
       - name: citizen_sex
       - name: citizen_age
+      - name: subject_of_letter
+        description: >
+          text description of disciplinary letter
   event:
     columns:
       - name: event_uid
