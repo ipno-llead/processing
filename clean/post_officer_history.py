@@ -374,7 +374,7 @@ def convert_agency_to_slug(df):
         .str.replace(r"^gretnapld$", "gretna-pd", regex=True)
         .str.replace(r"^sthelena-so$", "st-helena-so", regex=True)
         .str.replace(r"^ng-oaparish-so$", "", regex=True)
-        .str.replace(r"^vermilion-o$^", "vermilion-so", regex=True)
+        .str.replace(r"^vermilion-s?o$^", "", regex=True)
     )
     return df
 
