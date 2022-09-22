@@ -956,10 +956,10 @@ branch:
     file: data/fuse/brady_baton_rouge_da.csv
     primaryKey:
       - brady_uid
-  brady-new-orleans-da:
+  brady-orleans-da:
     remote: origin
-    merge: refs/heads/brady-new-orleans-da
-    file: data/fuse/brady_new_orleans_da.csv
+    merge: refs/heads/brady-orleans-da
+    file: data/fuse/brady_orleans_da.csv
     primaryKey:
       - brady_uid
   brady-ouachita-da:
