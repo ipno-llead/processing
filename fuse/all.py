@@ -149,6 +149,7 @@ def fuse_event():
                 pd.read_csv(deba.data("fuse/event_st_james_so.csv")),
                 pd.read_csv(deba.data("fuse/event_natchitoches_so.csv")),
                 pd.read_csv(deba.data("fuse/event_harahan_pd.csv")),
+                pd.read_csv(deba.data("fuse/event_ouachita_da.csv")),
             ]
         )
     ).sort_values(["agency", "event_uid"], ignore_index=True)
@@ -294,10 +295,9 @@ def fuse_brady():
     return rearrange_brady_columns(
         pd.concat(
             [
-                pd.read_csv(deba.data("fuse/brady_baton_rouge_pd.csv")),
-                pd.read_csv(deba.data("fuse/brady_new_orleans_pd.csv")),
-                pd.read_csv(deba.data("fuse/brady_ouachita_so.csv")),
-                pd.read_csv(deba.data("fuse/brady_tangipahoa_so.csv")),
+                pd.read_csv(deba.data("fuse/brady_baton_rouge_da.csv")),
+                pd.read_csv(deba.data("fuse/brady_orleans_da.csv")),
+                pd.read_csv(deba.data("fuse/brady_ouachita_da.csv")),
             ]
         )
     ).sort_values("brady_uid", ignore_index=True)

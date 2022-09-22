@@ -205,4 +205,4 @@ def clean():
 
 if __name__ == "__main__":
     df = clean()
-    df.to_csv(deba.data("clean/brady_new_orleans_da_2021.csv"), index=False)
+    df.to_csv(deba.data("clean/brady_orleans_da_2021.csv"), index=False)
