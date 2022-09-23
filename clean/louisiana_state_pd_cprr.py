@@ -92,7 +92,7 @@ def sanitize_dates(df):
     return df
 
 
-def clean():
+def clean_letters_2019():
     df = (
         pd.read_csv(deba.data("ner/letters_louisiana_state_pd_2019.csv"))
         .pipe(clean_column_names)
@@ -107,6 +107,66 @@ def clean():
     return df
 
 
+def join_allegation_columns(df):
+    for index, row in df.iterrows:
+        subjects = [row for row in df]
+    return subjects
+
+# def join_allegation_columns(df):
+#     df = df.fillna("")
+#     cols = [
+#         "previous_discipline",
+#         "previous_discipline_1",
+#         "previous_discipline_2",
+#         "previous_discipline_3",
+#         "previous_discipline_4",
+#         "previous_discipline_5",
+#         "previous_discipline_6",
+#     ]   
+#     df["discipline"] = df[cols].apply(lambda row: "".join(row.fillna("").values.astype(str)), axis=1)
+#     df.loc[:, "discipline_extracted"] = ""
+#     # df.loc[
+#     #     (df.md5.fillna("") == "5483e73cc28de9b2b05fecd6ba0c4f24") & (df.report_date.fillna("") == "September 28, 2020"),
+#     #     "discipline_extracted",
+#     # ] = df.discipline
+#     return df
+
+
+
+# def generate_history_id(df):
+#     stacked_agency_sr = df[
+#         [
+#             "md5",
+#         ]
+#     ].stack()
+
+#     stacked_agency_df = stacked_agency_sr.reset_index().iloc[:, [0, 2]]
+#     stacked_agency_df.columns = ["history_id", "md5"]
+
+#     names_df = df[
+#         [
+#             "report_date", "allegation", "previous_disicpline"
+#         ]
+#     ].reset_index()
+#     names_df = names_df.rename(columns={"index": "history_id"})
+
+#     stacked_agency_df = stacked_agency_df.merge(names_df, on="history_id", how="right")
+
+#     return stacked_agency_df
+
+
+# def search(df):
+#     values = "5483e73cc28de9b2b05fecd6ba0c4f24"
+#     dates = [x.notna() for x in str(df["report_date"]) if x]
+#     return dates
+
+def clean_reports_2020():
+    df = pd.read_csv(deba.data("ner/reports_louisiana_state_pd_2020.csv"))\
+        .pipe(clean_column_names)\
+        .pipe(join_allegation_columns)
+    return df
+
 if __name__ == "__main__":
-    df = clean()
-    df.to_csv(deba.data("clean/cprr_louisiana_state_pd_2019.csv"), index=False)
+    df1 = clean_letters_2019()
+    df2 = clean_reports_2020()
+    df1.to_csv(deba.data("clean/cprr_louisiana_state_pd_2019.csv"), index=False)

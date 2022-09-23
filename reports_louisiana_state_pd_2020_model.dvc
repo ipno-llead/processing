@@ -1,0 +1,6 @@
+wdir: data/ner/louisiana_state_pd/model
+outs:
+- md5: f4021f23b490aed8fb0beaa2412140df.dir
+  size: 3978384
+  nfiles: 11
+  path: reports_louisiana_state_pd_2020.model
