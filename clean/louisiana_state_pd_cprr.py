@@ -96,6 +96,7 @@ def clean():
     df = (
         pd.read_csv(deba.data("ner/letters_louisiana_state_pd_2019.csv"))
         .pipe(clean_column_names)
+        .drop(columns=["notification_date_1", "notification_date_2"])
         .pipe(drop_rows_missing_dates)
         .pipe(extract_ids_and_subject)
         .pipe(split_names)
