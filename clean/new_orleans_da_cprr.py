@@ -15,9 +15,11 @@ from lib.uid import gen_uid
 def split_names(df):
     names = (
         df.officer.str.lower()
-        .str.strip()
-        .str.replace(r"(not nopd|unknown)", "", regex=True)
-        .str.extract(r"^(?:(\w+-?\w+?) ) ?(\w+-?\'? ?\w+?) ?(jr)?$")
+        .str.strip().fillna("")
+        .str.replace(r"((.+)?nopd(.+)?|(.+)?unknown(.+)?|anonymous|none)", "", regex=True)\
+        .str.replace(r"\.", "", regex=True).str.replace(r"\'$", "", regex=True)
+        .str.replace(r"( +$|^ +)", "", regex=True)
+        .str.extract(r"^(?:(\w+\'?-?\w+?) ) ?(\w+-?\'? ?\w+?) ?(jr|sr)?$")
     )
 
     df.loc[:, "first_name"] = names[0].fillna("")
@@ -27,7 +29,8 @@ def split_names(df):
     df.loc[:, "last_name"] = df.last_name.fillna("").str.cat(
         df.suffix.fillna(""), sep=" "
     )
-    return df.drop(columns=["suffix", "officer"])
+    df.loc[:, "last_name"] = df.last_name.str.replace(r" +$", "", regex=True)
+    return df.drop(columns=["suffix"])[~((df.last_name.fillna("") == ""))]
 
 
 def clean_complainant_type(df):
