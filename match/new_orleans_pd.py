@@ -433,6 +433,7 @@ if __name__ == "__main__":
     pclaims21 = match_pclaims21_to_pprr(pclaims21, pprr)
     pprr_separations = match_pprr_separations_to_pprr(pprr_separations, pprr)
     cprr = match_cprr_to_pprr(cprr, pprr)
+    cprr = cprr[~((cprr.uid.fillna("") == ""))]
     award.to_csv(deba.data("match/award_new_orleans_pd_2016_2021.csv"), index=False)
     event_df.to_csv(deba.data("match/post_event_new_orleans_pd.csv"), index=False)
     lprr.to_csv(deba.data("match/lprr_new_orleans_csc_2000_2016.csv"), index=False)
