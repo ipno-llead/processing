@@ -180,6 +180,9 @@ schemas:
       - name: subject_of_letter
         description: >
           text description of disciplinary letter
+      - name: race
+      - name: sex
+      - name: age
   event:
     columns:
       - name: event_uid

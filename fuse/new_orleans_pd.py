@@ -104,6 +104,10 @@ def fuse_events(
                     "division_desc",
                     "department_desc",
                     "employment_status",
+                    "race",
+                    "sex", 
+                    "age", 
+                    "department_desc"
                 ],
             },
             events.INVESTIGATION_COMPLETE: {
@@ -118,6 +122,10 @@ def fuse_events(
                     "division_desc",
                     "department_desc",
                     "employment_status",
+                    "race",
+                    "sex", 
+                    "age", 
+                    "department_desc"
                 ],
             },
             events.COMPLAINT_INCIDENT: {
@@ -132,6 +140,10 @@ def fuse_events(
                     "division_desc",
                     "department_desc",
                     "employment_status",
+                    "race",
+                    "sex", 
+                    "age", 
+                    "department_desc"
                 ],
             },
         },
