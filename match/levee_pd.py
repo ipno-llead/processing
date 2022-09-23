@@ -59,5 +59,4 @@ if __name__ == "__main__":
             ),
         ]
     )
-    matched_cprr = matched_cprr[~((matched_cprr.uid.fillna("") == ""))]
     matched_cprr.to_csv(deba.data("match/cprr_levee_pd.csv"), index=False)
