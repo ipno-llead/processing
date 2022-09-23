@@ -104,6 +104,10 @@ def fuse_events(
                     "division_desc",
                     "department_desc",
                     "employment_status",
+                    "race",
+                    "sex", 
+                    "age", 
+                    "department_desc"
                 ],
             },
             events.INVESTIGATION_COMPLETE: {
@@ -118,6 +122,10 @@ def fuse_events(
                     "division_desc",
                     "department_desc",
                     "employment_status",
+                    "race",
+                    "sex", 
+                    "age", 
+                    "department_desc"
                 ],
             },
             events.COMPLAINT_INCIDENT: {
@@ -132,6 +140,10 @@ def fuse_events(
                     "division_desc",
                     "department_desc",
                     "employment_status",
+                    "race",
+                    "sex", 
+                    "age", 
+                    "department_desc"
                 ],
             },
         },
@@ -270,6 +282,7 @@ if __name__ == "__main__":
     )
 
     cprr = pd.read_csv(deba.data("match/cprr_new_orleans_da_2016_2020.csv"))
+    cprr = cprr[~((cprr.uid.fillna("") == ""))]
     pib = pd.read_csv(deba.data("match/cprr_new_orleans_pib_reports_2014_2020.csv"))
     nopd_settlements = pd.read_csv(
         deba.data("clean/settlements_new_orleans_pd.csv")

@@ -271,7 +271,7 @@ def match_cprr_to_pprr(cprr, pprr):
         dfb,
         show_progress=True,
     )
-    decision = 1
+    decision = .943
 
     matcher.save_pairs_to_excel(
         deba.data("match/cprr_new_orleans_da_v_pprr_new_orleans_pd_2020.xlsx"),
@@ -432,6 +432,7 @@ if __name__ == "__main__":
     pclaims20 = match_pclaims20_to_pprr(pclaims20, pprr)
     pclaims21 = match_pclaims21_to_pprr(pclaims21, pprr)
     pprr_separations = match_pprr_separations_to_pprr(pprr_separations, pprr)
+    cprr = match_cprr_to_pprr(cprr, pprr)
     award.to_csv(deba.data("match/award_new_orleans_pd_2016_2021.csv"), index=False)
     event_df.to_csv(deba.data("match/post_event_new_orleans_pd.csv"), index=False)
     lprr.to_csv(deba.data("match/lprr_new_orleans_csc_2000_2016.csv"), index=False)
