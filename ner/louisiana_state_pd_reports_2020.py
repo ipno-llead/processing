@@ -19,15 +19,15 @@ def training_data():
     return data
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  
     pdfs = read_pdfs()
-    training = training_data()
-    ner = train_spacy_model(pdfs, training)
-    ner.to_disk(
-        deba.data("ner/louisiana_state_pd/model/reports_louisiana_state_pd_2020.model")
-    )
-    # trained_model = spacy.load(
-    #     "data/ner/louisiana_state_pd/model/letters_louisiana_state_pd_2019.model"
+    # training = training_data()
+    # ner = train_spacy_model(pdfs, training)
+    # ner.to_disk(
+    #     deba.data("ner/louisiana_state_pd/model/reports_louisiana_state_pd_2020.model")
     # )
-    ner = apply_spacy_model(pdfs, ner)
+    trained_model = spacy.load(
+        "data/ner/louisiana_state_pd/model/reports_louisiana_state_pd_2020.model"
+    )
+    ner = apply_spacy_model(pdfs, trained_model)
     ner.to_csv(deba.data("ner/reports_louisiana_state_pd_2020.csv"), index=False)
