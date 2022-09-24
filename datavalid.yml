@@ -179,7 +179,10 @@ schemas:
       - name: citizen_age
       - name: letter_subject
         description: >
-          text description of disciplinary letter
+          text description of investigative letter
+      - name: report_subject
+        description: >
+          text description of investigative report
       - name: race
       - name: sex
       - name: age
