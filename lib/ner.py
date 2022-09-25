@@ -31,10 +31,12 @@ def train_spacy_model(df: pd.DataFrame, training_data: str) -> pd.DataFrame:
     nlp = spacy.blank("en")
     ner = nlp.create_pipe("ner")
     nlp.add_pipe("ner")
-    ner.add_label("accused_name")
-    ner.add_label("subject_of_letter")
-    ner.add_label("notification_date")
+    ner.add_label("report_subject")
     ner.add_label("tracking_id")
+    ner.add_label("allegation")
+    ner.add_label("previous_discipline")
+    ner.add_label("report_date")
+    ner.add_label("accused_name")
 
     optimizer = nlp.begin_training()
     for itn in range(50):
