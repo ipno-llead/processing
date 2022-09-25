@@ -56,7 +56,7 @@ def extract_ids_and_subject(df):
             "tracking_id_2",
             "tracking_id_3",
             "data",
-            "subject_of_letter"
+            "subject_of_letter",
         ]
     )
 
@@ -245,7 +245,17 @@ def clean_reports_2020():
     df = (
         pd.read_csv(deba.data("ner/reports_louisiana_state_pd_2020.csv"))
         .pipe(clean_column_names)
-        .drop(columns=["previous_discipline"])
+        .drop(
+            columns=[
+                "previous_discipline",
+                "previous_discipline_1",
+                "previous_discipline_2",
+                "previous_discipline_3",
+                "previous_discipline_4",
+                "previous_discipline_5",
+                "previous_discipline_6",
+            ]
+        )
         .pipe(join_multiple_extracted_entity_cols)
         .pipe(extract_and_split_names_2020)
         .pipe(clean_report_subject)
