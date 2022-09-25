@@ -78,7 +78,6 @@ def fuse_events(lprr, pprr, pprr_term, cprr19, cprr20):
         {
             events.INVESTIGATION_COMPLETE: {
                 "prefix": "report",
-                "parse_date": True,
                 "keep": [
                     "uid",
                     "agency",

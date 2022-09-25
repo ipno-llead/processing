@@ -1,7 +1,7 @@
 import deba
 import pandas as pd
 from lib.columns import clean_column_names, set_values
-from lib.clean import clean_names
+from lib.clean import clean_names, clean_dates
 from lib.uid import gen_uid
 from functools import reduce
 
@@ -143,8 +143,10 @@ def join_multiple_extracted_entity_cols(df):
     df = reduce(
         lambda left, right: pd.merge(left, right, on=["md5"], how="outer"), data_frames
     )
-    df = df[~((df.report_date.fillna("") == ""))]
-    return df
+    df = df[['report_date', 'md5', 'filepath', 'filesha1', 'fileid', 'filetype',
+       'fn', 'file_category', 'text', 'pageno', 'tracking_id', 'allegation',
+       'report_subject']]
+    return df[~((df.report_date.fillna("") == ""))].reset_index(drop=True)
 
 
 def extract_and_split_names_2020(df):
@@ -214,13 +216,13 @@ def sanitize_dates_2020(df):
         .str.replace(r"december (.+)", r"12/\1", regex=True)
         .str.replace(r"october (.+)", r"10/\1", regex=True)
         .str.replace(r"september (.+)", r"10/\1", regex=True)
-        .str.replace(r"august (.+)", r"08/\1", regex=True)
-        .str.replace(r"june (.+)", r"06/\1", regex=True)
-        .str.replace(r"may (.+)", r"05/\1", regex=True)
-        .str.replace(r"april (.+)", r"04/\1", regex=True)
-        .str.replace(r"march (.+)", r"03/\1", regex=True)
-        .str.replace(r"february (.+)", r"02/\1", regex=True)
-        .str.replace(r"january (.+)", r"02/\1", regex=True)
+        .str.replace(r"august (.+)", r"8/\1", regex=True)
+        .str.replace(r"june (.+)", r"6/\1", regex=True)
+        .str.replace(r"may (.+)", r"5/\1", regex=True)
+        .str.replace(r"april (.+)", r"4/\1", regex=True)
+        .str.replace(r"march (.+)", r"3/\1", regex=True)
+        .str.replace(r"february (.+)", r"2/\1", regex=True)
+        .str.replace(r"january (.+)", r"1/\1", regex=True)
     )
     return df
 
@@ -257,14 +259,15 @@ def clean_reports_2020():
             ]
         )
         .pipe(join_multiple_extracted_entity_cols)
+        .pipe(sanitize_dates_2020)
+        .pipe(clean_dates, ["report_date"])
         .pipe(extract_and_split_names_2020)
         .pipe(clean_report_subject)
         .pipe(extract_allegation_and_disposition)
-        .pipe(sanitize_dates_2020)
         .pipe(clean_names, ["first_name", "last_name"])
         .pipe(set_values, {"agency": "louisiana-state-pd"})
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
-        .pipe(gen_uid, ["allegation", "uid", "report_date"], "allegation_uid")
+        .pipe(gen_uid, ["allegation", "uid", "report_year", "report_month", "report_day"], "allegation_uid")
         .drop_duplicates(subset=["allegation_uid"])
     )
     return df
