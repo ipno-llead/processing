@@ -214,17 +214,20 @@ def sanitize_dates_2020(df):
         .str.strip()
         .str.replace(r"(\w+)\, ?(\w+)", r"\1/\2", regex=True)
         .str.replace(r"december (.+)", r"12/\1", regex=True)
+        .str.replace(r"november (.+)", r"11/\1", regex=True)
         .str.replace(r"october (.+)", r"10/\1", regex=True)
-        .str.replace(r"september (.+)", r"10/\1", regex=True)
+        .str.replace(r"september (.+)", r"9/\1", regex=True)
         .str.replace(r"august (.+)", r"8/\1", regex=True)
+        .str.replace(r"july (.+)", r"7/\1", regex=True)
         .str.replace(r"june (.+)", r"6/\1", regex=True)
         .str.replace(r"may (.+)", r"5/\1", regex=True)
         .str.replace(r"april (.+)", r"4/\1", regex=True)
         .str.replace(r"march (.+)", r"3/\1", regex=True)
         .str.replace(r"february (.+)", r"2/\1", regex=True)
         .str.replace(r"january (.+)", r"1/\1", regex=True)
+        .str.replace(r"(.+)?([a-z]|\.|previous)(.+)?", "", regex=True)
     )
-    return df
+    return df[~((df.report_date.fillna("") == ""))]
 
 
 def clean_letters_2019():
