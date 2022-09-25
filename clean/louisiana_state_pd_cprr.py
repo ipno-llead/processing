@@ -230,6 +230,10 @@ def sanitize_dates_2020(df):
     return df[~((df.report_date.fillna("") == ""))]
 
 
+def drop_rows_missing_names(df):
+    return df[~((df.last_name.fillna("") == ""))]
+
+
 def clean_letters_2019():
     df = (
         pd.read_csv(deba.data("ner/letters_louisiana_state_pd_2019.csv"))
@@ -272,6 +276,7 @@ def clean_reports_2020():
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(gen_uid, ["allegation", "uid", "report_year", "report_month", "report_day"], "allegation_uid")
         .drop_duplicates(subset=["allegation_uid"])
+        .pipe(drop_rows_missing_names)
     )
     return df
 
