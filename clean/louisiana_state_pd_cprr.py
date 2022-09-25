@@ -230,6 +230,13 @@ def sanitize_dates_2020(df):
     return df[~((df.report_date.fillna("") == ""))]
 
 
+def clean_tracking_id(df):
+    df.loc[:, "tracking_id"] = df.tracking_id.fillna("").str.lower().str.strip()\
+        .str.replace(r"\n", "", regex=True)\
+        .str.replace(r"\'", "", regex=True)\
+        .str.replace(r"case ?#?:? ?n?", "", regex=True)
+    return df
+
 def drop_rows_missing_names(df):
     return df[~((df.last_name.fillna("") == ""))]
 
@@ -271,6 +278,7 @@ def clean_reports_2020():
         .pipe(extract_and_split_names_2020)
         .pipe(clean_report_subject)
         .pipe(extract_allegation_and_disposition)
+        .pipe(clean_tracking_id)
         .pipe(clean_names, ["first_name", "last_name"])
         .pipe(set_values, {"agency": "louisiana-state-pd"})
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
