@@ -95,6 +95,10 @@ def sanitize_letter_dates(df):
     return df.drop(columns=["notification_date"])
 
 
+def drop_rows_missing_letter_subjects(df):
+    return df[~((df.letter_subject.fillna("") == ""))]
+
+
 def join_multiple_extracted_entity_cols(df):
     allegation_cols = [
         "allegation",
@@ -249,6 +253,7 @@ def clean_letters_2019():
         .pipe(extract_ids_and_subject)
         .pipe(split_names)
         .pipe(sanitize_letter_dates)
+        .pipe(drop_rows_missing_letter_subjects)
         .pipe(clean_names, ["first_name", "last_name"])
         .pipe(set_values, {"agency": "louisiana-state-pd"})
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
