@@ -428,6 +428,23 @@ def clean_action15(df):
         .str.replace(r"\bda\b", "district attorney", regex=True)
         .str.replace(r"universitvgames for", "university games", regex=False)
         .str.replace(r"\"", "", regex=True)
+        .str.replace(r"^none$", "", regex=True)
+        .str.replace(r"retrair", "retrain", regex=False)
+        .str.replace(
+            r"^deputy chose to resign instead of submitting to a polygrpah exam$",
+            "resignation in lieu of polygraph exam",
+            regex=True,
+        )
+        .str.replace(r" $", "", regex=True)
+        .str.replace(r"no action taken(.+)?", "", regex=True)
+        .str.replace(r"^unfounded$", "", regex=True)
+        .str.replace(r"suspension loss", "suspension;loss", regex=False)
+        .str.replace(r"^(cadarette was |deputy was )", "", regex=True)
+        .str.replace(
+            r"^terminated;turned over to detectives$",
+            "termination;turned over to detectives",
+            regex=True,
+        )
     )
     return df.drop(columns=["action_taken"])
 
@@ -549,7 +566,7 @@ def clean15():
             columns={
                 "file_number": "tracking_id",
                 "badge": "badge_no",
-                "date_acquired_rank": "rank_acquired_date",
+                "date_acquired_rank": "rank_date",
             }
         )
         .pipe(split_dates_and_time15)
@@ -561,7 +578,7 @@ def clean15():
         .pipe(clean_action15)
         .pipe(clean_races, ["race"])
         .pipe(clean_sexes, ["sex"])
-        .pipe(clean_dates, ["occur_date", "receive_date"])
+        .pipe(clean_dates, ["occur_date", "receive_date", "rank_date"])
         .pipe(
             standardize_desc_cols,
             ["tracking_id", "badge_no", "birth_year", "disposition"],

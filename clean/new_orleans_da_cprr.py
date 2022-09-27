@@ -30,7 +30,7 @@ def split_names(df):
         df.suffix.fillna(""), sep=" "
     )
     df.loc[:, "last_name"] = df.last_name.str.replace(r" +$", "", regex=True)
-    return df.drop(columns=["suffix"])[~((df.last_name.fillna("") == ""))]
+    return df.drop(columns=["suffix", "officer"])[~((df.last_name.fillna("") == ""))]
 
 
 def clean_complainant_type(df):

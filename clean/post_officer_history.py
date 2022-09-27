@@ -149,24 +149,17 @@ def clean_agency_pre_split(df):
     return df[~((df.agency == ""))]
 
 
-def split_agency_column(df):
-    data = (
-        df.agency.fillna("")
-        .str.lower()
-        .str.strip()
-        .str.extract(
-            r"(\w+? ?\w+? ? ?\w+? ?\w+? ? ?\w+?) ?(?:(full-time|reserve|retired|part-time|deceased?) )? "
-            r"?(\w{1,2}\/\w{1,2}\/\w{4}) ?(\w{1,2}\/\w{1,2}\/\w{4})? ?((.+)?termi?n?a?t?i?o?n?(.+)?|"
-            r"(.+)?resig(nation|ned)(.+)?|(.+)?(retired)(.+)?)?(.+)?$"
-        )
+def split_agency(df):
+    terms = df.agency.str.extract(
+        r"( ?termination ?| ?resignation ?| ?involuntary resignation ?| ?volu[mn]tary resignation ?)"
     )
+    df.loc[:, "left_reason"] = terms[0].fillna("")
 
-    df.loc[:, "agency"] = data[0]
-    df.loc[:, "employment_status"] = data[1].str.replace(
-        r"^decease$", "deceased", regex=True
+    dates = df.agency.str.extract(
+        r"(\w{1,2}\/\w{1,2}\/\w{4}) ?(\w{1,2}\/\w{1,2}\/\w{4})?"
     )
     df.loc[:, "hire_date"] = (
-        data[2]
+        dates[0]
         .fillna("")
         .str.replace(r"^d(\w{1})", r"\1", regex=True)
         .str.replace(r"^0\/(.+)", "", regex=True)
@@ -177,18 +170,36 @@ def split_agency_column(df):
         .str.replace(r"(.+)?[a-z](.+)?", "", regex=True)
         .str.replace(r"(.+)?(_|\,|&|-)(.+)?", "", regex=True)
     )
-
     df.loc[:, "left_date"] = (
-        data[3]
+        dates[1]
         .fillna("")
         .str.replace(r"(.+)(_|\,|&|-)(.+)?", "", regex=True)
         .str.replace(r"^0\/(.+)", "", regex=True)
         .str.replace(r"^7/51/2020", "", regex=True)
         .str.replace(r"(.+)?[a-z](.+)?", "", regex=True)
     )
-    df.loc[:, "left_reason"] = data[4].fillna("")
 
-    return df[~((df.hire_date == ""))]
+    bio = df.agency.str.extract(
+        r"^(\w+? ?\w+? ? ?\w+? ?\w+? ? ?\w+?) (full-time|reserve|retired|part-time|deceased?)"
+    )
+    df.loc[:, "agency"] = bio[0]
+    df.loc[:, "employment_status"] = bio[1].str.replace(
+        r"^decease$", "deceased", regex=True
+    )
+    return df[~((df.hire_date.fillna("") == ""))]
+
+
+def clean_left_reason(df):
+    l_reasons = (
+        df.left_reason.str.replace(r"volumtary", "voluntary", regex=False)
+        .str.replace(r"(\||=|_)", "", regex=True)
+        .str.extract(
+            r"( ?termination ?| ?involuntary resignation ?| ?voluntary resignation ?| ?resignation ?)"
+        )
+    )
+
+    df.loc[:, "left_reason"] = l_reasons[0].str.replace(r"^ ", "", regex=True)
+    return df
 
 
 def clean_agency(df):
@@ -303,6 +314,7 @@ def clean_agency(df):
         .str.replace(r"^Dillard$", "Dillard University PD", regex=True)
         .str.replace(r"^Bunice PD", "Eunice PD", regex=True)
         .str.replace(r"^New Orleans Da Office$", "New Orleans DA", regex=True)
+        .str.replace(r"Stbernard", r"St Bernard", regex=True)
     )
     return df
 
@@ -376,24 +388,11 @@ def convert_agency_to_slug(df):
         .str.replace(r"^ng-oaparish-so$", "", regex=True)
         .str.replace(r"^vermilion-s?o$", "", regex=True)
     )
-    return df
-
-
-def clean_left_reason(df):
-    l_reasons = (
-        df.left_reason.str.replace(r"volumtary", "voluntary", regex=False)
-        .str.replace(r"(\||=|_)", "", regex=True)
-        .str.extract(
-            r"( ?termination ?| ?involuntary resignation ?| ?voluntary resignation ?| ?resignation ?)"
-        )
-    )
-
-    df.loc[:, "left_reason"] = l_reasons[0].str.replace(r"^ ", "", regex=True)
-    return df
+    return df[~((df.agency.fillna("") == ""))]
 
 
 def drop_duplicates(df):
-    return df.drop_duplicates(subset="uid")
+    return df.drop_duplicates(subset="uid", keep="first")
 
 
 def check_for_duplicate_uids(df):
@@ -406,16 +405,12 @@ def check_for_duplicate_uids(df):
         else:
             raise ValueError("uid found in multiple history ids")
 
-    return df[~((df.agency.fillna("") == ""))]
+    return df
 
 
 def switched_job(df):
     df.loc[:, "switched_job"] = df.duplicated(subset=["history_id"], keep=False)
     return df
-
-
-def drop_rows_missing_history_id(df):
-    return df[~(df.history_id.fillna("") == "")]
 
 
 def clean():
@@ -433,7 +428,8 @@ def clean():
         .pipe(generate_history_id)
         .pipe(split_names)
         .pipe(clean_agency_pre_split)
-        .pipe(split_agency_column)
+        .pipe(split_agency)
+        .pipe(clean_left_reason)
         .pipe(
             names_to_title_case,
             [
@@ -441,12 +437,11 @@ def clean():
             ],
         )
         .pipe(clean_agency)
-        .pipe(clean_left_reason)
+        .pipe(convert_agency_to_slug)
         .pipe(gen_uid, ["first_name", "last_name", "middle_name", "agency"])
         .pipe(drop_duplicates)
         .pipe(check_for_duplicate_uids)
         .pipe(switched_job)
-        .pipe(convert_agency_to_slug)
         .pipe(set_values, {"source_agency": "post"})
         .pipe(standardize_desc_cols, ["agency"])
     )
