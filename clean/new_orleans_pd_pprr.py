@@ -88,6 +88,11 @@ def clean_emp_id_csd(df):
     return df
 
 
+def clean_badge_no(df):
+    df.loc[:, "badge_no"] = df.badge_number.str.replace(r"^00", "", regex=True)
+    return df.drop(columns=["badge_number"])
+
+
 def drop_rows_missing_names(df):
     return df[~((df.first_name.fillna("") == ""))]
 
@@ -220,9 +225,9 @@ def clean():
                 "race_ethnicity": "race",
                 "gender": "sex",
                 "annual_rate_job_dta": "salary",
-                "badge_number": "badge_no",
             }
         )
+        .pipe(clean_badge_no)
         .pipe(clean_dates, ["hire_date", "rehire_date"])
         .pipe(clean_department_desc)
         .pipe(clean_rank_desc)
