@@ -13,11 +13,16 @@ def fuse_events(cprr_15, cprr_18, cprr_21, post):
         {
             events.COMPLAINT_RECEIVE: {
                 "prefix": "receive",
-                "keep": ["uid", "agency", "allegation_uid"],
+                "keep": ["uid", "agency", "allegation_uid","badge_no", "rank_desc"],
             },
             events.COMPLAINT_INCIDENT: {
                 "prefix": "occur",
-                "keep": ["uid", "agency", "allegation_uid"],
+                "keep": ["uid", "agency", "allegation_uid", "badge_no", "rank_desc"],
+            },
+            events.OFFICER_RANK: {
+                "prefix": "rank",
+                "keep": ["uid", "agency", "badge_no", "rank_desc"],
+                "id_cols": ["uid"],
             },
         },
         ["uid", "allegation_uid"],
@@ -32,7 +37,7 @@ def fuse_events(cprr_15, cprr_18, cprr_21, post):
             },
             events.COMPLAINT_INCIDENT: {
                 "prefix": "occur",
-                "keep": ["uid", "agency", "allegation_uid"],
+                "keep": ["uid", "agency", "allegation_uid", "badge_no", "rank_desc"],
             },
         },
         ["uid", "allegation_uid"],
@@ -47,7 +52,7 @@ def fuse_events(cprr_15, cprr_18, cprr_21, post):
             },
             events.COMPLAINT_INCIDENT: {
                 "prefix": "occur",
-                "keep": ["uid", "agency", "allegation_uid"],
+                "keep": ["uid", "agency", "allegation_uid", "badge_no", "rank_desc"],
             },
         },
         ["uid", "allegation_uid"],
