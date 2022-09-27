@@ -733,7 +733,6 @@ def assign_agency(df):
     return df
 
 
-
 def strip_leading_commas09(df):
     for col in df.columns:
         df = df.apply(lambda col: col.str.replace(r"\'", "", regex=True))
@@ -793,6 +792,7 @@ def clean_allegation09(df):
         .str.replace(r"carryi?ny?g?\b", "carrying", regex=True)
         .str.replace(r"prop$", "property", regex=True)
         .str.replace(r"^carry\b", "carrying", regex=True)
+        .str.replace(r"^coo$", "", regex=True)
     )
     return df.drop(columns=["complaint"])
 
@@ -856,6 +856,10 @@ def clean_disposition09(df):
             "resigned in lieu of pre-disciplinary",
             regex=True,
         )
+        .str.replace(r"termnation", "termination", regex=False)
+        .str.replace("resignation", "resigned", regex=True)
+        .str.replace(r"^terminated$", "termination", regex=True)
+        .str.replace(r"resigned-", "resigned; ", regex=False)
     )
     return df
 
@@ -864,6 +868,7 @@ def clean_action09(df):
     df.loc[:, "action"] = (
         df.action.str.lower()
         .str.strip()
+        .str.replace(r" \(60-day\)", "", regex=True)
         .str.replace(r" (\w{1,2}\/\w{1,2}\/\w{1,4})", "", regex=True)
         .str.replace(r"^sust(ained)?\.?\/?(.+)", r"\2", regex=True)
         .str.replace(r"(.+)terminated(.+)", "terminated", regex=True)
@@ -913,6 +918,10 @@ def clean_action09(df):
             "resigned in lieu of pre-disciplinary hearing",
             regex=True,
         )
+        .str.replace(r"\bterminated\b", "termination", regex=True)
+        .str.replace(r"\; ?$", "", regex=True)
+        .str.replace(r"^-$", "", regex=True)
+        .str.replace(r"(\w+)- (\w+)", r"\1-\2", regex=True)
     )
     return df
 
@@ -924,6 +933,39 @@ def assign_action09(df):
     df.loc[
         ((df.last_name == "johnson") & (df.occur_day == "27")), "action"
     ] = "3-day suspension"
+    df.loc[
+        ((df.last_name == "peoples") & (df.occur_day == "20")), "action"
+    ] = "termination"
+    df.loc[
+        ((df.last_name == "robinson") & (df.occur_day == "4")), "action"
+    ] = "termination"
+    df.loc[
+        ((df.last_name == "holmes") & (df.occur_day == "21")), "action"
+    ] = "termination"
+    df.loc[
+        ((df.last_name == "wall") & (df.occur_day == "6")), "action"
+    ] = "resigned in lieu of termination"
+    df.loc[
+        ((df.last_name == "wall") & (df.occur_day == "6")), "action"
+    ] = "resigned in lieu of termination"
+    df.loc[
+        ((df.last_name == "johnson") & (df.occur_day == "12")), "action"
+    ] = "resigned in lieu of termination"
+    df.loc[
+        ((df.last_name == "batiste") & (df.occur_day == "18")), "action"
+    ] = "resigned in lieu of pre-disciplinary"
+    df.loc[((df.last_name == "duclo") & (df.occur_day == "22")), "action"] = "resigned"
+    df.loc[
+        ((df.last_name == "jenkins") & (df.occur_day == "21")), "action"
+    ] = "resigned"
+    df.loc[((df.last_name == "honore") & (df.occur_day == "2")), "action"] = "resigned"
+    df.loc[
+        ((df.last_name == "mccloskey") & (df.occur_day == "7")), "action"
+    ] = "resigned"
+    df.loc[
+        ((df.last_name == "delaughter") & (df.occur_day == "23")), "action"
+    ] = "resigned"
+    df.loc[((df.last_name == "jones") & (df.occur_day == "15")), "action"] = "resigned"
     return df
 
 
@@ -955,6 +997,10 @@ def split_names09(df):
         .str.replace(r" civ\.", "", regex=True)
         .str.replace(r"sgt\.?", "sergeant", regex=True)
         .str.replace(r"^(\w\.) (\w+) (\w+)$", r"\2 \1 \3", regex=True)
+        .str.replace(r"unknown", "", regex=True)
+        .str.replace(r"car!", "carl", regex=False)
+        .str.replace(r"ed\.", "ed", regex=True)
+        .str.replace(r"^l\.", "", regex=True)
         .str.extract(
             r"(cpl\.?|lt\.?|sergeant|off?c?\.?|capt\.?|^co\b ?i?|det\.?|\bassi?s?t\.? chief\b|chief|reserve)? ?(\w+-?\w+|\w\.|\w\.\w\.) ?(\w+\.?)? (\w+-?\w+) ?(jr\.|sr\.|iii?)?$"
         )
@@ -980,8 +1026,7 @@ def split_names09(df):
     df.loc[:, "last_name"] = df.last_name.fillna("").str.cat(
         df.suffix.fillna(""), sep=" "
     )
-    return df.drop(columns=["officer_name", "suffix"])
-
+    return df.drop(columns=["suffix"])
 
 
 def clean_18():
@@ -1199,9 +1244,7 @@ def clean_21():
 
 def clean09():
     df = (
-        pd.read_csv(
-            deba.data("raw/baton_rouge_pd/baton_rouge_pd_cprr_2004_2009.csv")
-        )
+        pd.read_csv(deba.data("raw/baton_rouge_pd/baton_rouge_pd_cprr_2004_2009.csv"))
         .pipe(clean_column_names)
         .rename(columns={"ia_year": "investigation_year"})
         .pipe(strip_leading_commas09)
@@ -1216,7 +1259,10 @@ def clean09():
         .pipe(split_rows_with_multiple_officers09)
         .pipe(split_names09)
         .pipe(clean_names, ["first_name", "middle_name", "last_name"])
-        .pipe(clean_dates, ["occur_date", "receive_date", "resignation_date", "termination_date"])
+        .pipe(
+            clean_dates,
+            ["occur_date", "receive_date", "resignation_date", "termination_date"],
+        )
         .pipe(assign_action09)
         .pipe(
             standardize_desc_cols,
@@ -1230,7 +1276,21 @@ def clean09():
         )
         .pipe(set_values, {"agency": "baton-rouge-pd"})
         .pipe(gen_uid, ["first_name", "last_name", "middle_name", "agency"])
-        .pipe(gen_uid, ["action", "allegation_desc", "allegation", "investigation_status", "disposition", "occur_day", "occur_year", "occur_month", "uid", ], "allegation_uid")
+        .pipe(
+            gen_uid,
+            [
+                "action",
+                "allegation_desc",
+                "allegation",
+                "investigation_status",
+                "disposition",
+                "occur_day",
+                "occur_year",
+                "occur_month",
+                "uid",
+            ],
+            "allegation_uid",
+        )
         .drop_duplicates(subset=["allegation_uid"])
     )
     return df
