@@ -534,9 +534,11 @@ schemas:
           unique identifier of case
       - name: case_number
       - name: case_name
-      - name: case_status
+      - name: claim_status
       - name: settlement_amount
       - name: original_judgment_principal
+      - name: check_date
+      - name: final_judgement_date
       - name: agency
 
 save_bad_rows_to: data/invalid_rows.csv
