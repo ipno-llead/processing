@@ -7,6 +7,8 @@ from lib.columns import (
     rearrange_event_columns,
 )
 from lib import events
+from lib.personnel import fuse_personnel
+from lib.post import load_for_agency
 
 
 def fuse_events(pprr, cprr):
@@ -56,6 +58,8 @@ def fuse_events(pprr, cprr):
 
 if __name__ == "__main__":
     pprr = pd.read_csv(deba.data("clean/pprr_ponchatoula_pd_2010_2020.csv"))
+    agency = pprr.agency[0]
+    post = load_for_agency(agency)
     cprr = pd.read_csv(deba.data("match/cprr_ponchatoula_pd_2010_2020.csv"))
     post_event = pd.read_csv(deba.data("match/post_event_ponchatoula_pd_2020.csv"))
     cprr_post_events = pd.read_csv(
@@ -65,6 +69,7 @@ if __name__ == "__main__":
         pd.concat([fuse_events(pprr, cprr), post_event, cprr_post_events])
     )
     per_df = rearrange_personnel_columns(pprr)
+    per_df = fuse_personnel(per_df, post)
     per_df.to_csv(deba.data("fuse/per_ponchatoula_pd.csv"), index=False)
     com_df = rearrange_allegation_columns(cprr)
     com_df.to_csv(deba.data("fuse/com_ponchatoula_pd.csv"), index=False)

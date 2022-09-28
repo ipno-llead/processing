@@ -4,6 +4,7 @@ import deba
 from lib.columns import rearrange_event_columns
 from lib.personnel import fuse_personnel
 from lib import events
+from lib.post import load_for_agency
 
 
 def fuse_events(pprr):
@@ -41,8 +42,10 @@ def fuse_events(pprr):
 
 if __name__ == "__main__":
     pprr_csd = pd.read_csv(deba.data("clean/pprr_slidell_csd_2010_2019.csv"))
+    agency = pprr_csd.agency[0]
+    post = load_for_agency(agency)
     post_event = pd.read_csv(deba.data("match/post_event_slidell_pd_2020.csv"))
     events_df = rearrange_event_columns(pd.concat([post_event, fuse_events(pprr_csd)]))
-    per_df = fuse_personnel(pprr_csd)
+    per_df = fuse_personnel(pprr_csd, post)
     per_df.to_csv(deba.data("fuse/per_slidell_pd.csv"), index=False)
     events_df.to_csv(deba.data("fuse/event_slidell_pd.csv"), index=False)

@@ -7,6 +7,7 @@ from lib.columns import (
     rearrange_appeal_hearing_columns,
 )
 from lib import events
+from lib.post import load_for_agency
 
 
 def fuse_events(csd_pprr_17, csd_pprr_19, cprr_18, cprr_21, cprr_09):
@@ -113,6 +114,8 @@ if __name__ == "__main__":
     cprr_18 = pd.read_csv(deba.data("match/cprr_baton_rouge_pd_2018.csv"))
     cprr_21 = pd.read_csv(deba.data("match/cprr_baton_rouge_pd_2021.csv"))
     pprr = pd.read_csv(deba.data("match/pprr_baton_rouge_pd_2021.csv"))
+    agency = pprr.agency[0]
+    post = load_for_agency(agency)
     cprr_09 = pd.read_csv(deba.data("match/cprr_baton_rouge_pd_2004_2009.csv"))
     
     # limit csd data to just officers found in PD roster
@@ -128,7 +131,8 @@ if __name__ == "__main__":
         csd_pprr_19.drop_duplicates(subset="uid", keep="last"),
         cprr_18,
         cprr_21,
-        cprr_09
+        cprr_09,
+        post
     )
 
     events_df = fuse_events(csd_pprr_17, csd_pprr_19, cprr_18, cprr_21, cprr_09)

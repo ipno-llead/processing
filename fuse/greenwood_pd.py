@@ -1,8 +1,10 @@
 from lib.columns import rearrange_allegation_columns, rearrange_personnel_columns
 import deba
+from lib.personnel import fuse_personnel
 from lib.post import load_for_agency
 from lib import events
 import pandas as pd
+from lib.post import load_for_agency
 
 
 def fuse_events(cprr, post):
@@ -45,7 +47,10 @@ if __name__ == "__main__":
     cprr = pd.read_csv(deba.data("clean/cprr_greenwood_pd_2015_2020.csv"))
     agency = cprr.agency[0]
     post = load_for_agency(agency)
+    agency = cprr.agency[0]
+    post = load_for_agency(agency)
     per = rearrange_personnel_columns(post)
+    per = fuse_personnel(per, post)
     com = rearrange_allegation_columns(cprr)
     event = fuse_events(cprr, post)
     per.to_csv(deba.data("fuse/per_greenwood_pd.csv"), index=False)
