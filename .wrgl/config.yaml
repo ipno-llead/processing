@@ -972,6 +972,12 @@ branch:
     file: data/fuse/brady_ouachita_da.csv
     primaryKey:
       - brady_uid
+  brady-iberia-da:
+    remote: origin
+    merge: refs/heads/brady-iberia-da
+    file: data/fuse/brady_iberia_da.csv
+    primaryKey:
+      - brady_uid
   per-eunice-pd:
     remote: origin
     merge: refs/heads/per-eunice-pd
