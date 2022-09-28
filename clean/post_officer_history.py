@@ -571,6 +571,9 @@ def convert_agency_to_slug(df):
         .str.replace(
             r"shreveport-city-marshall", "shreveport-city-marshal", regex=False
         )
+        .str.replace(r"^jefferson$", "jefferson-so", regex=True)
+        .str.replace(r"^sulphur-city-marshall$", "sulphur-city-marshal", regex=True)
+        .str.replace(r"^natchitoches$", "natchitoches-so", regex=True)
     )
     return df[~((df.agency.fillna("") == ""))]
 
