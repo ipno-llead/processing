@@ -568,6 +568,7 @@ def convert_agency_to_slug(df):
         .str.replace(r"ponc-louisiana-pd", "", regex=False)
         .str.replace(r"pox-louisiana-pd", "", regex=False)
         .str.replace(r"university-pd-uno", "uno-university-pd", regex=False)
+        .str.replace(r"shreveport-city-marshall", "shreveport-city-marshal", regex=False)
     )
     return df[~((df.agency.fillna("") == ""))]
 
@@ -593,6 +594,9 @@ def switched_job(df):
     df.loc[:, "switched_job"] = df.duplicated(subset=["history_id"], keep=False)
     return df
 
+def search(df):
+    df = df[df.agency.str.contains("marshall")]
+    return df
 
 def clean():
     dfa = pd.read_csv(deba.data("ner/advocate_post_officer_history_reports.csv"))
@@ -626,6 +630,7 @@ def clean():
         .pipe(switched_job)
         .pipe(set_values, {"source_agency": "post"})
         .pipe(standardize_desc_cols, ["agency"])
+        .pipe(search)
     )
     return df
 
