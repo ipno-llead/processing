@@ -560,7 +560,6 @@ def convert_agency_to_slug(df):
         .str.replace(r"^tangipaho-s-so$", "tangipahoa-so", regex=True)
         .str.replace(r"1-nc-oula-pd", "", regex=False)
         .str.replace(r"atio-generals-office", "attorney-generals-office", regex=False)
-        .str.replace(r"barksdale-afb", "", regex=False)
         .str.replace(r"bossier-parishso", "bossier-so", regex=False)
         .str.replace(
             r"lsu-university-pdhscno", "lsuhsc-new-orleans-university-pd", regex=False
