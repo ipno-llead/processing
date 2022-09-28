@@ -494,36 +494,81 @@ def convert_agency_to_slug(df):
         .str.replace(r"^ng-oaparish-so$", "", regex=True)
         .str.replace(r"^vermilion-s?o$", "", regex=True)
         .str.replace(r"^(\w+)-district-attorney", r"\1-da", regex=True)
-        .str.replace(r"medical-centerla-new-orleans-pd", "medical-center-of-louisiana-new-orleans-pd", regex=False)
+        .str.replace(
+            r"medical-centerla-new-orleans-pd",
+            "medical-center-of-louisiana-new-orleans-pd",
+            regex=False,
+        )
         .str.replace(r"hama-pd", "", regex=False)
         .str.replace(r"university-pd-lsu", "lsu-university-pd", regex=False)
-        .str.replace(r"^lsuhsc-university-pd-new-orleans-pd$", "lsuhsc-new-orleans-university-pd", regex=True)
-        .str.replace(r"city-park-pd-new-orleans-pd", "new-orleans-city-park-pd", regex=False)
+        .str.replace(
+            r"^lsuhsc-university-pd-new-orleans-pd$",
+            "lsuhsc-new-orleans-university-pd",
+            regex=True,
+        )
+        .str.replace(
+            r"city-park-pd-new-orleans-pd", "new-orleans-city-park-pd", regex=False
+        )
         .str.replace(r"university-pdbaton-rouge", "", regex=False)
         .str.replace(r"lasupreme-court", "louisiana-supreme-court", regex=False)
         .str.replace(r"crowley-pp", "crowley-pd", regex=False)
         .str.replace(r"university-pdnsu", "", regex=False)
         .str.replace(r"^new-orleans-p$", "new-orleans-pd", regex=True)
         .str.replace(r"lastate-museum-pd", "louisiana-state-museum-pd", regex=False)
-        .str.replace(r"louisiana-state-museum-fd", "louisiana-state-museum-pd", regex=False)
-        .str.replace(r"^university-pdlsusc-new-orleans-pd$", "lsuhsc-new-orleans-university-pd", regex=True)
-        .str.replace(r"university-pddelgado-ce", "delgado-community-college-university-pd", regex=False)
-        .str.replace(r"officeinspector-general", "louisiana-office-of-inspector-general", regex=False)
-        .str.replace(r"university-pdsouthernbr", "southern-br-university-pd", regex=False)
-        .str.replace(r"university-pdlsushreveport", "lsuhsc-shreveport-university-pd", regex=False)
+        .str.replace(
+            r"louisiana-state-museum-fd", "louisiana-state-museum-pd", regex=False
+        )
+        .str.replace(
+            r"^university-pdlsusc-new-orleans-pd$",
+            "lsuhsc-new-orleans-university-pd",
+            regex=True,
+        )
+        .str.replace(
+            r"university-pddelgado-ce",
+            "delgado-community-college-university-pd",
+            regex=False,
+        )
+        .str.replace(
+            r"officeinspector-general",
+            "louisiana-office-of-inspector-general",
+            regex=False,
+        )
+        .str.replace(
+            r"university-pdsouthernbr", "southern-br-university-pd", regex=False
+        )
+        .str.replace(
+            r"university-pdlsushreveport",
+            "lsuhsc-shreveport-university-pd",
+            regex=False,
+        )
         .str.replace(r"university-pdcentenary", "", regex=False)
         .str.replace(r"bossier-cc", "", regex=False)
-        .str.replace(r"new-orleans-criminal-court", "orleans-criminal-court", regex=False)
-        .str.replace(r"shreveport-city-marshal", "shreveport-city-marshall", regex=False)
+        .str.replace(
+            r"new-orleans-criminal-court", "orleans-criminal-court", regex=False
+        )
+        .str.replace(
+            r"shreveport-city-marshal", "shreveport-city-marshall", regex=False
+        )
         .str.replace(r"juvenile-servicesbr", "juvenile-services-br", regex=False)
         .str.replace(r"new-orleans-po", "", regex=False)
         .str.replace(r"stjoin-so", "st-john-so", regex=False)
         .str.replace(r"outstare", "out-of-state", regex=False)
         .str.replace(r"tepferson-so", "", regex=False)
-        .str.replace(r"jbfferson-o", "jefferson-so", regex=False)
+        .str.replace(r"j[eb]fferson-o", "jefferson-so", regex=True)
         .str.replace(r"washington-paristi-so", "washington-so", regex=False)
         .str.replace(r"st-martinso", "st-martin-so", regex=False)
         .str.replace(r"^tangipaho-s-so$", "tangipahoa-so", regex=True)
+        .str.replace(r"1-nc-oula-pd", "", regex=False)
+        .str.replace(r"atio-generals-office", "attorney-generals-office", regex=False)
+        .str.replace(r"barksdale-afb", "", regex=False)
+        .str.replace(r"bossier-parishso", "bossier-parish-so", regex=False)
+        .str.replace(
+            r"lsu-university-pdhscno", "lsuhsc-new-orleans-university-pd", regex=False
+        )
+        .str.replace(r"p-d$", "pd", regex=True)
+        .str.replace(r"ponc-louisiana-pd", "ponc-louisiana-pd", regex=False)
+        .str.replace(r"ponc-louisiana-pd", "", regex=False)
+        .str.replace(r"university-pd-uno", "uno-university-pd", regex=False)
     )
     return df[~((df.agency.fillna("") == ""))]
 
