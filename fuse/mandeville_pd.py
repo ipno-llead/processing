@@ -3,6 +3,7 @@ from lib.columns import rearrange_allegation_columns, rearrange_event_columns
 import deba
 from lib.personnel import fuse_personnel
 import pandas as pd
+from lib.post import load_for_agency
 
 
 def fuse_events(cprr, pprr):
@@ -58,11 +59,13 @@ def fuse_events(cprr, pprr):
 
 if __name__ == "__main__":
     pprr = pd.read_csv(deba.data("clean/pprr_mandeville_csd_2020.csv"))
+    agency = pprr.agency[0]
+    post = load_for_agency(agency)
     post_event = pd.read_csv(deba.data("match/post_event_mandeville_pd_2019.csv"))
     cprr = pd.read_csv(deba.data("match/cprr_mandeville_pd_2019.csv"))
     events_df = fuse_events(cprr, pprr)
     events_df = rearrange_event_columns(pd.concat([post_event, events_df]))
-    per_df = fuse_personnel(pprr, cprr)
+    per_df = fuse_personnel(pprr, cprr, post)
     com_df = rearrange_allegation_columns(cprr)
     events_df.to_csv(deba.data("fuse/event_mandeville_pd.csv"), index=False)
     com_df.to_csv(deba.data("fuse/com_mandeville_pd.csv"), index=False)
