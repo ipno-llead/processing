@@ -561,13 +561,13 @@ def convert_agency_to_slug(df):
         .str.replace(r"1-nc-oula-pd", "", regex=False)
         .str.replace(r"atio-generals-office", "attorney-generals-office", regex=False)
         .str.replace(r"barksdale-afb", "", regex=False)
-        .str.replace(r"bossier-parishso", "bossier-parish-so", regex=False)
+        .str.replace(r"bossier-parishso", "bossier-so", regex=False)
         .str.replace(
             r"lsu-university-pdhscno", "lsuhsc-new-orleans-university-pd", regex=False
         )
         .str.replace(r"p-d$", "pd", regex=True)
-        .str.replace(r"ponc-louisiana-pd", "ponc-louisiana-pd", regex=False)
         .str.replace(r"ponc-louisiana-pd", "", regex=False)
+        .str.replace(r"pox-louisiana-pd", "", regex=False)
         .str.replace(r"university-pd-uno", "uno-university-pd", regex=False)
     )
     return df[~((df.agency.fillna("") == ""))]
