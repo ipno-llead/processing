@@ -14,6 +14,7 @@ from lib.columns import (
 from lib.clean import float_to_int_str
 from lib.personnel import fuse_personnel
 from lib import events
+from lib.post import load_for_agency
 
 
 def fuse_events(
@@ -263,6 +264,8 @@ def fuse_events(
 
 if __name__ == "__main__":
     pprr = pd.read_csv(deba.data("clean/pprr_new_orleans_pd_2020.csv"))
+    agency = pprr.agency[0]
+    post = load_for_agency(agency)
     pprr_csd = pd.read_csv(deba.data("match/pprr_new_orleans_csd_2014.csv"))
     uof_officers = pd.read_csv(
         deba.data("clean/uof_officers_new_orleans_pd_2016_2021.csv")

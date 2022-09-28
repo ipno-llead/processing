@@ -4,6 +4,7 @@ import deba
 from lib.columns import rearrange_allegation_columns, rearrange_event_columns
 from lib.personnel import fuse_personnel
 from lib import events
+from lib.post import load_for_agency
 
 
 def fuse_events(cprr19, cprr20, pprr):
@@ -97,7 +98,9 @@ if __name__ == "__main__":
     cprr19 = pd.read_csv(deba.data("match/cprr_new_orleans_so_2019.csv"))
     cprr20 = pd.read_csv(deba.data("match/cprr_new_orleans_so_2020.csv"))
     pprr = pd.read_csv(deba.data("clean/pprr_new_orleans_so_2021.csv"))
-    personnel_df = fuse_personnel(cprr20, cprr19, pprr)
+    agency = pprr.agency[0]
+    post = load_for_agency(agency)
+    personnel_df = fuse_personnel(cprr20, cprr19, pprr, post)
     events_df = fuse_events(cprr19, cprr20, pprr)
     events_df = rearrange_event_columns(pd.concat([post_events, events_df]))
     complaint_df = rearrange_allegation_columns(pd.concat([cprr19, cprr20]))
