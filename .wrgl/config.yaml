@@ -927,7 +927,7 @@ branch:
   per-post:
     remote: origin
     merge: refs/heads/per-post
-    file: data/fuse/personnel_post.csv
+    file: data/fuse/per_post.csv
     primaryKey:
       - uid
   per-acadia-so:
