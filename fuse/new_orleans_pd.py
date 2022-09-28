@@ -300,6 +300,7 @@ if __name__ == "__main__":
         pprr_separations,
         cprr,
         pib,
+        post
     )
     events_df = fuse_events(
         pprr,
