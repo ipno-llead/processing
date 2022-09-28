@@ -66,7 +66,7 @@ if __name__ == "__main__":
     post = load_for_agency(agency)
     post_event = pd.read_csv(deba.data("match/post_event_bossier_city_pd.csv"))
     cprr = pd.read_csv(deba.data("match/cprr_bossier_city_pd_2020.csv"))
-    per_df = fuse_personnel(pprr, cprr)
+    per_df = fuse_personnel(pprr, cprr, post)
     com_df = rearrange_allegation_columns(cprr)
     events_df = fuse_events(pprr, cprr)
     events_df = rearrange_event_columns(
