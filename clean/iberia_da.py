@@ -16,7 +16,7 @@ def split_names(df):
 
 def clean():
     df = (
-        pd.read_csv(deba.data("raw/iberia_da/iberia_da_brady_2022.csv"))
+        pd.read_csv(deba.data("raw/iberia_da/brady_iberia_da_2022.csv"))
         .pipe(clean_column_names)
         .pipe(split_names)
         .pipe(clean_names, ["first_name", "last_name"])
