@@ -960,12 +960,6 @@ branch:
     file: data/fuse/brady_baton_rouge_da.csv
     primaryKey:
       - brady_uid
-  brady-orleans-da:
-    remote: origin
-    merge: refs/heads/brady-orleans-da
-    file: data/fuse/brady_orleans_da.csv
-    primaryKey:
-      - brady_uid
   brady-ouachita-da:
     remote: origin
     merge: refs/heads/brady-ouachita-da
@@ -976,6 +970,12 @@ branch:
     remote: origin
     merge: refs/heads/brady-iberia-da
     file: data/fuse/brady_iberia_da.csv
+    primaryKey:
+      - brady_uid
+  brady-tangipahoa-da:
+    remote: origin
+    merge: refs/heads/brady-tangipahoa-da
+    file: data/fuse/brady_tangipahoa_da.csv
     primaryKey:
       - brady_uid
   per-eunice-pd:

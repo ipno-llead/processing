@@ -230,6 +230,7 @@ schemas:
           - claim_receive
           - claim_occur
           - claim_closed
+          - brady_list
         no_na: true
       - name: year
         integer: true
@@ -328,6 +329,8 @@ schemas:
         description: >
           narrative summary of the officer's reason for leaving
       - name: years_of_service
+      - name: source_agency
+      - name: brady_uid
     validation_tasks:
       - name: event dates should be valid
         valid_date:

@@ -150,6 +150,7 @@ def fuse_event():
                 pd.read_csv(deba.data("fuse/event_natchitoches_so.csv")),
                 pd.read_csv(deba.data("fuse/event_harahan_pd.csv")),
                 pd.read_csv(deba.data("fuse/event_ouachita_da.csv")),
+                pd.read_csv(deba.data("fuse/event_baton_rouge_da.csv")),
             ]
         )
     ).sort_values(["agency", "event_uid"], ignore_index=True)
@@ -296,9 +297,9 @@ def fuse_brady():
         pd.concat(
             [
                 pd.read_csv(deba.data("fuse/brady_baton_rouge_da.csv")),
-                pd.read_csv(deba.data("fuse/brady_orleans_da.csv")),
                 pd.read_csv(deba.data("fuse/brady_ouachita_da.csv")),
                 pd.read_csv(deba.data("fuse/brady_iberia_da.csv")),
+                pd.read_csv(deba.data("fuse/brady_tangipahoa_da.csv")),
             ]
         )
     ).sort_values("brady_uid", ignore_index=True)
