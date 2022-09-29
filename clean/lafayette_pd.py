@@ -715,8 +715,8 @@ def clean_disposition_14(df):
     return standardize_from_lookup_table(df, "disposition", disposition_14_lookup)
 
 
-def clean_charges_14(df):
-    df.loc[:, "charges"] = (
+def clean_allegation_14(df):
+    df.loc[:, "allegation"] = (
         df.complaint.str.lower()
         .str.strip()
         .fillna("")
@@ -742,14 +742,14 @@ def clean_charges_14(df):
     return df.drop(columns="complaint")
 
 
-def split_rows_with_multiple_charges_14(df):
+def split_rows_with_multiple_allegations_14(df):
     i = 0
-    for idx in df[df.charges.str.contains(r"/")].index:
-        s = df.loc[idx + i, "charges"]
+    for idx in df[df.allegation.str.contains(r"/")].index:
+        s = df.loc[idx + i, "allegation"]
         parts = re.split(r"\s*(?:/)\s*", s)
         df = duplicate_row(df, idx + i, len(parts))
         for j, name in enumerate(parts):
-            df.loc[idx + i + j, "charges"] = name
+            df.loc[idx + i + j, "allegation"] = name
         i += len(parts) - 1
     return df
 
@@ -863,11 +863,11 @@ def split_names_14(df):
         .str.replace(r"\(\(?|\)\)?", "", regex=True)
         .str.replace("cid", "criminal investigations", regex=False)
     )
-    return df
+    return df.drop(columns=["focus_officer_s"])
 
 
-def drop_rows_missing_charges_disposition_and_action_14(df):
-    return df[~((df.charges == "") & (df.action == "") & (df.disposition == ""))]
+def drop_rows_missing_allegation_disposition_and_action_14(df):
+    return df[~((df.allegation == "") & (df.action == "") & (df.disposition == ""))]
 
 
 def assign_correct_actions_14(df):
@@ -938,7 +938,7 @@ def assign_correct_actions_14(df):
         (
             (df.last_name == "bertrand")
             & (df.tracking_id == "2012-003")
-            & (df.charges == "insubordination")
+            & (df.allegation == "insubordination")
         ),
         "action",
     ] = ""
@@ -1028,7 +1028,7 @@ def assign_correct_disposition_14(df):
         (
             (df.last_name == "bertrand")
             & (df.tracking_id == "2012-003")
-            & (df.charges == "insubordination")
+            & (df.allegation == "insubordination")
         ),
         "disposition",
     ] = "unfounded"
@@ -1036,7 +1036,7 @@ def assign_correct_disposition_14(df):
         (
             (df.last_name == "bertrand")
             & (df.tracking_id == "2012-003")
-            & (df.charges == "rude and unprofessional")
+            & (df.allegation == "rude and unprofessional")
         ),
         "disposition",
     ] = "sustained"
@@ -1055,13 +1055,13 @@ def clean_cprr_14():
         .pipe(clean_and_split_investigator_14)
         .pipe(extract_action_from_disposition_14)
         .pipe(clean_disposition_14)
-        .pipe(clean_charges_14)
-        .pipe(split_rows_with_multiple_charges_14)
+        .pipe(clean_allegation_14)
+        .pipe(split_rows_with_multiple_allegations_14)
         .pipe(split_rows_with_multiple_names_14)
         .pipe(split_names_14)
         .pipe(assign_correct_actions_14)
         .pipe(assign_correct_disposition_14)
-        .pipe(drop_rows_missing_charges_disposition_and_action_14)
+        .pipe(drop_rows_missing_allegation_disposition_and_action_14)
         .pipe(set_values, {"agency": "lafayette-pd"})
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(
@@ -1071,7 +1071,7 @@ def clean_cprr_14():
         )
         .pipe(
             gen_uid,
-            ["uid", "charges", "action", "tracking_id", "disposition"],
+            ["uid", "allegation", "action", "tracking_id", "disposition"],
             "allegation_uid",
         )
         .pipe(drop_rows_missing_names)
