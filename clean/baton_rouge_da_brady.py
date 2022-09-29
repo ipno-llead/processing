@@ -72,7 +72,7 @@ def clean21():
         .pipe(clean_column_names)
         .pipe(clean_allegations)
         .pipe(extract_disposition)
-        .pipe(set_values, {"source_agency": "east-baton-rouge-da"})
+        .pipe(set_values, {"source_agency": "east-baton-rouge-da", "brady_date": "2/1/2021"})
         .rename(columns={"status": "action"})
     )
     return (
@@ -91,7 +91,7 @@ def clean18():
         .pipe(split_list18)
         .pipe(clean_names, ["first_name", "last_name"])
         .pipe(standardize_desc_cols, ["allegation_desc"])
-        .pipe(set_values, {"source_agency": "east-baton-rouge-da"})
+        .pipe(set_values, {"source_agency": "east-baton-rouge-da", "brady_date": "3/1/2018"})
         .pipe(gen_uid, ["agency", "first_name", "last_name"])
         .pipe(gen_uid, ["uid", "source_agency", "allegation_desc"], "brady_uid")
     )
