@@ -299,6 +299,7 @@ def fuse_brady():
                 pd.read_csv(deba.data("fuse/brady_orleans_da.csv")),
                 pd.read_csv(deba.data("fuse/brady_ouachita_da.csv")),
                 pd.read_csv(deba.data("fuse/brady_iberia_da.csv")),
+                pd.read_csv(deba.data("fuse/brady_tangipahoa_da.csv")),
             ]
         )
     ).sort_values("brady_uid", ignore_index=True)
