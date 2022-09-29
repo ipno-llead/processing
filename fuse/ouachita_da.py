@@ -14,7 +14,12 @@ def fuse_events(brady):
         {
             events.INVESTIGATION_COMPLETE: {
                 "prefix": "investigation_complete",
-                "keep": ["brady_uid", "agency"],
+                "keep": ["brady_uid", "agency", "source_ageny"],
+            },
+            events.BRADY_LIST: {
+                "prefix": "brady",
+                "parse_date": True,
+                "keep": ["uid", "brady_uid", "agency", "source_agency"],
             },
         },
         ["uid"],

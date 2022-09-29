@@ -76,7 +76,7 @@ def clean():
         .pipe(clean_action)
         .pipe(assign_agency)
         .pipe(clean_names, ["first_name", "middle_name", "last_name"])
-        .pipe(set_values, {"source_agency": "ouachita-da"})
+        .pipe(set_values, {"source_agency": "ouachita-da", "brady_date": "10/5/2021"})
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(gen_uid, ["uid", "source_agency"], "brady_uid")
     )

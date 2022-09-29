@@ -27,7 +27,7 @@ def match_brady_to_personnel(brady, post):
         dfa,
         dfb,
     )
-    decision = .967
+    decision = 1
     matcher.save_pairs_to_excel(
         deba.data("match/brady_tangipahoa_da_2021_v_post.xlsx"), decision
     )
@@ -42,3 +42,4 @@ if __name__ == "__main__":
     post = load_for_agency("tangipahoa-so")
     brady = pd.read_csv(deba.data("clean/brady_tangipahoa_da_2021.csv"))
     brady = match_brady_to_personnel(brady, post)
+    brady.to_csv(deba.data("match/brady_tangipahoa_da_2021.csv"), index=False)

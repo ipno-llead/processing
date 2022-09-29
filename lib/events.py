@@ -60,6 +60,8 @@ CLAIM_RECIEVE = "claim_receive"
 CLAIM_CLOSED = "claim_closed"
 CLAIM_OCCUR = "claim_occur"
 
+BRADY_LIST = "brady_list" # date on which we received a brady list (this date should be considered as of)
+
 
 event_cat_type = CategoricalDtype(
     categories=[
@@ -99,6 +101,7 @@ event_cat_type = CategoricalDtype(
         CLAIM_RECIEVE,
         CLAIM_CLOSED,
         CLAIM_OCCUR,
+        BRADY_LIST,
     ],
     ordered=True,
 )
