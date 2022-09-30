@@ -74,3 +74,4 @@ if __name__ == "__main__":
     com_df = rearrange_allegation_columns(cprr)
     com_df.to_csv(deba.data("fuse/com_ponchatoula_pd.csv"), index=False)
     event_df.to_csv(deba.data("fuse/event_ponchatoula_pd.csv"), index=False)
+    post.to_csv(deba.data("fuse/post_ponchatoula_pd.csv"), index=False)

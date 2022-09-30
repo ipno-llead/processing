@@ -74,3 +74,4 @@ if __name__ == "__main__":
     personnels.to_csv(deba.data("fuse/per_scott_pd.csv"), index=False)
     events_df.to_csv(deba.data("fuse/event_scott_pd.csv"), index=False)
     complaints.to_csv(deba.data("fuse/com_scott_pd.csv"), index=False)
+    post.to_csv(deba.data("fuse/post_scott_pd.csv"), index=False)

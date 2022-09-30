@@ -40,7 +40,7 @@ if __name__ == "__main__":
     agency = pprr.agency[0]
     post = load_for_agency(agency)
     post_event = pd.read_csv(deba.data("match/post_event_lake_charles_2020_11_06.csv"))
-    per_df = fuse_personnel(cprr20, cprr19, pprr, post)
+    per_df = fuse_personnel(cprr20, cprr19, pprr)
     com_df = rearrange_allegation_columns(pd.concat([cprr20, cprr19]))
     event_df = rearrange_event_columns(
         pd.concat([fuse_events(cprr20, cprr19), post_event])
@@ -48,3 +48,4 @@ if __name__ == "__main__":
     event_df.to_csv(deba.data("fuse/event_lake_charles_pd.csv"), index=False)
     com_df.to_csv(deba.data("fuse/com_lake_charles_pd.csv"), index=False)
     per_df.to_csv(deba.data("fuse/per_lake_charles_pd.csv"), index=False)
+    post.to_csv(deba.data("fuse/post_lake_charles_pd.csv"), index=False)

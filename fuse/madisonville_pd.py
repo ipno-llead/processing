@@ -47,10 +47,11 @@ if __name__ == "__main__":
     pprr.loc[:, "agency"] = "madisonville-pd"
     post_event = pd.read_csv(deba.data("match/post_event_madisonville_csd_2019.csv"))
     per = rearrange_personnel_columns(pprr)
-    per = fuse_personnel(per, post)
+    per = fuse_personnel(per)
     com = rearrange_allegation_columns(cprr)
     event = fuse_events(pprr, cprr)
     event = rearrange_event_columns(pd.concat([post_event, event]))
     per.to_csv(deba.data("fuse/per_madisonville_pd.csv"), index=False)
     event.to_csv(deba.data("fuse/event_madisonville_pd.csv"), index=False)
     com.to_csv(deba.data("fuse/com_madisonville_pd.csv"), index=False)
+    post.to_csv(deba.data("fuse/post_madisonville_pd.csv"), index=False)
