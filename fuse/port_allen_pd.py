@@ -57,10 +57,11 @@ if __name__ == "__main__":
     post = load_for_agency(agency)
     pprr.loc[:, "agency"] = "port-allen-pd"
     personnel_df = rearrange_personnel_columns(pprr)
-    personnel_df = fuse_personnel(personnel_df, post)
+    personnel_df = fuse_personnel(personnel_df)
     complaint_df = rearrange_allegation_columns(pd.concat([cprr16, cprr18, cprr19]))
     events_df = fuse_events(pprr, cprr16, cprr18, cprr19)
     events_df = rearrange_event_columns(pd.concat([post_event, events_df]))
     personnel_df.to_csv(deba.data("fuse/per_port_allen_pd.csv"), index=False)
     events_df.to_csv(deba.data("fuse/event_port_allen_pd.csv"), index=False)
     complaint_df.to_csv(deba.data("fuse/com_port_allen_pd.csv"), index=False)
+    post.to_csv(deba.data("fuse/post_port_allen_pd.csv"), index=False)

@@ -70,7 +70,6 @@ if __name__ == "__main__":
     events_df = fuse_events(cprr_20, cprr_14, pprr)
     events_df = rearrange_event_columns(pd.concat([post_events, events_df]))
     per = fuse_personnel(
-        post,
         pprr,
         cprr_20[["uid", "first_name", "last_name"]],
         cprr_20[
@@ -97,3 +96,4 @@ if __name__ == "__main__":
     per.to_csv(deba.data("fuse/per_lafayette_pd.csv"), index=False)
     com.to_csv(deba.data("fuse/com_lafayette_pd.csv"), index=False)
     events_df.to_csv(deba.data("fuse/event_lafayette_pd.csv"), index=False)
+    post.to_csv(deba.data("fuse/post_lafayette_pd.csv"), index=False)
