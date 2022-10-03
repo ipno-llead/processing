@@ -1,6 +1,6 @@
 # LLEAD data integration
 
-Notebooks and Python scripts to combine & integrate PPACT data. All generated data are kept in [Wrgl](https://hub.wrgl.co/@ipno).
+Notebooks and Python scripts to combine & integrate LLEAD data. All generated data are kept in [Wrgl](https://hub.wrgl.co/@ipno).
 
 ## 1. Getting started
 
