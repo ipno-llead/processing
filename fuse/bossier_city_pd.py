@@ -66,7 +66,7 @@ if __name__ == "__main__":
     post = load_for_agency(agency)
     post_event = pd.read_csv(deba.data("match/post_event_bossier_city_pd.csv"))
     cprr = pd.read_csv(deba.data("match/cprr_bossier_city_pd_2020.csv"))
-    per_df = fuse_personnel(pprr, cprr, post)
+    per_df = fuse_personnel(pprr, cprr)
     com_df = rearrange_allegation_columns(cprr)
     events_df = fuse_events(pprr, cprr)
     events_df = rearrange_event_columns(
@@ -80,3 +80,4 @@ if __name__ == "__main__":
     per_df.to_csv(deba.data("fuse/per_bossier_city_pd.csv"), index=False)
     events_df.to_csv(deba.data("fuse/event_bossier_city_pd.csv"), index=False)
     com_df.to_csv(deba.data("fuse/com_bossier_city_pd.csv"), index=False)
+    post.to_csv(deba.data("fuse/post_bossier_city_pd.csv"), index=False)

@@ -66,7 +66,7 @@ if __name__ == "__main__":
     cprr_post_events = pd.read_csv(
         deba.data("match/cprr_post_events_kenner_pd_2020.csv")
     )
-    per = fuse_personnel(pprr, uof_officers, post)
+    per = fuse_personnel(pprr, uof_officers)
     uof_df = rearrange_use_of_force(uof)
     uof_officers = rearrange_uof_officer_columns(uof_officers)
     events_df = rearrange_event_columns(
@@ -76,3 +76,4 @@ if __name__ == "__main__":
     events_df.to_csv(deba.data("fuse/event_kenner_pd.csv"), index=False)
     uof.to_csv(deba.data("fuse/uof_kenner_pd.csv"), index=False)
     uof_officers.to_csv(deba.data("fuse/uof_officers_kenner_pd.csv"), index=False)
+    post.to_csv(deba.data("fuse/post_kenner_pd.csv"), index=False)

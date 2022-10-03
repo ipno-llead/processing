@@ -46,6 +46,7 @@ if __name__ == "__main__":
     post = load_for_agency(agency)
     post_event = pd.read_csv(deba.data("match/post_event_slidell_pd_2020.csv"))
     events_df = rearrange_event_columns(pd.concat([post_event, fuse_events(pprr_csd)]))
-    per_df = fuse_personnel(pprr_csd, post)
+    per_df = fuse_personnel(pprr_csd)
     per_df.to_csv(deba.data("fuse/per_slidell_pd.csv"), index=False)
     events_df.to_csv(deba.data("fuse/event_slidell_pd.csv"), index=False)
+    post.to_csv(deba.data("fuse/post_slidell_pd.csv"), index=False)

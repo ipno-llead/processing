@@ -35,6 +35,7 @@ if __name__ == "__main__":
     post_event = pd.read_csv(deba.data("match/post_event_sterlington_pd_2010_2020.csv"))
     events_df = rearrange_event_columns(pd.concat([fuse_events(pprr), post_event]))
     per_df = rearrange_personnel_columns(pprr)
-    per_df = fuse_personnel(per_df, post)
+    per_df = fuse_personnel(per_df)
     per_df.to_csv(deba.data("fuse/per_sterlington_pd.csv"), index=False)
     events_df.to_csv(deba.data("fuse/event_sterlington_pd.csv"), index=False)
+    post.to_csv(deba.data("fuse/post_sterlington_pd.csv"), index=False)
