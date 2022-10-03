@@ -50,6 +50,8 @@ if __name__ == "__main__":
     per_df = rearrange_personnel_columns(pd.concat([per_pre_post, post]))
     per_df = per_df[~((per_df.last_name.fillna("") == ""))]
     per_df = per_df[~((per_df.agency.fillna("") == ""))]
+    event_df = event_df[~((event_df.agency.fillna("") == ""))]
+    event_df = event_df[~((event_df.uid.fillna("") == ""))]
     post = rearrange_post_officer_history_columns(post)
 
     per_df.to_csv(deba.data("fuse/personnel.csv"), index=False)
