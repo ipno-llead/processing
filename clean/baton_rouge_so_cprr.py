@@ -449,6 +449,10 @@ def clean_action15(df):
     return df.drop(columns=["action_taken"])
 
 
+def drop_rows_missing_name(df):
+    return df[~((df.first_name.fillna("") == ""))]
+
+
 def clean18():
     df = pd.read_csv(deba.data("raw/baton_rouge_so/baton_rouge_so_cprr_2018.csv"))
     df = clean_column_names(df)
@@ -590,6 +594,7 @@ def clean15():
             ["uid", "allegation", "disposition", "tracking_id", "occur_day"],
             "allegation_uid",
         )
+        .pipe(drop_rows_missing_name)
     )
     return df
 
