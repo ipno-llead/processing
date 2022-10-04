@@ -873,7 +873,7 @@ def clean_rank_desc_19(df):
     df.loc[:, "rank_desc"] = (
         df.job_title.str.lower().str.strip().str.replace(r"mr\.", "", regex=True)
     )
-    return df
+    return df.drop(columns=["job_title"])
 
 
 def clean_referred_by(df):
@@ -913,13 +913,21 @@ def clean_initial_action(df):
     )
     return df.drop(columns=["intial_action"])
 
+
 def clean_disposition_19(df):
-    dispositions = df.disposition.str.lower().str.strip()\
-        .str.extract(r"(non-? ?sustained|sustained|exonerated|terminated all charges|unfounded)")
-    
-    df.loc[:, "disposition"] = dispositions[0]\
-        .str.replace(r"non ?sustained", "non-sustained", regex=True)
-    return df 
+    dispositions = (
+        df.disposition.str.lower()
+        .str.strip()
+        .str.extract(
+            r"(non-? ?sustained|sustained|exonerated|terminated all charges|unfounded)"
+        )
+    )
+
+    df.loc[:, "disposition"] = dispositions[0].str.replace(
+        r"non ?sustained", "non-sustained", regex=True
+    )
+    return df
+
 
 def clean19():
     df = pd.read_csv(
@@ -1012,7 +1020,10 @@ def clean19():
         .drop_duplicates(subset=["allegation_uid"], keep="last", ignore_index=True)
         .pipe(clean_referred_by)
         .pipe(clean_initial_action)
-        .pipe(standardize_desc_cols, ["referred_by", "allegation", "action", "allegation_desc"])
+        .pipe(
+            standardize_desc_cols,
+            ["referred_by", "allegation", "action", "allegation_desc"],
+        )
         .pipe(clean_names, ["first_name", "middle_name", "last_name"])
     )
     return df
