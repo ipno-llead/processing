@@ -1176,12 +1176,6 @@ branch:
     file: data/fuse/post_new_orleans_harbor_pd.csv
     primaryKey:
       - uid
-  post-new-orleans-pd:
-    remote: origin
-    merge: refs/heads/post-new-orleans-pd
-    file: data/fuse/post_new_orleans_pd.csv
-    primaryKey:
-      - uid
   post-new-orleans-so:
     remote: origin
     merge: refs/heads/post-new-orleans-so

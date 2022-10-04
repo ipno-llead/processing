@@ -300,6 +300,7 @@ if __name__ == "__main__":
         pprr_separations,
         cprr,
         pib,
+        post
     )
     events_df = fuse_events(
         pprr,
@@ -338,4 +339,3 @@ if __name__ == "__main__":
     )
     pclaims_df.to_csv(deba.data("fuse/pclaims_new_orleans_pd.csv"), index=False)
     settlements.to_csv(deba.data("fuse/settlements_new_orleans_pd.csv"), index=False)
-    post.to_csv(deba.data("fuse/post_new_orleans_pd.csv"), index=False)
