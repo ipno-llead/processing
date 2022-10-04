@@ -29,6 +29,7 @@ def extract_ids_and_subject(df):
         .str.replace(r"(\w+) hour", r"\1-hour", regex=True)
         .str.replace("eight", "8", regex=False)
         .str.replace(r"twenty- ", "", regex=False)
+        .str.replace(r"©", "", regex=False)
     )
 
     ids = (
