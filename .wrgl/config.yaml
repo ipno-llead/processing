@@ -336,10 +336,10 @@ branch:
     file: data/fuse/event_brusly_pd.csv
     primaryKey:
       - event_uid
-  event-caddo-parish-so:
+  event-caddo-so:
     remote: origin
-    merge: refs/heads/event-caddo-parish-so
-    file: data/fuse/event_caddo_parish_so.csv
+    merge: refs/heads/event-caddo-so
+    file: data/fuse/event_caddo_so.csv
     primaryKey:
       - event_uid
   event-cameron-so:
@@ -696,10 +696,10 @@ branch:
     file: data/fuse/per_brusly_pd.csv
     primaryKey:
       - uid
-  per-caddo-parish-so:
+  per-caddo-so:
     remote: origin
-    merge: refs/heads/per-caddo-parish-so
-    file: data/fuse/per_caddo_parish_so.csv
+    merge: refs/heads/per-caddo-so
+    file: data/fuse/per_caddo_so.csv
     primaryKey:
       - uid
   per-cameron_so:
