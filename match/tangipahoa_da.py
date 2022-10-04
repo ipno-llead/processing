@@ -6,12 +6,12 @@ from lib.post import load_for_agency
 
 
 def match_brady_to_personnel(brady, post):
-    dfa = brady[["first_name", "last_name", "uid"]]
+    dfa = brady[["first_name", "last_name", "uid", "agency"]]
     dfa.loc[:, "fc"] = dfa.first_name.fillna("").map(lambda x: x[:1])
     dfa.loc[:, "lc"] = dfa.last_name.fillna("").map(lambda x: x[:1])
     dfa = dfa.drop_duplicates(subset=["uid"]).set_index("uid")
 
-    dfb = post[["first_name", "last_name", "uid"]]
+    dfb = post[["first_name", "last_name", "uid", "agency"]]
     dfb.loc[:, "first_name"] = dfb.first_name.str.lower().str.strip()
     dfb.loc[:, "last_name"] = dfb.last_name.str.lower().str.strip()
     dfb.loc[:, "fc"] = dfb.first_name.fillna("").map(lambda x: x[:1])
