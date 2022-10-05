@@ -4,6 +4,7 @@ from lib.personnel import fuse_personnel
 from lib.post import load_for_agency
 import pandas as pd
 from lib import events
+from lib.post import load_for_agency
 
 
 def fuse_events(pprr):
@@ -32,7 +33,7 @@ if __name__ == "__main__":
     post_event = pd.read_csv(deba.data("match/post_event_baker_pd_2020_11_06.csv"))
     agency = cprr20.agency[0]
     post = load_for_agency(agency)
-    per_df = fuse_personnel(cprr20, pprr, cprr17)
+    per_df = fuse_personnel(cprr20, pprr, cprr17, post)
     com_df = rearrange_allegation_columns(pd.concat([cprr20, cprr17]))
     event_df = fuse_events(pprr)
     event_df = rearrange_event_columns(pd.concat([post_event, event_df]))

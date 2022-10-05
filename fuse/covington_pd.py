@@ -69,6 +69,6 @@ if __name__ == "__main__":
     post = load_for_agency(agency)
     events_df = rearrange_event_columns(pd.concat([post_event, fuse_events(ah, pprr)]))
     events_df.to_csv(deba.data("fuse/event_covington_pd.csv"), index=False)
-    per_df = fuse_personnel(ah, pprr)
+    per_df = fuse_personnel(ah, pprr, post)
     per_df.to_csv(deba.data("fuse/per_covington_pd.csv"), index=False)
     post.to_csv(deba.data("fuse/post_carencro_pd.csv"), index=False)
