@@ -132,6 +132,7 @@ if __name__ == "__main__":
         cprr_18,
         cprr_21,
         cprr_09,
+        post
     )
 
     events_df = fuse_events(csd_pprr_17, csd_pprr_19, cprr_18, cprr_21, cprr_09)

@@ -35,7 +35,7 @@ if __name__ == "__main__":
     events_df = fuse_events(post)
     events_df = rearrange_event_columns(events_df)
     per_df = rearrange_personnel_columns(pprr)
-    per_df = fuse_personnel(per_df)
+    per_df = fuse_personnel(per_df, post)
     per_df.to_csv(deba.data("fuse/per_harahan_pd.csv"), index=False)
     events_df.to_csv(deba.data("fuse/event_harahan_pd.csv"), index=False)
     post.to_csv(deba.data("fuse/post_harahan_pd.csv"), index=False)

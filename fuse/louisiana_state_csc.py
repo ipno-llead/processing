@@ -107,7 +107,7 @@ if __name__ == "__main__":
     cprr20 = pd.read_csv(deba.data("match/cprr_louisiana_state_pd_2020.csv"))
     agency = cprr19.agency[0]
     post = load_for_agency(agency)
-    per_df = fuse_personnel(pprr, pprr_term, lprr, cprr19, cprr20)
+    per_df = fuse_personnel(pprr, pprr_term, lprr, cprr19, cprr20, post)
     per_df = per_df[~((per_df.last_name.fillna("") == ""))]
     event_df = rearrange_event_columns(
         pd.concat([post_event, fuse_events(lprr, pprr, pprr_term, cprr19, cprr20)])
