@@ -542,6 +542,7 @@ schemas:
       - name: original_judgment_principal
       - name: check_date
       - name: final_judgement_date
+      - name: pay_year
       - name: agency
 
 save_bad_rows_to: data/invalid_rows.csv

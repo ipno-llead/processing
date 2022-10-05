@@ -13,9 +13,15 @@ def fuse_events(brady18, brady21):
         brady18,
         {
             events.BRADY_LIST: {
-                "prefix": "brady",
+                "prefix": "brady_list",
                 "parse_date": True,
-                "keep": ["uid", "brady_uid", "agency", "source_agency"],
+                "keep": [
+                    "uid",
+                    "brady_uid",
+                    "agency",
+                    "source_agency",
+                    "allegation_desc",
+                ],
             },
         },
         ["uid"],
@@ -24,9 +30,16 @@ def fuse_events(brady18, brady21):
         brady21,
         {
             events.BRADY_LIST: {
-                "prefix": "brady",
+                "prefix": "brady_list",
                 "parse_date": True,
-                "keep": ["uid", "brady_uid", "agency", "source_agency"],
+                "keep": [
+                    "uid",
+                    "brady_uid",
+                    "agency",
+                    "source_agency",
+                    "action",
+                    "allegation",
+                ],
             },
         },
         ["uid"],

@@ -60,7 +60,7 @@ CLAIM_RECIEVE = "claim_receive"
 CLAIM_CLOSED = "claim_closed"
 CLAIM_OCCUR = "claim_occur"
 
-BRADY_LIST = "brady_list" # date on which we received a brady list (this date should be considered as of)
+BRADY_LIST = "brady_list"  # date brady list received i.e., officer x is on brady list as of x date
 
 
 event_cat_type = CategoricalDtype(

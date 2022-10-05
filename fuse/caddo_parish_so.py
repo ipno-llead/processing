@@ -42,6 +42,6 @@ if __name__ == "__main__":
     )
     per_df = rearrange_personnel_columns(pprr)
     per_df = fuse_personnel(per_df)
-    per_df.to_csv(deba.data("fuse/per_caddo_parish_so.csv"), index=False)
-    event_df.to_csv(deba.data("fuse/event_caddo_parish_so.csv"), index=False)
+    per_df.to_csv(deba.data("fuse/per_caddo_so.csv"), index=False)
+    event_df.to_csv(deba.data("fuse/event_caddo_so.csv"), index=False)
     post.to_csv(deba.data("fuse/post_caddo_so.csv"), index=False)

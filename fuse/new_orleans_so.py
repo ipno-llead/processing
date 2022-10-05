@@ -14,35 +14,56 @@ def fuse_events(cprr19, cprr20, pprr):
         {
             events.COMPLAINT_RECEIVE: {
                 "prefix": "receive",
-                "keep": ["uid", "agency", "allegation_uid"],
+                "keep": ["uid", "agency", "allegation_uid", "rank_desc", "employee_id"],
             },
             events.INVESTIGATION_START: {
                 "prefix": "investigation_start",
-                "keep": ["uid", "agency", "allegation_uid"],
+                "keep": ["uid", "agency", "allegation_uid", "rank_desc", "employee_id"],
             },
             events.INVESTIGATION_COMPLETE: {
                 "prefix": "investigation_complete",
-                "keep": ["uid", "agency", "allegation_uid"],
+                "keep": ["uid", "agency", "allegation_uid", "rank_desc", "employee_id"],
             },
             events.SUSPENSION_START: {
                 "prefix": "suspension_start",
-                "keep": ["uid", "agency", "allegation_uid"],
+                "keep": ["uid", "agency", "allegation_uid", "rank_desc", "employee_id"],
             },
             events.SUSPENSION_END: {
                 "prefix": "suspension_end",
-                "keep": ["uid", "agency", "allegation_uid"],
+                "keep": ["uid", "agency", "allegation_uid", "rank_desc", "employee_id"],
             },
             events.OFFICER_LEFT: {
                 "prefix": "resignation",
-                "keep": ["uid", "agency", "allegation_uid", "left_reason"],
+                "keep": [
+                    "uid",
+                    "agency",
+                    "allegation_uid",
+                    "left_reason",
+                    "rank_desc",
+                    "employee_id",
+                ],
             },
             events.OFFICER_LEFT: {
                 "prefix": "arrest",
-                "keep": ["uid", "agency", "allegation_uid", "left_reason"],
+                "keep": [
+                    "uid",
+                    "agency",
+                    "allegation_uid",
+                    "left_reason",
+                    "rank_desc",
+                    "employee_id",
+                ],
             },
             events.OFFICER_LEFT: {
                 "prefix": "termination",
-                "keep": ["uid", "agency", "allegation_uid", "left_reason"],
+                "keep": [
+                    "uid",
+                    "agency",
+                    "allegation_uid",
+                    "left_reason",
+                    "rank_desc",
+                    "employee_id",
+                ],
             },
         },
         ["uid", "allegation_uid"],
@@ -52,42 +73,68 @@ def fuse_events(cprr19, cprr20, pprr):
         {
             events.COMPLAINT_RECEIVE: {
                 "prefix": "receive",
-                "keep": ["uid", "agency", "allegation_uid"],
+                "keep": ["uid", "agency", "allegation_uid", "rank_desc", "employee_id"],
             },
             events.INVESTIGATION_START: {
                 "prefix": "investigation_start",
-                "keep": ["uid", "agency", "allegation_uid"],
+                "keep": ["uid", "agency", "allegation_uid", "rank_desc", "employee_id"],
             },
             events.INVESTIGATION_COMPLETE: {
                 "prefix": "investigation_complete",
-                "keep": ["uid", "agency", "allegation_uid"],
+                "keep": ["uid", "agency", "allegation_uid", "rank_desc", "employee_id"],
             },
             events.SUSPENSION_START: {
                 "prefix": "suspension_start",
-                "keep": ["uid", "agency", "allegation_uid"],
+                "keep": ["uid", "agency", "allegation_uid", "rank_desc", "employee_id"],
             },
             events.SUSPENSION_END: {
                 "prefix": "suspension_end",
-                "keep": ["uid", "agency", "allegation_uid"],
+                "keep": ["uid", "agency", "allegation_uid", "rank_desc", "employee_id"],
             },
             events.OFFICER_LEFT: {
                 "prefix": "resignation",
-                "keep": ["uid", "agency", "allegation_uid", "left_reason"],
+                "keep": [
+                    "uid",
+                    "agency",
+                    "allegation_uid",
+                    "left_reason",
+                    "rank_desc",
+                    "employee_id",
+                ],
             },
             events.OFFICER_LEFT: {
                 "prefix": "arrest",
-                "keep": ["uid", "agency", "allegation_uid", "left_reason"],
+                "keep": [
+                    "uid",
+                    "agency",
+                    "allegation_uid",
+                    "left_reason",
+                    "rank_desc",
+                    "employee_id",
+                ],
             },
             events.OFFICER_LEFT: {
                 "prefix": "termination",
-                "keep": ["uid", "agency", "allegation_uid", "left_reason"],
+                "keep": [
+                    "uid",
+                    "agency",
+                    "allegation_uid",
+                    "left_reason",
+                    "rank_desc",
+                    "employee_id",
+                ],
             },
         },
         ["uid", "allegation_uid"],
     )
     builder.extract_events(
         pprr,
-        {events.OFFICER_HIRE: {"prefix": "hire", "keep": ["uid", "agency"]}},
+        {
+            events.OFFICER_HIRE: {
+                "prefix": "hire",
+                "keep": ["uid", "agency", "rank_desc"],
+            }
+        },
         ["uid"],
     )
     return builder.to_frame()
