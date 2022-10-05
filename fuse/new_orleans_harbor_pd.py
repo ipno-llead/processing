@@ -82,7 +82,7 @@ if __name__ == "__main__":
         deba.data("match/post_event_new_orleans_harbor_pd_2020.csv")
     )
     personnel_df = rearrange_personnel_columns(pd.concat([pprr08, pprr20]))
-    personnel_df = fuse_personnel(personnel_df)
+    personnel_df = fuse_personnel(personnel_df, post)
     complaint_df = rearrange_allegation_columns(cprr)
     event_df = fuse_events(pprr08, pprr20, cprr)
     event_df = rearrange_event_columns(pd.concat([post_event, event_df]))

@@ -41,7 +41,7 @@ if __name__ == "__main__":
         pd.concat([post_event, event_df, cprr_post_event])
     )
     per_df = rearrange_personnel_columns(pprr)
-    per_df = fuse_personnel(per_df)
+    per_df = fuse_personnel(per_df, post)
     per_df.to_csv(deba.data("fuse/per_caddo_so.csv"), index=False)
     event_df.to_csv(deba.data("fuse/event_caddo_so.csv"), index=False)
     post.to_csv(deba.data("fuse/post_caddo_so.csv"), index=False)

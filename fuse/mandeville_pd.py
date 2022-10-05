@@ -65,7 +65,7 @@ if __name__ == "__main__":
     cprr = pd.read_csv(deba.data("match/cprr_mandeville_pd_2019.csv"))
     events_df = fuse_events(cprr, pprr)
     events_df = rearrange_event_columns(pd.concat([post_event, events_df]))
-    per_df = fuse_personnel(pprr, cprr)
+    per_df = fuse_personnel(pprr, cprr, post)
     com_df = rearrange_allegation_columns(cprr)
     events_df.to_csv(deba.data("fuse/event_mandeville_pd.csv"), index=False)
     com_df.to_csv(deba.data("fuse/com_mandeville_pd.csv"), index=False)

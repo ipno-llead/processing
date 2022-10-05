@@ -147,7 +147,7 @@ if __name__ == "__main__":
     pprr = pd.read_csv(deba.data("clean/pprr_new_orleans_so_2021.csv"))
     agency = pprr.agency[0]
     post = load_for_agency(agency)
-    personnel_df = fuse_personnel(cprr20, cprr19, pprr)
+    personnel_df = fuse_personnel(cprr20, cprr19, pprr, post)
     events_df = fuse_events(cprr19, cprr20, pprr)
     events_df = rearrange_event_columns(pd.concat([post_events, events_df]))
     complaint_df = rearrange_allegation_columns(pd.concat([cprr19, cprr20]))

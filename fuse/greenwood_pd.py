@@ -50,7 +50,7 @@ if __name__ == "__main__":
     agency = cprr.agency[0]
     post = load_for_agency(agency)
     per = rearrange_personnel_columns(post)
-    per = fuse_personnel(per)
+    per = fuse_personnel(per, post)
     com = rearrange_allegation_columns(cprr)
     event = fuse_events(cprr, post)
     per.to_csv(deba.data("fuse/per_greenwood_pd.csv"), index=False)

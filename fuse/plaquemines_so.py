@@ -49,7 +49,7 @@ if __name__ == "__main__":
     post = load_for_agency(agency)
     post_event = pd.read_csv(deba.data("match/event_plaquemines_so_2018.csv"))
     events_df = fuse_events(cprr19, cprr20, pprr)
-    per_df = fuse_personnel(pprr, cprr19, cprr20)
+    per_df = fuse_personnel(pprr, cprr19, cprr20, post)
     per_df.to_csv(deba.data("fuse/per_plaquemines_so.csv"), index=False)
     com = rearrange_allegation_columns(pd.concat([cprr19, cprr20]))
     com.to_csv(deba.data("fuse/com_plaquemines_so.csv"), index=False)

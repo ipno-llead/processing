@@ -70,6 +70,7 @@ if __name__ == "__main__":
     events_df = fuse_events(cprr_20, cprr_14, pprr)
     events_df = rearrange_event_columns(pd.concat([post_events, events_df]))
     per = fuse_personnel(
+        post,
         pprr,
         cprr_20[["uid", "first_name", "last_name"]],
         cprr_20[

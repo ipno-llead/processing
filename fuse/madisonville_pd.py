@@ -47,7 +47,7 @@ if __name__ == "__main__":
     pprr.loc[:, "agency"] = "madisonville-pd"
     post_event = pd.read_csv(deba.data("match/post_event_madisonville_csd_2019.csv"))
     per = rearrange_personnel_columns(pprr)
-    per = fuse_personnel(per)
+    per = fuse_personnel(per, post)
     com = rearrange_allegation_columns(cprr)
     event = fuse_events(pprr, cprr)
     event = rearrange_event_columns(pd.concat([post_event, event]))
