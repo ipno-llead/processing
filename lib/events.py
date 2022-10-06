@@ -36,6 +36,7 @@ SUSPENSION_START = "suspension_start"
 SUSPENSION_END = "suspension_end"
 INITIAL_ACTION = "initial_action"  # date on which the initial action was allocated
 DISPOSITION = "disposition"
+BOARD_HEARING = "board_hearing" # date on which investigation is reviewed by disciplinary board
 
 APPEAL_FILE = "appeal_file"
 APPEAL_HEARING = "appeal_hearing"
@@ -102,6 +103,7 @@ event_cat_type = CategoricalDtype(
         CLAIM_CLOSED,
         CLAIM_OCCUR,
         BRADY_LIST,
+        BOARD_HEARING,
     ],
     ordered=True,
 )

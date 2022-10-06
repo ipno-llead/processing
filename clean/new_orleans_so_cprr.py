@@ -987,7 +987,8 @@ def sanitize_dates_21(df):
     )
 
     df.loc[:, "investigation_start_date"] = (
-        df.date_started.str.lower()
+        df.date_started.astype(str)
+        .str.lower()
         .str.strip()
         .str.replace(r"[A-Za-z]", "", regex=True)
         .str.replace(r"^\/$", "", regex=True)
@@ -996,10 +997,13 @@ def sanitize_dates_21(df):
         .str.replace(r"\/201$", r"/2021", regex=True)
         .str.replace(r"(\w+)\/(\w{2})(\w{4})", r"\1/\2/\3", regex=True)
         .str.replace(r"(.+)\/(20222)", "", regex=True)
+        .str.replace(r"\/\/", "/", regex=True)
+        .str.replace(r" +", "", regex=True)
     )
 
     df.loc[:, "investigation_complete_date"] = (
-        df.date_completed.str.replace(r"(\w+) +$", r"\1", regex=True)
+        df.date_completed.astype(str)
+        .str.replace(r"(\w+) +$", r"\1", regex=True)
         .str.replace(r"(\w+)-(\w+)-(\w+)", r"\1/\2/\3", regex=True)
         .str.replace(r"4\/21\/20231", "4/21/2021", regex=True)
         .str.replace(r"5\/28.+", "", regex=True)
@@ -1008,10 +1012,14 @@ def sanitize_dates_21(df):
         .str.replace(r"(\w+)\/(\w{3,4})\/.+", "", regex=True)
         .str.replace(r"11\/2021", "", regex=True)
         .str.replace(r".+\/$", "", regex=True)
+        .str.replace(r"1921", "2021", regex=False)
+        .str.replace(r"\/\/", "/", regex=True)
+        .str.replace(r" +", "", regex=True)
     )
 
-    df.loc[:, "board_date"] = (
-        df.date_of_board.str.lower()
+    df.loc[:, "board_hearing_date"] = (
+        df.date_of_board.astype(str)
+        .str.lower()
         .str.strip()
         .str.replace(r"(\w+) +$", r"\1", regex=True)
         .str.replace(r"[a-z]", "", regex=True)
@@ -1019,6 +1027,9 @@ def sanitize_dates_21(df):
         .str.replace(r"\?", "", regex=True)
         .str.replace(r"(\w+)-(\w+)-(\w+)", r"\1/\2/\3", regex=True)
         .str.replace(r"\/201$", "/2021", regex=True)
+    )
+    df.loc[:, "suspension_start_date"] = df.suspension_start_date.str.replace(
+        r"6/16/201", "6/16/2021", regex=False
     )
     return df.drop(
         columns=["date_received", "date_started", "date_completed", "date_of_board"]
@@ -1213,7 +1224,9 @@ def clean_allegations_21(df):
         df.charges.str.lower()
         .str.strip()
         .str.replace(r"worker\'s", "workers", regex=True)
-        .str.replace(r"\/\'", "", regex=True)
+        .str.replace(r"(\'|\"|\")", "", regex=True)
+        .str.replace(r"(\w+) ?\/ ?(\w+)", r"\1/\2", regex=True)
+        .str.replace(r"act(\w{1,2})", r"act \1", regex=True)
         .str.replace(r"(\w+)- (\w+)", r"\1-\2", regex=True)
         .str.replace(r"cooperration", "cooperation", regex=False)
         .str.replace(r"dduty", "duty", regex=False)
@@ -1235,32 +1248,19 @@ def clean_allegations_21(df):
         .str.replace(r"reprim ?", "", regex=True)
         .str.replace(r"mwmber", "", regex=False)
         .str.replace(r"\((\w+)\)", "", regex=True)
-        .str.replace(r"(\w+) +$", r"\1", regex=True)
-        .str.replace(r"\"(\w+)\" \"(\w+)\"", r'"\1", "\2"', regex=True)
-        .str.replace(r"(\w+) \"(\w+)\"", r'\1: "\2"', regex=True)
-        .str.replace(r"(\w+) \, (\w+)", r"\1, \2", regex=True)
-        .str.replace(r"\" ?(\w+) ?\"?", r'"\1"', regex=True)
-        .str.replace(r"(\w+)\"(\w+)\"", r'\1 "\2"', regex=True)
-        .str.replace(r"&12", ' and "12"', regex=False)
         .str.replace(r"\"and", r'" and', regex=True)
-        .str.replace(r"\"?(\w+)\"? and (\w+)", r"\1, \2", regex=True)
         .str.replace(r"\, and (\w+)", r", \1", regex=True)
         .str.replace(r"\bstff\b", "staff", regex=False)
         .str.replace(r"duyt", "duty", regex=False)
         .str.replace(r"menber", "member", regex=False)
         .str.replace(r"superviosr", "supervisor", regex=False)
-        .str.replace(r"1&(\w{1,2})\b", r'"1" and "\1"', regex=True)
         .str.replace(r"duty general", "duty-general", regex=False)
         .str.replace(r"raanked", "ranked", regex=False)
         .str.replace(r"staffed", "staff", regex=False)
-        .str.replace(r"\"(ceasing|neglect)", r'" \1', regex=True)
         .str.replace(r"respoonsibility", "responsibility", regex=False)
         .str.replace(r"pofessionalism", "professionalism", regex=False)
         .str.replace(r"zfor", "for", regex=False)
-        .str.replace(r"\'$", "", regex=True)
-        .str.replace(r"\/$", "", regex=True)
         .str.replace(r"procedures and ", "procedures, ", regex=False)
-        .str.replace(r"\"4\", 12, &14", '"4" and "12" and "14"', regex=True)
     )
     return df.drop(columns=["charges"])
 
@@ -1297,30 +1297,52 @@ def clean21():
         .pipe(clean_referred_by_21)
         .pipe(clean_action_21)
         .pipe(extraction_action_dates_21)
-        .pipe(sanitize_dates_21)
-        .pipe(
-            clean_dates,
-            [
-                "receive_date",
-                "investigation_complete_date",
-                "investigation_start_date",
-                "board_date",
-            ],
-        )
         .pipe(clean_allegations_21)
         .pipe(clean_allegation_desc)
         .pipe(standardize_desc_cols, ["tracking_id", "allegation"])
+        .pipe(sanitize_dates_21)
+        .pipe(
+            float_to_int_str,
+            [
+                "suspension_start_date",
+                "suspension_end_date",
+                "return_from_suspension_date",
+                "termination_date",
+                "resignation_date",
+                "referred_to_training_date",
+                "receive_date",
+                "investigation_start_date",
+                "investigation_complete_date",
+                "board_hearing_date",
+            ],
+        )
         .pipe(set_values, {"agency": "new-orleans-so"})
         .pipe(
             gen_uid, ["agency", "first_name", "middle_name", "last_name", "employee_id"]
         )
         .pipe(
             gen_uid,
-            ["tracking_id", "allegation", "action", "employee_id"],
+            [
+                "tracking_id",
+                "allegation",
+                "action",
+                "employee_id",
+                "receive_date",
+                "allegation_desc",
+            ],
             "allegation_uid",
         )
+        .pipe(
+            gen_uid,
+            [
+                "investigating_supervisor_first_name",
+                "investigating_supervisor_last_name",
+                "agency",
+            ],
+            "investigating_supervisor_uid",
+        )
     )
-    return df
+    return df.astype(str)
 
 
 def clean19():

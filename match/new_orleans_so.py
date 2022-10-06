@@ -64,33 +64,6 @@ def deduplicate_cprr_20_personnel(cprr):
     return canonicalize_officers(cprr, clusters)
 
 
-def deduplicate_cprr_21_personnel(cprr):
-    df = (
-        cprr.loc[
-            cprr.uid.notna(),
-            ["employee_id", "first_name", "last_name", "middle_name", "uid"],
-        ]
-        .drop_duplicates(subset=["uid"])
-        .set_index("uid", drop=True)
-    )
-
-    matcher = ThresholdMatcher(
-        ColumnsIndex("employee_id"),
-        {
-            "first_name": JaroWinklerSimilarity(),
-            "last_name": JaroWinklerSimilarity(),
-        },
-        df,
-    )
-    decision = 0.921
-    matcher.save_clusters_to_excel(
-        deba.data("match/deduplicate_new_orleans_so_cprr_21.xlsx"), decision, decision
-    )
-    clusters = matcher.get_index_clusters_within_thresholds(decision)
-    # canonicalize name and uid
-    return canonicalize_officers(cprr, clusters)
-
-
 def assign_uid_19_from_pprr(cprr, pprr):
     dfa = (
         cprr.loc[cprr.uid.notna(), ["uid", "first_name", "last_name"]]
@@ -283,7 +256,7 @@ def match_pprr_against_post(pprr, post):
     return extract_events_from_post(post, matches, "new-orleans-so")
 
 
-def assign_uid_21_from_pprr(cprr, pprr):
+def match_cprr_21_w_pprr(cprr, pprr):
     dfa = (
         cprr.loc[cprr.uid.notna(), ["uid", "first_name", "last_name"]]
         .drop_duplicates(subset=["uid"])
@@ -293,10 +266,10 @@ def assign_uid_21_from_pprr(cprr, pprr):
 
     dfb = (
         pprr[["uid", "first_name", "last_name"]]
-        .drop_duplicates(subset=["uid"])
+        .drop_duplicates()
         .set_index("uid", drop=True)
     )
-    dfb.loc[:, "fc"] = dfb.first_name.map(lambda x: x[:1])
+    dfb.loc[:, "fc"] = dfb.first_name.fillna("").map(lambda x: x[:1])
 
     matcher = ThresholdMatcher(
         ColumnsIndex("fc"),
@@ -309,7 +282,7 @@ def assign_uid_21_from_pprr(cprr, pprr):
     )
     decision = 0.931
     matcher.save_pairs_to_excel(
-        deba.data("match/new_orleans_so_cprr_21_officer_v_noso_pprr_2021.xlsx"),
+        deba.data("match/cprr_orleans_so_2021_v_pprr.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(decision)
@@ -319,6 +292,28 @@ def assign_uid_21_from_pprr(cprr, pprr):
     return cprr
 
 
+def deduplicate_cprr_21_officers(cprr):
+    df = cprr[["uid", "first_name", "last_name", "rank_desc"]]
+    df = df.drop_duplicates(subset=["uid"]).set_index("uid")
+    df.loc[:, "fc"] = df.first_name.fillna("").map(lambda x: x[:1])
+    matcher = ThresholdMatcher(
+        ColumnsIndex("fc"),
+        {
+            "first_name": JaroWinklerSimilarity(),
+            "last_name": JaroWinklerSimilarity(),
+        },
+        df,
+    )
+    decision = 0.950
+    matcher.save_clusters_to_excel(
+        deba.data("match/deduplicate_orleans_so_cprr_21.xlsx"),
+        decision,
+        decision,
+    )
+    clusters = matcher.get_index_clusters_within_thresholds(decision)
+    return canonicalize_officers(cprr, clusters)
+
+
 if __name__ == "__main__":
     cprr19 = pd.read_csv(deba.data("clean/cprr_new_orleans_so_2019.csv"))
     cprr20 = pd.read_csv(deba.data("clean/cprr_new_orleans_so_2020.csv"))
@@ -326,15 +321,14 @@ if __name__ == "__main__":
     agency = cprr20.agency[0]
     post = load_for_agency(agency)
     pprr = pd.read_csv(deba.data("clean/pprr_new_orleans_so_2021.csv"))
-
     cprr19 = deduplicate_cprr_19_personnel(cprr19)
     cprr20 = deduplicate_cprr_20_personnel(cprr20)
-    cprr21 = deduplicate_cprr_21_personnel(cprr21)
+    cprr21 = deduplicate_cprr_21_officers(cprr21)
     cprr19 = assign_uid_19_from_pprr(cprr19, pprr)
     cprr20 = assign_uid_20_from_pprr(cprr20, pprr)
+    cprr21 = match_cprr_21_w_pprr(cprr21, pprr)
     cprr19 = assign_supervisor_19_uid_from_pprr(cprr19, pprr)
     cprr20 = assign_supervisor_20_uid_from_pprr(cprr20, pprr)
-    cprr21 = assign_uid_21_from_pprr(cprr21, pprr)
     post_events = match_pprr_against_post(pprr, post)
     cprr19.to_csv(deba.data("match/cprr_new_orleans_so_2019.csv"), index=False)
     cprr20.to_csv(deba.data("match/cprr_new_orleans_so_2020.csv"), index=False)
