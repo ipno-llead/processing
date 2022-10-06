@@ -231,6 +231,7 @@ schemas:
           - claim_occur
           - claim_closed
           - brady_list
+          - board_hearing
         no_na: true
       - name: year
         integer: true
