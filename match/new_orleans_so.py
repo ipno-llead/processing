@@ -27,7 +27,7 @@ def deduplicate_cprr_19_personnel(cprr):
             "first_name": JaroWinklerSimilarity(),
             "last_name": JaroWinklerSimilarity(),
         },
-        df
+        df,
     )
     decision = 0.9
     matcher.save_clusters_to_excel(
@@ -53,7 +53,7 @@ def deduplicate_cprr_20_personnel(cprr):
             "first_name": JaroWinklerSimilarity(),
             "last_name": JaroWinklerSimilarity(),
         },
-        df
+        df,
     )
     decision = 0.9
     matcher.save_clusters_to_excel(
@@ -256,20 +256,81 @@ def match_pprr_against_post(pprr, post):
     return extract_events_from_post(post, matches, "new-orleans-so")
 
 
+def match_cprr_21_w_pprr(cprr, pprr):
+    dfa = (
+        cprr.loc[cprr.uid.notna(), ["uid", "first_name", "last_name"]]
+        .drop_duplicates(subset=["uid"])
+        .set_index("uid", drop=True)
+    )
+    dfa.loc[:, "fc"] = dfa.first_name.fillna("").map(lambda x: x[:1])
+
+    dfb = (
+        pprr[["uid", "first_name", "last_name"]]
+        .drop_duplicates()
+        .set_index("uid", drop=True)
+    )
+    dfb.loc[:, "fc"] = dfb.first_name.fillna("").map(lambda x: x[:1])
+
+    matcher = ThresholdMatcher(
+        ColumnsIndex("fc"),
+        {
+            "first_name": JaroWinklerSimilarity(),
+            "last_name": JaroWinklerSimilarity(),
+        },
+        dfa,
+        dfb,
+    )
+    decision = 0.931
+    matcher.save_pairs_to_excel(
+        deba.data("match/cprr_orleans_so_2021_v_pprr.xlsx"),
+        decision,
+    )
+    matches = matcher.get_index_pairs_within_thresholds(decision)
+    match_dict = dict(matches)
+
+    cprr.loc[:, "uid"] = cprr.uid.map(lambda x: match_dict.get(x, x))
+    return cprr
+
+
+def deduplicate_cprr_21_officers(cprr):
+    df = cprr[["uid", "first_name", "last_name", "rank_desc"]]
+    df = df.drop_duplicates(subset=["uid"]).set_index("uid")
+    df.loc[:, "fc"] = df.first_name.fillna("").map(lambda x: x[:1])
+    matcher = ThresholdMatcher(
+        ColumnsIndex("fc"),
+        {
+            "first_name": JaroWinklerSimilarity(),
+            "last_name": JaroWinklerSimilarity(),
+        },
+        df,
+    )
+    decision = 0.950
+    matcher.save_clusters_to_excel(
+        deba.data("match/deduplicate_orleans_so_cprr_21.xlsx"),
+        decision,
+        decision,
+    )
+    clusters = matcher.get_index_clusters_within_thresholds(decision)
+    return canonicalize_officers(cprr, clusters)
+
+
 if __name__ == "__main__":
     cprr19 = pd.read_csv(deba.data("clean/cprr_new_orleans_so_2019.csv"))
     cprr20 = pd.read_csv(deba.data("clean/cprr_new_orleans_so_2020.csv"))
+    cprr21 = pd.read_csv(deba.data("clean/cprr_new_orleans_so_2021.csv"))
     agency = cprr20.agency[0]
     post = load_for_agency(agency)
     pprr = pd.read_csv(deba.data("clean/pprr_new_orleans_so_2021.csv"))
-
     cprr19 = deduplicate_cprr_19_personnel(cprr19)
     cprr20 = deduplicate_cprr_20_personnel(cprr20)
+    cprr21 = deduplicate_cprr_21_officers(cprr21)
     cprr19 = assign_uid_19_from_pprr(cprr19, pprr)
     cprr20 = assign_uid_20_from_pprr(cprr20, pprr)
+    cprr21 = match_cprr_21_w_pprr(cprr21, pprr)
     cprr19 = assign_supervisor_19_uid_from_pprr(cprr19, pprr)
     cprr20 = assign_supervisor_20_uid_from_pprr(cprr20, pprr)
     post_events = match_pprr_against_post(pprr, post)
     cprr19.to_csv(deba.data("match/cprr_new_orleans_so_2019.csv"), index=False)
     cprr20.to_csv(deba.data("match/cprr_new_orleans_so_2020.csv"), index=False)
+    cprr21.to_csv(deba.data("match/cprr_new_orleans_so_2021.csv"), index=False)
     post_events.to_csv(deba.data("match/post_event_new_orleans_so.csv"), index=False)
