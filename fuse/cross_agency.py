@@ -141,8 +141,6 @@ def cross_match_officers_between_agencies(personnel, events, constraints, post):
     matcher = ThresholdMatcher(
         index=MultiIndex(
             [
-                # only officers who have the same first letter in their first name would be matched
-                ColumnsIndex(["fc", "lc"]),
                 # or if they are in the same attract constraint
                 ColumnsIndex("attract_id", ignore_key_error=True),
                 # or if they are in the same history constraingt
@@ -151,19 +149,6 @@ def cross_match_officers_between_agencies(personnel, events, constraints, post):
         ),
         scorer=MaxScorer(
             [
-                AlterScorer(
-                    # calculate similarity score (0-1) based on name similarity
-                    scorer=SimSumScorer(
-                        {
-                            "first_name": JaroWinklerSimilarity(),
-                            "last_name": JaroWinklerSimilarity(),
-                        }
-                    ),
-                    # but for pairs that have the same name and their name is common
-                    values=common_names_sr,
-                    # give a penalty of -.2 which is enough to eliminate them
-                    alter=lambda score: score - 0.2,
-                ),
                 # but if two officers belong to the same attract constraint then give them the highest score regardless
                 AbsoluteScorer("attract_id", 1, ignore_key_error=True),
                 AbsoluteScorer("history_id", 1, ignore_key_error=True),
