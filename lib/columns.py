@@ -362,3 +362,25 @@ def rearrange_settlement_columns(df):
         "settlement",
         df.sort_values(["agency", "settlement_uid"]),
     )
+
+
+def rearrange_docs_columns(df):
+    """Performs final processing step for a docs table
+
+    This performs the following tasks:
+    - discard columns not present in docs schema
+    - drop row duplicates
+    - convert numeric columns to int or str
+
+    Args:
+        df (pd.DataFrame):
+            the frame to process
+
+    Returns:
+        the updated frame
+    """
+    df = df[~((df.matched_uid.fillna("") == ""))]
+    return datavalid_config.rearrange_columns(
+        "docs",
+        df.sort_values(["agency", "docid"]),
+    )

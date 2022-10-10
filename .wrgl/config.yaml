@@ -1177,6 +1177,12 @@ branch:
     file: data/fuse/settlements.csv
     primaryKey:
       - settlement_uid
+  docs:
+    remote: origin
+    merge: refs/heads/docs
+    file: data/fuse/docs.csv
+    primaryKey:
+      - docid
 merge:
   fastForward: only
 pack:

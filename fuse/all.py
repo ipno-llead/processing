@@ -13,6 +13,7 @@ from lib.columns import (
     rearrange_uof_officer_columns,
     rearrange_brady_columns,
     rearrange_settlement_columns,
+    rearrange_docs_columns,
 )
 from lib.uid import ensure_uid_unique
 
@@ -322,6 +323,16 @@ def fuse_settlements():
     ).sort_values("settlement_uid", ignore_index=True)
 
 
+def fuse_docs():
+    return rearrange_docs_columns(
+        pd.concat(
+            [
+                pd.read_csv(deba.data("fuse/docs_louisiana_state_pd.csv")),
+            ]
+        )
+    ).sort_values("docid", ignore_index=True)
+
+
 if __name__ == "__main__":
     per_df = fuse_personnel()
     ensure_uid_unique(per_df, "uid")
@@ -339,6 +350,7 @@ if __name__ == "__main__":
     brady_df = fuse_brady()
     property_claims_df = fuse_property_claims()
     settlements = fuse_settlements()
+    docs = fuse_docs()
     event_df.to_csv("events.csv", index=False)
 
     per_df.to_csv(deba.data("fuse/personnel_pre_post.csv"), index=False)
@@ -351,6 +363,7 @@ if __name__ == "__main__":
     award_df.to_csv(deba.data("fuse/awards.csv"), index=False)
     brady_df.to_csv(deba.data("fuse/brady.csv"), index=False)
     settlements.to_csv(deba.data("fuse/settlements.csv"), index=False)
+    docs.to_csv(deba.data("fuse/docs.csv"), index=False)
 
     post_event_df = pd.read_csv(deba.data("fuse/event_post.csv"))
     missing_agency_df = find_event_agency_if_missing_from_post(event_df, post_event_df)
