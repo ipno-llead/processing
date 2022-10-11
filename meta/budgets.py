@@ -38,6 +38,6 @@ def db_path():
 if __name__ == "__main__":
     df = fetch_reports()
     df.to_csv(deba.data("meta/budgets_files.csv"), index=False)
-    fpath = db_path()
-    db_meta = download_db_metadata(fpath)
-    db_meta.to_csv("data/raw/budgets/budgets_db_meta.csv", index=False)
+    # fpath = db_path()
+    # db_meta = download_db_metadata(fpath)
+    # db_meta.to_csv("data/raw/budgets/budgets_db_meta.csv", index=False)
