@@ -22,3 +22,5 @@ build
 .deba
 
 *.log
+
+db.txt
