@@ -294,6 +294,11 @@ def concat_text_from_all_pages(df):
     return df
 
 
+def generate_doc_date(df):
+    df.loc[:, "doc_date"] = df.letter_date
+    return df
+
+
 def clean_letters_2019():
     db_meta = pd.read_csv(
         deba.data("raw/louisiana_state_pd/letters_louisiana_state_pd_2019_db_files.csv")
@@ -315,7 +320,11 @@ def clean_letters_2019():
         .pipe(clean_fn)
     )
     df = pd.merge(df, db_meta, on="fn", how="outer")
-    df = df.rename(columns={"md5": "docid"})
+    df = (
+        df.rename(columns={"md5": "docid"})
+        .pipe(generate_doc_date)
+        .pipe(clean_dates, ["doc_date"])
+    )
     return df
 
 

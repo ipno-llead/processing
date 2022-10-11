@@ -4,7 +4,7 @@ import os
 import pandas as pd
 from datavalid import load_config
 
-from .clean import float_to_int_str, names_to_title_case
+from .clean import float_to_int_str, names_to_title_case, clean_dates
 
 
 datavalid_config = load_config(os.path.join(os.path.dirname(__file__), ".."))
@@ -383,4 +383,4 @@ def rearrange_docs_columns(df):
     return datavalid_config.rearrange_columns(
         "docs",
         df.sort_values(["agency", "docid"]),
-    )
+    ).pipe(names_to_title_case, ["title"])
