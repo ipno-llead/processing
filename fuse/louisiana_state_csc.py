@@ -4,6 +4,7 @@ from lib.columns import (
     rearrange_appeal_hearing_columns,
     rearrange_event_columns,
     rearrange_settlement_columns,
+    rearrange_docs_columns,
 )
 from lib.personnel import fuse_personnel
 from lib import events
@@ -115,6 +116,7 @@ if __name__ == "__main__":
     settlements = rearrange_settlement_columns(settlements)
     app_df = rearrange_appeal_hearing_columns(lprr)
     cprr = rearrange_allegation_columns(pd.concat([cprr19, cprr20]))
+    lsp_docs = rearrange_docs_columns(cprr19)
     per_df.to_csv(deba.data("fuse/per_louisiana_state_pd.csv"), index=False)
     event_df.to_csv(deba.data("fuse/event_louisiana_state_pd.csv"), index=False)
     app_df.to_csv(deba.data("fuse/app_louisiana_state_pd.csv"), index=False)
@@ -123,3 +125,4 @@ if __name__ == "__main__":
     )
     cprr.to_csv(deba.data("fuse/com_louisiana_state_pd.csv"), index=False)
     post.to_csv(deba.data("fuse/post_louisiana_state_pd.csv"), index=False)
+    lsp_docs.to_csv(deba.data("fuse/docs_louisiana_state_pd.csv"), index=False)

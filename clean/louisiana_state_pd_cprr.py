@@ -32,6 +32,8 @@ def extract_ids_and_subject(df):
         .str.replace(r"©", "", regex=False)
     )
 
+    df.loc[:, "title"] = df.letter_subject
+
     ids = (
         df.data.str.lower()
         .str.replace(r" ?nan ?", " ", regex=True)
@@ -148,9 +150,23 @@ def join_multiple_extracted_entity_cols(df):
     df = reduce(
         lambda left, right: pd.merge(left, right, on=["md5"], how="outer"), data_frames
     )
-    df = df[['report_date', 'md5', 'filepath', 'filesha1', 'fileid', 'filetype',
-       'fn', 'file_category', 'text', 'pageno', 'tracking_id', 'allegation',
-       'report_subject']]
+    df = df[
+        [
+            "report_date",
+            "md5",
+            "filepath",
+            "filesha1",
+            "fileid",
+            "filetype",
+            "fn",
+            "file_category",
+            "text",
+            "pageno",
+            "tracking_id",
+            "allegation",
+            "report_subject",
+        ]
+    ]
     return df[~((df.report_date.fillna("") == ""))].reset_index(drop=True)
 
 
@@ -236,20 +252,62 @@ def sanitize_dates_2020(df):
 
 
 def clean_tracking_id(df):
-    df.loc[:, "tracking_id"] = df.tracking_id.fillna("").str.lower().str.strip()\
-        .str.replace(r"\n", "", regex=True)\
-        .str.replace(r"\'", "", regex=True)\
+    df.loc[:, "tracking_id"] = (
+        df.tracking_id.fillna("")
+        .str.lower()
+        .str.strip()
+        .str.replace(r"\n", "", regex=True)
+        .str.replace(r"\'", "", regex=True)
         .str.replace(r"case ?#?:? ?n?", "", regex=True)
+    )
     return df
+
 
 def drop_rows_missing_names(df):
     return df[~((df.last_name.fillna("") == ""))]
 
 
+def extract_db_meta(df):
+    fn = df.meta_data.str.extract(r", name=\'(.+.pdf)\', (parent_shared_folder_id)")
+    pdf_db_content_hash = df.meta_data.str.extract(
+        r", content_hash=\'(.+)\', (export_info)"
+    )
+    pdf_db_path = df.meta_data.str.extract(r", path_display=\'(.+)\', (path_lower)")
+    pdf_db_id = df.meta_data.str.extract(r", id=\'(.+)\', (is_downloadable)")
+
+    df.loc[:, "fn"] = fn[0]
+    df.loc[:, "pdf_db_content_hash"] = pdf_db_content_hash[0]
+    df.loc[:, "pdf_db_path"] = pdf_db_path[0]
+    df.loc[:, "pdf_db_id"] = pdf_db_id[0]
+    return df.drop(columns=["meta_data"])
+
+
+def clean_fn(df):
+    df.loc[:, "fn"] = df.fn.str.replace(r"(\[|\]|\')", "", regex=True)
+    return df
+
+
+def concat_text_from_all_pages(df):
+    text = df.groupby("md5")["text"].apply(" ".join).reset_index()
+    df = df.drop(columns=["text"])
+    df = pd.merge(df, text, on="md5", how="outer")
+    return df
+
+
+def generate_doc_date(df):
+    df.loc[:, "doc_date"] = df.letter_date
+    return df
+
+
 def clean_letters_2019():
+    db_meta = pd.read_csv(
+        deba.data("raw/louisiana_state_pd/letters_louisiana_state_pd_2019_db_files.csv")
+    ).pipe(extract_db_meta)
+
     df = (
         pd.read_csv(deba.data("ner/letters_louisiana_state_pd_2019.csv"))
         .pipe(clean_column_names)
+        .pipe(concat_text_from_all_pages)
         .pipe(drop_rows_missing_dates)
         .pipe(extract_ids_and_subject)
         .pipe(split_names)
@@ -259,6 +317,13 @@ def clean_letters_2019():
         .pipe(set_values, {"agency": "louisiana-state-pd"})
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(gen_uid, ["letter_subject", "uid", "letter_date"], "allegation_uid")
+        .pipe(clean_fn)
+    )
+    df = pd.merge(df, db_meta, on="fn", how="outer")
+    df = (
+        df.rename(columns={"md5": "docid"})
+        .pipe(generate_doc_date)
+        .pipe(clean_dates, ["doc_date"])
     )
     return df
 
@@ -288,7 +353,11 @@ def clean_reports_2020():
         .pipe(clean_names, ["first_name", "last_name"])
         .pipe(set_values, {"agency": "louisiana-state-pd"})
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
-        .pipe(gen_uid, ["allegation", "uid", "report_year", "report_month", "report_day"], "allegation_uid")
+        .pipe(
+            gen_uid,
+            ["allegation", "uid", "report_year", "report_month", "report_day"],
+            "allegation_uid",
+        )
         .drop_duplicates(subset=["allegation_uid"])
         .pipe(drop_rows_missing_names)
     )

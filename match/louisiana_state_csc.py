@@ -174,10 +174,11 @@ def match_cprr_19_to_pprr(cprr, pprr):
         deba.data("match/cprr_lsp_2019_v_pprr_lsp.xlsx"),
         decision,
     )
-    matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
+    matches = matcher.get_index_pairs_within_thresholds(decision)
     match_dict = dict(matches)
 
     cprr.loc[:, "uid"] = cprr.uid.map(lambda x: match_dict.get(x, x))
+    cprr.loc[:, "matched_uid"] = cprr.uid.map(lambda x: match_dict.get(x, x))
     return cprr
 
 

@@ -25,6 +25,8 @@ files:
     schema: post_officer_history
   data/fuse/settlements.csv:
     schema: settlement
+  data/fuse/docs.csv:
+    schema: docs
 
 schemas:
   personnel:
@@ -545,5 +547,23 @@ schemas:
       - name: final_judgement_date
       - name: pay_year
       - name: agency
+  docs:
+    columns:
+      - name: docid
+        description: >
+          unique identifier of doc generated at meta stage
+      - name: text
+      - name: title
+      - name: doc_year
+      - name: doc_month
+      - name: doc_day
+      - name: pdf_db_content_hash
+      - name: pdf_db_path
+      - name: pdf_db_id
+      - name: agency
+      - name: matched_uid
+        description: >
+          uid of officer matched to the doc
+
 
 save_bad_rows_to: data/invalid_rows.csv

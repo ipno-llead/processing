@@ -1,6 +1,7 @@
 import deba
-from lib.dvc import files_meta_frame
 import pandas as pd
+from lib.dvc import files_meta_frame
+from lib.meta import download_db_metadata
 
 
 def set_filetype(df: pd.DataFrame) -> pd.DataFrame:
@@ -29,6 +30,19 @@ def fetch_reports() -> pd.DataFrame:
     )
 
 
+def db_path():
+    fpath = (
+        r"/IPNO/data/Louisiana State/Data Collected/Louisiana State Police Department/"
+        r"Data Collected/Disciplinary Letters/2019/raw_louisiana_state_pd_letters_2019"
+    )
+    return fpath
+
+
 if __name__ == "__main__":
     df = fetch_reports()
     df.to_csv(deba.data("meta/letters_louisiana_state_pd_2019_files.csv"), index=False)
+    # fpath = db_path()
+    # db_meta = download_db_metadata(fpath)
+    # db_meta.to_csv(
+    #     "data/raw/louisiana_state_pd/letters_louisiana_state_pd_2019_db_files.csv"
+    # )
