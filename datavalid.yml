@@ -553,6 +553,7 @@ schemas:
         description: >
           unique identifier of doc generated at meta stage
       - name: text
+      - name: title
       - name: pdf_db_content_hash
       - name: pdf_db_path
       - name: pdf_db_id

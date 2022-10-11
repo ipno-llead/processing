@@ -32,6 +32,8 @@ def extract_ids_and_subject(df):
         .str.replace(r"©", "", regex=False)
     )
 
+    df.loc[:, "title"] = df.letter_subject
+
     ids = (
         df.data.str.lower()
         .str.replace(r" ?nan ?", " ", regex=True)
@@ -294,7 +296,7 @@ def concat_text_from_all_pages(df):
 
 def clean_letters_2019():
     db_meta = pd.read_csv(
-        deba.data("meta/letters_louisiana_state_pd_2019_db_files.csv")
+        deba.data("raw/louisiana_state_pd/letters_louisiana_state_pd_2019_db_files.csv")
     ).pipe(extract_db_meta)
 
     df = (
