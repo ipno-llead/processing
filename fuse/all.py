@@ -328,9 +328,10 @@ def fuse_docs():
         pd.concat(
             [
                 pd.read_csv(deba.data("fuse/docs_louisiana_state_pd.csv")),
+                pd.read_csv(deba.data("fuse/docs_budgets.csv")),
             ]
         )
-    ).sort_values("docid", ignore_index=True)
+    ).sort_values("agency", ignore_index=True)
 
 
 if __name__ == "__main__":
