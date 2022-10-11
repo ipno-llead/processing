@@ -1,0 +1,6 @@
+wdir: data
+outs:
+- md5: e5de70e8d709ead779066a088ed8836f.dir
+  size: 21073134
+  nfiles: 4
+  path: raw_budgets
