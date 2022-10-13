@@ -1,8 +1,9 @@
 import deba
+import pandas as pd
 from lib.columns import (
     rearrange_docs_columns,
 )
-import pandas as pd
+
 
 
 if __name__ == "__main__":

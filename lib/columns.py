@@ -379,7 +379,6 @@ def rearrange_docs_columns(df):
     Returns:
         the updated frame
     """
-    df = df[~((df.matched_uid.fillna("") == ""))]
     return datavalid_config.rearrange_columns(
         "docs",
         df.sort_values(["agency", "docid"]),
