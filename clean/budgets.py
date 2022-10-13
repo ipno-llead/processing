@@ -1,6 +1,6 @@
 import deba
 import pandas as pd
-from lib.columns import clean_column_names
+from lib.columns import clean_column_names, set_values
 from lib.clean import clean_dates, names_to_title_case
 from lib.uid import gen_uid
 
@@ -90,7 +90,7 @@ def budgets():
     df = (
         df.rename(columns={"md5": "docid"})
         .pipe(clean_dates, ["doc_date"])
-        .pipe(gen_uid, ["agency"], "matched_uid")
+        .pipe(set_values, {"matched_uid": ""})
     )
     return df
 
