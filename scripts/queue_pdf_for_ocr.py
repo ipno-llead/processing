@@ -78,6 +78,7 @@ if __name__ == "__main__":
         [
             "bash",
             "-c",
-            "kustomize build %s | kubectl apply -f -" % KUSTOMIZE_DIR,
+            "kustomize build %s | kubectl delete -f -; kustomize build %s | kubectl apply -f -"
+            % (KUSTOMIZE_DIR, KUSTOMIZE_DIR),
         ],
     )
