@@ -12,6 +12,8 @@ from lib.columns import (
     rearrange_uof_citizen_columns,
     rearrange_uof_officer_columns,
     rearrange_brady_columns,
+    rearrange_settlement_columns,
+    rearrange_docs_columns,
 )
 from lib.uid import ensure_uid_unique
 
@@ -30,8 +32,8 @@ def fuse_personnel():
                 pd.read_csv(deba.data("fuse/per_greenwood_pd.csv")),
                 pd.read_csv(deba.data("fuse/per_st_tammany_so.csv")),
                 pd.read_csv(deba.data("fuse/per_plaquemines_so.csv")),
-                pd.read_csv(deba.data("fuse/per_louisiana_state_police.csv")),
-                pd.read_csv(deba.data("fuse/per_caddo_parish_so.csv")),
+                pd.read_csv(deba.data("fuse/per_louisiana_state_pd.csv")),
+                pd.read_csv(deba.data("fuse/per_caddo_so.csv")),
                 pd.read_csv(deba.data("fuse/per_mandeville_pd.csv")),
                 pd.read_csv(deba.data("fuse/per_levee_pd.csv")),
                 pd.read_csv(deba.data("fuse/per_grand_isle_pd.csv")),
@@ -78,6 +80,8 @@ def fuse_personnel():
                 pd.read_csv(deba.data("fuse/per_sulphur_pd.csv")),
                 pd.read_csv(deba.data("fuse/per_pineville_pd.csv")),
                 pd.read_csv(deba.data("fuse/per_st_james_so.csv")),
+                pd.read_csv(deba.data("fuse/per_natchitoches_so.csv")),
+                pd.read_csv(deba.data("fuse/per_harahan_pd.csv")),
             ]
         )
     ).sort_values("uid", ignore_index=True)
@@ -97,8 +101,8 @@ def fuse_event():
                 pd.read_csv(deba.data("fuse/event_greenwood_pd.csv")),
                 pd.read_csv(deba.data("fuse/event_st_tammany_so.csv")),
                 pd.read_csv(deba.data("fuse/event_plaquemines_so.csv")),
-                pd.read_csv(deba.data("fuse/event_louisiana_state_police.csv")),
-                pd.read_csv(deba.data("fuse/event_caddo_parish_so.csv")),
+                pd.read_csv(deba.data("fuse/event_louisiana_state_pd.csv")),
+                pd.read_csv(deba.data("fuse/event_caddo_so.csv")),
                 pd.read_csv(deba.data("fuse/event_mandeville_pd.csv")),
                 pd.read_csv(deba.data("fuse/event_levee_pd.csv")),
                 pd.read_csv(deba.data("fuse/event_grand_isle_pd.csv")),
@@ -144,6 +148,10 @@ def fuse_event():
                 pd.read_csv(deba.data("fuse/event_sulphur_pd.csv")),
                 pd.read_csv(deba.data("fuse/event_pineville_pd.csv")),
                 pd.read_csv(deba.data("fuse/event_st_james_so.csv")),
+                pd.read_csv(deba.data("fuse/event_natchitoches_so.csv")),
+                pd.read_csv(deba.data("fuse/event_harahan_pd.csv")),
+                pd.read_csv(deba.data("fuse/event_ouachita_da.csv")),
+                pd.read_csv(deba.data("fuse/event_baton_rouge_da.csv")),
             ]
         )
     ).sort_values(["agency", "event_uid"], ignore_index=True)
@@ -196,6 +204,8 @@ def fuse_allegation():
                 pd.read_csv(deba.data("fuse/com_sulphur_pd.csv")),
                 pd.read_csv(deba.data("fuse/com_pineville_pd.csv")),
                 pd.read_csv(deba.data("fuse/com_st_james_so.csv")),
+                pd.read_csv(deba.data("fuse/com_natchitoches_so.csv")),
+                pd.read_csv(deba.data("fuse/com_louisiana_state_pd.csv")),
             ]
         )
     ).sort_values(["agency", "tracking_id"], ignore_index=True)
@@ -264,9 +274,8 @@ def fuse_appeal_hearing_logs():
     return rearrange_appeal_hearing_columns(
         pd.concat(
             [
-                pd.read_csv(deba.data("fuse/app_baton_rouge_pd.csv")),
                 pd.read_csv(deba.data("fuse/app_new_orleans_csc.csv")),
-                pd.read_csv(deba.data("fuse/app_louisiana_state_police.csv")),
+                pd.read_csv(deba.data("fuse/app_louisiana_state_pd.csv")),
             ]
         )
     ).sort_values("uid", ignore_index=True)
@@ -288,10 +297,10 @@ def fuse_brady():
     return rearrange_brady_columns(
         pd.concat(
             [
-                pd.read_csv(deba.data("fuse/brady_baton_rouge_pd.csv")),
-                pd.read_csv(deba.data("fuse/brady_new_orleans_pd.csv")),
-                pd.read_csv(deba.data("fuse/brady_ouachita_so.csv")),
-                pd.read_csv(deba.data("fuse/brady_tangipahoa_so.csv")),
+                pd.read_csv(deba.data("fuse/brady_baton_rouge_da.csv")),
+                pd.read_csv(deba.data("fuse/brady_ouachita_da.csv")),
+                pd.read_csv(deba.data("fuse/brady_iberia_da.csv")),
+                pd.read_csv(deba.data("fuse/brady_tangipahoa_da.csv")),
             ]
         )
     ).sort_values("brady_uid", ignore_index=True)
@@ -301,6 +310,28 @@ def fuse_property_claims():
     return rearrange_property_claims_columns(
         pd.concat([pd.read_csv(deba.data("fuse/pclaims_new_orleans_pd.csv"))])
     ).sort_values("property_claims_uid", ignore_index=True)
+
+
+def fuse_settlements():
+    return rearrange_settlement_columns(
+        pd.concat(
+            [
+                pd.read_csv(deba.data("fuse/settlements_new_orleans_pd.csv")),
+                pd.read_csv(deba.data("fuse/settlements_louisiana_state_pd.csv")),
+            ]
+        )
+    ).sort_values("settlement_uid", ignore_index=True)
+
+
+def fuse_docs():
+    return rearrange_docs_columns(
+        pd.concat(
+            [
+                pd.read_csv(deba.data("fuse/docs_louisiana_state_pd.csv")),
+                pd.read_csv(deba.data("fuse/docs_budgets.csv")),
+            ]
+        )
+    ).sort_values("agency", ignore_index=True)
 
 
 if __name__ == "__main__":
@@ -319,6 +350,9 @@ if __name__ == "__main__":
     award_df = fuse_award()
     brady_df = fuse_brady()
     property_claims_df = fuse_property_claims()
+    settlements = fuse_settlements()
+    docs = fuse_docs()
+    event_df.to_csv("events.csv", index=False)
 
     per_df.to_csv(deba.data("fuse/personnel_pre_post.csv"), index=False)
     allegation_df.to_csv(deba.data("fuse/allegation.csv"), index=False)
@@ -329,6 +363,8 @@ if __name__ == "__main__":
     uof_officer_df.to_csv(deba.data("fuse/uof_officers.csv"), index=False)
     award_df.to_csv(deba.data("fuse/awards.csv"), index=False)
     brady_df.to_csv(deba.data("fuse/brady.csv"), index=False)
+    settlements.to_csv(deba.data("fuse/settlements.csv"), index=False)
+    docs.to_csv(deba.data("fuse/docs.csv"), index=False)
 
     post_event_df = pd.read_csv(deba.data("fuse/event_post.csv"))
     missing_agency_df = find_event_agency_if_missing_from_post(event_df, post_event_df)
@@ -336,4 +372,3 @@ if __name__ == "__main__":
     event_df = pd.concat([event_df, post_event_df], ignore_index=True)
     event_df.to_csv(deba.data("fuse/event_pre_post.csv"), index=False)
     property_claims_df.to_csv(deba.data("fuse/property_claims.csv"), index=False)
-    

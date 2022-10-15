@@ -24,26 +24,31 @@ def train_spacy_model(df: pd.DataFrame, training_data: str) -> pd.DataFrame:
         entities = []
         for e in entry["label"]:
             entities.append((e[0], e[1], e[2]))
-        spacy_entry = (entry["data"], {"entities": entities})
+        spacy_entry = (entry["text"], {"entities": entities})
         TRAINING_DATA.append(spacy_entry)
 
     ### train model
     nlp = spacy.blank("en")
     ner = nlp.create_pipe("ner")
     nlp.add_pipe("ner")
+    ner.add_label("report_subject")
+    ner.add_label("tracking_id")
     ner.add_label("allegation")
+    ner.add_label("previous_discipline")
+    ner.add_label("report_date")
+    ner.add_label("accused_name")
 
     optimizer = nlp.begin_training()
-    for itn in range(200):
+    for itn in range(50):
         random.shuffle(TRAINING_DATA)
         losses = {}
         for batch in spacy.util.minibatch(
-            TRAINING_DATA, size=compounding(3.0, 2.0, 1.001)
+            TRAINING_DATA, size=compounding(5.0, 2.0, 1.001)
         ):
             for text, annotations in batch:
                 doc = nlp.make_doc(text)
                 example = Example.from_dict(doc, annotations)
-                nlp.update([example], sgd=optimizer, losses=losses, drop=0.4)
+                nlp.update([example], sgd=optimizer, losses=losses, drop=0.2)
                 print(losses)
         entities = []
     return nlp
@@ -71,4 +76,5 @@ def apply_spacy_model(df: pd.DataFrame, spacy_model: str) -> pd.DataFrame:
         entities.append(renamed_ents)
 
     ner = pd.DataFrame(entities)
-    return ner
+    df = pd.concat([ner, df], axis=1)
+    return df

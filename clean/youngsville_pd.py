@@ -22,7 +22,7 @@ def clean_pprr_17_18(df, year):
         .pipe(
             set_values,
             {
-                "agency": "Youngsville PD",
+                "agency": "youngsville-pd",
                 "salary_freq": salary.YEARLY,
                 "salary_year": year,
             },
@@ -41,7 +41,7 @@ def clean_pprr_19():
         .pipe(
             set_values,
             {
-                "agency": "Youngsville PD",
+                "agency": "youngsville-pd",
                 "salary_freq": salary.YEARLY,
                 "salary_year": 2019,
                 "employment_status": "full-time",

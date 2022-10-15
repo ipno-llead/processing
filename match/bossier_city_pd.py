@@ -50,7 +50,7 @@ def extract_post_events(pprr, post):
         deba.data("match/pprr_bossier_city_pd_v_post_2016_2019.xlsx"), decision
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
-    return extract_events_from_post(post, matches, "Bossier City PD")
+    return extract_events_from_post(post, matches, "bossier-city-pd")
 
 
 def match_cprr_with_pprr(cprr, pprr):

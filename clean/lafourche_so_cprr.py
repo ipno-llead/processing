@@ -168,6 +168,10 @@ def clean_disposition15(df):
         .str.replace(r"completionmander", "completion", regex=False)
         .str.replace(r"resigned; before", "resigned before", regex=False)
         .str.replace(r"  +", " ", regex=True)
+        .str.replace(r"\badm\b", "administrative", regex=True)
+        .str.replace(r"\((.+)\)", "", regex=True)
+        .str.replace(r"adm rem;", "", regex=False)
+        .str.replace(r" +$", "", regex=True)
     )
 
     return df.drop(columns=["outcome"])
@@ -246,6 +250,25 @@ def map_allegation_desc(df):
     return df
 
 
+def correct_actions(df):
+    df.loc[(df.last_name == "peterson")  & (df.disposition == "sustained; resigned prior to discipline"), "action"] = "resgined prior to discipline"
+    df.loc[(df.last_name == "durand")  & (df.disposition == "resigned before completion"), "action"] = "resigned before completion"
+    df.loc[(df.last_name == "fields")  & (df.disposition == "resigned before completion"), "action"] = "resigned before completion"
+    df.loc[(df.last_name == "guidry")  & (df.disposition == "resigned before completion"), "action"] = "resigned before completion"
+    df.loc[(df.last_name == "marulli")  & (df.disposition == "resigned before completion"), "action"] = "resigned before completion"
+    df.loc[(df.last_name == "wintzel")  & (df.disposition == "resigned before completion"), "action"] = "resigned before completion"
+    df.loc[(df.last_name == "bearden")  & (df.disposition == "resigned before completion"), "action"] = "resigned before completion"
+    df.loc[(df.last_name == "guilliot")  & (df.disposition == "resigned before completion"), "action"] = "resigned before completion"
+    df.loc[(df.last_name == "lymous")  & (df.disposition == "transferred before completion; appeal; resigned"), "action"] = "resigned"
+    df.loc[(df.last_name == "campo")  & (df.disposition == "sustained; resigned"), "action"] = "resigned"
+    df.loc[(df.last_name == "bogle")  & (df.disposition == "sustained; resigned"), "action"] = "resigned"
+    df.loc[(df.last_name == "guidry")  & (df.disposition == "sustained; resigned"), "action"] = "resigned"
+    df.loc[(df.last_name == "jennings")  & (df.disposition == "sustained; resigned"), "action"] = "resigned"
+    df.loc[(df.last_name == "kaufman")  & (df.disposition == "sustained; resigned"), "action"] = "resigned"
+    df.loc[(df.last_name == "johnson")  & (df.disposition == "    resigned; refused to cooperate"), "action"] = "resigned"
+    return df
+
+
 def clean21():
     df = (
         pd.read_csv(deba.data("raw/lafourche_so/lafourche_so_cprr_2019_2021.csv"))
@@ -265,7 +288,7 @@ def clean21():
         .pipe(clean_races, ["race"])
         .pipe(clean_sexes, ["sex"])
         .pipe(clean_names, ["first_name", "middle_name", "last_name"])
-        .pipe(set_values, {"agency": "Lafourche SO"})
+        .pipe(set_values, {"agency": "lafourche-so"})
         .pipe(gen_uid, ["first_name", "middle_name", "last_name", "agency"])
         .pipe(
             gen_uid,
@@ -291,7 +314,8 @@ def clean15():
         .pipe(drop_rows_missing_allegations)
         .pipe(split_rows_with_multiple_allegations15)
         .pipe(map_allegation_desc)
-        .pipe(set_values, {"agency": "Lafourche SO"})
+        .pipe(correct_actions)
+        .pipe(set_values, {"agency": "lafourche-so"})
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(gen_uid, ["uid", "allegation", "disposition", "action"], "allegation_uid")
         .drop_duplicates(subset=["allegation_uid"], keep="first")

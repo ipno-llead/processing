@@ -182,8 +182,21 @@ def clean_action_08(df):
         .str.replace("n/a", "", regex=False)
         .str.replace(r"\/", "|", regex=True)
         .str.replace(r"^remid$", "remedial", regex=True)
+        .str.replace(r"\|eap", "", regex=True)
+        .str.replace(r"off duty security", "", regex=False)
+        .str.replace(r"\|off duty", "", regex=True)
     )
     return df.drop(columns="leave")
+
+
+def clean_disposition_08(df):
+    df.loc[:, "disposition"] = (
+        df.disposition.str.lower()
+        .str.strip()
+        .str.replace(r"comp withdrew", "complaint withdrawn", regex=False)
+        .str.replace(r"sust$", "sustained", regex=True)
+    )
+    return df
 
 
 def drop_rows_missing_names(df):
@@ -214,7 +227,7 @@ def clean20():
         .pipe(
             set_values,
             {
-                "agency": "Lafayette SO",
+                "agency": "lafayette-so",
             },
         )
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
@@ -242,7 +255,7 @@ def clean14():
         .pipe(clean_disposition)
         .pipe(clean_action)
         .pipe(clean_department_desc)
-        .pipe(set_values, {"agency": "Lafayette SO"})
+        .pipe(set_values, {"agency": "lafayette-so"})
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(
             gen_uid,
@@ -268,7 +281,8 @@ def clean08():
         .pipe(clean_complete)
         .pipe(clean_level)
         .pipe(clean_action_08)
-        .pipe(set_values, {"agency": "Lafayette SO"})
+        .pipe(clean_disposition_08)
+        .pipe(set_values, {"agency": "lafayette-so"})
         .pipe(gen_uid, ["agency", "first_name", "last_name"])
         .pipe(
             gen_uid,

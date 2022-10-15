@@ -4,7 +4,7 @@ import os
 import pandas as pd
 from datavalid import load_config
 
-from .clean import float_to_int_str, names_to_title_case
+from .clean import float_to_int_str, names_to_title_case, clean_dates
 
 
 datavalid_config = load_config(os.path.join(os.path.dirname(__file__), ".."))
@@ -320,3 +320,66 @@ def rearrange_property_claims_columns(df):
         "property_claims",
         df.sort_values(["agency", "property_claims_uid"]),
     )
+
+
+def rearrange_post_officer_history_columns(df):
+    """Performs final processing step for a post officer history report table
+
+    This performs the following tasks:
+    - discard columns not present in post officer history schema
+    - drop row duplicates
+    - convert numeric columns to int or str
+
+    Args:
+        df (pd.DataFrame):
+            the frame to process
+
+    Returns:
+        the updated frame
+    """
+    return datavalid_config.rearrange_columns(
+        "post_officer_history",
+        df.sort_values(["history_id", "uid"]),
+    )
+
+
+def rearrange_settlement_columns(df):
+    """Performs final processing step for a settlement table
+
+    This performs the following tasks:
+    - discard columns not present in settlement schema
+    - drop row duplicates
+    - convert numeric columns to int or str
+
+    Args:
+        df (pd.DataFrame):
+            the frame to process
+
+    Returns:
+        the updated frame
+    """
+    return datavalid_config.rearrange_columns(
+        "settlement",
+        df.sort_values(["agency", "settlement_uid"]),
+    )
+
+
+def rearrange_docs_columns(df):
+    """Performs final processing step for a docs table
+
+    This performs the following tasks:
+    - discard columns not present in docs schema
+    - drop row duplicates
+    - convert numeric columns to int or str
+
+    Args:
+        df (pd.DataFrame):
+            the frame to process
+
+    Returns:
+        the updated frame
+    """
+    return datavalid_config.rearrange_columns(
+        "docs",
+        df.sort_values(["agency", "docid"]),
+    ).pipe(names_to_title_case, ["title"])

@@ -1,0 +1,6 @@
+wdir: data
+outs:
+- md5: 6daf30f8d1591cc975eb6cc5ae07d15b.dir
+  size: 78606709
+  nfiles: 19
+  path: raw_louisiana_state_pd_letters_2019

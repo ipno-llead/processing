@@ -64,7 +64,7 @@ def clean():
         .pipe(clean_races, ["race"])
         .pipe(clean_sexes, ["sex"])
         .pipe(clean_names, ["first_name", "last_name", "middle_name"])
-        .pipe(set_values, {"data_production_year": 2021, "agency": "Scott PD"})
+        .pipe(set_values, {"data_production_year": 2021, "agency": "scott-pd"})
         .pipe(gen_uid, ["agency", "first_name", "last_name", "birth_year", "badge_no"])
     )
     return df

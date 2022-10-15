@@ -4,6 +4,7 @@ import deba
 from lib import events
 from lib.personnel import fuse_personnel
 from lib.columns import rearrange_allegation_columns, rearrange_event_columns
+from lib.post import load_for_agency
 
 
 def fuse_events(cprr_20, cprr_14, cprr_08, pprr):
@@ -65,10 +66,13 @@ if __name__ == "__main__":
     cprr_08 = pd.read_csv(deba.data("clean/cprr_hammond_pd_2004_2008.csv"))
     post_event = pd.read_csv(deba.data("match/post_event_hammond_pd_2020_11_06.csv"))
     pprr = pd.read_csv(deba.data("clean/pprr_hammond_pd_2021.csv"))
-    personnel_df = fuse_personnel(cprr_20, cprr_14, cprr_08, pprr)
+    agency = pprr.agency[0]
+    post = load_for_agency(agency)
+    personnel_df = fuse_personnel(cprr_20, cprr_14, cprr_08, pprr, post)
     complaints_df = rearrange_allegation_columns(pd.concat([cprr_20, cprr_14, cprr_08]))
     event_df = fuse_events(cprr_20, cprr_14, cprr_08, pprr)
     event_df = rearrange_event_columns(pd.concat([event_df, post_event]))
     event_df.to_csv(deba.data("fuse/event_hammond_pd.csv"), index=False)
     personnel_df.to_csv(deba.data("fuse/per_hammond_pd.csv"), index=False)
     complaints_df.to_csv(deba.data("fuse/com_hammond_pd.csv"), index=False)
+    post.to_csv(deba.data("fuse/post_hammond_pd.csv"), index=False)

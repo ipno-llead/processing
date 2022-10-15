@@ -138,7 +138,7 @@ def clean21():
         .pipe(split_and_clean_names)
         .pipe(clean_receive_and_complete_dates)
         .pipe(clean_dates, ["receive_date", "investigation_complete_date"])
-        .pipe(set_values, {"agency": "Abbeville PD"})
+        .pipe(set_values, {"agency": "abbeville-pd"})
         .pipe(gen_uid, ["agency", "first_name", "last_name"])
         .pipe(
             gen_uid,
@@ -177,7 +177,7 @@ def clean18():
         .pipe(clean_action)
         .pipe(remove_q_marks_from_dates)
         .pipe(clean_dates, ["receive_date", "investigation_complete_date"])
-        .pipe(set_values, {"agency": "Abbeville PD"})
+        .pipe(set_values, {"agency": "abbeville-pd"})
         .pipe(gen_uid, ["agency", "first_name", "last_name"])
         .pipe(
             gen_uid,

@@ -520,7 +520,7 @@ def condense_rows_with_same_docket_no(df):
 
 
 def assign_agency(df):
-    df.loc[:, "agency"] = "Baton Rouge PD"
+    df.loc[:, "agency"] = "baton-rouge-pd"
     df.loc[:, "data_production_year"] = 2012
     return df
 

@@ -21,6 +21,13 @@ files:
     schema: award
   data/fuse/property_claims.csv:
     schema: property_claims
+  data/fuse/post_officer_history.csv:
+    schema: post_officer_history
+  data/fuse/settlements.csv:
+    schema: settlement
+  data/fuse/docs.csv:
+    schema: docs
+
 schemas:
   personnel:
     columns:
@@ -92,9 +99,6 @@ schemas:
       - name: body_worn_camera_available
       - name: app_used
       - name: citizen_arrested
-      - name: citizen
-        description: >
-          demographic info of the involved citizen
       - name: disposition
         description: >
           the final disposition for the complaint
@@ -159,7 +163,10 @@ schemas:
       - name: shift_supervisor
       - name: allegation_desc
         description: >
-          text description of the allegation
+          narrative form text description of allegation
+      - name: allegation_sub_desc
+        description: >
+          policy/manual text description of allegation
       - name: investigating_department
         description: >
           small departments frequently turnover internal investigations to the sheriff's office
@@ -168,6 +175,19 @@ schemas:
       - name: disposition_desc
         description: >
           text description of aftermath of disposition, or reason for disposition.
+      - name: item_number
+      - name: citizen_race
+      - name: citizen_sex
+      - name: citizen_age
+      - name: letter_subject
+        description: >
+          text description of investigative letter
+      - name: report_subject
+        description: >
+          text description of investigative report
+      - name: race
+      - name: sex
+      - name: age
   event:
     columns:
       - name: event_uid
@@ -212,6 +232,8 @@ schemas:
           - claim_receive
           - claim_occur
           - claim_closed
+          - brady_list
+          - board_hearing
         no_na: true
       - name: year
         integer: true
@@ -259,6 +281,8 @@ schemas:
       - name: division_desc
       - name: sub_division_a_desc
       - name: sub_division_b_desc
+      - name: unit_desc
+      - name: unit_sub_desc
       - name: current_supervisor
       - name: employee_class
         description: >
@@ -270,7 +294,7 @@ schemas:
       - name: rank_desc
         description: >
           text description of the officer's rank at the time of the event.
-      - name: officer_employment_status
+      - name: employment_status
       #   description: >
       #     whether the officer is full time, part time, reserve, ... etc
       - name: sworn
@@ -286,6 +310,9 @@ schemas:
         integer: true
       - name: salary
         float: true
+      - name: salary_year
+      - name: overtime_and_detail_annual_total
+      - name: overtime_and_detail_annual_year
       - name: salary_freq
         options:
           - hourly
@@ -305,6 +332,8 @@ schemas:
         description: >
           narrative summary of the officer's reason for leaving
       - name: years_of_service
+      - name: source_agency
+      - name: brady_uid
     validation_tasks:
       - name: event dates should be valid
         valid_date:
@@ -492,5 +521,49 @@ schemas:
       - name: property_damage_open
       - name: property_damage_incurred
       - name: property_damage_sub
+  post_officer_history:
+    columns:
+      - name: history_id
+        description: >
+          unique identifier of post officer history report
+      - name: uid
+        description: >
+          unique identifier of officer
+        unique: true
+        no_na: true
+      - name: agency
+      - name: left_reason
+  settlement:
+    columns:
+      - name: settlement_uid
+        description: >
+          unique identifier of case
+      - name: case_number
+      - name: case_name
+      - name: claim_status
+      - name: settlement_amount
+      - name: original_judgment_principal
+      - name: check_date
+      - name: final_judgement_date
+      - name: pay_year
+      - name: agency
+  docs:
+    columns:
+      - name: docid
+        description: >
+          unique identifier of doc generated at meta stage
+      - name: text
+      - name: title
+      - name: doc_year
+      - name: doc_month
+      - name: doc_day
+      - name: pdf_db_content_hash
+      - name: pdf_db_path
+      - name: pdf_db_id
+      - name: agency
+      - name: matched_uid
+        description: >
+          uid of officer matched to the doc
+
 
 save_bad_rows_to: data/invalid_rows.csv

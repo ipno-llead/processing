@@ -12,13 +12,15 @@ def match_post_to_personnel(post, personnel):
     dfa = post[["uid", "first_name", "last_name", "middle_name", "agency"]]
     dfa = dfa.drop_duplicates(subset=["uid"]).set_index("uid")
     dfa.loc[:, "fc"] = dfa.first_name.fillna("").map(lambda x: x[:1])
+    dfa.loc[:, "lc"] = dfa.last_name.fillna("").map(lambda x: x[:1])
 
     dfb = personnel[["uid", "first_name", "last_name", "middle_name", "agency"]]
     dfb = dfb.drop_duplicates(subset=["uid"]).set_index("uid")
     dfb.loc[:, "fc"] = dfb.first_name.fillna("").map(lambda x: x[:1])
+    dfb.loc[:, "lc"] = dfb.last_name.fillna("").map(lambda x: x[:1])
 
     matcher = ThresholdMatcher(
-        ColumnsIndex(["fc", "agency"]),
+        ColumnsIndex(["fc", "lc", "agency"]),
         {
             "first_name": JaroWinklerSimilarity(),
             "last_name": JaroWinklerSimilarity(),
@@ -27,7 +29,10 @@ def match_post_to_personnel(post, personnel):
         dfa,
         dfb,
     )
-    decision = 0.9
+    decision = .800
+    matcher.save_pairs_to_excel(
+        deba.data("match/cprr_post_ohr_personnel.xlsx"), decision
+    )
     matches = matcher.get_index_pairs_within_thresholds(decision)
     match_dict = dict(matches)
 
@@ -46,9 +51,18 @@ def post_agency_is_per_agency_subset(personnel, post):
     return post
 
 
+def drop_rows_missing_hire_dates(df):
+    return df[~((df.hire_date.fillna("") == ""))]
+
+
+def drop_rows_missing_agency(df):
+    return df[~((df.agency.fillna("") == ""))]
+
+
 if __name__ == "__main__":
     post = pd.read_csv(deba.data("clean/post_officer_history.csv"))
     personnel = pd.read_csv(deba.data("fuse/personnel_pre_post.csv"))
     post = post_agency_is_per_agency_subset(personnel, post)
     post = match_post_to_personnel(post, personnel)
+    post = post.pipe(drop_rows_missing_hire_dates).pipe(drop_rows_missing_agency)
     post.to_csv(deba.data("match/post_officer_history.csv"), index=False)

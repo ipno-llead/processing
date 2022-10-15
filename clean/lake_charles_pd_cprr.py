@@ -10,8 +10,8 @@ import re
 
 disposition_lookup = [
     ["exonerated", "closeexhor", "close/exhan"],
-    [
-        "sustained; resigned",
+    [   
+        "sustained",
         "sust/r",
         "sust//r",
         "sustr/r",
@@ -24,7 +24,7 @@ disposition_lookup = [
         "sust//",
         "bust/",
         "singe/resign",
-        "sustained; resigned",
+        "sustained; resigned"
     ],
     [
         "resigned",
@@ -321,7 +321,7 @@ def assign_first_names_from_post_20(df):
 
 
 def assign_agency(df):
-    df.loc[:, "agency"] = "Lake Charles PD"
+    df.loc[:, "agency"] = "lake-charles-pd"
     return df
 
 
@@ -617,6 +617,7 @@ def clean_disposition_19(df):
         .str.strip()
         .fillna("")
         .str.replace("  ", " ", regex=False)
+        .str.replace(r"(.+)?s[yua]s(.+)?", "sustained", regex=True)
     )
     return standardize_from_lookup_table(df, "disposition", disposition_lookup)
 

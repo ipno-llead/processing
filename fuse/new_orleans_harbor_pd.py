@@ -6,6 +6,8 @@ from lib.columns import (
     rearrange_allegation_columns,
 )
 from lib import events
+from lib.personnel import fuse_personnel
+from lib.post import load_for_agency
 
 
 def fuse_events(pprr08, pprr20, cprr):
@@ -73,14 +75,18 @@ def fuse_events(pprr08, pprr20, cprr):
 if __name__ == "__main__":
     pprr20 = pd.read_csv(deba.data("clean/pprr_new_orleans_harbor_pd_2020.csv"))
     pprr08 = pd.read_csv(deba.data("clean/pprr_new_orleans_harbor_pd_1991_2008.csv"))
+    agency = pprr08.agency[0]
+    post = load_for_agency(agency)
     cprr = pd.read_csv(deba.data("match/cprr_new_orleans_harbor_pd_2020.csv"))
     post_event = pd.read_csv(
         deba.data("match/post_event_new_orleans_harbor_pd_2020.csv")
     )
     personnel_df = rearrange_personnel_columns(pd.concat([pprr08, pprr20]))
+    personnel_df = fuse_personnel(personnel_df, post)
     complaint_df = rearrange_allegation_columns(cprr)
     event_df = fuse_events(pprr08, pprr20, cprr)
     event_df = rearrange_event_columns(pd.concat([post_event, event_df]))
     personnel_df.to_csv(deba.data("fuse/per_new_orleans_harbor_pd.csv"), index=False)
     event_df.to_csv(deba.data("fuse/event_new_orleans_harbor_pd.csv"), index=False)
     complaint_df.to_csv(deba.data("fuse/com_new_orleans_harbor_pd.csv"), index=False)
+    post.to_csv(deba.data("fuse/post_new_orleans_harbor_pd.csv"), index=False)

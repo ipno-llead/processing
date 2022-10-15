@@ -107,7 +107,7 @@ def clean_employment_status(df):
 
 def assign_agency(df):
     df.loc[:, "data_production_year"] = 2020
-    df.loc[:, "agency"] = "Harahan CSD"
+    df.loc[:, "agency"] = "harahan-pd"
     return df
 
 

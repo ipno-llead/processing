@@ -1,0 +1,6 @@
+wdir: ../../../data/raw
+outs:
+- md5: 4071f12759925126697f8cac2a7eaffa.dir
+  size: 60507104
+  nfiles: 3
+  path: external

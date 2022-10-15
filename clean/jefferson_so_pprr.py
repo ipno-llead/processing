@@ -278,6 +278,10 @@ def clean_rank_descriptions(df):
     return df
 
 
+def drop_rows_missing_name(df):
+    return df[~((df.first_name.fillna("") == ""))]
+
+
 def clean():
     df = (
         pd.read_csv(deba.data("raw/jefferson_so/jefferson_parish_so_pprr_2020.csv"))
@@ -288,10 +292,11 @@ def clean():
         .pipe(clean_department_descriptions)
         .pipe(standardize_rank_descriptions)
         .pipe(clean_rank_descriptions)
-        .pipe(set_values, {"agency": "Jefferson SO"})
+        .pipe(set_values, {"agency": "jefferson-so"})
         .pipe(
             gen_uid, ["agency", "first_name", "middle_name", "last_name", "employee_id"]
         )
+        .pipe(drop_rows_missing_name)
     )
     return df
 

@@ -370,7 +370,7 @@ def clean_20():
         .pipe(
             set_values,
             {
-                "agency": "Hammond PD",
+                "agency": "hammond-pd",
             },
         )
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
@@ -397,7 +397,7 @@ def clean_14():
         .pipe(
             set_values,
             {
-                "agency": "Hammond PD",
+                "agency": "hammond-pd",
             },
         )
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
@@ -425,7 +425,7 @@ def clean_08():
         .pipe(clean_action_date_08)
         .pipe(clean_tracking_id_08)
         .pipe(clean_dates, ["initial_action_date", "incident_date"])
-        .pipe(set_values, {"agency": "Hammond PD"})
+        .pipe(set_values, {"agency": "hammond-pd"})
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(
             gen_uid,

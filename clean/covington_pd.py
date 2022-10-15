@@ -23,7 +23,7 @@ def split_names(df, col, drop=True):
 
 def assign_agency(df):
     df.loc[:, "data_production_year"] = 2021
-    df.loc[:, "agency"] = "Covington PD"
+    df.loc[:, "agency"] = "covington-pd"
     return df
 
 
@@ -95,7 +95,7 @@ def clean_pprr_2010_2020(df):
             {
                 "salary_freq": salary.YEARLY,
                 "data_production_year": 2020,
-                "agency": "Covington PD",
+                "agency": "covington-pd",
             },
         )
         .pipe(clean_names, ["first_name", "last_name"])
@@ -120,7 +120,7 @@ def clean_pprr_2021():
         .pipe(split_names, "employee_name")
         .pipe(clean_names, ["first_name", "last_name", "middle_name"])
         .pipe(standardize_desc_cols, ["rank_desc"])
-        .pipe(set_values, {"data_production_year": 2021, "agency": "Covington PD"})
+        .pipe(set_values, {"data_production_year": 2021, "agency": "covington-pd"})
         .pipe(gen_uid, ["agency", "employee_id"])
     )
 

@@ -45,7 +45,7 @@ def clean():
         .pipe(split_names)
         .pipe(standardize_desc_cols, ["disposition", "allegation"])
         .pipe(clean_names, ["last_name", "middle_name", "first_name"])
-        .pipe(set_values, {"agency": "Eunice PD"})
+        .pipe(set_values, {"agency": "eunice-pd"})
         .pipe(gen_uid, ["last_name", "middle_name", "first_name", "agency"])
         .pipe(
             gen_uid,

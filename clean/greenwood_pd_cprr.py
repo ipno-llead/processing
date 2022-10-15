@@ -30,7 +30,7 @@ def clean():
     return (
         df.pipe(clean_dates, ["occur_date", "receive_date"])
         .pipe(float_to_int_str, ["comission_number"])
-        .pipe(set_values, {"agency": "Greenwood PD"})
+        .pipe(set_values, {"agency": "greenwood-pd"})
         .pipe(gen_uid, ["first_name", "last_name"], "uid")
         .pipe(assign_allegations)
         .pipe(

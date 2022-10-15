@@ -7,7 +7,7 @@ import pandas as pd
 
 def assign_agency(df):
     df.loc[:, "data_production_year"] = 2020
-    df.loc[:, "agency"] = "Kenner PD"
+    df.loc[:, "agency"] = "kenner-pd"
     return df
 
 

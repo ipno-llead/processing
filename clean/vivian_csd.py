@@ -18,7 +18,7 @@ def split_salary_col(df):
 
 
 def assign_agency(df):
-    df.loc[:, "agency"] = "Vivian PD"
+    df.loc[:, "agency"] = "vivian-pd"
     df.loc[:, "data_production_year"] = 2021
     return df
 

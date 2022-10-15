@@ -36,6 +36,13 @@ def clean_disposition_19(df):
     )
     return df[~((df.disposition == ""))].drop(columns="outcome_after_investigation")
 
+def correct_action_19(df):
+    df.loc[(df.disposition == "terminated") & (df.last_name == "gant"), "action"] = "terminated"
+    df.loc[(df.disposition == "terminated; write up attached") & (df.last_name == "raimer"), "action"] = "terminated"
+    df.loc[(df.disposition == "terminated; write up attached") & (df.last_name == "guillory"), "action"] = "terminated"
+    df.loc[(df.disposition == "terminated; write up attached") & (df.last_name == "nothanel"), "action"] = "terminated"
+    df.loc[(df.disposition == "resigned; criminal charges") & (df.last_name == "nunez"), "action"] = "resigned"
+    return df
 
 def split_rows_with_multiple_officers_14(df):
     i = 0
@@ -80,7 +87,7 @@ def clean_20():
             }
         )
         .pipe(clean_names, ["first_name", "last_name"])
-        .pipe(set_values, {"agency": "Cameron SO"})
+        .pipe(set_values, {"agency": "cameron-so"})
         .pipe(standardize_desc_cols, ["allegation", "disposition"])
         .pipe(gen_uid, ["agency", "first_name", "last_name"])
         .pipe(gen_uid, ["uid", "allegation", "disposition"], "allegation_uid")
@@ -96,8 +103,9 @@ def clean_19():
         .pipe(clean_names, ["first_name", "last_name"])
         .pipe(clean_allegation_19)
         .pipe(clean_disposition_19)
-        .pipe(set_values, {"agency": "Cameron SO"})
+        .pipe(set_values, {"agency": "cameron-so"})
         .pipe(standardize_desc_cols, ["allegation", "disposition"])
+        .pipe(correct_action_19)
         .pipe(gen_uid, ["agency", "first_name", "last_name"])
         .pipe(gen_uid, ["uid", "allegation", "disposition"], "allegation_uid")
     )
@@ -113,7 +121,7 @@ def clean_14():
         .pipe(clean_allegation_14)
         .pipe(standardize_desc_cols, ["allegation", "disposition"])
         .pipe(clean_names, ["first_name", "last_name"])
-        .pipe(set_values, {"agency": "Cameron SO"})
+        .pipe(set_values, {"agency": "cameron-so"})
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(gen_uid, ["uid", "allegation", "disposition"], "allegation_uid")
     )

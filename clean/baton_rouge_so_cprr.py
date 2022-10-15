@@ -9,6 +9,7 @@ from lib.clean import (
     clean_races,
     clean_datetimes,
 )
+from lib.columns import set_values
 import pandas as pd
 
 
@@ -288,13 +289,168 @@ def clean_birth_year_20(df):
 
 
 def assign_agency(df):
-    df.loc[:, "agency"] = "Baton Rouge SO"
+    df.loc[:, "agency"] = "east-baton-rouge-so"
     return df
 
 
 def assign_prod_year(df, year):
     df.loc[:, "data_production_year"] = year
     return df
+
+
+def clear_leading_commas15(df):
+    for col in df.columns:
+        df = df.apply(lambda col: col.str.replace(r"^\'", "", regex=True))
+        return df
+
+
+def split_dates_and_time15(df):
+    # some times do not make sense
+    receive_dates = df.datetime_complaint.astype(str).str.extract(
+        r"(\w{1,2}\/\w{1,2}\/\w{4}) (.+)"
+    )
+
+    occur_dates = df.datetime_infraction.astype(str).str.extract(
+        r"(\w{1,2}\/\w{1,2}\/\w{4}) (.+)"
+    )
+
+    df.loc[:, "receive_date"] = receive_dates[0]
+
+    df.loc[:, "occur_date"] = occur_dates[0]
+    return df.drop(columns=["datetime_complaint", "datetime_infraction"])
+
+
+def clean_rank_desc15(df):
+    df.loc[:, "rank_desc"] = (
+        df["rank"]
+        .str.lower()
+        .str.strip()
+        .str.replace(r"lt\.", "lieutenant", regex=True)
+        .str.replace(r"^hr", "human resource", regex=True)
+        .str.replace(r" (2|3|ii)", "", regex=True)
+        .str.replace(r"terminated", "", regex=False)
+    )
+    return df.drop(columns=["rank"])
+
+
+def clean_complainant15(df):
+    df.loc[:, "complainant_type"] = (
+        df.complainant.str.lower()
+        .str.strip()
+        .str.replace(r"cowo?rker", "co-worker", regex=True)
+        .str.replace(r"super?vis?o?r", "supervisor", regex=True)
+        .str.replace(r"adminis tration", "administration", regex=False)
+        .str.replace(r"brpd", "baton rouge police department", regex=False)
+        .str.replace(r"pd$", "police department", regex=True)
+        .str.replace(r"da\'s", "district attorney's", regex=True)
+    )
+    return df.drop(columns=["complainant"])
+
+
+def clean_department_desc15(df):
+    df.loc[:, "department_desc"] = (
+        df.unit_assigned.str.lower()
+        .str.strip()
+        .str.replace(r"lienpeter", "kleinpeter", regex=False)
+        .str.replace(r"^thary", "zachary", regex=True)
+        .str.replace(r"substati?o?\b", "substation", regex=True)
+        .str.replace(r"^da\b", "district attorney", regex=True)
+        .str.replace(r" o\b$", "", regex=True)
+        .str.replace(r"pergency services u", "emergency services unit", regex=False)
+        .str.replace(
+            r"(ves|ive) general investig?", "general investigations", regex=True
+        )
+        .str.replace(r"ninal investigative l", "criminal investigations", regex=False)
+        .str.replace(r"chief of ", "", regex=False)
+        .str.replace(r" deputy", "", regex=False)
+        .str.replace(r"etectives main offi", "detectives main office", regex=False)
+    )
+    return df.drop(columns=["unit_assigned"])
+
+
+def clean_and_split_names15(df):
+    df.loc[:, "deputy"] = (
+        df.deputy.str.lower()
+        .str.strip()
+        .str.replace(r"(\w+)\, (\w+)", r"\1 \2", regex=True)
+        .str.replace(r"ebr court room (.+)", "", regex=True)
+        .str.replace(r"joe? ann", "joann", regex=False)
+        .str.replace(r"bobby dale", "bobby dale.", regex=False)
+        .str.replace(r"(\w+) (\w) (\w+)", r"\1 \2. \3", regex=True)
+    )
+
+    names = df.deputy.str.extract(r"^(\w+) ?(\w+\.)? ?(\w+) ?(iii|jr\.?)?")
+    df.loc[:, "first_name"] = names[0]
+    df.loc[:, "middle_name"] = names[1].str.replace(r"\.", "", regex=True)
+    df.loc[:, "last_name"] = names[2]
+    df.loc[:, "suffix"] = names[3].str.replace(r"\.", "", regex=True)
+
+    df.loc[:, "last_name"] = df.last_name.fillna("").str.cat(
+        df.suffix.fillna(""), sep=" "
+    )
+    return df.drop(columns=["deputy", "suffix"])
+
+
+def clean_allegation15(df):
+    df.loc[:, "allegation"] = (
+        df.infraction.str.lower()
+        .str.strip()
+        .str.replace(r"\b(\w{2})\-? (\w{2})\b", r"\1-\2", regex=True)
+        .str.replace(r"\.6", ".06", regex=True)
+        .str.replace(r"performanceo1", "performance 01", regex=False)
+    )
+    return df.drop(columns=["infraction"])
+
+
+def clean_action15(df):
+    df.loc[:, "action"] = (
+        df.action_taken.str.lower()
+        .str.strip()
+        .str.replace("suspended for", r"suspended", regex=False)
+        .str.replace(r"one day", "1-day", regex=False)
+        .str.replace(r"five", "5", regex=False)
+        .str.replace(r"(\w+) days? suspension", r"\1-day suspension", regex=True)
+        .str.replace(r"suspended (\w{1,2}) weeks?", r"\1-week suspension", regex=True)
+        .str.replace(r"suspended (\w{1,2}) days?", r"\1-day suspension", regex=True)
+        .str.replace(r"sgt\.?", "sergeant", regex=True)
+        .str.replace(r"lt\.?\b", "lieutenant", regex=True)
+        .str.replace(r"(\w{1,2})\/(\w{1,2})\/(\w{1,4})", r"\1-\2-\3", regex=True)
+        .str.replace(r" ?(\/|\,) ?", r";", regex=True)
+        .str.replace(r"demotion", "demoted", regex=False)
+        .str.replace(r"\.$", "", regex=True)
+        .str.replace(r"col\.?", "colonel", regex=True)
+        .str.replace(r"suspension and (\w+)", r"suspension;\1", regex=True)
+        .str.replace(r"deputy and (\w+)", r"deputy;\1", regex=True)
+        .str.replace(r"demoted and (\w+)", r"demoted;\1", regex=True)
+        .str.replace(r"terminated and (\w+)", r"terminated;\1", regex=True)
+        .str.replace(r"trasferred", "transferred", regex=False)
+        .str.replace(r"\.", "", regex=True)
+        .str.replace(r"\bda\b", "district attorney", regex=True)
+        .str.replace(r"universitvgames for", "university games", regex=False)
+        .str.replace(r"\"", "", regex=True)
+        .str.replace(r"^none$", "", regex=True)
+        .str.replace(r"retrair", "retrain", regex=False)
+        .str.replace(
+            r"^deputy chose to resign instead of submitting to a polygrpah exam$",
+            "resignation in lieu of polygraph exam",
+            regex=True,
+        )
+        .str.replace(r" $", "", regex=True)
+        .str.replace(r"no action taken(.+)?", "", regex=True)
+        .str.replace(r"^unfounded$", "", regex=True)
+        .str.replace(r"suspension loss", "suspension;loss", regex=False)
+        .str.replace(r"^(cadarette was |deputy was )", "", regex=True)
+        .str.replace(
+            r"^terminated;turned over to detectives$",
+            "termination;turned over to detectives",
+            regex=True,
+        )
+    )
+    return df.drop(columns=["action_taken"])
+
+
+def drop_rows_missing_name(df):
+    return df[~((df.first_name.fillna("") == ""))]
 
 
 def clean18():
@@ -405,8 +561,48 @@ def clean20():
     return df
 
 
+def clean15():
+    df = (
+        pd.read_csv(deba.data("raw/baton_rouge_so/baton_rouge_so_cprr_2011_2015.csv"))
+        .pipe(clean_column_names)
+        .pipe(clear_leading_commas15)
+        .rename(
+            columns={
+                "file_number": "tracking_id",
+                "badge": "badge_no",
+                "date_acquired_rank": "rank_date",
+            }
+        )
+        .pipe(split_dates_and_time15)
+        .pipe(clean_rank_desc15)
+        .pipe(clean_department_desc15)
+        .pipe(clean_complainant15)
+        .pipe(clean_and_split_names15)
+        .pipe(clean_allegation15)
+        .pipe(clean_action15)
+        .pipe(clean_races, ["race"])
+        .pipe(clean_sexes, ["sex"])
+        .pipe(clean_dates, ["occur_date", "receive_date", "rank_date"])
+        .pipe(
+            standardize_desc_cols,
+            ["tracking_id", "badge_no", "birth_year", "disposition"],
+        )
+        .pipe(set_values, {"agency": "east-baton-rouge-so"})
+        .pipe(gen_uid, ["first_name", "middle_name", "last_name", "badge_no", "agency"])
+        .pipe(
+            gen_uid,
+            ["uid", "allegation", "disposition", "tracking_id", "occur_day"],
+            "allegation_uid",
+        )
+        .pipe(drop_rows_missing_name)
+    )
+    return df
+
+
 if __name__ == "__main__":
+    df15 = clean15()
     df18 = clean18()
     df20 = clean20()
+    df15.to_csv(deba.data("clean/cprr_baton_rouge_so_2011_2015.csv"), index=False)
     df18.to_csv(deba.data("clean/cprr_baton_rouge_so_2018.csv"), index=False)
     df20.to_csv(deba.data("clean/cprr_baton_rouge_so_2016_2020.csv"), index=False)

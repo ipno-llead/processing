@@ -168,7 +168,7 @@ def clean():
         .pipe(
             set_values,
             {
-                "agency": "New Orleans PD",
+                "agency": "new-orleans-pd",
             },
         )
         .pipe(gen_uid, ["first_name", "last_name", "agency"])

@@ -263,7 +263,7 @@ def assign_action(df):
 
 
 def assign_agency(df):
-    df.loc[:, "agency"] = "Bossier City PD"
+    df.loc[:, "agency"] = "bossier-city-pd"
     return df
 
 

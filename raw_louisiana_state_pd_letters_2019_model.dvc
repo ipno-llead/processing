@@ -1,0 +1,6 @@
+wdir: data/ner/louisiana_state_pd/model
+outs:
+- md5: f3f8406f81c2cbdcfb9ae8942190156f.dir
+  size: 3991983
+  nfiles: 11
+  path: letters_louisiana_state_pd_2019.model

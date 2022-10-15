@@ -59,7 +59,7 @@ def clean():
         .pipe(clean_sexes, ["sex"])
         .pipe(split_names)
         .pipe(clean_names, ["first_name", "middle_name", "last_name"])
-        .pipe(set_values, {"agency": "Baker PD"})
+        .pipe(set_values, {"agency": "baker-pd"})
         .pipe(gen_uid, ["first_name", "middle_name", "last_name"])
     )
     return df

@@ -8,7 +8,7 @@ import re
 
 
 def assign_agency(df):
-    df.loc[:, "agency"] = "Plaquemines SO"
+    df.loc[:, "agency"] = "plaquemines-so"
     return df
 
 
