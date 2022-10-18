@@ -1,0 +1,6 @@
+wdir: data/topic_modelling
+outs:
+- md5: 6b35ccc0e9326f5cd761fd04888b0608.dir
+  size: 16445527
+  nfiles: 1
+  path: model
