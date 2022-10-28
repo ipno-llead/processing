@@ -1,0 +1,28 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: actions-runner-controller-github-webhook-server
+  namespace: ipno-production
+  annotations:
+    acme.cert-manager.io/http01-edit-in-place: "true"
+    cert-manager.io/issue-temporary-certificate: "true"
+    cert-manager.io/issuer: letsencrypt
+    kubernetes.io/ingress.class: gce
+    kubernetes.io/ingress.regional-static-ip-name: webhook-llead-co
+    kubernetes.io/tls-acme: "true"
+spec:
+  tls:
+    - hosts:
+        - webhook.llead.co
+      secretName: letsencrypt-tls
+  rules:
+    - host: webhook.llead.co
+      http:
+        paths:
+          - path: /actions-runner-controller-github-webhook-server
+            pathType: Prefix
+            backend:
+              service:
+                name: actions-runner-controller-github-webhook-server
+                port:
+                  number: 80

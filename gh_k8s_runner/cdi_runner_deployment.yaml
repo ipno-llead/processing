@@ -4,7 +4,6 @@ metadata:
   name: cdi-runner
   namespace: cdi-runner
 spec:
-  replicas: 1
   template:
     spec:
       repository: ppact/processing
@@ -12,8 +11,13 @@ spec:
       labels:
         - cdi-runner
       env: []
-      # # uncomment when there's a need to inspect runner pod after job finished
-      # ephemeral: false
+      resources:
+        limits:
+          cpu: "4.0"
+          memory: "8Gi"
+        requests:
+          cpu: "2.0"
+          memory: "4Gi"
       volumes:
         - name: data
           persistentVolumeClaim:

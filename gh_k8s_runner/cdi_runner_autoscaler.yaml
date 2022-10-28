@@ -1,0 +1,15 @@
+apiVersion: actions.summerwind.dev/v1alpha1
+kind: HorizontalRunnerAutoscaler
+metadata:
+  name: cdi-runner-deployment-autoscaler
+  namespace: cdi-runner
+spec:
+  scaleTargetRef:
+    kind: RunnerDeployment
+    name: cdi-runner
+  minReplicas: 0
+  maxReplicas: 1
+  scaleUpTriggers:
+    - githubEvent:
+        workflowJob: {}
+      duration: "30m"
