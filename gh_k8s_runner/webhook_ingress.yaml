@@ -2,7 +2,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: actions-runner-controller-github-webhook-server
-  namespace: ipno-production
+  namespace: actions-runner-system
   annotations:
     acme.cert-manager.io/http01-edit-in-place: "true"
     cert-manager.io/issue-temporary-certificate: "true"
@@ -14,7 +14,7 @@ spec:
   tls:
     - hosts:
         - webhook.llead.co
-      secretName: letsencrypt-tls
+      secretName: webhook-ssl
   rules:
     - host: webhook.llead.co
       http:
