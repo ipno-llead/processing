@@ -185,7 +185,8 @@ def extract_allegation_desc(df):
         .str.extract(r"\((.+)\)")
     )
 
-    df.loc[:, "allegation_desc"] = allegation_desc[0].fillna("")
+    df.loc[:, "allegation_desc"] = allegation_desc[0].fillna("")\
+    .str.replace(r"(.+) \((.+)", r"\2", regex=True)
     return df
 
 
