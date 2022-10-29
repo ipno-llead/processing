@@ -1,0 +1,13 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: actions-runner-controller-github-webhook-server
+  namespace: ipno-production
+spec:
+  type: ExternalName
+  externalName: actions-runner-controller-github-webhook-server.actions-runner-system.svc.cluster.local
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: http
