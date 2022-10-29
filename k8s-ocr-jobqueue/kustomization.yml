@@ -8,9 +8,26 @@ commonLabels:
 images:
   - name: doctr
     newName: gcr.io/excellent-zoo-300106/doctr
-    newTag: 89c0f9f6ae2c
+    newTag: 3e2557432d37
 configMapGenerator:
   - literals:
       - SOURCE_BUCKET=k8s-ocr-jobqueue-pdfs
       - SINK_BUCKET=k8s-ocr-jobqueue-results
     name: doctr-config
+
+patchesStrategicMerge:
+  - |-
+    apiVersion: batch/v1
+    kind: Job
+    metadata:
+      name: doctr
+    spec:
+      template:
+        spec:
+          nodeSelector:
+            part-of: ocr-jobqueue
+          tolerations:
+            - key: "part-of"
+              operator: "Equal"
+              value: "ocr-jobqueue"
+              effect: "NoSchedule"

@@ -1,0 +1,16 @@
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: letsencrypt
+  namespace: actions-runner-system
+spec:
+  acme:
+    email: ipno@eastagile.com
+    preferredChain: ""
+    privateKeySecretRef:
+      name: letsencrypt
+    server: https://acme-v02.api.letsencrypt.org/directory
+    solvers:
+      - http01:
+          ingress:
+            class: gce

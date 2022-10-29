@@ -4,16 +4,27 @@ metadata:
   name: cdi-runner
   namespace: cdi-runner
 spec:
-  replicas: 1
   template:
     spec:
-      repository: ppact/processing
+      nodeSelector:
+        part-of: actions-runner
+      tolerations:
+        - key: "part-of"
+          operator: "Equal"
+          value: "actions-runner"
+          effect: "NoSchedule"
+      repository: ipno-llead/processing
       image: ghrunner
       labels:
         - cdi-runner
       env: []
-      # # uncomment when there's a need to inspect runner pod after job finished
-      # ephemeral: false
+      resources:
+        limits:
+          cpu: "1.0"
+          memory: "8Gi"
+        requests:
+          cpu: "0.5"
+          memory: "4Gi"
       volumes:
         - name: data
           persistentVolumeClaim:
