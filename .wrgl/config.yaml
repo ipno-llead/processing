@@ -1104,6 +1104,12 @@ branch:
     file: data/fuse/settlements_louisiana_state_pd.csv
     primaryKey:
       - settlement_uid
+  settlements-baton-rouge-pd:
+    remote: origin
+    merge: refs/heads/settlements-baton-rouge-pd
+    file: data/fuse/settlements_baton_rouge_pd.csv
+    primaryKey:
+      - settlement_uid
   person:
     remote: origin
     merge: refs/heads/person
