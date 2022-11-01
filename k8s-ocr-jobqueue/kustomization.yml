@@ -8,7 +8,7 @@ commonLabels:
 images:
   - name: doctr
     newName: gcr.io/excellent-zoo-300106/doctr
-    newTag: 3e2557432d37
+    newTag: a593ca52abe3
 configMapGenerator:
   - literals:
       - SOURCE_BUCKET=k8s-ocr-jobqueue-pdfs
