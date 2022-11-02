@@ -148,7 +148,7 @@ branch:
     file: data/fuse/com_new_orleans_so.csv
     primaryKey:
       - allegation_uid
-  com-plaquemines-so:
+  com-plaquemines-pd:
     remote: origin
     merge: refs/heads/com-plaquemines-pd
     file: data/fuse/com_plaquemines_so.csv
@@ -1161,13 +1161,13 @@ branch:
       - uof_citizen_uid
   property-claims:
     remote: origin
-    merge: refs/heads/property_claims
+    merge: refs/heads/property-claims
     file: data/fuse/property_claims.csv
     primaryKey:
       - property_claims_uid
   post-officer-history:
     remote: origin
-    merge: refs/heads/post_officer_history
+    merge: refs/heads/post-officer-history
     file: data/fuse/post_officer_history.csv
     primaryKey:
       - uid

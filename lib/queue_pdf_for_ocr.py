@@ -51,6 +51,8 @@ def run(paths: List[str], pos=0) -> None:
                             )
                         with open(os.path.join(pdf_dir, "count"), "w") as f:
                             f.write(str(ind + 1))
+        # remove all named pipes in temp dir which were causing gsutil to hang
+        subprocess.run(["find", tmpdirname, "-type", "p", "-delete"], check=True)
         subprocess.run(
             [
                 "gsutil",
