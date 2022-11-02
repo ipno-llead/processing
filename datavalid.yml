@@ -382,7 +382,7 @@ schemas:
       - name: appeal_uid
         description: >
           unique per docket_no and uid
-      - name: docket_no
+      - name: tracking_id
       - name: uid
       - name: counsel
       - name: charging_supervisor
