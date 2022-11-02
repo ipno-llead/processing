@@ -148,7 +148,7 @@ branch:
     file: data/fuse/com_new_orleans_so.csv
     primaryKey:
       - allegation_uid
-  com-plaquemines-so:
+  com-plaquemines-pd:
     remote: origin
     merge: refs/heads/com-plaquemines-pd
     file: data/fuse/com_plaquemines_so.csv
