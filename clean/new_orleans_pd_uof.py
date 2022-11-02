@@ -476,14 +476,23 @@ def extract_officer(uof):
     return df, uof
 
 
+def merge_uof(dfa, dfb, dfc):
+    df = pd.merge(pd.merge(dfa,dfb,on='uof_uid'),dfc,on='uof_uid')
+    df = df.drop_duplicates(subset=["uof_uid", "uid"])
+    df = df.drop_duplicates(subset=["uof_citizen_uid", "uof_uid"])
+    return df
+
+
 if __name__ == "__main__":
     uof = clean_uof()
     uof_citizen, uof = extract_citizen(uof)
     uof_officer, uof = extract_officer(uof)
-    uof.to_csv(deba.data("clean/uof_new_orleans_pd_2016_2021.csv"), index=False)
+    merged_uof = merge_uof(uof, uof_citizen, uof_officer)
+    uof.to_csv(deba.data("clean/uof_meta_new_orleans_pd_2016_2021.csv"), index=False)
     uof_citizen.to_csv(
         deba.data("clean/uof_citizens_new_orleans_pd_2016_2021.csv"), index=False
     )
     uof_officer.to_csv(
         deba.data("clean/uof_officers_new_orleans_pd_2016_2021.csv"), index=False
     )
+    merged_uof.to_csv(deba.data("clean/uof_new_orleans_pd_2016_2021.csv"), index=False)
