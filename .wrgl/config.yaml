@@ -148,7 +148,7 @@ branch:
     file: data/fuse/com_new_orleans_so.csv
     primaryKey:
       - allegation_uid
-  com-plaquemines-so:
+  com-plaquemines-pd:
     remote: origin
     merge: refs/heads/com-plaquemines-pd
     file: data/fuse/com_plaquemines_so.csv
@@ -1102,6 +1102,12 @@ branch:
     remote: origin
     merge: refs/heads/settlements-louisiana-state-pd
     file: data/fuse/settlements_louisiana_state_pd.csv
+    primaryKey:
+      - settlement_uid
+  settlements-baton-rouge-pd:
+    remote: origin
+    merge: refs/heads/settlements-baton-rouge-pd
+    file: data/fuse/settlements_baton_rouge_pd.csv
     primaryKey:
       - settlement_uid
   person:
