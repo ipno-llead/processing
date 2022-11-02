@@ -540,8 +540,10 @@ schemas:
           unique identifier of case
       - name: case_number
       - name: case_name
+      - name: case_disposition
       - name: claim_status
       - name: settlement_amount
+      - name: settlement_amount_desc
       - name: original_judgment_principal
       - name: check_date
       - name: final_judgement_date
