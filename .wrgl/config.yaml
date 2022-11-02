@@ -1056,18 +1056,6 @@ branch:
     file: data/fuse/per_lake_charles_pd.csv
     primaryKey:
       - uid
-  uof-citizens-new-orleans-pd:
-    remote: origin
-    merge: refs/heads/uof-citizens-new-orleans-pd
-    file: data/fuse/uof_citizens_new_orleans_pd.csv
-    primaryKey:
-      - uof_citizen_uid
-  uof-officers-new-orleans-pd:
-    remote: origin
-    merge: refs/heads/uof-officers-new-orleans-pd
-    file: data/fuse/uof_officers_new_orleans_pd.csv
-    primaryKey:
-      - uid
   uof-new-orleans-pd:
     remote: origin
     merge: refs/heads/uof-new-orleans-pd

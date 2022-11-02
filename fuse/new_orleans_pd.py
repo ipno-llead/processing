@@ -266,7 +266,7 @@ if __name__ == "__main__":
     agency = pprr.agency[0]
     post = load_for_agency(agency)
     pprr_csd = pd.read_csv(deba.data("match/pprr_new_orleans_csd_2014.csv"))
-    uof = pd.read_csv(deba.data("clean/uof_new_orleans_pd_2016_2021.csv"))
+    uof = pd.read_csv(deba.data("match/uof_new_orleans_pd_2016_2021.csv"))
     post_event = pd.read_csv(deba.data("match/post_event_new_orleans_pd.csv"))
     award = pd.read_csv(deba.data("match/award_new_orleans_pd_2016_2021.csv"))
     lprr = pd.read_csv(deba.data("match/lprr_new_orleans_csc_2000_2016.csv"))
