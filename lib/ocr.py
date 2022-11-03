@@ -1,5 +1,8 @@
 import os
+import timeit
 from pathlib import Path
+from contextlib import contextmanager
+from datetime import timedelta
 import pathlib
 import tempfile
 import json
@@ -36,8 +39,19 @@ def _run_gsutil(*args):
         )
     except subprocess.CalledProcessError as e:
         raise RuntimeError(
-            f'command {" ".join([gsutil, *args])} failed\n\tstdout:{e.stdout}\n\tstderr:{e.stderr}'
+            f'command {" ".join([gsutil, *args])} failed\n\tstdout:{e.stdout.decode("utf8")}\n\tstderr:{e.stderr.decode("utf8")}'
         )
+
+
+@contextmanager
+def _time_exc(desc: str):
+    start = timeit.default_timer()
+
+    yield None
+
+    stop = timeit.default_timer()
+
+    print(f"finished {desc} ({timedelta(seconds=stop-start)})")
 
 
 def _rsync_ocr_results(df: pd.DataFrame) -> pd.DataFrame:
@@ -45,15 +59,16 @@ def _rsync_ocr_results(df: pd.DataFrame) -> pd.DataFrame:
     ocr_dir = deba.data("ocr_results")
     ocr_dir.mkdir(parents=True, exist_ok=True)
 
-    _run_gsutil(
-        "-m",
-        "rsync",
-        "-i",
-        "-J",
-        "-r",
-        "gs://%s/ocr/" % RESULT_BUCKET,
-        str(ocr_dir.absolute()),
-    )
+    with _time_exc("downloading ocr result"):
+        _run_gsutil(
+            "-m",
+            "rsync",
+            "-i",
+            "-J",
+            "-r",
+            "gs://%s/ocr/" % RESULT_BUCKET,
+            str(ocr_dir.absolute()),
+        )
 
     records = []
 
@@ -61,7 +76,11 @@ def _rsync_ocr_results(df: pd.DataFrame) -> pd.DataFrame:
         filedir = ocr_dir / filesha1[:2] / (filesha1[2:] + ".pdf")
         if not filedir.exists():
             records.append(
-                {"filesha1": filesha1, "pageno": pd.NA, "ocr_status": "file not found"}
+                {
+                    "filesha1": filesha1,
+                    "pageno": pd.NA,
+                    "ocr_status": "file not found",
+                }
             )
             continue
         try:
@@ -105,39 +124,44 @@ def _rsync_ocr_results(df: pd.DataFrame) -> pd.DataFrame:
                 )
                 continue
 
-    return pd.DataFrame.from_records(records).merge(df, how="outer", on="filesha1")
+    files = pd.DataFrame.from_records(records)
+    return files.merge(df, how="outer", on="filesha1")
 
 
-def _find_unqueued_files(df: pd.DataFrame) -> pd.DataFrame:
+def _check_for_processing_files(df: pd.DataFrame) -> pd.DataFrame:
+    """finds files that are not yet present in the queue bucket and mark them as 'queued'"""
     credentials, _ = default()
     client = Client(GCLOUD_PROJECT, credentials=credentials)
-    notfound_files = df.loc[
-        df.pageno.isna() & (df.ocr_status == "file not found"), "filesha1"
-    ]
-    for idx, filesha1 in notfound_files.items():
+    sha1s = set()
+    for filesha1 in (
+        df.loc[df.ocr_status == "queueing", "filesha1"].drop_duplicates().values()
+    ):
         blobs = client.list_blobs(
             SOURCE_BUCKET, 1, prefix=f"ocr/{filesha1[:2]}/{filesha1[2:]}"
         )
-        if len(list(blobs)) == 0:
-            df.loc[idx, "ocr_status"] = "not queued"
-        else:
-            df.loc[idx, "ocr_status"] = "queued"
+        if len(list(blobs)) > 0:
+            sha1s.add(filesha1)
+    df.loc[df.filesha1.isin(sha1s), "ocr_status"] = "processing"
     return df
 
 
 def _enqueue_pdf(
-    df: pd.DataFrame, dir_name: str, requeue: bool = False
+    df: pd.DataFrame,
+    dir_name: str,
+    requeue: bool = False,
+    requeue_unsuccessful: bool = False,
 ) -> pd.DataFrame:
     if not requeue:
-        df = _find_unqueued_files(df)
-        if len(df.loc[df.ocr_status == "not queued"]) == 0:
+        if not requeue_unsuccessful:
+            df = _check_for_processing_files(df)
+        if len(df.loc[df.ocr_status == "queueing"]) == 0:
             return df
     with tempfile.TemporaryDirectory() as tmpdirname:
         tmpdir = Path(tmpdirname) / "ocr"
         if requeue:
             files_to_process = df
         else:
-            files_to_process = df.loc[df.ocr_status == "not queued"]
+            files_to_process = df.loc[df.ocr_status == "queueing"]
         for idx, row in files_to_process.iterrows():
             file: Path = tmpdir / row.filesha1[:2] / (row.filesha1[2:] + ".pdf")
             if file.exists():
@@ -147,14 +171,22 @@ def _enqueue_pdf(
                 (Path(dir_name) / row.filepath).resolve(), target_is_directory=False
             )
         queue_pdf_for_ocr.run([str(tmpdir)])
-    df.loc[df.ocr_status == "not queued", "ocr_status"] = "queued"
+    df.loc[df.ocr_status == "queueing", "ocr_status"] = "queued"
     return df
+
+
+def _arg_from_env_var(arg: bool, env_name: str) -> bool:
+    if not arg and os.getenv(f"OCR_{env_name}", "").lower() == "true":
+        return True
+    return arg
 
 
 def process_pdf(
     df: pd.DataFrame,
     dir_name: str,
     requeue: bool = False,
+    requeue_unsuccessful: bool = False,
+    ensure_complete: bool = False,
 ) -> pd.DataFrame:
     """Reads and returns PDF content as text
 
@@ -190,19 +222,37 @@ def process_pdf(
             the parent directory of all PDF files
         requeue (bool):
             requeue pdf pages for reprocessing even if those files
-            are already processed. If environment variable "REQUEUE"
+            are already processed. If environment variable "OCR_REQUEUE"
             is set to "true", it also takes effect.
+        requeue_unsuccessful (bool):
+            requeue non-"success" pdf files for processing. This is
+            also set to True if environment variable
+            "OCR_REQUEUE_UNSUCCESSFUL" is set to "true".
+        ensure_complete (bool):
+            raise error if there are non-"success" rows. This is also
+            set to True if environment variable
+            "OCR_ENSURE_COMPLETE" is set to "true".
 
     Returns:
         exploded frame with 1 row per page
     """
-    if not requeue and os.getenv("REQUEUE").lower() == "true":
-        requeue = True
+    requeue = _arg_from_env_var(requeue, "REQUEUE")
+    requeue_unsuccessful = _arg_from_env_var(
+        requeue_unsuccessful, "REQUEUE_UNSUCCESSFUL"
+    )
+    ensure_complete = _arg_from_env_var(ensure_complete, "ENSURE_COMPLETE")
     df = _rsync_ocr_results(df)
-    df = _enqueue_pdf(df, dir_name, requeue)
+    if requeue_unsuccessful:
+        df.loc[df.ocr_status != "success", "ocr_status"] = "queueing"
+    else:
+        df.loc[df.ocr_status == "file not found", "ocr_status"] = "queueing"
+    df = _enqueue_pdf(df, dir_name, requeue, requeue_unsuccessful)
     df = df.sort_values(["filesha1", "pageno"]).reset_index(drop=True)
     print(
-        "ocr status:\n%s",
-        df.groupby("ocr_status").value_counts(),
+        df.groupby("ocr_status")["ocr_status"].count(),
     )
+    if ensure_complete:
+        n = df.loc[df.ocr_status != "success"].shape[0]
+        if n > 0:
+            raise ValueError(f'there are {n} rows with non "success" ocr_status')
     return df
