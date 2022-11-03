@@ -1,7 +1,13 @@
 import deba
 import pandas as pd
 from lib.columns import clean_column_names, set_values
-from lib.clean import clean_races, clean_sexes, float_to_int_str, standardize_desc_cols
+from lib.clean import (
+    clean_races,
+    clean_sexes,
+    float_to_int_str,
+    standardize_desc_cols,
+    clean_dates,
+)
 from lib.uid import gen_uid
 
 
@@ -28,14 +34,16 @@ def split_names(df):
         .str.replace(r"(\w+) (\w) (\w+)", r"\1 \2. \3", regex=True)
         .str.replace(r" de los angeles", "delosangeles", regex=False)
         .str.replace(r"(\w+) +(\w+)", r"\1 \2", regex=True)
+        .str.replace(r"\,(\w+)\.$", r" \1", regex=True)
+        .str.replace(r"(\w+)\.(\w+)", r"\1. \2", regex=True)
         .str.extract(r"^(\w+-?\w+?) ?(?:(\w)?\.? ) ?(.+)")
     )
 
     df.loc[:, "first_name"] = names1[0]
-    df.loc[:, "middle_name"] = names1[1]
+    df.loc[:, "middle_name"] = names1[1].fillna("")
     df.loc[:, "last_name"] = names1[2].str.replace(r"\,", "", regex=True)
 
-    return df.drop(columns=["officer_name"])[~((df.last_name.fillna("") == ""))]
+    return df[~((df.last_name.fillna("") == ""))].drop(columns=["officer_name"])
 
 
 def drop_rows_missing_names(df):
@@ -67,6 +75,7 @@ def clean():
 
     dfa = (
         pd.read_csv(deba.data("raw/new_orleans_pd/new_orleans_pd_epr_2010_2022.csv"))
+        .astype(str)
         .drop(columns=["persontype", "hate_crime"])
         .rename(
             columns={
@@ -95,11 +104,23 @@ def clean():
             ["offender_number", "offender_age", "victim_age", "offender_id"],
         )
         .pipe(set_values, {"agency": "new-orleans-pd"})
-        .pipe(gen_uid, ["first_name", "last_name", "agency"])
+        .pipe(gen_uid, ["first_name", "middle_name", "last_name", "agency"])
+        .pipe(
+            gen_uid,
+            [
+                "uid",
+                "item_number",
+                "disposition",
+                "charge_description",
+                "occurred_date",
+            ],
+            "police_report_uid",
+        )
     )
 
     dfb = (
         pd.read_csv(deba.data("raw/new_orleans_pd/rtcc_footage_request_id.csv"))
+        .astype(str)
         .pipe(clean_column_names)
         .pipe(standardize_desc_cols, ["item_number"])
         .pipe(set_values, {"rtcc_footage_requested": "yes"})
@@ -107,6 +128,13 @@ def clean():
 
     df = pd.merge(dfa, dfb, on="item_number", how="outer")
 
-    df = df.pipe(drop_rows_missing_names)
+    df = df.pipe(drop_rows_missing_names).drop_duplicates(
+        subset=["uid", "police_report_uid"], keep="last"
+    )
 
     return df
+
+
+if __name__ == "__main__":
+    df = clean()
+    df.to_csv(deba.data("clean/pr_new_orleans_pd_2010_2022.csv"), index=False)

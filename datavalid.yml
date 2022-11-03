@@ -27,6 +27,8 @@ files:
     schema: settlement
   data/fuse/docs.csv:
     schema: docs
+  data/fuse/police_report.csv:
+    schema: police_report
 
 schemas:
   personnel:
@@ -234,6 +236,7 @@ schemas:
           - claim_closed
           - brady_list
           - board_hearing
+          - occurred_date
         no_na: true
       - name: year
         integer: true
@@ -334,6 +337,10 @@ schemas:
       - name: years_of_service
       - name: source_agency
       - name: brady_uid
+      - name: police_report_uid
+        description: >
+          unique identifier for a police report, references the `police_report_uid` column
+          in police_report.csv.
     validation_tasks:
       - name: event dates should be valid
         valid_date:
@@ -564,6 +571,21 @@ schemas:
       - name: matched_uid
         description: >
           uid of officer matched to the doc
-
-
+  police_report:
+    columns:
+      - name: police_report_uid
+        description: >
+          unique identifier of police report
+      - name: uid
+      - name: agency
+      - name: report_type
+      - name: location
+      - name: district
+      - name: signal_description
+      - name: charge_description
+      - name: offender_race
+      - name: offender_sex
+      - name: offender_age
+      - name: offender_status
+   
 save_bad_rows_to: data/invalid_rows.csv
