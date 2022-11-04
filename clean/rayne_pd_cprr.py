@@ -178,14 +178,15 @@ def split_rows_w_multiple_allegations14(df):
 
 
 def extract_allegation_desc(df):
-    allegation_desc = (
+    desc = (
         df.disposition.str.lower()
         .str.strip()
         .str.replace(r"[bc1-3]\)", "", regex=True)
         .str.extract(r"\((.+)\)")
     )
 
-    df.loc[:, "allegation_desc"] = allegation_desc[0].fillna("")
+    df.loc[:, "allegation_desc"] = desc[0].fillna("")\
+    .str.replace(r"(.+) \((.+)", r"\2", regex=True)
     return df
 
 

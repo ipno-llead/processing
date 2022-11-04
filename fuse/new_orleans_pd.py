@@ -3,7 +3,6 @@ import deba
 from lib.columns import (
     rearrange_appeal_hearing_columns,
     rearrange_allegation_columns,
-    rearrange_uof_citizen_columns,
     rearrange_stop_and_search_columns,
     rearrange_use_of_force,
     rearrange_event_columns,
@@ -284,13 +283,7 @@ if __name__ == "__main__":
     agency = pprr.agency[0]
     post = load_for_agency(agency)
     pprr_csd = pd.read_csv(deba.data("match/pprr_new_orleans_csd_2014.csv"))
-    uof_officers = pd.read_csv(
-        deba.data("clean/uof_officers_new_orleans_pd_2016_2021.csv")
-    )
-    uof_citizens = pd.read_csv(
-        deba.data("clean/uof_citizens_new_orleans_pd_2016_2021.csv")
-    )
-    uof = pd.read_csv(deba.data("clean/uof_new_orleans_pd_2016_2021.csv"))
+    uof = pd.read_csv(deba.data("match/uof_new_orleans_pd_2016_2021.csv"))
     post_event = pd.read_csv(deba.data("match/post_event_new_orleans_pd.csv"))
     award = pd.read_csv(deba.data("match/award_new_orleans_pd_2016_2021.csv"))
     lprr = pd.read_csv(deba.data("match/lprr_new_orleans_csc_2000_2016.csv"))
@@ -312,7 +305,7 @@ if __name__ == "__main__":
         pprr,
         lprr,
         pprr_csd,
-        uof_officers,
+        uof,
         pclaims20,
         pclaims21,
         pprr_separations,
@@ -338,8 +331,6 @@ if __name__ == "__main__":
     ).drop_duplicates(subset=["event_uid"], keep="first")
     sas_df = rearrange_stop_and_search_columns(sas)
     lprr_df = rearrange_appeal_hearing_columns(lprr)
-    uof_officer_df = rearrange_uof_officer_columns(uof_officers)
-    uof_citizen_df = rearrange_uof_citizen_columns(uof_citizens)
     uof_df = rearrange_use_of_force(uof)
     pclaims_df = rearrange_property_claims_columns(pd.concat([pclaims20, pclaims21]))
     com = pd.concat([cprr, pib]).drop_duplicates(subset=["allegation_uid"], keep="last")
@@ -352,12 +343,6 @@ if __name__ == "__main__":
     lprr_df.to_csv(deba.data("fuse/app_new_orleans_csc.csv"), index=False)
     sas_df.to_csv(deba.data("fuse/sas_new_orleans_pd.csv"), index=False)
     uof_df.to_csv(deba.data("fuse/uof_new_orleans_pd.csv"), index=False)
-    uof_officer_df.to_csv(
-        deba.data("fuse/uof_officers_new_orleans_pd.csv"), index=False
-    )
-    uof_citizen_df.to_csv(
-        deba.data("fuse/uof_citizens_new_orleans_pd.csv"), index=False
-    )
     pclaims_df.to_csv(deba.data("fuse/pclaims_new_orleans_pd.csv"), index=False)
     settlements.to_csv(deba.data("fuse/settlements_new_orleans_pd.csv"), index=False)
     pr.to_csv(deba.data("fuse/pr_new_orleans_pd.csv"), index=False)
