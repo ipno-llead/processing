@@ -1056,18 +1056,6 @@ branch:
     file: data/fuse/per_lake_charles_pd.csv
     primaryKey:
       - uid
-  uof-citizens-new-orleans-pd:
-    remote: origin
-    merge: refs/heads/uof-citizens-new-orleans-pd
-    file: data/fuse/uof_citizens_new_orleans_pd.csv
-    primaryKey:
-      - uof_citizen_uid
-  uof-officers-new-orleans-pd:
-    remote: origin
-    merge: refs/heads/uof-officers-new-orleans-pd
-    file: data/fuse/uof_officers_new_orleans_pd.csv
-    primaryKey:
-      - uid
   uof-new-orleans-pd:
     remote: origin
     merge: refs/heads/uof-new-orleans-pd
@@ -1102,6 +1090,12 @@ branch:
     remote: origin
     merge: refs/heads/settlements-louisiana-state-pd
     file: data/fuse/settlements_louisiana_state_pd.csv
+    primaryKey:
+      - settlement_uid
+  settlements-baton-rouge-pd:
+    remote: origin
+    merge: refs/heads/settlements-baton-rouge-pd
+    file: data/fuse/settlements_baton_rouge_pd.csv
     primaryKey:
       - settlement_uid
   person:
@@ -1153,12 +1147,6 @@ branch:
     primaryKey:
       - uid
       - uof_uid
-  use-of-force-citizens:
-    remote: origin
-    merge: refs/heads/use-of-force-citizens
-    file: data/fuse/uof_citizens.csv
-    primaryKey:
-      - uof_citizen_uid
   property-claims:
     remote: origin
     merge: refs/heads/property-claims
