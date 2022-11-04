@@ -74,7 +74,10 @@ def join_names(df):
 def clean():
 
     dfa = (
-        pd.read_csv(deba.data("raw/new_orleans_pd/new_orleans_pd_epr_2010_2022.csv"))
+        pd.read_csv(
+            deba.data("raw/new_orleans_pd/new_orleans_pd_epr_2010_2022.csv"),
+            encoding="utf-8",
+        )
         .astype(str)
         .drop(columns=["persontype", "hate_crime"])
         .rename(
@@ -119,7 +122,10 @@ def clean():
     )
 
     dfb = (
-        pd.read_csv(deba.data("raw/new_orleans_pd/rtcc_footage_request_id.csv"))
+        pd.read_csv(
+            deba.data("raw/new_orleans_pd/rtcc_footage_request_id.csv"),
+            encoding="ISO-8859-1",
+        )
         .astype(str)
         .pipe(clean_column_names)
         .pipe(standardize_desc_cols, ["item_number"])
