@@ -1098,6 +1098,12 @@ branch:
     file: data/fuse/settlements_baton_rouge_pd.csv
     primaryKey:
       - settlement_uid
+  police_report-new-orleans-pd:
+    remote: origin
+    merge: refs/heads/police-report-new-orleans-pd
+    file: data/fuse/pr_new_orleans_pd.csv
+    primaryKey:
+      - police_report_uid
   person:
     remote: origin
     merge: refs/heads/person
@@ -1171,6 +1177,12 @@ branch:
     file: data/fuse/docs.csv
     primaryKey:
       - docid
+  police_report:
+    remote: origin
+    merge: refs/heads/police-report
+    file: data/fuse/police_reports.csv
+    primaryKey:
+      - police_report_uid
 merge:
   fastForward: only
 pack:
