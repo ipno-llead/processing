@@ -134,7 +134,7 @@ def _check_for_processing_files(df: pd.DataFrame) -> pd.DataFrame:
     client = Client(GCLOUD_PROJECT, credentials=credentials)
     sha1s = set()
     for filesha1 in (
-        df.loc[df.ocr_status == "queueing", "filesha1"].drop_duplicates().values()
+        df.loc[df.ocr_status == "queueing", "filesha1"].drop_duplicates().values
     ):
         blobs = client.list_blobs(
             SOURCE_BUCKET, 1, prefix=f"ocr/{filesha1[:2]}/{filesha1[2:]}"
