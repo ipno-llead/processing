@@ -49,7 +49,7 @@ def split_officer_names(df):
     names = df.officer_name.str.extract(r"(\w+)\, ?(\w+)?")
     df.loc[:, "last_name"] = names[0]
     df.loc[:, "first_name"] = names[1]
-    return df.drop(columns=["officer_name"])
+    return df.drop(columns=["officer_name"])[~((df.last_name.fillna("") == ""))]
 
 
 def split_citizen_rows(df):
@@ -280,7 +280,7 @@ def clean_citizen_age(df):
 
 
 def clean_uof():
-    df = (
+    dfa = (
         pd.read_csv(deba.data("raw/new_orleans_pd/new_orleans_pd_uof_2016_2021.csv"))
         .pipe(clean_column_names)
         .rename(
@@ -288,7 +288,22 @@ def clean_uof():
                 "filenum": "tracking_id",
                 "occurred_date": "uof_occur_date",
                 "shift": "shift_time",
-                "use_of_force_type": "use_of_force_description"
+                "use_of_force_type": "use_of_force_description",
+                "subject_ethnicity": "citizen_race",
+                "subject_gender": "citizen_sex",
+                "subject_hospitalized": "citizen_hospitalized",
+                "subject_injured": "citizen_injured",
+                "subject_distance_from_officer": "citizen_distance_from_officer",
+                "subject_arrested": "citizen_arrested",
+                "subject_arrest_charges": "citizen_arrest_charges",
+                "subject_influencing_factors": "citizen_influencing_factors",
+                "subject_build": "citizen_build",
+                "subject_age": "citizen_age",
+                "subject_height": "citizen_height",
+                "officer_race_ethnicity": "race",
+                "officer_gender": "sex",
+                "officer_age": "age",
+                "officer_years_of_service": "years_of_service",
             }
         )
         .pipe(clean_weather_condition)
@@ -323,6 +338,31 @@ def clean_uof():
             "uof_uid",
         )
     )
+    dfb = (
+        dfa.pipe(split_officer_rows)
+        .pipe(split_officer_names)
+        .pipe(clean_use_of_force_description)
+        .pipe(clean_races, ["race"])
+        .pipe(clean_sexes, ["sex"])
+        .pipe(clean_names, ["last_name", "first_name"])
+        .pipe(
+            standardize_desc_cols,
+            [
+                "use_of_force_description",
+                "use_of_force_level",
+                "use_of_force_effective",
+            ],
+        )
+        .pipe(set_values, {"agency": "new-orleans-pd"})
+        .pipe(gen_uid, ["first_name", "last_name", "agency"])
+        .drop_duplicates(subset=["uid", "uof_uid"])
+    )
+    df = pd.merge(dfa, dfb, on="uof_uid")
+    df = (
+        df.pipe(gen_uid, ["uid", "uof_uid"], "uof_uid")
+        .drop(columns=["agency_y"])
+        .rename(columns={"agency_x": "agency"})
+    )
     return df
 
 
@@ -331,36 +371,21 @@ def extract_citizen(uof):
         uof.loc[
             :,
             [
-                "subject_ethnicity",
-                "subject_gender",
-                "subject_hospitalized",
-                "subject_injured",
-                "subject_influencing_factors",
-                "subject_distance_from_officer",
-                "subject_age",
-                "subject_build",
-                "subject_height",
-                "subject_arrested",
-                "subject_arrest_charges",
+                "citizen_race",
+                "citizen_sex",
+                "citizen_hospitalized",
+                "citizen_injured",
+                "citizen_influencing_factors",
+                "citizen_distance_from_officer",
+                "citizen_age",
+                "citizen_build",
+                "citizen_height",
+                "citizen_arrested",
+                "citizen_arrest_charges",
                 "uof_uid",
             ],
         ]
         .pipe(clean_column_names)
-        .rename(
-            columns={
-                "subject_ethnicity": "citizen_race",
-                "subject_gender": "citizen_sex",
-                "subject_hospitalized": "citizen_hospitalized",
-                "subject_injured": "citizen_injured",
-                "subject_distance_from_officer": "citizen_distance_from_officer",
-                "subject_arrested": "citizen_arrested",
-                "subject_arrest_charges": "citizen_arrest_charges",
-                "subject_influencing_factors": "citizen_influencing_factors",
-                "subject_build": "citizen_build",
-                "subject_age": "citizen_age",
-                "subject_height": "citizen_height",
-            }
-        )
         .pipe(split_citizen_rows)
         .pipe(clean_citizen_arrest_charges)
         .pipe(clean_citizen_age)
@@ -391,108 +416,32 @@ def extract_citizen(uof):
                 "citizen_influencing_factors",
                 "citizen_build",
                 "citizen_height",
-                "citizen_race",
-                "citizen_sex",
-                "uof_uid",
             ],
             "uof_citizen_uid",
         )
-        .drop_duplicates(subset=["uof_citizen_uid", "uof_uid"])
     )
     uof = uof.drop(
         columns=[
-            "subject_ethnicity",
-            "subject_gender",
-            "subject_hospitalized",
-            "subject_injured",
-            "subject_distance_from_officer",
-            "subject_arrested",
-            "subject_arrest_charges",
-            "subject_influencing_factors",
-            "subject_build",
-            "subject_age",
-            "subject_height",
+            "citizen_race",
+            "citizen_sex",
+            "citizen_hospitalized",
+            "citizen_injured",
+            "citizen_distance_from_officer",
+            "citizen_arrested",
+            "citizen_arrest_charges",
+            "citizen_influencing_factors",
+            "citizen_build",
+            "citizen_age",
+            "citizen_height",
         ]
     )
     return df, uof
-
-
-def extract_officer(uof):
-    df = (
-        uof.loc[
-            :,
-            [
-                "officer_race_ethnicity",
-                "officer_gender",
-                "officer_age",
-                "officer_years_of_service",
-                "officer_name",
-                "use_of_force_description",
-                "use_of_force_level",
-                "use_of_force_effective",
-                "officer_injured",
-                "uof_uid",
-            ],
-        ]
-        .rename(
-            columns={
-                "officer_race_ethnicity": "race",
-                "officer_gender": "sex",
-                "officer_age": "age",
-                "officer_years_of_service": "years_of_service",
-            }
-        )
-        .pipe(split_officer_rows)
-        .pipe(split_officer_names)
-        .pipe(clean_use_of_force_description)
-        .pipe(clean_races, ["race"])
-        .pipe(clean_sexes, ["sex"])
-        .pipe(clean_names, ["last_name", "first_name"])
-        .pipe(
-            standardize_desc_cols,
-            [
-                "use_of_force_description",
-                "use_of_force_level",
-                "use_of_force_effective",
-            ],
-        )
-        .pipe(set_values, {"agency": "new-orleans-pd"})
-        .pipe(gen_uid, ["first_name", "last_name", "agency"])
-        .drop_duplicates(subset=["uid", "uof_uid"])
-    )
-    uof = uof.drop(
-        columns=[
-            "officer_race_ethnicity",
-            "officer_gender",
-            "officer_age",
-            "officer_years_of_service",
-            "officer_name",
-            "use_of_force_description",
-            "use_of_force_level",
-            "officer_injured",
-            "use_of_force_effective"
-        ]
-    )
-    return df, uof
-
-
-def merge_uof(dfa, dfb, dfc):
-    df = pd.merge(pd.merge(dfa,dfb,on='uof_uid'),dfc,on='uof_uid')
-    df = df.drop_duplicates(subset=["uof_uid", "uid"])
-    df = df.drop_duplicates(subset=["uof_citizen_uid", "uof_uid"])
-    return df
 
 
 if __name__ == "__main__":
     uof = clean_uof()
     uof_citizen, uof = extract_citizen(uof)
-    uof_officer, uof = extract_officer(uof)
-    merged_uof = merge_uof(uof, uof_citizen, uof_officer)
-    uof.to_csv(deba.data("clean/uof_meta_new_orleans_pd_2016_2021.csv"), index=False)
+    uof.to_csv(deba.data("clean/uof_new_orleans_pd_2016_2021.csv"), index=False)
     uof_citizen.to_csv(
         deba.data("clean/uof_citizens_new_orleans_pd_2016_2021.csv"), index=False
     )
-    uof_officer.to_csv(
-        deba.data("clean/uof_officers_new_orleans_pd_2016_2021.csv"), index=False
-    )
-    merged_uof.to_csv(deba.data("clean/uof_new_orleans_pd_2016_2021.csv"), index=False)
