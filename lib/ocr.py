@@ -3,6 +3,7 @@ import timeit
 from pathlib import Path
 from contextlib import contextmanager
 from datetime import timedelta
+import pathlib
 import tempfile
 import json
 import subprocess
@@ -21,9 +22,13 @@ GCLOUD_PROJECT = "excellent-zoo-300106"
 
 
 def _run_gsutil(*args):
-    gsutil = find_executable("gsutil")
+    paths = [
+        str(pathlib.Path.home() / "google-cloud-sdk/bin"),
+        "/usr/local/gcloud/google-cloud-sdk/bin",
+    ]
+    gsutil = find_executable("gsutil", *paths)
     if gsutil is None:
-        raise Exception("couldnt find gsutil in ~/google-cloud-sdk/bin")
+        raise Exception("couldnt find gsutil in %s" % (":".join(paths)))
 
     try:
         subprocess.run(
