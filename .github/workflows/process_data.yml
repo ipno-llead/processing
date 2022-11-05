@@ -31,6 +31,7 @@ jobs:
         run: |
           sed -iE 's/dataDir\: data/dataDir\: \/runner\/_work\/data\/data/g' deba.yaml
           echo "md5Dir: /runner/_work/data/md5" >> deba.yaml
+          rm -rf /runner/_work/data/data/ocr
           make WRGL_FLAGS="--wrgl-dir /runner/_work/data/.wrgl"
         env:
           OCR_ENSURE_COMPLETE: "true"
