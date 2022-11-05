@@ -28,6 +28,7 @@ RUN sudo chmod +x /tmp/install_wrgl.sh \
     && sudo /tmp/install_wrgl.sh \
     && sudo rm /tmp/install_wrgl.sh /tmp/requirements.txt
 
-ENV CLOUDSDK_INSTALL_DIR /usr/local/gcloud/
-RUN RUN curl -sSL https://sdk.cloud.google.com | bash
+ADD https://sdk.cloud.google.com /tmp/install_gcloud.sh
+RUN sudo chmod +x /tmp/install_gcloud.sh \
+    && sudo /tmp/install_gcloud.sh --install-dir=/usr/local/gcloud
 ENV PATH $PATH:/usr/local/gcloud/google-cloud-sdk/bin
