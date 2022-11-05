@@ -2,9 +2,7 @@ FROM summerwind/actions-runner:latest
 
 RUN sudo apt update -y \
     && sudo apt install -y software-properties-common \
-    && sudo add-apt-repository ppa:deadsnakes/ppa \
-    && sudo add-apt-repository ppa:alex-p/tesseract-ocr-devel \
-    && sudo apt install -y poppler-utils tesseract-ocr python3.9 python3.9-dev \
+    && sudo apt install -y poppler-utils python3.9 python3.9-dev \
     && sudo rm -rf /var/lib/apt/lists/*
 
 ADD http://ftp.gnu.org/gnu/make/make-4.3.tar.gz /tmp/
@@ -29,3 +27,7 @@ ADD https://github.com/wrgl/wrgl/releases/download/v0.12.7/install.sh /tmp/insta
 RUN sudo chmod +x /tmp/install_wrgl.sh \
     && sudo /tmp/install_wrgl.sh \
     && sudo rm /tmp/install_wrgl.sh /tmp/requirements.txt
+
+ENV CLOUDSDK_INSTALL_DIR /usr/local/gcloud/
+RUN RUN curl -sSL https://sdk.cloud.google.com | bash
+ENV PATH $PATH:/usr/local/gcloud/google-cloud-sdk/bin
