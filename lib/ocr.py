@@ -22,13 +22,15 @@ GCLOUD_PROJECT = "excellent-zoo-300106"
 
 
 def _run_gsutil(*args):
-    paths = [
-        str(pathlib.Path.home() / "google-cloud-sdk/bin"),
-        "/usr/local/gcloud/google-cloud-sdk/bin",
-    ]
-    gsutil = find_executable("gsutil", *paths)
+    paths = os.pathsep.join(
+        [
+            str(pathlib.Path.home() / "google-cloud-sdk/bin"),
+            "/usr/local/gcloud/google-cloud-sdk/bin",
+        ]
+    )
+    gsutil = find_executable("gsutil", paths)
     if gsutil is None:
-        raise Exception("couldnt find gsutil in %s" % (":".join(paths)))
+        raise Exception("couldnt find gsutil in %s" % paths)
 
     try:
         subprocess.run(
