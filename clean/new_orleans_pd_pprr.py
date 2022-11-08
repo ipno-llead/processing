@@ -35,7 +35,9 @@ def split_names_overtime(df):
     df.loc[:, "last_name"] = names[0]
     df.loc[:, "first_name"] = names[1]
     df.loc[:, "middle_name"] = names[2]
-    return df.drop(columns=["name"])[~((df.overtime_and_detail_annual_total.fillna("") == ""))]
+    return df.drop(columns=["name"])[
+        ~((df.overtime_and_detail_annual_total.fillna("") == ""))
+    ]
 
 
 def clean_department_desc(df):
@@ -96,22 +98,26 @@ def clean_badge_no(df):
 def drop_rows_missing_names(df):
     return df[~((df.first_name.fillna("") == ""))]
 
+
 def clean_location(df):
-    df.loc[:, "overtime_and_detail_location"] = df.location.str.lower().str.strip()\
-        .str.replace(r"^pol ", "",regex=True)\
-        .str.replace(r"&", "and", regex=False)\
-        .str.replace(r"sprt", "support", regex=False)\
-        .str.replace(r"bure\b", "bureau", regex=True)\
-        .str.replace(r"managemnt", "management", regex=False)\
-        .str.replace(r"off\b", "office", regex=True)\
-        .str.replace(r"(\w+)  +(\w+)", r"\1 \2", regex=True)\
-        .str.replace(r"div\b", "division", regex=True)\
-        .str.replace(r"prevent dst", "prevention district", regex=False)\
-        .str.replace(r".+blank.+", "", regex=True)\
-        .str.replace(r"integrity$", "integrity bureau", regex=True)\
-        .str.replace(r"mid city", "mid-city", regex=False)\
-        .str.replace(r"investiation", "investigation", regex=False)\
+    df.loc[:, "overtime_and_detail_location"] = (
+        df.location.str.lower()
+        .str.strip()
+        .str.replace(r"^pol ", "", regex=True)
+        .str.replace(r"&", "and", regex=False)
+        .str.replace(r"sprt", "support", regex=False)
+        .str.replace(r"bure\b", "bureau", regex=True)
+        .str.replace(r"managemnt", "management", regex=False)
+        .str.replace(r"off\b", "office", regex=True)
+        .str.replace(r"(\w+)  +(\w+)", r"\1 \2", regex=True)
+        .str.replace(r"div\b", "division", regex=True)
+        .str.replace(r"prevent dst", "prevention district", regex=False)
+        .str.replace(r".+blank.+", "", regex=True)
+        .str.replace(r"integrity$", "integrity bureau", regex=True)
+        .str.replace(r"mid city", "mid-city", regex=False)
+        .str.replace(r"investiation", "investigation", regex=False)
         .str.replace(r"investigation prg$", "investigations", regex=True)
+    )
     return df.drop(columns=["location"])
 
 
@@ -229,10 +235,6 @@ def clean():
     )
     return df
 
-
-def explore():
-    df = pd.read_csv(deba.data("clean/pprr_new_orleans_pd_2020.csv"))
-    return df 
 
 if __name__ == "__main__":
     df = clean()
