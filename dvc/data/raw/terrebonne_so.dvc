@@ -1,6 +1,6 @@
 wdir: ../../../data/raw
 outs:
-- md5: c3858349ae7a68480611e2ba8778a538.dir
-  size: 432
-  nfiles: 1
+- md5: 044c706e0a4323508afd1e1d25f87de8.dir
+  size: 59632
+  nfiles: 3
   path: terrebonne_so
