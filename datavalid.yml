@@ -311,6 +311,7 @@ schemas:
       - name: salary_year
       - name: overtime_and_detail_annual_total
       - name: overtime_and_detail_annual_year
+      - name: overtime_and_detail_location
       - name: salary_freq
         options:
           - hourly
