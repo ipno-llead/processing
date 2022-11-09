@@ -1177,7 +1177,7 @@ branch:
     file: data/fuse/docs.csv
     primaryKey:
       - docid
-  police_report:
+  police-report:
     remote: origin
     merge: refs/heads/police-report
     file: data/fuse/police_reports.csv
