@@ -401,7 +401,7 @@ schemas:
       - name: appeal_uid
         description: >
           unique per docket_no and uid
-      - name: docket_no
+      - name: tracking_id
       - name: uid
       - name: counsel
       - name: charging_supervisor
@@ -417,8 +417,7 @@ schemas:
           unique identifier of stop and search report.
         unique: true
         no_na: true
-      - name: stop_and_search_interview_id
-      - name: stop_and_search_interview_id_2
+      - name: tracking_id
       - name: item_number
       - name: id
       - name: district
