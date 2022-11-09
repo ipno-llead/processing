@@ -141,7 +141,7 @@ def assign_agency(df):
 
 
 def assign_charging_supervisor(df):
-    docket_year = df.docket_no.str.replace(r"^(\d+)-.+$", r"\1")
+    docket_year = df.tracking_id.str.replace(r"^(\d+)-.+$", r"\1")
     df.loc[:, "charging_supervisor"] = (
         df.charging_supervisor.str.strip()
         .str.replace(r"Flores", "Marlin A. Flores")
@@ -193,12 +193,13 @@ def clean():
         .pipe(correct_docket_no)
         .pipe(clean_appeal_disposition)
         .pipe(assign_agency)
+        .rename(columns={"docket_no": "tracking_id"})
         .pipe(clean_names, ["first_name", "middle_name", "last_name"])
         .pipe(gen_uid, ["agency", "first_name", "middle_name", "last_name"])
-        .pipe(gen_uid, ["agency", "docket_no", "uid"], "appeal_uid")
+        .pipe(gen_uid, ["agency", "tracking_id", "uid"], "appeal_uid")
         .pipe(assign_charging_supervisor)
     )
-    return df.drop_duplicates(subset=["docket_no", "uid"]).reset_index(drop=True)
+    return df.drop_duplicates(subset=["tracking_id", "uid"]).reset_index(drop=True)
 
 
 if __name__ == "__main__":
