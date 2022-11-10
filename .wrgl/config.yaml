@@ -1062,7 +1062,7 @@ branch:
     file: data/fuse/uof_new_orleans_pd.csv
     primaryKey:
       - uof_uid
-  uof-citizens=new-orleans-pd:
+  uof-citizens-new-orleans-pd:
     remote: origin
     merge: refs/heads/uof-citizens-new-orleans-pd
     file: data/fuse/uof_citizens_new_orleans_pd.csv

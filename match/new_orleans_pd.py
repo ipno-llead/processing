@@ -237,7 +237,7 @@ def match_use_of_force_to_pprr(uof, pprr):
         dfb,
         show_progress=True,
     )
-    decision = 1
+    decision = .935
 
     matcher.save_pairs_to_excel(
         deba.data("match/uof_new_orleans_pd_2016_2021_v_pprr_new_orleans_pd_2020.xlsx"),

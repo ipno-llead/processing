@@ -247,7 +247,9 @@ def fuse_uof_officers():
 
 
 def fuse_uof_citizens():
-    return rearrange_uof_citizen_columns(pd.concat([pd.read_csv(deba.data("fuse/uof_citizens_new_orleans_pd.csv"))])).sort_values("agency")
+    return rearrange_uof_citizen_columns(
+        pd.concat([pd.read_csv(deba.data("fuse/uof_citizens_new_orleans_pd.csv"))])
+    ).sort_values("agency")
 
 
 def find_event_agency_if_missing_from_post(event_df, post_event_df):

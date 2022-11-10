@@ -338,8 +338,17 @@ def clean_uof():
             "uof_uid",
         )
     )
-    dfb = (
-        dfa.pipe(split_officer_rows)
+    dfb = dfa[["officer_name",
+        "race",
+        "sex",
+        "age",
+        "years_of_service",
+        "use_of_force_description",
+        "use_of_force_level",
+        "use_of_force_effective",
+        "officer_injured", "uof_uid"]]
+    dfb = (dfb
+        .pipe(split_officer_rows)
         .pipe(split_officer_names)
         .pipe(clean_use_of_force_description)
         .pipe(clean_races, ["race"])
@@ -357,11 +366,18 @@ def clean_uof():
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .drop_duplicates(subset=["uid", "uof_uid"])
     )
+    dfa = dfa.drop(columns=["officer_name",
+        "race",
+        "sex",
+        "age",
+        "years_of_service",
+        "use_of_force_description",
+        "use_of_force_level",
+        "use_of_force_effective",
+        "officer_injured", "agency"])
     df = pd.merge(dfa, dfb, on="uof_uid")
     df = (
         df.pipe(gen_uid, ["uid", "uof_uid"], "uof_uid")
-        .drop(columns=["agency_y"])
-        .rename(columns={"agency_x": "agency"})
     )
     return df
 
