@@ -314,7 +314,7 @@ def clean():
                 "eventdate": "stop_and_search_datetime",
                 "zip": "zip_code",
                 "blockaddress": "stop_and_search_location",
-                "stop_and_search__field_interviews__fieldinterviewid": "stop_and_search_interview_id",
+                "stop_and_search__field_interviews__fieldinterviewid": "tracking_id",
                 "fic_officersnames_10_21_2021_fieldinterviewid": "stop_and_search_interview_id_2",
                 "nopd_item": "item_number",
                 "stopdescription": "stop_reason",
@@ -371,7 +371,7 @@ def clean():
             gen_uid,
             [
                 "uid",
-                "stop_and_search_interview_id",
+                "tracking_id",
                 "citizen_id",
                 "stop_reason",
                 "evidence_seized",
