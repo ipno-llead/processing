@@ -4,6 +4,7 @@ from lib.clean import (
     float_to_int_str,
     standardize_desc_cols,
     clean_races,
+    clean_names,
 )
 import deba
 from lib.columns import clean_column_names, set_values
@@ -366,7 +367,8 @@ def clean():
             ],
         )
         .pipe(set_values, {"agency": "new-orleans-pd"})
-        .pipe(gen_uid, ["agency", "first_name", "middle_name", "last_name"])
+        .pipe(clean_names, ["first_name", "last_name"])
+        .pipe(gen_uid, ["agency", "first_name", "last_name"])
         .pipe(
             gen_uid,
             [

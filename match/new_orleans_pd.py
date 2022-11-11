@@ -439,6 +439,31 @@ def match_pr_to_pprr(pr, pprr):
     return pr
 
 
+def deduplicate_pr_officers(pr):
+    df = pr[["uid", "first_name", "middle_name", "last_name"]]
+    df = df.drop_duplicates(subset=["uid"]).set_index("uid")
+    df.loc[:, "fc"] = df.first_name.fillna("").map(lambda x: x[:1])
+    df.loc[:, "lc"] = df.last_name.fillna("").map(lambda x: x[:1])
+    df.loc[:, "middle_name"] = df.middle_name.fillna("")
+    matcher = ThresholdMatcher(
+        ColumnsIndex("fc"),
+        {
+            "first_name": JaroWinklerSimilarity(),
+            "middle_name": JaroWinklerSimilarity(),
+            "last_name": JaroWinklerSimilarity(),
+        },
+        df,
+    )
+    decision = 0.953
+    matcher.save_clusters_to_excel(
+        deba.data("match/deduplicate_epr_nopd_2010_2022.xlsx"),
+        decision,
+        decision,
+    )
+    clusters = matcher.get_index_clusters_within_thresholds(decision)
+    return canonicalize_officers(pr, clusters)
+
+
 if __name__ == "__main__":
     pprr = pd.read_csv(deba.data("clean/pprr_new_orleans_pd_2020.csv"))
     pprr_csd = pd.read_csv(deba.data("clean/pprr_new_orleans_csd_2014.csv"))
@@ -449,14 +474,13 @@ if __name__ == "__main__":
     award = pd.read_csv(deba.data("clean/award_new_orleans_pd_2016_2021.csv"))
     lprr = pd.read_csv(deba.data("clean/lprr_new_orleans_csc_2000_2016.csv"))
     sas = pd.read_csv(deba.data("clean/sas_new_orleans_pd_2017_2021.csv"))
-    uof = pd.read_csv(
-        deba.data("clean/uof_new_orleans_pd_2016_2021.csv")
-    )
+    uof = pd.read_csv(deba.data("clean/uof_new_orleans_pd_2016_2021.csv"))
     cprr = pd.read_csv(deba.data("clean/cprr_new_orleans_da_2016_2020.csv"))
     pprr_separations = pd.read_csv(
         deba.data("clean/pprr_seps_new_orleans_pd_2018_2022.csv")
     )
     pr = pd.read_csv(deba.data("clean/pr_new_orleans_pd_2010_2022.csv"))
+    pr = deduplicate_pr_officers(pr)
     pr = match_pr_to_pprr(pr, pprr)
     pib = join_pib_and_da()
     award = deduplicate_award(award)
@@ -477,9 +501,7 @@ if __name__ == "__main__":
         deba.data("match/pprr_new_orleans_csd_2014.csv"), index=False
     )
     sas.to_csv(deba.data("match/sas_new_orleans_pd_2017_2021.csv"), index=False)
-    uof.to_csv(
-        deba.data("match/uof_new_orleans_pd_2016_2021.csv"), index=False
-    )
+    uof.to_csv(deba.data("match/uof_new_orleans_pd_2016_2021.csv"), index=False)
     pclaims20.to_csv(deba.data("match/pclaims_new_orleans_pd_2020.csv"), index=False)
     pclaims21.to_csv(deba.data("match/pclaims_new_orleans_pd_2021.csv"), index=False)
     cprr.to_csv(deba.data("match/cprr_new_orleans_da_2016_2020.csv"), index=False)
