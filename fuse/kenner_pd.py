@@ -50,7 +50,7 @@ def fuse_events(pprr, uof):
                 "prefix": "incident",
             },
         },
-        ["uof_uid"],
+        ["uid", "uof_uid"],
     )
     return builder.to_frame()
 
