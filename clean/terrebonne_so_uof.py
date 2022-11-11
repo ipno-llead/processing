@@ -178,12 +178,13 @@ def clean():
                 "status",
                 "use_of_force_type",
                 "occurred_date",
+                "use_of_force_result",
             ],
             "uof_uid",
         )
         .pipe(
             gen_uid,
-            ["citizen_race", "citizen_sex", "citizen_age", "use_of_force_result"],
+            ["citizen_race", "citizen_sex", "citizen_age"],
             "uof_citizen_uid",
         )
     )

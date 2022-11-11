@@ -64,7 +64,7 @@ def match_uof_and_post(uof, post):
         dfa,
         dfb,
     )
-    decision = 0
+    decision = .953
     matcher.save_pairs_to_excel(
         deba.data("match/uof_terrebonne_2021_v_post_pprr_2020_11_06.xlsx"),
         decision,

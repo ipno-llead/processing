@@ -6,7 +6,7 @@ from lib.personnel import fuse_personnel
 from lib.post import load_for_agency
 
 
-def fuse_events(cprr, post):
+def fuse_events(cprr, post, uof):
     builder = events.Builder()
     builder.extract_events(
         cprr,
@@ -52,17 +52,17 @@ def fuse_events(cprr, post):
             events.UOF_INCIDENT: {
                 "prefix": "occurred",
                 "parse_date": True,
-                "keep": ["uid", "uof_uid", "use_of_force_type", "use_of_force_result", "agency",],
+                "keep": ["uid", "uof_uid", "agency",],
             },
         },
-        ["uid"],
+        ["uid", "uof_uid"],
     )
     return builder.to_frame()
 
 
 if __name__ == "__main__":
     cprr = pd.read_csv(deba.data("clean/cprr_terrebonne_so_2019_2021.csv"))
-    uof = pd.read_csv(deba.data("match/terrebonne_so_2021.csv"))
+    uof = pd.read_csv(deba.data("match/uof_terrebonne_so_2021.csv"))
     agency = cprr.agency[0]
     post = load_for_agency(agency)
     per = fuse_personnel(cprr, post, uof)
