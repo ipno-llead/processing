@@ -25,6 +25,8 @@ files:
     schema: settlement
   data/fuse/docs.csv:
     schema: docs
+  data/fuse/police_report.csv:
+    schema: police_report
 
 schemas:
   personnel:
@@ -232,6 +234,7 @@ schemas:
           - claim_closed
           - brady_list
           - board_hearing
+          - occurred_date
         no_na: true
       - name: year
         integer: true
@@ -311,6 +314,7 @@ schemas:
       - name: salary_year
       - name: overtime_and_detail_annual_total
       - name: overtime_and_detail_annual_year
+      - name: overtime_and_detail_location
       - name: salary_freq
         options:
           - hourly
@@ -332,6 +336,10 @@ schemas:
       - name: years_of_service
       - name: source_agency
       - name: brady_uid
+      - name: police_report_uid
+        description: >
+          unique identifier for a police report, references the `police_report_uid` column
+          in police_report.csv.
     validation_tasks:
       - name: event dates should be valid
         valid_date:
@@ -401,7 +409,7 @@ schemas:
       - name: appeal_uid
         description: >
           unique per docket_no and uid
-      - name: docket_no
+      - name: tracking_id
       - name: uid
       - name: counsel
       - name: charging_supervisor
@@ -417,8 +425,7 @@ schemas:
           unique identifier of stop and search report.
         unique: true
         no_na: true
-      - name: stop_and_search_interview_id
-      - name: stop_and_search_interview_id_2
+      - name: tracking_id
       - name: item_number
       - name: id
       - name: district
@@ -567,6 +574,21 @@ schemas:
       - name: matched_uid
         description: >
           uid of officer matched to the doc
-
-
+  police_report:
+    columns:
+      - name: police_report_uid
+        description: >
+          unique identifier of police report
+      - name: uid
+      - name: agency
+      - name: report_type
+      - name: location
+      - name: district
+      - name: signal_description
+      - name: charge_description
+      - name: offender_race
+      - name: offender_sex
+      - name: offender_age
+      - name: offender_status
+   
 save_bad_rows_to: data/invalid_rows.csv

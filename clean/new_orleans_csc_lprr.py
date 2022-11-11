@@ -158,7 +158,7 @@ def clean():
                 "transcript_received": "transcript_receive_date",
                 "h_e_report_received": "h_e_report_receive_date",
                 "final_disposition_date": "appeal_disposition_date",
-                "docket_number": "docket_no",
+                "docket_number": "tracking_id",
             }
         )
         .pipe(clean_suspension)
@@ -169,7 +169,7 @@ def clean():
         .pipe(assign_agency)
         .pipe(clean_names, ["first_name", "last_name"])
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
-        .pipe(gen_uid, ["uid", "docket_no"], "appeal_uid")
+        .pipe(gen_uid, ["uid", "tracking_id"], "appeal_uid")
         .pipe(assign_final_appeal_hearing_date)
         .pipe(clean_dates, ["appeal_hearing_date", "appeal_disposition_date", "appeal_receive_date"])
     )

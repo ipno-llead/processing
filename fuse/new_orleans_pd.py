@@ -9,6 +9,7 @@ from lib.columns import (
     rearrange_uof_officer_columns,
     rearrange_property_claims_columns,
     rearrange_settlement_columns,
+    rearrange_police_report_columns,
 )
 from lib.clean import float_to_int_str
 from lib.personnel import fuse_personnel
@@ -17,7 +18,7 @@ from lib.post import load_for_agency
 
 
 def fuse_events(
-    pprr, pprr_csd, cprr, uof, award, lprr, pclaims20, pclaims21, pprr_separations
+    pprr, pprr_csd, cprr, uof, award, lprr, pclaims20, pclaims21, pprr_separations, pr
 ):
     builder = events.Builder()
     builder.extract_events(
@@ -33,6 +34,7 @@ def fuse_events(
                     "salary",
                     "salary_freq",
                     "overtime_and_detail_annual_total",
+                    "overtime_and_detail_location",
                     "badge_no",
                     "employee_id",
                     "race",
@@ -50,6 +52,7 @@ def fuse_events(
                     "salary",
                     "salary_freq",
                     "overtime_and_detail_annual_total",
+                    "overtime_and_detail_location",
                     "badge_no",
                     "employee_id",
                     "race",
@@ -105,9 +108,9 @@ def fuse_events(
                     "department_desc",
                     "employment_status",
                     "race",
-                    "sex", 
-                    "age", 
-                    "department_desc"
+                    "sex",
+                    "age",
+                    "department_desc",
                 ],
             },
             events.INVESTIGATION_COMPLETE: {
@@ -123,9 +126,9 @@ def fuse_events(
                     "department_desc",
                     "employment_status",
                     "race",
-                    "sex", 
-                    "age", 
-                    "department_desc"
+                    "sex",
+                    "age",
+                    "department_desc",
                 ],
             },
             events.COMPLAINT_INCIDENT: {
@@ -141,9 +144,9 @@ def fuse_events(
                     "department_desc",
                     "employment_status",
                     "race",
-                    "sex", 
-                    "age", 
-                    "department_desc"
+                    "sex",
+                    "age",
+                    "department_desc",
                 ],
             },
         },
@@ -258,6 +261,22 @@ def fuse_events(
         },
         ["uid", "separation_uid"],
     )
+    builder.extract_events(
+        pr,
+        {
+            events.POLICE_REPORT_INCIDENT_DATE: {
+                "prefix": "occurred",
+                "parse_date": True,
+                "keep": [
+                    "police_report_uid",
+                    "uid",
+                    "item_number",
+                    "agency",
+                ],
+            },
+        },
+        ["uid", "police_report_uid"],
+    )
     return builder.to_frame()
 
 
@@ -283,6 +302,7 @@ if __name__ == "__main__":
     nopd_settlements = pd.read_csv(
         deba.data("clean/settlements_new_orleans_pd.csv")
     ).dropna()
+    pr = pd.read_csv(deba.data("match/pr_new_orleans_pd_2010_2022.csv"))
     personnel = fuse_personnel(
         pprr,
         lprr,
@@ -293,7 +313,8 @@ if __name__ == "__main__":
         pprr_separations,
         cprr,
         pib,
-        post
+        post,
+        pr,
     )
     events_df = fuse_events(
         pprr,
@@ -305,6 +326,7 @@ if __name__ == "__main__":
         pclaims20,
         pclaims21,
         pprr_separations,
+        pr,
     )
     events_df = rearrange_event_columns(
         pd.concat([post_event, events_df])
@@ -316,6 +338,7 @@ if __name__ == "__main__":
     com = pd.concat([cprr, pib]).drop_duplicates(subset=["allegation_uid"], keep="last")
     com = rearrange_allegation_columns(com)
     settlements = rearrange_settlement_columns(nopd_settlements)
+    pr = rearrange_police_report_columns(pr)
     com.to_csv(deba.data("fuse/com_new_orleans_pd.csv"), index=False)
     personnel.to_csv(deba.data("fuse/per_new_orleans_pd.csv"), index=False)
     events_df.to_csv(deba.data("fuse/event_new_orleans_pd.csv"), index=False)
@@ -324,3 +347,4 @@ if __name__ == "__main__":
     uof_df.to_csv(deba.data("fuse/uof_new_orleans_pd.csv"), index=False)
     pclaims_df.to_csv(deba.data("fuse/pclaims_new_orleans_pd.csv"), index=False)
     settlements.to_csv(deba.data("fuse/settlements_new_orleans_pd.csv"), index=False)
+    pr.to_csv(deba.data("fuse/pr_new_orleans_pd.csv"), index=False)

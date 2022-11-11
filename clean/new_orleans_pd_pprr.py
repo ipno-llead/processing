@@ -35,7 +35,9 @@ def split_names_overtime(df):
     df.loc[:, "last_name"] = names[0]
     df.loc[:, "first_name"] = names[1]
     df.loc[:, "middle_name"] = names[2]
-    return df.drop(columns=["name"])
+    return df.drop(columns=["name"])[
+        ~((df.overtime_and_detail_annual_total.fillna("") == ""))
+    ]
 
 
 def clean_department_desc(df):
@@ -97,33 +99,39 @@ def drop_rows_missing_names(df):
     return df[~((df.first_name.fillna("") == ""))]
 
 
+def clean_location(df):
+    df.loc[:, "overtime_and_detail_location"] = (
+        df.location.str.lower()
+        .str.strip()
+        .str.replace(r"^pol ", "", regex=True)
+        .str.replace(r"&", "and", regex=False)
+        .str.replace(r"sprt", "support", regex=False)
+        .str.replace(r"bure\b", "bureau", regex=True)
+        .str.replace(r"managemnt", "management", regex=False)
+        .str.replace(r"off\b", "office", regex=True)
+        .str.replace(r"(\w+)  +(\w+)", r"\1 \2", regex=True)
+        .str.replace(r"div\b", "division", regex=True)
+        .str.replace(r"prevent dst", "prevention district", regex=False)
+        .str.replace(r".+blank.+", "", regex=True)
+        .str.replace(r"integrity$", "integrity bureau", regex=True)
+        .str.replace(r"mid city", "mid-city", regex=False)
+        .str.replace(r"investiation", "investigation", regex=False)
+        .str.replace(r"investigation prg$", "investigations", regex=True)
+    )
+    return df.drop(columns=["location"])
+
+
 def clean():
     df19 = (
         pd.read_csv(
             deba.data("raw/new_orleans_pd/new_orleans_pd_pprr_overtime_2019.csv")
         )
-        .drop(
-            columns=[
-                "Months",
-                "Unnamed: 3",
-                "Unnamed: 4",
-                "Unnamed: 5",
-                "Unnamed: 6",
-                "Unnamed: 7",
-                "Unnamed: 8",
-                "Unnamed: 9",
-                "Unnamed: 10",
-                "Unnamed: 11",
-                "Unnamed: 12",
-                "Unnamed: 13",
-                "Unnamed: 14",
-            ]
-        )
         .rename(
             columns={
-                "Sum of Earnings per PPE": "employee_id",
+                "Sum": "employee_id",
                 "Unnamed: 1": "name",
-                "Unnamed: 15": "overtime_and_detail_annual_total",
+                "Unnamed: 2": "location",
+                "Unnamed: 3": "overtime_and_detail_annual_total",
             }
         )
         .pipe(set_values, {"overtime_and_detail_date": "12/31/2019"})
@@ -131,6 +139,7 @@ def clean():
         .pipe(drop_rows_missing_name_overtime)
         .pipe(split_names_overtime)
         .pipe(clean_emp_id_csd)
+        .pipe(clean_location)
         .drop(columns=["first_name", "last_name", "middle_name"])
     )
 
@@ -138,28 +147,12 @@ def clean():
         pd.read_csv(
             deba.data("raw/new_orleans_pd/new_orleans_pd_pprr_overtime_2020.csv")
         )
-        .drop(
-            columns=[
-                "Months",
-                "Unnamed: 3",
-                "Unnamed: 4",
-                "Unnamed: 5",
-                "Unnamed: 6",
-                "Unnamed: 7",
-                "Unnamed: 8",
-                "Unnamed: 9",
-                "Unnamed: 10",
-                "Unnamed: 11",
-                "Unnamed: 12",
-                "Unnamed: 13",
-                "Unnamed: 14",
-            ]
-        )
         .rename(
             columns={
-                "Sum of Earnings per PPE": "employee_id",
+                "Sum": "employee_id",
                 "Unnamed: 1": "name",
-                "Unnamed: 15": "overtime_and_detail_annual_total",
+                "Unnamed: 2": "location",
+                "Unnamed: 3": "overtime_and_detail_annual_total",
             }
         )
         .pipe(set_values, {"overtime_and_detail_date": "12/31/2020"})
@@ -167,6 +160,7 @@ def clean():
         .pipe(drop_rows_missing_name_overtime)
         .pipe(split_names_overtime)
         .pipe(clean_emp_id_csd)
+        .pipe(clean_location)
         .drop(columns=["first_name", "last_name", "middle_name"])
     )
 
@@ -174,28 +168,12 @@ def clean():
         pd.read_csv(
             deba.data("raw/new_orleans_pd/new_orleans_pd_pprr_overtime_2021.csv")
         )
-        .drop(
-            columns=[
-                "Months",
-                "Unnamed: 3",
-                "Unnamed: 4",
-                "Unnamed: 5",
-                "Unnamed: 6",
-                "Unnamed: 7",
-                "Unnamed: 8",
-                "Unnamed: 9",
-                "Unnamed: 10",
-                "Unnamed: 11",
-                "Unnamed: 12",
-                "Unnamed: 13",
-                "Unnamed: 14",
-            ]
-        )
         .rename(
             columns={
                 "Sum of Earnings per PPE": "employee_id",
                 "Unnamed: 1": "name",
-                "Unnamed: 15": "overtime_and_detail_annual_total",
+                "Unnamed: 2": "location",
+                "Unnamed: 3": "overtime_and_detail_annual_total",
             }
         )
         .pipe(set_values, {"overtime_and_detail_date": "12/31/2021"})
@@ -203,6 +181,7 @@ def clean():
         .pipe(drop_rows_missing_name_overtime)
         .pipe(split_names_overtime)
         .pipe(clean_emp_id_csd)
+        .pipe(clean_location)
         .drop(columns=["first_name", "last_name", "middle_name"])
     )
 
