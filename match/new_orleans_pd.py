@@ -271,7 +271,7 @@ def match_cprr_to_pprr(cprr, pprr):
         dfb,
         show_progress=True,
     )
-    decision = .943
+    decision = 0.943
 
     matcher.save_pairs_to_excel(
         deba.data("match/cprr_new_orleans_da_v_pprr_new_orleans_pd_2020.xlsx"),
@@ -404,6 +404,41 @@ def join_pib_and_da():
     return df
 
 
+def match_pr_to_pprr(pr, pprr):
+    dfa = pr[["uid", "first_name", "middle_name", "last_name"]]
+    dfa.loc[:, "fc"] = dfa.first_name.fillna("").map(lambda x: x[:1])
+    dfa.loc[:, "lc"] = dfa.last_name.fillna("").map(lambda x: x[:1])
+    dfa = dfa.drop_duplicates(subset=["uid"]).set_index("uid")
+
+    dfb = pprr[["uid", "first_name", "middle_name", "last_name"]]
+    dfb.loc[:, "fc"] = dfb.first_name.fillna("").map(lambda x: x[:1])
+    dfb.loc[:, "lc"] = dfb.last_name.fillna("").map(lambda x: x[:1])
+    dfb = dfb.drop_duplicates(subset=["uid"]).set_index("uid")
+
+    matcher = ThresholdMatcher(
+        ColumnsIndex(["fc", "lc"]),
+        {
+            "first_name": JaroWinklerSimilarity(),
+            "middle_name": JaroWinklerSimilarity(),
+            "last_name": JaroWinklerSimilarity(),
+        },
+        dfa,
+        dfb,
+        show_progress=True,
+    )
+    decision = 0.772
+
+    matcher.save_pairs_to_excel(
+        deba.data("match/police_reports_nopd_v_pprr_new_orleans_pd_2020.xlsx"),
+        decision,
+    )
+    matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
+    match_dict = dict(matches)
+
+    pr.loc[:, "uid"] = pr.uid.map(lambda x: match_dict.get(x, x))
+    return pr
+
+
 if __name__ == "__main__":
     pprr = pd.read_csv(deba.data("clean/pprr_new_orleans_pd_2020.csv"))
     pprr_csd = pd.read_csv(deba.data("clean/pprr_new_orleans_csd_2014.csv"))
@@ -421,6 +456,8 @@ if __name__ == "__main__":
     pprr_separations = pd.read_csv(
         deba.data("clean/pprr_seps_new_orleans_pd_2018_2022.csv")
     )
+    pr = pd.read_csv(deba.data("clean/pr_new_orleans_pd_2010_2022.csv"))
+    pr = match_pr_to_pprr(pr, pprr)
     pib = join_pib_and_da()
     award = deduplicate_award(award)
     event_df = match_pprr_against_post(pprr, post)
@@ -452,3 +489,4 @@ if __name__ == "__main__":
     pib.to_csv(
         deba.data("match/cprr_new_orleans_pib_reports_2014_2020.csv"), index=False
     )
+    pr.to_csv(deba.data("match/pr_new_orleans_pd_2010_2022.csv"), index=False)
