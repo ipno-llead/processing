@@ -13,6 +13,7 @@ from lib.columns import (
     rearrange_brady_columns,
     rearrange_settlement_columns,
     rearrange_docs_columns,
+    rearrange_police_report_columns,
 )
 from lib.uid import ensure_uid_unique
 
@@ -315,6 +316,12 @@ def fuse_docs():
     ).sort_values("agency", ignore_index=True)
 
 
+def fuse_police_reports():
+    return rearrange_police_report_columns(
+        pd.concat([pd.read_csv(deba.data("fuse/pr_new_orleans_pd.csv"))])
+    ).sort_values("agency", ignore_index=True)
+
+
 if __name__ == "__main__":
     per_df = fuse_personnel()
     ensure_uid_unique(per_df, "uid")
@@ -332,6 +339,7 @@ if __name__ == "__main__":
     property_claims_df = fuse_property_claims()
     settlements = fuse_settlements()
     docs = fuse_docs()
+    police_reports = fuse_police_reports()
     event_df.to_csv("events.csv", index=False)
 
     per_df.to_csv(deba.data("fuse/personnel_pre_post.csv"), index=False)
@@ -351,3 +359,4 @@ if __name__ == "__main__":
     event_df = pd.concat([event_df, post_event_df], ignore_index=True)
     event_df.to_csv(deba.data("fuse/event_pre_post.csv"), index=False)
     property_claims_df.to_csv(deba.data("fuse/property_claims.csv"), index=False)
+    police_reports.to_csv(deba.data("fuse/police_reports.csv"), index=False)
