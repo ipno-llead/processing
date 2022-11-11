@@ -13,8 +13,6 @@ files:
     schema: appeal_hearing
   data/fuse/brady.csv:
     schema: brady
-  data/fuse/uof_officers.csv:
-    schema: uof_officer
   data/fuse/uof_citizens.csv:
     schema: uof_citizen
   data/fuse/awards.csv:
@@ -468,22 +466,7 @@ schemas:
       - name: court_location
       - name: agency
       - name: source_agency
-      - name: charging_agencyu
-  uof_officer:
-    columns:
-      - name: uid
-        description: >
-          unique identifier of officer.
-      - name: uof_uid
-        description: >
-          unique identifier of use of force report.
-      - name: use_of_force_description
-      - name: use_of_force_level
-      - name: use_of_force_effective
-      - name: age
-      - name: years_of_service
-      - name: officer_injured
-      - name: agency
+      - name: charging_agency
   uof_citizen:
     columns:
       - name: uof_citizen_uid

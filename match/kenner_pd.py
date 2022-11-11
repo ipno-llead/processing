@@ -115,13 +115,13 @@ if __name__ == "__main__":
     pprr = pd.read_csv(deba.data("clean/pprr_kenner_pd_2020.csv"))
     agency = pprr.agency[0]
     post = load_for_agency(agency)
-    uof = pd.read_csv(deba.data("clean/uof_officers_kenner_pd_2005_2021.csv"))
+    uof = pd.read_csv(deba.data("clean/uof_kenner_pd_2005_2021.csv"))
     cprr_post = pd.read_csv(deba.data("match/cprr_post_2016_2019.csv"))
     post_events = extract_post_events(pprr, post)
     cprr_post_events = extract_cprr_post_events(pprr, cprr_post)
     uof = match_uof_pprr(uof, pprr)
     post_events.to_csv(deba.data("match/post_event_kenner_pd_2020.csv"), index=False)
-    uof.to_csv(deba.data("match/uof_officers_kenner_pd_2005_2021.csv"), index=False)
+    uof.to_csv(deba.data("match/uof_kenner_pd_2005_2021.csv"), index=False)
     cprr_post_events.to_csv(
         deba.data("match/cprr_post_events_kenner_pd_2020.csv"), index=False
     )
