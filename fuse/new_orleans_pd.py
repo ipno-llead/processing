@@ -349,4 +349,5 @@ if __name__ == "__main__":
     uof_df.to_csv(deba.data("fuse/uof_new_orleans_pd.csv"), index=False)
     pclaims_df.to_csv(deba.data("fuse/pclaims_new_orleans_pd.csv"), index=False)
     settlements.to_csv(deba.data("fuse/settlements_new_orleans_pd.csv"), index=False)
+    uof_citizen_df.to_csv(deba.data("fuse/uof_citizens_new_orleans_pd.csv"), index=False)
     pr.to_csv(deba.data("fuse/pr_new_orleans_pd.csv"), index=False)
