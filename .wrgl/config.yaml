@@ -1074,6 +1074,12 @@ branch:
     file: data/fuse/uof_kenner_pd.csv
     primaryKey:
       - uof_uid
+  uof-terrebonne-so:
+    remote: origin
+    merge: refs/heads/uof-terrebonne-so
+    file: data/fuse/uof_terrebonne_so.csv
+    primaryKey:
+      - uof_uid
   pclaims-new-orleans-pd:
     remote: origin
     merge: refs/heads/pclaims-new-orleans-pd
