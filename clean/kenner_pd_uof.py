@@ -1,7 +1,7 @@
 import pandas as pd
 import deba
 from lib.columns import clean_column_names
-from lib.clean import clean_dates
+from lib.clean import clean_dates, standardize_desc_cols
 from lib.uid import gen_uid
 
 
@@ -44,7 +44,7 @@ def clean_disposition(df):
 
 
 def clean_charges(df):
-    df.loc[:, "charges"] = (
+    df.loc[:, "allegation"] = (
         df.alleged_violation.str.lower()
         .str.strip()
         .str.replace(", ", "/", regex=False)
@@ -84,12 +84,16 @@ def clean_uof():
         .pipe(clean_disposition)
         .pipe(clean_charges)
         .pipe(assign_agency)
+        .pipe(split_name)
+        .pipe(standardize_desc_cols, ["location"])
+        .pipe(gen_uid, ["first_name", "middle_name", "last_name", "agency"])
         .pipe(
             gen_uid,
             [
+                "uid",
                 "disposition",
                 "action",
-                "charges",
+                "allegation",
                 "location",
                 "incident_year",
                 "incident_month",
@@ -97,31 +101,11 @@ def clean_uof():
             ],
             "uof_uid",
         )
+        .drop_duplicates(subset=["uid", "uof_uid"])
     )
     return df
 
 
-def extract_officer(uof):
-    df = (
-        uof.loc[
-            :,
-            [
-                "officer",
-                "agency",
-                "uof_uid",
-            ],
-        ]
-        .pipe(split_name)
-        .pipe(gen_uid, ["first_name", "middle_name", "last_name", "agency"])
-    )
-    uof = uof.drop(columns=["officer"])
-    return df, uof
-
-
 if __name__ == "__main__":
     uof = clean_uof()
-    uof_officer, uof = extract_officer(uof)
     uof.to_csv(deba.data("clean/uof_kenner_pd_2005_2021.csv"), index=False)
-    uof_officer.to_csv(
-        deba.data("clean/uof_officers_kenner_pd_2005_2021.csv"), index=False
-    )
