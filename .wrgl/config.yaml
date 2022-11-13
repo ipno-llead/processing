@@ -1062,16 +1062,22 @@ branch:
     file: data/fuse/uof_new_orleans_pd.csv
     primaryKey:
       - uof_uid
-  uof-officers-kenner-pd:
+  uof-citizens-new-orleans-pd:
     remote: origin
-    merge: refs/heads/uof-officers-kenner-pd
-    file: data/fuse/uof_officers_kenner_pd.csv
+    merge: refs/heads/uof-citizens-new-orleans-pd
+    file: data/fuse/uof_citizens_new_orleans_pd.csv
     primaryKey:
-      - uid
+      - uof_uid
   uof-kenner-pd:
     remote: origin
     merge: refs/heads/uof-kenner-pd
     file: data/fuse/uof_kenner_pd.csv
+    primaryKey:
+      - uof_uid
+  uof-terrebonne-so:
+    remote: origin
+    merge: refs/heads/uof-terrebonne-so
+    file: data/fuse/uof_terrebonne_so.csv
     primaryKey:
       - uof_uid
   pclaims-new-orleans-pd:
@@ -1146,12 +1152,11 @@ branch:
     file: data/fuse/brady.csv
     primaryKey:
       - brady_uid
-  use-of-force-officers:
+  use-of-force-citizens:
     remote: origin
-    merge: refs/heads/use-of-force-officers
-    file: data/fuse/uof_officers.csv
+    merge: refs/heads/use-of-force-citizens
+    file: data/fuse/uof_citizens.csv
     primaryKey:
-      - uid
       - uof_uid
   property-claims:
     remote: origin

@@ -217,8 +217,8 @@ def rearrange_stop_and_search_columns(df):
     )
 
 
-def rearrange_uof_officer_columns(df):
-    """Performs final processing step for a use of force personnel table
+def rearrange_uof_citizen_columns(df):
+    """Performs final processing step for a use of force citizen table
 
     This performs the following tasks:
     - discard columns not present in uof_officer schema
@@ -233,8 +233,8 @@ def rearrange_uof_officer_columns(df):
         the updated frame
     """
     return datavalid_config.rearrange_columns(
-        "uof_officer",
-        df.sort_values(["agency", "uid"]),
+        "uof_citizen",
+        df.sort_values(["agency"]),
     )
 
 

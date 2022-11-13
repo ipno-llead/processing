@@ -308,6 +308,7 @@ def clean_races(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
                 ],
                 ["mixed", "two or more races", "multi-racial", "2 or more races"],
                 ["indian"],
+                ["middle eastern"],
             ],
         )
     return df

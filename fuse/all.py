@@ -9,7 +9,7 @@ from lib.columns import (
     rearrange_stop_and_search_columns,
     rearrange_use_of_force,
     rearrange_award_columns,
-    rearrange_uof_officer_columns,
+    rearrange_uof_citizen_columns,
     rearrange_brady_columns,
     rearrange_settlement_columns,
     rearrange_docs_columns,
@@ -217,6 +217,7 @@ def fuse_use_of_force():
             [
                 pd.read_csv(deba.data("fuse/uof_new_orleans_pd.csv")),
                 pd.read_csv(deba.data("fuse/uof_kenner_pd.csv")),
+                pd.read_csv(deba.data("fuse/uof_terrebonne_so.csv"))
             ]
         )
     ).sort_values(["agency", "uof_uid"])
@@ -234,16 +235,10 @@ def fuse_stop_and_search():
     ).sort_values(["agency", "stop_and_search_uid"])
 
 
-def fuse_uof_officers():
-    return rearrange_uof_officer_columns(
-        pd.concat(
-            [
-                pd.read_csv(
-                    deba.data("fuse/uof_officers_kenner_pd.csv"),
-                ),
-            ]
-        )
-    ).sort_values(["agency", "uid"])
+def fuse_uof_citizens():
+    return rearrange_uof_citizen_columns(
+        pd.concat([pd.read_csv(deba.data("fuse/uof_citizens_new_orleans_pd.csv"))])
+    ).sort_values("agency")
 
 
 def find_event_agency_if_missing_from_post(event_df, post_event_df):
@@ -339,7 +334,7 @@ if __name__ == "__main__":
     ensure_uid_unique(uof_df, "uof_uid")
     sas_df = fuse_stop_and_search()
     app_df = fuse_appeal_hearing_logs()
-    uof_officer_df = fuse_uof_officers()
+    uof_citizen_df = fuse_uof_citizens()
     award_df = fuse_award()
     brady_df = fuse_brady()
     property_claims_df = fuse_property_claims()
@@ -353,7 +348,7 @@ if __name__ == "__main__":
     uof_df.to_csv(deba.data("fuse/use_of_force.csv"), index=False)
     sas_df.to_csv(deba.data("fuse/stop_and_search.csv"), index=False)
     app_df.to_csv(deba.data("fuse/appeals.csv"), index=False)
-    uof_officer_df.to_csv(deba.data("fuse/uof_officers.csv"), index=False)
+    uof_citizen_df.to_csv(deba.data("fuse/uof_citizens.csv"), index=False)
     award_df.to_csv(deba.data("fuse/awards.csv"), index=False)
     brady_df.to_csv(deba.data("fuse/brady.csv"), index=False)
     settlements.to_csv(deba.data("fuse/settlements.csv"), index=False)
