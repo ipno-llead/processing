@@ -224,15 +224,14 @@ def clean():
             },
         )
         .pipe(clean_names, ["first_name", "last_name", "middle_name"])
-        .pipe(
-            gen_uid, ["first_name", "last_name", "middle_name", "employee_id", "agency"]
-        )
+        .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .drop_duplicates(subset=["uid", "salary", "salary_date"])
     )
 
     df = pd.merge(personnel, overtime, on="employee_id", how="outer").pipe(
         drop_rows_missing_names
     )
+    df = df.drop_duplicates(subset=["uid", "salary_date", "overtime_and_detail_date"])
     return df
 
 

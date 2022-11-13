@@ -2,7 +2,7 @@ import pandas as pd
 import deba
 from lib.uid import gen_uid
 from lib.columns import clean_column_names, set_values
-from lib.clean import clean_dates, standardize_desc_cols
+from lib.clean import clean_dates, standardize_desc_cols, clean_names
 
 
 def drop_rows_missing_names(df):
@@ -113,6 +113,7 @@ def clean21():
             ],
         )
         .pipe(set_values, {"agency": "new-orleans-pd"})
+        .pipe(clean_names, ["first_name", "last_name"])
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(
             gen_uid,

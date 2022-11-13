@@ -7,6 +7,7 @@ from lib.clean import (
     float_to_int_str,
     standardize_desc_cols,
     clean_dates,
+    clean_names,
 )
 from lib.uid import gen_uid
 
@@ -107,7 +108,8 @@ def clean():
             ["offender_number", "offender_age", "victim_age", "offender_id"],
         )
         .pipe(set_values, {"agency": "new-orleans-pd"})
-        .pipe(gen_uid, ["first_name", "middle_name", "last_name", "agency"])
+        .pipe(clean_names, ["first_name", "last_name"])
+        .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(
             gen_uid,
             [

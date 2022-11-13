@@ -245,6 +245,7 @@ def clean22():
             ],
         )
         .pipe(set_values, {"agency": "new-orleans-pd"})
+        .pipe(clean_names, ["first_name", "last_name"])
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(
             gen_uid, ["left_reason", "left_reason_desc", "left_date"], "separation_uid"
