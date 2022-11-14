@@ -1,6 +1,6 @@
 wdir: ../../../data/raw
 outs:
-- md5: 956e17f934a5d67f0310fc0c9e3248a1.dir
-  size: 1770
-  nfiles: 1
+- md5: 3ada6e4238273d976a562bacddbc41bc.dir
+  size: 4416
+  nfiles: 2
   path: washington_so
