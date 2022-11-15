@@ -1,7 +1,7 @@
 import deba
 import pandas as pd
 from lib.columns import clean_column_names, set_values
-from lib.clean import clean_names, clean_dates
+from lib.clean import clean_names, clean_dates, names_to_title_case
 from lib.uid import gen_uid
 from functools import reduce
 
@@ -98,6 +98,40 @@ def sanitize_letter_dates(df):
     return df.drop(columns=["notification_date"])
 
 
+def format_titles_2019(df):
+    df.loc[:, "title"] = (
+        df.title.fillna("")
+        + ":"
+        + df.first_name.fillna("")
+        + " "
+        + df.last_name.fillna("")
+        + " on "
+        + df.letter_date
+    )
+    df.loc[:, "title"] = df.title.str.replace(
+        r"(.+):(.+)", r"\1 Notice: \2", regex=True
+    ).str.replace(r"\/", "-", regex=True)
+    return df.pipe(names_to_title_case, ["title"])
+
+
+def format_titles_2020(df):
+    df.loc[:, "title"] = df.report_subject
+    df.loc[:, "title"] = (
+        df.title.fillna("")
+        + ":"
+        + df.first_name.fillna("")
+        + " "
+        + df.last_name.fillna("")
+        + df.middle_name.fillna("")
+        + " on "
+        + df.report_date
+    )
+    df.loc[:, "title"] = df.title.str.replace(
+        r"(.+):(.+)", r"\1 investigative report: \2", regex=True
+    ).str.replace(r"\/", "-", regex=True)
+    return df.pipe(names_to_title_case, ["title"])
+
+
 def drop_rows_missing_letter_subjects(df):
     return df[~((df.letter_subject.fillna("") == ""))]
 
@@ -191,6 +225,8 @@ def clean_report_subject(df):
         .str.replace(r"\n.+", "", regex=True)
         .str.replace(r"(re:|su[rb]ject:) ", "", regex=True)
         .str.replace(r"re:\n\n", "", regex=True)
+        .str.replace(r" on the(.+)", "", regex=True)
+        .str.replace(r"^(lost|accidental|stolen)", r"allegation of \1", regex=True)
     )
     return df
 
@@ -312,6 +348,7 @@ def clean_letters_2019():
         .pipe(extract_ids_and_subject)
         .pipe(split_names)
         .pipe(sanitize_letter_dates)
+        .pipe(format_titles_2019)
         .pipe(drop_rows_missing_letter_subjects)
         .pipe(clean_names, ["first_name", "last_name"])
         .pipe(set_values, {"agency": "louisiana-state-pd"})
@@ -345,11 +382,12 @@ def clean_reports_2020():
         )
         .pipe(join_multiple_extracted_entity_cols)
         .pipe(sanitize_dates_2020)
-        .pipe(clean_dates, ["report_date"])
         .pipe(extract_and_split_names_2020)
         .pipe(clean_report_subject)
         .pipe(extract_allegation_and_disposition)
         .pipe(clean_tracking_id)
+        .pipe(format_titles_2020)
+        .pipe(clean_dates, ["report_date"])
         .pipe(clean_names, ["first_name", "last_name"])
         .pipe(set_values, {"agency": "louisiana-state-pd"})
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
