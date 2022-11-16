@@ -330,8 +330,18 @@ def concat_text_from_all_pages(df):
     return df
 
 
-def generate_doc_date(df):
+def generate_doc_date_letters(df):
     df.loc[:, "doc_date"] = df.letter_date
+    return df
+
+def generate_doc_date_reports(df):
+    df.loc[:, "doc_date"] = df.report_date
+    return df
+
+def convert_doc_dates_to_int(df):
+    for col in df.columns:
+        if col.startswith("date"):
+            df = df.apply(lambda col: int(col))
     return df
 
 
@@ -359,8 +369,9 @@ def clean_letters_2019():
     df = pd.merge(df, db_meta, on="fn", how="outer")
     df = (
         df.rename(columns={"md5": "docid"})
-        .pipe(generate_doc_date)
+        .pipe(generate_doc_date_letters)
         .pipe(clean_dates, ["doc_date"])
+        .pipe(convert_doc_dates_to_int)
     )
     return df
 
@@ -387,7 +398,9 @@ def clean_reports_2020():
         .pipe(extract_allegation_and_disposition)
         .pipe(clean_tracking_id)
         .pipe(format_titles_2020)
-        .pipe(clean_dates, ["report_date"])
+        .pipe(generate_doc_date_reports)
+        .pipe(clean_dates, ["report_date", "doc_date"])
+        .pipe(convert_doc_dates_to_int)
         .pipe(clean_names, ["first_name", "last_name"])
         .pipe(set_values, {"agency": "louisiana-state-pd"})
         .pipe(gen_uid, ["first_name", "last_name", "agency"])

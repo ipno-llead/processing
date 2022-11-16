@@ -556,8 +556,11 @@ schemas:
       - name: text
       - name: title
       - name: doc_year
+        integer: true
       - name: doc_month
+        integer: true
       - name: doc_day
+        integer: true
       - name: pdf_db_content_hash
       - name: pdf_db_path
       - name: pdf_db_id
