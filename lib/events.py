@@ -21,6 +21,7 @@ OFFICER_RANK = "officer_rank"
 OFFICER_DEPT = "officer_dept"
 OFFICER_HIRE = "officer_hire"
 OFFICER_PAY_PROG_START = "officer_pay_prog_start"
+OFFICER_OVERTIME = "officer_overtime"
 OFFICER_PAY_EFFECTIVE = "officer_pay_effective"
 OFFICER_LEFT = "officer_left"
 OFFICER_POST_DECERTIFICATION = (
@@ -77,6 +78,7 @@ event_cat_type = CategoricalDtype(
         OFFICER_HIRE,
         OFFICER_LEFT,
         OFFICER_PAY_PROG_START,
+        OFFICER_OVERTIME,
         OFFICER_PAY_EFFECTIVE,
         COMPLAINT_INCIDENT,
         COMPLAINT_RECEIVE,
