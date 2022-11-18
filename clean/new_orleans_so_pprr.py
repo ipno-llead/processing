@@ -226,8 +226,8 @@ def overtime():
 
 if __name__ == "__main__":
     df = clean()
-    overtime_20 = overtime()
+    overtime20 = overtime()
     df.to_csv(deba.data("clean/pprr_new_orleans_so_2021.csv"), index=False)
-    overtime_20.to_csv(
+    overtime20.to_csv(
         deba.data("clean/pprr_overtime_new_orleans_so_2020.csv"), index=False
     )

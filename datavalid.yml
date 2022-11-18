@@ -236,6 +236,7 @@ schemas:
           - brady_list
           - board_hearing
           - occurred_date
+          - overtime
         no_na: true
       - name: year
         integer: true
@@ -316,6 +317,7 @@ schemas:
       - name: overtime_annual_total
       - name: overtime_annual_year
       - name: overtime_location
+      - name: overtime_freq
       - name: salary_freq
         options:
           - hourly
