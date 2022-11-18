@@ -1,27 +1,24 @@
 import pandas as pd
 from pandas_dedupe import dedupe_dataframe
+import re
+from lib.rows import duplicate_row
 
-def convert_to_str(df):
-    return df[df.allegation_uid.astype(str)]
 
 def filter_out_non_duplicates(df: pd.DataFrame):
-    return df.loc[df.tracking_id.notna(), ['uid', 'tracking_id', "allegation_uid"]].groupby("tracking_id").filter(lambda x: len(x) >= 2)
+    df = df.loc[df.tracking_id.notna(), ['uid', 'tracking_id']].groupby("tracking_id").filter(lambda x: len(x) >= 2)
+    df["uid_counts"] = df.loc[df.tracking_id.notna(), ['uid', 'tracking_id']].groupby("tracking_id")["uid"].transform("nunique")
+    df = df[~((df.uid_counts.astype(str) == "1"))]
+    return df.drop(columns=["uid_counts"])
 
 
 def groupby_tracking_number_and_uid(df):
     return pd.DataFrame(
-        ((tn, id.str.cat(sep=", ")) for tn, id in df.groupby(['tracking_id', "allegation_uid"])['uid']),
-        columns=["ids", "uids"])
-
-
-def split_cols(df):
-    df.loc[:, "ids"] = df.ids.astype(str).str.replace(r"(\(|\)|\')", "", regex=True)
-    df[["tracking_id", "allegation_uid"]] = df['ids'].str.split(r'\,', expand=True)
-    return df.drop(columns=["ids"])
+        ((tn, id.str.cat(sep=", ")) for tn, id in df.groupby(['tracking_id'])['uid']),
+        columns=["tracking_id", "uids"])
 
 
 def create_clusters(df):
-    df = dedupe_dataframe(df, ['uids'])
+    df = dedupe_dataframe(df, ["uids"])
     return df
 
 """
@@ -32,18 +29,37 @@ def create_clusters(df):
 
 
 def filter_clusters_for_exact_coaccusals(df):
-    df = df[df.duplicated(subset=['cluster_id'], keep=False)].sort_values(by=["cluster_id"])
+    df = df[df.duplicated(subset=['cluster_id'], keep=False)]
     return df
+
+
+def split_rows_with_multiple_uids(df):
+    df = (
+        df.drop("uids", axis=1)
+        .join(
+            df["uids"]
+            .str.split(", ", expand=True)
+            .stack()
+            .reset_index(level=1, drop=True)
+            .rename("uids"),
+            how="outer",
+        )
+        .reset_index(drop=True)
+    )
+    return df.rename(columns={"uids": "uid"})
 
 
 def cluster():
-    df = pd.read_csv("data/clean/cprr_new_orleans_da_2016_2020.csv")
-    df = (df
+    dfa = pd.read_csv("data/clean/cprr_new_orleans_da_2016_2020.csv")
+    dfb = (dfa
         .pipe(filter_out_non_duplicates)
         .pipe(groupby_tracking_number_and_uid)
-        .pipe(split_cols)
-        # .pipe(create_clusters)
-        # .rename(columns={"cluster id": "cluster_id"})
-        # .pipe(filter_clusters_for_exact_coaccusals)
+        .pipe(create_clusters)
+        .rename(columns={"cluster id": "cluster_id"})
+        .pipe(filter_clusters_for_exact_coaccusals)
+        .pipe(split_rows_with_multiple_uids)
     )
-    return df
+    dfa = dfa[["allegation_uid", "tracking_id", "uid"]]
+    df = pd.merge(dfa, dfb, on=["uid", "tracking_id"])
+    df = df.drop_duplicates(subset=["allegation_uid"])   
+    return df.sort_values("cluster_id").drop(columns=["confidence"])
