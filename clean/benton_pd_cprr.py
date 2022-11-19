@@ -79,9 +79,9 @@ def clean04():
 
 
 if __name__ == "__main__":
+    df04 = clean04()
     df21 = clean21()
     df14 = clean14()
-    df04 = clean04()
     df21.to_csv(deba.data("clean/cprr_benton_pd_2015_2021.csv"), index=False)
     df14.to_csv(deba.data("clean/cprr_benton_pd_2009_2014.csv"), index=False)
     df04.to_csv(deba.data("clean/cprr_benton_pd_2004_2008.csv"), index=False)
