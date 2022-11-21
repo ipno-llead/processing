@@ -1,0 +1,6 @@
+wdir: ../../../data/raw
+outs:
+- md5: e4ab51ac904189575da2bc9afe292024.dir
+  size: 4517
+  nfiles: 1
+  path: iberia_so
