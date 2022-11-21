@@ -18,7 +18,7 @@ jobs:
           find dvc/data/raw -type f | xargs -I{} sed -iE 's/wdir\: ..\/..\/..\/data\/raw/wdir\: \/runner\/_work\/data\/data\/raw/g' {}
           mkdir /runner/_work/data/dvc_cache || true
           dvc cache dir --local /runner/_work/data/dvc_cache
-          dvc pull -v
+          dvc pull -v -f
       - name: wrgl pull
         run: |
           wrgl config set --global user.email "gh-action@publicdata.works"

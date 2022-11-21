@@ -315,9 +315,8 @@ schemas:
         float: true
       - name: salary_year
       - name: overtime_annual_total
-      - name: overtime_annual_year
+      - name: overtime_year
       - name: overtime_location
-      - name: overtime_freq
       - name: salary_freq
         options:
           - hourly
