@@ -6,10 +6,10 @@ from lib.columns import (
     rearrange_stop_and_search_columns,
     rearrange_use_of_force,
     rearrange_event_columns,
-    rearrange_uof_citizen_columns,
     rearrange_property_claims_columns,
     rearrange_settlement_columns,
     rearrange_police_report_columns,
+    rearrange_citizen_columns,
 )
 from lib.clean import float_to_int_str
 from lib.personnel import fuse_personnel
@@ -286,7 +286,9 @@ if __name__ == "__main__":
     post = load_for_agency(agency)
     pprr_csd = pd.read_csv(deba.data("match/pprr_new_orleans_csd_2014.csv"))
     uof = pd.read_csv(deba.data("match/uof_new_orleans_pd_2016_2021.csv"))
-    uof_citizen = pd.read_csv(deba.data("clean/uof_citizens_new_orleans_pd_2016_2021.csv"))
+    uof_citizen = pd.read_csv(
+        deba.data("clean/uof_citizens_new_orleans_pd_2016_2021.csv")
+    )
     post_event = pd.read_csv(deba.data("match/post_event_new_orleans_pd.csv"))
     award = pd.read_csv(deba.data("match/award_new_orleans_pd_2016_2021.csv"))
     lprr = pd.read_csv(deba.data("match/lprr_new_orleans_csc_2000_2016.csv"))
@@ -304,6 +306,11 @@ if __name__ == "__main__":
         deba.data("clean/settlements_new_orleans_pd.csv")
     ).dropna()
     pr = pd.read_csv(deba.data("match/pr_new_orleans_pd_2010_2022.csv"))
+    cprr_citizens = pd.read_csv(
+        deba.data("clean/cprr_cit_new_orleans_da_2016_2020.csv")
+    )
+    sas_citizens = pd.read_csv(deba.data("clean/sas_cit_new_orleans_pd_2017_2021.csv"))
+    pr_citizens = pd.read_csv(deba.data("clean/pr_cit_new_orleans_pd_2010_2022.csv"))
     personnel = fuse_personnel(
         pprr,
         lprr,
@@ -335,12 +342,12 @@ if __name__ == "__main__":
     sas_df = rearrange_stop_and_search_columns(sas)
     lprr_df = rearrange_appeal_hearing_columns(lprr)
     uof_df = rearrange_use_of_force(uof)
-    uof_citizen_df = rearrange_uof_citizen_columns(uof_citizen)
     pclaims_df = rearrange_property_claims_columns(pd.concat([pclaims20, pclaims21]))
     com = pd.concat([cprr, pib]).drop_duplicates(subset=["allegation_uid"], keep="last")
     com = rearrange_allegation_columns(com)
     settlements = rearrange_settlement_columns(nopd_settlements)
     pr = rearrange_police_report_columns(pr)
+    citizen_df =  pd.concat([cprr_citizens, uof_citizen, sas_citizens], axis=1)
     com.to_csv(deba.data("fuse/com_new_orleans_pd.csv"), index=False)
     personnel.to_csv(deba.data("fuse/per_new_orleans_pd.csv"), index=False)
     events_df.to_csv(deba.data("fuse/event_new_orleans_pd.csv"), index=False)
@@ -349,5 +356,5 @@ if __name__ == "__main__":
     uof_df.to_csv(deba.data("fuse/uof_new_orleans_pd.csv"), index=False)
     pclaims_df.to_csv(deba.data("fuse/pclaims_new_orleans_pd.csv"), index=False)
     settlements.to_csv(deba.data("fuse/settlements_new_orleans_pd.csv"), index=False)
-    uof_citizen_df.to_csv(deba.data("fuse/uof_citizens_new_orleans_pd.csv"), index=False)
+    citizen_df.to_csv(deba.data("fuse/cit_new_orleans_pd.csv"), index=False)
     pr.to_csv(deba.data("fuse/pr_new_orleans_pd.csv"), index=False)

@@ -134,9 +134,19 @@ def clean():
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(gen_uid, ["agency", "tracking_id"], "allegation_uid")
     )
-    return df
+    citizen_df = df[["complainant_sex", "complainant_race", "allegation_uid", "agency"]]
+    citizen_df = citizen_df.pipe(
+        gen_uid,
+        ["complainant_sex", "complainant_race", "allegation_uid", "agency"],
+        "citizen_uid",
+    )
+    df = df.drop(columns=["complainant_sex", "complainant_race"])
+    return df, citizen_df
 
 
 if __name__ == "__main__":
-    df = clean()
+    df, citizen_df = clean()
     df.to_csv(deba.data("clean/cprr_new_orleans_harbor_pd_2020.csv"), index=False)
+    citizen_df.to_csv(
+        deba.data("clean/cprr_cit_new_orleans_harbor_pd_2020.csv"), index=False
+    )
