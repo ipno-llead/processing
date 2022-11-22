@@ -204,6 +204,7 @@ schemas:
           - officer_hire
           - officer_left
           - officer_pay_prog_start
+          - officer_overtime
           - officer_pay_effective
           - officer_post_decertification
           - complaint_incident
@@ -235,6 +236,7 @@ schemas:
           - brady_list
           - board_hearing
           - occurred_date
+          - overtime
         no_na: true
       - name: year
         integer: true
@@ -315,6 +317,7 @@ schemas:
       - name: overtime_annual_total
       - name: overtime_year
       - name: overtime_location
+      - name: overtime_freq
       - name: salary_freq
         options:
           - hourly
