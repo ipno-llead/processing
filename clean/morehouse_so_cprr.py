@@ -57,7 +57,7 @@ def split_rows_with_multiple_allegations(df):
 
 def clean():
     df = (
-        pd.read_csv(deba.data("raw/morehouse_so/morehouse_so_cprr_2018_2021.csv"))
+        pd.read_csv(deba.data("raw/morehouse_so/morehouse_so_cprr_2018_2021.csv"), encoding="ISO-8859-1")
         .pipe(clean_column_names)
         .drop(columns=["reporting_date", "receive_date"])
         .rename(columns={"receive_date_1": "receive_date"})
