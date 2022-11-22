@@ -2,7 +2,12 @@ import pandas as pd
 import deba
 from lib.columns import clean_column_names, set_values
 from lib.uid import gen_uid
-from lib.clean import clean_salaries, standardize_desc_cols, clean_dates
+from lib.clean import (
+    clean_salaries,
+    standardize_desc_cols,
+    clean_dates,
+    float_to_int_str,
+)
 from lib import salary
 
 
@@ -146,6 +151,26 @@ def assign_agency(df):
     return df
 
 
+def clean_rank_desc(df):
+    df.loc[:, "rank_desc"] = (
+        df.rank_code.str.lower().str.strip().str.replace(r"(\w+) - ", "", regex=True)
+    )
+    return df.drop(columns=["rank_code"])
+
+
+def split_names_overtime(df):
+    names = (
+        df.payroll_name.str.lower()
+        .str.strip()
+        .str.extract(r"(.+)\, (\w+\'?-?\w+) ?(\w+)?$")
+    )
+
+    df.loc[:, "last_name"] = names[0].str.replace(r"(\,|\.)", "", regex=True)
+    df.loc[:, "first_name"] = names[1]
+    df.loc[:, "middle_name"] = names[2]
+    return df.drop(columns=["payroll_name"])
+
+
 def clean():
     df = (
         pd.read_csv(deba.data("raw/new_orleans_so/new_orleans_so_pprr_2021.csv"))
@@ -178,6 +203,31 @@ def clean():
     return df
 
 
+def overtime():
+    df = (
+        pd.read_csv(deba.data("raw/new_orleans_so/new_orleans_so_overtime_2020.csv"))
+        .pipe(clean_column_names)
+        .rename(columns={"overtime_earnings_total": "overtime_annual_total"})
+        .pipe(clean_rank_desc)
+        .pipe(split_names_overtime)
+        .pipe(set_values, {"overtime_date": "12/31/2020"})
+        .pipe(float_to_int_str, ["overtime_annual_total"])
+        .pipe(clean_salaries, ["overtime_annual_total"])
+        .pipe(set_values, {"overtime_freq": salary.YEARLY})
+        .pipe(set_values, {"agency": "new-orleans-so"})
+        .pipe(gen_uid, ["first_name", "last_name", "agency"])
+        .pipe(
+            gen_uid, ["uid", "overtime_annual_total", "overtime_date"], "overtime_uid"
+        )
+        .drop_duplicates(subset=["uid", "overtime_date"])
+    )
+    return df
+
+
 if __name__ == "__main__":
     df = clean()
+    overtime20 = overtime()
     df.to_csv(deba.data("clean/pprr_new_orleans_so_2021.csv"), index=False)
+    overtime20.to_csv(
+        deba.data("clean/pprr_overtime_new_orleans_so_2020.csv"), index=False
+    )
