@@ -406,6 +406,7 @@ schemas:
       - name: charging_supervisor
       - name: appeal_disposition
       - name: action_appealed
+      - name: appeal_hearing_year
       - name: appealed
       - name: agency
       - name: motions
