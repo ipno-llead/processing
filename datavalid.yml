@@ -541,10 +541,16 @@ schemas:
       - name: charge_description
   citizens:
     columns:
+      - name: citizen_uid
+        description: >
+          unique identifier of citizen
       - name: allegation_uid
         description: >
           unique identifier of allegation incident
       - name: uof_uid
+        description: >
+          unique identifier of use of force incident
+      - name: stop_and_search_uid
         description: >
           unique identifier of use of force incident
       - name: complainant_type

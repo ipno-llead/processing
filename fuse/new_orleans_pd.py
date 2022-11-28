@@ -347,7 +347,7 @@ if __name__ == "__main__":
     com = rearrange_allegation_columns(com)
     settlements = rearrange_settlement_columns(nopd_settlements)
     pr = rearrange_police_report_columns(pr)
-    citizen_df =  pd.concat([cprr_citizens, uof_citizen, sas_citizens], axis=1)
+    citizen_df =  pd.concat([cprr_citizens, uof_citizen, sas_citizens])
     com.to_csv(deba.data("fuse/com_new_orleans_pd.csv"), index=False)
     personnel.to_csv(deba.data("fuse/per_new_orleans_pd.csv"), index=False)
     events_df.to_csv(deba.data("fuse/event_new_orleans_pd.csv"), index=False)
