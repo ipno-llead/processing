@@ -294,6 +294,10 @@ branch:
     remote: origin
     merge: refs/heads/com-louisiana-state-pd
     file: data/fuse/com_louisiana_state_pd.csv
+  com-morehouse-so:
+    remote: origin
+    merge: refs/heads/com-morehouse-so
+    file: data/fuse/com_morehouse_so.csv
   event:
     remote: origin
     merge: refs/heads/event
@@ -658,6 +662,12 @@ branch:
     remote: origin
     merge: refs/heads/event-lake-charles-pd
     file: data/fuse/event_lake_charles_pd.csv
+    primaryKey:
+      - event_uid
+  event-morehouse-so:
+    remote: origin
+    merge: refs/heads/event-morehouse-so
+    file: data/fuse/event_.csv
     primaryKey:
       - event_uid
   per-abbeville-pd:
@@ -1054,6 +1064,12 @@ branch:
     remote: origin
     merge: refs/heads/per-lake-charles-pd
     file: data/fuse/per_lake_charles_pd.csv
+    primaryKey:
+      - uid
+  per-morehouse-so:
+    remote: origin
+    merge: refs/heads/per-morehouse-so
+    file: data/fuse/per_morehouse_so.csv
     primaryKey:
       - uid
   uof-new-orleans-pd:

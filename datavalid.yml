@@ -170,6 +170,9 @@ schemas:
       - name: race
       - name: sex
       - name: age
+      - name: arresting_officer_uid
+      - name: investigating_supervisor_uid
+      - name: reporting_officer_uid
   event:
     columns:
       - name: event_uid
