@@ -187,6 +187,7 @@ def clean():
             ["citizen_race", "citizen_sex", "citizen_age"],
             "uof_citizen_uid",
         )
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_uid")
     )
     df = df.drop_duplicates(subset=["uid", "uof_uid"])
     dfa = df[

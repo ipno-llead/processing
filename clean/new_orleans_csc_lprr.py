@@ -172,6 +172,7 @@ def clean():
         .pipe(gen_uid, ["uid", "tracking_id"], "appeal_uid")
         .pipe(assign_final_appeal_hearing_date)
         .pipe(clean_dates, ["appeal_hearing_date", "appeal_disposition_date", "appeal_receive_date"])
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_uid")
     )
     return df
 

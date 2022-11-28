@@ -520,6 +520,7 @@ def clean_cprr_20():
             ["agency", "tracking_id", "allegation", "uid"],
             "allegation_uid",
         )
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_uid")
     )
 
 
@@ -1075,6 +1076,7 @@ def clean_cprr_14():
             "allegation_uid",
         )
         .pipe(drop_rows_missing_names)
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_uid")
     )
     return df
 

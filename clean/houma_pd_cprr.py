@@ -181,6 +181,7 @@ def clean21():
             "allegation_uid",
         )
         .pipe(drop_rows_missing_names)
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_uid")
     )
     return df
 
@@ -204,6 +205,7 @@ def clean18():
             ["uid", "allegation", "action", "case_number", "tracking_id"],
             "allegation_uid",
         )
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_uid")
     )
     return df
 

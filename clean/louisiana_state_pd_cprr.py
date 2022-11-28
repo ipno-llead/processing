@@ -360,6 +360,7 @@ def clean_reports_2020():
         )
         .drop_duplicates(subset=["allegation_uid"])
         .pipe(drop_rows_missing_names)
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_uid")
     )
     return df
 

@@ -1341,6 +1341,7 @@ def clean21():
             ],
             "investigating_supervisor_uid",
         )
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_uid")
     )
     return df.astype(str)
 
@@ -1441,6 +1442,7 @@ def clean19():
             ["referred_by", "allegation", "action", "allegation_desc"],
         )
         .pipe(clean_names, ["first_name", "middle_name", "last_name"])
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_uid")
     )
     return df
 
@@ -1531,6 +1533,7 @@ def clean20():
             ],
         )
         .pipe(clean_initial_action)
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_uid")
     )
     return df
 

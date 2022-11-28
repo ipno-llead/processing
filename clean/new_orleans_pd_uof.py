@@ -337,6 +337,7 @@ def clean_uof():
             ],
             "uof_uid",
         )
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_uid")
     )
     dfb = dfa[["officer_name",
         "race",

@@ -248,6 +248,7 @@ def clean_cprr(disposition_file, name_file, year):
             na_position="first",
         )
         .drop_duplicates(["allegation_uid"], keep="last")
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_uid")
         .reset_index(drop=True)
     )
 

@@ -198,6 +198,7 @@ def clean():
         .pipe(gen_uid, ["agency", "first_name", "middle_name", "last_name"])
         .pipe(gen_uid, ["agency", "tracking_id", "uid"], "appeal_uid")
         .pipe(assign_charging_supervisor)
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_uid")
     )
     return df.drop_duplicates(subset=["tracking_id", "uid"]).reset_index(drop=True)
 

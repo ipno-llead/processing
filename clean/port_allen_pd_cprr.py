@@ -178,6 +178,7 @@ def clean19():
             ["agency", "tracking_id", "uid", "allegation"],
             "allegation_uid",
         )
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_uid")
     )
     return df
 
@@ -226,6 +227,7 @@ def clean18():
         .pipe(clean_names, ["first_name", "last_name"])
         .pipe(gen_uid, ["agency", "first_name", "last_name"])
         .pipe(gen_uid, ["agency", "tracking_id", "uid"], "allegation_uid")
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_uid")
         .dropna(subset=["tracking_id"])
         .drop_duplicates(subset=["allegation_uid"])
     )
@@ -268,6 +270,7 @@ def clean16():
             ["agency", "tracking_id", "uid", "allegation"],
             "allegation_uid",
         )
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_uid")
     )
 
 

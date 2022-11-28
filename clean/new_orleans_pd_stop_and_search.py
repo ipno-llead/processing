@@ -380,6 +380,7 @@ def clean():
             ],
             "stop_and_search_uid",
         )
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_uid")
         .drop_duplicates(subset="stop_and_search_uid")
     )
     return df

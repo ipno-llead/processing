@@ -58,6 +58,7 @@ def clean14():
         .pipe(set_values, {"agency": "benton-pd"})
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(gen_uid, ["allegation_desc", "disposition", "uid"], "allegation_uid")
+
     )
     return df
 

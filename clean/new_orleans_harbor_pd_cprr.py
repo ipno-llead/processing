@@ -133,6 +133,7 @@ def clean():
         .pipe(assign_agency)
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(gen_uid, ["agency", "tracking_id"], "allegation_uid")
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_uid")
     )
     return df
 

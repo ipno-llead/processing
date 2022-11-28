@@ -120,6 +120,7 @@ def clean21():
             ["tracking_id", "agency"],
             "property_claims_uid",
         )
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_uid")
     )
     return df
 
@@ -185,6 +186,7 @@ def clean20():
             ["tracking_id", "agency"],
             "property_claims_uid",
         )
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_uid")
     )
     return df
 

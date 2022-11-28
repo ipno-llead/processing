@@ -87,6 +87,7 @@ def clean():
         .pipe(set_values, {"agency": "pineville-pd"})
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(gen_uid, ["uid", "tracking_id", "allegation"], "allegation_uid")
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_uid")
     )
     return df
 

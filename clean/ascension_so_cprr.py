@@ -73,6 +73,7 @@ def clean():
         .pipe(set_values, {"agency": "ascension-so"})
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(gen_uid, ["uid", "disposition", "tracking_id"], "allegation_uid")
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_uid")
     )
     return df
 

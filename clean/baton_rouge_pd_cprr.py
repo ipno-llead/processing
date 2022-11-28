@@ -1065,6 +1065,7 @@ def clean_18():
             ["agency", "tracking_id", "uid", "action", "allegation"],
             "allegation_uid",
         )
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_uid")
     )
     return df
 
@@ -1238,6 +1239,7 @@ def clean_21():
                 ["traffic violations"],
             ],
         )
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_uid")
     )
     return df
 

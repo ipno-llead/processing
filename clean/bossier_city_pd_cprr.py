@@ -301,6 +301,7 @@ def clean():
             clean_dates,
             ["receive_date", "investigation_complete_date", "investigation_start_date"],
         )
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_uid")
     )
     return df
 

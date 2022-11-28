@@ -39,6 +39,7 @@ def clean():
             "allegation_uid",
         )
         .dropna()
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_uid")
     )
     return df
 

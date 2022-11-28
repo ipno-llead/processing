@@ -295,6 +295,7 @@ def clean21():
             ["uid", "tracking_id", "allegation", "disposition", "action"],
             "allegation_uid",
         )
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_uid")
     )
     return df
 
@@ -319,6 +320,7 @@ def clean15():
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(gen_uid, ["uid", "allegation", "disposition", "action"], "allegation_uid")
         .drop_duplicates(subset=["allegation_uid"], keep="first")
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_uid")
     )
     return df
 

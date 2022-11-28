@@ -564,6 +564,7 @@ def clean():
             ],
             "appeal_disposition_uid",
         )
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_uid")
     )
     return df.drop_duplicates().reset_index(drop=True)
 

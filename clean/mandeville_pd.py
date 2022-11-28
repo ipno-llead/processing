@@ -83,6 +83,7 @@ def clean_cprr_19():
         .pipe(clean_names, ["last_name"])
         .pipe(gen_uid, ["agency", "rank_desc", "last_name"])
         .pipe(gen_uid, ["agency", "tracking_id"], "allegation_uid")
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_uid")
     )
 
 

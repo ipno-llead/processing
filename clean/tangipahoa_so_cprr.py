@@ -399,6 +399,7 @@ def clean13():
             ["uid", "allegation", "disposition", "tracking_id"],
             "allegation_uid",
         )
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_uid")
     )
     return df
 

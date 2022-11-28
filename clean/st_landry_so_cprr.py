@@ -86,6 +86,7 @@ def clean():
             ["uid", "tracking_id", "allegation", "action"],
             "allegation_uid",
         )
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_uid")
     )
     return df
 

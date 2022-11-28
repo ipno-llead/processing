@@ -713,6 +713,7 @@ def clean_19():
             ],
             "allegation_uid",
         )
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_uid")
     )
     return df
 

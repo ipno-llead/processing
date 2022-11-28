@@ -99,6 +99,7 @@ def clean19():
                 "action",
             ],
         )
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_uid")
     )
 
 
@@ -134,6 +135,7 @@ def clean20():
         .pipe(assign_uid)
         .pipe(gen_uid, ["agency", "tracking_id"], "allegation_uid")
         .pipe(remove_NA_values, ["shift_supervisor", "action"])
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_uid")
     )
 
 

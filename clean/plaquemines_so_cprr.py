@@ -139,6 +139,7 @@ def clean19():
             ["agency", "first_name", "last_name", "middle_name"],
         )
         .pipe(gen_uid, ["agency", "tracking_id"], "allegation_uid")
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_uid")
     )
 
 
@@ -167,6 +168,7 @@ def clean20():
             ["first_name", "last_name", "middle_name", "agency"],
         )
         .pipe(gen_uid, ["uid", "tracking_id", "allegation"], "allegation_uid")
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_uid")
     )
     return df
 
