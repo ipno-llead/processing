@@ -208,7 +208,7 @@ def combine_appeal_and_action_columns(df):
 
 
 def clean18():
-    return (
+    df = (
         pd.read_csv(deba.data("raw/port_allen_pd/port_allen_cprr_2017-2018_byhand.csv"))
         .pipe(clean_column_names)
         .rename(
@@ -238,10 +238,16 @@ def clean18():
         .dropna(subset=["tracking_id"])
         .drop_duplicates(subset=["allegation_uid"])
     )
+    citizen_df = df[["complainant_type", "allegation_uid", "agency"]]
+    citizen_df = citizen_df.pipe(
+        gen_uid, ["complainant_type", "allegation_uid", "agency"], "citizen_uid"
+    )
+    df = df.drop(columns=["complainant_type"])
+    return df, citizen_df
 
 
 def clean16():
-    return (
+    df = (
         pd.read_csv(deba.data("raw/port_allen_pd/port_allen_cprr_2015-2016_byhand.csv"))
         .pipe(clean_column_names)
         .rename(columns={"tracking_number": "tracking_id"})
@@ -280,12 +286,22 @@ def clean16():
         .pipe(create_tracking_id_og_col)
         .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
     )
+    citizen_df = df[["complainant_type", "allegation_uid", "agency"]]
+    citizen_df = citizen_df.pipe(
+        gen_uid, ["complainant_type", "allegation_uid", "agency"], "citizen_uid"
+    )
+    df = df.drop(columns=["complainant_type"])
+    return df, citizen_df
 
 
 if __name__ == "__main__":
     df19 = clean19()
-    df18 = clean18()
-    df16 = clean16()
+    df18, citizen_df18 = clean18()
+    df16, citizen_df16 = clean16()
+    citizen_df = pd.concat([citizen_df18, citizen_df16])
     df19.to_csv(deba.data("clean/cprr_port_allen_pd_2019.csv"), index=False)
     df18.to_csv(deba.data("clean/cprr_port_allen_pd_2017_2018.csv"), index=False)
     df16.to_csv(deba.data("clean/cprr_port_allen_pd_2015_2016.csv"), index=False)
+    citizen_df.to_csv(
+        deba.data("clean/cprr_cit_port_allen_pd_2015_2018.csv"), index=False
+    )

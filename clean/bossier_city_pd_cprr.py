@@ -21,7 +21,7 @@ def clean_tracking_id(df):
 
 
 def clean_complaint_type(df):
-    df.loc[:, "complaint_type"] = (
+    df.loc[:, "complainant_type"] = (
         df.chassification.str.lower()
         .str.strip()
         .str.replace(r"dep[ea]rtmenta?[lds]\!?", "departmental", regex=True)
@@ -307,9 +307,15 @@ def clean():
         .pipe(create_tracking_id_og_col)
         .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
     )
-    return df
+    citizen_df = df[["complainant_type", "allegation_uid", "agency"]]
+    citizen_df = citizen_df.pipe(
+        gen_uid, ["complainant_type", "allegation_uid", "agency"], "citizen_uid"
+    )
+    df = df.drop(columns=["complainant_type"])
+    return df, citizen_df
 
 
 if __name__ == "__main__":
-    df = clean()
+    df, citizen_df = clean()
     df.to_csv(deba.data("clean/cprr_bossier_city_pd_2020.csv"), index=False)
+    citizen_df.to_csv(deba.data("clean/cprr_cit_bossier_city_pd_2020.csv"), index=False)

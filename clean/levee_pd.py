@@ -61,13 +61,8 @@ def clean_agency_19(df):
     return df
 
 
-def create_tracking_id_og_col(df):
-    df.loc[:, "tracking_id_og"] = df.tracking_id
-    return df
-
-
 def clean19():
-    return (
+    df = (
         pd.read_csv(deba.data("raw/levee_pd/levee_pd_cprr_2019.csv"))
         .pipe(clean_column_names)
         .rename(
@@ -111,10 +106,16 @@ def clean19():
         .pipe(create_tracking_id_og_col)
         .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
     )
+    citizen_df = df[["complainant_type", "allegation_uid", "agency"]]
+    citizen_df = citizen_df.pipe(
+        gen_uid, ["complainant_type", "allegation_uid", "agency"], "citizen_uid"
+    )
+    df = df.drop(columns=["complainant_type"])
+    return df, citizen_df
 
 
 def clean20():
-    return (
+    df = (
         pd.read_csv(deba.data("raw/levee_pd/levee_pd_cprr_2020.csv"))
         .pipe(clean_column_names)
         .rename(
@@ -148,10 +149,18 @@ def clean20():
         .pipe(create_tracking_id_og_col)
         .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
     )
+    citizen_df = df[["complainant_type", "allegation_uid", "agency"]]
+    citizen_df = citizen_df.pipe(
+        gen_uid, ["complainant_type", "allegation_uid", "agency"], "citizen_uid"
+    )
+    df = df.drop(columns=["complainant_type"])
+    return df, citizen_df
 
 
 if __name__ == "__main__":
-    df20 = clean20()
-    df19 = clean19()
+    df20, citizen_df20 = clean20()
+    df19, citizen_df19 = clean19()
     df = pd.concat([df19, df20])
     df.to_csv(deba.data("clean/cprr_levee_pd.csv"), index=False)
+    citizen_df = pd.concat([citizen_df20, citizen_df19])
+    citizen_df.to_csv(deba.data("clean/cprr_cit_levee_pd.csv"), index=False)

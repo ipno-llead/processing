@@ -541,15 +541,6 @@ def clean_tracking_id_14(df):
     return df.drop(columns="cc_number")
 
 
-def clean_complainant(df):
-    df.loc[:, "complainant"] = (
-        df.complainant.str.lower()
-        .str.strip()
-        .str.replace(r"(\/\/|ry|lt\.)", "", regex=True)
-    )
-    return df
-
-
 def clean_receive_date_14(df):
     df.loc[:, "receive_date"] = (
         df.date_received.str.replace("0517/2010", "05/17/2010", regex=False)
@@ -1054,11 +1045,11 @@ def clean_cprr_14():
     df = (
         pd.read_csv(deba.data("raw/lafayette_pd/lafayette_pd_cprr_2009_2014.csv"))
         .pipe(clean_column_names)
+        .drop(columns=["complainant"])
         .pipe(clean_receive_date_14)
         .pipe(clean_complete_date_14)
         .pipe(clean_dates, ["receive_date", "complete_date"])
         .pipe(clean_tracking_id_14)
-        .pipe(clean_complainant)
         .pipe(clean_and_split_investigator_14)
         .pipe(extract_action_from_disposition_14)
         .pipe(clean_disposition_14)

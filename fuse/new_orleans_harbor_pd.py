@@ -4,6 +4,7 @@ from lib.columns import (
     rearrange_personnel_columns,
     rearrange_event_columns,
     rearrange_allegation_columns,
+    rearrange_citizen_columns,
 )
 from lib import events
 from lib.personnel import fuse_personnel
@@ -81,12 +82,15 @@ if __name__ == "__main__":
     post_event = pd.read_csv(
         deba.data("match/post_event_new_orleans_harbor_pd_2020.csv")
     )
+    citizen_df = pd.read_csv(deba.data("clean/cprr_cit_new_orleans_harbor_pd_2020.csv"))
     personnel_df = rearrange_personnel_columns(pd.concat([pprr08, pprr20]))
     personnel_df = fuse_personnel(personnel_df, post)
     complaint_df = rearrange_allegation_columns(cprr)
     event_df = fuse_events(pprr08, pprr20, cprr)
     event_df = rearrange_event_columns(pd.concat([post_event, event_df]))
+    citizen_df = rearrange_citizen_columns(citizen_df)
     personnel_df.to_csv(deba.data("fuse/per_new_orleans_harbor_pd.csv"), index=False)
     event_df.to_csv(deba.data("fuse/event_new_orleans_harbor_pd.csv"), index=False)
     complaint_df.to_csv(deba.data("fuse/com_new_orleans_harbor_pd.csv"), index=False)
     post.to_csv(deba.data("fuse/post_new_orleans_harbor_pd.csv"), index=False)
+    citizen_df.to_csv(deba.data("fuse/cit_new_orleans_harbor_pd.csv"), index=False)

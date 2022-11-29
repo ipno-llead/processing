@@ -27,7 +27,7 @@ def clean():
             "complaintant_gender": "complainant_sex",
         }
     )
-    return (
+    df = (
         df.pipe(clean_dates, ["occur_date", "receive_date"])
         .pipe(float_to_int_str, ["comission_number"])
         .pipe(set_values, {"agency": "greenwood-pd"})
@@ -39,8 +39,33 @@ def clean():
             "allegation_uid",
         )
     )
+    citizen_df = df[
+        [
+            "complainant_type",
+            "complainant_race",
+            "complainant_sex",
+            "agency",
+            "allegation_uid",
+        ]
+    ]
+    citizen_df = citizen_df.pipe(
+        gen_uid,
+        [
+            "complainant_type",
+            "complainant_race",
+            "complainant_sex",
+            "agency",
+            "allegation_uid",
+        ],
+        "citizen_uid",
+    )
+    df = df.drop(columns=["complainant_type", "complainant_race", "complainant_sex"])
+    return df, citizen_df
 
 
 if __name__ == "__main__":
-    df = clean()
+    df, citizen_df = clean()
     df.to_csv(deba.data("clean/cprr_greenwood_pd_2015_2020.csv"), index=False)
+    citizen_df.to_csv(
+        deba.data("clean/cprr_cit_greenwood_pd_2015_2020.csv"), index=False
+    )

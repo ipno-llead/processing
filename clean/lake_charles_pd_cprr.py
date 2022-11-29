@@ -337,17 +337,15 @@ def clean_tracking_id_19(df):
 
 
 def clean_complainant_19(df):
-    df.loc[:, "complainant"] = (
+    df.loc[:, "complainant_type"] = (
         df.complainant_s.str.lower()
         .str.strip()
         .fillna("")
         .str.replace(
             r"(rcpb|ucps|ups|^\/|kepb|admini station lcpa)", "lcpd", regex=True
         )
-        .str.replace(
-            r"^l(.+)", "lake charles police department or sheriffs office", regex=True
-        )
-        .str.replace(r"^(?!lake).*", "", regex=True)
+        .str.replace(r"^l(.+)", "internal", regex=True)
+        .str.replace(r"^(?!internal).*", "", regex=True)
     )
     return df.drop(columns="complainant_s")
 
@@ -721,11 +719,20 @@ def clean_19():
         .pipe(create_tracking_id_og_col)
         .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
     )
-    return df
+    citizen_df = df[["complainant_type", "allegation_uid", "agency"]]
+    citizen_df = citizen_df.pipe(
+        gen_uid, ["complainant_type", "allegation_uid", "agency"], "citizen_uid"
+    )
+
+    df = df.drop(columns=["complainant_type"])
+    return df, citizen_df
 
 
 if __name__ == "__main__":
     df20 = clean_20()
-    df19 = clean_19()
+    df19, citizen_df19 = clean_19()
     df20.to_csv(deba.data("clean/cprr_lake_charles_pd_2020.csv"), index=False)
     df19.to_csv(deba.data("clean/cprr_lake_charles_pd_2014_2019.csv"), index=False)
+    citizen_df19.to_csv(
+        deba.data("clean/cprr_cit_lake_charles_pd_2014_2019.csv"), index=False
+    )

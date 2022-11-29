@@ -54,7 +54,7 @@ def clean_disposition(df):
 
 
 def clean_complainant_name(df):
-    df.loc[:, "complainant"] = (
+    df.loc[:, "complainant_type"] = (
         df.name_of_complainant.str.lower()
         .str.strip()
         .str.replace(r"(chief|warden|22).+", "internal", regex=True)
@@ -120,11 +120,6 @@ def clean_investigator(df):
     return df.drop(columns=["investigator"])
 
 
-def create_tracking_id_og_col(df):
-    df.loc[:, "tracking_id_og"] = df.tracking_id
-    return df
-
-
 def clean():
     df = (
         pd.read_csv(deba.data("raw/washington_so/washington_so_cprr_2010_2022.csv"))
@@ -150,9 +145,17 @@ def clean():
         .pipe(create_tracking_id_og_col)
         .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
     )
-    return df
+    citizen_df = df[["complainant_type", "allegation_uid", "agency"]]
+    citizen_df = citizen_df.pipe(
+        gen_uid, ["complainant_type", "allegation_uid", "agency"], "citizen_uid"
+    )
+    df = df.drop(columns=["complainant_type"])
+    return df, citizen_df
 
 
 if __name__ == "__main__":
-    df = clean()
+    df, citizen_df = clean()
     df.to_csv(deba.data("clean/cprr_washington_so_2010_2022.csv"), index=False)
+    citizen_df.to_csv(
+        deba.data("clean/cprr_cit_washington_so_2010_2022.csv"), index=False
+    )

@@ -271,9 +271,27 @@ def clean():
         .pipe(create_tracking_id_og_col)
         .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
     )
-    return df
+    citizen_df = df[
+        ["complainant_type", "citizen_sex", "citizen_race", "agency", "allegation_uid"]
+    ]
+    citizen_df = citizen_df.pipe(
+        gen_uid,
+        ["complainant_type", "citizen_sex", "citizen_race", "agency", "allegation_uid"],
+        "citizen_uid",
+    )
+    df = df.drop(
+        columns=[
+            "complainant_type",
+            "citizen_sex",
+            "citizen_race",
+        ]
+    )
+    return df, citizen_df
 
 
 if __name__ == "__main__":
-    df = clean()
+    df, citizen_df = clean()
     df.to_csv(deba.data("clean/cprr_new_orleans_da_2016_2020.csv"), index=False)
+    citizen_df.to_csv(
+        deba.data("clean/cprr_cit_new_orleans_da_2016_2020.csv"), index=False
+    )

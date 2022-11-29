@@ -413,6 +413,7 @@ def extract_citizen(uof):
                 "citizen_height",
                 "citizen_arrested",
                 "citizen_arrest_charges",
+                "agency",
                 "uof_uid",
             ],
         ]
@@ -447,8 +448,9 @@ def extract_citizen(uof):
                 "citizen_influencing_factors",
                 "citizen_build",
                 "citizen_height",
+                "agency",
             ],
-            "uof_citizen_uid",
+            "citizen_uid",
         )
     )
     uof = uof.drop(

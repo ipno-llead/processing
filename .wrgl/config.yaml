@@ -294,6 +294,10 @@ branch:
     remote: origin
     merge: refs/heads/com-louisiana-state-pd
     file: data/fuse/com_louisiana_state_pd.csv
+  com-morehouse-so:
+    remote: origin
+    merge: refs/heads/com-morehouse-so
+    file: data/fuse/com_morehouse_so.csv
   event:
     remote: origin
     merge: refs/heads/event
@@ -658,6 +662,12 @@ branch:
     remote: origin
     merge: refs/heads/event-lake-charles-pd
     file: data/fuse/event_lake_charles_pd.csv
+    primaryKey:
+      - event_uid
+  event-morehouse-so:
+    remote: origin
+    merge: refs/heads/event-morehouse-so
+    file: data/fuse/event_.csv
     primaryKey:
       - event_uid
   per-abbeville-pd:
@@ -1056,16 +1066,16 @@ branch:
     file: data/fuse/per_lake_charles_pd.csv
     primaryKey:
       - uid
+  per-morehouse-so:
+    remote: origin
+    merge: refs/heads/per-morehouse-so
+    file: data/fuse/per_morehouse_so.csv
+    primaryKey:
+      - uid
   uof-new-orleans-pd:
     remote: origin
     merge: refs/heads/uof-new-orleans-pd
     file: data/fuse/uof_new_orleans_pd.csv
-    primaryKey:
-      - uof_uid
-  uof-citizens-new-orleans-pd:
-    remote: origin
-    merge: refs/heads/uof-citizens-new-orleans-pd
-    file: data/fuse/uof_citizens_new_orleans_pd.csv
     primaryKey:
       - uof_uid
   uof-kenner-pd:
@@ -1152,12 +1162,6 @@ branch:
     file: data/fuse/brady.csv
     primaryKey:
       - brady_uid
-  use-of-force-citizens:
-    remote: origin
-    merge: refs/heads/use-of-force-citizens
-    file: data/fuse/uof_citizens.csv
-    primaryKey:
-      - uof_uid
   property-claims:
     remote: origin
     merge: refs/heads/property-claims
@@ -1188,6 +1192,12 @@ branch:
     file: data/fuse/police_reports.csv
     primaryKey:
       - police_report_uid
+  citizens:
+    remote: origin
+    merge: refs/heads/citizens
+    file: data/fuse/citizens.csv
+    primaryKey:
+      - citizen_uid
 merge:
   fastForward: only
 pack:

@@ -1,5 +1,5 @@
 import deba
-from lib.columns import rearrange_allegation_columns
+from lib.columns import rearrange_allegation_columns, rearrange_citizen_columns
 from lib import events
 from lib.personnel import fuse_personnel
 from lib.post import load_for_agency
@@ -48,11 +48,14 @@ def fuse_events(cprr21, post):
 if __name__ == "__main__":
     cprr21 = pd.read_csv(deba.data("match/cprr_tangipahoa_so_2015_2021.csv"))
     cprr13 = pd.read_csv(deba.data("match/tangipahoa_so_cprr_2013.csv"))
+    citizen_df = pd.read_csv(deba.data("clean/cprr_cit_tangipahoa_so_2015_2021.csv"))
     agency = cprr21.agency[0]
     post = load_for_agency(agency)
     per = fuse_personnel(cprr21, cprr13, post)
     complaints = rearrange_allegation_columns(pd.concat([cprr21, cprr13], axis=0))
     event = fuse_events(cprr21, post)
+    citizen_df = rearrange_citizen_columns(citizen_df)
     event.to_csv(deba.data("fuse/event_tangipahoa_so.csv"), index=False)
     complaints.to_csv(deba.data("fuse/com_tangipahoa_so.csv"), index=False)
     per.to_csv(deba.data("fuse/per_tangipahoa_so.csv"), index=False)
+    citizen_df.to_csv(deba.data("fuse/cit_tangipahoa_so.csv"), index=False)

@@ -139,10 +139,45 @@ def clean():
     df = df.pipe(drop_rows_missing_names).drop_duplicates(
         subset=["uid", "police_report_uid"], keep="last"
     )
-
-    return df
+    citizen_df = df[
+        [
+            "offender_number",
+            "offender_race",
+            "offender_sex",
+            "offender_age",
+            "police_report_uid",
+            "agency",
+            "offender_status",
+        ]
+    ]
+    citizen_df = citizen_df.pipe(
+        gen_uid,
+        [
+            "offender_number",
+            "offender_race",
+            "offender_sex",
+            "offender_age",
+            "police_report_uid",
+            "agency",
+            "offender_status",
+        ],
+        "citizen_uid",
+    )
+    df = df.drop(
+        columns=[
+            "offender_number",
+            "offender_race",
+            "offender_sex",
+            "offender_age",
+            "offender_status",
+        ]
+    )
+    return df, citizen_df
 
 
 if __name__ == "__main__":
-    df = clean()
+    df, citizen_df = clean()
     df.to_csv(deba.data("clean/pr_new_orleans_pd_2010_2022.csv"), index=False)
+    citizen_df.to_csv(
+        deba.data("clean/pr_cit_new_orleans_pd_2010_2022.csv"), index=False
+    )
