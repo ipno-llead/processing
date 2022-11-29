@@ -52,6 +52,11 @@ def split_officer_names(df):
     return df.drop(columns=["employee_involved"])
 
 
+def create_tracking_id_og_col(df):
+    df.loc[:, "tracking_id_og"] = df.tracking_id
+    return df
+
+
 def clean():
     df = (
         pd.read_csv(deba.data("raw/ascension_so/ascension_so_cprr_2019_2021.csv"))
@@ -73,7 +78,8 @@ def clean():
         .pipe(set_values, {"agency": "ascension-so"})
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(gen_uid, ["uid", "disposition", "tracking_id"], "allegation_uid")
-        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_uid")
+        .pipe(create_tracking_id_og_col)
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
     )
     return df
 

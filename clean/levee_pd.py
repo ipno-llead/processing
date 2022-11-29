@@ -53,9 +53,18 @@ def remove_NA_values(df, cols):
 
 
 def clean_agency_19(df):
-    df.loc[:, "agency"] = df.agency.str.lower().str.strip()\
+    df.loc[:, "agency"] = (
+        df.agency.str.lower()
+        .str.strip()
         .str.replace(r"^harahan pd$", "harahan-pd", regex=True)
+    )
     return df
+
+
+def create_tracking_id_og_col(df):
+    df.loc[:, "tracking_id_og"] = df.tracking_id
+    return df
+
 
 def clean19():
     return (
@@ -99,7 +108,8 @@ def clean19():
                 "action",
             ],
         )
-        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_uid")
+        .pipe(create_tracking_id_og_col)
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
     )
 
 
@@ -135,7 +145,8 @@ def clean20():
         .pipe(assign_uid)
         .pipe(gen_uid, ["agency", "tracking_id"], "allegation_uid")
         .pipe(remove_NA_values, ["shift_supervisor", "action"])
-        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_uid")
+        .pipe(create_tracking_id_og_col)
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
     )
 
 

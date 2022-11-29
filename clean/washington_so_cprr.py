@@ -33,7 +33,11 @@ def extract_action_from_disposition(df):
         .str.replace(r"fired", "terminated", regex=False)
         .str.replace(r"-", "; ", regex=False)
         .str.replace(r"suspended (\w+) days?", r"\1-day suspension", regex=True)
-        .str.replace("tot lsp; arrested", r"arrested; turned over to the Louisiana State Police Department", regex=True)
+        .str.replace(
+            "tot lsp; arrested",
+            r"arrested; turned over to the Louisiana State Police Department",
+            regex=True,
+        )
         .str.replace(r"^; ", "", regex=True)
     )
     return df
@@ -76,6 +80,7 @@ def split_rows_with_multiple_officers(df):
     )
     return df
 
+
 def split_names(df):
     names = (
         df.deputy.str.lower()
@@ -102,10 +107,23 @@ def standardize_tracking_id(df):
 
 
 def clean_investigator(df):
-    df.loc[:, "investigator_name"] = df.investigator.str.lower().str.strip()\
-        .str.replace(r"tot lsp", "turned over to the louisiana state police department", regex=False)\
+    df.loc[:, "investigator_name"] = (
+        df.investigator.str.lower()
+        .str.strip()
+        .str.replace(
+            r"tot lsp",
+            "turned over to the louisiana state police department",
+            regex=False,
+        )
         .str.replace(r"\, ", "/", regex=True)
+    )
     return df.drop(columns=["investigator"])
+
+
+def create_tracking_id_og_col(df):
+    df.loc[:, "tracking_id_og"] = df.tracking_id
+    return df
+
 
 def clean():
     df = (
@@ -129,7 +147,8 @@ def clean():
             ["uid", "disposition", "tracking_id", "action"],
             "allegation_uid",
         )
-        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_uid")
+        .pipe(create_tracking_id_og_col)
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
     )
     return df
 

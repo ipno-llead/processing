@@ -213,6 +213,11 @@ def make_disposition_categorical(df):
     return df
 
 
+def create_tracking_id_og_col(df):
+    df.loc[:, "tracking_id_og"] = df.tracking_id
+    return df
+
+
 def clean_cprr(disposition_file, name_file, year):
     df = clean_cprr_disposition(disposition_file, year)
     name_df = clean_cprr_names(name_file, year)
@@ -248,7 +253,8 @@ def clean_cprr(disposition_file, name_file, year):
             na_position="first",
         )
         .drop_duplicates(["allegation_uid"], keep="last")
-        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_uid")
+        .pipe(create_tracking_id_og_col)
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
         .reset_index(drop=True)
     )
 

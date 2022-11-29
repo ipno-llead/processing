@@ -326,6 +326,11 @@ def split_names(df):
     )
 
 
+def create_tracking_id_og_col(df):
+    df.loc[:, "tracking_id_og"] = df.tracking_id
+    return df
+
+
 def clean21():
     df = (
         pd.read_csv(deba.data("raw/tangipahoa_so/tangipahoa_so_cprr_2015_2021.csv"))
@@ -399,7 +404,8 @@ def clean13():
             ["uid", "allegation", "disposition", "tracking_id"],
             "allegation_uid",
         )
-        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_uid")
+        .pipe(create_tracking_id_og_col)
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
     )
     return df
 

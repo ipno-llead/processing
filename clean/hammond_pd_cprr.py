@@ -349,6 +349,11 @@ def clean_tracking_id_08(df):
     return df.drop(columns="ia_no")
 
 
+def create_tracking_id_og_col(df):
+    df.loc[:, "tracking_id_og"] = df.tracking_id
+    return df
+
+
 def clean_20():
     df = pd.read_csv(deba.data("raw/hammond_pd/hammond_pd_cprr_2015_2020.csv")).pipe(
         clean_column_names
@@ -379,7 +384,8 @@ def clean_20():
             ["uid", "allegation", "tracking_id", "disposition"],
             "allegation_uid",
         )
-        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_uid")
+        .pipe(create_tracking_id_og_col)
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
     )
     return df
 
@@ -407,7 +413,8 @@ def clean_14():
             ["uid", "allegation", "tracking_id", "disposition"],
             "allegation_uid",
         )
-        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_uid")
+        .pipe(create_tracking_id_og_col)
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
     )
     return df
 
@@ -434,7 +441,8 @@ def clean_08():
             ["uid", "allegation", "action", "tracking_id"],
             "allegation_uid",
         )
-        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_uid")
+        .pipe(create_tracking_id_og_col)
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
     )
     return df
 

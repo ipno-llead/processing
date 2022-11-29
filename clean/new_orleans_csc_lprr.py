@@ -139,6 +139,11 @@ def assign_final_appeal_hearing_date(df):
     return df.drop(columns=["hearing_date_1"])
 
 
+def create_tracking_id_og_col(df):
+    df.loc[:, "tracking_id_og"] = df.tracking_id
+    return df
+
+
 def clean():
     df = (
         pd.read_csv(deba.data("raw/new_orleans_csc/new_orleans_csc_lprr_2000_2016.csv"))
@@ -171,8 +176,12 @@ def clean():
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(gen_uid, ["uid", "tracking_id"], "appeal_uid")
         .pipe(assign_final_appeal_hearing_date)
-        .pipe(clean_dates, ["appeal_hearing_date", "appeal_disposition_date", "appeal_receive_date"])
-        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_uid")
+        .pipe(
+            clean_dates,
+            ["appeal_hearing_date", "appeal_disposition_date", "appeal_receive_date"],
+        )
+        .pipe(create_tracking_id_og_col)
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
     )
     return df
 

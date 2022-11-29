@@ -299,6 +299,11 @@ def generate_doc_date(df):
     return df
 
 
+def create_tracking_id_og_col(df):
+    df.loc[:, "tracking_id_og"] = df.tracking_id
+    return df
+
+
 def clean_letters_2019():
     db_meta = pd.read_csv(
         deba.data("raw/louisiana_state_pd/letters_louisiana_state_pd_2019_db_files.csv")
@@ -360,7 +365,8 @@ def clean_reports_2020():
         )
         .drop_duplicates(subset=["allegation_uid"])
         .pipe(drop_rows_missing_names)
-        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_uid")
+        .pipe(create_tracking_id_og_col)
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
     )
     return df
 

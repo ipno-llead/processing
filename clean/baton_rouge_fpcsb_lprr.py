@@ -525,6 +525,11 @@ def assign_agency(df):
     return df
 
 
+def create_tracking_id_og_col(df):
+    df.loc[:, "tracking_id_og"] = df.tracking_id
+    return df
+
+
 def clean():
     df = realign()
     df = (
@@ -564,7 +569,8 @@ def clean():
             ],
             "appeal_disposition_uid",
         )
-        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_uid")
+        .pipe(create_tracking_id_og_col)
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
     )
     return df.drop_duplicates().reset_index(drop=True)
 

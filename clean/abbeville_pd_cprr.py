@@ -125,6 +125,11 @@ def clean_receive_and_complete_dates(df):
     return df.drop(columns=["date_received", "date_completed"])
 
 
+def create_tracking_id_og_col(df):
+    df.loc[:, "tracking_id_og"] = df.tracking_id
+    return df
+
+
 def clean21():
     df = (
         pd.read_csv(deba.data("raw/abbeville_pd/abbeville_pd_cprr_2019_2021.csv"))
@@ -153,7 +158,8 @@ def clean21():
             ],
             "allegation_uid",
         )
-        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_uid")
+        .pipe(create_tracking_id_og_col)
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
         .pipe(drop_rows_missing_names)
     )
     return df

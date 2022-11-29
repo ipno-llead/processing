@@ -15,9 +15,13 @@ from lib.uid import gen_uid
 def split_names(df):
     names = (
         df.officer.str.lower()
-        .str.strip().fillna("")
-        .str.replace(r"((.+)?nopd(.+)?|(.+)?unknown(.+)?|anonymous|none)", "", regex=True)\
-        .str.replace(r"\.", "", regex=True).str.replace(r"\'$", "", regex=True)
+        .str.strip()
+        .fillna("")
+        .str.replace(
+            r"((.+)?nopd(.+)?|(.+)?unknown(.+)?|anonymous|none)", "", regex=True
+        )
+        .str.replace(r"\.", "", regex=True)
+        .str.replace(r"\'$", "", regex=True)
         .str.replace(r"( +$|^ +)", "", regex=True)
         .str.extract(r"^(?:(\w+\'?-?\w+?) ) ?(\w+-?\'? ?\w+?) ?(jr|sr)?$")
     )
@@ -189,6 +193,11 @@ def clean_allegation_sub_desc(df):
     return df
 
 
+def create_tracking_id_og_col(df):
+    df.loc[:, "tracking_id_og"] = df.tracking_id
+    return df
+
+
 def clean():
     df = (
         pd.read_csv(deba.data("raw/new_orleans_pd/new_orleans_da_cprr_giglio_2021.csv"))
@@ -259,7 +268,8 @@ def clean():
             ]
         )
         .drop_duplicates(subset=["allegation_uid"])
-        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_uid")
+        .pipe(create_tracking_id_og_col)
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
     )
     return df
 

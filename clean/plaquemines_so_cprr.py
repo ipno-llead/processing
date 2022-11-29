@@ -127,10 +127,17 @@ def clean_disposition(df):
     return df.drop(columns="conclusion")
 
 
+def create_tracking_id_og_col(df):
+    df.loc[:, "tracking_id_og"] = df.tracking_id
+    return df
+
+
 def clean19():
     df = pd.read_csv(deba.data("raw/plaquemines_so/plaquemines_so_cprr_2019.csv"))
     df = clean_column_names(df)
-    df = df.rename(columns={"rule_violation": "allegation", "tracking_number": "tracking_id"})
+    df = df.rename(
+        columns={"rule_violation": "allegation", "tracking_number": "tracking_id"}
+    )
     return (
         df.pipe(assign_agency)
         .pipe(clean_names, ["first_name", "last_name", "middle_name"])
@@ -139,7 +146,8 @@ def clean19():
             ["agency", "first_name", "last_name", "middle_name"],
         )
         .pipe(gen_uid, ["agency", "tracking_id"], "allegation_uid")
-        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_uid")
+        .pipe(create_tracking_id_og_col)
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
     )
 
 
@@ -168,7 +176,8 @@ def clean20():
             ["first_name", "last_name", "middle_name", "agency"],
         )
         .pipe(gen_uid, ["uid", "tracking_id", "allegation"], "allegation_uid")
-        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_uid")
+        .pipe(create_tracking_id_og_col)
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
     )
     return df
 

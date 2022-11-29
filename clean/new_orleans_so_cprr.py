@@ -1265,6 +1265,11 @@ def clean_allegations_21(df):
     return df.drop(columns=["charges"])
 
 
+def create_tracking_id_og_col(df):
+    df.loc[:, "tracking_id_og"] = df.tracking_id
+    return df
+
+
 def clean21():
     df = (
         pd.read_csv(deba.data("raw/new_orleans_so/new_orleans_so_cprr_2021.csv"))
@@ -1341,7 +1346,8 @@ def clean21():
             ],
             "investigating_supervisor_uid",
         )
-        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_uid")
+        .pipe(create_tracking_id_og_col)
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
     )
     return df.astype(str)
 
@@ -1442,7 +1448,8 @@ def clean19():
             ["referred_by", "allegation", "action", "allegation_desc"],
         )
         .pipe(clean_names, ["first_name", "middle_name", "last_name"])
-        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_uid")
+        .pipe(create_tracking_id_og_col)
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
     )
     return df
 
@@ -1533,7 +1540,8 @@ def clean20():
             ],
         )
         .pipe(clean_initial_action)
-        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_uid")
+        .pipe(create_tracking_id_og_col)
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
     )
     return df
 

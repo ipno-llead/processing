@@ -19,6 +19,11 @@ def clean_disposition(df):
     return df
 
 
+def create_tracking_id_og_col(df):
+    df.loc[:, "tracking_id_og"] = df.tracking_id
+    return df
+
+
 def clean():
     df = (
         pd.read_csv(deba.data("raw/sulphur_pd/sulphur_pd_cprr_2014_2019.csv"))
@@ -39,7 +44,8 @@ def clean():
             "allegation_uid",
         )
         .dropna()
-        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_uid")
+        .pipe(create_tracking_id_og_col)
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
     )
     return df
 

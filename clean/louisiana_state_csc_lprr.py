@@ -115,8 +115,8 @@ def correct_docket_no(df):
             return row.filed_year[2:] + row.docket_no[2:]
         return row.docket_no
 
-    df.loc[:, "docket_no"] = (
-        df.agg(process, axis=1).str.replace(r"(-|\/)", "", regex=True)
+    df.loc[:, "docket_no"] = df.agg(process, axis=1).str.replace(
+        r"(-|\/)", "", regex=True
     )
     return df
 
@@ -168,6 +168,11 @@ def assign_charging_supervisor(df):
     return df
 
 
+def create_tracking_id_og_col(df):
+    df.loc[:, "tracking_id_og"] = df.tracking_id
+    return df
+
+
 def clean():
     df = pd.read_csv(
         deba.data("raw/louisiana_state_csc/louisianastate_csc_lprr_1991-2020.csv")
@@ -198,7 +203,8 @@ def clean():
         .pipe(gen_uid, ["agency", "first_name", "middle_name", "last_name"])
         .pipe(gen_uid, ["agency", "tracking_id", "uid"], "appeal_uid")
         .pipe(assign_charging_supervisor)
-        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_uid")
+        .pipe(create_tracking_id_og_col)
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
     )
     return df.drop_duplicates(subset=["tracking_id", "uid"]).reset_index(drop=True)
 

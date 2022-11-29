@@ -251,21 +251,71 @@ def map_allegation_desc(df):
 
 
 def correct_actions(df):
-    df.loc[(df.last_name == "peterson")  & (df.disposition == "sustained; resigned prior to discipline"), "action"] = "resgined prior to discipline"
-    df.loc[(df.last_name == "durand")  & (df.disposition == "resigned before completion"), "action"] = "resigned before completion"
-    df.loc[(df.last_name == "fields")  & (df.disposition == "resigned before completion"), "action"] = "resigned before completion"
-    df.loc[(df.last_name == "guidry")  & (df.disposition == "resigned before completion"), "action"] = "resigned before completion"
-    df.loc[(df.last_name == "marulli")  & (df.disposition == "resigned before completion"), "action"] = "resigned before completion"
-    df.loc[(df.last_name == "wintzel")  & (df.disposition == "resigned before completion"), "action"] = "resigned before completion"
-    df.loc[(df.last_name == "bearden")  & (df.disposition == "resigned before completion"), "action"] = "resigned before completion"
-    df.loc[(df.last_name == "guilliot")  & (df.disposition == "resigned before completion"), "action"] = "resigned before completion"
-    df.loc[(df.last_name == "lymous")  & (df.disposition == "transferred before completion; appeal; resigned"), "action"] = "resigned"
-    df.loc[(df.last_name == "campo")  & (df.disposition == "sustained; resigned"), "action"] = "resigned"
-    df.loc[(df.last_name == "bogle")  & (df.disposition == "sustained; resigned"), "action"] = "resigned"
-    df.loc[(df.last_name == "guidry")  & (df.disposition == "sustained; resigned"), "action"] = "resigned"
-    df.loc[(df.last_name == "jennings")  & (df.disposition == "sustained; resigned"), "action"] = "resigned"
-    df.loc[(df.last_name == "kaufman")  & (df.disposition == "sustained; resigned"), "action"] = "resigned"
-    df.loc[(df.last_name == "johnson")  & (df.disposition == "    resigned; refused to cooperate"), "action"] = "resigned"
+    df.loc[
+        (df.last_name == "peterson")
+        & (df.disposition == "sustained; resigned prior to discipline"),
+        "action",
+    ] = "resgined prior to discipline"
+    df.loc[
+        (df.last_name == "durand") & (df.disposition == "resigned before completion"),
+        "action",
+    ] = "resigned before completion"
+    df.loc[
+        (df.last_name == "fields") & (df.disposition == "resigned before completion"),
+        "action",
+    ] = "resigned before completion"
+    df.loc[
+        (df.last_name == "guidry") & (df.disposition == "resigned before completion"),
+        "action",
+    ] = "resigned before completion"
+    df.loc[
+        (df.last_name == "marulli") & (df.disposition == "resigned before completion"),
+        "action",
+    ] = "resigned before completion"
+    df.loc[
+        (df.last_name == "wintzel") & (df.disposition == "resigned before completion"),
+        "action",
+    ] = "resigned before completion"
+    df.loc[
+        (df.last_name == "bearden") & (df.disposition == "resigned before completion"),
+        "action",
+    ] = "resigned before completion"
+    df.loc[
+        (df.last_name == "guilliot") & (df.disposition == "resigned before completion"),
+        "action",
+    ] = "resigned before completion"
+    df.loc[
+        (df.last_name == "lymous")
+        & (df.disposition == "transferred before completion; appeal; resigned"),
+        "action",
+    ] = "resigned"
+    df.loc[
+        (df.last_name == "campo") & (df.disposition == "sustained; resigned"), "action"
+    ] = "resigned"
+    df.loc[
+        (df.last_name == "bogle") & (df.disposition == "sustained; resigned"), "action"
+    ] = "resigned"
+    df.loc[
+        (df.last_name == "guidry") & (df.disposition == "sustained; resigned"), "action"
+    ] = "resigned"
+    df.loc[
+        (df.last_name == "jennings") & (df.disposition == "sustained; resigned"),
+        "action",
+    ] = "resigned"
+    df.loc[
+        (df.last_name == "kaufman") & (df.disposition == "sustained; resigned"),
+        "action",
+    ] = "resigned"
+    df.loc[
+        (df.last_name == "johnson")
+        & (df.disposition == "    resigned; refused to cooperate"),
+        "action",
+    ] = "resigned"
+    return df
+
+
+def create_tracking_id_og_col(df):
+    df.loc[:, "tracking_id_og"] = df.tracking_id
     return df
 
 
@@ -295,7 +345,8 @@ def clean21():
             ["uid", "tracking_id", "allegation", "disposition", "action"],
             "allegation_uid",
         )
-        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_uid")
+        .pipe(create_tracking_id_og_col)
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
     )
     return df
 
@@ -320,7 +371,8 @@ def clean15():
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(gen_uid, ["uid", "allegation", "disposition", "action"], "allegation_uid")
         .drop_duplicates(subset=["allegation_uid"], keep="first")
-        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_uid")
+        .pipe(create_tracking_id_og_col)
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
     )
     return df
 
