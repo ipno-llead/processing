@@ -85,7 +85,7 @@ if __name__ == "__main__":
     post = load_for_agency(agency)
     personnel_df = fuse_personnel(cprr_15, cprr_18, cprr_20, post)
     event_df = fuse_events(cprr_15, cprr_18, cprr_20, post)
-    complaint_df = rearrange_allegation_columns(pd.concat([cprr_15, cprr_18, cprr_20]))
+    complaint_df = rearrange_allegation_columns(pd.concat([cprr_15, cprr_18, cprr_20], axis=0))
     personnel_df.to_csv(deba.data("fuse/per_baton_rouge_so.csv"), index=False)
     event_df.to_csv(deba.data("fuse/event_baton_rouge_so.csv"), index=False)
     complaint_df.to_csv(deba.data("fuse/com_baton_rouge_so.csv"), index=False)

@@ -94,7 +94,7 @@ if __name__ == "__main__":
     agency = cprr21.agency[0]
     post = load_for_agency(agency)
     per = fuse_personnel(cprr21, post, cprr14, cprr04)
-    complaints = rearrange_allegation_columns(pd.concat([cprr21, cprr14]))
+    complaints = rearrange_allegation_columns(pd.concat([cprr21, cprr14], axis=0))
     event = fuse_events(cprr21, post, cprr14, cprr04)
     complaints.to_csv(deba.data("fuse/com_benton_pd.csv"), index=False)
     per.to_csv(deba.data("fuse/per_benton_pd.csv"), index=False)

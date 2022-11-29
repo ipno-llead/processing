@@ -337,7 +337,7 @@ if __name__ == "__main__":
     uof_df = rearrange_use_of_force(uof)
     uof_citizen_df = rearrange_uof_citizen_columns(uof_citizen)
     pclaims_df = rearrange_property_claims_columns(pd.concat([pclaims20, pclaims21]))
-    com = pd.concat([cprr, pib]).drop_duplicates(subset=["allegation_uid"], keep="last")
+    com = pd.concat([cprr, pib], axis=0).drop_duplicates(subset=["allegation_uid"], keep="last")
     com = rearrange_allegation_columns(com)
     settlements = rearrange_settlement_columns(nopd_settlements)
     pr = rearrange_police_report_columns(pr)

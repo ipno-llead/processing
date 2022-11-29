@@ -235,7 +235,7 @@ if __name__ == "__main__":
     personnel_df = fuse_personnel(cprr20, cprr19, cprr21, pprr, post, overtime20)
     events_df = fuse_events(cprr19, cprr20, cprr21, pprr, overtime20)
     events_df = rearrange_event_columns(pd.concat([post_events, events_df]))
-    complaint_df = rearrange_allegation_columns(pd.concat([cprr19, cprr20, cprr21]))
+    complaint_df = rearrange_allegation_columns(pd.concat([cprr19, cprr20, cprr21], axis=0))
     personnel_df.to_csv(deba.data("fuse/per_new_orleans_so.csv"), index=False)
     events_df.to_csv(deba.data("fuse/event_new_orleans_so.csv"), index=False)
     complaint_df.to_csv(deba.data("fuse/com_new_orleans_so.csv"), index=False)

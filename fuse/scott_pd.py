@@ -68,7 +68,7 @@ if __name__ == "__main__":
     post = load_for_agency(agency)
     post_event = pd.read_csv(deba.data("match/post_event_scott_pd_2021.csv"))
     personnels = fuse_personnel(pprr, cprr20, cprr14, post)
-    complaints = rearrange_allegation_columns(pd.concat([cprr20, cprr14]))
+    complaints = rearrange_allegation_columns(pd.concat([cprr20, cprr14], axis=0))
     events_df = fuse_events(pprr, cprr20, cprr14)
     events_df = rearrange_event_columns(pd.concat([post_event, events_df]))
     personnels.to_csv(deba.data("fuse/per_scott_pd.csv"), index=False)

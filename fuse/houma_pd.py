@@ -37,7 +37,7 @@ if __name__ == "__main__":
     agency = cprr18.agency[0]
     post = load_for_agency(agency)
     personnel_df = fuse_personnel(cprr21, cprr18, post)
-    allegation_df = rearrange_allegation_columns(pd.concat([cprr21, cprr18]))
+    allegation_df = rearrange_allegation_columns(pd.concat([cprr21, cprr18], axis=0))
     event_df = fuse_events(post)
     event_df.to_csv(deba.data("fuse/event_houma_pd.csv"), index=False)
     personnel_df.to_csv(deba.data("fuse/per_houma_pd.csv"), index=False)

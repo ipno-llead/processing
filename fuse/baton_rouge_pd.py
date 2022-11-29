@@ -162,7 +162,7 @@ if __name__ == "__main__":
         csd_pprr_17, csd_pprr_19, cprr_18, cprr_21, cprr_09, settlements
     )
     events_df = rearrange_event_columns(pd.concat([post_event, events_df]))
-    complaint_df = rearrange_allegation_columns(pd.concat([cprr_18, cprr_21, cprr_09]))
+    complaint_df = rearrange_allegation_columns(pd.concat([cprr_18, cprr_21, cprr_09], axis=0))
     settlement_df = rearrange_settlement_columns(settlements)
 
     personnel_df.to_csv(deba.data("fuse/per_baton_rouge_pd.csv"), index=False)
