@@ -120,6 +120,11 @@ def clean_investigator(df):
     return df.drop(columns=["investigator"])
 
 
+def create_tracking_id_og_col(df):
+    df.loc[:, "tracking_id_og"] = df.tracking_id
+    return df
+    
+
 def clean():
     df = (
         pd.read_csv(deba.data("raw/washington_so/washington_so_cprr_2010_2022.csv"))
