@@ -34,7 +34,7 @@ if __name__ == "__main__":
     agency = cprr20.agency[0]
     post = load_for_agency(agency)
     per_df = fuse_personnel(cprr20, pprr, cprr17, post)
-    com_df = rearrange_allegation_columns(pd.concat([cprr20, cprr17]))
+    com_df = rearrange_allegation_columns(pd.concat([cprr20, cprr17], axis=0))
     event_df = fuse_events(pprr)
     event_df = rearrange_event_columns(pd.concat([post_event, event_df]))
     com_df.to_csv(deba.data("fuse/com_baker_pd.csv"), index=False)

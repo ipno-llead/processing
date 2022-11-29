@@ -60,7 +60,7 @@ if __name__ == "__main__":
     pprr.loc[:, "agency"] = "port-allen-pd"
     personnel_df = rearrange_personnel_columns(pprr)
     personnel_df = fuse_personnel(personnel_df, post)
-    complaint_df = rearrange_allegation_columns(pd.concat([cprr16, cprr18, cprr19]))
+    complaint_df = rearrange_allegation_columns(pd.concat([cprr16, cprr18, cprr19], axis=0))
     events_df = fuse_events(pprr, cprr16, cprr18, cprr19)
     events_df = rearrange_event_columns(pd.concat([post_event, events_df]))
     citizen_df = rearrange_citizen_columns(citizen_df)

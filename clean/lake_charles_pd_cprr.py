@@ -645,6 +645,11 @@ def clean_and_split_investigator_19(df):
     return df.drop(columns="investigator")
 
 
+def create_tracking_id_og_col(df):
+    df.loc[:, "tracking_id_og"] = df.tracking_id
+    return df
+
+
 def clean_20():
     df = pd.read_csv(deba.data("raw/lake_charles_pd/lake_charles_pd_cprr_2020.csv"))
     df = (
@@ -711,6 +716,8 @@ def clean_19():
             ],
             "allegation_uid",
         )
+        .pipe(create_tracking_id_og_col)
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
     )
     citizen_df = df[["complainant_type", "allegation_uid", "agency"]]
     citizen_df = citizen_df.pipe(

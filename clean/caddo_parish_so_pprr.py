@@ -90,5 +90,4 @@ def clean():
 if __name__ == "__main__":
     df = clean()
     ensure_uid_unique(df, "uid")
-
     df.to_csv(deba.data("clean/pprr_caddo_parish_so_2020.csv"), index=False)

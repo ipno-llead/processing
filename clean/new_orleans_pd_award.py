@@ -181,5 +181,4 @@ def clean():
 
 if __name__ == "__main__":
     award = clean()
-
     award.to_csv(deba.data("clean/award_new_orleans_pd_2016_2021.csv"), index=False)

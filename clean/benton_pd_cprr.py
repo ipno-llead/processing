@@ -28,8 +28,11 @@ def clean_disposition14(df):
 
 def standardize_dates(df):
     df.loc[:, "receive_date"] = df.receive_date.str.replace(r"-", "/", regex=False)
-    df.loc[:, "resignation_date"] = df.resignation_date.str.replace(r"-", "/", regex=False)
+    df.loc[:, "resignation_date"] = df.resignation_date.str.replace(
+        r"-", "/", regex=False
+    )
     return df
+
 
 def clean21():
     df = (
@@ -60,8 +63,6 @@ def clean14():
         .pipe(gen_uid, ["allegation_desc", "disposition", "uid"], "allegation_uid")
     )
     return df
-
-
 
 
 def clean04():

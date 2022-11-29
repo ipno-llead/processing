@@ -65,13 +65,16 @@ def split_names(df):
     return df.drop(columns="name")
 
 
+def create_tracking_id_og_col(df):
+    df.loc[:, "tracking_id_og"] = df.tracking_id
+    return df
+
+
 def clean():
     df = (
         pd.read_csv(deba.data("raw/st_landry_so/st_landry_so_cprr_2019_2020.csv"))
         .pipe(clean_column_names)
-        .rename(
-            columns={"case": "tracking_id", "date": "investigation_complete_date"}
-        )
+        .rename(columns={"case": "tracking_id", "date": "investigation_complete_date"})
         .pipe(clean_dates, ["investigation_complete_date"])
         .pipe(clean_allegation)
         .pipe(split_rows_with_allegations)
@@ -86,6 +89,8 @@ def clean():
             ["uid", "tracking_id", "allegation", "action"],
             "allegation_uid",
         )
+        .pipe(create_tracking_id_og_col)
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
     )
     return df
 

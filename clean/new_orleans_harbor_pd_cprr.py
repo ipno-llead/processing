@@ -76,6 +76,11 @@ def assign_allegations(df):
     )
 
 
+def create_tracking_id_og_col(df):
+    df.loc[:, "tracking_id_og"] = df.tracking_id
+    return df
+
+
 def clean():
     df = (
         realign()
@@ -133,6 +138,8 @@ def clean():
         .pipe(assign_agency)
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(gen_uid, ["agency", "tracking_id"], "allegation_uid")
+        .pipe(create_tracking_id_og_col)
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
     )
     citizen_df = df[["complainant_sex", "complainant_race", "allegation_uid", "agency"]]
     citizen_df = citizen_df.pipe(

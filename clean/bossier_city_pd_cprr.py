@@ -265,6 +265,11 @@ def assign_agency(df):
     return df
 
 
+def create_tracking_id_og_col(df):
+    df.loc[:, "tracking_id_og"] = df.tracking_id
+    return df
+
+
 def clean():
     df = (
         pd.read_csv(deba.data("raw/bossier_city_pd/bossier_city_pd_cprr_2020.csv"))
@@ -299,6 +304,8 @@ def clean():
             clean_dates,
             ["receive_date", "investigation_complete_date", "investigation_start_date"],
         )
+        .pipe(create_tracking_id_og_col)
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
     )
     citizen_df = df[["complainant_type", "allegation_uid", "agency"]]
     citizen_df = citizen_df.pipe(

@@ -1029,6 +1029,11 @@ def split_names09(df):
     return df.drop(columns=["suffix"])
 
 
+def create_tracking_id_og_col(df):
+    df.loc[:, "tracking_id_og"] = df.tracking_id
+    return df
+
+
 def clean_18():
     df = realign_18()
     df = clean_column_names(df)
@@ -1065,6 +1070,8 @@ def clean_18():
             ["agency", "tracking_id", "uid", "action", "allegation"],
             "allegation_uid",
         )
+        .pipe(create_tracking_id_og_col)
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
     )
     return df
 
@@ -1238,6 +1245,8 @@ def clean_21():
                 ["traffic violations"],
             ],
         )
+        .pipe(create_tracking_id_og_col)
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
     )
     return df
 

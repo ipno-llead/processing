@@ -144,6 +144,11 @@ def assign_prod_year(df, year):
     return df
 
 
+def create_tracking_id_og_col(df):
+    df.loc[:, "tracking_id_og"] = df.tracking_id
+    return df
+
+
 def clean19():
     df = pd.read_csv(deba.data("raw/port_allen_pd/port_allen_cprr_2019.csv"))
     df = clean_column_names(df)
@@ -178,6 +183,8 @@ def clean19():
             ["agency", "tracking_id", "uid", "allegation"],
             "allegation_uid",
         )
+        .pipe(create_tracking_id_og_col)
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
     )
     return df
 
@@ -226,6 +233,8 @@ def clean18():
         .pipe(clean_names, ["first_name", "last_name"])
         .pipe(gen_uid, ["agency", "first_name", "last_name"])
         .pipe(gen_uid, ["agency", "tracking_id", "uid"], "allegation_uid")
+        .pipe(create_tracking_id_og_col)
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
         .dropna(subset=["tracking_id"])
         .drop_duplicates(subset=["allegation_uid"])
     )
@@ -274,6 +283,8 @@ def clean16():
             ["agency", "tracking_id", "uid", "allegation"],
             "allegation_uid",
         )
+        .pipe(create_tracking_id_og_col)
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
     )
     citizen_df = df[["complainant_type", "allegation_uid", "agency"]]
     citizen_df = citizen_df.pipe(

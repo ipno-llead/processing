@@ -453,6 +453,11 @@ def drop_rows_missing_name(df):
     return df[~((df.first_name.fillna("") == ""))]
 
 
+def create_tracking_id_og_col(df):
+    df.loc[:, "tracking_id_og"] = df.tracking_id
+    return df
+
+
 def clean18():
     df = pd.read_csv(deba.data("raw/baton_rouge_so/baton_rouge_so_cprr_2018.csv"))
     df = clean_column_names(df)
@@ -563,6 +568,8 @@ def clean20():
             ["agency", "uid", "occur_year", "occur_month", "occur_day"],
             "allegation_uid",
         )
+        .pipe(create_tracking_id_og_col)
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
     )
     citizen_df = df[["complainant_type", "allegation_uid", "agency"]]
     citizen_df = citizen_df.pipe(
@@ -607,6 +614,8 @@ def clean15():
             "allegation_uid",
         )
         .pipe(drop_rows_missing_name)
+        .pipe(create_tracking_id_og_col)
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
     )
     citizen_df = df[["complainant_type", "allegation_uid", "agency"]]
     citizen_df = citizen_df.pipe(

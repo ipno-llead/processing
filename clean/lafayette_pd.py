@@ -356,6 +356,11 @@ def drop_rows_missing_names(df):
     return df[~((df.first_name == "") & (df.last_name == ""))]
 
 
+def create_tracking_id_og_col(df):
+    df.loc[:, "tracking_id_og"] = df.tracking_id
+    return df 
+
+
 def clean_cprr_20():
     return (
         pd.read_csv(deba.data("raw/lafayette_pd/lafayette_pd_cprr_2015_2020.csv"))
@@ -520,6 +525,8 @@ def clean_cprr_20():
             ["agency", "tracking_id", "allegation", "uid"],
             "allegation_uid",
         )
+        .pipe(create_tracking_id_og_col)
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
     )
 
 
@@ -1066,6 +1073,8 @@ def clean_cprr_14():
             "allegation_uid",
         )
         .pipe(drop_rows_missing_names)
+        .pipe(create_tracking_id_og_col)
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
     )
     return df
 

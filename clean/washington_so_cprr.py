@@ -120,6 +120,11 @@ def clean_investigator(df):
     return df.drop(columns=["investigator"])
 
 
+def create_tracking_id_og_col(df):
+    df.loc[:, "tracking_id_og"] = df.tracking_id
+    return df
+    
+
 def clean():
     df = (
         pd.read_csv(deba.data("raw/washington_so/washington_so_cprr_2010_2022.csv"))
@@ -142,6 +147,8 @@ def clean():
             ["uid", "disposition", "tracking_id", "action"],
             "allegation_uid",
         )
+        .pipe(create_tracking_id_og_col)
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
     )
     citizen_df = df[["complainant_type", "allegation_uid", "agency"]]
     citizen_df = citizen_df.pipe(

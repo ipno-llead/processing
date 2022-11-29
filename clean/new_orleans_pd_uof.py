@@ -279,6 +279,11 @@ def clean_citizen_age(df):
     return df
 
 
+def create_tracking_id_og_col(df):
+    df.loc[:, "tracking_id_og"] = df.tracking_id
+    return df
+
+
 def clean_uof():
     dfa = (
         pd.read_csv(deba.data("raw/new_orleans_pd/new_orleans_pd_uof_2016_2021.csv"))
@@ -337,6 +342,8 @@ def clean_uof():
             ],
             "uof_uid",
         )
+        .pipe(create_tracking_id_og_col)
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
     )
     dfb = dfa[
         [

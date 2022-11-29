@@ -132,6 +132,11 @@ def clean_names(df):
     return df.drop(columns="officer_name")
 
 
+def create_tracking_id_og_col(df):
+    df.loc[:, "tracking_id_og"] = df.tracking_id
+    return df
+
+
 def clean():
     df = (
         pd.read_csv(
@@ -155,6 +160,8 @@ def clean():
             ["uid", "allegation", "allegation_desc", "disposition", "action"],
             "allegation_uid",
         )
+        .pipe(create_tracking_id_og_col)
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
     )
     return df
 

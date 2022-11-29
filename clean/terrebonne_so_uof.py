@@ -136,6 +136,11 @@ def split_rows_with_multiple_citizens(df):
     )
 
 
+def create_tracking_id_og_col(df):
+    df.loc[:, "tracking_id_og"] = df.tracking_id
+    return df
+
+
 def clean():
     df = (
         pd.read_csv(deba.data("raw/terrebonne_so/terrebonne_so_uof_2021.csv"))
@@ -187,6 +192,8 @@ def clean():
             ["citizen_race", "citizen_sex", "citizen_age"],
             "uof_citizen_uid",
         )
+        .pipe(create_tracking_id_og_col)
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
     )
     df = df.drop_duplicates(subset=["uid", "uof_uid"])
     dfa = df[

@@ -28,6 +28,11 @@ def clean_complainant_type(df):
     return df.drop(columns=["complainant"])
 
 
+def create_tracking_id_og_col(df):
+    df.loc[:, "tracking_id_og"] = df.tracking_id
+    return df
+
+
 def clean():
     df = (
         pd.read_csv(deba.data("raw/sulphur_pd/sulphur_pd_cprr_2014_2019.csv"))
@@ -55,6 +60,8 @@ def clean():
             "allegation_uid",
         )
         .dropna()
+        .pipe(create_tracking_id_og_col)
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
     )
     citizen_df = df[["complainant_type", "allegation_uid", "agency"]]
     citizen_df = citizen_df.pipe(

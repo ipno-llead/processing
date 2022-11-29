@@ -88,7 +88,7 @@ if __name__ == "__main__":
     post = load_for_agency(agency)
     personnel_df = fuse_personnel(cprr_15, cprr_18, cprr_20, post)
     event_df = fuse_events(cprr_15, cprr_18, cprr_20, post)
-    complaint_df = rearrange_allegation_columns(pd.concat([cprr_15, cprr_18, cprr_20]))
+    complaint_df = rearrange_allegation_columns(pd.concat([cprr_15, cprr_18, cprr_20], axis=0))
     citizen_df = rearrange_citizen_columns(
         pd.concat([citizen_df15, citizen_df18, citizen_df20])
     )

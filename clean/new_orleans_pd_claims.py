@@ -65,6 +65,11 @@ def clean_bad_dates(df):
     return df
 
 
+def create_tracking_id_og_col(df):
+    df.loc[:, "tracking_id_og"] = df.tracking_id
+    return df
+
+
 def clean21():
     df = (
         pd.read_csv(deba.data("raw/new_orleans_pd/new_orleans_pd_pclaims_2021.csv"))
@@ -120,6 +125,8 @@ def clean21():
             ["tracking_id", "agency"],
             "property_claims_uid",
         )
+        .pipe(create_tracking_id_og_col)
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
     )
     return df
 
@@ -185,6 +192,8 @@ def clean20():
             ["tracking_id", "agency"],
             "property_claims_uid",
         )
+        .pipe(create_tracking_id_og_col)
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
     )
     return df
 

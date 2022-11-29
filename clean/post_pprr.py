@@ -105,7 +105,9 @@ def clean_agency(df):
         .str.replace(r"^gretnapld$", "gretna-pd", regex=True)
         .str.replace(r"^sthelena-so$", "st-helena-so", regex=True)
         .str.replace(r"^ng-oaparish-so$", "", regex=True)
-        .str.replace(r"^shreveport-city-marshall$", "shreveport-city-marshal", regex=True)
+        .str.replace(
+            r"^shreveport-city-marshall$", "shreveport-city-marshal", regex=True
+        )
         .str.replace(r"^jefferson$", "jefferson-so", regex=True)
         .str.replace(r"^sulphur-city-marshall$", "sulphur-city-marshal", regex=True)
         .str.replace(r"^natchitoches$", "natchitoches-so", regex=True)
@@ -166,5 +168,4 @@ def clean():
 
 if __name__ == "__main__":
     df = clean()
-
     df.to_csv(deba.data("clean/pprr_post_2020_11_06.csv"), index=False)
