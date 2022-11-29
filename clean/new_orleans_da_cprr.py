@@ -15,9 +15,13 @@ from lib.uid import gen_uid
 def split_names(df):
     names = (
         df.officer.str.lower()
-        .str.strip().fillna("")
-        .str.replace(r"((.+)?nopd(.+)?|(.+)?unknown(.+)?|anonymous|none)", "", regex=True)\
-        .str.replace(r"\.", "", regex=True).str.replace(r"\'$", "", regex=True)
+        .str.strip()
+        .fillna("")
+        .str.replace(
+            r"((.+)?nopd(.+)?|(.+)?unknown(.+)?|anonymous|none)", "", regex=True
+        )
+        .str.replace(r"\.", "", regex=True)
+        .str.replace(r"\'$", "", regex=True)
         .str.replace(r"( +$|^ +)", "", regex=True)
         .str.extract(r"^(?:(\w+\'?-?\w+?) ) ?(\w+-?\'? ?\w+?) ?(jr|sr)?$")
     )
@@ -260,9 +264,27 @@ def clean():
         )
         .drop_duplicates(subset=["allegation_uid"])
     )
-    return df
+    citizen_df = df[
+        ["complainant_type", "citizen_sex", "citizen_race", "agency", "allegation_uid"]
+    ]
+    citizen_df = citizen_df.pipe(
+        gen_uid,
+        ["complainant_type", "citizen_sex", "citizen_race", "agency", "allegation_uid"],
+        "citizen_uid",
+    )
+    df = df.drop(
+        columns=[
+            "complainant_type",
+            "citizen_sex",
+            "citizen_race",
+        ]
+    )
+    return df, citizen_df
 
 
 if __name__ == "__main__":
-    df = clean()
+    df, citizen_df = clean()
     df.to_csv(deba.data("clean/cprr_new_orleans_da_2016_2020.csv"), index=False)
+    citizen_df.to_csv(
+        deba.data("clean/cprr_cit_new_orleans_da_2016_2020.csv"), index=False
+    )

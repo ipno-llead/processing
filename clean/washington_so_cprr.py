@@ -33,7 +33,11 @@ def extract_action_from_disposition(df):
         .str.replace(r"fired", "terminated", regex=False)
         .str.replace(r"-", "; ", regex=False)
         .str.replace(r"suspended (\w+) days?", r"\1-day suspension", regex=True)
-        .str.replace("tot lsp; arrested", r"arrested; turned over to the Louisiana State Police Department", regex=True)
+        .str.replace(
+            "tot lsp; arrested",
+            r"arrested; turned over to the Louisiana State Police Department",
+            regex=True,
+        )
         .str.replace(r"^; ", "", regex=True)
     )
     return df
@@ -50,7 +54,7 @@ def clean_disposition(df):
 
 
 def clean_complainant_name(df):
-    df.loc[:, "complainant"] = (
+    df.loc[:, "complainant_type"] = (
         df.name_of_complainant.str.lower()
         .str.strip()
         .str.replace(r"(chief|warden|22).+", "internal", regex=True)
@@ -75,6 +79,7 @@ def split_rows_with_multiple_officers(df):
         .reset_index(drop=True)
     )
     return df
+
 
 def split_names(df):
     names = (
@@ -102,10 +107,18 @@ def standardize_tracking_id(df):
 
 
 def clean_investigator(df):
-    df.loc[:, "investigator_name"] = df.investigator.str.lower().str.strip()\
-        .str.replace(r"tot lsp", "turned over to the louisiana state police department", regex=False)\
+    df.loc[:, "investigator_name"] = (
+        df.investigator.str.lower()
+        .str.strip()
+        .str.replace(
+            r"tot lsp",
+            "turned over to the louisiana state police department",
+            regex=False,
+        )
         .str.replace(r"\, ", "/", regex=True)
+    )
     return df.drop(columns=["investigator"])
+
 
 def clean():
     df = (
@@ -130,9 +143,17 @@ def clean():
             "allegation_uid",
         )
     )
-    return df
+    citizen_df = df[["complainant_type", "allegation_uid", "agency"]]
+    citizen_df = citizen_df.pipe(
+        gen_uid, ["complainant_type", "allegation_uid", "agency"], "citizen_uid"
+    )
+    df = df.drop(columns=["complainant_type"])
+    return df, citizen_df
 
 
 if __name__ == "__main__":
-    df = clean()
+    df, citizen_df = clean()
     df.to_csv(deba.data("clean/cprr_washington_so_2010_2022.csv"), index=False)
+    citizen_df.to_csv(
+        deba.data("clean/cprr_cit_washington_so_2010_2022.csv"), index=False
+    )

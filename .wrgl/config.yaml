@@ -1078,12 +1078,6 @@ branch:
     file: data/fuse/uof_new_orleans_pd.csv
     primaryKey:
       - uof_uid
-  uof-citizens-new-orleans-pd:
-    remote: origin
-    merge: refs/heads/uof-citizens-new-orleans-pd
-    file: data/fuse/uof_citizens_new_orleans_pd.csv
-    primaryKey:
-      - uof_uid
   uof-kenner-pd:
     remote: origin
     merge: refs/heads/uof-kenner-pd
@@ -1168,12 +1162,6 @@ branch:
     file: data/fuse/brady.csv
     primaryKey:
       - brady_uid
-  use-of-force-citizens:
-    remote: origin
-    merge: refs/heads/use-of-force-citizens
-    file: data/fuse/uof_citizens.csv
-    primaryKey:
-      - uof_uid
   property-claims:
     remote: origin
     merge: refs/heads/property-claims
@@ -1204,6 +1192,12 @@ branch:
     file: data/fuse/police_reports.csv
     primaryKey:
       - police_report_uid
+  citizens:
+    remote: origin
+    merge: refs/heads/citizens
+    file: data/fuse/citizens.csv
+    primaryKey:
+      - citizen_uid
 merge:
   fastForward: only
 pack:

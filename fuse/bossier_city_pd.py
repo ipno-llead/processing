@@ -1,6 +1,10 @@
 import pandas as pd
 from lib.personnel import fuse_personnel
-from lib.columns import rearrange_allegation_columns, rearrange_event_columns
+from lib.columns import (
+    rearrange_allegation_columns,
+    rearrange_event_columns,
+    rearrange_citizen_columns,
+)
 import deba
 from lib import events
 from lib.post import load_for_agency
@@ -66,6 +70,7 @@ if __name__ == "__main__":
     post = load_for_agency(agency)
     post_event = pd.read_csv(deba.data("match/post_event_bossier_city_pd.csv"))
     cprr = pd.read_csv(deba.data("match/cprr_bossier_city_pd_2020.csv"))
+    citizen_df = pd.read_csv(deba.data("clean/cprr_cit_bossier_city_pd_2020.csv"))
     per_df = fuse_personnel(pprr, cprr, post)
     com_df = rearrange_allegation_columns(cprr)
     events_df = fuse_events(pprr, cprr)
@@ -77,7 +82,9 @@ if __name__ == "__main__":
             ]
         )
     )
+    citizen_df = rearrange_citizen_columns(citizen_df)
     per_df.to_csv(deba.data("fuse/per_bossier_city_pd.csv"), index=False)
     events_df.to_csv(deba.data("fuse/event_bossier_city_pd.csv"), index=False)
     com_df.to_csv(deba.data("fuse/com_bossier_city_pd.csv"), index=False)
     post.to_csv(deba.data("fuse/post_bossier_city_pd.csv"), index=False)
+    citizen_df.to_csv(deba.data("fuse/cit_bossier_city_pd.csv"), index=False)

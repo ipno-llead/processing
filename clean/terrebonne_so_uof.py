@@ -207,13 +207,14 @@ def clean():
             "uof_uid",
         ]
     ]
-    dfb = df[["uof_uid", "citizen_age", "citizen_sex", "citizen_race"]]
+    dfb = df[["uof_uid", "citizen_age", "citizen_sex", "citizen_race", "agency"]]
+    dfb = dfb.pipe(gen_uid, ["uof_uid", "citizen_age", "citizen_sex", "citizen_race", "agency"], "citizen_uid")
+    
+    df = df.drop(columns=["citizen_age", "citizen_sex", "citizen_race",])
     return dfa, dfb
 
 
 if __name__ == "__main__":
     uof, citizen_uof = clean()
     uof.to_csv(deba.data("clean/uof_terrebonne_so_2021.csv"), index=False)
-    citizen_uof.to_csv(
-        deba.data("clean/uof_citizens_terrebonne_so_2021.csv"), index=False
-    )
+    citizen_uof.to_csv(deba.data("clean/uof_cit_terrebonne_so_2021.csv"), index=False)

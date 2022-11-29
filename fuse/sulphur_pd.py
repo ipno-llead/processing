@@ -1,7 +1,5 @@
 import deba
-from lib.columns import (
-    rearrange_allegation_columns,
-)
+from lib.columns import rearrange_allegation_columns, rearrange_citizen_columns
 from lib import events
 from lib.personnel import fuse_personnel
 from lib.post import load_for_agency
@@ -53,11 +51,14 @@ def fuse_events(cprr, post):
 
 if __name__ == "__main__":
     cprr = pd.read_csv(deba.data("match/cprr_sulphur_pd_2014_2019.csv"))
+    citizen_df = pd.read_csv(deba.data("clean/cprr_cit_sulphur_pd_2014_2019.csv"))
     agency = cprr.agency[0]
     post = load_for_agency(agency)
     per_df = fuse_personnel(cprr, post)
     com_df = rearrange_allegation_columns(cprr)
     event_df = fuse_events(cprr, post)
+    citizen_df = rearrange_citizen_columns(citizen_df)
     event_df.to_csv(deba.data("fuse/event_sulphur_pd.csv"), index=False)
     com_df.to_csv(deba.data("fuse/com_sulphur_pd.csv"), index=False)
     per_df.to_csv(deba.data("fuse/per_sulphur_pd.csv"), index=False)
+    citizen_df.to_csv(deba.data("fuse/cit_sulphur_pd.csv"), index=False)

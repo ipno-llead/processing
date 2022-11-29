@@ -502,7 +502,13 @@ def clean18():
             "allegation_uid",
         )
     )
-    return df
+    citizen_df = df[["complainant_type", "allegation_uid", "agency"]]
+    citizen_df = citizen_df.pipe(
+        gen_uid, ["complainant_type", "allegation_uid", "agency"], "citizen_uid"
+    )
+
+    df = df.drop(columns=["complainant_type"])
+    return df, citizen_df
 
 
 def clean20():
@@ -558,7 +564,13 @@ def clean20():
             "allegation_uid",
         )
     )
-    return df
+    citizen_df = df[["complainant_type", "allegation_uid", "agency"]]
+    citizen_df = citizen_df.pipe(
+        gen_uid, ["complainant_type", "allegation_uid", "agency"], "citizen_uid"
+    )
+
+    df = df.drop(columns=["complainant_type"])
+    return df, citizen_df
 
 
 def clean15():
@@ -596,13 +608,28 @@ def clean15():
         )
         .pipe(drop_rows_missing_name)
     )
-    return df
+    citizen_df = df[["complainant_type", "allegation_uid", "agency"]]
+    citizen_df = citizen_df.pipe(
+        gen_uid, ["complainant_type", "allegation_uid", "agency"], "citizen_uid"
+    )
+
+    df = df.drop(columns=["complainant_type"])
+    return df, citizen_df
 
 
 if __name__ == "__main__":
-    df15 = clean15()
-    df18 = clean18()
-    df20 = clean20()
+    df15, citizen_df15 = clean15()
+    df18, citizen_df18 = clean18()
+    df20, citizen_df20 = clean20()
+    citizen_df15.to_csv(
+        deba.data("clean/cprr_cit_baton_rouge_so_2011_2015.csv"), index=False
+    )
+    citizen_df18.to_csv(
+        deba.data("clean/cprr_cit_baton_rouge_so_2018.csv"), index=False
+    )
+    citizen_df20.to_csv(
+        deba.data("clean/cprr_cit_baton_rouge_so_2016_2020.csv"), index=False
+    )
     df15.to_csv(deba.data("clean/cprr_baton_rouge_so_2011_2015.csv"), index=False)
     df18.to_csv(deba.data("clean/cprr_baton_rouge_so_2018.csv"), index=False)
     df20.to_csv(deba.data("clean/cprr_baton_rouge_so_2016_2020.csv"), index=False)
