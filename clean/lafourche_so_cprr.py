@@ -132,9 +132,8 @@ def clean_allegation(df):
     return df.drop(columns=["outcome"])
 
 
-def strip_leading_commas(df):
-    for col in df.columns:
-        df[col] = df[col].str.replace(r"\'", "", regex=True)
+def strip_leading_aps(df):
+    df = df.apply(lambda x: x.str.replace(r"^\'", "", regex=True))
     return df
 
 
@@ -319,6 +318,29 @@ def create_tracking_id_og_col(df):
     return df
 
 
+def split_rows_with_multiple_officers_10(df):
+    df.loc[:, "officer"] = df.officer.str.replace(r"(\,|&)", "/", regex=True)
+    i = 0
+    for idx in df[df.officer.str.contains("/")].index:
+        s = df.loc[idx + i, "officer"]
+        parts = re.split(r"\/", s)
+        df = duplicate_row(df, idx + i, len(parts))
+        for j, name in enumerate(parts):
+            df.loc[idx + i + j, "officer"] = name
+        i += len(parts) - 1
+    return df
+
+
+def split_names_10(df):
+    names = df.officer.str.lower().str.strip()\
+        .str.replace(r"^ (\w+)", r"\1", regex=True)\
+        .str.replace(r"(\w+) $", r"\1", regex=True)\
+        .str.replace(r"tpd off ricky ross", "ricky ross", regex=False)\
+        .str.replace(r"(unknown.+|lps.+|tpd.+|inmate.+|\?|\((\w+)\)|detention.+)", "", regex=True)\
+        .str.extract(r"(dty\.?|agt\.?|clerk|lt\.?|sgt\.?|capt\.?")
+    df.loc[:, ""]
+
+
 def clean21():
     df = (
         pd.read_csv(deba.data("raw/lafourche_so/lafourche_so_cprr_2019_2021.csv"))
@@ -357,7 +379,7 @@ def clean15():
         .pipe(clean_column_names)
         .drop(columns=["ia"])
         .rename(columns={"date": "receive_date", "case": "tracking_id"})
-        .pipe(strip_leading_commas)
+        .pipe(strip_leading_aps)
         .pipe(clean_dates, ["receive_date"])
         .pipe(extract_action)
         .pipe(clean_disposition15)
@@ -376,6 +398,15 @@ def clean15():
     )
     return df
 
+
+
+def clean10():
+    df = (pd.read_csv(deba.data("raw/lafourche_so/lafourche_so_cprr_2010_2014.csv"))\
+        .pipe(clean_column_names)
+        .pipe(strip_leading_aps)
+        .pipe(split_rows_with_multiple_officers_10)
+    )
+    return df
 
 if __name__ == "__main__":
     df21 = clean21()
