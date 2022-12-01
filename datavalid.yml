@@ -401,8 +401,10 @@ schemas:
       - name: counsel
       - name: charging_supervisor
       - name: appeal_disposition
-      - name: action_appealed
       - name: appeal_hearing_year
+      - name: appeal_hearing_month
+      - name: appeal_hearing_day
+      - name: action_appealed
       - name: appealed
       - name: agency
       - name: motions
