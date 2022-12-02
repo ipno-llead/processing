@@ -29,7 +29,7 @@ def fetch_reports_2021() -> pd.DataFrame:
     )
 
 
-def fetch_reports_2022() -> pd.DataFrame:
+def fetch_reports_2022a() -> pd.DataFrame:
     return (
         files_meta_frame("raw_post_officer_history_reports_9_16_2022.dvc")
         .pipe(set_filetype)
@@ -37,8 +37,19 @@ def fetch_reports_2022() -> pd.DataFrame:
         .pipe(set_file_category)
     )
 
+
+def fetch_reports_2022b() -> pd.DataFrame:
+    return (
+        files_meta_frame("raw_post_officer_history_reports_9_30_2022.dvc")
+        .pipe(set_filetype)
+        .pipe(split_filepath)
+        .pipe(set_file_category)
+    )
+
 if __name__ == "__main__":
     df21 = fetch_reports_2021()
-    df22 = fetch_reports_2022()
+    df22a = fetch_reports_2022a()
+    df22b = fetch_reports_2022b()
     df21.to_csv(deba.data("meta/post_officer_history_reports_files.csv"), index=False)
-    df22.to_csv(deba.data("meta/post_officer_history_reports_9_16_2022_files.csv"), index=False)
+    df22a.to_csv(deba.data("meta/post_officer_history_reports_9_16_2022_files.csv"), index=False)
+    df22b.to_csv(deba.data("meta/post_officer_history_reports_9_30_2022_files.csv"), index=False)
