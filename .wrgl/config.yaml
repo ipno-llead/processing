@@ -298,6 +298,10 @@ branch:
     remote: origin
     merge: refs/heads/com-morehouse-so
     file: data/fuse/com_morehouse_so.csv
+  com-iberia-so:
+    remote: origin
+    merge: refs/heads/com-iberia-so
+    file: data/fuse/com_iberia_so.csv
   event:
     remote: origin
     merge: refs/heads/event
@@ -667,7 +671,13 @@ branch:
   event-morehouse-so:
     remote: origin
     merge: refs/heads/event-morehouse-so
-    file: data/fuse/event_.csv
+    file: data/fuse/event_morehouse_so.csv
+    primaryKey:
+      - event_uid
+  event-iberia-so:
+    remote: origin
+    merge: refs/heads/event-iberia-so
+    file: data/fuse/event_iberia_so.csv
     primaryKey:
       - event_uid
   per-abbeville-pd:
@@ -1070,6 +1080,12 @@ branch:
     remote: origin
     merge: refs/heads/per-morehouse-so
     file: data/fuse/per_morehouse_so.csv
+    primaryKey:
+      - uid
+  per-iberia-so:
+    remote: origin
+    merge: refs/heads/per-iberia-so
+    file: data/fuse/per_iberia_so.csv
     primaryKey:
       - uid
   uof-new-orleans-pd:
