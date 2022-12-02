@@ -1,0 +1,6 @@
+wdir: ../../../data/raw
+outs:
+- md5: 0249220ca0878f89cb23f84473b1bc30.dir
+  size: 1858
+  nfiles: 1
+  path: jefferson_davis_so
