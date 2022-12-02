@@ -20,6 +20,7 @@ def clean():
             "allegation_uid",
         )
     )
+    df = df[(df.allegation.fillna("") == "")]
     return df
 
 
