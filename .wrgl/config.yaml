@@ -1177,7 +1177,7 @@ branch:
   post-officer-history-new-orleans-pd:
     remote: origin
     merge: refs/heads/post-officer-history-new-orleans-pd
-    file: data/clean/post_officer_history_new_orleans_pd.csv
+    file: data/fuse/post_officer_history_new_orleans_pd.csv
     primaryKey:
       - uid
   settlements:
