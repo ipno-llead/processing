@@ -12,6 +12,7 @@ def clean():
         )
         .pipe(clean_column_names)
         .pipe(standardize_desc_cols, ["allegation", "allegation_desc"])
+        .rename(columns={"action_date": "termination_date"})
         .pipe(set_values, {"agency": "jefferson-davis-so"})
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(
@@ -20,7 +21,6 @@ def clean():
             "allegation_uid",
         )
     )
-    df = df[(df.allegation.fillna("") == "")]
     return df
 
 

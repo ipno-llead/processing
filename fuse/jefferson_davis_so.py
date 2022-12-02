@@ -18,6 +18,16 @@ def fuse_events(cprr, post):
                 "parse_date": True,
                 "keep": ["uid", "agency", "disposition", "action", "allegation_uid"],
             },
+            events.OFFICER_LEFT: {
+                "prefix": "termination",
+                "parse_date": True,
+                "keep": ["uid", "agency", "disposition", "action", "allegation_uid"],
+            },
+            events.COMPLAINT_INCIDENT: {
+                "prefix": "incident",
+                "parse_date": True,
+                "keep": ["uid", "agency", "disposition", "action", "allegation_uid"],
+            },
         },
         ["uid", "allegation_uid"],
     )
