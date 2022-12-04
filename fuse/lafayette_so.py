@@ -80,7 +80,7 @@ if __name__ == "__main__":
     award17 = pd.read_csv(deba.data("match/award_lafayette_so_2017.csv"))
     agency = cprr08.agency[0]
     post = load_for_agency(agency)
-    complaints = rearrange_allegation_columns(pd.concat([cprr20, cprr14, cprr08]))
+    complaints = rearrange_allegation_columns(pd.concat([cprr20, cprr14, cprr08], axis=0))
     event = fuse_events(award17, cprr20, cprr14, cprr08, post)
     personnel_df = fuse_personnel(cprr20, cprr14, cprr08, post, award17)
     award_df = rearrange_award_columns(award17)

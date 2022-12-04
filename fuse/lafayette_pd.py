@@ -93,7 +93,7 @@ if __name__ == "__main__":
             }
         ),
     )
-    com = rearrange_allegation_columns(pd.concat([cprr_20, cprr_14]))
+    com = rearrange_allegation_columns(pd.concat([cprr_20, cprr_14], axis=0))
     per.to_csv(deba.data("fuse/per_lafayette_pd.csv"), index=False)
     com.to_csv(deba.data("fuse/com_lafayette_pd.csv"), index=False)
     events_df.to_csv(deba.data("fuse/event_lafayette_pd.csv"), index=False)

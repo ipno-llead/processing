@@ -1,0 +1,6 @@
+wdir: ../../../data/raw
+outs:
+- md5: d95e3d0f3544b62272346f8c471891d6.dir
+  size: 7918
+  nfiles: 1
+  path: morehouse_so

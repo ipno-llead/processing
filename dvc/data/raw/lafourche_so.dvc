@@ -1,6 +1,6 @@
 wdir: ../../../data/raw
 outs:
-- md5: 4ec5160409dc177581dcd8b24e0301d0.dir
-  size: 24482
-  nfiles: 4
+- md5: bbac163d152166f9b7ca623adfe25fdc.dir
+  size: 48453
+  nfiles: 5
   path: lafourche_so

@@ -160,6 +160,7 @@ def clean_submission_type(df):
         .str.replace(r"(in )?per(son)?", "complainant appeared in person", regex=True)
         .str.replace(r"^l$", "complaint by letter", regex=True)
         .str.replace(r"(l/)?email", "complaint by email", regex=True)
+        .str.replace(r"int", "internal", regex=False)
     )
     return df.drop(columns="submission_type")
 
@@ -326,6 +327,11 @@ def split_names(df):
     )
 
 
+def create_tracking_id_og_col(df):
+    df.loc[:, "tracking_id_og"] = df.tracking_id
+    return df
+
+
 def clean21():
     df = (
         pd.read_csv(deba.data("raw/tangipahoa_so/tangipahoa_so_cprr_2015_2021.csv"))
@@ -364,7 +370,12 @@ def clean21():
         )
         .pipe(drop_rows_missing_names)
     )
-    return df
+    citizen_df = df[["complainant_type", "allegation_uid", "agency"]]
+    citizen_df = citizen_df.pipe(
+        gen_uid, ["complainant_type", "allegation_uid", "agency"], "citizen_uid"
+    )
+    df = df.drop(columns=["complainant_type"])
+    return df, citizen_df
 
 
 def clean13():
@@ -399,12 +410,17 @@ def clean13():
             ["uid", "allegation", "disposition", "tracking_id"],
             "allegation_uid",
         )
+        .pipe(create_tracking_id_og_col)
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
     )
     return df
 
 
 if __name__ == "__main__":
-    df21 = clean21()
+    df21, citizen_df = clean21()
     df13 = clean13()
     df21.to_csv(deba.data("clean/cprr_tangipahoa_so_2015_2021.csv"), index=False)
     df13.to_csv(deba.data("clean/tangipahoa_so_cprr_2013.csv"), index=False)
+    citizen_df.to_csv(
+        deba.data("clean/cprr_cit_tangipahoa_so_2015_2021.csv"), index=False
+    )

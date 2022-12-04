@@ -279,6 +279,11 @@ def clean_citizen_age(df):
     return df
 
 
+def create_tracking_id_og_col(df):
+    df.loc[:, "tracking_id_og"] = df.tracking_id
+    return df
+
+
 def clean_uof():
     dfa = (
         pd.read_csv(deba.data("raw/new_orleans_pd/new_orleans_pd_uof_2016_2021.csv"))
@@ -337,18 +342,25 @@ def clean_uof():
             ],
             "uof_uid",
         )
+        .pipe(create_tracking_id_og_col)
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
     )
-    dfb = dfa[["officer_name",
-        "race",
-        "sex",
-        "age",
-        "years_of_service",
-        "use_of_force_description",
-        "use_of_force_level",
-        "use_of_force_effective",
-        "officer_injured", "uof_uid"]]
-    dfb = (dfb
-        .pipe(split_officer_rows)
+    dfb = dfa[
+        [
+            "officer_name",
+            "race",
+            "sex",
+            "age",
+            "years_of_service",
+            "use_of_force_description",
+            "use_of_force_level",
+            "use_of_force_effective",
+            "officer_injured",
+            "uof_uid",
+        ]
+    ]
+    dfb = (
+        dfb.pipe(split_officer_rows)
         .pipe(split_officer_names)
         .pipe(clean_use_of_force_description)
         .pipe(clean_races, ["race"])
@@ -366,19 +378,22 @@ def clean_uof():
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .drop_duplicates(subset=["uid", "uof_uid"])
     )
-    dfa = dfa.drop(columns=["officer_name",
-        "race",
-        "sex",
-        "age",
-        "years_of_service",
-        "use_of_force_description",
-        "use_of_force_level",
-        "use_of_force_effective",
-        "officer_injured", "agency"])
-    df = pd.merge(dfa, dfb, on="uof_uid")
-    df = (
-        df.pipe(gen_uid, ["uid", "uof_uid"], "uof_uid")
+    dfa = dfa.drop(
+        columns=[
+            "officer_name",
+            "race",
+            "sex",
+            "age",
+            "years_of_service",
+            "use_of_force_description",
+            "use_of_force_level",
+            "use_of_force_effective",
+            "officer_injured",
+            "agency",
+        ]
     )
+    df = pd.merge(dfa, dfb, on="uof_uid")
+    df = df.pipe(gen_uid, ["uid", "uof_uid"], "uof_uid")
     return df
 
 
@@ -398,6 +413,7 @@ def extract_citizen(uof):
                 "citizen_height",
                 "citizen_arrested",
                 "citizen_arrest_charges",
+                "agency",
                 "uof_uid",
             ],
         ]
@@ -432,8 +448,9 @@ def extract_citizen(uof):
                 "citizen_influencing_factors",
                 "citizen_build",
                 "citizen_height",
+                "agency",
             ],
-            "uof_citizen_uid",
+            "citizen_uid",
         )
     )
     uof = uof.drop(

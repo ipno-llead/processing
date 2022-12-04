@@ -1,7 +1,11 @@
 import pandas as pd
 import deba
 from lib import events
-from lib.columns import rearrange_allegation_columns, rearrange_use_of_force
+from lib.columns import (
+    rearrange_allegation_columns,
+    rearrange_use_of_force,
+    rearrange_citizen_columns,
+)
 from lib.personnel import fuse_personnel
 from lib.post import load_for_agency
 
@@ -52,7 +56,11 @@ def fuse_events(cprr, post, uof):
             events.UOF_INCIDENT: {
                 "prefix": "occurred",
                 "parse_date": True,
-                "keep": ["uid", "uof_uid", "agency",],
+                "keep": [
+                    "uid",
+                    "uof_uid",
+                    "agency",
+                ],
             },
         },
         ["uid", "uof_uid"],
@@ -63,13 +71,16 @@ def fuse_events(cprr, post, uof):
 if __name__ == "__main__":
     cprr = pd.read_csv(deba.data("clean/cprr_terrebonne_so_2019_2021.csv"))
     uof = pd.read_csv(deba.data("match/uof_terrebonne_so_2021.csv"))
+    citizen_df = pd.read_csv(deba.data("clean/uof_cit_terrebonne_so_2021.csv"))
     agency = cprr.agency[0]
     post = load_for_agency(agency)
     per = fuse_personnel(cprr, post, uof)
     com = rearrange_allegation_columns(cprr)
     event = fuse_events(cprr, post, uof)
     uof = rearrange_use_of_force(uof)
+    citizen_df = rearrange_citizen_columns(citizen_df)
     event.to_csv(deba.data("fuse/event_terrebonne_so.csv"), index=False)
     com.to_csv(deba.data("fuse/com_terrebonne_so.csv"), index=False)
     per.to_csv(deba.data("fuse/per_terrebonne_so.csv"), index=False)
     uof.to_csv(deba.data("fuse/uof_terrebonne_so.csv"), index=False)
+    citizen_df.to_csv(deba.data("fuse/cit_terrebonne_so.csv"), index=False)

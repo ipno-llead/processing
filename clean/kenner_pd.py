@@ -179,5 +179,4 @@ if __name__ == "__main__":
     former_long = clean_former_long()
     former_short = clean_former_short()
     combined = combine_pprrs(pprr, former_long, former_short)
-
     combined.to_csv(deba.data("clean/pprr_kenner_pd_2020.csv"), index=False)

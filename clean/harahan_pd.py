@@ -42,5 +42,4 @@ def clean():
 
 if __name__ == "__main__":
     df = clean()
-
     df.to_csv(deba.data("clean/pprr_harahan_pd_2020.csv"), index=False)
