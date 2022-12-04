@@ -8,7 +8,7 @@ import deba
 
 
 def train_spacy_model(df: pd.DataFrame, training_data: str) -> pd.DataFrame:
-    ###  import labeled_data that has been exported from doccano
+    """import labeled_data that has been exported from doccano"""
 
     labeled_data = []
     with open(
@@ -31,19 +31,16 @@ def train_spacy_model(df: pd.DataFrame, training_data: str) -> pd.DataFrame:
     nlp = spacy.blank("en")
     ner = nlp.create_pipe("ner")
     nlp.add_pipe("ner")
-    ner.add_label("report_subject")
-    ner.add_label("tracking_id")
-    ner.add_label("allegation")
-    ner.add_label("previous_discipline")
-    ner.add_label("report_date")
-    ner.add_label("accused_name")
+    ner.add_label("officer_name")
+    ner.add_label("officer_sex")
+    ner.add_label("agency")
 
     optimizer = nlp.begin_training()
-    for itn in range(50):
+    for itn in range(500):
         random.shuffle(TRAINING_DATA)
         losses = {}
         for batch in spacy.util.minibatch(
-            TRAINING_DATA, size=compounding(5.0, 2.0, 1.001)
+            TRAINING_DATA, size=compounding(4.0, 32.0, 1.001)
         ):
             for text, annotations in batch:
                 doc = nlp.make_doc(text)
@@ -56,7 +53,6 @@ def train_spacy_model(df: pd.DataFrame, training_data: str) -> pd.DataFrame:
 
 def apply_spacy_model(df: pd.DataFrame, spacy_model: str) -> pd.DataFrame:
     nlp = spacy_model
-    ### train model
     entities = []
     for row in df["text"].apply(nlp):
         text = [text.text for text in row.ents]
