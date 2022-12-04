@@ -20,6 +20,7 @@ stages:
       - fuse/person.csv
     commonPrerequisites:
       - datavalid.yml
+  - name: analysis
 targets:
   - fuse/personnel.csv
   - fuse/allegation.csv
