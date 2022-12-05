@@ -383,3 +383,28 @@ def rearrange_citizen_columns(df):
         "citizens",
         df.sort_values(["agency"]),
     )
+
+
+def rearrange_coaccusal_columns(df):
+    """Performs final processing step for a coaccusal table
+
+    This performs the following tasks:
+    - discard columns not present in docs schema
+    - drop row duplicates
+    - convert numeric columns to int or str
+
+    Args:
+        df (pd.DataFrame):
+            the frame to process
+
+    Returns:
+        the updated frame
+    """
+    return datavalid_config.rearrange_columns(
+        "coaccusals",
+        df.sort_values(["agency"]),
+    )
+
+
+
+

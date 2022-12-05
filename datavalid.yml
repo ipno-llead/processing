@@ -27,6 +27,8 @@ files:
     schema: police_report
   data/fuse/citizens.csv:
     schema: citizens
+  data/analysis/coaccusals.csv:
+    schema: coaccusals
 
 schemas:
   personnel:
@@ -608,6 +610,18 @@ schemas:
       - name: offender_sex
       - name: offender_age
       - name: offender_status
+      - name: agency
+  coaccusals:
+    columns:
+      - name: tracking_id
+        description: >
+          unique identifier of complaint
+      - name: allegation_uid
+        description: >
+          unique identifier of allegation incident
+      - name: uid
+        description: >
+          unique identifier of person
       - name: agency
    
 save_bad_rows_to: data/invalid_rows.csv
