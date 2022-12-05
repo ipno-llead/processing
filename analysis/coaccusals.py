@@ -1,8 +1,8 @@
 import pandas as pd
 from datamatch import ThresholdMatcher, ColumnsIndex
-from pandas_dedupe import dedupe_dataframe
 import re
 from lib.rows import duplicate_row
+from lib.columns import rearrange_coaccusal_columns
 import deba
 
 
@@ -58,15 +58,16 @@ def reformat_clusters(df):
     )
     clusters = clusters.pipe(split_rows_with_multiple_uids)
 
-    df = df[["allegation_uid", "tracking_id", "uid"]]
+    df = df[["allegation_uid", "tracking_id", "uid", "agency"]]
 
     clusters = pd.merge(clusters, df, on=["uid", "tracking_id"])
     clusters = clusters.drop_duplicates(subset=["allegation_uid"])
-    return df
+    return df[~((df.tracking_id.fillna("") == ""))]
 
 
 if __name__ == "__main__":
     df = pd.read_csv(deba.data("fuse/allegation.csv"))
     gen_clusters = create_clusters(df)
     clusters = reformat_clusters(df)
-    clusters.to_csv(deba.data("analysis/coaccusals_allegation.csv"), index=False)
+    clusters = rearrange_coaccusal_columns(clusters)
+    clusters.to_csv(deba.data("analysis/coaccusals.csv"), index=False)

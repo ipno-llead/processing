@@ -28,3 +28,4 @@ targets:
   - fuse/stop_and_search.csv
   - fuse/appeals.csv
   - fuse/event.csv
+  - analysis/coaccusals.csv
