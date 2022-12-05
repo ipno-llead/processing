@@ -1178,12 +1178,6 @@ branch:
     file: data/fuse/pr_new_orleans_pd.csv
     primaryKey:
       - police_report_uid
-  coaccusals-allegation:
-    remote: origin
-    merge: refs/heads/coaccusals-allegation
-    file: data/analysis/coaccusals_allegation.csv
-    primaryKey:
-      - allegation_uid
   person:
     remote: origin
     merge: refs/heads/person
@@ -1262,6 +1256,12 @@ branch:
     file: data/fuse/citizens.csv
     primaryKey:
       - citizen_uid
+  coaccusals:
+    remote: origin
+    merge: refs/heads/coaccusals
+    file: data/analysis/coaccusals.csv
+    primaryKey:
+      - uid
 merge:
   fastForward: only
 pack:
