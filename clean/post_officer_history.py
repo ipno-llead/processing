@@ -137,6 +137,7 @@ def clean_agency_pre_split(df):
         .str.replace(r" Â«", " ", regex=True)
         .str.replace(r"~\-", "", regex=True)
         .str.replace(r"(\w+)  +(\w+)\/", r"\1 \2", regex=True)
+        .str.replace(r"-", "", regex=False)
     )
     return df[~((df.agency == ""))]
 
@@ -172,8 +173,10 @@ def split_agency(df):
     )
 
     agency = df.agency.str.extract(r"(.+) (\w+)\/(\w+)?")
-    df.loc[:, "agency"] = agency[0].str.lower().replace(r"(\w+)-(\w+)?.+", "", regex=True)\
-        .str.replace(r"( ?reserve| ?deceased| ?retired)", "", regex=True).str.replace(r"(\w+)\/(\w+)\/(\w+)", "", regex=True) 
+    df.loc[:, "agency"] = (agency[0].str.lower().replace(r"(\w+)-(\w+)?.+", "", regex=True)
+        .str.replace(r"( ?reserve| ?deceased| ?retired)", "", regex=True)
+        .str.replace(r"(\w+)\/(\w+)\/(\w+)", "", regex=True)
+    )
 
     emp_status = df.agency.str.lower().str.extract(
         r"( ?reserve ?| ?full-?time ?| ?part-?time ?| ?deceased ?| ?retired ?)"
@@ -199,8 +202,57 @@ def clean_left_reason(df):
 
 def clean_agency(df):
     df.loc[:, "agency"] = (
-        df.agency.str.strip().str.replace(r"(\w)\.(\w)\.", r"\1\2", regex=True).str.replace(r" parish ", " ", regex=False)\
-            .str.replace(r"univ\b", "university", regex=True).str.replace(r"(\w+) (\w+)", r"\1-\2", regex=True).str.replace(r"unknown", "", regex=True)
+        df.agency.str.strip()
+            .str.replace(r"(\/|\)|\||\\)", "", regex=True)
+            .str.replace(r"^(part|full).+", "", regex=True)
+            .str.replace(r"-", "", regex=False)
+            .str.replace(r"unknown", "", regex=False)
+            .str.replace(r" ([pf]ull|part).+", "", regex=True)
+            .str.replace(r"(p[pd]|nsu|so|police|eastern) (.+)", r"pd", regex=True)
+            .str.replace(r"^e\b", "east", regex=True)
+            .str.replace(r"^w\b", "west", regex=True)
+            .str.replace(r"(\w+) c[ec]", r"\1cc", regex=True)
+            .str.replace(r" pari(sti|sh)", "", regex=True)
+            .str.replace(r"stmartinso", "st martin so", regex=False)
+            .str.replace(r"sttamimany", "sttammany", regex=False)
+            .str.replace(r"join", "john", regex=False)
+            .str.replace(r"outsta[tr]e", "out of state")
+            .str.replace(r"jbfferson", "jefferson", regex=False)
+            .str.replace(r"bossiercc", "univ pdbossiercc")
+            .str.replace(r"ccnter", "center", regex=False)
+            .str.replace(r"correctionalcenter", "correctional center", regex=False)
+            .str.replace(r"(.+)?(academy|fire)(.+)?", "", regex=True)
+            .str.replace(r" o$", " so", regex=True)
+            .str.replace(r"police", "pd", regex=False)
+            .str.replace(r"^(univ pd)$", "", regex=True)
+            .str.replace(r" (pb|po)$", " pd", regex=True)
+            .str.replace(r"univ pd(\w+)", r"\1 univ pd", regex=True)
+            .str.replace(r"(\w+)cc\b", "community college", regex=False)
+            .str.replace(r"servicesbr", "services bureau", regex=False)
+            # .str.replace(r"la ?state police", "la state pd", regex=True)
+            # .str.replace(r"pb", "pd", regex=False)
+            # .str.replace(r"madi-sonville", "madisonville", regex=False)
+            # .str.replace(r"fol-som", "folsom", regex=False)
+            # .str.replace(r"jeffer-son", "jefferson", regex=False)
+            # .str.replace(r"du-son", "duson", regex=False)
+            # .str.replace(r"madi-son", "madison", regex=False)
+            # .str.replace(r"dod\-son", "dodson", regex=True)
+            # .str.replace(r"jack-son", "jackson", regex=False)
+            # .str.replace(r"w\b", "west", regex=True)
+            # .str.replace(r"e\b", "east", regex=True)
+            # .str.replace(r"^st(\w+)", r"st-\1", regex=True)
+            # .str.replace(r"east-(so|pd)", r"e-\1", regex=True)
+            # .str.replace(r"st-ateparks", "state-parks", regex=False)
+            # .str.replace(r" [pf]ull.+", "", regex=True)
+            # .str.replace(r"orleans-so", "new-orleans-so", regex=False)
+            # .str.replace(r"(\w)\.(\w)\.", r"\1\2", regex=True)
+            # .str.replace(r" parish ", " ", regex=False)
+            # .str.replace(r"unknown", "", regex=True)\
+            # .str.replace(r"housing-authorityno", "housing-authority-of-new-orleans", regex=False)
+            # .str.replace(r" (\w+)(200[56])", "", regex=True)
+            # .str.replace(r"(\w+)so", r"\1-so", regex=True)
+            # .str.replace(r"univ pd(\w+)", r"\1-university-pd", regex=True)
+            # .str.replace(r"(\w+) (\w+)", r"\1-\2", regex=True)
             
     )
     return df[~((df.agency.fillna("") ==  ""))]
