@@ -437,7 +437,7 @@ def clean():
 
 if __name__ == "__main__":
     df, citizen_df = clean()
-    df.to_csv(deba.data("clean/sas_new_orleans_pd_2017_2021.csv"), index=False)
+    df.to_csv(deba.data("clean/sas_new_orleans_pd_2010_2021.csv"), index=False)
     citizen_df.to_csv(
-        deba.data("clean/sas_cit_new_orleans_pd_2017_2021.csv"), index=False
+        deba.data("clean/sas_cit_new_orleans_pd_2010_2021.csv"), index=False
     )
