@@ -18,7 +18,7 @@ from lib.post import load_for_agency
 
 
 def fuse_events(
-    pprr, pprr_csd, cprr, uof, award, lprr, pclaims20, pclaims21, pprr_separations, pr
+    pprr, pprr_csd, cprr, uof, award, lprr, pclaims20, pclaims21, pprr_separations
 ):
     builder = events.Builder()
     builder.extract_events(
@@ -261,22 +261,6 @@ def fuse_events(
         },
         ["uid", "separation_uid"],
     )
-    builder.extract_events(
-        pr,
-        {
-            events.POLICE_REPORT_INCIDENT_DATE: {
-                "prefix": "occurred",
-                "parse_date": True,
-                "keep": [
-                    "police_report_uid",
-                    "uid",
-                    "item_number",
-                    "agency",
-                ],
-            },
-        },
-        ["uid", "police_report_uid"],
-    )
     return builder.to_frame()
 
 
@@ -322,7 +306,6 @@ if __name__ == "__main__":
         cprr,
         pib,
         post,
-        pr,
     )
     events_df = fuse_events(
         pprr,
@@ -334,7 +317,6 @@ if __name__ == "__main__":
         pclaims20,
         pclaims21,
         pprr_separations,
-        pr,
     )
     events_df = rearrange_event_columns(
         pd.concat([post_event, events_df])
