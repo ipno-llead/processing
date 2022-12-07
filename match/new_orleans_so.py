@@ -138,13 +138,13 @@ def assign_uid_20_from_pprr(cprr, pprr):
 
 def assign_supervisor_19_uid_from_pprr(cprr, pprr):
     dfa = cprr.loc[
-        cprr.supervisor_first_name.notna(),
-        ["supervisor_first_name", "supervisor_last_name"],
+        cprr.investigating_supervisor_first_name.notna(),
+        ["investigating_supervisor_first_name", "investigating_supervisor_last_name"],
     ].drop_duplicates()
     dfa = dfa.rename(
         columns={
-            "supervisor_first_name": "first_name",
-            "supervisor_last_name": "last_name",
+            "investigating_supervisor_first_name": "first_name",
+            "investigating_supervisor_last_name": "last_name",
         }
     )
     dfa.loc[:, "fc"] = dfa.first_name.map(lambda x: x[:1])
@@ -173,19 +173,19 @@ def assign_supervisor_19_uid_from_pprr(cprr, pprr):
     matches = matcher.get_index_pairs_within_thresholds(decision)
     match_dict = dict(matches)
 
-    cprr.loc[:, "supervisor_uid"] = cprr.index.map(lambda x: match_dict.get(x, ""))
+    cprr.loc[:, "investigating_supervisor_uid"] = cprr.index.map(lambda x: match_dict.get(x, ""))
     return cprr
 
 
 def assign_supervisor_20_uid_from_pprr(cprr, pprr):
     dfa = cprr.loc[
-        cprr.supervisor_first_name.notna(),
-        ["supervisor_first_name", "supervisor_last_name"],
+        cprr.investigating_supervisor_first_name.notna(),
+        ["investigating_supervisor_first_name", "investigating_supervisor_last_name"],
     ].drop_duplicates()
     dfa = dfa.rename(
         columns={
-            "supervisor_first_name": "first_name",
-            "supervisor_last_name": "last_name",
+            "investigating_supervisor_first_name": "first_name",
+            "investigating_supervisor_last_name": "last_name",
         }
     )
     dfa.loc[:, "fc"] = dfa.first_name.map(lambda x: x[:1])
@@ -214,7 +214,7 @@ def assign_supervisor_20_uid_from_pprr(cprr, pprr):
     matches = matcher.get_index_pairs_within_thresholds(decision)
     match_dict = dict(matches)
 
-    cprr.loc[:, "supervisor_uid"] = cprr.index.map(lambda x: match_dict.get(x, ""))
+    cprr.loc[:, "investigating_supervisor_uid"] = cprr.index.map(lambda x: match_dict.get(x, ""))
     return cprr
 
 
