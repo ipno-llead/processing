@@ -15,11 +15,15 @@ def fuse_events(cprr21, cprr18, post):
                 "prefix": "investigation_complete",
                 "keep": ["uid", "agency", "allegation_uid"],
             },
+            events.COMPLAINT_RECEIVE: {
+                "prefix": "receive",
+                "keep": ["uid", "agency", "allegation_uid"],
+            },
         },
         ["uid", "allegation_uid"],
     )
     builder.extract_events(
-        cprr21,
+        cprr18,
         {
             events.INVESTIGATION_COMPLETE: {
                 "prefix": "investigation_complete",
