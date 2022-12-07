@@ -359,6 +359,7 @@ def clean():
                 "vehicle_style",
                 "vehicle_color",
                 "citizen_hair_color",
+                "item_number",
             ],
         )
         .pipe(
