@@ -1,15 +1,45 @@
 import pandas as pd
 import deba
-from lib.columns import clean_column_names
-from lib.clean import standardize_desc_cols
+from lib.columns import clean_column_names, set_values
+from lib.clean import standardize_desc_cols, clean_names
 from lib.uid import gen_uid
 
+def clean_agency(df):
+    df.loc[:, "agency"] = df.agency.str.replace(r"orleans-so", "new-orleans-so", regex=False)
+    return df 
+
+
 def clean():
-    df = (pd.read_csv(deba.data("raw/morehouse_da/morehouse_da_brady_2017_2022.csv"))
-        .pipe(clean_column_names)\
+    df = (
+        pd.read_csv(deba.data("raw/morehouse_da/morehouse_da_brady_2017_2022.csv"))
+        .pipe(clean_column_names)
         .rename(columns={"tracking_id": "tracking_id_og"})
         .pipe(standardize_desc_cols, ["tracking_id_og"])
+        .pipe(clean_agency)
+        .pipe(clean_names, ["first_name", "middle_name", "last_name"])
+        .pipe(
+            set_values,
+            {"source_agency": "morehouse-da", "brady_list_date": "12/1/2022"},
+        )
         .pipe(gen_uid, ["tracking_id_og", "agency"], "tracking_id")
+        .pipe(gen_uid, ["first_name", "last_name", "agency"])
+        .pipe(
+            gen_uid,
+            [
+                "uid",
+                "source_agency",
+                "allegation",
+                "initial_allegation",
+                "action",
+                "tracking_id",
+            ],
+            "brady_uid",
+        )
     )
 
     return df
+
+
+if __name__ == "__main__":
+    df = clean()
+    df.to_csv(deba.data("clean/brady_morehouse_da_2022.csv"), index=False)
