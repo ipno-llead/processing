@@ -1,0 +1,6 @@
+wdir: data
+outs:
+- md5: f4a64851f5a4dc34a840b201921664fb.dir
+  size: 151029167
+  nfiles: 199
+  path: raw_nopd_appeals

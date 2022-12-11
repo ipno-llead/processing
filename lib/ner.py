@@ -8,7 +8,19 @@ import deba
 
 
 def train_spacy_model(df: pd.DataFrame, training_data: str) -> pd.DataFrame:
-    ###  import labeled_data that has been exported from doccano
+    """Trains a Spacy model on training data downloaded from Doccano
+    This performs the following tasks:
+    - discard columns not present in docs schema
+
+    Args:
+        df (pd.DataFrame):
+            the frame to process
+        training_data (str):
+            the data that model will be trained on
+
+    Returns:
+        Spacy model
+    """
 
     labeled_data = []
     with open(
@@ -19,24 +31,35 @@ def train_spacy_model(df: pd.DataFrame, training_data: str) -> pd.DataFrame:
             data = json.loads(line)
             labeled_data.append(data)
 
+            
     TRAINING_DATA = []
     for entry in labeled_data:
         entities = []
-        for e in entry["label"]:
-            entities.append((e[0], e[1], e[2]))
+        for e in entry["entities"]:
+            k, v = list(zip(*e.items()))
+            id, label, start, end = v
+            ents = start, end, label
+            entities.append(ents)
         spacy_entry = (entry["text"], {"entities": entities})
         TRAINING_DATA.append(spacy_entry)
+
+    # TRAINING_DATA = []
+    # for entry in labeled_data:
+    #     entities = []
+    #     for e in entry["text"]:
+    #         entities.append((e[0], e[1], e[2]))
+    #     spacy_entry = (entry["text"], {"entities": entities})
+    #     TRAINING_DATA.append(spacy_entry)
 
     ### train model
     nlp = spacy.blank("en")
     ner = nlp.create_pipe("ner")
     nlp.add_pipe("ner")
-    ner.add_label("report_subject")
-    ner.add_label("tracking_id")
-    ner.add_label("allegation")
-    ner.add_label("previous_discipline")
-    ner.add_label("report_date")
     ner.add_label("accused_name")
+    ner.add_label("appeal_hearing_date")
+    ner.add_label("appeal_hearing_disposition")
+    ner.add_label("docket_number")
+    ner.add_label("appeal_filed_date")
 
     optimizer = nlp.begin_training()
     for itn in range(50):
