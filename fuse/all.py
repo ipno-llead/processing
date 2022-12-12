@@ -83,6 +83,9 @@ def fuse_personnel():
                 pd.read_csv(deba.data("fuse/per_natchitoches_so.csv")),
                 pd.read_csv(deba.data("fuse/per_harahan_pd.csv")),
                 pd.read_csv(deba.data("fuse/per_morehouse_so.csv")),
+                pd.read_csv(deba.data("fuse/per_iberia_so.csv")),
+                pd.read_csv(deba.data("fuse/per_lockport_pd.csv")),
+                pd.read_csv(deba.data("fuse/per_jefferson_davis_so.csv")),
             ]
         )
     ).sort_values("uid", ignore_index=True)
@@ -154,6 +157,10 @@ def fuse_event():
                 pd.read_csv(deba.data("fuse/event_ouachita_da.csv")),
                 pd.read_csv(deba.data("fuse/event_baton_rouge_da.csv")),
                 pd.read_csv(deba.data("fuse/event_morehouse_so.csv")),
+                pd.read_csv(deba.data("fuse/event_iberia_so.csv")),
+                pd.read_csv(deba.data("fuse/event_lockport_pd.csv")),
+                pd.read_csv(deba.data("fuse/event_jefferson_davis_so.csv")),
+                pd.read_csv(deba.data("fuse/event_morehouse_da.csv")),
             ]
         )
     ).sort_values(["agency", "event_uid"], ignore_index=True)
@@ -209,6 +216,9 @@ def fuse_allegation():
                 pd.read_csv(deba.data("fuse/com_natchitoches_so.csv")),
                 pd.read_csv(deba.data("fuse/com_louisiana_state_pd.csv")),
                 pd.read_csv(deba.data("fuse/com_morehouse_so.csv")),
+                pd.read_csv(deba.data("fuse/com_iberia_so.csv")),
+                pd.read_csv(deba.data("fuse/com_lockport_pd.csv")),
+                pd.read_csv(deba.data("fuse/com_jefferson_davis_so.csv")),
             ]
         )
     ).sort_values(["agency", "tracking_id"], ignore_index=True)
@@ -280,6 +290,8 @@ def fuse_brady():
                 pd.read_csv(deba.data("fuse/brady_ouachita_da.csv")),
                 pd.read_csv(deba.data("fuse/brady_iberia_da.csv")),
                 pd.read_csv(deba.data("fuse/brady_tangipahoa_da.csv")),
+                pd.read_csv(deba.data("fuse/brady_morehouse_da.csv")),
+
             ]
         )
     ).sort_values("brady_uid", ignore_index=True)

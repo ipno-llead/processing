@@ -87,9 +87,11 @@ def clean_pprr():
 
 def clean_tracking_id(df):
     df.loc[:, "tracking_id"] = (
-        df.tracking_id.str.strip()
+        df.tracking_id.str.lower()
+        .str.strip()
         .str.replace(" ", "", regex=False)
         .str.replace(r"(\w+)(\d+)", r"\1 \2", regex=True)
+        .str.replace(r"\s+", "", regex=True)
     )
     return df[df.tracking_id != "\x1a"].reset_index(drop=True)
 
@@ -358,7 +360,7 @@ def drop_rows_missing_names(df):
 
 def create_tracking_id_og_col(df):
     df.loc[:, "tracking_id_og"] = df.tracking_id
-    return df 
+    return df
 
 
 def clean_cprr_20():
@@ -535,8 +537,8 @@ def clean_tracking_id_14(df):
         df.cc_number.str.lower()
         .str.strip()
         .str.replace(r"^-", "", regex=True)
-        .str.replace(r"^(ad)(\d+)-", r"\1 \2-", regex=True)
         .str.replace(r"sl(\d{2})", r"sl \1", regex=True)
+        .str.replace(r"\s+", "", regex=True)
     )
     return df.drop(columns="cc_number")
 

@@ -18,7 +18,7 @@ from lib.post import load_for_agency
 
 
 def fuse_events(
-    pprr, pprr_csd, cprr, uof, award, lprr, pclaims20, pclaims21, pprr_separations, pr
+    pprr, pprr_csd, cprr, uof, award, lprr, pclaims20, pclaims21, pprr_separations
 ):
     builder = events.Builder()
     builder.extract_events(
@@ -261,22 +261,6 @@ def fuse_events(
         },
         ["uid", "separation_uid"],
     )
-    builder.extract_events(
-        pr,
-        {
-            events.POLICE_REPORT_INCIDENT_DATE: {
-                "prefix": "occurred",
-                "parse_date": True,
-                "keep": [
-                    "police_report_uid",
-                    "uid",
-                    "item_number",
-                    "agency",
-                ],
-            },
-        },
-        ["uid", "police_report_uid"],
-    )
     return builder.to_frame()
 
 
@@ -292,7 +276,7 @@ if __name__ == "__main__":
     post_event = pd.read_csv(deba.data("match/post_event_new_orleans_pd.csv"))
     award = pd.read_csv(deba.data("match/award_new_orleans_pd_2016_2021.csv"))
     lprr = pd.read_csv(deba.data("match/lprr_new_orleans_csc_2000_2016.csv"))
-    sas = pd.read_csv(deba.data("match/sas_new_orleans_pd_2017_2021.csv"))
+    sas = pd.read_csv(deba.data("match/sas_new_orleans_pd_2010_2021.csv"))
     pclaims20 = pd.read_csv(deba.data("match/pclaims_new_orleans_pd_2020.csv"))
     pclaims21 = pd.read_csv(deba.data("match/pclaims_new_orleans_pd_2021.csv"))
     pprr_separations = pd.read_csv(
@@ -309,7 +293,7 @@ if __name__ == "__main__":
     cprr_citizens = pd.read_csv(
         deba.data("clean/cprr_cit_new_orleans_da_2016_2020.csv")
     )
-    sas_citizens = pd.read_csv(deba.data("clean/sas_cit_new_orleans_pd_2017_2021.csv"))
+    sas_citizens = pd.read_csv(deba.data("clean/sas_cit_new_orleans_pd_2010_2021.csv"))
     pr_citizens = pd.read_csv(deba.data("clean/pr_cit_new_orleans_pd_2010_2022.csv"))
     personnel = fuse_personnel(
         pprr,
@@ -322,7 +306,6 @@ if __name__ == "__main__":
         cprr,
         pib,
         post,
-        pr,
     )
     events_df = fuse_events(
         pprr,
@@ -334,7 +317,6 @@ if __name__ == "__main__":
         pclaims20,
         pclaims21,
         pprr_separations,
-        pr,
     )
     events_df = rearrange_event_columns(
         pd.concat([post_event, events_df])

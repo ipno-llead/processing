@@ -294,10 +294,32 @@ branch:
     remote: origin
     merge: refs/heads/com-louisiana-state-pd
     file: data/fuse/com_louisiana_state_pd.csv
+    primaryKey:
+      - allegation_uid
   com-morehouse-so:
     remote: origin
     merge: refs/heads/com-morehouse-so
     file: data/fuse/com_morehouse_so.csv
+    primaryKey:
+      - allegation_uid
+  com-iberia-so:
+    remote: origin
+    merge: refs/heads/com-iberia-so
+    file: data/fuse/com_iberia_so.csv
+    primaryKey:
+      - allegation_uid
+  com-lockport-pd:
+    remote: origin
+    merge: refs/heads/com-lockport-pd
+    file: data/fuse/com_lockport_pd.csv
+    primaryKey:
+      - allegation_uid
+  com-jefferson-davis-so:
+    remote: origin
+    merge: refs/heads/com-jefferson-davis-so
+    file: data/fuse/com_jefferson_davis_so.csv
+    primaryKey:
+      - allegation_uid
   event:
     remote: origin
     merge: refs/heads/event
@@ -667,7 +689,25 @@ branch:
   event-morehouse-so:
     remote: origin
     merge: refs/heads/event-morehouse-so
-    file: data/fuse/event_.csv
+    file: data/fuse/event_morehouse_so.csv
+    primaryKey:
+      - event_uid
+  event-iberia-so:
+    remote: origin
+    merge: refs/heads/event-iberia-so
+    file: data/fuse/event_iberia_so.csv
+    primaryKey:
+      - event_uid
+  event-lockport-pd:
+    remote: origin
+    merge: refs/heads/event-lockport-pd
+    file: data/fuse/event_lockport_pd.csv
+    primaryKey:
+      - event_uid
+  event-jefferson-davis-so:
+    remote: origin
+    merge: refs/heads/event-jefferson-davis-so
+    file: data/fuse/event_jefferson_davis_so.csv
     primaryKey:
       - event_uid
   per-abbeville-pd:
@@ -988,6 +1028,12 @@ branch:
     file: data/fuse/brady_tangipahoa_da.csv
     primaryKey:
       - brady_uid
+  brady-morehouse-da:
+    remote: origin
+    merge: refs/heads/brady-morehouse-da
+    file: data/fuse/brady_morehouse_da.csv
+    primaryKey:
+      - brady_uid
   per-eunice-pd:
     remote: origin
     merge: refs/heads/per-eunice-pd
@@ -1070,6 +1116,24 @@ branch:
     remote: origin
     merge: refs/heads/per-morehouse-so
     file: data/fuse/per_morehouse_so.csv
+    primaryKey:
+      - uid
+  per-iberia-so:
+    remote: origin
+    merge: refs/heads/per-iberia-so
+    file: data/fuse/per_iberia_so.csv
+    primaryKey:
+      - uid
+  per-lockport-pd:
+    remote: origin
+    merge: refs/heads/per-lockport-pd
+    file: data/fuse/per_lockport_pd.csv
+    primaryKey:
+      - uid
+  per-jefferson-davis-so:
+    remote: origin
+    merge: refs/heads/per-jefferson-davis-so
+    file: data/fuse/per_jefferson_davis_so.csv
     primaryKey:
       - uid
   uof-new-orleans-pd:
@@ -1198,6 +1262,12 @@ branch:
     file: data/fuse/citizens.csv
     primaryKey:
       - citizen_uid
+  coaccusals:
+    remote: origin
+    merge: refs/heads/coaccusals
+    file: data/analysis/coaccusals.csv
+    primaryKey:
+      - uid
 merge:
   fastForward: only
 pack:
