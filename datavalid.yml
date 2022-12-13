@@ -464,14 +464,19 @@ schemas:
           unique brady uid
       - name: uid
       - name: allegation
+      - name: initial_allegation
       - name: initial_disposition
       - name: disposition
       - name: action
       - name: allegation_desc
       - name: court_location
-      - name: agency
+      - name: charge_location
+      - name: indicted_by
+      - name: tracking_id
+      - name: tracking_id_og
       - name: source_agency
       - name: charging_agency
+      - name: agency
   award:
     columns:
       - name: award_uid

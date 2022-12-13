@@ -511,4 +511,4 @@ if __name__ == "__main__":
     pib.to_csv(
         deba.data("match/cprr_new_orleans_pib_reports_2014_2020.csv"), index=False
     )
-    pr.to_csv(deba.data("match/pr_new_orleans_pd_2010_2022.csv"), index=False)
+    pr.to_csv(deba.data("match/pr_new_orleans_pd_2010_2022.csv"))
