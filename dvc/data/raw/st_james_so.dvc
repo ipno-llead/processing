@@ -1,6 +1,6 @@
 wdir: ../../../data/raw
 outs:
-- md5: 944310c29f5bdcaa325625cec4bb9f01.dir
-  size: 1030
-  nfiles: 1
+- md5: b867d39741509ea2b3a1b0eb62e3043f.dir
+  size: 2060
+  nfiles: 2
   path: st_james_so

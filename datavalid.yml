@@ -27,6 +27,8 @@ files:
     schema: police_report
   data/fuse/citizens.csv:
     schema: citizens
+  data/analysis/coaccusals.csv:
+    schema: coaccusals
 
 schemas:
   personnel:
@@ -462,14 +464,19 @@ schemas:
           unique brady uid
       - name: uid
       - name: allegation
+      - name: initial_allegation
       - name: initial_disposition
       - name: disposition
       - name: action
       - name: allegation_desc
       - name: court_location
-      - name: agency
+      - name: charge_location
+      - name: indicted_by
+      - name: tracking_id
+      - name: tracking_id_og
       - name: source_agency
       - name: charging_agency
+      - name: agency
   award:
     columns:
       - name: award_uid
@@ -608,6 +615,18 @@ schemas:
       - name: offender_sex
       - name: offender_age
       - name: offender_status
+      - name: agency
+  coaccusals:
+    columns:
+      - name: tracking_id
+        description: >
+          unique identifier of complaint
+      - name: allegation_uid
+        description: >
+          unique identifier of allegation incident
+      - name: uid
+        description: >
+          unique identifier of person
       - name: agency
    
 save_bad_rows_to: data/invalid_rows.csv
