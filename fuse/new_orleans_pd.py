@@ -9,7 +9,7 @@ from lib.columns import (
     rearrange_property_claims_columns,
     rearrange_settlement_columns,
     rearrange_police_report_columns,
-    rearrange_citizen_columns,
+    rearrange_docs_columns
 )
 from lib.clean import float_to_int_str
 from lib.personnel import fuse_personnel
@@ -18,7 +18,16 @@ from lib.post import load_for_agency
 
 
 def fuse_events(
-    pprr, pprr_csd, cprr, uof, award, lprr, pclaims20, pclaims21, pprr_separations
+    pprr,
+    pprr_csd,
+    cprr,
+    uof,
+    award,
+    lprr,
+    pclaims20,
+    pclaims21,
+    pprr_separations,
+    app_transcripts,
 ):
     builder = events.Builder()
     builder.extract_events(
@@ -261,6 +270,22 @@ def fuse_events(
         },
         ["uid", "separation_uid"],
     )
+    builder.extract_events(
+        app_transcripts,
+        {
+            events.APPEAL_HEARING: {
+                "prefix": "appeal_hearing",
+                "parse_date": True,
+                "keep": ["uid", "agency", "appeal_uid"],
+            },
+            events.APPEAL_CLOSED: {
+                "prefix": "appeal_closed",
+                "parse_date": True,
+                "keep": ["uid", "agency", "appeal_uid"],
+            },
+        },
+        ["uid", "appeal_uid"],
+    )
     return builder.to_frame()
 
 
@@ -295,6 +320,7 @@ if __name__ == "__main__":
     )
     sas_citizens = pd.read_csv(deba.data("clean/sas_cit_new_orleans_pd_2010_2021.csv"))
     pr_citizens = pd.read_csv(deba.data("clean/pr_cit_new_orleans_pd_2010_2022.csv"))
+    app_transcripts = pd.read_csv(deba.data("match/app_new_orleans_pd.csv"))
     personnel = fuse_personnel(
         pprr,
         lprr,
@@ -306,6 +332,7 @@ if __name__ == "__main__":
         cprr,
         pib,
         post,
+        app_transcripts,
     )
     events_df = fuse_events(
         pprr,
@@ -317,26 +344,31 @@ if __name__ == "__main__":
         pclaims20,
         pclaims21,
         pprr_separations,
+        app_transcripts,
     )
     events_df = rearrange_event_columns(
         pd.concat([post_event, events_df])
     ).drop_duplicates(subset=["event_uid"], keep="first")
     sas_df = rearrange_stop_and_search_columns(sas)
-    lprr_df = rearrange_appeal_hearing_columns(lprr)
+    appeal_df = rearrange_appeal_hearing_columns(pd.concat([lprr, app_transcripts], axis=0))
     uof_df = rearrange_use_of_force(uof)
     pclaims_df = rearrange_property_claims_columns(pd.concat([pclaims20, pclaims21]))
-    com = pd.concat([cprr, pib], axis=0).drop_duplicates(subset=["allegation_uid"], keep="last")
+    com = pd.concat([cprr, pib], axis=0).drop_duplicates(
+        subset=["allegation_uid"], keep="last"
+    )
     com = rearrange_allegation_columns(com)
     settlements = rearrange_settlement_columns(nopd_settlements)
     pr = rearrange_police_report_columns(pr)
-    citizen_df =  pd.concat([cprr_citizens, uof_citizen, sas_citizens])
+    docs = rearrange_docs_columns(app_transcripts)
+    citizen_df = pd.concat([cprr_citizens, uof_citizen, sas_citizens])
     com.to_csv(deba.data("fuse/com_new_orleans_pd.csv"), index=False)
     personnel.to_csv(deba.data("fuse/per_new_orleans_pd.csv"), index=False)
     events_df.to_csv(deba.data("fuse/event_new_orleans_pd.csv"), index=False)
-    lprr_df.to_csv(deba.data("fuse/app_new_orleans_csc.csv"), index=False)
+    appeal_df.to_csv(deba.data("fuse/app_new_orleans_csc.csv"), index=False)
     sas_df.to_csv(deba.data("fuse/sas_new_orleans_pd.csv"), index=False)
     uof_df.to_csv(deba.data("fuse/uof_new_orleans_pd.csv"), index=False)
     pclaims_df.to_csv(deba.data("fuse/pclaims_new_orleans_pd.csv"), index=False)
     settlements.to_csv(deba.data("fuse/settlements_new_orleans_pd.csv"), index=False)
     citizen_df.to_csv(deba.data("fuse/cit_new_orleans_pd.csv"), index=False)
     pr.to_csv(deba.data("fuse/pr_new_orleans_pd.csv"), index=False)
+    docs.to_csv(deba.data("fuse/docs_new_orleans_pd.csv"), index=False)

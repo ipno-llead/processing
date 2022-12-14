@@ -209,6 +209,7 @@ schemas:
           - appeal_receive
           - appeal_render
           - appeal_disposition
+          - appeal_closed
           - uof_occur
           - uof_receive
           - uof_assigned
@@ -404,7 +405,6 @@ schemas:
       - name: charging_supervisor
       - name: appeal_disposition
       - name: action_appealed
-      - name: appeal_hearing_year
       - name: appealed
       - name: agency
       - name: motions
@@ -543,18 +543,27 @@ schemas:
       - name: docid
         description: >
           unique identifier of doc generated at meta stage
-      - name: text
+      - name: hrg_text
       - name: title
-      - name: doc_year
-      - name: doc_month
-      - name: doc_day
+      - name: year
+      - name: month
+      - name: day
       - name: pdf_db_content_hash
       - name: pdf_db_path
       - name: pdf_db_id
+      - name: page_count
+      - name: accused
       - name: agency
+      - name: uid
       - name: matched_uid
         description: >
           uid of officer matched to the doc
+      - name: txt_db_path
+      - name: txt_db_id
+      - name: txt_db_content_hash
+      - name: hrg_type
+      - name: dt_source
+      - name: hrg_no
   police_report:
     columns:
       - name: police_report_uid

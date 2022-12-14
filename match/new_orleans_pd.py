@@ -237,7 +237,7 @@ def match_use_of_force_to_pprr(uof, pprr):
         dfb,
         show_progress=True,
     )
-    decision = .935
+    decision = 0.935
 
     matcher.save_pairs_to_excel(
         deba.data("match/uof_new_orleans_pd_2016_2021_v_pprr_new_orleans_pd_2020.xlsx"),
@@ -464,6 +464,38 @@ def deduplicate_pr_officers(pr):
     return canonicalize_officers(pr, clusters)
 
 
+def match_app_transripts_to_pprr(app, pprr):
+    dfa = app[["uid", "first_name", "last_name"]]
+    dfa.loc[:, "fc"] = dfa.first_name.fillna("").map(lambda x: x[:1])
+    dfa = dfa.drop_duplicates(subset=["uid"]).set_index("uid")
+
+    dfb = pprr[["uid", "first_name", "last_name"]]
+    dfb.loc[:, "fc"] = dfb.first_name.fillna("").map(lambda x: x[:1])
+    dfb = dfb.drop_duplicates(subset=["uid"]).set_index("uid")
+
+    matcher = ThresholdMatcher(
+        ColumnsIndex(["fc"]),
+        {
+            "first_name": JaroWinklerSimilarity(),
+            "last_name": JaroWinklerSimilarity(),
+        },
+        dfa,
+        dfb,
+        show_progress=True,
+    )
+    decision = 0.969
+
+    matcher.save_pairs_to_excel(
+        deba.data("match/appeal_transcripts_v_pprr_new_orleans_pd_2020.xlsx"),
+        decision,
+    )
+    matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
+    match_dict = dict(matches)
+
+    app.loc[:, "uid"] = app.uid.map(lambda x: match_dict.get(x, x))
+    return app
+
+
 if __name__ == "__main__":
     pprr = pd.read_csv(deba.data("clean/pprr_new_orleans_pd_2020.csv"))
     pprr_csd = pd.read_csv(deba.data("clean/pprr_new_orleans_csd_2014.csv"))
@@ -476,6 +508,7 @@ if __name__ == "__main__":
     sas = pd.read_csv(deba.data("clean/sas_new_orleans_pd_2010_2021.csv"))
     uof = pd.read_csv(deba.data("clean/uof_new_orleans_pd_2016_2021.csv"))
     cprr = pd.read_csv(deba.data("clean/cprr_new_orleans_da_2016_2020.csv"))
+    app_transcripts = pd.read_csv(deba.data("clean/app_new_orleans_pd.csv"))
     pprr_separations = pd.read_csv(
         deba.data("clean/pprr_seps_new_orleans_pd_2018_2022.csv")
     )
@@ -494,6 +527,7 @@ if __name__ == "__main__":
     pclaims21 = match_pclaims21_to_pprr(pclaims21, pprr)
     pprr_separations = match_pprr_separations_to_pprr(pprr_separations, pprr)
     cprr = match_cprr_to_pprr(cprr, pprr)
+    app_transcripts = match_app_transripts_to_pprr(app_transcripts, pprr)
     award.to_csv(deba.data("match/award_new_orleans_pd_2016_2021.csv"), index=False)
     event_df.to_csv(deba.data("match/post_event_new_orleans_pd.csv"), index=False)
     lprr.to_csv(deba.data("match/lprr_new_orleans_csc_2000_2016.csv"), index=False)
@@ -512,3 +546,4 @@ if __name__ == "__main__":
         deba.data("match/cprr_new_orleans_pib_reports_2014_2020.csv"), index=False
     )
     pr.to_csv(deba.data("match/pr_new_orleans_pd_2010_2022.csv"))
+    app_transcripts.to_csv(deba.data("match/app_new_orleans_pd.csv"))

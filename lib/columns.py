@@ -339,7 +339,7 @@ def rearrange_docs_columns(df):
     """
     return datavalid_config.rearrange_columns(
         "docs",
-        df.sort_values(["agency", "docid"]),
+        df.sort_values(["agency"]),
     ).pipe(names_to_title_case, ["title"])
 
 

@@ -19,13 +19,12 @@ def training_data():
 if __name__ == "__main__":
     read_training_data = training_data()
     pdfs = read_pdfs()
-    ner = train_spacy_model(pdfs, read_training_data)
-    model = ner.to_disk(
-        deba.data("raw/new_orleans_pd/model/new_orleans_pd_appeals_v2.model")
-    )
-
-    # load_model = spacy.load(
-    #     deba.data("raw/new_orleans_pd/model/nopd_pib_reports.model")
+    # ner = train_spacy_model(pdfs, read_training_data)
+    # model = ner.to_disk(
+    #     deba.data("raw/new_orleans_pd/model/new_orleans_pd_appeals_v2.model")
     # )
-    ner = apply_spacy_model(pdfs, ner)
+    load_model = spacy.load(
+        deba.data("raw/new_orleans_pd/model/new_orleans_pd_appeals.model")
+    )
+    ner = apply_spacy_model(pdfs, load_model)
     ner.to_csv(deba.data("ner/new_orleans_pd_appeals_pdfs.csv"), index=False)

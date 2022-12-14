@@ -46,6 +46,7 @@ APPEAL_HEARING = "appeal_hearing"
 APPEAL_HEARING_2 = "appeal_hearing_2"
 APPEAL_RECEIVE = "appeal_receive"
 APPEAL_DISPOSITION = "appeal_disposition"
+APPEAL_CLOSED = "appeal_closed"
 
 UOF_INCIDENT = "uof_occur"
 UOF_RECEIVE = "uof_receive"
@@ -111,6 +112,7 @@ event_cat_type = CategoricalDtype(
         BRADY_LIST,
         BOARD_HEARING,
         POLICE_REPORT_INCIDENT_DATE,
+        APPEAL_CLOSED,
     ],
     ordered=True,
 )

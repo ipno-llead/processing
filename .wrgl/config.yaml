@@ -1244,10 +1244,10 @@ branch:
     file: data/fuse/settlements.csv
     primaryKey:
       - settlement_uid
-  docs:
+  documents:
     remote: origin
-    merge: refs/heads/docs
-    file: data/fuse/docs.csv
+    merge: refs/heads/documents
+    file: data/fuse/documents.csv
     primaryKey:
       - docid
   police-report:
