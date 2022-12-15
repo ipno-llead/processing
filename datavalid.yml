@@ -528,6 +528,7 @@ schemas:
       - name: settlement_uid
         description: >
           unique identifier of case
+      - name: uid
       - name: case_number
       - name: case_name
       - name: case_disposition
