@@ -1,6 +1,6 @@
 remote:
   origin:
-    url: https://hub.wrgl.co/api/users/ipno/repos/data
+    url: https://wrgl.llead.co
     fetch:
       - +refs/heads/*:refs/remotes/origin/*
 branch:
