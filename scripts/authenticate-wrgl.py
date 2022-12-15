@@ -19,6 +19,6 @@ if __name__ == "__main__":
     parser.add_argument("client_secret")
     args = parser.parse_args()
     eprint(f"authorizing access to {args.repo_uri} as {args.client_id}")
-    repo = Repository(args.repo_uri, args.client_id, args.client_secret)
+    repo = Repository(args.repo_uri, args.client_id.strip(), args.client_secret.strip())
     rpt = repo.authenticate()
     print(rpt)
