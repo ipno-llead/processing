@@ -227,6 +227,7 @@ schemas:
           - board_hearing
           - occurred_date
           - overtime
+          - check_date
         no_na: true
       - name: year
         integer: true
