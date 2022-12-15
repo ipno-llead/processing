@@ -36,7 +36,7 @@ jobs:
         id: transaction
         run: |
           cd /runner/_work/data
-          /runner/_work/scripts/authenticate-wrgl.py https://wrgl.llead.co ipno-github "${KEYCLOAK_CLIENT_SECRET}" > token.txt
+          ${GITHUB_WORKSPACE}/scripts/authenticate-wrgl.py https://wrgl.llead.co ipno-github "${KEYCLOAK_CLIENT_SECRET}" > token.txt
           wrgl credentials authenticate https://wrgl.llead.co --token-location token.txt
           rm token.txt
           wrgl transaction start | tr -d "[:space:]" > txid.txt
