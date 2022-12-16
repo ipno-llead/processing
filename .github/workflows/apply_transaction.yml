@@ -35,28 +35,23 @@ jobs:
           regex: .+\/tx\/(.+)
           flags: "" # Optional, defaults to "g"
           replacement: $1
-      - name: Extract repo url
-        if: ${{ steps.txURL.outputs.value != null }}
-        id: repoURL
-        uses: ashley-taylor/regex-property-action@1.2
-        with:
-          value: ${{ steps.txURL.outputs.value }}
-          regex: |
-            https://hub\.wrgl\.co\/@(.+)\/r\/([^/]+).+
-          flags: "" # Optional, defaults to "g"
-          replacement: https://hub.wrgl.co/api/users/$1/repos/$2
       - name: Apply transaction
-        if: ${{ steps.txid.outputs.value != null && steps.repoURL.outputs.value != null }}
+        if: ${{ steps.txid.outputs.value != null }}
         run: |
-          echo "To ${REPO_URL}/transactions/${TXID}/"
-          curl --fail -XPOST ${REPO_URL}/transactions/${TXID}/ \
+          cd /runner/_work/data
+          echo "${KEYCLOAK_CLIENT_SECRET}" > secret.txt
+          wrgl credentials authenticate https://wrgl.llead.co ipno-github secret.txt
+          rm secret.txt
+          yq e repos."https://wrgl.llead.co".relyingPartyToken ${HOME}/.config/wrgl/credentials.yaml > token.txt
+          echo "To https://wrgl.llead.co/transactions/${TXID}/"
+          curl --fail -XPOST https://wrgl.llead.co/transactions/${TXID}/ \
           -H "Content-Type: application/json" \
-          -H "Authorization: Bearer ${WRGLHUB_TOKEN}" \
+          -H "Authorization: Bearer $(cat token.txt)" \
           -d '{"commit":true}'
+          rm token.txt
         env:
-          WRGLHUB_TOKEN: ${{ secrets.WRGLHUB_TOKEN }}
+          KEYCLOAK_CLIENT_SECRET: ${{ secrets.KEYCLOAK_CLIENT_SECRET }}
           TXID: ${{ steps.txid.outputs.value }}
-          REPO_URL: ${{ steps.repoURL.outputs.value }}
       - name: Create comment
         if: ${{ steps.txURL.outputs.value != null && steps.txid.outputs.value != null }}
         uses: peter-evans/create-or-update-comment@v2
