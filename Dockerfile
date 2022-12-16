@@ -1,6 +1,9 @@
 FROM summerwind/actions-runner:latest
 
-RUN sudo apt update -y \
+RUN sudo add-apt-repository ppa:rmescandon/yq \
+    && sudo add-apt-repository ppa:deadsnakes/ppa \
+    && sudo add-apt-repository ppa:alex-p/tesseract-ocr-devel \
+    && sudo apt update -y \
     && sudo apt remove libgit2-dev \
     && sudo apt install -y software-properties-common \
     build-essential \
@@ -9,9 +12,11 @@ RUN sudo apt update -y \
     libssl-dev \
     pkg-config \
     git \
-    && sudo add-apt-repository ppa:deadsnakes/ppa \
-    && sudo add-apt-repository ppa:alex-p/tesseract-ocr-devel \
-    && sudo apt install -y poppler-utils tesseract-ocr python3.9 python3.9-dev \
+    poppler-utils \
+    tesseract-ocr \
+    python3.9 \
+    python3.9-dev \
+    yq \
     && sudo rm -rf /var/lib/apt/lists/*
 
 ARG libgit2_version=1.5.0
