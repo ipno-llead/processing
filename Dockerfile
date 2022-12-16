@@ -52,7 +52,7 @@ ADD requirements.txt /tmp
 
 RUN python -m pip install -r /tmp/requirements.txt
 
-ADD https://github.com/wrgl/wrgl/releases/download/v0.13.2/install.sh /tmp/install_wrgl.sh
+ADD https://github.com/wrgl/wrgl/releases/download/v0.13.4/install.sh /tmp/install_wrgl.sh
 
 RUN sudo chmod +x /tmp/install_wrgl.sh \
     && sudo /tmp/install_wrgl.sh \
