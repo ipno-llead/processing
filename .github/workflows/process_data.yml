@@ -37,6 +37,7 @@ jobs:
         run: |
           cd /runner/_work/data
           echo "${KEYCLOAK_CLIENT_SECRET}" > token.txt
+          cat token.txt
           wrgl credentials authenticate https://wrgl.llead.co ipno-github token.txt
           rm token.txt
           wrgl transaction start | tr -d "[:space:]" > txid.txt
