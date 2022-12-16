@@ -620,6 +620,12 @@ branch:
     file: data/fuse/event_new_orleans_so.csv
     primaryKey:
       - event_uid
+  event-ouachita-da:
+    remote: origin
+    merge: refs/heads/event-ouachita-da
+    file: data/fuse/event_ouachita_da.csv
+    primaryKey:
+      - event_uid
   event-ouachita-so:
     remote: origin
     merge: refs/heads/event-ouachita-so
