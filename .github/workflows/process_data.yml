@@ -37,7 +37,6 @@ jobs:
         run: |
           cd /runner/_work/data
           echo "${KEYCLOAK_CLIENT_SECRET}" > token.txt
-          cat token.txt
           wrgl credentials authenticate https://wrgl.llead.co ipno-github token.txt
           rm token.txt
           wrgl transaction start | tr -d "[:space:]" > txid.txt
@@ -47,7 +46,7 @@ jobs:
             echo "::set-output name=txid::$(cat txid.txt)" && \
             echo "::set-output name=txURL::https://hub.wrgl.co/@ipno/r/data/tx/$(cat txid.txt)"
         env:
-          WRGLHUB_TOKEN: ${{ secrets.WRGLHUB_TOKEN }}
+          KEYCLOAK_CLIENT_SECRET: ${{ secrets.KEYCLOAK_CLIENT_SECRET }}
           PR: ${{ steps.findPr.outputs.pr }}
           PR_TITLE: ${{ steps.findPr.outputs.title }}
       - name: Create comment
