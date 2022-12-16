@@ -42,7 +42,7 @@ jobs:
           echo "${KEYCLOAK_CLIENT_SECRET}" > secret.txt
           wrgl credentials authenticate https://wrgl.llead.co ipno-github secret.txt
           rm secret.txt
-          yq e 'repos."https://wrgl.llead.co".relyingPartyToken' ${HOME}/.config/wrgl/credentials.yaml > token.txt
+          yq e '.repos."https://wrgl.llead.co".relyingPartyToken' ${HOME}/.config/wrgl/credentials.yaml > token.txt
           echo "To https://wrgl.llead.co/transactions/${TXID}/"
           curl --fail -XPOST https://wrgl.llead.co/transactions/${TXID}/ \
           -H "Content-Type: application/json" \
