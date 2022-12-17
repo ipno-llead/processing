@@ -34,10 +34,21 @@ def process_pdfs_2022b() -> pd.DataFrame:
     )
 
 
+def process_pdfs_adv() -> pd.DataFrame:
+    dir_name = real_dir_path("post_ohr_advocate.dvc")
+    return (
+        pd.read_csv(deba.data("meta/post_officer_history_reports_advocate_files.csv"))
+        .pipe(only_pdf)
+        .pipe(process_pdf, dir_name)
+    )
+
+
 if __name__ == "__main__":
-    df21 = process_all_pdfs()
-    df22a = process_pdfs_2022a()
-    df22b = process_pdfs_2022b()
-    df21.to_csv(deba.data("ocr/post_officer_history_reports_pdfs.csv"), index=False)
-    df22a.to_csv(deba.data("ocr/post_officer_history_reports_9_16_2022_pdfs.csv"), index=False)
-    df22b.to_csv(deba.data("ocr/post_officer_history_reports_9_30_2022_pdfs.csv"), index=False)
+    df_21 = process_all_pdfs()
+    df_22a = process_pdfs_2022a()
+    df_22b = process_pdfs_2022b()
+    df_adv = process_pdfs_adv()
+    df_21.to_csv(deba.data("ocr/post_officer_history_reports_pdfs.csv"), index=False)
+    df_22a.to_csv(deba.data("ocr/post_officer_history_reports_9_16_2022_pdfs.csv"), index=False)
+    df_22b.to_csv(deba.data("ocr/post_officer_history_reports_9_30_2022_pdfs.csv"), index=False)
+    df_adv.to_csv(deba.data("ocr/post_officer_history_reports_advocate_pdfs.csv"), index=False)

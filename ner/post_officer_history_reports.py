@@ -31,7 +31,7 @@ def read_pdfs_advocate():
 
 def training_data():
     data = (
-        r"data/raw/post/post_officer_history/training_data/post_officer_history.jsonl"
+        r"data/raw/post/post_officer_history/training_data/ayyub.jsonl"
     )
     return data
 
@@ -43,6 +43,7 @@ if __name__ == "__main__":
     pdfs_advocate = read_pdfs_advocate()
     training = training_data()
     # ner = train_spacy_model(pdfs_21, training)
+    # model = ner.to_disk(deba.data("ner/post/post_officer_history/model/post_officer_history.model"))
     trained_model = spacy.load(
         "data/ner/post/post_officer_history/model/post_officer_history.model"
     )

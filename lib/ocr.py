@@ -79,7 +79,7 @@ def process_pdf(
                 continue
 
         pages = []
-        kwargs = {"dpi": 100}
+        kwargs = {"dpi": 300}
         if output_images_to_tempdir:
             tempdir = tempfile.TemporaryDirectory()
             kwargs["output_folder"] = tempdir.name
