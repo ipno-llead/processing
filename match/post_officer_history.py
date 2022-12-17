@@ -29,7 +29,7 @@ def match_post_to_personnel(post, personnel):
         dfa,
         dfb,
     )
-    decision = .800
+    decision = .797
     matcher.save_pairs_to_excel(
         deba.data("match/cprr_post_ohr_personnel.xlsx"), decision
     )
