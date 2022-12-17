@@ -61,12 +61,6 @@ def standardize_rank_2014(df):
     return df
 
 
-def assign_cols_2014(df):
-    df.loc[:, "data_production_year"] = "2014"
-    df.loc[:, "agency"] = "new-orleans-pd"
-    return df
-
-
 def clean_2014():
     df = pd.read_csv(deba.data("raw/new_orleans_csd/new_orleans_csd_pprr_2014.csv"))
     df = (
@@ -80,10 +74,8 @@ def clean_2014():
         .pipe(parse_salary_2014)
         .pipe(standardize_rank_2014)
         .pipe(standardize_desc_cols, ["department_desc"])
-        .pipe(assign_cols_2014)
-        .pipe(
-            gen_uid, ["first_name", "last_name", "hire_year", "hire_month", "hire_day"]
-        )
+        .pipe(set_values, {"agency": "new-orleans-pd"})
+        .pipe(gen_uid, ["first_name", "last_name", "agency"])
     )
     return df
 
@@ -137,12 +129,6 @@ def standardize_rank_2009(df):
     return df
 
 
-def assign_cols_2009(df):
-    df.loc[:, "data_production_year"] = "2009"
-    df.loc[:, "agency"] = "new-orleans-pd"
-    return df
-
-
 def clean_2009():
     df = pd.read_csv(
         deba.data("raw/new_orleans_csd/new_orleans_csd_pprr_2009_realigned.csv")
@@ -154,18 +140,15 @@ def clean_2009():
         .pipe(parse_salary_2009)
         .pipe(standardize_rank_2009)
         .pipe(standardize_desc_cols, ["department_desc"])
+        .pipe(set_values, {"agency": "new-orleans-pd"})
         .pipe(
             gen_uid,  # "mid" is match id, used to match against 2014 data
             [
                 "first_name",
                 "last_name",
-                "pay_prog_start_year",
-                "pay_prog_start_month",
-                "pay_prog_start_day",
+                "agency",
             ],
-            "mid",
         )
-        .pipe(assign_cols_2009)
     )
     return df
 

@@ -29,5 +29,5 @@ def process_pdfs_2022() -> pd.DataFrame:
 if __name__ == "__main__":
     df21 = process_all_pdfs()
     df22 = process_pdfs_2022()
-    df21.to_csv(deba.data("ocr/post_officer_history_reports_pdfs.csv"), index=False)
     df22.to_csv(deba.data("ocr/post_officer_history_reports_9_16_2022_pdfs.csv"), index=False)
+    df21.to_csv(deba.data("ocr/post_officer_history_reports_pdfs.csv"), index=False)

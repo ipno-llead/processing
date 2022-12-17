@@ -4,6 +4,7 @@ from lib.clean import (
     float_to_int_str,
     standardize_desc_cols,
     clean_races,
+    clean_names,
 )
 import deba
 from lib.columns import clean_column_names, set_values
@@ -11,7 +12,7 @@ from lib.uid import gen_uid
 
 
 def clean_citizen_gender(df):
-    df.loc[:, "citizen_gender"] = (
+    df.loc[:, "citizen_sex"] = (
         df.subjectgender.fillna("")
         .str.lower()
         .str.strip()
@@ -293,6 +294,11 @@ def split_names_and_extract_rank_badge(df):
     return df.drop(columns=["suffix", "officer_names_and_badges"])
 
 
+def create_tracking_id_og_col(df):
+    df.loc[:, "tracking_id_og"] = df.tracking_id
+    return df
+
+
 def clean():
     df = (
         pd.read_csv(deba.data("raw/ipm/new_orleans_pd_stop_and_search_2007_2021.csv"))
@@ -314,7 +320,7 @@ def clean():
                 "eventdate": "stop_and_search_datetime",
                 "zip": "zip_code",
                 "blockaddress": "stop_and_search_location",
-                "stop_and_search__field_interviews__fieldinterviewid": "stop_and_search_interview_id",
+                "stop_and_search__field_interviews__fieldinterviewid": "tracking_id",
                 "fic_officersnames_10_21_2021_fieldinterviewid": "stop_and_search_interview_id_2",
                 "nopd_item": "item_number",
                 "stopdescription": "stop_reason",
@@ -353,6 +359,7 @@ def clean():
                 "vehicle_style",
                 "vehicle_color",
                 "citizen_hair_color",
+                "item_number",
             ],
         )
         .pipe(
@@ -366,23 +373,72 @@ def clean():
             ],
         )
         .pipe(set_values, {"agency": "new-orleans-pd"})
-        .pipe(gen_uid, ["agency", "first_name", "middle_name", "last_name"])
+        .pipe(clean_names, ["first_name", "last_name"])
+        .pipe(gen_uid, ["agency", "first_name", "last_name"])
         .pipe(
             gen_uid,
             [
                 "uid",
-                "stop_and_search_interview_id",
+                "tracking_id",
                 "citizen_id",
                 "stop_reason",
                 "evidence_seized",
             ],
             "stop_and_search_uid",
         )
+        .pipe(create_tracking_id_og_col)
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
         .drop_duplicates(subset="stop_and_search_uid")
     )
-    return df
+    citizen_df = df[
+        [
+            "citizen_id",
+            "citizen_race",
+            "citizen_height",
+            "citizen_weight",
+            "citizen_hair_color",
+            "citizen_driver_license_state",
+            "citizen_sex",
+            "citizen_eye_color",
+            "stop_and_search_uid",
+            "agency",
+        ]
+    ]
+    citizen_df = citizen_df.pipe(
+        gen_uid,
+        [
+            "citizen_id",
+            "citizen_race",
+            "citizen_height",
+            "citizen_weight",
+            "citizen_hair_color",
+            "citizen_driver_license_state",
+            "citizen_sex",
+            "citizen_eye_color",
+            "stop_and_search_uid",
+            "agency",
+        ],
+        "citizen_uid",
+    )
+
+    df = df.drop(
+        columns=[
+            "citizen_id",
+            "citizen_race",
+            "citizen_height",
+            "citizen_weight",
+            "citizen_hair_color",
+            "citizen_driver_license_state",
+            "citizen_sex",
+            "citizen_eye_color",
+        ]
+    )
+    return df, citizen_df
 
 
 if __name__ == "__main__":
-    df = clean()
-    df.to_csv(deba.data("clean/sas_new_orleans_pd_2017_2021.csv"), index=False)
+    df, citizen_df = clean()
+    df.to_csv(deba.data("clean/sas_new_orleans_pd_2010_2021.csv"), index=False)
+    citizen_df.to_csv(
+        deba.data("clean/sas_cit_new_orleans_pd_2010_2021.csv"), index=False
+    )

@@ -115,8 +115,8 @@ def correct_docket_no(df):
             return row.filed_year[2:] + row.docket_no[2:]
         return row.docket_no
 
-    df.loc[:, "docket_no"] = (
-        df.agg(process, axis=1).str.replace(r"(-|\/)", "", regex=True)
+    df.loc[:, "docket_no"] = df.agg(process, axis=1).str.replace(
+        r"(-|\/)", "", regex=True
     )
     return df
 
@@ -141,7 +141,7 @@ def assign_agency(df):
 
 
 def assign_charging_supervisor(df):
-    docket_year = df.docket_no.str.replace(r"^(\d+)-.+$", r"\1")
+    docket_year = df.tracking_id.str.replace(r"^(\d+)-.+$", r"\1")
     df.loc[:, "charging_supervisor"] = (
         df.charging_supervisor.str.strip()
         .str.replace(r"Flores", "Marlin A. Flores")
@@ -165,6 +165,11 @@ def assign_charging_supervisor(df):
             (docket_year.isin(years)) & (df.charging_supervisor == first_letter),
             "charging_supervisor",
         ] = full_name
+    return df
+
+
+def create_tracking_id_og_col(df):
+    df.loc[:, "tracking_id_og"] = df.tracking_id
     return df
 
 
@@ -193,12 +198,15 @@ def clean():
         .pipe(correct_docket_no)
         .pipe(clean_appeal_disposition)
         .pipe(assign_agency)
+        .rename(columns={"docket_no": "tracking_id"})
         .pipe(clean_names, ["first_name", "middle_name", "last_name"])
         .pipe(gen_uid, ["agency", "first_name", "middle_name", "last_name"])
-        .pipe(gen_uid, ["agency", "docket_no", "uid"], "appeal_uid")
+        .pipe(gen_uid, ["agency", "tracking_id", "uid"], "appeal_uid")
         .pipe(assign_charging_supervisor)
+        .pipe(create_tracking_id_og_col)
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
     )
-    return df.drop_duplicates(subset=["docket_no", "uid"]).reset_index(drop=True)
+    return df.drop_duplicates(subset=["tracking_id", "uid"]).reset_index(drop=True)
 
 
 if __name__ == "__main__":

@@ -11,7 +11,7 @@ azure-storage-blob==12.9.0
 python-dotenv==0.19.1
 PyPDF2==1.26.0
 requests==2.26.0
-wrgl==0.12.0
+wrgl==0.13.4
 flake8==4.0.1
 black==21.12b0
 deba==0.1.8

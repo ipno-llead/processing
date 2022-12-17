@@ -87,9 +87,11 @@ def clean_pprr():
 
 def clean_tracking_id(df):
     df.loc[:, "tracking_id"] = (
-        df.tracking_id.str.strip()
+        df.tracking_id.str.lower()
+        .str.strip()
         .str.replace(" ", "", regex=False)
         .str.replace(r"(\w+)(\d+)", r"\1 \2", regex=True)
+        .str.replace(r"\s+", "", regex=True)
     )
     return df[df.tracking_id != "\x1a"].reset_index(drop=True)
 
@@ -356,6 +358,11 @@ def drop_rows_missing_names(df):
     return df[~((df.first_name == "") & (df.last_name == ""))]
 
 
+def create_tracking_id_og_col(df):
+    df.loc[:, "tracking_id_og"] = df.tracking_id
+    return df
+
+
 def clean_cprr_20():
     return (
         pd.read_csv(deba.data("raw/lafayette_pd/lafayette_pd_cprr_2015_2020.csv"))
@@ -520,6 +527,8 @@ def clean_cprr_20():
             ["agency", "tracking_id", "allegation", "uid"],
             "allegation_uid",
         )
+        .pipe(create_tracking_id_og_col)
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
     )
 
 
@@ -528,19 +537,10 @@ def clean_tracking_id_14(df):
         df.cc_number.str.lower()
         .str.strip()
         .str.replace(r"^-", "", regex=True)
-        .str.replace(r"^(ad)(\d+)-", r"\1 \2-", regex=True)
         .str.replace(r"sl(\d{2})", r"sl \1", regex=True)
+        .str.replace(r"\s+", "", regex=True)
     )
     return df.drop(columns="cc_number")
-
-
-def clean_complainant(df):
-    df.loc[:, "complainant"] = (
-        df.complainant.str.lower()
-        .str.strip()
-        .str.replace(r"(\/\/|ry|lt\.)", "", regex=True)
-    )
-    return df
 
 
 def clean_receive_date_14(df):
@@ -1047,11 +1047,11 @@ def clean_cprr_14():
     df = (
         pd.read_csv(deba.data("raw/lafayette_pd/lafayette_pd_cprr_2009_2014.csv"))
         .pipe(clean_column_names)
+        .drop(columns=["complainant"])
         .pipe(clean_receive_date_14)
         .pipe(clean_complete_date_14)
         .pipe(clean_dates, ["receive_date", "complete_date"])
         .pipe(clean_tracking_id_14)
-        .pipe(clean_complainant)
         .pipe(clean_and_split_investigator_14)
         .pipe(extract_action_from_disposition_14)
         .pipe(clean_disposition_14)
@@ -1075,6 +1075,8 @@ def clean_cprr_14():
             "allegation_uid",
         )
         .pipe(drop_rows_missing_names)
+        .pipe(create_tracking_id_og_col)
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
     )
     return df
 

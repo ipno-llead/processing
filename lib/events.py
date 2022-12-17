@@ -21,6 +21,7 @@ OFFICER_RANK = "officer_rank"
 OFFICER_DEPT = "officer_dept"
 OFFICER_HIRE = "officer_hire"
 OFFICER_PAY_PROG_START = "officer_pay_prog_start"
+OFFICER_OVERTIME = "officer_overtime"
 OFFICER_PAY_EFFECTIVE = "officer_pay_effective"
 OFFICER_LEFT = "officer_left"
 OFFICER_POST_DECERTIFICATION = (
@@ -36,7 +37,9 @@ SUSPENSION_START = "suspension_start"
 SUSPENSION_END = "suspension_end"
 INITIAL_ACTION = "initial_action"  # date on which the initial action was allocated
 DISPOSITION = "disposition"
-BOARD_HEARING = "board_hearing" # date on which investigation is reviewed by disciplinary board
+BOARD_HEARING = (
+    "board_hearing"  # date on which investigation is reviewed by disciplinary board
+)
 
 APPEAL_FILE = "appeal_file"
 APPEAL_HEARING = "appeal_hearing"
@@ -61,6 +64,8 @@ CLAIM_RECIEVE = "claim_receive"
 CLAIM_CLOSED = "claim_closed"
 CLAIM_OCCUR = "claim_occur"
 
+POLICE_REPORT_INCIDENT_DATE = "occurred_date"
+
 BRADY_LIST = "brady_list"  # date brady list received i.e., officer x is on brady list as of x date
 
 
@@ -73,6 +78,7 @@ event_cat_type = CategoricalDtype(
         OFFICER_HIRE,
         OFFICER_LEFT,
         OFFICER_PAY_PROG_START,
+        OFFICER_OVERTIME,
         OFFICER_PAY_EFFECTIVE,
         COMPLAINT_INCIDENT,
         COMPLAINT_RECEIVE,
@@ -104,6 +110,7 @@ event_cat_type = CategoricalDtype(
         CLAIM_OCCUR,
         BRADY_LIST,
         BOARD_HEARING,
+        POLICE_REPORT_INCIDENT_DATE,
     ],
     ordered=True,
 )

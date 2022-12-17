@@ -2,7 +2,7 @@ import pandas as pd
 import deba
 from lib.uid import gen_uid
 from lib.columns import clean_column_names, set_values
-from lib.clean import clean_dates, standardize_desc_cols
+from lib.clean import clean_dates, standardize_desc_cols, clean_names
 
 
 def drop_rows_missing_names(df):
@@ -65,6 +65,11 @@ def clean_bad_dates(df):
     return df
 
 
+def create_tracking_id_og_col(df):
+    df.loc[:, "tracking_id_og"] = df.tracking_id
+    return df
+
+
 def clean21():
     df = (
         pd.read_csv(deba.data("raw/new_orleans_pd/new_orleans_pd_pclaims_2021.csv"))
@@ -113,12 +118,15 @@ def clean21():
             ],
         )
         .pipe(set_values, {"agency": "new-orleans-pd"})
+        .pipe(clean_names, ["first_name", "last_name"])
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(
             gen_uid,
             ["tracking_id", "agency"],
             "property_claims_uid",
         )
+        .pipe(create_tracking_id_og_col)
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
     )
     return df
 
@@ -184,6 +192,8 @@ def clean20():
             ["tracking_id", "agency"],
             "property_claims_uid",
         )
+        .pipe(create_tracking_id_og_col)
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
     )
     return df
 

@@ -217,27 +217,6 @@ def rearrange_stop_and_search_columns(df):
     )
 
 
-def rearrange_uof_officer_columns(df):
-    """Performs final processing step for a use of force personnel table
-
-    This performs the following tasks:
-    - discard columns not present in uof_officer schema
-    - drop row duplicates
-    - convert numeric columns to int or str
-
-    Args:
-        df (pd.DataFrame):
-            the frame to process
-
-    Returns:
-        the updated frame
-    """
-    return datavalid_config.rearrange_columns(
-        "uof_officer",
-        df.sort_values(["agency", "uid"]),
-    )
-
-
 def rearrange_award_columns(df):
     """Performs final processing step for an award table
 
@@ -362,3 +341,70 @@ def rearrange_docs_columns(df):
         "docs",
         df.sort_values(["agency", "docid"]),
     ).pipe(names_to_title_case, ["title"])
+
+
+def rearrange_police_report_columns(df):
+    """Performs final processing step for a police report table
+
+    This performs the following tasks:
+    - discard columns not present in docs schema
+    - drop row duplicates
+    - convert numeric columns to int or str
+
+    Args:
+        df (pd.DataFrame):
+            the frame to process
+
+    Returns:
+        the updated frame
+    """
+    return datavalid_config.rearrange_columns(
+        "police_report",
+        df.sort_values(["agency", "police_report_uid"]),
+    )
+
+
+def rearrange_citizen_columns(df):
+    """Performs final processing step for a citizen table
+
+    This performs the following tasks:
+    - discard columns not present in docs schema
+    - drop row duplicates
+    - convert numeric columns to int or str
+
+    Args:
+        df (pd.DataFrame):
+            the frame to process
+
+    Returns:
+        the updated frame
+    """
+    return datavalid_config.rearrange_columns(
+        "citizens",
+        df.sort_values(["agency"]),
+    )
+
+
+def rearrange_coaccusal_columns(df):
+    """Performs final processing step for a coaccusal table
+
+    This performs the following tasks:
+    - discard columns not present in docs schema
+    - drop row duplicates
+    - convert numeric columns to int or str
+
+    Args:
+        df (pd.DataFrame):
+            the frame to process
+
+    Returns:
+        the updated frame
+    """
+    return datavalid_config.rearrange_columns(
+        "coaccusals",
+        df.sort_values(["agency"]),
+    )
+
+
+
+

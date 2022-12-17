@@ -115,7 +115,7 @@ if __name__ == "__main__":
     )
     settlements = rearrange_settlement_columns(settlements)
     app_df = rearrange_appeal_hearing_columns(lprr)
-    cprr = rearrange_allegation_columns(pd.concat([cprr19, cprr20]))
+    cprr = rearrange_allegation_columns(pd.concat([cprr19, cprr20], axis=0))
     lsp_docs = rearrange_docs_columns(cprr19)
     per_df.to_csv(deba.data("fuse/per_louisiana_state_pd.csv"), index=False)
     event_df.to_csv(deba.data("fuse/event_louisiana_state_pd.csv"), index=False)

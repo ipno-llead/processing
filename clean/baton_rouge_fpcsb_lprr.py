@@ -525,6 +525,11 @@ def assign_agency(df):
     return df
 
 
+def create_tracking_id_og_col(df):
+    df.loc[:, "tracking_id_og"] = df.tracking_id
+    return df
+
+
 def clean():
     df = realign()
     df = (
@@ -547,12 +552,12 @@ def clean():
         .pipe(condense_rows_with_same_docket_no)
         .pipe(standardize_desc_cols, ["appeal_disposition"])
         .pipe(clean_dates, ["appeal_disposition_date"])
-        .rename(columns={"action": "action_appealed"})
+        .rename(columns={"action": "action_appealed", "docket_no": "tracking_id"})
         .pipe(
             gen_uid,
             ["agency", "first_name", "last_name", "middle_name"],
         )
-        .pipe(gen_uid, ["uid", "docket_no"], "appeal_uid")
+        .pipe(gen_uid, ["uid", "tracking_id"], "appeal_uid")
         .pipe(
             gen_uid,
             [
@@ -564,6 +569,8 @@ def clean():
             ],
             "appeal_disposition_uid",
         )
+        .pipe(create_tracking_id_og_col)
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
     )
     return df.drop_duplicates().reset_index(drop=True)
 

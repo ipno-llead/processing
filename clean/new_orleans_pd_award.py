@@ -1,7 +1,7 @@
 from lib.columns import clean_column_names, set_values
 from lib.uid import gen_uid
 import deba
-from lib.clean import standardize_desc_cols, clean_ranks
+from lib.clean import standardize_desc_cols, clean_ranks, clean_names
 import pandas as pd
 
 
@@ -17,10 +17,12 @@ def extract_rank(df):
             r"group supervisor|supervisory special agent|s/t|tpr)"
         )
     )
-    df.loc[:, "rank_desc"] = ranks[0]\
-        .str.replace(r"s\/t", "", regex=True)\
-        .str.replace(r"\bmag unit\b", "multi-agency gang unit", regex=True)\
+    df.loc[:, "rank_desc"] = (
+        ranks[0]
+        .str.replace(r"s\/t", "", regex=True)
+        .str.replace(r"\bmag unit\b", "multi-agency gang unit", regex=True)
         .str.replace(r"\batf\b", "alcohol tobacco firearms and explosives", regex=True)
+    )
     return df
 
 
@@ -165,6 +167,7 @@ def clean():
         .pipe(clean_recommended_award)
         .pipe(clean_award)
         .pipe(drop_rows_where_award_recommended_and_award_is_empty)
+        .pipe(clean_names, ["first_name", "last_name"])
         .pipe(
             set_values,
             {
@@ -178,5 +181,4 @@ def clean():
 
 if __name__ == "__main__":
     award = clean()
-
     award.to_csv(deba.data("clean/award_new_orleans_pd_2016_2021.csv"), index=False)
