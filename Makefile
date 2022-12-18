@@ -7,7 +7,6 @@ BUILD_DIR := build
 
 .SUFFIXES:
 .SECONDARY:
-.PHONY: all clean
 
 define check_var
 @[ "$($(1))" ] || ( echo "$(1) is not set"; exit 1 )
@@ -21,6 +20,13 @@ schema.md: $(MD5_DIR)/data/datavalid.yml.md5
 include deba.mk
 include wrgl.mk
 
+.PHONY: all
 all: deba $(DEBA_DATA_DIR)/fuse/person.csv
+
+.PHONY: clean
 clean: cleandeba
 	rm -rf $(BUILD_DIR)
+
+.PHONY: ocr_results
+ocr_results:
+	gsutil -m rsync -i -J -r gs://k8s-ocr-jobqueue-results/ocr/ data/ocr_results

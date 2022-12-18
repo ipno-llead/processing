@@ -47,33 +47,48 @@ def _run_gsutil(*args):
         )
 
 
-@contextmanager
-def _time_exc(desc: str):
-    start = timeit.default_timer()
+def _concat_text(data):
+    def geometry_key(o):
+        # sort by (y_min, x_min)
+        return o["geometry"][0][1], o["geometry"][0][0]
 
-    yield None
-
-    stop = timeit.default_timer()
-
-    print(f"finished {desc} ({timedelta(seconds=stop-start)})")
-
-
-def _rsync_ocr_results(df: pd.DataFrame) -> pd.DataFrame:
-    """Rsync ocr results from gcs bucket and report for filesha1 in df"""
-    ocr_dir = deba.data("ocr_results")
-    ocr_dir.mkdir(parents=True, exist_ok=True)
-
-    with _time_exc("downloading ocr result"):
-        _run_gsutil(
-            "-m",
-            "rsync",
-            "-i",
-            "-J",
-            "-r",
-            "gs://%s/ocr/" % RESULT_BUCKET,
-            str(ocr_dir.absolute()),
+    def overlap_y(a, b):
+        ya_min, ya_max = a["geometry"][0][1], a["geometry"][1][1]
+        yb_min, yb_max = b["geometry"][0][1], b["geometry"][1][1]
+        return (ya_min >= yb_min and ya_min <= yb_max) or (
+            yb_min >= ya_min and yb_min <= ya_max
         )
 
+    # sort blocks and cluster into paragraphs
+    paragraphs = list()
+    blocks = list()
+    prev_blk = None
+    for blk in sorted(data["blocks"], key=geometry_key):
+        if prev_blk is None or (prev_blk is not None and overlap_y(prev_blk, blk)):
+            blocks.append(blk)
+        else:
+            paragraphs.append(blocks)
+            blocks = [blk]
+        prev_blk = blk
+    paragraphs.append(blocks)
+
+    # sort lines and blocks again before concatenating text
+    return [
+        [
+            [
+                " ".join([word["value"] for word in line["words"]])
+                for line in sorted(blk["lines"], key=geometry_key)
+            ]
+            for blk in sorted(p, key=geometry_key)
+        ]
+        for p in paragraphs
+    ]
+
+
+def _read_ocr_results(df: pd.DataFrame) -> pd.DataFrame:
+    """Read ocr results and report for filesha1 in df"""
+    ocr_dir = deba.data("ocr_results")
+    ocr_dir.mkdir(parents=True, exist_ok=True)
     records = []
 
     for filesha1 in df.filesha1.values:
@@ -103,18 +118,11 @@ def _rsync_ocr_results(df: pd.DataFrame) -> pd.DataFrame:
             try:
                 with (filedir / ("%03d.json" % pageno)).open() as f:
                     data = json.loads(f.read())
-                text = "\n".join(
-                    [
-                        " ".join([word["value"] for word in line["words"]])
-                        for blk in data["blocks"]
-                        for line in blk["lines"]
-                    ]
-                )
                 records.append(
                     {
                         "filesha1": filesha1,
                         "pageno": pageno,
-                        "text": text,
+                        "paragraphs": _concat_text(data),
                         "ocr_status": "success",
                     }
                 )
@@ -192,7 +200,7 @@ def process_pdf(
     requeue_unsuccessful: bool = False,
     ensure_complete: bool = False,
 ) -> pd.DataFrame:
-    """Reads and returns PDF content as text
+    """Reads and returns PDF content as paragraphs of text
 
     This function expect a dataframe, each row containing metadata
     about a PDF file. The following columns are expected:
@@ -204,7 +212,7 @@ def process_pdf(
     When the processing is finished, the dataframe will be exploded
     into 1 row per page. The following columns will be added:
 
-    - text: the text content of the pdf page
+    - paragraphs: the text content of the pdf page as paragraphs
     - pageno: the page number
     - ocr_status: ocr status of each page. Most "not found" statuses simply
       mean that the pdf page isn't completely processed and merely need
@@ -245,16 +253,13 @@ def process_pdf(
         requeue_unsuccessful, "REQUEUE_UNSUCCESSFUL"
     )
     ensure_complete = _arg_from_env_var(ensure_complete, "ENSURE_COMPLETE")
-    df = _rsync_ocr_results(df)
+    df = _read_ocr_results(df)
     if requeue_unsuccessful:
         df.loc[df.ocr_status != "success", "ocr_status"] = "queueing"
     else:
         df.loc[df.ocr_status == "file not found", "ocr_status"] = "queueing"
     df = _enqueue_pdf(df, dir_name, requeue, requeue_unsuccessful)
     df = df.sort_values(["filesha1", "pageno"]).reset_index(drop=True)
-    print(
-        df.groupby("ocr_status")["ocr_status"].count(),
-    )
     if ensure_complete:
         n = df.loc[df.ocr_status != "success"].shape[0]
         if n > 0:
