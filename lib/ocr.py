@@ -1,8 +1,5 @@
 import os
-import timeit
 from pathlib import Path
-from contextlib import contextmanager
-from datetime import timedelta
 import pathlib
 import tempfile
 import json
@@ -11,10 +8,12 @@ from distutils.spawn import find_executable
 
 import deba
 import pandas as pd
+import numpy as np
 from google.cloud.storage import Client
 from google.auth import default
 
 from lib import queue_pdf_for_ocr
+from lib.ocr_layout import relayout_doc
 
 SOURCE_BUCKET = "k8s-ocr-jobqueue-pdfs"
 RESULT_BUCKET = "k8s-ocr-jobqueue-results"
@@ -47,42 +46,26 @@ def _run_gsutil(*args):
         )
 
 
-def _concat_text(data):
-    def geometry_key(o):
-        # sort by (y_min, x_min)
-        return o["geometry"][0][1], o["geometry"][0][0]
-
-    def overlap_y(a, b):
-        ya_min, ya_max = a["geometry"][0][1], a["geometry"][1][1]
-        yb_min, yb_max = b["geometry"][0][1], b["geometry"][1][1]
-        return (ya_min >= yb_min and ya_min <= yb_max) or (
-            yb_min >= ya_min and yb_min <= ya_max
-        )
-
-    # sort blocks and cluster into paragraphs
-    paragraphs = list()
-    blocks = list()
-    prev_blk = None
-    for blk in sorted(data["blocks"], key=geometry_key):
-        if prev_blk is None or (prev_blk is not None and overlap_y(prev_blk, blk)):
-            blocks.append(blk)
-        else:
-            paragraphs.append(blocks)
-            blocks = [blk]
-        prev_blk = blk
-    paragraphs.append(blocks)
-
-    # sort lines and blocks again before concatenating text
-    return [
-        [
-            [
-                " ".join([word["value"] for word in line["words"]])
-                for line in sorted(blk["lines"], key=geometry_key)
-            ]
-            for blk in sorted(p, key=geometry_key)
-        ]
-        for p in paragraphs
-    ]
+def _read_doc_result(filedir: Path, filesha1: str, count: int):
+    """read ocr results for a single document"""
+    relayout_page = relayout_doc()
+    for pageno in range(1, count + 1):
+        try:
+            with (filedir / ("%03d.json" % pageno)).open() as f:
+                data = json.loads(f.read())
+            yield {
+                "filesha1": filesha1,
+                "pageno": pageno,
+                "paragraphs": relayout_page(data),
+                "ocr_status": "success",
+            }
+        except FileNotFoundError:
+            yield {
+                "filesha1": filesha1,
+                "pageno": pageno,
+                "ocr_status": "page not found",
+            }
+            continue
 
 
 def _read_ocr_results(df: pd.DataFrame) -> pd.DataFrame:
@@ -114,27 +97,7 @@ def _read_ocr_results(df: pd.DataFrame) -> pd.DataFrame:
                 }
             )
             continue
-        for pageno in range(1, count + 1):
-            try:
-                with (filedir / ("%03d.json" % pageno)).open() as f:
-                    data = json.loads(f.read())
-                records.append(
-                    {
-                        "filesha1": filesha1,
-                        "pageno": pageno,
-                        "paragraphs": _concat_text(data),
-                        "ocr_status": "success",
-                    }
-                )
-            except FileNotFoundError:
-                records.append(
-                    {
-                        "filesha1": filesha1,
-                        "pageno": pageno,
-                        "ocr_status": "page not found",
-                    }
-                )
-                continue
+        records += list(_read_doc_result(filedir, filesha1, count))
 
     files = pd.DataFrame.from_records(records)
     return files.merge(df, how="outer", on="filesha1")
