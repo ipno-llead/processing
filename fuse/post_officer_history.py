@@ -39,6 +39,7 @@ def fuse_events(post):
 if __name__ == "__main__":
     post = pd.read_csv(deba.data("match/post_officer_history.csv"))
 
+    allegation_df = pd.read_csv(deba.data("fuse/allegation.csv"))
     events_pre_post = pd.read_csv(deba.data("fuse/event_pre_post.csv"))
     per_pre_post = pd.read_csv(deba.data("fuse/personnel_pre_post.csv"))
 
@@ -48,8 +49,15 @@ if __name__ == "__main__":
     )
     event_df = rearrange_event_columns(event_df)
     per_df = rearrange_personnel_columns(pd.concat([per_pre_post, post]))
+
     per_df = per_df[~((per_df.last_name.fillna("") == ""))]
     per_df = per_df[~((per_df.agency.fillna("") == ""))]
+    per_dfa = per_df[per_df["uid"].isin(allegation_df["uid"])]
+    per_dfb = per_df[per_df['uid'].isin(event_df['uid'])]
+
+    per_df = pd.concat([per_dfa, per_dfb], axis=0)
+
+
     event_df = event_df[~((event_df.agency.fillna("") == ""))]
     post = rearrange_post_officer_history_columns(post)
 

@@ -463,7 +463,7 @@ def split_investigating_supervisor(df):
             continue
         first_word = s[: s.index(" ")]
         if first_word in ranks:
-            df.loc[idx, "supervisor_rank"] = first_word
+            df.loc[idx, "investigating_supervisor_rank"] = first_word
             df.loc[idx, "supervisor_name"] = s[s.index(" ") + 1 :]
         else:
             df.loc[idx, "supervisor_name"] = s
@@ -471,8 +471,8 @@ def split_investigating_supervisor(df):
         " -", "-", regex=False
     )
     names = df.supervisor_name.fillna("").str.extract(r"^([^ ]+) (.+)")
-    df.loc[:, "supervisor_first_name"] = names[0]
-    df.loc[:, "supervisor_last_name"] = names[1]
+    df.loc[:, "investigating_supervisor_first_name"] = names[0]
+    df.loc[:, "investigating_supervisor_last_name"] = names[1]
     return df.drop(columns=["investigating_supervisor", "supervisor_name"])
 
 
@@ -1438,6 +1438,15 @@ def clean19():
             ["agency", "employee_id", "first_name", "last_name", "middle_name"],
         )
         .pipe(gen_uid, ["agency", "tracking_id", "uid"], "allegation_uid")
+        .pipe(
+            gen_uid,
+            [
+                "investigating_supervisor_first_name",
+                "investigating_supervisor_last_name",
+                "agency",
+            ],
+            "investigating_supervisor_uid",
+        )
         .pipe(set_empty_uid_for_anonymous_officers)
         .sort_values(["tracking_id"])
         .drop_duplicates(subset=["allegation_uid"], keep="last", ignore_index=True)
@@ -1523,6 +1532,15 @@ def clean20():
             gen_uid,
             ["tracking_id", "allegation", "action", "employee_id"],
             "allegation_uid",
+        )
+        .pipe(
+            gen_uid,
+            [
+                "investigating_supervisor_first_name",
+                "investigating_supervisor_last_name",
+                "agency",
+            ],
+            "investigating_supervisor_uid",
         )
         .pipe(add_left_reason_column)
         .pipe(drop_rows_missing_names)

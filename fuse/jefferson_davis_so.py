@@ -8,25 +8,25 @@ from lib.post import load_for_agency
 import pandas as pd
 
 
-def fuse_events(post, cprr15, cprr10):
+def fuse_events(cprr, post):
     builder = events.Builder()
     builder.extract_events(
-        cprr15,
-        {
-            events.COMPLAINT_RECEIVE: {
-                "prefix": "receive",
-                "keep": ["uid", "agency", "allegation_uid"],
-            },
-        },
-        ["uid", "allegation_uid"],
-    )
-    builder.extract_events(
-        cprr10,
+        cprr,
         {
             events.COMPLAINT_RECEIVE: {
                 "prefix": "receive",
                 "parse_date": True,
-                "keep": ["uid", "agency", "allegation_uid"],
+                "keep": ["uid", "agency", "disposition", "action", "allegation_uid"],
+            },
+            events.OFFICER_LEFT: {
+                "prefix": "termination",
+                "parse_date": True,
+                "keep": ["uid", "agency", "disposition", "action", "allegation_uid"],
+            },
+            events.COMPLAINT_INCIDENT: {
+                "prefix": "incident",
+                "parse_date": True,
+                "keep": ["uid", "agency", "disposition", "action", "allegation_uid"],
             },
         },
         ["uid", "allegation_uid"],
@@ -59,14 +59,12 @@ def fuse_events(post, cprr15, cprr10):
 
 
 if __name__ == "__main__":
-    cprr21 = pd.read_csv(deba.data("match/cprr_lafourche_so_2019_2021.csv"))
-    cprr15 = pd.read_csv(deba.data("match/cprr_lafourche_so_2015_2018.csv"))
-    cprr10 = pd.read_csv(deba.data("match/cprr_lafourche_so_2010_2014.csv"))
-    agency = cprr21.agency[0]
+    cprr = pd.read_csv(deba.data("match/cprr_jefferson_davis_so_2013_2022.csv"))
+    agency = cprr.agency[0]
     post = load_for_agency(agency)
-    per_df = fuse_personnel(cprr21, post, cprr15, cprr10)
-    com_df = rearrange_allegation_columns(pd.concat([cprr21, cprr15, cprr10], axis=0))
-    event_df = fuse_events(post, cprr15, cprr10)
-    event_df.to_csv(deba.data("fuse/event_lafourche_so.csv"), index=False)
-    com_df.to_csv(deba.data("fuse/com_lafourche_so.csv"), index=False)
-    per_df.to_csv(deba.data("fuse/per_lafourche_so.csv"), index=False)
+    per_df = fuse_personnel(cprr, post)
+    com_df = rearrange_allegation_columns(cprr)
+    event_df = fuse_events(cprr, post)
+    event_df.to_csv(deba.data("fuse/event_jefferson_davis_so.csv"), index=False)
+    com_df.to_csv(deba.data("fuse/com_jefferson_davis_so.csv"), index=False)
+    per_df.to_csv(deba.data("fuse/per_jefferson_davis_so.csv"), index=False)
