@@ -58,7 +58,7 @@ def clean_action(df):
     return df.drop(columns=["disciplinary_action"])
 
 
-def clean():
+def clean21():
     df = (
         pd.read_csv(deba.data("raw/st_james_so/st_james_so_cprr_2019_2021.csv"))
         .pipe(clean_column_names)
@@ -78,6 +78,10 @@ def clean():
     return df
 
 
+def clean00(df):
+    df = pd.read_csv(deba.data("raw/st_james_so/st_james_so_cprr_1990_2000.csv"))
+    return df 
+
 if __name__ == "__main__":
-    df = clean()
+    df = clean21()
     df.to_csv(deba.data("clean/cprr_st_james_so_2019_2021.csv"), index=False)
