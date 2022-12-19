@@ -66,7 +66,7 @@ def _valid_line_y_dist_range(data):
             prev_line = line
     # dists_arr = np.array(dists)
     mean, sd = _mean_n_std(dists)
-    return mean - sd, mean + sd
+    return mean - 2 * sd, mean + sd
 
 
 def _rearrange_lines_into_blocks(data, line_y_dist_range):
