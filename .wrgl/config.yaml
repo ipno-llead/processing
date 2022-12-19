@@ -1,6 +1,6 @@
 remote:
   origin:
-    url: https://hub.wrgl.co/api/users/ipno/repos/data
+    url: https://wrgl.llead.co
     fetch:
       - +refs/heads/*:refs/remotes/origin/*
 branch:
@@ -618,6 +618,12 @@ branch:
     remote: origin
     merge: refs/heads/event-new-orleans-so
     file: data/fuse/event_new_orleans_so.csv
+    primaryKey:
+      - event_uid
+  event-ouachita-da:
+    remote: origin
+    merge: refs/heads/event-ouachita-da
+    file: data/fuse/event_ouachita_da.csv
     primaryKey:
       - event_uid
   event-ouachita-so:
