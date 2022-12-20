@@ -57,6 +57,36 @@ def clean_action(df):
     )
     return df.drop(columns=["disciplinary_action"])
 
+    
+def split_rows_with_multiple_allegations(df):
+    df.loc[:, "allegation"] = df.nature_of_complaint.str.replace(r"and", "/", regex=True)
+    df = (
+        df.drop("allegation", axis=1)
+        .join(
+            df["allegation"]
+            .str.split("/", expand=True)
+            .stack()
+            .reset_index(level=1, drop=True)
+            .rename("allegation"),
+            how="outer",
+        )
+        .reset_index(drop=True)
+    )
+    return df.drop(columns=["nature_of_complaint"])
+
+
+def clean_action(df):
+    df.loc[:, "action"] = df.disciplinary_action.str.replace(r"none", "", regex=False).str.replace(r"(\w+) and (\w+)", r"\1;\2", regex=True)
+    return df.drop(columns=["disciplinary_action"])
+
+
+def split_names_00(df):
+    names = df.deputy.str.extract(r"(dty|lt)?\.? ?(\w+) (\w+)")
+    df.loc[:, "rank_desc"] = names[0].str.replace(r"lt", "lieutenant", regex=False).str.replace(r"dty", "deputy", regex=False)
+    df.loc[:, "first_name"] = names[1]
+    df.loc[:, "last_namee"] = names[2]
+    return df.drop(columns=["deputy"])
+
 
 def clean21():
     df = (
@@ -78,10 +108,21 @@ def clean21():
     return df
 
 
-def clean00(df):
-    df = pd.read_csv(deba.data("raw/st_james_so/st_james_so_cprr_1990_2000.csv"))
+def clean00():
+    df = (pd.read_csv(deba.data("raw/st_james_so/st_james_so_cprr_1990_2000.csv"))
+    .pipe(clean_column_names)
+    .rename(columns={"date": "receive_date"})
+    .pipe(split_rows_with_multiple_allegations)
+    .pipe(clean_action)
+    .pipe(split_names_00)
+    .pipe(set_values, {"agency": "st-james-so"})
+    .pipe(gen_uid, ["first_name", "last_name", "agency"])
+    .pipe(gen_uid, ["allegation", "action", "uid"], "allegation_uid")
+    )
     return df 
 
 if __name__ == "__main__":
-    df = clean21()
-    df.to_csv(deba.data("clean/cprr_st_james_so_2019_2021.csv"), index=False)
+    df21 = clean21()
+    df00 = clean00()
+    df21.to_csv(deba.data("clean/cprr_st_james_so_2019_2021.csv"), index=False)
+    df00.to_csv(deba.data("clean/cprr_st_james_so_1990_2000.csv"), index=False)
