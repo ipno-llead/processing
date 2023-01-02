@@ -9,4 +9,4 @@ def clean():
 
 if __name__ == "__main__":
     df = clean()
-    df.to_csv(deba.data("clean/agency-reference-list.csv"), index=False)
+    df.to_csv(deba.data("clean/agency_reference_list.csv"), index=False)
