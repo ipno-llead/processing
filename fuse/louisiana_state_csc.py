@@ -12,7 +12,7 @@ from lib.post import load_for_agency
 import pandas as pd
 
 
-def fuse_events(lprr, pprr, pprr_term, cprr19, cprr20):
+def fuse_events(lprr, pprr, pprr_term, cprr19, cprr20, settlements):
     builder = events.Builder()
     builder.extract_events(
         lprr,
@@ -91,6 +91,21 @@ def fuse_events(lprr, pprr, pprr_term, cprr19, cprr20):
         },
         ["uid", "allegation_uid"],
     )
+    builder.extract_events(
+        settlements,
+        {
+            events.SETTLEMENT_CHECK: {
+                "prefix": "check",
+                "parse_date": True,
+                "keep": [
+                    "uid",
+                    "settlement_uid",
+                    "agency",
+                ],
+            }
+        },
+        ["uid", "settlement_uid"],
+    )
     return builder.to_frame()
 
 
@@ -111,7 +126,7 @@ if __name__ == "__main__":
     per_df = fuse_personnel(pprr, pprr_term, lprr, cprr19, cprr20, post)
     per_df = per_df[~((per_df.last_name.fillna("") == ""))]
     event_df = rearrange_event_columns(
-        pd.concat([post_event, fuse_events(lprr, pprr, pprr_term, cprr19, cprr20)])
+        pd.concat([post_event, fuse_events(lprr, pprr, pprr_term, cprr19, cprr20, settlements)])
     )
     settlements = rearrange_settlement_columns(settlements)
     app_df = rearrange_appeal_hearing_columns(lprr)

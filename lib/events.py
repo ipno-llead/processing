@@ -68,6 +68,7 @@ POLICE_REPORT_INCIDENT_DATE = "occurred_date"
 
 BRADY_LIST = "brady_list"  # date brady list received i.e., officer x is on brady list as of x date
 
+SETTLEMENT_CHECK = "check_date"
 
 event_cat_type = CategoricalDtype(
     categories=[
@@ -111,6 +112,7 @@ event_cat_type = CategoricalDtype(
         BRADY_LIST,
         BOARD_HEARING,
         POLICE_REPORT_INCIDENT_DATE,
+        SETTLEMENT_CHECK,
     ],
     ordered=True,
 )
