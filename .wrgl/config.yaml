@@ -1279,7 +1279,7 @@ branch:
     merge: refs/heads/agency-reference-list
     file: data/fuse/agency_reference_list.csv
     primaryKey:
-      - agency
+      - agency_name
 merge:
   fastForward: only
 pack:
