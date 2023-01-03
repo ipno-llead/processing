@@ -422,8 +422,8 @@ def rearrange_agency_columns(df):
         the updated frame
     """
     return datavalid_config.rearrange_columns(
-        "coaccusals",
-        df.sort_values(["agency"]),
+        "agency_reference_list",
+        df.sort_values(["agency_name"]),
     )
 
 
