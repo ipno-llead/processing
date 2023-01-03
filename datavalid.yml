@@ -29,6 +29,8 @@ files:
     schema: citizens
   data/analysis/coaccusals.csv:
     schema: coaccusals
+  data/fuse/agency_reference_list.csv:
+    schema: agency_reference_list
 
 schemas:
   personnel:
@@ -630,5 +632,10 @@ schemas:
         description: >
           unique identifier of person
       - name: agency
+  agency_reference_list:
+    columns:
+      - name: agency_slug
+      - name: agency_name
+      - name: location
    
 save_bad_rows_to: data/invalid_rows.csv
