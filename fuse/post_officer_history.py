@@ -5,6 +5,7 @@ from lib.columns import (
     rearrange_event_columns,
     rearrange_post_officer_history_columns,
 )
+from lib.clean import names_to_title_case
 from lib import events
 
 
@@ -55,7 +56,7 @@ if __name__ == "__main__":
     per_dfa = per_df[per_df["uid"].isin(allegation_df["uid"])]
     per_dfb = per_df[per_df['uid'].isin(event_df['uid'])]
 
-    per_df = pd.concat([per_dfa, per_dfb], axis=0)
+    per_df = pd.concat([per_dfa, per_dfb], axis=0).pipe(names_to_title_case, ["race", "sex"])
 
 
     event_df = event_df[~((event_df.agency.fillna("") == ""))]
