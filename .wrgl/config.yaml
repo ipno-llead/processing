@@ -1274,6 +1274,12 @@ branch:
     file: data/analysis/coaccusals.csv
     primaryKey:
       - uid
+  agency-reference-list:
+    remote: origin
+    merge: refs/heads/agency-reference-list
+    file: data/fuse/agency_reference_list.csv
+    primaryKey:
+      - agency_name
 merge:
   fastForward: only
 pack:

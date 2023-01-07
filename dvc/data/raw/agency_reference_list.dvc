@@ -1,0 +1,6 @@
+wdir: ../../../data/raw
+outs:
+- md5: dc00008c36cd705d21246bcfa9706924.dir
+  size: 42697
+  nfiles: 1
+  path: agency_reference_list
