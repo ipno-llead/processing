@@ -26,7 +26,7 @@ jobs:
           mkdir /runner/_work/data/.wrgl || true
           cp .wrgl/config.yaml /runner/_work/data/.wrgl/
           wrgl init --wrgl-dir /runner/_work/data/.wrgl || true
-          wrgl pull --wrgl-dir /runner/_work/data/.wrgl --all --ignore-non-existent --no-progress --log-verbosity 2
+          wrgl pull --wrgl-dir /runner/_work/data/.wrgl --all --ignore-non-existent --no-progress
       - name: process data
         run: |
           sed -iE 's/dataDir\: data/dataDir\: \/runner\/_work\/data\/data/g' deba.yaml
@@ -42,7 +42,7 @@ jobs:
           wrgl transaction start | tr -d "[:space:]" > txid.txt
           export newline=$'\n'
           wrgl commit --all --txid $(cat txid.txt) "[PR #${PR}: ${PR_TITLE}][1]${newline}${newline}[1]: https://github.com/${GITHUB_REPOSITORY}/pull/${PR}"
-          wrgl transaction push origin $(cat txid.txt) --no-progress --log-verbosity 2 && \
+          wrgl transaction push origin $(cat txid.txt) --no-progress && \
             echo "::set-output name=txid::$(cat txid.txt)" && \
             echo "::set-output name=txURL::https://hub.wrgl.co/@ipno/r/data/tx/$(cat txid.txt)"
         env:
