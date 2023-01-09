@@ -256,6 +256,7 @@ def clean_investigation_status_21(df):
 
 def assign_tracking_id_21(df):
     df.loc[:, "tracking_id"] = df.ia_year.apply(str) + "-" + df.ia_seq.apply(str)
+    df.loc[:, "tracking_id"] = df.tracking_id.str.replace(r"(.+)-HS", "", regex=True)
     return df.drop(columns=["ia_seq", "ia_year"])
 
 
