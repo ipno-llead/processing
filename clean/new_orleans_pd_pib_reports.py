@@ -145,7 +145,7 @@ def extract_allegation_desc(df):
         allegation_desc[0]
         .str.replace(r"( disposition:?(.+)| discipline:?(.+))", "", regex=True)
         .str.replace(r"^mand ?", "", regex=True)
-    )
+    ).str.replace(r"annual report (\w+) (\w+), (\w{4})", "", regex=True)
     return df
 
 
