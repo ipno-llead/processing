@@ -1160,6 +1160,12 @@ branch:
     file: data/fuse/uof_terrebonne_so.csv
     primaryKey:
       - uof_uid
+  uof-baton-rouge-so:
+    remote: origin
+    merge: refs/heads/uof-baton-rouge-so
+    file: data/fuse/uof_baton_rouge_so.csv
+    primaryKey:
+      - uof_uid
   pclaims-new-orleans-pd:
     remote: origin
     merge: refs/heads/pclaims-new-orleans-pd
