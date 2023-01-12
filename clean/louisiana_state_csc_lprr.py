@@ -211,5 +211,4 @@ def clean():
 
 if __name__ == "__main__":
     df = clean()
-
     df.to_csv(deba.data("clean/lprr_louisiana_state_csc_1991_2020.csv"), index=False)

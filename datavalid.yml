@@ -337,6 +337,8 @@ schemas:
         description: >
           unique identifier for a police report, references the `police_report_uid` column
           in police_report.csv.
+      - name: use_of_force_description
+      - name: use_of_force_effective
     validation_tasks:
       - name: event dates should be valid
         valid_date:
