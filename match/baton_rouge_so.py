@@ -91,7 +91,6 @@ def match_cprr_15_against_post(cprr, post):
     return cprr
 
 
-
 def match_uof_against_post(uof, post):
     dfa = uof[["uid", "first_name", "last_name"]]
     dfa.loc[:, "fc"] = dfa.first_name.fillna("").map(lambda x: x[:1])
@@ -110,7 +109,7 @@ def match_uof_against_post(uof, post):
         dfa,
         dfb,
     )
-    decision = .951
+    decision = 0.951
     matcher.save_pairs_to_excel(
         deba.data("match/baton_rouge_so_uof_2020_v_post_pprr_2020_11_06.xlsx"),
         decision,
