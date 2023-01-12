@@ -290,7 +290,6 @@ def fuse_brady():
                 pd.read_csv(deba.data("fuse/brady_baton_rouge_da.csv")),
                 pd.read_csv(deba.data("fuse/brady_ouachita_da.csv")),
                 pd.read_csv(deba.data("fuse/brady_iberia_da.csv")),
-                pd.read_csv(deba.data("fuse/brady_tangipahoa_da.csv")),
                 pd.read_csv(deba.data("fuse/brady_morehouse_da.csv")),
             ]
         )

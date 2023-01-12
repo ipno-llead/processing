@@ -1248,6 +1248,7 @@ def clean_21():
         )
         .pipe(create_tracking_id_og_col)
         .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
+        .drop_duplicates(subset=["allegation_uid"])
     )
     return df
 
