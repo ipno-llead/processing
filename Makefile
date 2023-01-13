@@ -1,4 +1,5 @@
 SHELL = /bin/bash
+GSUTIL = gsutil
 
 OS := $(shell uname -s)
 BUILD_DIR := build
@@ -29,4 +30,4 @@ clean: cleandeba
 
 .PHONY: ocr_results
 ocr_results:
-	gsutil -m rsync -i -J -r gs://k8s-ocr-jobqueue-results/ocr/ data/ocr_results
+	$(GSUTIL) -m rsync -i -J -r gs://k8s-ocr-jobqueue-results/ocr/ data/ocr_results
