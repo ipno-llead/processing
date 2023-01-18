@@ -9,6 +9,8 @@ patterns:
 stages:
   - name: meta
   - name: ocr
+    commonPrerequisites:
+      - ocr_results
   - name: ner
   - name: clean
     ignoredTargets:

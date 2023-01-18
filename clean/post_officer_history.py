@@ -606,32 +606,32 @@ def clean():
     dfc = pd.read_csv(deba.data("ner/post_officer_history_reports_9_16_2022.csv"))
     df = (
         pd.concat([dfa, dfb, dfc], axis=0, ignore_index=True)
-        .pipe(drop_rows_missing_names)
-        .rename(
-            columns={
-                "officer_sex": "sex",
-            }
-        )
-        .pipe(clean_sexes, ["sex"])
-        .pipe(generate_history_id)
-        .pipe(split_names)
-        .pipe(clean_agency_pre_split)
-        .pipe(split_agency)
-        .pipe(clean_left_reason)
-        .pipe(
-            names_to_title_case,
-            [
-                "agency",
-            ],
-        )
-        .pipe(clean_agency)
-        .pipe(convert_agency_to_slug)
-        .pipe(gen_uid, ["first_name", "last_name", "middle_name", "agency"])
-        .pipe(drop_duplicates)
-        .pipe(check_for_duplicate_uids)
-        .pipe(switched_job)
-        .pipe(set_values, {"source_agency": "post"})
-        .pipe(standardize_desc_cols, ["agency"])
+        # .pipe(drop_rows_missing_names)
+        # .rename(
+        #     columns={
+        #         "officer_sex": "sex",
+        #     }
+        # )
+        # .pipe(clean_sexes, ["sex"])
+        # .pipe(generate_history_id)
+        # .pipe(split_names)
+        # .pipe(clean_agency_pre_split)
+        # .pipe(split_agency)
+        # .pipe(clean_left_reason)
+        # .pipe(
+        #     names_to_title_case,
+        #     [
+        #         "agency",
+        #     ],
+        # )
+        # .pipe(clean_agency)
+        # .pipe(convert_agency_to_slug)
+        # .pipe(gen_uid, ["first_name", "last_name", "middle_name", "agency"])
+        # .pipe(drop_duplicates)
+        # .pipe(check_for_duplicate_uids)
+        # .pipe(switched_job)
+        # .pipe(set_values, {"source_agency": "post"})
+        # .pipe(standardize_desc_cols, ["agency"])
     )
     return df
 
