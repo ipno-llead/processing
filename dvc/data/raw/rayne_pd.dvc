@@ -1,6 +1,6 @@
 wdir: ../../../data/raw
 outs:
-- md5: 1b75406e23707d3f639f91d33863badc.dir
-  size: 8338
-  nfiles: 3
+- md5: 00be87e5b864208ec1907cfb3aeeafec.dir
+  size: 52785
+  nfiles: 4
   path: rayne_pd
