@@ -215,7 +215,7 @@ def fuse_allegation():
                 pd.read_csv(deba.data("fuse/com_pineville_pd.csv")),
                 pd.read_csv(deba.data("fuse/com_st_james_so.csv")),
                 pd.read_csv(deba.data("fuse/com_natchitoches_so.csv")),
-                pd.read_csv(deba.data("fuse/com_louisiana_state_pd.csv")),
+                # pd.read_csv(deba.data("fuse/com_louisiana_state_pd.csv")),
                 pd.read_csv(deba.data("fuse/com_morehouse_so.csv")),
                 pd.read_csv(deba.data("fuse/com_iberia_so.csv")),
                 pd.read_csv(deba.data("fuse/com_lockport_pd.csv")),
@@ -379,7 +379,7 @@ if __name__ == "__main__":
     brady_df = fuse_brady()
     property_claims_df = fuse_property_claims()
     settlements = fuse_settlements()
-    docs = fuse_docs()
+    # docs = fuse_docs()
     police_reports = fuse_police_reports()
     citizens = fuse_citizen_dfs()
     agencies = fuse_agency_lists()
@@ -393,7 +393,7 @@ if __name__ == "__main__":
     award_df.to_csv(deba.data("fuse/awards.csv"), index=False)
     brady_df.to_csv(deba.data("fuse/brady.csv"), index=False)
     settlements.to_csv(deba.data("fuse/settlements.csv"), index=False)
-    docs.to_csv(deba.data("fuse/docs.csv"), index=False)
+    # docs.to_csv(deba.data("fuse/docs.csv"), index=False)
 
     post_event_df = pd.read_csv(deba.data("fuse/event_post.csv"))
     missing_agency_df = find_event_agency_if_missing_from_post(event_df, post_event_df)

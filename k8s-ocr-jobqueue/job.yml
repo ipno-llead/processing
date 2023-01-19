@@ -3,6 +3,7 @@ kind: Job
 metadata:
   name: doctr
 spec:
+  ttlSecondsAfterFinished: 3600
   template:
     spec:
       containers:
