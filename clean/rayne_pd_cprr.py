@@ -2,7 +2,12 @@ import pandas as pd
 import deba
 
 from lib.columns import clean_column_names, set_values
-from lib.clean import clean_dates, clean_names, strip_leading_comma
+from lib.clean import (
+    clean_dates,
+    clean_names,
+    strip_leading_comma,
+    standardize_desc_cols,
+)
 from lib.uid import gen_uid
 import re
 from lib.rows import duplicate_row
@@ -48,7 +53,7 @@ def clean_allegation(df):
     return df.drop(columns="complaint")
 
 
-def split_investiator_names(df):
+def split_investigator_names(df):
     names = (
         df.assigned_investigator.str.lower()
         .str.strip()
@@ -230,16 +235,6 @@ def assign_dispositions14(df):
     return df
 
 
-def clean_disposition14(df):
-    df.loc[:, "disposition"] = (
-        df.disposition.str.lower()
-        .str.strip()
-        .str.replace(r"(2\)|1\))", "", regex=True)
-        .str.replace(r" ", "", regex=False)
-    )
-    return df
-
-
 def split_investigator_names14(df):
     names = (
         df.assigned_investigator.str.lower()
@@ -253,6 +248,40 @@ def split_investigator_names14(df):
     )
 
     df.loc[:, "investigator_first_name"] = names[1]
+    df.loc[:, "investigator_last_name"] = names[2]
+    return df.drop(columns=["assigned_investigator"])
+
+
+def clean_disposition14(df):
+    df.loc[:, "disposition"] = (
+        df.disposition.str.lower()
+        .str.strip()
+        .str.replace(r"(2\)|1\))", "", regex=True)
+        .str.replace(r" ", "", regex=False)
+    )
+    return df
+
+
+def split_investiator_names(df):
+    ranks = {
+        "lt": "lieutenant",
+        "cpl": "corporal",
+        "det": "detective",
+        "capt": "captain",
+        "sgt": "sergeant",
+    }
+
+    names = (
+        df.assigned_investigator.str.lower()
+        .str.strip()
+        .str.replace(r"^cpat", "capt", regex=True)
+        .str.replace(r"c\.", "chastity", regex=True)
+        .str.replace(r"l\. mike", "lt. mike", regex=True)
+        .str.extract(r"(capta?i?n?|det|lt|cpl|sgt)?\.? ?(\w+)?\.? (\w+)")
+    )
+
+    df.loc[:, "investigator_rank_desc"] = names[0].map(ranks)
+    df.loc[:, "investigator_first_name"] = names[1].fillna("")
     df.loc[:, "investigator_last_name"] = names[2]
     return df.drop(columns=["assigned_investigator"])
 
@@ -395,6 +424,79 @@ def split_names_13(df):
     return df.drop(columns=["focus_officers"])[~((df.last_name.fillna("") == ""))]
 
 
+def extract_action(df):
+    df.loc[:, "action"] = (
+        df.disposition.str.lower()
+        .str.strip()
+        .str.replace(r"((.+)sta rling(.+)|exonorated|\/ brent 3 (.+))", "", regex=True)
+        .str.replace(r"sutained", "sustained", regex=False)
+        .str.replace(r"counseli ng", "counseling")
+        .str.replace(
+            r"(susta?i?n?e?d?|unfounded|not sustained|exonerated|justified|use of|force|matrix|det|cnboc)\.?\/? ?",
+            "",
+            regex=True,
+        )
+        .str.replace(r"lor\b", "letter of reprimand", regex=True)
+        .str.replace(r"repremaind", "reprimand", regex=False)
+        .str.replace(r"(-?|; ?|\/ ?|\((.+)\))", "", regex=True)
+        .str.replace(
+            r"(complaint withdrawn|fit for duty|unprofessional conduct|officer ?|ds\b)",
+            "",
+            regex=True,
+        )
+        .str.replace(r"invest\.", "investigation", regex=True)
+        .str.replace(
+            r"^(ned fowler  cuboletter of reprimand gabe thompson  cubocounseling form|anboc deficiency|policy issue)$",
+            "",
+            regex=True,
+        )
+        .str.replace(
+            r"( for both s|performance inspection report|on all s|overturned by civil service bd)",
+            "",
+            regex=True,
+        )
+        .str.replace(
+            r"all focus s listed received counseling forms", "counseling", regex=False
+        )
+        .str.replace(r"^2 ?days?$", "2 day", regex=True)
+        .str.replace(
+            r"(excessive failure to complete report|sent to hr| "
+            r"insubordination rude and unprofessional |withdrawn|training issue|exonerated)",
+            "",
+            regex=True,
+        )
+        .str.replace(r"(\w+) days? suspension", r"\1-day suspension", regex=True)
+        .str.replace(r"nbocresigned", "resigned", regex=False)
+        .str.replace(r"loc\b", "letter of caution", regex=True)
+        .str.replace(r"deroussel", "", regex=False)
+        .str.replace(r"resignedterminated", "terminated", regex=False)
+        .str.replace(r"^termination $", "terminated", regex=True)
+        .str.replace(r"no violation ex", "", regex=False)
+        .str.replace(r"counseling form", "counseling", regex=False)
+        .str.replace(r" false statement", "", regex=False)
+    )
+    return df
+
+
+def clean_disposition(df):
+    dispos = (
+        df.disposition.str.lower()
+        .str.strip()
+        .str.replace(r"sutained", "sustained", regex=False)
+        .str.replace(r"invest\.", "investigation", regex=True)
+        .str.replace(r"hr\b", "human resources")
+        .str.extract(
+            r"(resigned under investigation|resigned prior to termination|resigned|"
+            r"exonerated|susta?i?n?e?d?|unfounded|not sustained|"
+            r"exonerated|justified|sent to human resources|"
+            r"excessive failure to complete report)"
+        )
+    )
+
+    df.loc[:, "disposition"] = dispos[0].str.replace(r"^sust$", "sustained", regex=True)
+    return df
+
+
 def clean20():
     df = (
         pd.read_csv(deba.data("raw/rayne_pd/rayne_pd_cprr_2019_2020.csv"))
@@ -482,12 +584,37 @@ def clean13():
         .pipe(clean_allegations_13)
         .pipe(split_rows_with_multiple_officers_13)
         .pipe(split_names_13)
+        .pipe(split_investigator_names)
+        .pipe(extract_action)
+        .pipe(clean_disposition)
+        .pipe(standardize_desc_cols, ["action", "disposition"])
+        .pipe(set_values, {"agency": "rayne-pd"})
+        .pipe(
+            gen_uid,
+            ["investigator_first_name", "investigator_last_name", "agency"],
+            "investigator_uid",
+        )
+        .pipe(gen_uid, ["first_name", "last_name", "agency"])
+        .pipe(
+            gen_uid,
+            [
+                "allegation",
+                "disposition",
+                "action",
+                "uid",
+                "receive_year",
+                "investigation_complete_year",
+            ],
+            "allegation_uid",
+        )
     )
-    return df
+    return df.drop_duplicates(subset=["allegation_uid"])
 
 
 if __name__ == "__main__":
     df20 = clean20()
     df14 = clean14()
+    df13 = clean13()
     df20.to_csv(deba.data("clean/cprr_rayne_pd_2019_2020.csv"), index=False)
     df14.to_csv(deba.data("clean/cprr_rayne_pd_2014_2018.csv"), index=False)
+    df13.to_csv(deba.data("clean/cprr_rayne_pd_2009_2013.csv"), index=False)
