@@ -607,6 +607,7 @@ def clean13():
             ],
             "allegation_uid",
         )
+        .pipe(gen_uid, ["tracking_id_og", "agency"], "tracking_id")
     )
     return df.drop_duplicates(subset=["allegation_uid"])
 
