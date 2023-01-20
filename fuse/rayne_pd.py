@@ -6,8 +6,7 @@ from lib.columns import rearrange_allegation_columns, rearrange_event_columns
 from lib.personnel import fuse_personnel
 from lib.post import load_for_agency
 
-
-def fuse_events(cprr14, cprr20, pprr):
+def fuse_events(cprr14, cprr20, pprr, cprr13):
     builder = events.Builder()
     builder.extract_events(
         cprr14,
@@ -51,6 +50,20 @@ def fuse_events(cprr14, cprr20, pprr):
         },
         ["uid"],
     )
+    builder.extract_events(
+        cprr13,
+        {
+            events.COMPLAINT_RECEIVE: {
+                "prefix": "receive",
+                "keep": ["uid", "agency", "allegation_uid"],
+            },
+            events.INVESTIGATION_COMPLETE: {
+                "prefix": "investigation_complete",
+                "keep": ["uid", "agency", "allegation_uid"],
+            },
+        },
+        ["uid", "allegation_uid"],
+    )
     return builder.to_frame()
 
 
@@ -62,10 +75,10 @@ if __name__ == "__main__":
     agency = pprr.agency[0]
     post = load_for_agency(agency)
     post_event = pd.read_csv(deba.data("match/post_event_rayne_pd_2020_11_06.csv"))
-    per = fuse_personnel(cprr20, pprr, cprr14, post)
-    com = rearrange_allegation_columns(pd.concat([cprr20, cprr14], axis=0))
+    per = fuse_personnel(cprr20, pprr, cprr14)
+    com = rearrange_allegation_columns(pd.concat([cprr20, cprr14, cprr13], axis=0))
     events_df = rearrange_event_columns(
-        pd.concat([post_event, fuse_events(cprr14, cprr20, pprr)])
+        pd.concat([post_event, fuse_events(cprr14, cprr20, pprr, cprr13)])
     )
     per.to_csv(deba.data("fuse/per_rayne_pd.csv"), index=False)
     com.to_csv(deba.data("fuse/com_rayne_pd.csv"), index=False)
