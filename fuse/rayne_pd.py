@@ -75,11 +75,14 @@ if __name__ == "__main__":
     agency = pprr.agency[0]
     post = load_for_agency(agency)
     post_event = pd.read_csv(deba.data("match/post_event_rayne_pd_2020_11_06.csv"))
-    per = fuse_personnel(cprr20, pprr, cprr14)
+    per = fuse_personnel(cprr20, pprr, cprr14, post, cprr13)
     com = rearrange_allegation_columns(pd.concat([cprr20, cprr14, cprr13], axis=0))
     events_df = rearrange_event_columns(
         pd.concat([post_event, fuse_events(cprr14, cprr20, pprr, cprr13)])
     )
+    events_df = events_df.dropna()
+    per = per.dropna()
+    com = com.dropna()
     per.to_csv(deba.data("fuse/per_rayne_pd.csv"), index=False)
     com.to_csv(deba.data("fuse/com_rayne_pd.csv"), index=False)
     events_df.to_csv(deba.data("fuse/event_rayne_pd.csv"), index=False)
