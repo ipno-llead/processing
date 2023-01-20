@@ -7,7 +7,7 @@ from lib.personnel import fuse_personnel
 from lib.post import load_for_agency
 
 
-def fuse_events(cprr14, cprr20, pprr, cprr13):
+def fuse_events(cprr14, cprr20, pprr):
     builder = events.Builder()
     builder.extract_events(
         cprr14,
@@ -50,20 +50,6 @@ def fuse_events(cprr14, cprr20, pprr, cprr13):
             },
         },
         ["uid"],
-    )
-    builder.extract_events(
-        cprr13,
-        {
-            events.COMPLAINT_RECEIVE: {
-                "prefix": "receive",
-                "keep": ["uid", "agency", "allegation_uid"],
-            },
-            events.INVESTIGATION_COMPLETE: {
-                "prefix": "investigation_complete",
-                "keep": ["uid", "agency", "allegation_uid"],
-            },
-        },
-        ["uid", "allegation_uid"],
     )
     return builder.to_frame()
 
