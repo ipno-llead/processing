@@ -7,6 +7,8 @@ from lib.columns import (
 )
 from lib import events
 
+from datamatch import JaroWinklerSimilarity, ThresholdMatcher, ColumnsIndex
+from lib.clean import canonicalize_officers
 
 def fuse_events(post):
     builder = events.Builder()
@@ -36,6 +38,29 @@ def fuse_events(post):
     return builder.to_frame()
 
 
+def deduplicate_personnel(personnel):
+    df = personnel[["uid", "first_name", "middle_name", "last_name", "agency"]]
+    df = df.drop_duplicates(subset=["uid"]).set_index("uid")
+    df.loc[:, "fc"] = df.first_name.fillna("").map(lambda x: x[:1])
+    df.loc[:, "lc"] = df.last_name.fillna("").map(lambda x: x[:1])
+    matcher = ThresholdMatcher(
+        ColumnsIndex(["fc", "lc", "agency"]),
+        {
+            "first_name": JaroWinklerSimilarity(),
+            "last_name": JaroWinklerSimilarity(),
+        },
+        df,
+    )
+    decision = 0.969
+    matcher.save_clusters_to_excel(
+        deba.data("fuse/dedeuplicate_personnel.xlsx"),
+        decision,
+        decision,
+    )
+    clusters = matcher.get_index_clusters_within_thresholds(decision)
+    return canonicalize_officers(personnel, clusters)
+
+
 if __name__ == "__main__":
     post = pd.read_csv(deba.data("match/post_officer_history.csv"))
 
@@ -56,7 +81,7 @@ if __name__ == "__main__":
     per_dfb = per_df[per_df['uid'].isin(event_df['uid'])]
 
     per_df = pd.concat([per_dfa, per_dfb], axis=0)
-
+    per_df = deduplicate_personnel(per_df)
 
     event_df = event_df[~((event_df.agency.fillna("") == ""))]
     # post = rearrange_post_officer_history_columns(post)
