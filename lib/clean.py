@@ -834,3 +834,18 @@ def clean_ranks(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
             ],
         )
     return df
+
+
+def strip_leading_comma(df: pd.DataFrame) -> pd.DataFrame:
+    """Strips leading commas
+
+    Args:
+        df (pd.DataFrame):
+            the frame to process
+            
+    Returns:
+        the updated frame
+    """
+    for col in df.columns:
+        df = df.apply(lambda x: x.str.replace(r"^\'", "", regex=True))
+    return df 
