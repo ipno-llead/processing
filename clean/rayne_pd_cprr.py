@@ -7,6 +7,7 @@ from lib.clean import (
     clean_names,
     strip_leading_comma,
     standardize_desc_cols,
+    float_to_int_str,
 )
 from lib.uid import gen_uid
 import re
@@ -336,11 +337,40 @@ def clean_allegations_13(df):
     return df[~((df.allegation.fillna("") == ""))]
 
 
-def clean_receive_dates(df):
-    df.loc[:, "receive_date"] = df.date_received.str.replace(
-        r"20100", "2010", regex=False
-    ).str.replace(r"0517", "05/17", regex=False)
-    return df.drop(columns=["date_received"])
+def clean_receive_and_investigation_dates(df):
+    df.loc[:, "receive_date"] = (
+        df.date_received.astype(str)
+        .str.replace(r"20100", "2010", regex=False)
+        .str.replace(r"0517", "05/17", regex=False)
+        .str.replace(r"^ (\w+)", r"\1", regex=True)
+        .str.replace(r"(\w+) $", r"\1", regex=True)
+        .str.replace(r"0\/29\/2009", "", regex=True)
+        .str.replace(r"\/14$", "2014", regex=True)
+        .str.replace(r"\/10$", "2010", regex=True)
+        .str.replace(r"\/11$", "2011", regex=True)
+        .str.replace(r"\/13$", "2013", regex=True)
+        .str.replace(r"\/15$", "2015", regex=True)
+        .str.replace(r"\/09$", "2009", regex=True)
+        .str.replace(r"7\/32014", r"7/3/2014", regex=True)
+        .str.replace(r"(\w{1,2})\/(\w{2})(\w{4})", r"\1/\2/\3", regex=True)
+    )
+
+    df.loc[:, "investigation_complete_date"] = (
+        df.date_completed.astype(str)
+        .str.replace(r"^ (\w+)", r"\1", regex=True)
+        .str.replace(r"(\w+) $", r"\1", regex=True)
+        .str.replace(r"\/14$", "2014", regex=True)
+        .str.replace(r"\/10$", "2010", regex=True)
+        .str.replace(r"\/11$", "2011", regex=True)
+        .str.replace(r"\/13$", "2013", regex=True)
+        .str.replace(r"\/15$", "2015", regex=True)
+        .str.replace(r"\/09$", "2009", regex=True)
+        .str.replace(r"8\/12014", r"8/1/2014", regex=True)
+        .str.replace(r"(\w{1,2})\/(\w{1})(\w{4})", r"\1/\2/\3", regex=True)
+        .str.replace(r"(\w{1,2})\/(\w{1})\/(\w{1})(\w{4})", r"\1/\2\3/\4", regex=True)
+    )
+
+    return df.drop(columns=["date_received", "date_completed"])
 
 
 def split_rows_with_multiple_officers_13(df):
@@ -421,7 +451,7 @@ def split_names_13(df):
         .str.replace(r"cid\b", "criminal investigations division", regex=True)
         .str.replace(r"(\(|\))", "", regex=True)
     )
-    return df.drop(columns=["focus_officers"])[~((df.last_name.fillna("") == ""))]
+    return df[~((df.last_name.fillna("") == ""))]
 
 
 def extract_action(df):
@@ -496,6 +526,11 @@ def clean_disposition(df):
     df.loc[:, "disposition"] = dispos[0].str.replace(r"^sust$", "sustained", regex=True)
     return df
 
+
+def drop_rows_missing_dates(df):
+    df = df[~((df.receive_date.fillna("") == ""))]
+    df = df[~((df.investigation_complete_date.fillna("") == ""))]
+    return df
 
 def clean20():
     df = (
@@ -575,18 +610,17 @@ def clean13():
     df = (
         pd.read_csv(deba.data("raw/rayne_pd/rayne_pd_cprr_2009_2013.csv"))
         .pipe(clean_column_names)
-        .rename(columns={"date_completed": "investigation_complete_date"})
-        .pipe(clean_receive_dates)
-        .pipe(clean_dates, ["receive_date", "investigation_complete_date"])
+        .pipe(clean_receive_and_investigation_dates)
         .pipe(strip_leading_comma)
         .pipe(clean_tracking_id)
         .pipe(split_rows_with_multiple_allegations_13)
         .pipe(clean_allegations_13)
-        .pipe(split_rows_with_multiple_officers_13)
-        .pipe(split_names_13)
         .pipe(split_investigator_names)
         .pipe(extract_action)
         .pipe(clean_disposition)
+        .pipe(split_rows_with_multiple_officers_13)
+        .pipe(split_names_13)
+        .pipe(drop_rows_missing_dates)
         .pipe(standardize_desc_cols, ["action", "disposition"])
         .pipe(set_values, {"agency": "rayne-pd"})
         .pipe(
@@ -602,12 +636,32 @@ def clean13():
                 "disposition",
                 "action",
                 "uid",
-                "receive_year",
-                "investigation_complete_year",
+                "receive_date",
+                "investigation_complete_date"
             ],
             "allegation_uid",
         )
         .pipe(gen_uid, ["tracking_id_og", "agency"], "tracking_id")
+        .pipe(
+            float_to_int_str,
+            [
+                "tracking_id_og",
+                "allegation",
+                "rank_desc",
+                "first_name",
+                "last_name",
+                "department_desc",
+                "investigator_rank_desc",
+                "investigator_first_name",
+                "investigator_last_name",
+                "action",
+                "agency",
+                "investigator_uid",
+                "uid",
+                "allegation_uid",
+                "tracking_id",
+            ],
+        )
     )
     return df.drop_duplicates(subset=["allegation_uid"])
 
