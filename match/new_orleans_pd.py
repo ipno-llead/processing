@@ -482,7 +482,7 @@ if __name__ == "__main__":
     pr = pd.read_csv(deba.data("clean/pr_new_orleans_pd_2010_2022.csv"))
     pr = deduplicate_pr_officers(pr)
     pr = match_pr_to_pprr(pr, pprr)
-    pib = join_pib_and_da()
+    # pib = join_pib_and_da()
     award = deduplicate_award(award)
     event_df = match_pprr_against_post(pprr, post)
     award = match_award_to_pprr(award, pprr)
@@ -508,7 +508,7 @@ if __name__ == "__main__":
     pprr_separations.to_csv(
         deba.data("match/pprr_seps_new_orleans_pd_2018_2022.csv"), index=False
     )
-    pib.to_csv(
-        deba.data("match/cprr_new_orleans_pib_reports_2014_2020.csv"), index=False
-    )
+    # pib.to_csv(
+    #     deba.data("match/cprr_new_orleans_pib_reports_2014_2020.csv"), index=False
+    # )
     pr.to_csv(deba.data("match/pr_new_orleans_pd_2010_2022.csv"))

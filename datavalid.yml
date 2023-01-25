@@ -29,6 +29,8 @@ files:
     schema: citizens
   data/analysis/coaccusals.csv:
     schema: coaccusals
+  data/fuse/agency_reference_list.csv:
+    schema: agency_reference_list
 
 schemas:
   personnel:
@@ -227,6 +229,7 @@ schemas:
           - board_hearing
           - occurred_date
           - overtime
+          - check_date
         no_na: true
       - name: year
         integer: true
@@ -527,6 +530,7 @@ schemas:
       - name: settlement_uid
         description: >
           unique identifier of case
+      - name: uid
       - name: case_number
       - name: case_name
       - name: case_disposition
@@ -628,5 +632,10 @@ schemas:
         description: >
           unique identifier of person
       - name: agency
+  agency_reference_list:
+    columns:
+      - name: agency_slug
+      - name: agency_name
+      - name: location
    
 save_bad_rows_to: data/invalid_rows.csv

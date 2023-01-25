@@ -406,5 +406,25 @@ def rearrange_coaccusal_columns(df):
     )
 
 
+def rearrange_agency_columns(df):
+    """Performs final processing step for an agency reference table
+
+    This performs the following tasks:
+    - discard columns not present in agency reference schema
+    - drop row duplicates
+    - convert numeric columns to int or str
+
+    Args:
+        df (pd.DataFrame):
+            the frame to process
+
+    Returns:
+        the updated frame
+    """
+    return datavalid_config.rearrange_columns(
+        "agency_reference_list",
+        df.sort_values(["agency_name"]),
+    )
+
 
 

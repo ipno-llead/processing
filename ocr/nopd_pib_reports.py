@@ -13,7 +13,7 @@ def process_all_pdfs() -> pd.DataFrame:
     return (
         pd.read_csv(deba.data("meta/nopd_pib_report_files_2014_2020.csv"))
         .pipe(only_pdf)
-        .pipe(process_pdf, dir_name, output_images_to_tempdir=False)
+        .pipe(process_pdf, dir_name)
     )
 
 

@@ -5,6 +5,7 @@ import argparse
 import tempfile
 import subprocess
 import json
+from typing import List
 
 from tqdm import tqdm
 import pypdfium2 as pdfium
@@ -14,25 +15,11 @@ SOURCE_BUCKET = "k8s-ocr-jobqueue-pdfs"
 KUSTOMIZE_DIR = "k8s-ocr-jobqueue"
 
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="Enqueue PDF files for OCR processing."
-    )
-    parser.add_argument(
-        "paths",
-        metavar="PATH",
-        type=str,
-        nargs="+",
-        help="a path that contain PDF files to be enqueued. Files that already exist in the queue will be ignored.",
-    )
-    args = parser.parse_args()
-
+def run(paths: List[str], pos=0) -> None:
     with tempfile.TemporaryDirectory() as tmpdirname:
-        paths = args.paths
-        pos = 0
         if len(paths) > 1:
-            paths = tqdm(paths, desc="pdf paths", position=0, leave=False)
-            pos = 1
+            paths = tqdm(paths, desc="pdf paths", position=pos, leave=False)
+            pos += 1
         for path in paths:
             path = path.rstrip("/")
             head, _ = os.path.split(path)
@@ -44,7 +31,13 @@ if __name__ == "__main__":
                     if not file.endswith(".pdf"):
                         continue
                     filepath = os.path.join(root, file)
+                    if os.path.islink(filepath):
+                        filepath = os.readlink(filepath)
                     with pdfium.PdfDocument(filepath) as pdf:
+                        pdf_dir = os.path.abspath(
+                            os.path.join(tmpdirname, relroot, file)
+                        )
+                        os.makedirs(pdf_dir, exist_ok=True)
                         for ind, img in enumerate(
                             tqdm(
                                 pdf.render_topil(scale=2),
@@ -53,13 +46,13 @@ if __name__ == "__main__":
                                 leave=False,
                             )
                         ):
-                            filepath = os.path.abspath(
-                                os.path.join(
-                                    tmpdirname, relroot, file, "%03d.png" % (ind + 1,)
-                                )
+                            img.save(
+                                os.path.join(pdf_dir, "%03d.png" % (ind + 1,)), "PNG"
                             )
-                            os.makedirs(os.path.dirname(filepath), exist_ok=True)
-                            img.save(filepath, "PNG")
+                        with open(os.path.join(pdf_dir, "count"), "w") as f:
+                            f.write(str(ind + 1))
+        # remove all named pipes in temp dir which were causing gsutil to hang
+        subprocess.run(["find", tmpdirname, "-type", "p", "-delete"], check=True)
         subprocess.run(
             [
                 "gsutil",
@@ -78,7 +71,22 @@ if __name__ == "__main__":
         [
             "bash",
             "-c",
-            "kustomize build %s | kubectl delete -f -; kustomize build %s | kubectl apply -f -"
-            % (KUSTOMIZE_DIR, KUSTOMIZE_DIR),
+            f"kubectl kustomize {KUSTOMIZE_DIR} | kubectl apply -f -",
         ],
     )
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        description="Enqueue PDF files for OCR processing."
+    )
+    parser.add_argument(
+        "paths",
+        metavar="PATH",
+        type=str,
+        nargs="+",
+        help="a path that contain PDF files to be enqueued. Files that already exist in the queue will be ignored.",
+    )
+    args = parser.parse_args()
+
+    run(args.paths)
