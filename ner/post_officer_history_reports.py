@@ -14,28 +14,46 @@ def read_pdfs_21():
     return pdfs
 
 
-def read_pdfs_22():
-    pdfs = pd.read_csv(deba.data("ocr/post_officer_history_reports_9_16_2022_pdfs.csv"))
+def read_pdfs_22a():
+    pdfs = pd.read_csv(deba.data("ocr/post_officer_history_reports_1_26_2023_pdfs.csv"))
+    return pdfs
+
+
+def read_pdfs_22b():
+    pdfs = pd.read_csv(deba.data("ocr/post_officer_history_reports_9_30_2022_pdfs.csv"))
+    return pdfs
+
+
+def read_pdfs_advocate():
+    pdfs = pd.read_csv(deba.data("ocr/post_officer_history_reports_advocate_pdfs.csv"))
     return pdfs
 
 
 def training_data():
     data = (
-        r"data/raw/post/post_officer_history/training_data/post_officer_history.jsonl"
+        r"data/raw/post/post_officer_history/training_data/post_officer_history_training_data.jsonl"
     )
     return data
 
 
 if __name__ == "__main__":
     pdfs_21 = read_pdfs_21()
-    pdfs_22 = read_pdfs_22()
+    pdfs_22a = read_pdfs_22a()
+    pdfs_22b = read_pdfs_22b()
+    pdfs_advocate = read_pdfs_advocate()
     training = training_data()
-    # ner = train_spacy_model(pdfs, training)
-    # trained_model = spacy.load("data/ner/post/post_officer_history/model/post_officer_history.model")
-    trained_model = spacy.load(
-        "data/ner/post/post_officer_history/model/post_officer_history.model"
-    )
-    ner21 = apply_spacy_model(pdfs_21, trained_model)
-    ner22 = apply_spacy_model(pdfs_22, trained_model)
-    ner21.to_csv(deba.data("ner/post_officer_history_reports.csv"), index=False)
-    ner22.to_csv(deba.data("ner/post_officer_history_reports_9_16_2022.csv"), index=False)
+    ner = train_spacy_model(pdfs_21, training)
+    model = ner.to_disk(deba.data("ner/post/post_officer_history/model/post_officer_history_2.model"))
+    # trained_model = spacy.load(
+    #     "data/ner/post/post_officer_history/model/post_officer_history.model"
+    # )
+    ner_21 = apply_spacy_model(pdfs_21, ner)
+    ner_22a = apply_spacy_model(pdfs_22a, ner)
+    # ner_22b = apply_spacy_model(pdfs_22b, ner)
+    ner_advocate = apply_spacy_model(pdfs_advocate, ner)
+    ner_21.to_csv(deba.data("ner/post_officer_history_reports.csv"), index=False)
+    ner_22a.to_csv(deba.data("ner/post_officer_history_reports_1_26_2023.csv"), index=False)
+    # ner_22b.to_csv(deba.data("ner/post_officer_history_reports_9_30_2022.csv"), index=False)
+    ner_advocate.to_csv(deba.data("ner/advocate_post_officer_history_reports.csv"), index=False)
+
+    

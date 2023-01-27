@@ -16,10 +16,7 @@ def drop_rows_missing_names(df):
 
 def split_names(df):
     names = (
-        df.officer_name.str.replace(r"^\~", "", regex=True)
-        .str.replace(r"\.[\.\,]?", ",", regex=True)
-        .str.replace(r"^ROSALIET\, \(No$", "ROSALIET", regex=True)
-        .str.replace(r"^6729/2012\,$", "", regex=True)
+        df.officer_name.str.replace(r"(Officer|\:)", "", regex=True)
         .str.strip()
         .str.extract(r"(\w+(?:'\w+)?),? ?(\w+)(?: (\w+))?")
     )
@@ -49,6 +46,7 @@ def generate_history_id(df):
             "agency_10",
             "agency_11",
             "agency_12",
+            "agency_13"
         ]
     ].stack()
 
@@ -64,7 +62,7 @@ def generate_history_id(df):
 
     stacked_agency_df = stacked_agency_df.merge(names_df, on="history_id", how="right")
 
-    return stacked_agency_df
+    return stacked_agency_df[~((stacked_agency_df.agency.fillna("") == ""))]
 
 
 def clean_agency_pre_split(df):
@@ -72,49 +70,9 @@ def clean_agency_pre_split(df):
         df.agency.str.strip()
         .str.lower()
         .fillna("")
-        .str.replace(r"time — (\w+)\/(\w+)\/(\w+)", r"time \1/\2/\3", regex=True)
-        .str.replace(r"(\w)\/(\w{2})(\w{4})", r"\1/\2/\3", regex=True)
-        .str.replace(r"(\w+) = (\w+)", r"\1 \2", regex=True)
-        .str.replace(r"(\w+) Ã¢â‚¬â€ (\w+)", r"\1 \2", regex=True)
-        .str.replace(r"(\w+) Ã‚Â© (\w+)\/(\w+)\/(\w+)", r"\1 \2/\3/\4", regex=True)
-        .str.replace(r" Â© ", "", regex=True)
-        .str.replace(r"--(\w+)", r"\1", regex=True)
-        .str.replace(r"bull-time", "full-time", regex=True)
-        .str.replace(r"_(\w+)\/(\w+)\/(\w+)â€”_", r"\1/\2/\3", regex=True)
-        .str.replace(r" â€”= ", "", regex=True)
-        .str.replace(r" +", " ", regex=True)
-        .str.replace(r" & ", "", regex=True)
-        .str.replace(r" - ", "", regex=True)
-        .str.replace(r" _?â€\” ", "", regex=True)
-        .str.replace(r" \_ ", "", regex=True)
-        .str.replace(r" = ", "", regex=True)
-        .str.replace(r"^ (\w+)", r"\1", regex=True)
-        .str.replace(r"^st (\w+)", r"st\1", regex=True)
-        .str.replace(r" of ", "", regex=True)
-        .str.replace(r" p\.d\.", " pd", regex=True)
-        .str.replace(r" pari?s?h? so", " so", regex=True)
-        .str.replace(r" Â§ ", "", regex=True)
-        .str.replace(r" â€˜", "", regex=True)
-        .str.replace(r"(\.|\,)", "", regex=True)
-        .str.replace(r" ~ ", "", regex=False)
-        .str.replace(r"(\w+) \_ (\w+)", r"\1 \2", regex=True)
-        .str.replace(r"-time(\w+\/\w+\/\w+)", r"-time \1", regex=True)
-        .str.replace(r"\'", "", regex=True)
-        .str.replace(r"_(\w+)", r"\1", regex=True)
-        .str.replace(
-            r"^(\w+? ?\w+? ? ?\w+? ?\w+? ? ?\w+?) ?(full-time|reserve|retired|part-time|deceased)$",
-            "",
-            regex=True,
-        )
-        .str.replace(r"^(.+)?(pd|so)$", "", regex=True)
-        .str.replace(r"\—", "", regex=True)
-        .str.replace(r"‘", "", regex=False)
-        .str.replace(r"(.+)?(range|safety academy)(.+)?", "", regex=True)
-        .str.replace(r"$", "", regex=True)
-        .str.replace(r" Â«", " ", regex=True)
-        .str.replace(r"~\-", "", regex=True)
-        .str.replace(r"(\w+)  +(\w+)\/", r"\1 \2", regex=True)
-        .str.replace(r"-", "", regex=False)
+        .str.replace(r"(\[|\]|\'|\,)", "", regex=True)
+        .str.replace(r"(.+)range(.+)", "", regex=True)
+        .str.replace(r"(.+)academy(.+)", "", regex=True)
     )
     return df[~((df.agency == ""))]
 
@@ -124,7 +82,7 @@ def split_agency(df):
         df.agency.str.lower()
         .str.strip()
         .str.extract(
-            r"(term(\w+)|(\w+) resi(\w+)|other|deceased)"
+            r"(termination|i?n?voluntary resignation|resignation|other|deceased)"
         )
     )
     df.loc[:, "left_reason"] = (
@@ -134,7 +92,6 @@ def split_agency(df):
     dates = df.agency.str.extract(r"(\w+\/\w+\/?\w+) ?(\w+\/\w+\/?\w+)?")
     df.loc[:, "hire_date"] = (
         dates[0]
-        .fillna("")
         .str.replace(r"^d(\w{1})", r"\1", regex=True)
         .str.replace(r"^0\/(.+)", "", regex=True)
         .str.replace(r"(.+)?7209(.+)?", "", regex=True)
@@ -146,11 +103,17 @@ def split_agency(df):
     )
     df.loc[:, "left_date"] = (
         dates[1]
-        .fillna("")
         .str.replace(r"(.+)(_|\,|&|-)(.+)?", "", regex=True)
         .str.replace(r"^0\/(.+)", "", regex=True)
         .str.replace(r"^7/51/2020", "", regex=True)
         .str.replace(r"(.+)?[a-z](.+)?", "", regex=True)
+    )
+
+    emp_status = df.agency.str.lower().str.extract(
+        r"( ?reserve ?| ?full-?time ?| ?part-?time ?| ?deceased ?| ?retired ?)"
+    )
+    df.loc[:, "employment_status"] = emp_status[0].str.replace(
+        r"^decease$", "deceased", regex=True
     )
 
     agency = df.agency.str.extract(r"(.+) (\w+)\/(\w+)?")
@@ -163,25 +126,6 @@ def split_agency(df):
         .str.replace(r"(\“|\(|\")", "", regex=True)
     )
 
-    emp_status = df.agency.str.lower().str.extract(
-        r"( ?reserve ?| ?full-?time ?| ?part-?time ?| ?deceased ?| ?retired ?)"
-    )
-    df.loc[:, "employment_status"] = emp_status[0].str.replace(
-        r"^decease$", "deceased", regex=True
-    )
-    return df[~((df.hire_date.fillna("") == ""))]
-
-
-def clean_left_reason(df):
-    l_reasons = (
-        df.left_reason.str.replace(r"volumtary", "voluntary", regex=False)
-        .str.replace(r"(\||=|_)", "", regex=True)
-        .str.extract(
-            r"( ?termination ?| ?involuntary resignation ?| ?voluntary resignation ?| ?resignation ?)"
-        )
-    )
-
-    df.loc[:, "left_reason"] = l_reasons[0].str.replace(r"^ ", "", regex=True)
     return df
 
 
@@ -395,10 +339,17 @@ def switched_job(df):
     return df
 
 
+def switched(df):
+    df = df[df.switched_job.astype(str).str.contains("True")]
+    return df
+
+### add DB metadata and add to docs table
+
+
 def clean():
     dfa = pd.read_csv(deba.data("ner/advocate_post_officer_history_reports.csv"))
     dfb = pd.read_csv(deba.data("ner/post_officer_history_reports.csv"))
-    dfc = pd.read_csv(deba.data("ner/post_officer_history_reports_9_16_2022.csv"))
+    dfc = pd.read_csv(deba.data("ner/post_officer_history_reports_1_26_2023.csv"))
     dfd = pd.read_csv(deba.data("ner/post_officer_history_reports_9_30_2022.csv"))
     df = (
         pd.concat([dfa, dfb, dfc], axis=0, ignore_index=True)
@@ -408,12 +359,11 @@ def clean():
         #         "officer_sex": "sex",
         #     }
         # )
+        # .pipe(split_names)
         # .pipe(clean_sexes, ["sex"])
         # .pipe(generate_history_id)
-        # .pipe(split_names)
         # .pipe(clean_agency_pre_split)
         # .pipe(split_agency)
-        # .pipe(clean_left_reason)
         # .pipe(
         #     names_to_title_case,
         #     [
@@ -426,6 +376,7 @@ def clean():
         # .pipe(drop_duplicates)
         # .pipe(check_for_duplicate_uids)
         # .pipe(switched_job)
+        # .pipe(switched)
         # .pipe(set_values, {"source_agency": "post"})
         # .pipe(standardize_desc_cols, ["agency"])
     )
