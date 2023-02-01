@@ -62,3 +62,8 @@ ADD https://github.com/wrgl/wrgl/releases/download/v0.13.7/install.sh /tmp/insta
 RUN sudo chmod +x /tmp/install_wrgl.sh \
     && sudo /tmp/install_wrgl.sh \
     && sudo rm /tmp/install_wrgl.sh /tmp/requirements.txt
+
+ADD https://sdk.cloud.google.com /tmp/install_gcloud.sh
+RUN sudo chmod +x /tmp/install_gcloud.sh \
+    && sudo /tmp/install_gcloud.sh --install-dir=/usr/local/gcloud
+ENV PATH $PATH:/usr/local/gcloud/google-cloud-sdk/bin

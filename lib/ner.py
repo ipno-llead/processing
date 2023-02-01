@@ -31,12 +31,9 @@ def train_spacy_model(df: pd.DataFrame, training_data: str) -> pd.DataFrame:
     nlp = spacy.blank("en")
     ner = nlp.create_pipe("ner")
     nlp.add_pipe("ner")
-    ner.add_label("report_subject")
-    ner.add_label("tracking_id")
-    ner.add_label("allegation")
-    ner.add_label("previous_discipline")
-    ner.add_label("report_date")
-    ner.add_label("accused_name")
+    ner.add_label("officer_name")
+    ner.add_label("officer_sex")
+    ner.add_label("agency")
 
     optimizer = nlp.begin_training()
     for itn in range(50):
@@ -58,7 +55,7 @@ def apply_spacy_model(df: pd.DataFrame, spacy_model: str) -> pd.DataFrame:
     nlp = spacy_model
     ### train model
     entities = []
-    for row in df["text"].apply(nlp):
+    for row in df["paragraphs"].apply(nlp):
         text = [text.text for text in row.ents]
         labels = [labels.label_ for labels in row.ents]
         ents = list(zip(labels, text))
