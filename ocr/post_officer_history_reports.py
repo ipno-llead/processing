@@ -48,7 +48,7 @@ if __name__ == "__main__":
     df_22a = process_pdfs_2022a()
     df_22b = process_pdfs_2022b()
     df_adv = process_pdfs_adv()
-    df_21.to_csv(deba.data("ocr/post_officer_history_reports_pdfs.csv"))
+    df_21.to_csv(deba.data("ocr/post_officer_history_reports_pdfs.csv"), index=False)
     df_22a.to_csv(deba.data("ocr/post_officer_history_reports_1_26_2023_pdfs.csv"), index=False)
     df_22b.to_csv(deba.data("ocr/post_officer_history_reports_9_30_2022_pdfs.csv"), index=False)
     df_adv.to_csv(deba.data("ocr/post_officer_history_reports_advocate_pdfs.csv"), index=False)
