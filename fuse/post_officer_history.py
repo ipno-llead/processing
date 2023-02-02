@@ -8,7 +8,7 @@ from lib.columns import (
 from lib import events
 
 from datamatch import JaroWinklerSimilarity, ThresholdMatcher, ColumnsIndex
-from lib.clean import canonicalize_officers
+from lib.clean import canonicalize_officers, names_to_title_case
 
 def fuse_events(post):
     builder = events.Builder()
@@ -82,6 +82,7 @@ if __name__ == "__main__":
 
     per_df = pd.concat([per_dfa, per_dfb], axis=0)
     per_df = deduplicate_personnel(per_df)
+    per_df = per_df.pipe(names_to_title_case, ["race", "sex"])
 
     event_df = event_df[~((event_df.agency.fillna("") == ""))]
     # post = rearrange_post_officer_history_columns(post)
