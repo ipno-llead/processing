@@ -352,7 +352,7 @@ def clean():
     dfc = pd.read_csv(deba.data("ner/post_officer_history_reports_1_26_2023.csv"))
     dfd = pd.read_csv(deba.data("ner/post_officer_history_reports_9_30_2022.csv"))
     df = (
-        pd.concat([dfa, dfb, dfc], axis=0, ignore_index=True)
+        pd.concat([dfa, dfb], axis=0, ignore_index=True)
         # .pipe(drop_rows_missing_names)
         # .rename(
         #     columns={
