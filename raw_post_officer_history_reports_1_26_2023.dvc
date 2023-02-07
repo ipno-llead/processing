@@ -1,6 +1,0 @@
-wdir: data
-outs:
-- md5: 67d87b75313dbd060ca1eaf5c3634023.dir
-  size: 74887332
-  nfiles: 4
-  path: raw_post_officer_history_reports_1_26_2023

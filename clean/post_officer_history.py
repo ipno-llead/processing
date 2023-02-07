@@ -7,7 +7,6 @@ from lib.clean import (
     standardize_desc_cols,
 )
 from lib.columns import set_values
-import sympy as sym
 
 
 def drop_rows_missing_names(df):
@@ -349,8 +348,6 @@ def switched(df):
 def clean():
     dfa = pd.read_csv(deba.data("ner/advocate_post_officer_history_reports.csv"))
     dfb = pd.read_csv(deba.data("ner/post_officer_history_reports.csv"))
-    dfc = pd.read_csv(deba.data("ner/post_officer_history_reports_1_26_2023.csv"))
-    dfd = pd.read_csv(deba.data("ner/post_officer_history_reports_9_30_2022.csv"))
     df = (
         pd.concat([dfa, dfb], axis=0, ignore_index=True)
         # .pipe(drop_rows_missing_names)
