@@ -40,7 +40,7 @@ def fetch_reports_2022() -> pd.DataFrame:
 
 def fetch_reports_2023() -> pd.DataFrame:
     return (
-        files_meta_frame("raw_post_officer_history_reports_2023.dvc")
+        files_meta_frame("raw_post_officer_history_reports_2023_a.dvc")
         .pipe(set_filetype)
         .pipe(split_filepath)
         .pipe(set_file_category)
