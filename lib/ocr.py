@@ -3,28 +3,167 @@ from pathlib import Path
 import pathlib
 import tempfile
 import json
-from typing import List, Union
 import subprocess
 from distutils.spawn import find_executable
 
-from pdf2image import convert_from_path
-import pytesseract
-from tqdm import tqdm
 import deba
 import pandas as pd
+import numpy as np
+from google.cloud.storage import Client
+from google.auth import default
+
+from lib import queue_pdf_for_ocr
+from lib.ocr_layout import relayout_doc
+
+SOURCE_BUCKET = "k8s-ocr-jobqueue-pdfs"
+RESULT_BUCKET = "k8s-ocr-jobqueue-results"
+GCLOUD_PROJECT = "excellent-zoo-300106"
 
 
-def _root_dir() -> pathlib.Path:
-    return pathlib.Path(os.path.realpath(__file__)).parent.parent
+def _run_gsutil(*args):
+    paths = os.pathsep.join(
+        [
+            str(pathlib.Path.home() / "google-cloud-sdk/bin"),
+            "/usr/local/gcloud/google-cloud-sdk/bin",
+        ]
+    )
+    gsutil = find_executable("gsutil", paths)
+    if gsutil is None:
+        raise Exception("couldnt find gsutil in %s" % paths)
+
+    try:
+        subprocess.run(
+            [
+                gsutil,
+                *args,
+            ],
+            capture_output=True,
+            check=True,
+        )
+    except subprocess.CalledProcessError as e:
+        raise RuntimeError(
+            f'command {" ".join([gsutil, *args])} failed\n\tstdout:{e.stdout.decode("utf8")}\n\tstderr:{e.stderr.decode("utf8")}'
+        )
+
+
+def _read_doc_result(filedir: Path, filesha1: str, count: int):
+    """read ocr results for a single document"""
+    relayout_page = relayout_doc()
+    for pageno in range(1, count + 1):
+        try:
+            with (filedir / ("%03d.json" % pageno)).open() as f:
+                data = json.loads(f.read())
+            yield {
+                "filesha1": filesha1,
+                "pageno": pageno,
+                "paragraphs": relayout_page(data),
+                "ocr_status": "success",
+            }
+        except FileNotFoundError:
+            yield {
+                "filesha1": filesha1,
+                "pageno": pageno,
+                "ocr_status": "page not found",
+            }
+            continue
+
+
+def _read_ocr_results(df: pd.DataFrame) -> pd.DataFrame:
+    """Read ocr results and report for filesha1 in df"""
+    ocr_dir = deba.data("ocr_results")
+    ocr_dir.mkdir(parents=True, exist_ok=True)
+    records = []
+
+    for filesha1 in df.filesha1.values:
+        filedir = ocr_dir / filesha1[:2] / (filesha1[2:] + ".pdf")
+        if not filedir.exists():
+            records.append(
+                {
+                    "filesha1": filesha1,
+                    "pageno": pd.NA,
+                    "ocr_status": "file not found",
+                }
+            )
+            continue
+        try:
+            with (filedir / "count").open() as f:
+                count = int(f.read())
+        except FileNotFoundError:
+            records.append(
+                {
+                    "filesha1": filesha1,
+                    "pageno": pd.NA,
+                    "ocr_status": "count file not found",
+                }
+            )
+            continue
+        records += list(_read_doc_result(filedir, filesha1, count))
+
+    files = pd.DataFrame.from_records(records)
+    return files.merge(df, how="outer", on="filesha1")
+
+
+def _check_for_processing_files(df: pd.DataFrame) -> pd.DataFrame:
+    """finds files that are not yet present in the queue bucket and mark them as 'queued'"""
+    credentials, _ = default()
+    client = Client(GCLOUD_PROJECT, credentials=credentials)
+    sha1s = set()
+    for filesha1 in (
+        df.loc[df.ocr_status == "queueing", "filesha1"].drop_duplicates().values
+    ):
+        blobs = client.list_blobs(
+            SOURCE_BUCKET, 1, prefix=f"ocr/{filesha1[:2]}/{filesha1[2:]}"
+        )
+        if len(list(blobs)) > 0:
+            sha1s.add(filesha1)
+    df.loc[df.filesha1.isin(sha1s), "ocr_status"] = "processing"
+    return df
+
+
+def _enqueue_pdf(
+    df: pd.DataFrame,
+    dir_name: str,
+    requeue: bool = False,
+    requeue_unsuccessful: bool = False,
+) -> pd.DataFrame:
+    if not requeue:
+        if not requeue_unsuccessful:
+            df = _check_for_processing_files(df)
+        if len(df.loc[df.ocr_status == "queueing"]) == 0:
+            return df
+    with tempfile.TemporaryDirectory() as tmpdirname:
+        tmpdir = Path(tmpdirname) / "ocr"
+        if requeue:
+            files_to_process = df
+        else:
+            files_to_process = df.loc[df.ocr_status == "queueing"]
+        for idx, row in files_to_process.iterrows():
+            file: Path = tmpdir / row.filesha1[:2] / (row.filesha1[2:] + ".pdf")
+            if file.exists():
+                continue
+            file.parent.mkdir(parents=True, exist_ok=True)
+            file.symlink_to(
+                (Path(dir_name) / row.filepath).resolve(), target_is_directory=False
+            )
+        queue_pdf_for_ocr.run([str(tmpdir)])
+    df.loc[df.ocr_status == "queueing", "ocr_status"] = "queued"
+    return df
+
+
+def _arg_from_env_var(arg: bool, env_name: str) -> bool:
+    if not arg and os.getenv(f"OCR_{env_name}", "").lower() == "true":
+        return True
+    return arg
 
 
 def process_pdf(
     df: pd.DataFrame,
     dir_name: str,
-    output_images_to_tempdir: bool = True,
-    ignore_cache: bool = False,
+    requeue: bool = False,
+    requeue_unsuccessful: bool = False,
+    ensure_complete: bool = False,
 ) -> pd.DataFrame:
-    """Reads and returns PDF content as text
+    """Reads and returns PDF content as paragraphs of text
 
     This function expect a dataframe, each row containing metadata
     about a PDF file. The following columns are expected:
@@ -36,181 +175,56 @@ def process_pdf(
     When the processing is finished, the dataframe will be exploded
     into 1 row per page. The following columns will be added:
 
-    - text: the text content of the pdf page
+    - paragraphs: the text content of the pdf page as paragraphs
     - pageno: the page number
-
-    This function keeps OCRed texts in the folder data/ocr_cache to
-    avoid reprocessing files that it has already processed. After
-    adding new files, please run the following commands to share the
-    OCR cache with others:
-
-        scripts/dvc_add.sh
-        dvc push
+    - ocr_status: ocr status of each page. Most "not found" statuses simply
+      mean that the pdf page isn't completely processed and merely need
+      more time. It could be one of these values:
+        + "success":
+            page was found and read successfully
+        + "queued":
+            pdf file wasn't found in the results bucket and was queued
+            for processing
+        + "count file not found":
+            pdf file page count wasn't found in the results bucket
+        + "page not found":
+            a pdf page wasn't found in the results bucket
 
     Args:
         df (pd.DataFrame):
             a frame containing PDFs metadata
         dir_name (str):
             the parent directory of all PDF files
-        output_images_to_tempdir (bool):
-            output PDF images to a tempdir. If set to False, keep images
-            in memory instead.
-        ignore_cache (bool):
-            if set to True, don't read from or write to OCR cache.
-            Useful for testing new OCR configs.
+        requeue (bool):
+            requeue pdf pages for reprocessing even if those files
+            are already processed. If environment variable "OCR_REQUEUE"
+            is set to "true", it also takes effect.
+        requeue_unsuccessful (bool):
+            requeue non-"success" pdf files for processing. This is
+            also set to True if environment variable
+            "OCR_REQUEUE_UNSUCCESSFUL" is set to "true".
+        ensure_complete (bool):
+            raise error if there are non-"success" rows. This is also
+            set to True if environment variable
+            "OCR_ENSURE_COMPLETE" is set to "true".
 
     Returns:
         exploded frame with 1 row per page
     """
-    texts: List[List[str]] = []
-    root_dir = _root_dir()
-    cache_root_dir = deba.data("ocr_cache") / os.path.relpath(dir_name, str(root_dir))
-    new_file_detected = False
-    for _, row in tqdm(df.iterrows(), desc="OCR pdf", total=df.shape[0], position=0):
-        pdfpath = "%s/%s" % (dir_name, row.filepath)
-
-        if not ignore_cache:
-            ocr_cachefile: Path = cache_root_dir / (row.filesha1 + ".json")
-            ocr_cachefile.parent.mkdir(parents=True, exist_ok=True)
-
-            if ocr_cachefile.is_file():
-                with open(ocr_cachefile, "r") as f:
-                    texts.append(json.load(f))
-                continue
-
-        pages = []
-        kwargs = {"dpi": 100}
-        if output_images_to_tempdir:
-            tempdir = tempfile.TemporaryDirectory()
-            kwargs["output_folder"] = tempdir.name
-
-        images = convert_from_path(pdfpath, **kwargs)
-        for image in tqdm(
-            images,
-            desc="processing %s" % os.path.relpath(pdfpath, str(root_dir)),
-            position=1,
-            leave=False,
-        ):
-            txt = pytesseract.image_to_string(image)
-            pages.append(txt)
-
-        if output_images_to_tempdir:
-            tempdir.cleanup()
-
-        if not ignore_cache:
-            with open(ocr_cachefile, "w") as f:
-                json.dump(pages, f)
-
-        texts.append(pages)
-        new_file_detected = True
-
-    if new_file_detected:
-        print(
-            "\n".join(
-                [
-                    "New OCR content detected, please run the following commands to share the OCR cache with others:",
-                    "",
-                    "    scripts/dvc_add.sh",
-                    "    dvc push",
-                    "",
-                ]
-            )
-        )
-
-    df.loc[:, "text"] = pd.Series(texts, index=df.index)
-    df = df.explode("text").reset_index(drop=True)
-    df.loc[:, "pageno"] = df.groupby("fileid").cumcount() + 1
+    requeue = _arg_from_env_var(requeue, "REQUEUE")
+    requeue_unsuccessful = _arg_from_env_var(
+        requeue_unsuccessful, "REQUEUE_UNSUCCESSFUL"
+    )
+    ensure_complete = _arg_from_env_var(ensure_complete, "ENSURE_COMPLETE")
+    df = _read_ocr_results(df)
+    if requeue_unsuccessful:
+        df.loc[df.ocr_status != "success", "ocr_status"] = "queueing"
+    else:
+        df.loc[df.ocr_status == "file not found", "ocr_status"] = "queueing"
+    df = _enqueue_pdf(df, dir_name, requeue, requeue_unsuccessful)
+    df = df.sort_values(["filesha1", "pageno"]).reset_index(drop=True)
+    if ensure_complete:
+        n = df.loc[df.ocr_status != "success"].shape[0]
+        if n > 0:
+            raise ValueError(f'there are {n} rows with non "success" ocr_status')
     return df
-
-
-def fetch_ocr_results(prefix: Union[str, None]) -> pd.DataFrame:
-    """Fetches OCR results from k8s-ocr-jobqueue
-
-    Args:
-        prefix (str):
-            fetch ocr results for files with this prefix
-
-    Returns:
-        a dataframe with the following columns:
-            filepath:
-                the original file path
-            pageno:
-                page number
-            result:
-                OCR result as produced by DocTR
-    """
-    cache_dir = pathlib.Path(__file__).parent.parent / "data/ocr_results"
-    bucket = "k8s-ocr-jobqueue-results"
-    src = "gs://%s" % bucket
-    dst = str(cache_dir.absolute())
-    if prefix is not None:
-        src = "%s/%s" % (src, prefix)
-        dst = os.path.abspath("%s/%s" % (dst, prefix))
-    os.makedirs(dst, exist_ok=True)
-
-    gsutil = find_executable(
-        "gsutil", str(pathlib.Path.home() / "google-cloud-sdk/bin")
-    )
-    if gsutil is None:
-        raise Exception("couldnt find gsutil in ~/google-cloud-sdk/bin")
-
-    subprocess.run(
-        [
-            gsutil,
-            "-m",
-            "rsync",
-            "-i",
-            "-J",
-            "-r",
-            src,
-            dst,
-        ],
-        capture_output=True,
-        check=True,
-    )
-
-    records = []
-    for root, _, files in tqdm(
-        list(os.walk(dst)), desc="loading files from %s" % json.dumps(dst), leave=False
-    ):
-        filepath = os.path.relpath(os.path.abspath(root), str(cache_dir))
-        for file in files:
-            pageno, _ = os.path.splitext(file)
-            pageno = int(pageno)
-
-            filename = pathlib.Path(root) / file
-            with filename.open("r") as f:
-                result = json.load(f)
-
-            records.append({"filepath": filepath, "pageno": pageno, "result": result})
-
-    return pd.DataFrame.from_records(records).sort_values(["filepath", "pageno"])
-
-
-def fetch_ocr_text(prefix: Union[str, None]) -> pd.DataFrame:
-    """Fetches OCR text from k8s-ocr-jobqueue
-
-    Args:
-        prefix (str):
-            fetch ocr results for files with this prefix
-
-    Returns:
-        a dataframe with the following columns:
-            filepath:
-                the original file path
-            pageno:
-                page number
-            text:
-                the combined text of the page
-    """
-    df = fetch_ocr_results(prefix)
-    df.loc[:, "text"] = df.result.map(
-        lambda pg: "\n".join(
-            [
-                " ".join([word["value"] for word in line["words"]])
-                for blk in pg["blocks"]
-                for line in blk["lines"]
-            ]
-        )
-    )
-    return df.drop(columns="result")
