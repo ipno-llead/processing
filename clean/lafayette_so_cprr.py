@@ -124,6 +124,7 @@ def clean_tracking_id_14(df):
         .str.replace(r"(\d+)?-?oct-?(\d+)?", r"10-\1", regex=True)
         .str.replace(r"(\d+)?-?nov-?(\d+)?", r"11-\1", regex=True)
         .str.replace(r"(\d+)?-?dec-?(\d+)?", r"12-\1", regex=True)
+        .str.replace(r"^(\w+)-$", "", regex=True)
     )
     return df.drop(columns="case")
 
