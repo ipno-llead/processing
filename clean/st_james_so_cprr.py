@@ -84,7 +84,7 @@ def split_names_00(df):
     names = df.deputy.str.extract(r"(dty|lt)?\.? ?(\w+) (\w+)")
     df.loc[:, "rank_desc"] = names[0].str.replace(r"lt", "lieutenant", regex=False).str.replace(r"dty", "deputy", regex=False)
     df.loc[:, "first_name"] = names[1]
-    df.loc[:, "last_namee"] = names[2]
+    df.loc[:, "last_name"] = names[2]
     return df.drop(columns=["deputy"])
 
 
