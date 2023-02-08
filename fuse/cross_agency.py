@@ -166,10 +166,8 @@ def cross_match_officers_between_agencies(personnel, events, constraints):
     with Spinner("saving matched clusters to Excel file"):
         matcher.save_clusters_to_excel(excel_path, decision, lower_bound=decision)
     clusters = matcher.get_index_clusters_within_thresholds(decision)
-    print(
-        "saved %d clusters to %s"
-        % (len(clusters), excel_path.relative_to(pathlib.Path.cwd()))
-    )
+    print("saved %d clusters to %s" % (len(clusters), excel_path))
+
 
     return clusters, per[["max_timestamp", "agency"]]
 
