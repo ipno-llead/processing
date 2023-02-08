@@ -6,11 +6,11 @@ from lib.uid import gen_uid
 
 
 def concat_text_from_all_pages(df):
-    df = df[~((df.text.fillna("") == ""))]
-    df.loc[:, "text"] = df.text.str.replace(r"\n", " ", regex=True)
-    text = df.groupby("md5")["text"].apply(" ".join)
+    df = df[~((df.paragraphs.fillna("") == ""))]
+    df.loc[:, "paragraphs"] = df.paragraphs.str.replace(r"\n", " ", regex=True)
+    text = df.groupby("md5")["paragraphs"].apply(" ".join)
 
-    df = df.drop(columns=["text"])
+    df = df.drop(columns=["paragraphs"])
     df = pd.merge(df, text, on="md5", how="outer")
     df = df[df.fileid.isin(["35294a6"])]
     return df.drop_duplicates(subset=["md5"])[~((df.md5.fillna("") == ""))]

@@ -1,5 +1,9 @@
+from pathlib import Path
+
 import deba
 import pandas as pd
+from vscode_spot_check import print_samples
+
 from lib.dvc import real_dir_path
 from lib.ocr import process_pdf
 
@@ -19,4 +23,13 @@ def process_all_pdfs() -> pd.DataFrame:
 
 if __name__ == "__main__":
     df = process_all_pdfs()
+
+    print_samples(
+        df,
+        resolve_source_path=lambda row: Path(__file__).parent.parent
+        / deba.data("raw_louisiana_state_pd_letters_2019")
+        / row.filepath,
+        resolve_pageno=lambda row: row.pageno,
+    )
+
     df.to_csv(deba.data("ocr/letters_louisiana_state_pd_2019_pdfs.csv"), index=False)

@@ -285,7 +285,7 @@ if __name__ == "__main__":
 
     cprr = pd.read_csv(deba.data("match/cprr_new_orleans_da_2016_2020.csv"))
     cprr = cprr[~((cprr.uid.fillna("") == ""))]
-    pib = pd.read_csv(deba.data("match/cprr_new_orleans_pib_reports_2014_2020.csv"))
+    # pib = pd.read_csv(deba.data("match/cprr_new_orleans_pib_reports_2014_2020.csv"))
     nopd_settlements = pd.read_csv(
         deba.data("clean/settlements_new_orleans_pd.csv")
     ).dropna()
@@ -304,7 +304,6 @@ if __name__ == "__main__":
         pclaims21,
         pprr_separations,
         cprr,
-        pib,
         post,
     )
     events_df = fuse_events(
@@ -325,8 +324,8 @@ if __name__ == "__main__":
     lprr_df = rearrange_appeal_hearing_columns(lprr)
     uof_df = rearrange_use_of_force(uof)
     pclaims_df = rearrange_property_claims_columns(pd.concat([pclaims20, pclaims21]))
-    com = pd.concat([cprr, pib], axis=0).drop_duplicates(subset=["allegation_uid"], keep="last")
-    com = rearrange_allegation_columns(com)
+    # com = pd.concat([cprr, pib], axis=0).drop_duplicates(subset=["allegation_uid"], keep="last")
+    com = rearrange_allegation_columns(cprr)
     settlements = rearrange_settlement_columns(nopd_settlements)
     pr = rearrange_police_report_columns(pr)
     citizen_df =  pd.concat([cprr_citizens, uof_citizen, sas_citizens])

@@ -15,6 +15,7 @@ def split_names(df):
         .str.replace(r"\.[\.\,]?", ",", regex=True)
         .str.replace(r"^ROSALIET\, \(No$", "ROSALIET", regex=True)
         .str.replace(r"^6729/2012\,$", "", regex=True)
+        .str.replace(r"Officer: ", "", regex=False)
         .str.strip()
         .str.extract(r"(\w+(?:'\w+)?),? ?(\w+)(?: (\w+))?")
     )
@@ -44,31 +45,6 @@ def generate_history_id(df):
             "agency_11",
             "agency_12",
             "agency_13",
-            "agency_14",
-            "agency_15",
-            "agency_16",
-            "agency_17",
-            "agency_18",
-            "agency_19",
-            "agency_20",
-            "agency_21",
-            "agency_22",
-            "agency_23",
-            "agency_24",
-            "agency_25",
-            "agency_26",
-            "agency_27",
-            "agency_28",
-            "agency_29",
-            "agency_30",
-            "agency_31",
-            "agency_32",
-            "agency_33",
-            "agency_34",
-            "agency_35",
-            "agency_36",
-            "agency_36",
-            "agency_37",
         ]
     ].stack()
 
@@ -615,23 +591,23 @@ def clean():
         .pipe(clean_sexes, ["sex"])
         .pipe(generate_history_id)
         .pipe(split_names)
-        .pipe(clean_agency_pre_split)
-        .pipe(split_agency)
-        .pipe(clean_left_reason)
-        .pipe(
-            names_to_title_case,
-            [
-                "agency",
-            ],
-        )
-        .pipe(clean_agency)
-        .pipe(convert_agency_to_slug)
-        .pipe(gen_uid, ["first_name", "last_name", "middle_name", "agency"])
-        .pipe(drop_duplicates)
-        .pipe(check_for_duplicate_uids)
-        .pipe(switched_job)
-        .pipe(set_values, {"source_agency": "post"})
-        .pipe(standardize_desc_cols, ["agency"])
+        # .pipe(clean_agency_pre_split)
+        # .pipe(split_agency)
+        # .pipe(clean_left_reason)
+        # .pipe(
+        #     names_to_title_case,
+        #     [
+        #         "agency",
+        #     ],
+        # )
+        # .pipe(clean_agency)
+        # .pipe(convert_agency_to_slug)
+        .pipe(gen_uid, ["first_name", "last_name"])
+        # .pipe(drop_duplicates)
+        # .pipe(check_for_duplicate_uids)
+        # .pipe(switched_job)
+        # .pipe(set_values, {"source_agency": "post"})
+        # .pipe(standardize_desc_cols, ["agency"])
     )
     return df
 
