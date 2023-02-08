@@ -285,7 +285,7 @@ if __name__ == "__main__":
 
     cprr = pd.read_csv(deba.data("match/cprr_new_orleans_da_2016_2020.csv"))
     cprr = cprr[~((cprr.uid.fillna("") == ""))]
-    pib = pd.read_csv(deba.data("match/cprr_new_orleans_pib_reports_2014_2020.csv"))
+    # pib = pd.read_csv(deba.data("match/cprr_new_orleans_pib_reports_2014_2020.csv"))
     nopd_settlements = pd.read_csv(
         deba.data("clean/settlements_new_orleans_pd.csv")
     ).dropna()
