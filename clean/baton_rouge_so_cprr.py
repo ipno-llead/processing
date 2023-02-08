@@ -453,6 +453,11 @@ def drop_rows_missing_name(df):
     return df[~((df.first_name.fillna("") == ""))]
 
 
+def create_tracking_id_og_col(df):
+    df.loc[:, "tracking_id_og"] = df.tracking_id
+    return df
+
+
 def clean18():
     df = pd.read_csv(deba.data("raw/baton_rouge_so/baton_rouge_so_cprr_2018.csv"))
     df = clean_column_names(df)
@@ -502,7 +507,13 @@ def clean18():
             "allegation_uid",
         )
     )
-    return df
+    citizen_df = df[["complainant_type", "allegation_uid", "agency"]]
+    citizen_df = citizen_df.pipe(
+        gen_uid, ["complainant_type", "allegation_uid", "agency"], "citizen_uid"
+    )
+
+    df = df.drop(columns=["complainant_type"])
+    return df, citizen_df
 
 
 def clean20():
@@ -557,8 +568,16 @@ def clean20():
             ["agency", "uid", "occur_year", "occur_month", "occur_day"],
             "allegation_uid",
         )
+        .pipe(create_tracking_id_og_col)
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
     )
-    return df
+    citizen_df = df[["complainant_type", "allegation_uid", "agency"]]
+    citizen_df = citizen_df.pipe(
+        gen_uid, ["complainant_type", "allegation_uid", "agency"], "citizen_uid"
+    )
+
+    df = df.drop(columns=["complainant_type"])
+    return df, citizen_df
 
 
 def clean15():
@@ -595,14 +614,31 @@ def clean15():
             "allegation_uid",
         )
         .pipe(drop_rows_missing_name)
+        .pipe(create_tracking_id_og_col)
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
     )
-    return df
+    citizen_df = df[["complainant_type", "allegation_uid", "agency"]]
+    citizen_df = citizen_df.pipe(
+        gen_uid, ["complainant_type", "allegation_uid", "agency"], "citizen_uid"
+    )
+
+    df = df.drop(columns=["complainant_type"])
+    return df, citizen_df
 
 
 if __name__ == "__main__":
-    df15 = clean15()
-    df18 = clean18()
-    df20 = clean20()
+    df15, citizen_df15 = clean15()
+    df18, citizen_df18 = clean18()
+    df20, citizen_df20 = clean20()
+    citizen_df15.to_csv(
+        deba.data("clean/cprr_cit_baton_rouge_so_2011_2015.csv"), index=False
+    )
+    citizen_df18.to_csv(
+        deba.data("clean/cprr_cit_baton_rouge_so_2018.csv"), index=False
+    )
+    citizen_df20.to_csv(
+        deba.data("clean/cprr_cit_baton_rouge_so_2016_2020.csv"), index=False
+    )
     df15.to_csv(deba.data("clean/cprr_baton_rouge_so_2011_2015.csv"), index=False)
     df18.to_csv(deba.data("clean/cprr_baton_rouge_so_2018.csv"), index=False)
     df20.to_csv(deba.data("clean/cprr_baton_rouge_so_2016_2020.csv"), index=False)

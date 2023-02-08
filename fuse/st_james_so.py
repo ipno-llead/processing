@@ -8,13 +8,24 @@ from lib.post import load_for_agency
 import pandas as pd
 
 
-def fuse_events(post):
+def fuse_events(cprr, cprr00, post):
     builder = events.Builder()
     builder.extract_events(
         cprr,
         {
             events.COMPLAINT_RECEIVE: {
                 "prefix": "receive",
+                "keep": ["uid", "agency", "allegation_uid"],
+            },
+        },
+        ["uid", "allegation_uid"],
+    )
+    builder.extract_events(
+        cprr00,
+        {
+            events.COMPLAINT_RECEIVE: {
+                "prefix": "receive",
+                "parse_date": True,
                 "keep": ["uid", "agency", "allegation_uid"],
             },
         },
@@ -49,11 +60,12 @@ def fuse_events(post):
 
 if __name__ == "__main__":
     cprr = pd.read_csv(deba.data("match/cprr_st_james_so_2019_2021.csv"))
+    cprr00 = pd.read_csv(deba.data("match/cprr_st_james_so_1990_2000.csv"))
     agency = cprr.agency[0]
     post = load_for_agency(agency)
-    per_df = fuse_personnel(cprr, post)
-    com_df = rearrange_allegation_columns(cprr)
-    event_df = fuse_events(post)
+    per_df = fuse_personnel(cprr, cprr00, post)
+    com_df = rearrange_allegation_columns(pd.concat([cprr, cprr00], axis=0))
+    event_df = fuse_events(cprr, cprr00, post)
     event_df.to_csv(deba.data("fuse/event_st_james_so.csv"), index=False)
     com_df.to_csv(deba.data("fuse/com_st_james_so.csv"), index=False)
     per_df.to_csv(deba.data("fuse/per_st_james_so.csv"), index=False)

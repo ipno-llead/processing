@@ -217,27 +217,6 @@ def rearrange_stop_and_search_columns(df):
     )
 
 
-def rearrange_uof_citizen_columns(df):
-    """Performs final processing step for a use of force citizen table
-
-    This performs the following tasks:
-    - discard columns not present in uof_officer schema
-    - drop row duplicates
-    - convert numeric columns to int or str
-
-    Args:
-        df (pd.DataFrame):
-            the frame to process
-
-    Returns:
-        the updated frame
-    """
-    return datavalid_config.rearrange_columns(
-        "uof_citizen",
-        df.sort_values(["agency"]),
-    )
-
-
 def rearrange_award_columns(df):
     """Performs final processing step for an award table
 
@@ -383,3 +362,69 @@ def rearrange_police_report_columns(df):
         "police_report",
         df.sort_values(["agency", "police_report_uid"]),
     )
+
+
+def rearrange_citizen_columns(df):
+    """Performs final processing step for a citizen table
+
+    This performs the following tasks:
+    - discard columns not present in docs schema
+    - drop row duplicates
+    - convert numeric columns to int or str
+
+    Args:
+        df (pd.DataFrame):
+            the frame to process
+
+    Returns:
+        the updated frame
+    """
+    return datavalid_config.rearrange_columns(
+        "citizens",
+        df.sort_values(["agency"]),
+    )
+
+
+def rearrange_coaccusal_columns(df):
+    """Performs final processing step for a coaccusal table
+
+    This performs the following tasks:
+    - discard columns not present in docs schema
+    - drop row duplicates
+    - convert numeric columns to int or str
+
+    Args:
+        df (pd.DataFrame):
+            the frame to process
+
+    Returns:
+        the updated frame
+    """
+    return datavalid_config.rearrange_columns(
+        "coaccusals",
+        df.sort_values(["agency"]),
+    )
+
+
+def rearrange_agency_columns(df):
+    """Performs final processing step for an agency reference table
+
+    This performs the following tasks:
+    - discard columns not present in agency reference schema
+    - drop row duplicates
+    - convert numeric columns to int or str
+
+    Args:
+        df (pd.DataFrame):
+            the frame to process
+
+    Returns:
+        the updated frame
+    """
+    return datavalid_config.rearrange_columns(
+        "agency_reference_list",
+        df.sort_values(["agency_name"]),
+    )
+
+
+

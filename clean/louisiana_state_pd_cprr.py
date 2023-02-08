@@ -1,7 +1,7 @@
 import deba
 import pandas as pd
 from lib.columns import clean_column_names, set_values
-from lib.clean import clean_names, clean_dates, names_to_title_case
+from lib.clean import clean_names, clean_dates
 from lib.uid import gen_uid
 from functools import reduce
 
@@ -12,7 +12,7 @@ def drop_rows_missing_dates(df):
 
 def extract_ids_and_subject(df):
     cols = [
-        "accused_name_2",
+        "accused_name",
         "tracking_id",
         "tracking_id_1",
         "tracking_id_2",
@@ -54,7 +54,6 @@ def extract_ids_and_subject(df):
 
     return df.drop(
         columns=[
-            "accused_name_2",
             "tracking_id_1",
             "tracking_id_2",
             "tracking_id_3",
@@ -66,7 +65,7 @@ def extract_ids_and_subject(df):
 
 def split_names(df):
     names = (
-        df.accused_name_1.str.lower()
+        df.accused_name.str.lower()
         .str.strip()
         .str.replace(r"st\, clair", "stclair", regex=True)
         .str.replace(r"(“(\w+)”) ", "", regex=True)
@@ -78,7 +77,7 @@ def split_names(df):
     df.loc[:, "rank_desc"] = names[0].str.replace(r"lt\.", "lieutenant", regex=True)
     df.loc[:, "first_name"] = names[1]
     df.loc[:, "last_name"] = names[2]
-    return df.drop(columns=["accused_name_1"])
+    return df.drop(columns=["accused_name"])
 
 
 def sanitize_letter_dates(df):
@@ -96,40 +95,6 @@ def sanitize_letter_dates(df):
         .str.replace(r"february (.+)", r"02/\1", regex=True)
     )
     return df.drop(columns=["notification_date"])
-
-
-def format_titles_2019(df):
-    df.loc[:, "title"] = (
-        df.title.fillna("")
-        + ":"
-        + df.first_name.fillna("")
-        + " "
-        + df.last_name.fillna("")
-        + " on "
-        + df.letter_date
-    )
-    df.loc[:, "title"] = df.title.str.replace(
-        r"(.+):(.+)", r"\1 Notice: \2", regex=True
-    ).str.replace(r"\/", "-", regex=True)
-    return df.pipe(names_to_title_case, ["title"])
-
-
-def format_titles_2020(df):
-    df.loc[:, "title"] = df.report_subject
-    df.loc[:, "title"] = (
-        df.title.fillna("")
-        + ":"
-        + df.first_name.fillna("")
-        + " "
-        + df.last_name.fillna("")
-        + df.middle_name.fillna("")
-        + " on "
-        + df.report_date
-    )
-    df.loc[:, "title"] = df.title.str.replace(
-        r"(.+):(.+)", r"\1 investigative report: \2", regex=True
-    ).str.replace(r"\/", "-", regex=True)
-    return df.pipe(names_to_title_case, ["title"])
 
 
 def drop_rows_missing_letter_subjects(df):
@@ -225,8 +190,6 @@ def clean_report_subject(df):
         .str.replace(r"\n.+", "", regex=True)
         .str.replace(r"(re:|su[rb]ject:) ", "", regex=True)
         .str.replace(r"re:\n\n", "", regex=True)
-        .str.replace(r" on the(.+)", "", regex=True)
-        .str.replace(r"^(lost|accidental|stolen)", r"allegation of \1", regex=True)
     )
     return df
 
@@ -330,18 +293,13 @@ def concat_text_from_all_pages(df):
     return df
 
 
-def generate_doc_date_letters(df):
+def generate_doc_date(df):
     df.loc[:, "doc_date"] = df.letter_date
     return df
 
-def generate_doc_date_reports(df):
-    df.loc[:, "doc_date"] = df.report_date
-    return df
 
-def convert_doc_dates_to_int(df):
-    for col in df.columns:
-        if col.startswith("date"):
-            df = df.apply(lambda col: int(col))
+def create_tracking_id_og_col(df):
+    df.loc[:, "tracking_id_og"] = df.tracking_id
     return df
 
 
@@ -353,26 +311,24 @@ def clean_letters_2019():
     df = (
         pd.read_csv(deba.data("ner/letters_louisiana_state_pd_2019.csv"))
         .pipe(clean_column_names)
-        .pipe(concat_text_from_all_pages)
-        .pipe(drop_rows_missing_dates)
-        .pipe(extract_ids_and_subject)
-        .pipe(split_names)
-        .pipe(sanitize_letter_dates)
-        .pipe(format_titles_2019)
-        .pipe(drop_rows_missing_letter_subjects)
-        .pipe(clean_names, ["first_name", "last_name"])
-        .pipe(set_values, {"agency": "louisiana-state-pd"})
-        .pipe(gen_uid, ["first_name", "last_name", "agency"])
-        .pipe(gen_uid, ["letter_subject", "uid", "letter_date"], "allegation_uid")
-        .pipe(clean_fn)
+        # .pipe(concat_text_from_all_pages)
+        # .pipe(drop_rows_missing_dates)
+        # .pipe(extract_ids_and_subject)
+        # .pipe(split_names)
+        # .pipe(sanitize_letter_dates)
+        # .pipe(drop_rows_missing_letter_subjects)
+        # .pipe(clean_names, ["first_name", "last_name"])
+        # .pipe(set_values, {"agency": "louisiana-state-pd"})
+        # .pipe(gen_uid, ["first_name", "last_name", "agency"])
+        # .pipe(gen_uid, ["letter_subject", "uid", "letter_date"], "allegation_uid")
+        # .pipe(clean_fn)
     )
-    df = pd.merge(df, db_meta, on="fn", how="outer")
-    df = (
-        df.rename(columns={"md5": "docid"})
-        .pipe(generate_doc_date_letters)
-        .pipe(clean_dates, ["doc_date"])
-        .pipe(convert_doc_dates_to_int)
-    )
+    # df = pd.merge(df, db_meta, on="fn", how="outer")
+    # df = (
+    #     df.rename(columns={"md5": "docid"})
+    #     .pipe(generate_doc_date)
+    #     .pipe(clean_dates, ["doc_date"])
+    # )
     return df
 
 
@@ -380,37 +336,36 @@ def clean_reports_2020():
     df = (
         pd.read_csv(deba.data("ner/reports_louisiana_state_pd_2020.csv"))
         .pipe(clean_column_names)
-        .drop(
-            columns=[
-                "previous_discipline",
-                "previous_discipline_1",
-                "previous_discipline_2",
-                "previous_discipline_3",
-                "previous_discipline_4",
-                "previous_discipline_5",
-                "previous_discipline_6",
-            ]
-        )
-        .pipe(join_multiple_extracted_entity_cols)
-        .pipe(sanitize_dates_2020)
-        .pipe(extract_and_split_names_2020)
-        .pipe(clean_report_subject)
-        .pipe(extract_allegation_and_disposition)
-        .pipe(clean_tracking_id)
-        .pipe(format_titles_2020)
-        .pipe(generate_doc_date_reports)
-        .pipe(clean_dates, ["report_date", "doc_date"])
-        .pipe(convert_doc_dates_to_int)
-        .pipe(clean_names, ["first_name", "last_name"])
-        .pipe(set_values, {"agency": "louisiana-state-pd"})
-        .pipe(gen_uid, ["first_name", "last_name", "agency"])
-        .pipe(
-            gen_uid,
-            ["allegation", "uid", "report_year", "report_month", "report_day"],
-            "allegation_uid",
-        )
-        .drop_duplicates(subset=["allegation_uid"])
-        .pipe(drop_rows_missing_names)
+        # .drop(
+        #     columns=[
+        #         "previous_discipline",
+        #         "previous_discipline_1",
+        #         "previous_discipline_2",
+        #         "previous_discipline_3",
+        #         "previous_discipline_4",
+        #         "previous_discipline_5",
+        #         "previous_discipline_6",
+        #     ]
+        # )
+        # .pipe(join_multiple_extracted_entity_cols)
+        # .pipe(sanitize_dates_2020)
+        # .pipe(clean_dates, ["report_date"])
+        # .pipe(extract_and_split_names_2020)
+        # .pipe(clean_report_subject)
+        # .pipe(extract_allegation_and_disposition)
+        # .pipe(clean_tracking_id)
+        # .pipe(clean_names, ["first_name", "last_name"])
+        # .pipe(set_values, {"agency": "louisiana-state-pd"})
+        # .pipe(gen_uid, ["first_name", "last_name", "agency"])
+        # .pipe(
+        #     gen_uid,
+        #     ["allegation", "uid", "report_year", "report_month", "report_day"],
+        #     "allegation_uid",
+        # )
+        # .drop_duplicates(subset=["allegation_uid"])
+        # .pipe(drop_rows_missing_names)
+        # .pipe(create_tracking_id_og_col)
+        # .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
     )
     return df
 

@@ -15,11 +15,15 @@ def fuse_events(cprr21, cprr18, post):
                 "prefix": "investigation_complete",
                 "keep": ["uid", "agency", "allegation_uid"],
             },
+            events.COMPLAINT_RECEIVE: {
+                "prefix": "receive",
+                "keep": ["uid", "agency", "allegation_uid"],
+            },
         },
         ["uid", "allegation_uid"],
     )
     builder.extract_events(
-        cprr21,
+        cprr18,
         {
             events.INVESTIGATION_COMPLETE: {
                 "prefix": "investigation_complete",
@@ -61,7 +65,7 @@ if __name__ == "__main__":
     agency = cprr21.agency[0]
     post = load_for_agency(agency)
     per = fuse_personnel(cprr21, cprr18, post)
-    com = rearrange_allegation_columns(pd.concat([cprr21, cprr18]))
+    com = rearrange_allegation_columns(pd.concat([cprr21, cprr18], axis=0))
     event = fuse_events(cprr21, cprr18, post)
     event.to_csv(deba.data("fuse/event_abbeville_pd.csv"), index=False)
     com.to_csv(deba.data("fuse/com_abbeville_pd.csv"), index=False)

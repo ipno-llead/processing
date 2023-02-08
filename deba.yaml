@@ -9,6 +9,8 @@ patterns:
 stages:
   - name: meta
   - name: ocr
+    commonPrerequisites:
+      - ocr_results
   - name: ner
   - name: clean
     ignoredTargets:
@@ -20,6 +22,7 @@ stages:
       - fuse/person.csv
     commonPrerequisites:
       - datavalid.yml
+  - name: analysis
 targets:
   - fuse/personnel.csv
   - fuse/allegation.csv
@@ -27,3 +30,4 @@ targets:
   - fuse/stop_and_search.csv
   - fuse/appeals.csv
   - fuse/event.csv
+  - analysis/coaccusals.csv

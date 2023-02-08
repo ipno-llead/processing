@@ -1,0 +1,6 @@
+wdir: ../../../data/raw
+outs:
+- md5: 6ca82407312ac01481472717541b3084.dir
+  size: 209
+  nfiles: 1
+  path: lockport_pd

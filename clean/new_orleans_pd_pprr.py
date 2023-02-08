@@ -36,7 +36,7 @@ def split_names_overtime(df):
     df.loc[:, "first_name"] = names[1]
     df.loc[:, "middle_name"] = names[2]
     return df.drop(columns=["name"])[
-        ~((df.overtime_and_detail_annual_total.fillna("") == ""))
+        ~((df.overtime_annual_total.fillna("") == ""))
     ]
 
 
@@ -100,7 +100,7 @@ def drop_rows_missing_names(df):
 
 
 def clean_location(df):
-    df.loc[:, "overtime_and_detail_location"] = (
+    df.loc[:, "overtime_location"] = (
         df.location.str.lower()
         .str.strip()
         .str.replace(r"^pol ", "", regex=True)
@@ -131,10 +131,10 @@ def clean():
                 "Sum": "employee_id",
                 "Unnamed: 1": "name",
                 "Unnamed: 2": "location",
-                "Unnamed: 3": "overtime_and_detail_annual_total",
+                "Unnamed: 3": "overtime_annual_total",
             }
         )
-        .pipe(set_values, {"overtime_and_detail_date": "12/31/2019"})
+        .pipe(set_values, {"overtime_date": "12/31/2019"})
         .pipe(drop_first_and_last_row_overtime)
         .pipe(drop_rows_missing_name_overtime)
         .pipe(split_names_overtime)
@@ -152,7 +152,7 @@ def clean():
                 "Sum": "employee_id",
                 "Unnamed: 1": "name",
                 "Unnamed: 2": "location",
-                "Unnamed: 3": "overtime_and_detail_annual_total",
+                "Unnamed: 3": "overtime_annual_total",
             }
         )
         .pipe(set_values, {"overtime_and_detail_date": "12/31/2020"})
@@ -173,10 +173,10 @@ def clean():
                 "Sum of Earnings per PPE": "employee_id",
                 "Unnamed: 1": "name",
                 "Unnamed: 2": "location",
-                "Unnamed: 3": "overtime_and_detail_annual_total",
+                "Unnamed: 3": "overtime_annual_total",
             }
         )
-        .pipe(set_values, {"overtime_and_detail_date": "12/31/2021"})
+        .pipe(set_values, {"overtime_date": "12/31/2021"})
         .pipe(drop_first_and_last_row_overtime)
         .pipe(drop_rows_missing_name_overtime)
         .pipe(split_names_overtime)
@@ -187,8 +187,8 @@ def clean():
 
     overtime = pd.concat([df19, df20, df21], axis=0).drop_duplicates(
         subset=[
-            "overtime_and_detail_annual_total",
-            "overtime_and_detail_date",
+            "overtime_annual_total",
+            "overtime_date",
             "employee_id",
         ]
     )
@@ -231,7 +231,7 @@ def clean():
     df = pd.merge(personnel, overtime, on="employee_id", how="outer").pipe(
         drop_rows_missing_names
     )
-    df = df.drop_duplicates(subset=["uid", "salary_date", "overtime_and_detail_date"])
+    df = df.drop_duplicates(subset=["uid", "salary_date", "overtime_date"])
     return df
 
 

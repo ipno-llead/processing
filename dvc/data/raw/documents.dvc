@@ -1,0 +1,6 @@
+wdir: ../../../data/raw
+outs:
+- md5: 7b4595b3acd031aadbeb68d76332e965.dir
+  size: 4288946
+  nfiles: 2
+  path: documents

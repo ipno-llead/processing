@@ -76,6 +76,11 @@ def assign_allegations(df):
     )
 
 
+def create_tracking_id_og_col(df):
+    df.loc[:, "tracking_id_og"] = df.tracking_id
+    return df
+
+
 def clean():
     df = (
         realign()
@@ -133,10 +138,22 @@ def clean():
         .pipe(assign_agency)
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(gen_uid, ["agency", "tracking_id"], "allegation_uid")
+        .pipe(create_tracking_id_og_col)
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
     )
-    return df
+    citizen_df = df[["complainant_sex", "complainant_race", "allegation_uid", "agency"]]
+    citizen_df = citizen_df.pipe(
+        gen_uid,
+        ["complainant_sex", "complainant_race", "allegation_uid", "agency"],
+        "citizen_uid",
+    )
+    df = df.drop(columns=["complainant_sex", "complainant_race"])
+    return df, citizen_df
 
 
 if __name__ == "__main__":
-    df = clean()
+    df, citizen_df = clean()
     df.to_csv(deba.data("clean/cprr_new_orleans_harbor_pd_2020.csv"), index=False)
+    citizen_df.to_csv(
+        deba.data("clean/cprr_cit_new_orleans_harbor_pd_2020.csv"), index=False
+    )

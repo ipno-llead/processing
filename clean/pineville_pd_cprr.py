@@ -73,6 +73,11 @@ def clean_allegation(df):
     return df
 
 
+def create_tracking_id_og_col(df):
+    df.loc[:, "tracking_id_og"] = df.tracking_id
+    return df
+
+
 def clean():
     df = (
         pd.read_csv(deba.data("raw/pineville_pd/pineville_pd_cprr_2015_2019.csv"))
@@ -87,6 +92,8 @@ def clean():
         .pipe(set_values, {"agency": "pineville-pd"})
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(gen_uid, ["uid", "tracking_id", "allegation"], "allegation_uid")
+        .pipe(create_tracking_id_og_col)
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
     )
     return df
 

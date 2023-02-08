@@ -223,32 +223,38 @@ def merge_split_tables(df):
     )
 
 
+def create_tracking_id_og_col(df):
+    df.loc[:, "tracking_id_og"] = df.tracking_id
+    return df
+
+
 def clean():
     df = (
         pd.read_csv(deba.data("ner/nopd_pib_reports_2014_2020.csv"))
-        .pipe(stack_df)
-        .pipe(clean_allegation)
-        .pipe(extract_tracking_id)
-        .pipe(extract_receive_date)
-        .pipe(extract_disposition)
-        .pipe(extract_actions)
-        .pipe(extract_allegation_desc)
-        .pipe(extract_allegation_made)
-        .pipe(extract_investigation_status)
-        .pipe(merge_split_tables)
-        .pipe(
-            standardize_desc_cols,
-            [
-                "allegation_desc",
-                "allegation",
-                "tracking_id",
-                "action",
-                "badge_no",
-                "disposition",
-            ],
-        )
-        .pipe(names_to_title_case, ["tracking_id"])
-        .pipe(set_values, {"agency": "new-orleans-pd"})
+        # .pipe(stack_df)
+        # .pipe(clean_allegation)
+        # .pipe(extract_tracking_id)
+        # .pipe(extract_receive_date)
+        # .pipe(extract_disposition)
+        # .pipe(extract_actions)
+        # .pipe(extract_allegation_desc)
+        # .pipe(extract_allegation_made)
+        # .pipe(extract_investigation_status)
+        # .pipe(merge_split_tables)
+        # .pipe(
+        #     standardize_desc_cols,
+        #     [
+        #         "allegation_desc",
+        #         "allegation",
+        #         "tracking_id",
+        #         "action",
+        #         "badge_no",
+        #         "disposition",
+        #     ],
+        # )
+        # .pipe(set_values, {"agency": "new-orleans-pd"})
+        # .pipe(create_tracking_id_og_col)
+        # .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
     )
     return df
 

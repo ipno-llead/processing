@@ -51,7 +51,7 @@ if __name__ == "__main__":
     events_df = fuse_events(cprr19, cprr20, pprr)
     per_df = fuse_personnel(pprr, cprr19, cprr20, post)
     per_df.to_csv(deba.data("fuse/per_plaquemines_so.csv"), index=False)
-    com = rearrange_allegation_columns(pd.concat([cprr19, cprr20]))
+    com = rearrange_allegation_columns(pd.concat([cprr19, cprr20], axis=0))
     com.to_csv(deba.data("fuse/com_plaquemines_so.csv"), index=False)
     events_df = rearrange_event_columns(pd.concat([events_df, post_event]))
     events_df.to_csv(deba.data("fuse/event_plaquemines_so.csv"), index=False)
