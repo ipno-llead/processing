@@ -15,7 +15,11 @@ def drop_rows_missing_names(df):
 
 def split_names(df):
     names = (
-        df.officer_name.str.replace(r"(Officer|\:)", "", regex=True)
+        df.officer_name.str.replace(r"^\~", "", regex=True)
+        .str.replace(r"\.[\.\,]?", ",", regex=True)
+        .str.replace(r"^ROSALIET\, \(No$", "ROSALIET", regex=True)
+        .str.replace(r"^6729/2012\,$", "", regex=True)
+        .str.replace(r"Officer: ", "", regex=False)
         .str.strip()
         .str.extract(r"(\w+(?:'\w+)?),? ?(\w+)(?: (\w+))?")
     )
@@ -45,7 +49,7 @@ def generate_history_id(df):
             "agency_10",
             "agency_11",
             "agency_12",
-            "agency_13"
+            "agency_13",
         ]
     ].stack()
 
@@ -349,16 +353,16 @@ def clean():
     dfa = pd.read_csv(deba.data("ner/advocate_post_officer_history_reports.csv"))
     dfb = pd.read_csv(deba.data("ner/post_officer_history_reports.csv"))
     df = (
-        pd.concat([dfa, dfb], axis=0, ignore_index=True)
-        # .pipe(drop_rows_missing_names)
-        # .rename(
-        #     columns={
-        #         "officer_sex": "sex",
-        #     }
-        # )
-        # .pipe(split_names)
-        # .pipe(clean_sexes, ["sex"])
-        # .pipe(generate_history_id)
+        pd.concat([dfa, dfb, dfc], axis=0, ignore_index=True)
+        .pipe(drop_rows_missing_names)
+        .rename(
+            columns={
+                "officer_sex": "sex",
+            }
+        )
+        .pipe(clean_sexes, ["sex"])
+        .pipe(generate_history_id)
+        .pipe(split_names)
         # .pipe(clean_agency_pre_split)
         # .pipe(split_agency)
         # .pipe(
@@ -369,7 +373,7 @@ def clean():
         # )
         # .pipe(clean_agency)
         # .pipe(convert_agency_to_slug)
-        # .pipe(gen_uid, ["first_name", "last_name", "middle_name", "agency"])
+        .pipe(gen_uid, ["first_name", "last_name"])
         # .pipe(drop_duplicates)
         # .pipe(check_for_duplicate_uids)
         # .pipe(switched_job)

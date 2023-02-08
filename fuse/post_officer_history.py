@@ -62,7 +62,7 @@ def deduplicate_personnel(personnel):
 
 
 if __name__ == "__main__":
-    post = pd.read_csv(deba.data("match/post_officer_history.csv"))
+    # post = pd.read_csv(deba.data("match/post_officer_history.csv"))
 
     allegation_df = pd.read_csv(deba.data("fuse/allegation.csv"))
     events_pre_post = pd.read_csv(deba.data("fuse/event_pre_post.csv"))
