@@ -39,7 +39,7 @@ def match_brady_to_personnel(brady, post):
 
 
 if __name__ == "__main__":
-    personnel = pd.read_csv(deba.data("fuse/personnel_pre_post.csv"))
+    post = load_for_agency("tangipahoa-so")
     brady = pd.read_csv(deba.data("clean/brady_tangipahoa_da_2021.csv"))
-    brady = match_brady_to_personnel(brady, personnel)
+    brady = match_brady_to_personnel(brady, post)
     brady.to_csv(deba.data("match/brady_tangipahoa_da_2021.csv"), index=False)
