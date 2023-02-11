@@ -29,7 +29,7 @@ def match_brady_to_post(brady, post):
     )
     decision = 1
     matcher.save_pairs_to_excel(
-        deba.data("match/brady_ouachita_da_2021_v_post.xlsx"),
+        deba.data("match/brady_ouachita_da_2021_v_personnel.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)

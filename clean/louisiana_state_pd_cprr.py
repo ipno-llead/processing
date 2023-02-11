@@ -1,7 +1,7 @@
 import deba
 import pandas as pd
 from lib.columns import clean_column_names, set_values
-from lib.clean import clean_names, clean_dates
+from lib.clean import clean_names, clean_dates, names_to_title_case
 from lib.uid import gen_uid
 from functools import reduce
 
@@ -303,14 +303,49 @@ def create_tracking_id_og_col(df):
     return df
 
 
+def format_titles_2019(df):
+    df.loc[:, "title"] = (
+        df.title.fillna("")
+        + ":"
+        + df.first_name.fillna("")
+        + " "
+        + df.last_name.fillna("")
+        + " on "
+        + df.letter_date
+    )
+    df.loc[:, "title"] = df.title.str.replace(
+        r"(.+):(.+)", r"\1 Notice: \2", regex=True
+    ).str.replace(r"\/", "-", regex=True)
+    return df.pipe(names_to_title_case, ["title"])
+
+
+def format_titles_2020(df):
+    df.loc[:, "title"] = df.report_subject
+    df.loc[:, "title"] = (
+        df.title.fillna("")
+        + ":"
+        + df.first_name.fillna("")
+        + " "
+        + df.last_name.fillna("")
+        + df.middle_name.fillna("")
+        + " on "
+        + df.report_date
+    )
+    df.loc[:, "title"] = df.title.str.replace(
+        r"(.+):(.+)", r"\1 investigative report: \2", regex=True
+    ).str.replace(r"\/", "-", regex=True)
+    return df.pipe(names_to_title_case, ["title"])
+
+
 def clean_letters_2019():
     db_meta = pd.read_csv(
         deba.data("raw/louisiana_state_pd/letters_louisiana_state_pd_2019_db_files.csv")
     ).pipe(extract_db_meta)
 
     df = (
-        pd.read_csv(deba.data("ner/letters_louisiana_state_pd_2019.csv"))
-        .pipe(clean_column_names)
+        pd.read_csv(deba.data("ner/letters_louisiana_state_pd_2019.csv")).pipe(
+            clean_column_names
+        )
         # .pipe(concat_text_from_all_pages)
         # .pipe(drop_rows_missing_dates)
         # .pipe(extract_ids_and_subject)
@@ -334,8 +369,9 @@ def clean_letters_2019():
 
 def clean_reports_2020():
     df = (
-        pd.read_csv(deba.data("ner/reports_louisiana_state_pd_2020.csv"))
-        .pipe(clean_column_names)
+        pd.read_csv(deba.data("ner/reports_louisiana_state_pd_2020.csv")).pipe(
+            clean_column_names
+        )
         # .drop(
         #     columns=[
         #         "previous_discipline",

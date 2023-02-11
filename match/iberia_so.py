@@ -38,7 +38,7 @@ def match_cprr_to_post(cprr, post):
 
 
 if __name__ == "__main__":
-    post = load_for_agency("iberia-da")
+    post = load_for_agency("iberia-so")
     cprr = pd.read_csv(deba.data("clean/iberia_so_cprr_2019_2021.csv"))
     cprr = match_cprr_to_post(cprr, post)
     cprr.to_csv(deba.data("match/iberia_so_cprr_2019_2021.csv"), index=False)

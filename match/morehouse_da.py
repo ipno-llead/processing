@@ -1,8 +1,4 @@
 
-
-
-
-
 from datamatch import ThresholdMatcher, JaroWinklerSimilarity, ColumnsIndex
 import deba
 import pandas as pd
@@ -32,7 +28,7 @@ def match_brady_to_post(brady, post):
     )
     decision = 1
     matcher.save_pairs_to_excel(
-        deba.data("match/brady_morehouse_da_2022_v_post.xlsx"),
+        deba.data("match/brady_morehouse_da_2022_v_personnel.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
@@ -43,7 +39,10 @@ def match_brady_to_post(brady, post):
 
 
 if __name__ == "__main__":
-    post = load_for_agency("morehouse-da")
+    post = load_for_agency("morehouse-so")
     brady = pd.read_csv(deba.data("clean/brady_morehouse_da_2022.csv"))
     brady = match_brady_to_post(brady, post)
     brady.to_csv(deba.data("match/brady_morehouse_da_2022.csv"), index=False)
+
+
+
