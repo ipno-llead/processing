@@ -36,7 +36,7 @@ def process_pdfs_2022() -> pd.DataFrame:
 
 
 def process_pdfs_2023() -> pd.DataFrame:
-    dir_name = real_dir_path("raw_post_officer_history_reports_2023_a.dvc")
+    dir_name = real_dir_path("raw_post_officer_history_reports_2023.dvc")
     return (
         pd.read_csv(deba.data("meta/post_officer_history_reports_2023_files.csv"))
         .pipe(only_pdf)
