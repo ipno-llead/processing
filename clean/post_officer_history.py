@@ -50,6 +50,7 @@ def generate_history_id(df):
             "agency_11",
             "agency_12",
             "agency_13",
+            "agency_14",
         ]
     ].stack()
 
@@ -66,6 +67,18 @@ def generate_history_id(df):
     stacked_agency_df = stacked_agency_df.merge(names_df, on="history_id", how="right")
 
     return stacked_agency_df[~((stacked_agency_df.agency.fillna("") == ""))]
+
+
+# def review_na(df):
+#     # df.loc[:, "agency"] = df.agency.fillna("")
+#     # df = df[df.agency.isin([""])]
+#     df = df[df.fn.str.contains(("SELA"))]
+#     df.loc[:, "pageno"] = df.pageno.astype(str)
+#     df = df[df.pageno.isin(["41", "2", "3", "4", "5", "6", "7", "8", "11",
+#                               "12",   "15", "19", "20", "22", "24", "25", "26"
+#                               "27", "29", "32", "33", "34", "35", "36", "37", "38"
+#                               "40", "41", "42", "44", "46", "51"])]
+#     return df
 
 
 def clean_agency_pre_split(df):
@@ -346,14 +359,17 @@ def switched(df):
     df = df[df.switched_job.astype(str).str.contains("True")]
     return df
 
+
 ### add DB metadata and add to docs table
 
 
 def clean():
     dfa = pd.read_csv(deba.data("ner/advocate_post_officer_history_reports.csv"))
     dfb = pd.read_csv(deba.data("ner/post_officer_history_reports.csv"))
+    dfc = pd.read_csv(deba.data("ner/post_officer_history_reports_2022.csv"))
+    dfd = pd.read_csv(deba.data("ner/post_officer_history_reports_2023.csv"))
     df = (
-        pd.concat([dfa, dfb], axis=0, ignore_index=True)
+        pd.concat([dfa, dfb, dfc, dfd], axis=0, ignore_index=True)
         .pipe(drop_rows_missing_names)
         .rename(
             columns={
@@ -363,7 +379,7 @@ def clean():
         .pipe(clean_sexes, ["sex"])
         .pipe(generate_history_id)
         .pipe(split_names)
-        # .pipe(clean_agency_pre_split)
+        .pipe(clean_agency_pre_split)
         # .pipe(split_agency)
         # .pipe(
         #     names_to_title_case,
@@ -373,7 +389,7 @@ def clean():
         # )
         # .pipe(clean_agency)
         # .pipe(convert_agency_to_slug)
-        .pipe(gen_uid, ["first_name", "last_name"])
+        # .pipe(gen_uid, ["first_name", "last_name", "agency"])
         # .pipe(drop_duplicates)
         # .pipe(check_for_duplicate_uids)
         # .pipe(switched_job)

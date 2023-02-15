@@ -19,15 +19,20 @@ def read_pdfs_22():
     return pdfs
 
 
+def read_pdfs_23():
+    pdfs = pd.read_csv(
+        deba.data("ocr/post_officer_history_reports_2023_rotated_pdfs.csv")
+    )
+    return pdfs
+
+
 def read_pdfs_advocate():
     pdfs = pd.read_csv(deba.data("ocr/post_officer_history_reports_advocate_pdfs.csv"))
     return pdfs
 
 
 def training_data():
-    data = (
-        r"data/raw/post/post_officer_history/training_data/post_officer_history_training_data.jsonl"
-    )
+    data = r"data/raw/post/post_officer_history/training_data/post_officer_history_training_data.jsonl"
     return data
 
 
@@ -35,17 +40,22 @@ if __name__ == "__main__":
     pdfs_21 = read_pdfs_21()
     pdfs_22 = read_pdfs_22()
     pdfs_advocate = read_pdfs_advocate()
+    pdfs_23 = read_pdfs_23()
     training = training_data()
     ner = train_spacy_model(pdfs_21, training)
-    model = ner.to_disk(deba.data("ner/post/post_officer_history/model/post_officer_history_2.model"))
+    model = ner.to_disk(
+        deba.data("ner/post/post_officer_history/model/post_officer_history_2.model")
+    )
     # trained_model = spacy.load(
-    #     "data/ner/post/post_officer_history/model/post_officer_history.model"
+    #     "data/ner/post/post_officer_history/model/post_officer_history_2.model"
     # )
     ner_21 = apply_spacy_model(pdfs_21, ner)
     ner_22 = apply_spacy_model(pdfs_22, ner)
+    ner_23 = apply_spacy_model(pdfs_23, ner)
     ner_advocate = apply_spacy_model(pdfs_advocate, ner)
-    ner_21.to_csv(deba.data("ner/post_officer_history_reports.csv"), index=False)
+    ner_21.to_csv(deba.data("ner/post_officer_history_reports.csv"))
     ner_22.to_csv(deba.data("ner/post_officer_history_reports_2022.csv"), index=False)
-    ner_advocate.to_csv(deba.data("ner/advocate_post_officer_history_reports.csv"), index=False)
-
-    
+    ner_23.to_csv(deba.data("ner/post_officer_history_reports_2023.csv"), index=False)
+    ner_advocate.to_csv(
+        deba.data("ner/advocate_post_officer_history_reports.csv"), index=False
+    )
