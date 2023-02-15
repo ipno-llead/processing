@@ -10,6 +10,8 @@ from lib.columns import set_values
 
 
 def drop_rows_missing_names(df):
+    df.loc[:, "agency"] = df.agency.fillna("").str.replace(r"^$", "999", regex=True)
+    df = df[df.agency.isin(["999"])]
     return df[~((df.officer_name.fillna("") == ""))]
 
 
@@ -87,10 +89,13 @@ def clean_agency_pre_split(df):
         .str.lower()
         .fillna("")
         .str.replace(r"(\[|\]|\'|\,)", "", regex=True)
-        .str.replace(r"(.+)range(.+)", "", regex=True)
-        .str.replace(r"(.+)academy(.+)", "", regex=True)
+        # .str.replace(r"(.+)range(.+)", "", regex=True)
+        # .str.replace(r"(.+)academy(.+)", "", regex=True)
     )
-    return df[~((df.agency == ""))]
+    agencies = df.agency.str.extract(r"(.+time.+)")
+
+    df.loc[:, "agency"] = agencies[0]
+    return df[~((df.agency.fillna("") == ""))]
 
 
 def split_agency(df):
@@ -377,9 +382,9 @@ def clean():
             }
         )
         .pipe(clean_sexes, ["sex"])
-        .pipe(generate_history_id)
-        .pipe(split_names)
-        .pipe(clean_agency_pre_split)
+        # .pipe(generate_history_id)
+        # .pipe(split_names)
+        # .pipe(clean_agency_pre_split)
         # .pipe(split_agency)
         # .pipe(
         #     names_to_title_case,
