@@ -51,7 +51,7 @@ def deduplicate_personnel(personnel):
         },
         df,
     )
-    decision = 0.969
+    decision = 0.986
     matcher.save_clusters_to_excel(
         deba.data("fuse/dedeuplicate_personnel.xlsx"),
         decision,
@@ -66,6 +66,7 @@ if __name__ == "__main__":
 
     allegation_df = pd.read_csv(deba.data("fuse/allegation.csv"))
     events_pre_post = pd.read_csv(deba.data("fuse/event_pre_post.csv"))
+ 
     per_pre_post = pd.read_csv(deba.data("fuse/personnel_pre_post.csv"))
 
     # post_events = fuse_events(post)
@@ -77,11 +78,14 @@ if __name__ == "__main__":
 
     per_df = per_df[~((per_df.last_name.fillna("") == ""))]
     per_df = per_df[~((per_df.agency.fillna("") == ""))]
+
     per_dfa = per_df[per_df["uid"].isin(allegation_df["uid"])]
     per_dfb = per_df[per_df['uid'].isin(event_df['uid'])]
 
+
     per_df = pd.concat([per_dfa, per_dfb], axis=0)
     per_df = deduplicate_personnel(per_df)
+    per_df = per_df.drop_duplicates(subset=["first_name", "middle_name", "last_name", "uid"])
     per_df = per_df.pipe(names_to_title_case, ["race", "sex"])
 
     event_df = event_df[~((event_df.agency.fillna("") == ""))]
