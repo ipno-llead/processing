@@ -32,7 +32,7 @@ def read_pdfs_advocate():
 
 
 def training_data():
-    data = r"data/raw/post/post_officer_history/training_data/post_officer_history_training_data.jsonl"
+    data = r"data/raw/post/post_officer_history/training_data/ayyub.jsonl"
     return data
 
 
