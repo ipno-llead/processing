@@ -1,0 +1,6 @@
+wdir: data
+outs:
+- md5: 83d6afc2650ab0d8ba1855672f23d545.dir
+  size: 40500706
+  nfiles: 3
+  path: raw_post_officer_history_reports_9_30_2022_rotated

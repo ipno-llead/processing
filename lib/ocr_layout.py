@@ -42,7 +42,7 @@ def _line_height(o):
 
 def _line_height_is_similar(a, b):
     lh_a, lh_b = _line_height(a), _line_height(b)
-    return lh_b > lh_a * 0.66 and lh_b < lh_a * 1.5
+    return lh_b > lh_a * 1.5 and lh_b < lh_a * 1.5
 
 
 def _mean_n_std(l) -> Tuple[float, float]:
