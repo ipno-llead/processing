@@ -34,6 +34,7 @@ def split_names(df):
 
 
 def generate_history_id(df):
+    # df = df[~df.fn.str.contains("9_30_2022.pdf")]
     stacked_agency_sr = df[
         [
             "agency",
@@ -129,7 +130,7 @@ def split_agency(df):
         .str.replace(r"(\“|\(|\"| ?agency ?| ?name ?)", "", regex=True)
     )
 
-    return df
+    return df[~((df.agency.fillna("") == ""))]
 
 
 def clean_agency(df):
@@ -156,9 +157,9 @@ def clean_agency(df):
         .str.replace(r"(\w+) univ pd", r"\1-university-pd", regex=True)
         .str.replace(r"shrevbport", "shreveport", regex=False)
         .str.replace(r"^bossier  cc-university-pd$", "bossier-community-college-university-pd", regex=True)
-        .str.replace(r"(kenner|thibodaux|vincent|lockport|tickfawi"
-                     r"|harahan|shreveport|jefferson|sunset|brusly"
-                     r"|felicianai|zachary|houma|covington|causeway|gretna)[ei]", r"\1", regex=True)
+        .str.replace(r"(kenner|thibodaux|vincent|lockport|tickfawi|settlement"
+                     r"|harahan|shreveport|jefferson|sunset|brusly|vidalia"
+                     r"|felicianai|zachary|houma|covington|causeway|gretna|welsh)[ei]", r"\1", regex=True)
         .str.replace(r"(.+)(pd|so)(.+)(so|pd)(.+)?", "", regex=True)
         .str.replace(r"^lsuhsc -no-university-pd$", "lsuhsc-new-orleans-university-pd", regex=True)
         .str.replace(r"^probation & parole adult$", "probation-parole-adult", regex=True)
@@ -168,6 +169,24 @@ def clean_agency(df):
         .str.replace(r"^office of youth dev dept of corrections$", "office-of-youth-development-department-of-corrections", regex=True)
         .str.replace(r"of uvenilejustice", "of juvenile justice", regex=False)
         .str.replace(r"^livestock brand comm office of inspector general$", "", regex=True)
+        .str.replace(r"outof", "out of", regex=False)
+        .str.replace(r"lsuhsc no", "lsuhsc-new-orleans", regex=False)
+        .str.replace(r"\bno\b", "new orleans", regex=True)
+        .str.replace(r"^probation &$", "", regex=True)
+        .str.replace(r"^medical center of ?(la new orleans)?", "medical-center-of-louisiana-new-orleans-pd", regex=True)
+        .str.replace(r"^orleans da office$", "orleans-da", regex=True)
+        .str.replace(r"^baton rouge cc-university-pd$", "baton-rouge-community-college-university-pd", regex=True)
+        .str.replace(r"^(st ammanyparisf so|st tamimanyparsh so)$", "st tammany so", regex=True)
+        .str.replace(r"& ", "", regex=False)
+        .str.replace(r"^-i? ?", "", regex=True)
+        .str.replace(r"ecarrollparise so", "east carroll so", regex=False)
+        .str.replace(r"^lakeprovidence pd$", "lake-providence-pd", regex=True)
+        .str.replace(r"^st i martinville pd$", "st martinville", regex=True)
+        .str.replace(r"^wiestwego pd$", "westwego pd", regex=True)
+        .str.replace(r"portallen", "port allen", regex=False)
+        .str.replace(r"(\w+) +(\w+)", r"\1 \2", regex=True)
+        .str.replace(r"\s+", "-", regex=True)
+
     )
     return df
 
@@ -229,19 +248,25 @@ def switched_job(df):
 
 def switched(df):
     df = df[df.switched_job.astype(str).str.contains("True")]
+    df.loc[:, "left_year"] = df.left_date.str.replace(r"(\w+)\/(\w+)\/(\w+)", r"\3", regex=True)
+    df.loc[:, "left_year"] = df.left_year.str.replace(r"^$", "n/a", regex=True)
+    df = df[(df.left_year.isin(["2018", "2019", "2020", "2021", "2022"]))]
     return df
 
 
 ### add DB metadata and add to docs table
 
 
+
+
 def clean():
     dfa = pd.read_csv(deba.data("ner/advocate_post_officer_history_reports.csv"))
     dfb = pd.read_csv(deba.data("ner/post_officer_history_reports.csv"))
     dfc = pd.read_csv(deba.data("ner/post_officer_history_reports_2022.csv"))
-    dfd = pd.read_csv(deba.data("ner/post_officer_history_reports_2023.csv"))
+    dfd = pd.read_csv(deba.data("ner/post_officer_history_reports_2022_rotated.csv"))
+    dfe = pd.read_csv(deba.data("ner/post_officer_history_reports_2023.csv"))
     df = (
-        pd.concat([dfa, dfb, dfc, dfd], axis=0, ignore_index=True)
+        pd.concat([dfa, dfb, dfc, dfd, dfe], axis=0, ignore_index=True)
         .pipe(drop_rows_missing_names)
         .rename(
             columns={
@@ -261,11 +286,11 @@ def clean():
         # )
         .pipe(clean_agency)
         # .pipe(convert_agency_to_slug)
-        # .pipe(gen_uid, ["first_name", "last_name", "agency"])
-        # .pipe(drop_duplicates)
-        # .pipe(check_for_duplicate_uids)
-        # .pipe(switched_job)
-        # .pipe(switched)
+        .pipe(gen_uid, ["first_name", "last_name", "agency"])
+        .pipe(drop_duplicates)
+        .pipe(check_for_duplicate_uids)
+        .pipe(switched_job)
+        .pipe(switched)
         # .pipe(set_values, {"source_agency": "post"})
         # .pipe(standardize_desc_cols, ["agency"])
     )

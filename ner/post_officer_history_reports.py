@@ -18,6 +18,10 @@ def read_pdfs_22():
     pdfs = pd.read_csv(deba.data("ocr/post_officer_history_reports_9_16_2022_pdfs.csv"))
     return pdfs
 
+def read_pdfs_22_rotated():
+    pdfs = pd.read_csv(deba.data("ocr/post_officer_history_reports_9_30_2022_rotated_pdfs.csv"))
+    return pdfs
+
 
 def read_pdfs_23():
     pdfs = pd.read_csv(
@@ -41,20 +45,23 @@ if __name__ == "__main__":
     pdfs_22 = read_pdfs_22()
     pdfs_advocate = read_pdfs_advocate()
     pdfs_23 = read_pdfs_23()
+    pdfs_22_rotated = read_pdfs_22_rotated()
     training = training_data()
-    ner = train_spacy_model(pdfs_21, training)
-    model = ner.to_disk(
-        deba.data("ner/post/post_officer_history/model/post_officer_history_2.model")
-    )
-    # trained_model = spacy.load(
-    #     "data/ner/post/post_officer_history/model/post_officer_history_2.model"
+    # ner = train_spacy_model(pdfs_21, training)
+    # model = ner.to_disk(
+    #     deba.data("ner/post/post_officer_history/model/post_officer_history_4.model")
     # )
-    ner_21 = apply_spacy_model(pdfs_21, ner)
-    ner_22 = apply_spacy_model(pdfs_22, ner)
-    ner_23 = apply_spacy_model(pdfs_23, ner)
-    ner_advocate = apply_spacy_model(pdfs_advocate, ner)
-    ner_21.to_csv(deba.data("ner/post_officer_history_reports.csv"))
+    trained_model = spacy.load(
+        "data/ner/post/post_officer_history/model/post_officer_history_3.model"
+    )
+    ner_21 = apply_spacy_model(pdfs_21, trained_model)
+    ner_22 = apply_spacy_model(pdfs_22, trained_model)
+    ner_22_rotated = apply_spacy_model(pdfs_22_rotated, trained_model)
+    ner_23 = apply_spacy_model(pdfs_23, trained_model)
+    ner_advocate = apply_spacy_model(pdfs_advocate, trained_model)
+    ner_21.to_csv(deba.data("ner/post_officer_history_reports.csv"), index=False)
     ner_22.to_csv(deba.data("ner/post_officer_history_reports_2022.csv"), index=False)
+    ner_22_rotated.to_csv(deba.data("ner/post_officer_history_reports_2022_rotated.csv"), index=False)
     ner_23.to_csv(deba.data("ner/post_officer_history_reports_2023.csv"), index=False)
     ner_advocate.to_csv(
         deba.data("ner/advocate_post_officer_history_reports.csv"), index=False
