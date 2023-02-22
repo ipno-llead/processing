@@ -248,15 +248,10 @@ def switched_job(df):
 
 def switched(df):
     df = df[df.switched_job.astype(str).str.contains("True")]
-    df.loc[:, "left_year"] = df.left_date.str.replace(r"(\w+)\/(\w+)\/(\w+)", r"\3", regex=True)
-    df.loc[:, "left_year"] = df.left_year.str.replace(r"^$", "n/a", regex=True)
-    df = df[(df.left_year.isin(["2018", "2019", "2020", "2021", "2022"]))]
     return df
 
 
 ### add DB metadata and add to docs table
-
-
 
 
 def clean():
@@ -278,21 +273,14 @@ def clean():
         .pipe(split_names)
         .pipe(clean_agency_pre_split)
         .pipe(split_agency)
-        # .pipe(
-        #     names_to_title_case,
-        #     [
-        #         "agency",
-        #     ],
-        # )
         .pipe(clean_agency)
-        # .pipe(convert_agency_to_slug)
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(drop_duplicates)
         .pipe(check_for_duplicate_uids)
         .pipe(switched_job)
         .pipe(switched)
-        # .pipe(set_values, {"source_agency": "post"})
-        # .pipe(standardize_desc_cols, ["agency"])
+        .pipe(set_values, {"source_agency": "post"})
+        .pipe(standardize_desc_cols, ["agency"])
     )
     return df
 

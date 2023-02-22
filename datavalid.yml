@@ -523,6 +523,8 @@ schemas:
           unique identifier of officer
         unique: true
         no_na: true
+      - name: hire_date
+      - name: left_date
       - name: agency
       - name: left_reason
   settlement:
