@@ -68,7 +68,7 @@ def read_constraints():
 
 
 def read_post():
-    post = pd.read_csv(deba.data("clean/post_officer_history.csv"))
+    post = pd.read_csv(deba.data("match/post_officer_history.csv"))
     post = post.drop_duplicates(subset=["uid"])
     print("read post officer history file (%d rows)" % post.shape[0])
     return post
@@ -282,22 +282,22 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    # old_person_df = pd.read_csv(args.person_csv)
-    # if args.new_person_csv is not None:
-    #     new_person_df = pd.read_csv(args.new_person_csv)
-    #     person_df = entity_resolution(
-    #         old_person=old_person_df, new_person=new_person_df
-    #     )
-    #     person_df.to_csv(deba.data("fuse/person.csv"), index=False)
-    # else:
-    #     personnel = pd.read_csv(deba.data("fuse/personnel.csv"))
-    #     print("read personnel file (%d x %d)" % personnel.shape)
-    #     events = pd.read_csv(deba.data("fuse/event.csv"))
-    #     print("read events file (%d x %d)" % events.shape)
-    #     constraints = read_constraints()
-    #     post = read_post()
-    #     clusters, personnel_event = cross_match_officers_between_agencies(
-    #         personnel, events, constraints, post
-    #     )
-    #     new_person_df = create_person_table(clusters, personnel, personnel_event)
-    #     new_person_df.to_csv(deba.data("fuse/person.csv"), index=False)
+    old_person_df = pd.read_csv(args.person_csv)
+    if args.new_person_csv is not None:
+        new_person_df = pd.read_csv(args.new_person_csv)
+        person_df = entity_resolution(
+            old_person=old_person_df, new_person=new_person_df
+        )
+        person_df.to_csv(deba.data("fuse/person.csv"), index=False)
+    else:
+        personnel = pd.read_csv(deba.data("fuse/personnel.csv"))
+        print("read personnel file (%d x %d)" % personnel.shape)
+        events = pd.read_csv(deba.data("fuse/event.csv"))
+        print("read events file (%d x %d)" % events.shape)
+        constraints = read_constraints()
+        post = read_post()
+        clusters, personnel_event = cross_match_officers_between_agencies(
+            personnel, events, constraints, post
+        )
+        new_person_df = create_person_table(clusters, personnel, personnel_event)
+        new_person_df.to_csv(deba.data("fuse/person.csv"), index=False)
