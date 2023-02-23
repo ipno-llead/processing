@@ -1,0 +1,6 @@
+wdir: data
+outs:
+- md5: bc8c872c300dd80185d0963d1c2b6339.dir
+  size: 32098666
+  nfiles: 95
+  path: raw_louisiana_state_pd_reports_2009_2020
