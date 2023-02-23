@@ -71,9 +71,7 @@ def clean_agency_pre_split(df):
         .str.lower()
         .fillna("")
         .str.replace(r"(\[|\]|\'|\,)", "", regex=True)
-
     )
-
 
     agencies = df.agency.str.extract(r"(.+(time|retired|reserve|deceased).+)")
 
@@ -158,27 +156,61 @@ def clean_agency(df):
         .str.replace(r"krotzsprings", "krotz springs", regex=False)
         .str.replace(r"(\w+) univ pd", r"\1-university-pd", regex=True)
         .str.replace(r"shrevbport", "shreveport", regex=False)
-        .str.replace(r"^bossier  cc-university-pd$", "bossier-community-college-university-pd", regex=True)
-        .str.replace(r"(kenner|thibodaux|vincent|lockport|tickfawi|settlement|mandeville|orleans"
-                     r"|harahan|shreveport|jefferson|sunset|brusly|vidalia|iberville|merryville"
-                     r"|feliciana|zachary|houma|covington|causeway|gretna|welsh|tickfaw)[ei]", r"\1", regex=True)
+        .str.replace(
+            r"^bossier  cc-university-pd$",
+            "bossier-community-college-university-pd",
+            regex=True,
+        )
+        .str.replace(
+            r"(kenner|thibodaux|vincent|lockport|tickfawi|settlement|mandeville|orleans"
+            r"|harahan|shreveport|jefferson|sunset|brusly|vidalia|iberville|merryville"
+            r"|feliciana|zachary|houma|covington|causeway|gretna|welsh|tickfaw)[ei]",
+            r"\1",
+            regex=True,
+        )
         .str.replace(r"(.+)(pd|so)(.+)(so|pd)(.+)?", "", regex=True)
-        .str.replace(r"^lsuhsc -no-university-pd$", "lsuhsc-new-orleans-university-pd", regex=True)
-        .str.replace(r"^probation & parole adult$", "probation-parole-adult", regex=True)
-        .str.replace(r"^medical center of la no$", "medical-center-of-louisiana-new-orleans-pd", regex=False)
+        .str.replace(
+            r"^lsuhsc -no-university-pd$",
+            "lsuhsc-new-orleans-university-pd",
+            regex=True,
+        )
+        .str.replace(
+            r"^probation & parole adult$", "probation-parole-adult", regex=True
+        )
+        .str.replace(
+            r"^medical center of la no$",
+            "medical-center-of-louisiana-new-orleans-pd",
+            regex=False,
+        )
         .str.replace(r"st ate", "state", regex=False)
         .str.replace(r"--", "", regex=True)
-        .str.replace(r"^office of youth dev dept of corrections$", "office-of-youth-development-department-of-corrections", regex=True)
+        .str.replace(
+            r"^office of youth dev dept of corrections$",
+            "office-of-youth-development-department-of-corrections",
+            regex=True,
+        )
         .str.replace(r"of uvenilejustice", "of juvenile justice", regex=False)
-        .str.replace(r"^livestock brand comm office of inspector general$", "", regex=True)
+        .str.replace(
+            r"^livestock brand comm office of inspector general$", "", regex=True
+        )
         .str.replace(r"outof", "out of", regex=False)
         .str.replace(r"lsuhsc no", "lsuhsc-new-orleans", regex=False)
         .str.replace(r"\bno\b", "new orleans", regex=True)
         .str.replace(r"^probation &$", "", regex=True)
-        .str.replace(r"^medical center of ?(la new orleans)?", "medical-center-of-louisiana-new-orleans-pd", regex=True)
+        .str.replace(
+            r"^medical center of ?(la new orleans)?",
+            "medical-center-of-louisiana-new-orleans-pd",
+            regex=True,
+        )
         .str.replace(r"^orleans da office$", "orleans-da", regex=True)
-        .str.replace(r"^baton rouge cc-university-pd$", "baton-rouge-community-college-university-pd", regex=True)
-        .str.replace(r"^(st ammanyparisf so|st tamimanyparsh so)$", "st tammany so", regex=True)
+        .str.replace(
+            r"^baton rouge cc-university-pd$",
+            "baton-rouge-community-college-university-pd",
+            regex=True,
+        )
+        .str.replace(
+            r"^(st ammanyparisf so|st tamimanyparsh so)$", "st tammany so", regex=True
+        )
         .str.replace(r"& ", "", regex=False)
         .str.replace(r"^-i? ?", "", regex=True)
         .str.replace(r"ecarrollparise so", "east carroll so", regex=False)
@@ -204,19 +236,35 @@ def clean_agency(df):
         .str.replace(r"b-baton", "east-baton", regex=False)
         .str.replace(r"attormn", "attorney", regex=False)
         .str.replace(r"avoyblles", "avoyelles", regex=False)
-        .str.replace(r"miss-river-bridge-pd", "mississippi-river-bridge-pd", regex=False)
+        .str.replace(
+            r"miss-river-bridge-pd", "mississippi-river-bridge-pd", regex=False
+        )
         .str.replace(r"naichitoches", "natchitoches", regex=False)
-        .str.replace(r"^new-orleans-criminal-court$", "orleans-criminal-court", regex=True)
-        .str.replace(r"(new-orleans-criminal-court-las-state-police|new-orleans-pd-orleans-da-office|"
-                     r"new-orleans-pd-out-of-state|new-orleans-pd-univ|newort-lans-pd)", "", regex=True)
+        .str.replace(
+            r"^new-orleans-criminal-court$", "orleans-criminal-court", regex=True
+        )
+        .str.replace(
+            r"(new-orleans-criminal-court-las-state-police|new-orleans-pd-orleans-da-office|"
+            r"new-orleans-pd-out-of-state|new-orleans-pd-univ|newort-lans-pd)",
+            "",
+            regex=True,
+        )
         .str.replace(r"portvincent", "port-vincent", regex=False)
         .str.replace(r"--", "-", regex=False)
-        .str.replace(r"^(shreveport-city-marshal-bossier-city-pd|slidell-city-marshal-slidell-pd|"
-                     r"state-fire-marshal-kenner-pd|state-fire-marshal-univ|st-landry-so-la-state-police|"
-                     r"ting-vtoaparish-so|university-pd|west-monroe-pd-west-monroe-marshal)$", "", regex=True)
+        .str.replace(
+            r"^(shreveport-city-marshal-bossier-city-pd|slidell-city-marshal-slidell-pd|"
+            r"state-fire-marshal-kenner-pd|state-fire-marshal-univ|st-landry-so-la-state-police|"
+            r"ting-vtoaparish-so|university-pd|west-monroe-pd-west-monroe-marshal)$",
+            "",
+            regex=True,
+        )
         .str.replace(r"sldell", "slidell", regex=False)
         .str.replace(r"southbastern", "southeastern", regex=False)
-        .str.replace(r"southern--?new-orleans-university-pd", "southern-university-pd", regex=True)
+        .str.replace(
+            r"southern--?new-orleans-university-pd",
+            "southern-university-pd",
+            regex=True,
+        )
         .str.replace(r"st-erlington-pd", "sterlington-pd", regex=False)
         .str.replace(r"st-i-mary-so", "st-mary-so", regex=False)
         .str.replace(r"st-martinville$", "st-martinville-pd", regex=True)
@@ -226,21 +274,35 @@ def clean_agency(df):
     )
     return df[~((df.agency.fillna("") == ""))]
 
+
 def clean_agency_2(df):
-    df.loc[:, "agency"] = (df.agency.str.replace(r"ponch\b|ponciatoula\b|ponciia-lla|ponciiatoula|poncitoula", "ponchatoula", regex=True)
-                           .str.replace(r"ia-pd", "pd", regex=False)
-                           .str.replace(r"detment\b", "department", regex=True)
-                           .str.replace(r"independencee", "independence", regex=False)
-                           .str.replace(r"(ting-vtoao|1-ngimtoai-so|mississippi-river-bridge-pd|red-river-so-natchitoches-so|"
-                                        r"red-river-o-bossier-city-pd)", "", regex=True)
-                           .str.replace(r"st-ammanyf-so", "st-tammany-so", regex=False)
-                           .str.replace(r"orleansp-so", "new-orleans-so", regex=False)
-                           .str.replace(r"vidalpd", "vidalia-pd", regex=False)
-                           .str.replace(r"new-iberpd", "new-iberia-pd", regex=False)
-                           .str.replace(r"ponchatoula-1a-pd", "ponchatoula-pd", regex=False)
-                            .str.replace(r"(.+)faw-pd", "tickfaw-pd", regex=True)
+    df.loc[:, "agency"] = (
+        df.agency.str.replace(
+            r"ponch\b|ponciatoula\b|ponciia-lla|ponciiatoula|poncitoula",
+            "ponchatoula",
+            regex=True,
+        )
+        .str.replace(r"ia-pd", "pd", regex=False)
+        .str.replace(r"detment\b", "department", regex=True)
+        .str.replace(r"independencee", "independence", regex=False)
+        .str.replace(
+            r"(ting-vtoao|1-ngimtoai-so|mississippi-river-bridge-pd|red-river-so-natchitoches-so|"
+            r"red-river-o-bossier-city-pd)",
+            "",
+            regex=True,
+        )
+        .str.replace(r"(st-ammanyf-so|st-tamimanyo)", "st-tammany-so", regex=True)
+        .str.replace(r"orleansp-so", "new-orleans-so", regex=False)
+        .str.replace(r"vidalpd", "vidalia-pd", regex=False)
+        .str.replace(r"new-iberpd", "new-iberia-pd", regex=False)
+        .str.replace(
+            r"(ponchatoula-1a-pd|ponciia-ula-pd)", "ponchatoula-pd", regex=True
+        )
+        .str.replace(r"(.+)faw-pd", "tickfaw-pd", regex=True)
+        .str.replace(r"^out-of-state-new-orleans-pd$", "", regex=True)
     )
-    return df 
+    return df
+
 
 def clean_parsed_dates(df):
     df.loc[:, "hire_date"] = (
