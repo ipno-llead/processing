@@ -47,18 +47,18 @@ if __name__ == "__main__":
     pdfs_23 = read_pdfs_23()
     pdfs_22_rotated = read_pdfs_22_rotated()
     training = training_data()
-    ner = train_spacy_model(pdfs_21, training)
-    model = ner.to_disk(
-        deba.data("ner/post/post_officer_history/model/post_ohr.model")
-    )
-    # trained_model = spacy.load(
-    #     "data/ner/post/post_officer_history/model/post_ohr.model"
+    # ner = train_spacy_model(pdfs_21, training)
+    # model = ner.to_disk(
+    #     deba.data("ner/post/post_officer_history/model/post_ohr.model")
     # )
-    ner_21 = apply_spacy_model(pdfs_21, ner)
-    ner_22 = apply_spacy_model(pdfs_22, ner)
-    ner_22_rotated = apply_spacy_model(pdfs_22_rotated, ner)
-    ner_23 = apply_spacy_model(pdfs_23, ner)
-    ner_advocate = apply_spacy_model(pdfs_advocate, ner)
+    trained_model = spacy.load(
+        "data/ner/post/post_officer_history/model/post_ohr.model"
+    )
+    ner_21 = apply_spacy_model(pdfs_21, trained_model)
+    ner_22 = apply_spacy_model(pdfs_22, trained_model)
+    ner_22_rotated = apply_spacy_model(pdfs_22_rotated, trained_model)
+    ner_23 = apply_spacy_model(pdfs_23, trained_model)
+    ner_advocate = apply_spacy_model(pdfs_advocate, trained_model)
     ner_21.to_csv(deba.data("ner/post_officer_history_reports.csv"), index=False)
     ner_22.to_csv(deba.data("ner/post_officer_history_reports_2022.csv"), index=False)
     ner_22_rotated.to_csv(deba.data("ner/post_officer_history_reports_2022_rotated.csv"), index=False)
