@@ -34,7 +34,6 @@ def split_names(df):
 
 
 def generate_history_id(df):
-    # df = df[~df.fn.str.contains("9_30_2022.pdf")]
     stacked_agency_sr = df[
         [
             "agency",
@@ -72,7 +71,6 @@ def clean_agency_pre_split(df):
         .fillna("")
         .str.replace(r"(\[|\]|\'|\,)", "", regex=True)
     )
-
     agencies = df.agency.str.extract(r"(.+(time|retired|reserve|deceased).+)")
 
     df.loc[:, "agency"] = agencies[0]
@@ -302,6 +300,7 @@ def clean_agency_2(df):
         .str.replace(r"^out-of-state-new-orleans-pd$", "", regex=True)
     )
     return df
+
 
 
 def clean_parsed_dates(df):
