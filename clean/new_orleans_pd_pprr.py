@@ -99,6 +99,11 @@ def drop_rows_missing_names(df):
     return df[~((df.first_name.fillna("") == ""))]
 
 
+def clean_overtime(df):
+    df.loc[:, "overtime_annual_total"] = df.overtime_annual_total.str.replace(r"\,", "", regex=True).astype(float)
+    return df
+
+
 def clean_location(df):
     df.loc[:, "overtime_location"] = (
         df.location.str.lower()
@@ -192,6 +197,8 @@ def clean():
             "employee_id",
         ]
     )
+
+    overtime = overtime.pipe(clean_overtime)
 
     personnel = (
         pd.read_csv(deba.data("raw/new_orleans_pd/new_orleans_pd_pprr_2020.csv"))
