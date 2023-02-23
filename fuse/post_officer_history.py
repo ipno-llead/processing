@@ -79,11 +79,6 @@ if __name__ == "__main__":
     per_df = per_df[~((per_df.last_name.fillna("") == ""))]
     per_df = per_df[~((per_df.agency.fillna("") == ""))]
 
-    per_dfa = per_df[per_df["uid"].isin(allegation_df["uid"])]
-    per_dfb = per_df[per_df['uid'].isin(event_df['uid'])]
-
-
-    per_df = pd.concat([per_dfa, per_dfb], axis=0)
     per_df = deduplicate_personnel(per_df)
     per_df = per_df.drop_duplicates(subset=["first_name", "middle_name", "last_name", "uid"])
     per_df = per_df.pipe(names_to_title_case, ["race", "sex"])
