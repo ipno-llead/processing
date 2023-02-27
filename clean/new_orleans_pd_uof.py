@@ -469,7 +469,7 @@ def extract_citizen(uof):
             "citizen_height",
         ]
     )
-    return df
+    return df, uof
 
 
 if __name__ == "__main__":
