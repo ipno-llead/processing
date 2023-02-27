@@ -398,8 +398,7 @@ def clean_uof():
     return df
 
 
-def extract_citizen():
-    uof = clean_uof()
+def extract_citizen(uof):
     df = (
         uof.loc[
             :,
