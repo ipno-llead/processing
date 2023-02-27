@@ -6,7 +6,7 @@ from lib.columns import (
     rearrange_post_officer_history_columns,
 )
 from lib import events
-
+from lib.personnel import fuse_personnel
 from datamatch import JaroWinklerSimilarity, ThresholdMatcher, ColumnsIndex
 from lib.clean import canonicalize_officers, names_to_title_case
 
@@ -62,19 +62,20 @@ def deduplicate_personnel(personnel):
 
 
 if __name__ == "__main__":
-    # post = pd.read_csv(deba.data("match/post_officer_history.csv"))
+    post = pd.read_csv(deba.data("match/post_officer_history.csv"))
     allegation_df = pd.read_csv(deba.data("fuse/allegation.csv"))
     events_pre_post = pd.read_csv(deba.data("fuse/event_pre_post.csv"))
     per_pre_post = pd.read_csv(deba.data("fuse/personnel_pre_post.csv"))
     uof_df = pd.read_csv(deba.data("fuse/use_of_force.csv"))
 
-    # post_events = fuse_events(post)
-    # event_df = pd.concat([post_events, events_pre_post], axis=0).drop_duplicates(
-    #     subset=["event_uid"], keep="last"
-    # )
+    post_events = fuse_events(post)
+    event_df = pd.concat([post_events, events_pre_post], axis=0).drop_duplicates(
+        subset=["event_uid"], keep="last"
+    )
     
+    per_df = fuse_personnel(per_pre_post, post)
     event_df = rearrange_event_columns(events_pre_post)
-    per_df = rearrange_personnel_columns(per_pre_post)
+    per_df = rearrange_personnel_columns(per_df)
 
     per_df = per_df[~((per_df.last_name.fillna("") == ""))]
     per_df = per_df[~((per_df.agency.fillna("") == ""))]
@@ -85,9 +86,9 @@ if __name__ == "__main__":
     uof_df = uof_df[uof_df["uid"].isin(per_df["uid"])]
 
     event_df = event_df[~((event_df.agency.fillna("") == ""))]
-    # post = rearrange_post_officer_history_columns(post)
+    post = rearrange_post_officer_history_columns(post)
 
     per_df.to_csv(deba.data("fuse/personnel.csv"), index=False)
     event_df.to_csv(deba.data("fuse/event.csv"), index=False)
     uof_df.to_csv(deba.data("fuse/use_of_force.csv"), index=False)
-    # post.to_csv(deba.data("fuse/post_officer_history.csv"), index=False)
+    post.to_csv(deba.data("fuse/post_officer_history.csv"), index=False)
