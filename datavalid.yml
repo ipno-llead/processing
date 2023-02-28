@@ -610,6 +610,7 @@ schemas:
       - name: citizen_hospitalized
       - name: citizen_injured
       - name: citizen_age
+        integer: true
       - name: citizen_race
       - name: citizen_sex
       - name: citizen_id
