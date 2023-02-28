@@ -275,14 +275,15 @@ def clean_citizen_arrest_charges(df):
 
 
 def clean_citizen_age(df):
-    df.loc[:, "citizen_age"] = df.citizen_age.str.replace("-1", "", regex=False)
+    df.loc[:, "citizen_age"] = (df.citizen_age.astype(str).str.replace("-1", "", regex=False)
+                                              .str.replace(r"(\w+\'\w+.+)", "", regex=True)
+                                              .str.replace(r"(\w{3})", "", regex=True))
     return df
 
 
 def create_tracking_id_og_col(df):
     df.loc[:, "tracking_id_og"] = df.tracking_id
     return df
-
 
 def clean_uof():
     dfa = (
