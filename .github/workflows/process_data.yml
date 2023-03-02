@@ -34,6 +34,7 @@ jobs:
           make WRGL_FLAGS="--wrgl-dir /runner/_work/data/.wrgl" GSUTIL="$(which gsutil)"
         env:
           OCR_ENSURE_COMPLETE: "true"
+          credentials: ${{ secrets.GSUTIL }}
       - name: commit changes in transaction
         id: transaction
         run: |
