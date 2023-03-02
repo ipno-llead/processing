@@ -11,7 +11,7 @@ spec:
           image: doctr
           env:
             - name: GOOGLE_APPLICATION_CREDENTIALS
-              value: ${{ secrets.GSUTIL}}
+              value: /etc/service_account/key.json
           envFrom:
             - configMapRef:
                 name: doctr-config
