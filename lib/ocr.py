@@ -23,7 +23,8 @@ GCLOUD_PROJECT = "excellent-zoo-300106"
 def _run_gsutil(*args):
     paths = os.pathsep.join(
         [
-            str(pathlib.Path.home() / "google-cloud-sdk/bin")
+            str(pathlib.Path.home() / "google-cloud-sdk/bin"),
+            "/usr/local/gcloud/google-cloud-sdk/bin",
         ]
     )
     gsutil = find_executable("gsutil", paths)
