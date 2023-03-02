@@ -62,7 +62,7 @@ def deduplicate_personnel(personnel):
 
 
 if __name__ == "__main__":
-    # post = pd.read_csv(deba.data("match/post_officer_history.csv"))
+    post = pd.read_csv(deba.data("match/post_officer_history.csv"))
     allegation_df = pd.read_csv(deba.data("fuse/allegation.csv"))
     events_pre_post = pd.read_csv(deba.data("fuse/event_pre_post.csv"))
     per_pre_post = pd.read_csv(deba.data("fuse/personnel_pre_post.csv"))
@@ -74,7 +74,8 @@ if __name__ == "__main__":
     # )
     
     event_df = rearrange_event_columns(events_pre_post)
-    per_df = rearrange_personnel_columns(per_pre_post)
+    per_df = pd.concat([per_pre_post, post], axis=0)
+    per_df = rearrange_personnel_columns(per_df)
 
     per_df = per_df[~((per_df.last_name.fillna("") == ""))]
     per_df = per_df[~((per_df.agency.fillna("") == ""))]
