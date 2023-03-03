@@ -14,7 +14,7 @@ import pandas as pd
 
 def initial_processing():
     df = pd.read_csv(
-        deba.data("raw/ipm/new_orleans_pd_cprr_allegations_1931-2020.csv"),
+        deba.data("raw/new_orleans_pd/new_orleans_pd_cprr_1931_2020.csv"),
         escapechar="\\",
     )
     df = df.dropna(axis=1, how="all")
@@ -232,7 +232,7 @@ def clean_allegation(df):
 
 def assign_agency(df):
     df.loc[:, "data_production_year"] = "2020"
-    df.loc[:, "agency"] = "New Orleans PD"
+    df.loc[:, "agency"] = "new-orleans-pd"
     return df
 
 
@@ -261,11 +261,6 @@ def discard_allegations_with_same_description(df):
     )
 
 
-def remove_rows_with_conflicting_disposition(df):
-    df.loc[df.allegation_finding == "sustained", "disposition"] = "sustained"
-    return df
-
-
 def clean_tracking_id(df):
     df.loc[:, "tracking_id"] = df.tracking_id.str.replace(
         r"^Rule9-", "", regex=True
@@ -274,13 +269,6 @@ def clean_tracking_id(df):
         df.loc[idx, "tracking_id"] = (
             row.allegation_create_year + row.tracking_id[3:]
         )
-    return df
-
-
-def replace_disposition(df):
-    df.loc[:, "disposition"] = df.disposition.replace(
-        {"di-2": "counseling", "nfim": "no investigation merited"}
-    )
     return df
 
 
@@ -307,27 +295,6 @@ def clean_investigation_complete_date(df):
     return df.drop(columns="completed_date")
 
 
-def drop_duplicate_allegation_uids(df):
-    disposition_cat = pd.CategoricalDtype(
-        categories=[
-            "sustained",
-            "not sustained",
-            "exonerated",
-            "unfounded",
-            "counseling",
-            "mediation",
-            "illegitimate outcome",
-            "no investigation merited",
-            "pending",
-        ],
-        ordered=True,
-    )
-    df.loc[:, "disposition"] = df.disposition.astype(disposition_cat)
-    return df.sort_values(["disposition", "allegation_uid"]).drop_duplicates(
-        subset=["allegation_uid"], keep="first"
-    )
-
-
 def clean_investigating_department(df):
     df.loc[:, "investigating_department"] = (
         df.assigned_department.str.lower()
@@ -347,6 +314,13 @@ def clean_investigating_department(df):
         .str.replace("superintendant", "superintendent", regex=False)
     )
     return df
+
+
+def clean_disposition(df):
+    df.loc[:, "disposition"] = (df.disposition.str.lower()
+                                              .str.replace(r"nfim", "no further investigation merited", regex=False)
+    )
+    return df 
 
 
 def clean():
@@ -370,8 +344,8 @@ def clean():
                 "county",
                 "created_date",
                 "day_of_week",
-                "disposition_nopd",
                 "due_date",
+                "disposition_oipm_by_officer",
                 "field_unit_level",
                 "hour_of_day",
                 "is_anonymous",
@@ -418,15 +392,16 @@ def clean():
             columns={
                 "pib_control_number": "tracking_id",
                 "occurred_date": "occur_date",
-                "disposition_oipm_by_officer": "disposition",
                 "received_date": "receive_date",
                 "allegation_created_on": "allegation_create_date",
                 "assigned_divison": "investigating_division",
                 "assigned_sub_division_a": "investigating_sub_divison_a",
                 "assigned_sub_division_b": "investigating_sub_division_b",
+                "disposition_nopd": "disposition",
             }
         )
         .pipe(clean_allegation)
+        .pipe(clean_disposition)
         .pipe(drop_rows_without_tracking_id)
         .pipe(clean_sexes, ["citizen_sex"])
         .pipe(clean_races, ["citizen_race"])
@@ -434,7 +409,6 @@ def clean():
         .pipe(
             standardize_desc_cols,
             [
-                "disposition",
                 "traffic_stop",
                 "body_worn_camera_available",
                 "citizen_arrested",
@@ -461,12 +435,11 @@ def clean():
             ["agency", "tracking_id", "officer_primary_key", "allegation"],
             "allegation_uid",
         )
-        .pipe(replace_disposition)
         .pipe(
             remove_future_dates, "2020-12-31", ["receive", "allegation_create", "occur"]
         )
-        .pipe(drop_duplicate_allegation_uids)
         .pipe(clean_investigating_department)
+        .drop_duplicates(subset=["allegation_uid"])
     )
 
 

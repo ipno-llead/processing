@@ -18,7 +18,8 @@ from lib.post import load_for_agency
 
 
 def fuse_events(
-    pprr, pprr_csd, cprr, uof, award, lprr, pclaims20, pclaims21, pprr_separations
+    pprr, pprr_csd, cprr, uof, award, lprr, pclaims20, pclaims21, pprr_separations,
+    cprr_iapro, pprr_iapro
 ):
     builder = events.Builder()
     builder.extract_events(
@@ -261,11 +262,65 @@ def fuse_events(
         },
         ["uid", "separation_uid"],
     )
+    builder.extract_events(
+        cprr_iapro,
+        {
+            events.COMPLAINT_RECEIVE: {
+                "prefix": "receive",
+                "keep": [
+                    "uid",
+                    "agency",
+                    "allegation_uid",
+                ],
+            },
+            events.INVESTIGATION_COMPLETE: {
+                "prefix": "investigation_complete",
+                "keep": [
+                    "uid",
+                    "agency",
+                    "allegation_uid",
+                ],
+            },
+        },
+        ["allegation_uid"],
+    )
+    builder.extract_events(
+        pprr_iapro,
+        {
+            events.OFFICER_HIRE: {
+                "prefix": "hire",
+                "keep": [
+                    "uid",
+                    "agency",
+                    "race", 
+                    "sex",
+                    "department_desc",
+                    "badge_no",
+                    "rank_desc",
+                ],
+            },
+            events.OFFICER_LEFT: {
+                "prefix": "left",
+                "keep": [
+                    "uid",
+                    "agency",
+                    "race", 
+                    "sex",
+                    "department_desc",
+                    "badge_no",
+                    "rank_desc",
+                ],
+            },
+        },
+        ["uid"],
+    )
     return builder.to_frame()
 
 
 if __name__ == "__main__":
     pprr = pd.read_csv(deba.data("clean/pprr_new_orleans_pd_2020.csv"))
+    pprr_iapro = pd.read_csv(deba.data("match/pprr_new_orleans_pd_1946_2018.csv"))
+    cprr_iapro = pd.read_csv(deba.data("clean/cprr_new_orleans_pd_1931_2020.csv"))
     agency = pprr.agency[0]
     post = load_for_agency(agency)
     pprr_csd = pd.read_csv(deba.data("match/pprr_new_orleans_csd_2014.csv"))
@@ -305,6 +360,7 @@ if __name__ == "__main__":
         pprr_separations,
         cprr,
         post,
+        pprr_iapro,
     )
     events_df = fuse_events(
         pprr,
@@ -316,6 +372,8 @@ if __name__ == "__main__":
         pclaims20,
         pclaims21,
         pprr_separations,
+        cprr_iapro,
+        pprr_iapro,
     )
     events_df = rearrange_event_columns(
         pd.concat([post_event, events_df])

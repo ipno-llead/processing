@@ -37,13 +37,13 @@ def strip_time_from_dates(df, cols):
 
 def assign_agency(df):
     df.loc[:, "data_production_year"] = "2018"
-    df.loc[:, "agency"] = "New Orleans PD"
+    df.loc[:, "agency"] = "new-orleans-pd"
     return df
 
 
 def clean_current_supervisor(df):
-    df.loc[:, "employee_id"] = df.employee_id.astype(str)
-    officer_number_dict = df.set_index("employee_id").uid.to_dict()
+    df.loc[:, "officer_primary_key"] = df.officer_primary_key.astype(str)
+    officer_number_dict = df.set_index("officer_primary_key").uid.to_dict()
     df.loc[:, "current_supervisor"] = df.current_supervisor.map(
         lambda x: officer_number_dict.get(x, "")
     )
@@ -149,7 +149,7 @@ def clean_sub_division_b_desc(df):
 
 
 def clean():
-    df = pd.read_csv(deba.data("raw/ipm/new_orleans_iapro_pprr_1946-2018.csv"))
+    df = pd.read_csv(deba.data("raw/new_orleans_pd/new_orleans_pprr_1946_2018.csv"))
     df = df.dropna(axis=1, how="all")
     df = clean_column_names(df)
     print(df.columns.tolist())
@@ -170,7 +170,7 @@ def clean():
             "officer_sex": "sex",
             "officer_race": "race",
             "middle_initial": "middle_name",
-            "officer_number": "employee_id",
+            "officer_number": "officer_primary_key",
         }
     )
     return (
@@ -195,8 +195,9 @@ def clean():
         .pipe(clean_races, ["race"])
         .pipe(clean_department_desc)
         .pipe(assign_agency)
+        .pipe(clean_names, ["first_name", "last_name"])
         .pipe(
-            gen_uid, ["agency", "employee_id", "first_name", "last_name", "middle_name"]
+            gen_uid, ["agency", "first_name", "last_name"]
         )
         .pipe(strip_time_from_dates, ["hire_date", "left_date", "dept_date"])
         .pipe(clean_dates, ["hire_date", "left_date", "dept_date"])
@@ -352,10 +353,10 @@ def clean():
             ],
         )
         .pipe(clean_sub_division_b_desc)
-        .drop_duplicates()
+        .drop_duplicates(subset=["uid"], keep="first")
     )
 
 
 if __name__ == "__main__":
     df = clean()
-    df.to_csv(deba.data("clean/pprr_new_orleans_ipm_iapro_1946_2018.csv"), index=False)
+    df.to_csv(deba.data("clean/pprr_new_orleans_pd_1946_2018.csv"), index=False)
