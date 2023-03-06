@@ -36,7 +36,7 @@ def train_spacy_model(df: pd.DataFrame, training_data: str) -> pd.DataFrame:
     ner.add_label("agency")
 
     optimizer = nlp.begin_training()
-    for itn in range(500):
+    for itn in range(75):
         random.shuffle(TRAINING_DATA)
         losses = {}
         for batch in spacy.util.minibatch(

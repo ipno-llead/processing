@@ -66,7 +66,7 @@ if __name__ == "__main__":
     allegation_df = pd.read_csv(deba.data("fuse/allegation.csv"))
     events_pre_post = pd.read_csv(deba.data("fuse/event_pre_post.csv"))
     per_pre_post = pd.read_csv(deba.data("fuse/personnel_pre_post.csv"))
-    uof_df = pd.read_csv(deba.data("fuse/use_of_force.csv"))
+    # uof_df = pd.read_csv(deba.data("fuse/use_of_force.csv"))
 
     # post_events = fuse_events(post)
     # event_df = pd.concat([post_events, events_pre_post], axis=0).drop_duplicates(
@@ -83,12 +83,12 @@ if __name__ == "__main__":
     per_df = deduplicate_personnel(per_df)
     per_df = per_df.drop_duplicates(subset=["first_name", "middle_name", "last_name", "uid"])
     per_df = per_df.pipe(names_to_title_case, ["race", "sex"])
-    uof_df = uof_df[uof_df["uid"].isin(per_df["uid"])]
+    # uof_df = uof_df[uof_df["uid"].isin(per_df["uid"])]
 
     event_df = event_df[~((event_df.agency.fillna("") == ""))]
     # post = rearrange_post_officer_history_columns(post)
 
     per_df.to_csv(deba.data("fuse/personnel.csv"), index=False)
     event_df.to_csv(deba.data("fuse/event.csv"), index=False)
-    uof_df.to_csv(deba.data("fuse/use_of_force.csv"), index=False)
+    # uof_df.to_csv(deba.data("fuse/use_of_force.csv"), index=False)
     # post.to_csv(deba.data("fuse/post_officer_history.csv"), index=False)
