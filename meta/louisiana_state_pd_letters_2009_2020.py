@@ -40,9 +40,13 @@ def db_path():
 
 if __name__ == "__main__":
     df = fetch_reports()
-    df.to_csv(deba.data("meta/letters_louisiana_state_pd_2009_2020_files.csv"), index=False)
+    df.to_csv(
+        deba.data("meta/letters_louisiana_state_pd_2009_2020_files.csv"), index=False
+    )
     fpath = db_path()
     db_meta = download_db_metadata(fpath)
     db_meta.to_csv(
-        "data/raw/louisiana_state_pd/letters_louisiana_state_pd_2009_2020_db_files.csv"
+        deba.data(
+            "meta/louisiana_state_pd/letters_louisiana_state_pd_2009_2020_db_files.csv"
+        )
     )

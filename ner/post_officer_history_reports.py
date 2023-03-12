@@ -18,8 +18,11 @@ def read_pdfs_22():
     pdfs = pd.read_csv(deba.data("ocr/post_officer_history_reports_9_16_2022_pdfs.csv"))
     return pdfs
 
+
 def read_pdfs_22_rotated():
-    pdfs = pd.read_csv(deba.data("ocr/post_officer_history_reports_9_30_2022_rotated_pdfs.csv"))
+    pdfs = pd.read_csv(
+        deba.data("ocr/post_officer_history_reports_9_30_2022_rotated_pdfs.csv")
+    )
     return pdfs
 
 
@@ -36,8 +39,9 @@ def read_pdfs_advocate():
 
 
 def training_data():
-    data = r"data/raw/post/post_officer_history/training_data/post_officer_history_training_data.jsonl"
-    return data
+    return deba.data(
+        "raw/post/post_officer_history/training_data/post_officer_history_training_data.jsonl"
+    )
 
 
 if __name__ == "__main__":
@@ -61,7 +65,9 @@ if __name__ == "__main__":
     ner_advocate = apply_spacy_model(pdfs_advocate, ner)
     ner_21.to_csv(deba.data("ner/post_officer_history_reports.csv"), index=False)
     ner_22.to_csv(deba.data("ner/post_officer_history_reports_2022.csv"), index=False)
-    ner_22_rotated.to_csv(deba.data("ner/post_officer_history_reports_2022_rotated.csv"), index=False)
+    ner_22_rotated.to_csv(
+        deba.data("ner/post_officer_history_reports_2022_rotated.csv"), index=False
+    )
     ner_23.to_csv(deba.data("ner/post_officer_history_reports_2023.csv"), index=False)
     ner_advocate.to_csv(
         deba.data("ner/advocate_post_officer_history_reports.csv"), index=False
