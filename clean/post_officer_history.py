@@ -5,6 +5,7 @@ from lib.clean import (
     names_to_title_case,
     clean_sexes,
     standardize_desc_cols,
+    clean_dates,
 )
 from lib.columns import set_values
 
@@ -303,32 +304,19 @@ def clean_agency_2(df):
         .str.replace(r"^ecarr(.+)", r"east-carroll-so")
         .str.replace(r"lafavetteo", "lafayette-so", regex=False)
         .str.replace(r"orlbans", "orleans", regex=False)
+        .str.replace(r"(.+)(certifications|training|resignation)(.+)", "", regex=True)
     )
     return df
 
 
 
 def clean_parsed_dates(df):
-    df.loc[:, "hire_date"] = (
-        df.hire_date.str.replace(r"21\/2001", "2/1/2001", regex=True)
-        .str.replace(r"^(\w{1,4})\/(\w{4})$", "", regex=True)
-        .str.replace(r"(\w{3})\/(\w{3})", "", regex=True)
-        .str.replace(r"(\w+)\/(\w+)\/(\w)(\w{4})", r"\1/\2/\4", regex=True)
-        .str.replace(r"3\/17\/01410", "", regex=True)
-    )
-
     df.loc[:, "left_date"] = (
-        df.left_date.str.replace(r"924\/2020", "9/24/2020", regex=True)
-        .str.replace(r"(\w)[12](\w{1})\/(\w{4})", r"\1/1\2/\3", regex=True)
-        .str.replace(r"(\w{2})(\w{2})\/(\w{4})", r"\1/\2/\3", regex=True)
-        .str.replace(r"^(\w)(\w)\/(\w{4})$", r"\1/\2/\3", regex=True)
-        .str.replace(r"^(\w{1,4})\/(\w{4})$", "", regex=True)
-        .str.replace(r"_\/1\/2019", "", regex=True)
-        .str.replace(r"\/72019", "/2019", regex=True)
-        .str.replace(r"(\w{3})\/(\w{3})", "", regex=True)
-        .str.replace(r"(\w+)\/(\w+)\/(\w)(\w{4})", r"\1/\2/\4", regex=True)
-        .str.replace(r"3\/17\/01410", "", regex=True)
+        df.left_date.str.replace(r"16\/2016", r"1/6/2016", regex=True)
+        .str.replace(r"(\w+)\/(\w+)\/(\w+)\/(\w+)", "", regex=True)
     )
+    df = df[~(df.left_date.astype(str).fillna("") == "")]
+    df = df[~(df.hire_date.astype(str).fillna("") == "")]
     return df
 
 
@@ -366,6 +354,12 @@ def switched_job(df):
 
 ### add DB metadata and add to docs table
 
+def filter_agencies(df):
+    agencies = pd.read_csv(deba.data("raw/agency/agency_reference_list.csv"))
+    agencies = agencies.agency_slug.tolist()    
+    df = df[df.agency.isin(agencies)]
+    return df
+
 
 def clean():
     dfa = pd.read_csv(deba.data("ner/advocate_post_officer_history_reports.csv"))
@@ -395,6 +389,8 @@ def clean():
         .pipe(switched_job)
         .pipe(set_values, {"source_agency": "post"})
         .pipe(standardize_desc_cols, ["agency"])
+        .pipe(filter_agencies)
+        .pipe(clean_parsed_dates)
     )
     return df
 
