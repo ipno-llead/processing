@@ -275,9 +275,7 @@ def clean_citizen_arrest_charges(df):
 
 
 def clean_citizen_age(df):
-    df.loc[:, "citizen_age"] = (df.citizen_age.astype(str).str.replace("-1", "", regex=False)
-                                              .str.replace(r"(\w+\'\w+.+)", "", regex=True)
-                                              .str.replace(r"(\w{3})", "", regex=True))
+    df.loc[:, 'citizen_age'] = df.citizen_age.str.extract('(\d+)', expand=False)
     return df
 
 
