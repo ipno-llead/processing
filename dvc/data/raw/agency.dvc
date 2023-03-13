@@ -1,0 +1,6 @@
+wdir: ../../../data/raw
+outs:
+- md5: 0d53579ea3e7ec84b063127570120e0e.dir
+  size: 42697
+  nfiles: 1
+  path: agency
