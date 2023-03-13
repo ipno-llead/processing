@@ -314,6 +314,10 @@ def clean_parsed_dates(df):
     df.loc[:, "left_date"] = (
         df.left_date.str.replace(r"16\/2016", r"1/6/2016", regex=True)
         .str.replace(r"(\w+)\/(\w+)\/(\w+)\/(\w+)", "", regex=True)
+        .str.replace(r"^(\w{2})\/(\w{4})$", "", regex=True)
+    )
+    df.loc[:, "hire_date"] = (
+        df.hire_date.str.replace(r"^(\w{2})\/(\w{4})$", "", regex=True)
     )
     df = df[~(df.left_date.astype(str).fillna("") == "")]
     df = df[~(df.hire_date.astype(str).fillna("") == "")]
