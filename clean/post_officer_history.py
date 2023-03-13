@@ -315,13 +315,26 @@ def clean_parsed_dates(df):
         df.left_date.str.replace(r"16\/2016", r"1/6/2016", regex=True)
         .str.replace(r"(\w+)\/(\w+)\/(\w+)\/(\w+)", "", regex=True)
         .str.replace(r"^(\w{2})\/(\w{4})$", "", regex=True)
+        .str.replace(r"^$", "", regex=True)
     )
     df.loc[:, "hire_date"] = (
         df.hire_date.str.replace(r"^(\w{2})\/(\w{4})$", "", regex=True)
     )
-    df = df[~(df.left_date.astype(str).fillna("") == "")]
-    df = df[~(df.hire_date.astype(str).fillna("") == "")]
-    return df
+    hire_dates = df.hire_date.str.extract(r"^(\w{1,2})\/(\w{1,2})\/(\w{4})")
+
+    df.loc[:, "hire_month"] = hire_dates[0]
+    df.loc[:, "hire_day"] = hire_dates[1]
+    df.loc[:, "hire_year"] = hire_dates[2]  
+
+    left_dates = df.left_date.str.extract(r"^(\w{1,2})\/(\w{1,2})\/(\w{4})")
+    df.loc[:, "left_month"] = left_dates[0]
+    df.loc[:, "left_day"] = left_dates[1]
+    df.loc[:, "left_year"] = left_dates[2]  
+
+    df = df[~((df.hire_month.fillna("") == ""))]
+    df = df[~((df.hire_day.fillna("") == ""))]
+    df = df[~((df.hire_year.fillna("") == ""))]
+    return df.drop(columns=["hire_date", "left_date"])
 
 
 def clean_employment_status(df):

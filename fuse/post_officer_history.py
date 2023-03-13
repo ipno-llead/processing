@@ -17,7 +17,6 @@ def fuse_events(post):
         {
             events.OFFICER_HIRE: {
                 "prefix": "hire",
-                "parse_date": True,
                 "keep": [
                     "uid",
                     "agency",
@@ -25,7 +24,6 @@ def fuse_events(post):
             },
             events.OFFICER_LEFT: {
                 "prefix": "left",
-                "parse_date": True,
                 "keep": [
                     "uid",
                     "left_reason",
