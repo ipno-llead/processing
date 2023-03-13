@@ -309,7 +309,6 @@ def clean_agency_2(df):
     return df
 
 
-
 def clean_parsed_dates(df):
     df.loc[:, "left_date"] = (
         df.left_date.str.replace(r"16\/2016", r"1/6/2016", regex=True)
@@ -317,24 +316,24 @@ def clean_parsed_dates(df):
         .str.replace(r"^(\w{2})\/(\w{4})$", "", regex=True)
         .str.replace(r"^$", "", regex=True)
     )
-    df.loc[:, "hire_date"] = (
-        df.hire_date.str.replace(r"^(\w{2})\/(\w{4})$", "", regex=True)
+    df.loc[:, "hire_date"] = df.hire_date.str.replace(
+        r"^(\w{2})\/(\w{4})$", "", regex=True
     )
     hire_dates = df.hire_date.str.extract(r"^(\w{1,2})\/(\w{1,2})\/(\w{4})")
 
     df.loc[:, "hire_month"] = hire_dates[0]
     df.loc[:, "hire_day"] = hire_dates[1]
-    df.loc[:, "hire_year"] = hire_dates[2]  
+    df.loc[:, "hire_year"] = hire_dates[2]
 
     left_dates = df.left_date.str.extract(r"^(\w{1,2})\/(\w{1,2})\/(\w{4})")
     df.loc[:, "left_month"] = left_dates[0]
     df.loc[:, "left_day"] = left_dates[1]
-    df.loc[:, "left_year"] = left_dates[2]  
+    df.loc[:, "left_year"] = left_dates[2]
 
     df = df[~((df.hire_month.fillna("") == ""))]
     df = df[~((df.hire_day.fillna("") == ""))]
     df = df[~((df.hire_year.fillna("") == ""))]
-    return df.drop(columns=["hire_date", "left_date"])
+    return df
 
 
 def clean_employment_status(df):
@@ -371,9 +370,10 @@ def switched_job(df):
 
 ### add DB metadata and add to docs table
 
+
 def filter_agencies(df):
     agencies = pd.read_csv(deba.data("raw/agency/agency_reference_list.csv"))
-    agencies = agencies.agency_slug.tolist()    
+    agencies = agencies.agency_slug.tolist()
     df = df[df.agency.isin(agencies)]
     return df
 
@@ -399,7 +399,6 @@ def clean():
         .pipe(split_agency)
         .pipe(clean_agency)
         .pipe(clean_agency_2)
-        .pipe(standardize_desc_cols, ["employment_status", "left_reason"])
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(drop_duplicates)
         .pipe(check_for_duplicate_uids)
@@ -407,6 +406,15 @@ def clean():
         .pipe(set_values, {"source_agency": "post"})
         .pipe(standardize_desc_cols, ["agency"])
         .pipe(filter_agencies)
+        .pipe(
+            standardize_desc_cols,
+            [
+                "employment_status",
+                "left_reason",
+                "hire_date",
+                "left_date",
+            ],
+        )
         .pipe(clean_parsed_dates)
     )
     return df
