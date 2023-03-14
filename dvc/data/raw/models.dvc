@@ -1,0 +1,6 @@
+wdir: ../../../data/raw
+outs:
+- md5: 54b7a5adb9bb7911f1ba4e3220dc382e.dir
+  size: 4026379
+  nfiles: 11
+  path: models
