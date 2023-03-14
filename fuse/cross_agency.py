@@ -189,7 +189,6 @@ def cross_match_officers_between_agencies(personnel, events, constraints, post):
     )
 
     per = per.set_index("uid")
-    per = per.join(constraints)
 
     # aggregating min/max date
     events = events.set_index(["uid", "event_uid"])
