@@ -36,7 +36,7 @@ def read_pdfs_advocate():
 
 
 def training_data():
-    return deba.data("/raw/post/post_officer_history/training_data/post_ohr_training_data.jsonl")
+    return deba.data("raw/post/post_officer_history/training_data/post_ohr_training_data.jsonl")
 
 
 if __name__ == "__main__":
