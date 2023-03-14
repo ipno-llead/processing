@@ -68,12 +68,14 @@ if __name__ == "__main__":
     event_df = pd.read_csv(deba.data("fuse/event.csv"))
     sas_df = pd.read_csv(deba.data("fuse/stop_and_search.csv"))
     appeals_df = pd.read_csv(deba.data("fuse/appeals.csv"))
+    post_df = pd.read_csv(deba.data("fuse/post_officer_history.csv"))
     
     allegation_df = allegation_df[allegation_df["uid"].isin(per_df["uid"])]
     uof_df = uof_df[uof_df["uid"].isin(per_df["uid"])]
     event_df = event_df[event_df["uid"].isin(per_df["uid"])]
     sas_df = sas_df[sas_df["uid"].isin(per_df["uid"])]
     appeals_df = appeals_df[appeals_df["uid"].isin(per_df["uid"])]
+    post_df = post_df[post_df["uid"].isin(per_df["uid"])]
 
     event_df = event_df[~((event_df.agency.fillna("") == ""))]
     # post = rearrange_post_officer_history_columns(post)
@@ -84,3 +86,4 @@ if __name__ == "__main__":
     event_df.to_csv(deba.data("consolidate/event.csv"), index=False)
     sas_df.to_csv(deba.data("consolidate/stop_and_search.csv"), index=False)
     appeals_df.to_csv(deba.data("consolidate/appeals.csv"), index=False)
+    post_df.to_csv(deba.data("consolidate/post_officer_history.csv"), index=False)
