@@ -21,9 +21,89 @@ import deba
 
 from lib.date import combine_date_columns
 
-common_names = [
-    "Michael Smith",
+uncommon_names_fr_list = [
+    "Nahia Simon", 
+    "Nolvey Stelly",
+    "Laconnda Ernest",
+    "Shandreika Machado",
+    "Blayke Dingeman",
+    "Krekel Eckland",
+    "Ashish Shah",
+    "Nissan Patel",
+    "Hali Louviere",
+    "Shaquille Guerin",
+    "Shawtika Richard",
+    "Maia Prosper",
+    "Dawn Ingersoll",
+    "Starlette Cuzzort",
+    "Catrica Youngblood",
+    "Gener Spitelera",
+    "Leontine Mullins",
+    "Ottos Dejean",
+    "Blaze Bourg",
+    "Kenya Huggins",
+    "Jarret Iguess",
+    "Euclide Talley",
+    "Chasen Swan "
+
 ]
+
+
+uncommon_names_ls_list = [
+    "Shandreika Machado",
+    "Blayke Dingeman",
+    "Ashish Shah",
+    "Anny Sanclemente Haynes",
+    "Anny Sanclemente-Luna",
+    "David Vishnefski",
+    "Nissan Patel",
+    "Kaleab Magyar",
+    "Chad Stroyewski",
+    "Maia Prosper",
+    "Dawn Ingersoll",
+    "Paul Quatrevingt",
+    "Starlette Cuzzort",
+    "Bryan St Cyr",
+    "Catrica Youngblood",
+    "Michael Kazerooni",
+    "Gener Spitelera",
+    "Ottos Dejean",
+    "Terry Zaffuto",
+    "Kenya Huggins",
+    "Jarret Iguess",
+    "Jason Naquin",
+    "Vincent Ogrinc",
+    "Gregory Ebarb",
+    "Chasen Swan"
+
+]
+
+def split_uncommon_names(uncommon_names_fr_list, uncommon_names_ls_list):
+    uncommon_names_fr_df = pd.DataFrame(uncommon_names_fr_list, columns=["full_name"])
+    uncommon_names_ls_df = pd.DataFrame(uncommon_names_ls_list, columns=["full_name"])
+    
+    first_names = uncommon_names_fr_df.full_name.str.extract(r"(\w+) (.+)")
+    uncommon_names_fr_df.loc[:, "first_name"] = first_names[0]
+    uncommon_names_fr_lst = [x for x in uncommon_names_fr_df["first_name"]]
+
+    last_names = uncommon_names_ls_df.full_name.str.extract(r"(\w+) (.+)")
+    uncommon_names_ls_df.loc[:, "last_name"] = last_names[1]
+    uncommon_names_ls_lst = [x for x in uncommon_names_ls_df["last_name"]]
+    return uncommon_names_fr_lst, uncommon_names_ls_lst
+
+
+def apply_constraints(personnel):
+    uncommon_first_names = personnel[personnel["first_name"].isin(uncommon_first_names_list)]
+    uncommon_first_names["attract_id"] = 1
+    uncommon_last_names = personnel[personnel["last_name"].isin(uncommon_last_names_list)]
+    uncommon_last_names["attract_id"] = 1
+
+    personnel = personnel[~personnel["first_name"].isin(uncommon_first_names_list)]
+    personnel = personnel[~personnel["last_name"].isin(uncommon_last_names_list)]
+    personnel["attract_id"] = 0
+
+    personnel = pd.concat([uncommon_first_names, uncommon_last_names, personnel])
+    return personnel
 
 
 def discard_rows(
@@ -50,21 +130,6 @@ def assign_min_col(events: pd.DataFrame, per: pd.DataFrame, col: str):
 def assign_max_col(events: pd.DataFrame, per: pd.DataFrame, col: str):
     max_dict = events[col].max(level="uid").to_dict()
     per.loc[:, "max_" + col] = per.index.map(lambda x: max_dict.get(x, np.NaN))
-
-
-def read_constraints():
-    # TODO: replace this line with the real constraints data
-    constraints = pd.DataFrame([], columns=["uids", "kind"])
-    print("read constraints (%d rows)" % constraints.shape[0])
-    records = dict()
-    for idx, row in constraints.iterrows():
-        uids = row.uids.split(",")
-        for uid in uids:
-            if row.kind == "attract":
-                records.setdefault(uid, dict())["attract_id"] = idx
-            elif row.kind == "repell":
-                records.setdefault(uid, dict())["repell_id"] = idx
-    return pd.DataFrame.from_records(records)
 
 
 def read_post():
@@ -113,10 +178,12 @@ def cross_match_officers_between_agencies(personnel, events, constraints, post):
     )
 
     per = pd.concat([per, post], axis=0)
+    per = pd.concat([per, constraints], axis=0)
+    per = per.drop_duplicates(subset=["uid"], keep="last")
 
-    per = discard_rows(
-        per, per.switched_job.fillna(True), "officers who have not switched jobs"
-    )
+    # per = discard_rows(
+    #     per, per.switched_job.fillna(True), "officers who have not switched jobs"
+    # )
     per = per.drop(columns=["switched_job"]).drop_duplicates(
         subset=["uid"], keep="last"
     )
@@ -132,15 +199,12 @@ def cross_match_officers_between_agencies(personnel, events, constraints, post):
     assign_max_col(events, per, "timestamp")
     per = discard_rows(per, per.min_date.notna(), "officers with no event")
 
-    # concatenate first name and last name to get a series of full names
-    full_names = per.first_name.str.cat(per.last_name, sep=" ")
-    # filter down the full names to only those that are common
-    common_names_sr = full_names[full_names.isin(common_names)]
-
     excel_path = deba.data("match/cross_agency_officers.xlsx")
     matcher = ThresholdMatcher(
         index=MultiIndex(
             [
+                # only officers who have the same first letter in their first name would be matched
+                ColumnsIndex(["fc", "lc"]),
                 # or if they are in the same attract constraint
                 ColumnsIndex("attract_id", ignore_key_error=True),
                 # or if they are in the same history constraingt
@@ -149,6 +213,16 @@ def cross_match_officers_between_agencies(personnel, events, constraints, post):
         ),
         scorer=MaxScorer(
             [
+                AlterScorer(
+                    # calculate similarity score (0-1) based on name similarity
+                    scorer=SimSumScorer(
+                        {
+                            "first_name": JaroWinklerSimilarity(),
+                            "middle_name": JaroWinklerSimilarity(),
+                            "last_name": JaroWinklerSimilarity(),
+                        }
+                    ),
+                ),
                 # but if two officers belong to the same attract constraint then give them the highest score regardless
                 AbsoluteScorer("attract_id", 1, ignore_key_error=True),
                 AbsoluteScorer("history_id", 1, ignore_key_error=True),
@@ -165,7 +239,7 @@ def cross_match_officers_between_agencies(personnel, events, constraints, post):
         ],
         show_progress=True,
     )
-    decision = 0.98
+    decision = 1
     with Spinner("saving matched clusters to Excel file"):
         matcher.save_clusters_to_excel(excel_path, decision, lower_bound=decision)
     clusters = matcher.get_index_clusters_within_thresholds(decision)
@@ -294,7 +368,8 @@ if __name__ == "__main__":
         print("read personnel file (%d x %d)" % personnel.shape)
         events = pd.read_csv(deba.data("fuse/event.csv"))
         print("read events file (%d x %d)" % events.shape)
-        constraints = read_constraints()
+        uncommon_first_names_list, uncommon_last_names_list = split_uncommon_names(uncommon_names_fr_list, uncommon_names_ls_list)
+        constraints = apply_constraints(personnel)
         post = read_post()
         clusters, personnel_event = cross_match_officers_between_agencies(
             personnel, events, constraints, post
