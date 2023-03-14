@@ -5,6 +5,7 @@ from lib.clean import (
     names_to_title_case,
     clean_sexes,
     standardize_desc_cols,
+    clean_dates,
 )
 from lib.columns import set_values
 
@@ -303,32 +304,35 @@ def clean_agency_2(df):
         .str.replace(r"^ecarr(.+)", r"east-carroll-so")
         .str.replace(r"lafavetteo", "lafayette-so", regex=False)
         .str.replace(r"orlbans", "orleans", regex=False)
+        .str.replace(r"(.+)(certifications|training|resignation)(.+)", "", regex=True)
     )
     return df
 
 
-
 def clean_parsed_dates(df):
-    df.loc[:, "hire_date"] = (
-        df.hire_date.str.replace(r"21\/2001", "2/1/2001", regex=True)
-        .str.replace(r"^(\w{1,4})\/(\w{4})$", "", regex=True)
-        .str.replace(r"(\w{3})\/(\w{3})", "", regex=True)
-        .str.replace(r"(\w+)\/(\w+)\/(\w)(\w{4})", r"\1/\2/\4", regex=True)
-        .str.replace(r"3\/17\/01410", "", regex=True)
-    )
-
     df.loc[:, "left_date"] = (
-        df.left_date.str.replace(r"924\/2020", "9/24/2020", regex=True)
-        .str.replace(r"(\w)[12](\w{1})\/(\w{4})", r"\1/1\2/\3", regex=True)
-        .str.replace(r"(\w{2})(\w{2})\/(\w{4})", r"\1/\2/\3", regex=True)
-        .str.replace(r"^(\w)(\w)\/(\w{4})$", r"\1/\2/\3", regex=True)
-        .str.replace(r"^(\w{1,4})\/(\w{4})$", "", regex=True)
-        .str.replace(r"_\/1\/2019", "", regex=True)
-        .str.replace(r"\/72019", "/2019", regex=True)
-        .str.replace(r"(\w{3})\/(\w{3})", "", regex=True)
-        .str.replace(r"(\w+)\/(\w+)\/(\w)(\w{4})", r"\1/\2/\4", regex=True)
-        .str.replace(r"3\/17\/01410", "", regex=True)
+        df.left_date.str.replace(r"16\/2016", r"1/6/2016", regex=True)
+        .str.replace(r"(\w+)\/(\w+)\/(\w+)\/(\w+)", "", regex=True)
+        .str.replace(r"^(\w{2})\/(\w{4})$", "", regex=True)
+        .str.replace(r"^$", "", regex=True)
     )
+    df.loc[:, "hire_date"] = df.hire_date.str.replace(
+        r"^(\w{2})\/(\w{4})$", "", regex=True
+    )
+    hire_dates = df.hire_date.str.extract(r"^(\w{1,2})\/(\w{1,2})\/(\w{4})")
+
+    df.loc[:, "hire_month"] = hire_dates[0]
+    df.loc[:, "hire_day"] = hire_dates[1]
+    df.loc[:, "hire_year"] = hire_dates[2]
+
+    left_dates = df.left_date.str.extract(r"^(\w{1,2})\/(\w{1,2})\/(\w{4})")
+    df.loc[:, "left_month"] = left_dates[0]
+    df.loc[:, "left_day"] = left_dates[1]
+    df.loc[:, "left_year"] = left_dates[2]
+
+    df = df[~((df.hire_month.fillna("") == ""))]
+    df = df[~((df.hire_day.fillna("") == ""))]
+    df = df[~((df.hire_year.fillna("") == ""))]
     return df
 
 
@@ -367,6 +371,13 @@ def switched_job(df):
 ### add DB metadata and add to docs table
 
 
+def filter_agencies(df):
+    agencies = pd.read_csv(deba.data("raw/agency/agency_reference_list.csv"))
+    agencies = agencies.agency_slug.tolist()
+    df = df[df.agency.isin(agencies)]
+    return df
+
+
 def clean():
     dfa = pd.read_csv(deba.data("ner/advocate_post_officer_history_reports.csv"))
     dfb = pd.read_csv(deba.data("ner/post_officer_history_reports.csv"))
@@ -388,13 +399,23 @@ def clean():
         .pipe(split_agency)
         .pipe(clean_agency)
         .pipe(clean_agency_2)
-        .pipe(standardize_desc_cols, ["employment_status", "left_reason"])
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(drop_duplicates)
         .pipe(check_for_duplicate_uids)
         .pipe(switched_job)
         .pipe(set_values, {"source_agency": "post"})
         .pipe(standardize_desc_cols, ["agency"])
+        .pipe(filter_agencies)
+        .pipe(
+            standardize_desc_cols,
+            [
+                "employment_status",
+                "left_reason",
+                "hire_date",
+                "left_date",
+            ],
+        )
+        .pipe(clean_parsed_dates)
     )
     return df
 
