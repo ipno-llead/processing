@@ -30,4 +30,4 @@ clean: cleandeba
 
 .PHONY: ocr_results
 ocr_results:
-	$(GSUTIL) -m rsync -i -J -r gs://k8s-ocr-jobqueue-results/ocr/ data/ocr_results
+	$(GSUTIL) -m rsync -i -J -r gs://k8s-ocr-jobqueue-results/ocr/ ${DEBA_DATA_DIR}/ocr_results
