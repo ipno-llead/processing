@@ -372,7 +372,7 @@ def switched_job(df):
 
 
 def filter_agencies(df):
-    agencies = pd.read_csv(deba.data("raw/agency_reference_list/agency_reference_list.csv"))
+    agencies = pd.read_csv(deba.data("raw/agency/agency_reference_list.csv"))
     agencies = agencies.agency_slug.tolist()
     df = df[df.agency.isin(agencies)]
     return df
