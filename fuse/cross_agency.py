@@ -48,7 +48,6 @@ uncommon_names_fr_list = [
 
 ]
 
-
 uncommon_names_ls_list = [
     "Shandreika Machado",
     "Blayke Dingeman",
@@ -75,7 +74,10 @@ uncommon_names_ls_list = [
     "Vincent Ogrinc",
     "Gregory Ebarb",
     "Chasen Swan"
+]
 
+common_names = [
+    "Michael Smith"
 ]
 
 def split_uncommon_names(uncommon_names_fr_list, uncommon_names_ls_list):
@@ -198,6 +200,9 @@ def cross_match_officers_between_agencies(personnel, events, constraints, post):
     assign_max_col(events, per, "timestamp")
     per = discard_rows(per, per.min_date.notna(), "officers with no event")
 
+    full_names = per.first_name.str.cat(per.last_name, sep=" ")
+    common_names_sr = full_names[full_names.isin(common_names)]
+
     excel_path = deba.data("match/cross_agency_officers.xlsx")
     matcher = ThresholdMatcher(
         index=MultiIndex(
@@ -221,6 +226,10 @@ def cross_match_officers_between_agencies(personnel, events, constraints, post):
                             "last_name": JaroWinklerSimilarity(),
                         }
                     ),
+                    # but for pairs that have the same name and their name is common
+                    values=common_names_sr,
+                    # give a penalty of -.2 which is enough to eliminate them
+                    alter=lambda score: score - 0.2,
                 ),
                 # but if two officers belong to the same attract constraint then give them the highest score regardless
                 AbsoluteScorer("attract_id", 1, ignore_key_error=True),
