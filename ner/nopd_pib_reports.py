@@ -10,8 +10,7 @@ def read_pdfs():
 
 
 def training_data():
-    training_data = r"data/raw/new_orleans_pd/training_data/nopd_pib_reports.jsonl"
-    return training_data
+    return deba.data("data/raw/new_orleans_pd/training_data/nopd_pib_reports.jsonl")
 
 
 if __name__ == "__main__":

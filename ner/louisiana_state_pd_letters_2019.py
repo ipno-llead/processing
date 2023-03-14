@@ -15,8 +15,7 @@ def read_pdfs():
 
 
 def training_data():
-    data = r"data/raw/louisiana_state_pd/training_data/louisiana_state_pd_letters_2019.jsonl"
-    return data
+    return deba.data("data/raw/louisiana_state_pd/training_data/louisiana_state_pd_letters_2019.jsonl")
 
 
 if __name__ == "__main__":
@@ -26,8 +25,8 @@ if __name__ == "__main__":
     # ner.to_disk(
     #     deba.data("ner/louisiana_state_pd/model/letters_louisiana_state_pd_2019.model")
     # )
-    trained_model = spacy.load(
-        "data/ner/louisiana_state_pd/model/letters_louisiana_state_pd_2019.model"
-    )
+    trained_model = spacy.load(deba.data(
+        "ner/louisiana_state_pd/model/letters_louisiana_state_pd_2019.model"
+    ))
     ner = apply_spacy_model(pdfs, trained_model)
     ner.to_csv(deba.data("ner/letters_louisiana_state_pd_2019.csv"), index=False)

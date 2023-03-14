@@ -50,9 +50,9 @@ if __name__ == "__main__":
     # model = ner.to_disk(
     #     deba.data("ner/post/post_officer_history/model/post_officer_history_4.model")
     # )
-    trained_model = spacy.load(
-        ("data/ner/post/post_officer_history/model/post_officer_history.model")
-    )
+    trained_model = spacy.load(deba.data(
+        ("ner/post/post_officer_history/model/post_officer_history.model")
+    ))
     ner_21 = apply_spacy_model(pdfs_21, trained_model)
     ner_22 = apply_spacy_model(pdfs_22, trained_model)
     ner_22_rotated = apply_spacy_model(pdfs_22_rotated, trained_model)

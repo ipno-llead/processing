@@ -86,4 +86,5 @@ if __name__ == "__main__":
     event_df.to_csv(deba.data("consolidate/event.csv"), index=False)
     sas_df.to_csv(deba.data("consolidate/stop_and_search.csv"), index=False)
     appeals_df.to_csv(deba.data("consolidate/appeals.csv"), index=False)
+    allegation_df.to_csv(deba.data("consolidate/allegation.csv"), index=False)
     post_df.to_csv(deba.data("consolidate/post_officer_history.csv"), index=False)
