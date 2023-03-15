@@ -18,7 +18,7 @@ from lib import events
 from lib.post import load_for_agency
 
 
-def fuse_iapro():
+def fuse_iapro(dfa, dfb):
     dfa = pd.read_csv(deba.data("clean/cprr_new_orleans_pd_1931_2020.csv"))
     dfb = pd.read_csv(deba.data("match/pprr_new_orleans_pd_1946_2018.csv"))
 
