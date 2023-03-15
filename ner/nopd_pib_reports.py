@@ -20,7 +20,6 @@ if __name__ == "__main__":
     # model = model.to_disk(deba.data("raw/new_orleans_pd/model/nopd_pib_reports.model"))
 
     load_model = spacy.load(
-        deba.data("raw/new_orleans_pd/model/nopd_pib_reports.model")
-    )
+        "data/raw/new_orleans_pd/model/nopd_pib_reports.model")
     ner = apply_spacy_model(pdfs, load_model)
     ner.to_csv(deba.data("ner/nopd_pib_reports_2014_2020.csv"), index=False)

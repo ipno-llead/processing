@@ -25,8 +25,8 @@ if __name__ == "__main__":
     # ner.to_disk(
     #     deba.data("ner/louisiana_state_pd/model/reports_louisiana_state_pd_2020.model")
     # )
-    trained_model = spacy.load(deba.data(
-        "ner/louisiana_state_pd/model/reports_louisiana_state_pd_2020.model"
-    ))
+    trained_model = spacy.load(
+        "data/ner/louisiana_state_pd/model/reports_louisiana_state_pd_2020.model"
+    )
     ner = apply_spacy_model(pdfs, trained_model)
     ner.to_csv(deba.data("ner/reports_louisiana_state_pd_2020.csv"), index=False)
