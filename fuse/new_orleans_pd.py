@@ -21,6 +21,7 @@ from lib.post import load_for_agency
 def fuse_iapro(dfa, dfb):
     dfa = pd.read_csv(deba.data("clean/cprr_new_orleans_pd_1931_2020.csv"))
     dfb = pd.read_csv(deba.data("match/pprr_new_orleans_pd_1946_2018.csv"))
+    dfb = dfb.drop(columns=["agency"])
 
     df = pd.merge(dfa, dfb, on="officer_primary_key")
     return df

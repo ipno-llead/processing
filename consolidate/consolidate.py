@@ -18,8 +18,6 @@ if __name__ == "__main__":
     appeals_df = appeals_df[appeals_df["uid"].isin(per_df["uid"])]
     person_df = person_df[person_df["canonical_uid"].isin(per_df["uid"])]
 
-
-
     event_df = event_df[~((event_df.agency.fillna("") == ""))]
 
     per_df.to_csv(deba.data("consolidate/personnel.csv"), index=False)
