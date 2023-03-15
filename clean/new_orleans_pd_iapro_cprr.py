@@ -60,8 +60,8 @@ def combine_citizen_columns(df):
 
 
 def drop_rows_without_tracking_id(df):
-    df = df[df.tracking_id != "test"]
-    return df.dropna(subset=["tracking_id"]).reset_index(drop=True)
+    df = df[df.tracking_id_og != "test"]
+    return df.dropna(subset=["tracking_id_og"]).reset_index(drop=True)
 
 
 def clean_trailing_empty_time(df, cols):
@@ -255,19 +255,19 @@ def discard_allegations_with_same_description(df):
         {"di-2": "counseling", "nfim": "no investigation merited"}
     ).astype(finding_cat)
     return (
-        df.sort_values(["tracking_id", "allegation_uid", "allegation_finding"])
+        df.sort_values(["tracking_id_og", "allegation_uid", "allegation_finding"])
         .drop_duplicates(subset=["allegation_uid"], keep="first")
         .reset_index(drop=True)
     )
 
 
 def clean_tracking_id(df):
-    df.loc[:, "tracking_id"] = df.tracking_id.str.replace(
+    df.loc[:, "tracking_id_og"] = df.tracking_id_og.str.replace(
         r"^Rule9-", "", regex=True
     )
-    for idx, row in df.loc[df.tracking_id.str.match(r"^\d{3}-")].iterrows():
-        df.loc[idx, "tracking_id"] = (
-            row.allegation_create_year + row.tracking_id[3:]
+    for idx, row in df.loc[df.tracking_id_og.str.match(r"^\d{3}-")].iterrows():
+        df.loc[idx, "tracking_id_og"] = (
+            row.allegation_create_year + row.tracking_id_og[3:]
         )
     return df
 
@@ -390,7 +390,7 @@ def clean():
         .dropna(how="all")
         .rename(
             columns={
-                "pib_control_number": "tracking_id",
+                "pib_control_number": "tracking_id_og",
                 "occurred_date": "occur_date",
                 "received_date": "receive_date",
                 "allegation_created_on": "allegation_create_date",
@@ -430,6 +430,7 @@ def clean():
         .pipe(clean_complainant_type)
         .pipe(clean_investigating_unit)
         .pipe(assign_agency)
+        .pipe(gen_uid, ["tracking_id_og", "agency"], "tracking_id")
         .pipe(
             gen_uid,
             ["agency", "tracking_id", "officer_primary_key", "allegation"],
