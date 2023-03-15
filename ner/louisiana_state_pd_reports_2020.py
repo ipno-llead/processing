@@ -15,8 +15,7 @@ def read_pdfs():
 
 
 def training_data():
-    data = r"data/raw/louisiana_state_pd/training_data/louisiana_state_pd_reports_2020.jsonl"
-    return data
+    return deba.data("data/raw/louisiana_state_pd/training_data/louisiana_state_pd_reports_2020.jsonl")
 
 
 if __name__ == "__main__":  
