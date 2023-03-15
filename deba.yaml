@@ -22,12 +22,14 @@ stages:
       - fuse/person.csv
     commonPrerequisites:
       - datavalid.yml
+  - name: consolidate
   - name: analysis
 targets:
-  - fuse/personnel.csv
-  - fuse/allegation.csv
-  - fuse/use_of_force.csv
-  - fuse/stop_and_search.csv
-  - fuse/appeals.csv
-  - fuse/event.csv
+  - consolidate/allegation.csv
+  - consolidate/personnel.csv
+  - consolidate/use_of_force.csv
+  - consolidate/stop_and_search.csv
+  - consolidate/appeals.csv
+  - consolidate/event.csv
+  - consolidate/person.csv
   - analysis/coaccusals.csv

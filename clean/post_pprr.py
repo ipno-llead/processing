@@ -112,6 +112,7 @@ def clean_agency(df):
         .str.replace(r"^sulphur-city-marshall$", "sulphur-city-marshal", regex=True)
         .str.replace(r"^natchitoches$", "natchitoches-so", regex=True)
         .str.replace(r"4th-da", "morehouse-da", regex=False)
+        .str.replace(r"^juvenile-services-br$", "juvenile-services-bureau", regex=True)
     )
     return df
 

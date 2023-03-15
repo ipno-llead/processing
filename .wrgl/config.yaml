@@ -7,7 +7,7 @@ branch:
   allegation:
     remote: origin
     merge: refs/heads/allegation
-    file: data/fuse/allegation.csv
+    file: data/consolidate/allegation.csv
     primaryKey:
       - allegation_uid
   app-baton-rouge-pd:
@@ -323,7 +323,7 @@ branch:
   event:
     remote: origin
     merge: refs/heads/event
-    file: data/fuse/event.csv
+    file: data/consolidate/event.csv
     primaryKey:
       - event_uid
   event-abbeville-pd:
@@ -1193,13 +1193,13 @@ branch:
   person:
     remote: origin
     merge: refs/heads/person
-    file: data/fuse/person.csv
+    file: data/consolidate/person.csv
     primaryKey:
       - person_id
   personnel:
     remote: origin
     merge: refs/heads/personnel
-    file: data/fuse/personnel.csv
+    file: data/consolidate/personnel.csv
     primaryKey:
       - uid
   sas-new-orleans-pd:
@@ -1211,19 +1211,19 @@ branch:
   stop-and-search:
     remote: origin
     merge: refs/heads/stop-and-search
-    file: data/fuse/stop_and_search.csv
+    file: data/consolidate/stop_and_search.csv
     primaryKey:
       - stop_and_search_uid
   appeal-hearing:
     remote: origin
     merge: refs/heads/appeal-hearing
-    file: data/fuse/appeals.csv
+    file: data/consolidate/appeals.csv
     primaryKey:
       - appeal_uid
   use-of-force:
     remote: origin
     merge: refs/heads/use-of-force
-    file: data/fuse/use_of_force.csv
+    file: data/consolidate/use_of_force.csv
     primaryKey:
       - uof_uid
   brady:
