@@ -10,6 +10,7 @@ from lib.personnel import fuse_personnel
 from datamatch import JaroWinklerSimilarity, ThresholdMatcher, ColumnsIndex
 from lib.clean import canonicalize_officers, names_to_title_case
 
+
 def fuse_events(post):
     builder = events.Builder()
     builder.extract_events(
