@@ -1193,7 +1193,7 @@ branch:
   person:
     remote: origin
     merge: refs/heads/person
-    file: data/fuse/person.csv
+    file: data/consolidate/person.csv
     primaryKey:
       - person_id
   personnel:
