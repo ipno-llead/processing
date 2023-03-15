@@ -406,8 +406,14 @@ def clean_reports_2020():
     return df
 
 
+def lspc_letters():
+    df = pd.read_csv(deba.data("ocr/letters_louisiana_state_pd_2009_2020_pdfs.csv"))
+    return df 
+
 if __name__ == "__main__":
     df19 = clean_letters_2019()
     df20 = clean_reports_2020()
+    lspc = lspc_letters()
     df19.to_csv(deba.data("clean/cprr_louisiana_state_pd_2019.csv"), index=False)
     df20.to_csv(deba.data("clean/cprr_louisiana_state_pd_2020.csv"), index=False)
+    lspc.to_csv(deba.data("clean/cprr_lspc_2009_2020.csv"), index=False)
