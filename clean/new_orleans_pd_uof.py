@@ -294,6 +294,15 @@ def extract_use_of_force_level(df):
     return df 
 
 
+def clean_citizen_hospitalized_injured(df):
+    injured = df.citizen_injured.str.extract(r"(no|yes)")
+    df.loc[:, "citizen_injured"] = injured[0]
+
+    hospitalized = df.citizen_hospitalized.str.extract(r"(no|yes)")
+    df.loc[:, "citizen_hospitalized"] = hospitalized[0]
+    return df
+
+
 def clean_uof():
     dfa = (
         pd.read_csv(deba.data("raw/new_orleans_pd/new_orleans_pd_uof_2016_2021.csv"))
@@ -431,6 +440,7 @@ def extract_citizen(uof):
         .pipe(split_citizen_rows)
         .pipe(clean_citizen_arrest_charges)
         .pipe(clean_citizen_age)
+        .pipe(clean_citizen_hospitalized_injured)
         .pipe(clean_races, ["citizen_race"])
         .pipe(clean_sexes, ["citizen_sex"])
         .pipe(
@@ -529,7 +539,7 @@ def clean_uof_22():
                                         "citizen_distance_from_officer", "citizen_build", "citizen_height",
                                         "officer_injured", "tracking_id_og", "working_status",
                                         "citizen_influencing_factors", "use_of_force_reason", 
-                                        "citizen_arrested"])
+                                        "citizen_arrested", "citizen_hospitalized", "citizen_injured"])
           .pipe(extract_use_of_force_level)
           .pipe(set_values, {"agency": "new-orleans-pd"})
           .pipe(gen_uid, ["tracking_id_og", "agency"], "tracking_id")
