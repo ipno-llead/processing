@@ -294,12 +294,25 @@ def extract_use_of_force_level(df):
     return df 
 
 
-def clean_citizen_hospitalized_injured(df):
+def clean_citizen_cols(df):
     injured = df.citizen_injured.str.extract(r"(no|yes)")
     df.loc[:, "citizen_injured"] = injured[0]
 
     hospitalized = df.citizen_hospitalized.str.extract(r"(no|yes)")
     df.loc[:, "citizen_hospitalized"] = hospitalized[0]
+
+    df.loc[:, "citizen_influencing_factors"] = (df.citizen_influencing_factors
+                                                  .str.replace(r"^((\w{1,4})|(.+ feet .+))$", "", regex=True)
+                                                )
+
+    distance = df.citizen_distance_from_officer.str.extract(r"(.+ feet .+)")
+    df.loc[:, "citizen_distance_from_officer"] = distance[0]
+
+    build = df.citizen_build.str.extract(r"(small|medium|large|xlarge)")
+
+    df.loc[:, "citizen_build"] = build[0]
+
+    df.loc[:, "citizen_height"] = df.citizen_height.str.replace(r"(yes|no)", "", regex=True)
     return df
 
 
@@ -440,7 +453,7 @@ def extract_citizen(uof):
         .pipe(split_citizen_rows)
         .pipe(clean_citizen_arrest_charges)
         .pipe(clean_citizen_age)
-        .pipe(clean_citizen_hospitalized_injured)
+        .pipe(clean_citizen_cols)
         .pipe(clean_races, ["citizen_race"])
         .pipe(clean_sexes, ["citizen_sex"])
         .pipe(
@@ -539,7 +552,8 @@ def clean_uof_22():
                                         "citizen_distance_from_officer", "citizen_build", "citizen_height",
                                         "officer_injured", "tracking_id_og", "working_status",
                                         "citizen_influencing_factors", "use_of_force_reason", 
-                                        "citizen_arrested", "citizen_hospitalized", "citizen_injured"])
+                                        "citizen_arrested", "citizen_hospitalized", "citizen_injured",
+                                        "citizen_hospitalized"])
           .pipe(extract_use_of_force_level)
           .pipe(set_values, {"agency": "new-orleans-pd"})
           .pipe(gen_uid, ["tracking_id_og", "agency"], "tracking_id")
