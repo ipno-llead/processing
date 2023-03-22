@@ -295,24 +295,24 @@ def extract_use_of_force_level(df):
 
 
 def clean_citizen_cols(df):
-    injured = df.citizen_injured.str.extract(r"(no|yes)")
+    injured = df.citizen_injured.str.lower().str.strip().str.extract(r"(no|yes)")
     df.loc[:, "citizen_injured"] = injured[0]
 
-    hospitalized = df.citizen_hospitalized.str.extract(r"(no|yes)")
+    hospitalized = df.citizen_hospitalized.str.lower().str.strip().str.extract(r"(no|yes)")
     df.loc[:, "citizen_hospitalized"] = hospitalized[0]
 
-    df.loc[:, "citizen_influencing_factors"] = (df.citizen_influencing_factors
+    df.loc[:, "citizen_influencing_factors"] = (df.citizen_influencing_factors.str.lower().str.strip()
                                                   .str.replace(r"^((\w{1,4})|(.+ feet .+))$", "", regex=True)
                                                 )
 
-    distance = df.citizen_distance_from_officer.str.extract(r"(.+ feet .+)")
+    distance = df.citizen_distance_from_officer.str.lower().str.strip().str.extract(r"(.+ feet .+)")
     df.loc[:, "citizen_distance_from_officer"] = distance[0]
 
-    build = df.citizen_build.str.extract(r"(small|medium|large|xlarge)")
+    build = df.citizen_build.str.lower().str.strip().str.extract(r"(small|medium|large|xlarge)")
 
     df.loc[:, "citizen_build"] = build[0]
 
-    df.loc[:, "citizen_height"] = df.citizen_height.str.replace(r"(yes|no)", "", regex=True)
+    df.loc[:, "citizen_height"] = df.citizen_height.str.lower().str.strip().str.replace(r"(yes|no)", "", regex=True)
     return df
 
 
@@ -561,7 +561,7 @@ def clean_uof_22():
           .pipe(gen_uid, ["use_of_force_level", "use_of_force_description", "use_of_force_reason", 
                           "uid", "use_of_force_effective", "tracking_id", "use_of_force_effective",
                           'status', 'disposition', 'service_rendered', 'light_condition',
-                          'weather_condition', 'division', 'unit', 'working_status', 'shift_hours'], "uof_uid")
+                          'weather_condition', 'division', 'unit', 'working_status', 'shift_hours', "citizen_influencing_factors"], "uof_uid")
     )
     return df 
 
@@ -616,12 +616,12 @@ def extract_citizen_22(uof):
 
 
 def concat_dfs(uof, uof22, uof_citizen, uof_citizen_22):
-    uof_citizen = pd.concat([uof_citizen, uof_citizen_22], axis=0)
     uof = pd.concat([uof, uof22], axis=0)
+    uof_citizen = pd.concat([uof_citizen, uof_citizen_22], axis=0)
 
     uof = uof.drop_duplicates(subset=["uof_uid"])
     uof_citizen = uof_citizen.drop_duplicates(subset=["uof_uid"])
-    return uof_citizen, uof
+    return uof, uof_citizen
 
 
 if __name__ == "__main__":
@@ -629,7 +629,7 @@ if __name__ == "__main__":
     uof_citizen, uof = extract_citizen(uof)
     uof_22 = clean_uof_22()
     uof_citizen_22, uof_22 = extract_citizen_22(uof_22)
-    uof_citizen, uof = concat_dfs(uof, uof_22, uof_citizen, uof_citizen_22)
+    uof, uof_citizen = concat_dfs(uof, uof_22, uof_citizen, uof_citizen_22)
     uof.to_csv(deba.data("clean/uof_new_orleans_pd_2016_2022.csv"), index=False)
     uof_citizen.to_csv(
         deba.data("clean/uof_citizens_new_orleans_pd_2016_2022.csv"), index=False
