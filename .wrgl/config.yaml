@@ -1253,7 +1253,7 @@ branch:
   docs:
     remote: origin
     merge: refs/heads/docs
-    file: data/fuse/docs.csv
+    file: data/consolidate/documents.csv
     primaryKey:
       - docid
   police-report:
@@ -1265,7 +1265,7 @@ branch:
   citizens:
     remote: origin
     merge: refs/heads/citizens
-    file: data/fuse/citizens.csv
+    file: data/consolidate/citizens.csv
     primaryKey:
       - citizen_uid
   coaccusals:
@@ -1277,7 +1277,7 @@ branch:
   agency-reference-list:
     remote: origin
     merge: refs/heads/agency-reference-list
-    file: data/fuse/agency_reference_list.csv
+    file: data/consolidate/agency_reference_list.csv
     primaryKey:
       - agency_name
 merge:
