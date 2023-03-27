@@ -12,7 +12,7 @@ if __name__ == "__main__":
     person_df = pd.read_csv(deba.data("fuse/person.csv"))
     citizens = pd.read_csv(deba.data("fuse/citizens.csv"))
     agencies = pd.read_csv(deba.data("fuse/agency_reference_list.csv"))
-    documents = pd.read_csv(deba.data("raw/documents.csv"))
+    documents = pd.read_csv(deba.data("clean/documents.csv"))
 
     
     person_df = person_df[person_df["canonical_uid"].isin(per_df["uid"])]
@@ -35,4 +35,4 @@ if __name__ == "__main__":
     person_df.to_csv(deba.data("consolidate/person.csv"), index=False)  
     citizens.to_csv(deba.data("consolidate/citizens.csv"), index=False)
     agencies.to_csv(deba.data("consolidate/agency_reference_list.csv"), index=False)
-    documents.to_csv(deba.data("consolidate/documents.csv"))
+    documents.to_csv(deba.data("consolidate/documents.csv"), index=False)

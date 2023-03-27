@@ -1252,7 +1252,7 @@ branch:
       - settlement_uid
   docs:
     remote: origin
-    merge: refs/heads/docs
+    merge: refs/heads/documents
     file: data/consolidate/documents.csv
     primaryKey:
       - docid

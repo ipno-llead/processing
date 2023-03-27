@@ -32,7 +32,7 @@ targets:
   - consolidate/appeals.csv
   - consolidate/event.csv
   - consolidate/person.csv
-  - consolidate/documents.csv
-  - consolidate/agency_reference_list.csv
   - consolidate/citizens.csv
+  - consolidate/agency_reference_list.csv
+  - consolidate/documents.csv
   - analysis/coaccusals.csv
