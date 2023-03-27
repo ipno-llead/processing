@@ -11,12 +11,13 @@ if __name__ == "__main__":
     appeals_df = pd.read_csv(deba.data("fuse/appeals.csv"))
     person_df = pd.read_csv(deba.data("fuse/person.csv"))
     
+    person_df = person_df[person_df["canonical_uid"].isin(per_df["uid"])]
+    per_df = per_df[per_df["uid"].isin(person_df["canonical_uid"])]
     allegation_df = allegation_df[allegation_df["uid"].isin(per_df["uid"])]
     uof_df = uof_df[uof_df["uid"].isin(per_df["uid"])]
     event_df = event_df[event_df["uid"].isin(per_df["uid"])]
     sas_df = sas_df[sas_df["uid"].isin(per_df["uid"])]
     appeals_df = appeals_df[appeals_df["uid"].isin(per_df["uid"])]
-    person_df = person_df[person_df["canonical_uid"].isin(per_df["uid"])]
 
     event_df = event_df[~((event_df.agency.fillna("") == ""))]
 

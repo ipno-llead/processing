@@ -530,7 +530,7 @@ if __name__ == "__main__":
     post = load_for_agency(agency)
     award = pd.read_csv(deba.data("clean/award_new_orleans_pd_2016_2021.csv"))
     lprr = pd.read_csv(deba.data("clean/lprr_new_orleans_csc_2000_2016.csv"))
-    sas = pd.read_csv(deba.data("clean/sas_new_orleans_pd_2010_2021.csv"))
+    sas = pd.read_csv(deba.data("clean/sas_new_orleans_pd_2010_2023.csv"))
     uof = pd.read_csv(deba.data("clean/uof_new_orleans_pd_2016_2022.csv"))
     cprr = pd.read_csv(deba.data("clean/cprr_new_orleans_da_2016_2020.csv"))
     pprr_separations = pd.read_csv(
@@ -559,7 +559,7 @@ if __name__ == "__main__":
     pprr_csd_matched_with_ipm.to_csv(
         deba.data("match/pprr_new_orleans_csd_2014.csv"), index=False
     )
-    sas.to_csv(deba.data("match/sas_new_orleans_pd_2010_2021.csv"), index=False)
+    sas.to_csv(deba.data("match/sas_new_orleans_pd_2010_2023.csv"), index=False)
     uof.to_csv(deba.data("match/uof_new_orleans_pd_2016_2022.csv"), index=False)
     pclaims20.to_csv(deba.data("match/pclaims_new_orleans_pd_2020.csv"), index=False)
     pclaims21.to_csv(deba.data("match/pclaims_new_orleans_pd_2021.csv"), index=False)
