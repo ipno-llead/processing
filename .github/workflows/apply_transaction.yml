@@ -62,16 +62,16 @@ jobs:
 
             [1]: ${{ steps.txURL.outputs.value }}
 
-validate_schemas:
+  validate_schemas:
     needs: apply-transaction
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Install dependencies
-        run: |
-          sudo apt-get update && \
-          sudo apt-get install -y python3-pip && \
-          pip3 install requests
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+          cache: 'pip'
+      - name: Install packages
+        run: pip install requests
       - name: Run validation script
-        run: |
-          python3 scripts/validate_schemas.py
+        run: python scripts/validate_schemas.py
