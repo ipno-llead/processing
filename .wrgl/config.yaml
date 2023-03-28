@@ -1250,7 +1250,7 @@ branch:
     file: data/fuse/settlements.csv
     primaryKey:
       - settlement_uid
-  documentss:
+  documents:
     remote: origin
     merge: refs/heads/documents
     file: data/consolidate/documents.csv
