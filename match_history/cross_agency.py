@@ -68,7 +68,7 @@ def read_constraints():
 
 
 def read_post():
-    post = pd.read_csv(deba.data("match/post_officer_history.csv"))
+    post = pd.read_csv(deba.data("match_history/post_officer_history.csv"))
     post = post.drop_duplicates(subset=["uid"])
     print("read post officer history file (%d rows)" % post.shape[0])
     return post
@@ -137,7 +137,7 @@ def cross_match_officers_between_agencies(personnel, events, constraints, post):
     # filter down the full names to only those that are common
     common_names_sr = full_names[full_names.isin(common_names)]
 
-    excel_path = deba.data("match/cross_agency_officers.xlsx")
+    excel_path = deba.data("match_history/cross_agency_officers.xlsx")
     matcher = ThresholdMatcher(
         index=MultiIndex(
             [
@@ -258,7 +258,7 @@ def entity_resolution(
     with Spinner("saving person entity resolution to Excel file"):
         matcher.save_pairs_to_excel(
             name=deba.data(
-                "match/person_entity_resolution_%s.xlsx"
+                "match_history/person_entity_resolution_%s.xlsx"
                 % datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
             ),
             match_threshold=decision,
@@ -307,7 +307,7 @@ if __name__ == "__main__":
         person_df = entity_resolution(
             old_person=old_person_df, new_person=new_person_df
         )
-        person_df.to_csv(deba.data("fuse/person.csv"), index=False)
+        person_df.to_csv(deba.data("match_history/person.csv"), index=False)
     else:
         personnel = pd.read_csv(deba.data("match_history/personnel.csv"))
         print("read personnel file (%d x %d)" % personnel.shape)
