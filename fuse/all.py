@@ -9,14 +9,11 @@ if __name__ == "__main__":
     event_df = pd.read_csv(deba.data("match_history/event.csv"))
     sas_df = pd.read_csv(deba.data("fuse_agency/stop_and_search.csv"))
     appeals_df = pd.read_csv(deba.data("fuse_agency/appeals.csv"))
-    person_df = pd.read_csv(deba.data("match_history/person.csv"))
     citizens = pd.read_csv(deba.data("fuse_agency/citizens.csv"))
     agencies = pd.read_csv(deba.data("fuse_agency/agency_reference_list.csv"))
     documents = pd.read_csv(deba.data("clean/documents.csv"))
     post = pd.read_csv(deba.data("match_history/post_officer_history.csv"))
 
-    person_df = person_df[person_df["canonical_uid"].isin(per_df["uid"])]
-    per_df = per_df[per_df["uid"].isin(person_df["canonical_uid"])]
     allegation_df = allegation_df[allegation_df["uid"].isin(per_df["uid"])]
     uof_df = uof_df[uof_df["uid"].isin(per_df["uid"])]
     event_df = event_df[event_df["uid"].isin(per_df["uid"])]
@@ -32,7 +29,6 @@ if __name__ == "__main__":
     sas_df.to_csv(deba.data("fuse/stop_and_search.csv"), index=False)
     appeals_df.to_csv(deba.data("fuse/appeals.csv"), index=False)
     allegation_df.to_csv(deba.data("fuse/allegation.csv"), index=False)
-    person_df.to_csv(deba.data("fuse/person.csv"), index=False)  
     citizens.to_csv(deba.data("fuse/citizens.csv"), index=False)
     agencies.to_csv(deba.data("fuse/agency_reference_list.csv"), index=False)
     documents.to_csv(deba.data("fuse/documents.csv"), index=False)

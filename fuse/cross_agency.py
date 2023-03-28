@@ -307,11 +307,11 @@ if __name__ == "__main__":
         person_df = entity_resolution(
             old_person=old_person_df, new_person=new_person_df
         )
-        person_df.to_csv(deba.data("match_history/person.csv"), index=False)
+        person_df.to_csv(deba.data("fuse/person.csv"), index=False)
     else:
-        personnel = pd.read_csv(deba.data("match_history/personnel.csv"))
+        personnel = pd.read_csv(deba.data("fuse/personnel.csv"))
         print("read personnel file (%d x %d)" % personnel.shape)
-        events = pd.read_csv(deba.data("match_history/event.csv"))
+        events = pd.read_csv(deba.data("fuse/event.csv"))
         print("read events file (%d x %d)" % events.shape)
         constraints = read_constraints()
         post = read_post()
@@ -319,4 +319,5 @@ if __name__ == "__main__":
             personnel, events, constraints, post
         )
         new_person_df = create_person_table(clusters, personnel, personnel_event)
-        new_person_df.to_csv(deba.data("match_history/person.csv"), index=False)
+        new_person_df = new_person_df[new_person_df["canonical_uid"].isin(personnel["uid"])]
+        new_person_df.to_csv(deba.data("fuse/person.csv"), index=False)
