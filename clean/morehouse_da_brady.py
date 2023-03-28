@@ -6,7 +6,7 @@ from lib.uid import gen_uid
 
 def clean_agency(df):
     df.loc[:, "agency"] = df.agency.str.replace(r"orleans-so", "new-orleans-so", regex=False)
-    return df 
+    return df[~((df.agency.fillna("") == ""))]
 
 
 def concat_allegation_cols(df):
@@ -14,6 +14,7 @@ def concat_allegation_cols(df):
 
     df.loc[:, "allegation_desc"] = df.allegation.str.replace(r"; $", "", regex=True)
     return df.drop(columns=["initial_allegation", "allegation"])
+
 
 
 def clean():
