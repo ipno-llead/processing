@@ -320,6 +320,12 @@ branch:
     file: data/fuse/com_jefferson_davis_so.csv
     primaryKey:
       - allegation_uid
+  com-post:
+    remote: origin
+    merge: refs/heads/com-post
+    file: data/fuse/com_post.csv
+    primaryKey:
+      - allegation_uid
   event:
     remote: origin
     merge: refs/heads/event
