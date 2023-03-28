@@ -9,6 +9,13 @@ def clean_agency(df):
     return df 
 
 
+def concat_allegation_cols(df):
+    df.loc[:, "allegation_desc"] = df.allegation.fillna("").str.cat(df.initial_allegation.fillna(""), sep="; ")
+
+    df.loc[:, "allegation_desc"] = df.allegation.str.replace(r"; $", "", regex=True)
+    return df.drop(columns=["initial_allegation", "allegation"])
+
+
 def clean():
     df = (
         pd.read_csv(deba.data("raw/morehouse_da/morehouse_da_brady_2017_2022.csv"))
@@ -21,6 +28,7 @@ def clean():
             set_values,
             {"source_agency": "morehouse-da", "brady_list_date": "12/1/2022"},
         )
+        .pipe(concat_allegation_cols)
         .pipe(gen_uid, ["tracking_id_og", "agency"], "tracking_id")
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(
@@ -28,8 +36,7 @@ def clean():
             [
                 "uid",
                 "source_agency",
-                "allegation",
-                "initial_allegation",
+                "allegation_desc",
                 "action",
                 "tracking_id",
             ],
