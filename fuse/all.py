@@ -9,13 +9,12 @@ if __name__ == "__main__":
     event_df = pd.read_csv(deba.data("match_history/event.csv"))
     sas_df = pd.read_csv(deba.data("fuse_agency/stop_and_search.csv"))
     appeals_df = pd.read_csv(deba.data("fuse_agency/appeals.csv"))
-    person_df = pd.read_csv(deba.data("fuse_agency/person.csv"))
+    person_df = pd.read_csv(deba.data("match_history/person.csv"))
     citizens = pd.read_csv(deba.data("fuse_agency/citizens.csv"))
     agencies = pd.read_csv(deba.data("fuse_agency/agency_reference_list.csv"))
     documents = pd.read_csv(deba.data("clean/documents.csv"))
     post = pd.read_csv(deba.data("match_history/post_officer_history.csv"))
 
-    
     person_df = person_df[person_df["canonical_uid"].isin(per_df["uid"])]
     per_df = per_df[per_df["uid"].isin(person_df["canonical_uid"])]
     allegation_df = allegation_df[allegation_df["uid"].isin(per_df["uid"])]
