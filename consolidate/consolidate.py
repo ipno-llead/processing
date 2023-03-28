@@ -10,6 +10,10 @@ if __name__ == "__main__":
     sas_df = pd.read_csv(deba.data("fuse/stop_and_search.csv"))
     appeals_df = pd.read_csv(deba.data("fuse/appeals.csv"))
     person_df = pd.read_csv(deba.data("fuse/person.csv"))
+    citizens = pd.read_csv(deba.data("fuse/citizens.csv"))
+    agencies = pd.read_csv(deba.data("fuse/agency_reference_list.csv"))
+    documents = pd.read_csv(deba.data("clean/documents.csv"))
+
     
     person_df = person_df[person_df["canonical_uid"].isin(per_df["uid"])]
     per_df = per_df[per_df["uid"].isin(person_df["canonical_uid"])]
@@ -28,4 +32,7 @@ if __name__ == "__main__":
     sas_df.to_csv(deba.data("consolidate/stop_and_search.csv"), index=False)
     appeals_df.to_csv(deba.data("consolidate/appeals.csv"), index=False)
     allegation_df.to_csv(deba.data("consolidate/allegation.csv"), index=False)
-    person_df.to_csv(deba.data("consolidate/person.csv"), index=False)
+    person_df.to_csv(deba.data("consolidate/person.csv"), index=False)  
+    citizens.to_csv(deba.data("consolidate/citizens.csv"), index=False)
+    agencies.to_csv(deba.data("consolidate/agency_reference_list.csv"), index=False)
+    documents.to_csv(deba.data("consolidate/documents.csv"), index=False)
