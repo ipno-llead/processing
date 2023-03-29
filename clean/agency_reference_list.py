@@ -32,9 +32,13 @@ def add_hammond_marshal(df):
 
 
 def clean():
-    df = pd.read_csv(deba.data("raw/agency_reference_list/agency-reference-list.csv"))\
+    df = (pd.read_csv(deba.data("raw/agency_reference_list/agency-reference-list.csv"))\
         .pipe(add_morehouse_da)\
         .pipe(add_mississippi_river_bridge_pd)
+        .pipe(add_13th_da)
+        .pipe(add_probation_parola)
+        .pipe(add_hammond_marshal)
+    )
     return df
 
 
