@@ -137,7 +137,7 @@ def cross_match_officers_between_agencies(personnel, events, constraints, post):
     # filter down the full names to only those that are common
     common_names_sr = full_names[full_names.isin(common_names)]
 
-    excel_path = deba.data("match/cross_agency_officers.xlsx")
+    excel_path = deba.data("match_history/cross_agency_officers.xlsx")
     matcher = ThresholdMatcher(
         index=MultiIndex(
             [
@@ -258,7 +258,7 @@ def entity_resolution(
     with Spinner("saving person entity resolution to Excel file"):
         matcher.save_pairs_to_excel(
             name=deba.data(
-                "match/person_entity_resolution_%s.xlsx"
+                "match_history/person_entity_resolution_%s.xlsx"
                 % datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
             ),
             match_threshold=decision,
@@ -319,4 +319,5 @@ if __name__ == "__main__":
             personnel, events, constraints, post
         )
         new_person_df = create_person_table(clusters, personnel, personnel_event)
+        new_person_df = new_person_df[new_person_df["uid"].isin(personnel["uid"])]
         new_person_df.to_csv(deba.data("fuse/person.csv"), index=False)
