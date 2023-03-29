@@ -21,6 +21,7 @@ if __name__ == "__main__":
     sas_df = sas_df[sas_df["uid"].isin(per_df["uid"])]
     appeals_df = appeals_df[appeals_df["uid"].isin(per_df["uid"])]
     brady_df = brady_df[brady_df["uid"].isin(per_df["uid"])]
+    post = post[post["uid"].isin(per_df["uid"])]
 
     event_df = event_df[~((event_df.agency.fillna("") == ""))]
 
@@ -35,3 +36,4 @@ if __name__ == "__main__":
     agencies.to_csv(deba.data("fuse/agency_reference_list.csv"), index=False)
     documents.to_csv(deba.data("fuse/documents.csv"), index=False)
     brady_df.to_csv(deba.data("fuse/brady.csv"), index=False)
+    post.to_csv(deba.data("fuse/post_officer_history.csv"), index=False)

@@ -320,6 +320,12 @@ branch:
     file: data/fuse_agency/com_jefferson_davis_so.csv
     primaryKey:
       - allegation_uid
+  com-post:
+    remote: origin
+    merge: refs/heads/com-post
+    file: data/fuse/com_post.csv
+    primaryKey:
+      - allegation_uid
   event:
     remote: origin
     merge: refs/heads/event
@@ -1241,7 +1247,7 @@ branch:
   post-officer-history:
     remote: origin
     merge: refs/heads/post-officer-history
-    file: data/fuse_agency/post_officer_history.csv
+    file: data/fuse/post_officer_history.csv
     primaryKey:
       - uid
   settlements:
