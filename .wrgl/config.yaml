@@ -1247,7 +1247,7 @@ branch:
   post-officer-history:
     remote: origin
     merge: refs/heads/post-officer-history
-    file: data/fuse_agency/post_officer_history.csv
+    file: data/fuse/post_officer_history.csv
     primaryKey:
       - uid
   settlements:
