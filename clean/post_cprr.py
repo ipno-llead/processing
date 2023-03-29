@@ -39,61 +39,39 @@ def assign_action(df):
     return df
 
 
-def rename_agency(df):
-    df.loc[:, "agency"] = (
-        df.agency.str.strip().str.lower()
-        .fillna("")
-        .str.replace(r"(\w)\.\s*(\w)\.", r"\1\2", regex=True)
-        .str.replace(r"E\. Baton Rouge So", "east-baton-rouge-so", regex=True)
-        .str.replace(r"E\. Jefferson Levee PD", "east-jefferson-levee-PD", regex=True)
-        .str.replace(r"^St ", "St. ", regex=True)
-        .str.replace(r" ?Parish ?", " ", regex=True)
-        .str.replace(r"Pd$", "pd", regex=True)
-        .str.replace(r"So$", "so", regex=True)
-        .str.replace(r"Dept\.?", "Department", regex=True)
-        .str.replace(r"Univ\. Pd - (.+)", r"\1 University PD", regex=True)
-        .str.replace(r"^Lsu\b", "LSU", regex=True)
-        .str.replace(r"^Lsuhsc", "LSUHSC", regex=True)
-        .str.replace(r"^La\b", "Louisiana", regex=True)
-        .str.replace(r"^Orleans DA Office$", "New Orleans DA", regex=True)
-        .str.replace(r"DA Office$", "DA", regex=True)
-        .str.replace(r"^W\.?\b", "West", regex=True)
-        .str.replace(r"\-(\w+)", r"- \1", regex=True)
-        .str.replace(
-            r"^Se La Flood Protection Auth- E$",
-            "Southeast Louisiana Flood Protection Authority",
-            regex=True,
-        )
-        .str.replace(r"Dev\.\,", "Development", regex=True)
-        .str.replace("Red River Par", "Red River", regex=False)
-        .str.replace("Cc", "Community College", regex=False)
-        .str.replace("Constable'S", "Constable's", regex=False)
-        .str.replace(r"^Orleans", "New Orleans", regex=True)
-        .str.replace(r"Rep\.", "Representatives", regex=True)
-        .str.replace(r"Park & Rec\.", "Parks and Recreation", regex=True)
-        .str.replace(
-            "Housing Authority Of NO", "New Orleans Housing Authority", regex=False
-        )
-        .str.replace(r"^Ebr", "East Baton Rouge", regex=False)
-        .str.replace("City Park PD - NO", "New Orleans City Park PD", regex=False)
-        .str.replace("Nd", "nd", regex=False)
-        .str.replace(r"^(\w+)St", r"\1st", regex=True)
-        .str.replace(r"^(\w+)Th", r"\1th", regex=True)
-        .str.replace("Jdc", "Judicial District Court", regex=False)
-        .str.replace("Police", "PD", regex=False)
-        .str.replace(r"  +", " ", regex=True)
-        .str.replace(r" $", "", regex=True)
-        .str.replace("Plaquemines Par ", "Plaquemines ", regex=False)
-        .str.replace("District Attorney", "DA", regex=False)
-        .str.replace(r"^LSP$", "Louisiana State PD", regex=True)
-        .str.replace(r"\.", "", regex=True)\
-        .str.replace(r"\s+", "-", regex=True)\
-        .str.replace(r"\-+", "-", regex=True)\
-        .str.replace("&","-and-", regex=False)\
-        .str.replace(r"\/-bunkiepd", "/bunkie pd", regex=True)\
-        .str.replace(r"^e\-", "east-", regex=True)
+def clean_agency(df):
+    df.loc[:, "agency"] = (df.agency
+                           .str.lower()
+                           .str.strip()
+                           .str.replace(r"district attorney", "da", regex=False)
+                           .str.replace(r"(\w+)\/ ?(\w+)", "", regex=True)
+                           .str.replace(r"jda$", "da", regex=True)
+                           .str.replace(r"alexandria marshal", "alexandria city marshal", regex=False)
+                           .str.replace(r"parish ", "", regex=False)
+                           .str.replace(r"prob&parole", "probation parole", regex=False)
+                           .str.replace(r"univ\. pd southern\- shreveport", "southern shreveport university pd", regex=True)
+                           .str.replace(r"^ebrso$", "east baton rouge so", regex=True)
+                           .str.replace(r"^e ", "east ", regex=True)
+                           .str.replace(r"^lsp$", "louisiana state pd", regex=True)
+                           .str.replace(r"^opelousas marshal$", "opelousas city marshal", regex=True)
+                           .str.replace(r"^nopd$", "new orleans pd", regex=True)
+                           .str.replace(r"la ag\'s office", "attorney generals office", regex=True)
+                           .str.replace(r"^broussard$", "broussard pd", regex=True)
+                           .str.replace(r"^jp constable$", "jefferson constable", regex=True)
+                           .str.replace(r"^opelousas  landry$", "", regex=True)
+                           .str.replace(r"^st bernard$", "st bernard so", regex=True)
+                           .str.replace(r"^st martin$", "st martin so", regex=True)
+                           .str.replace(r"^univ. lsu-a$", "", regex=True)
+                           .str.replace(r"^orleans so$", "new orleans so", regex=True)
+                           .str.replace(r"^wbrso$", "west baton rouge so", regex=True)
+                           .str.replace(r"livington\b", "livingston", regex=True)
+                           .str.replace(r"coushatte", "coushatta", regex=False)
+                           .str.replace(r"^hammond marshal$", "hammond city marshal", regex=True)
+                           .str.replace(r"\s+", "-", regex=True)
+                           .str.replace(r"^cheneyville-$", "cheneyville-pd", regex=True)
+                           
     )
-    return df
+    return df[~((df.agency.fillna("") == ""))]
 
 
 def clean():
@@ -104,7 +82,7 @@ def clean():
         .pipe(split_name)
         .pipe(clean_allegations)
         .pipe(assign_action)
-        .pipe(rename_agency)
+        .pipe(clean_agency)
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(gen_uid, ["uid", "allegation", "decertification_date"], "allegation_uid")
     )
