@@ -34,6 +34,7 @@ def fuse_events(brady):
 
 if __name__ == "__main__":
     brady = pd.read_csv(deba.data("match/brady_morehouse_da_2022.csv"))
+    brady = brady.astype(str)
     event_df = fuse_events(brady)
     brady_df = rearrange_brady_columns(brady)
     per_df = rearrange_personnel_columns(brady)
