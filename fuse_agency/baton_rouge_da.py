@@ -1,7 +1,9 @@
 import pandas as pd
 import deba
+from lib.personnel import fuse_personnel
 from lib.columns import (
     rearrange_brady_columns,
+    rearrange_personnel_columns
 )
 
 from lib import events
@@ -52,5 +54,8 @@ if __name__ == "__main__":
     brady18 = pd.read_csv(deba.data("match/brady_baton_rouge_da_2018.csv"))
     brady_df = rearrange_brady_columns(pd.concat([brady21, brady18]))
     event_df = fuse_events(brady21, brady18)
+    per_df = fuse_personnel(brady18, brady21)
+    per_df = rearrange_personnel_columns(per_df)
     brady_df.to_csv(deba.data("fuse_agency/brady_baton_rouge_da.csv"), index=False)
     event_df.to_csv(deba.data("fuse_agency/event_baton_rouge_da.csv"), index=False)
+    per_df.to_csv(deba.data("fuse_agency/per_baton_rouge_da.csv"), index=False)

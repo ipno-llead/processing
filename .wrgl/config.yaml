@@ -1235,7 +1235,7 @@ branch:
   brady:
     remote: origin
     merge: refs/heads/brady
-    file: data/fuse_agency/brady.csv
+    file: data/fuse/brady.csv
     primaryKey:
       - brady_uid
   property-claims:

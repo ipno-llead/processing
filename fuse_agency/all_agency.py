@@ -87,6 +87,9 @@ def fuse_personnel():
                 pd.read_csv(deba.data("fuse_agency/per_iberia_so.csv")),
                 pd.read_csv(deba.data("fuse_agency/per_lockport_pd.csv")),
                 pd.read_csv(deba.data("fuse_agency/per_jefferson_davis_so.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_baton_rouge_da.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_ouachita_da.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_morehouse_da.csv")),
             ]
         )
     ).sort_values("uid", ignore_index=True)
@@ -290,7 +293,6 @@ def fuse_brady():
             [
                 pd.read_csv(deba.data("fuse_agency/brady_baton_rouge_da.csv")),
                 pd.read_csv(deba.data("fuse_agency/brady_ouachita_da.csv")),
-                pd.read_csv(deba.data("fuse_agency/brady_iberia_da.csv")),
                 pd.read_csv(deba.data("fuse_agency/brady_morehouse_da.csv")),
             ]
         )

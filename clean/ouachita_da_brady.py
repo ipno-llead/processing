@@ -18,7 +18,7 @@ def extract_charging_agency(df):
 
 
 def clean_allegations(df):
-    df.loc[:, "allegation"] = (
+    df.loc[:, "allegation_desc"] = (
         df.charges.str.replace("pled guilty to ", "", regex=False)
         .str.replace("indicted by federal department of justice for ", "", regex=False)
         .str.replace(r"\bbatter\b", "battery", regex=True)
