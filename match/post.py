@@ -13,7 +13,7 @@ def match_cprr_with_post(cprr, post):
     dfb = dfb.drop_duplicates(subset=["uid"]).set_index("uid")
 
     matcher = ThresholdMatcher(
-        ColumnsIndex(["fc"]),
+        ColumnsIndex(["fc", "agency"]),
         {
             "first_name": JaroWinklerSimilarity(),
             "last_name": JaroWinklerSimilarity(),

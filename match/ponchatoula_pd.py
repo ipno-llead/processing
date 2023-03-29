@@ -103,14 +103,9 @@ if __name__ == "__main__":
     cprr = pd.read_csv(deba.data("clean/cprr_ponchatoula_pd_2010_2020.csv"))
     agency = cprr.agency[0]
     post = load_for_agency(agency)
-    cprr_post = pd.read_csv(deba.data("match/cprr_post_2016_2019.csv"))
     cprr = match_cprr_and_pprr(cprr, pprr)
     post_events = extract_post_events(pprr, post)
-    cprr_post_events = extract_cprr_post_events(pprr, cprr_post)
     post_events.to_csv(
         deba.data("match/post_event_ponchatoula_pd_2020.csv"), index=False
     )
     cprr.to_csv(deba.data("match/cprr_ponchatoula_pd_2010_2020.csv"), index=False)
-    cprr_post_events.to_csv(
-        deba.data("match/cprr_post_events_ponchatoula_pd_2020.csv"), index=False
-    )

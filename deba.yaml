@@ -23,6 +23,7 @@ stages:
     commonPrerequisites:
       - datavalid.yml
   - name: match_history
+  - name: fuse_history
   - name: fuse
   - name: analysis
 targets:
