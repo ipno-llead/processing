@@ -6,7 +6,7 @@ import pandas as pd
 
 
 def clean_allegations(df):
-    df.loc[:, "allegation"] = (
+    df.loc[:, "allegation_desc"] = (
         df.rule_violaton.str.lower()
         .str.strip()
         .str.replace("sustained ", "", regex=False)
