@@ -61,13 +61,10 @@ if __name__ == "__main__":
     agency = pprr.agency[0]
     post = load_for_agency(agency)
     uof = pd.read_csv(deba.data("match/uof_kenner_pd_2005_2021.csv"))
-    cprr_post_events = pd.read_csv(
-        deba.data("match/cprr_post_events_kenner_pd_2020.csv")
-    )
     per = fuse_personnel(pprr, uof, post)
     uof_df = rearrange_use_of_force(uof)
     events_df = rearrange_event_columns(
-        pd.concat([post_event, cprr_post_events, fuse_events(pprr, uof)])
+        pd.concat([post_event, fuse_events(pprr, uof)])
     )
     per.to_csv(deba.data("fuse_agency/per_kenner_pd.csv"), index=False)
     events_df.to_csv(deba.data("fuse_agency/event_kenner_pd.csv"), index=False)

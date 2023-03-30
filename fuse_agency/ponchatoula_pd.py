@@ -62,12 +62,8 @@ if __name__ == "__main__":
     post = load_for_agency(agency)
     cprr = pd.read_csv(deba.data("match/cprr_ponchatoula_pd_2010_2020.csv"))
     post_event = pd.read_csv(deba.data("match/post_event_ponchatoula_pd_2020.csv"))
-    cprr_post_events = pd.read_csv(
-        deba.data("match/cprr_post_events_ponchatoula_pd_2020.csv")
-    )
     event_df = rearrange_event_columns(
-        pd.concat([fuse_events(pprr, cprr), post_event, cprr_post_events])
-    )
+        pd.concat([fuse_events(pprr, cprr), post_event]))
     per_df = rearrange_personnel_columns(pprr)
     per_df = fuse_personnel(per_df, post)
     per_df.to_csv(deba.data("fuse_agency/per_ponchatoula_pd.csv"), index=False)

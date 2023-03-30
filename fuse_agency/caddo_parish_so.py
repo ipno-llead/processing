@@ -33,12 +33,9 @@ if __name__ == "__main__":
     agency = pprr.agency[0]
     post = load_for_agency(agency)
     post_event = pd.read_csv(deba.data("match/post_event_caddo_parish_so.csv"))
-    cprr_post_event = pd.read_csv(
-        deba.data("match/cprr_post_event_caddo_parish_so.csv")
-    )
     event_df = fuse_events(pprr)
     event_df = rearrange_event_columns(
-        pd.concat([post_event, event_df, cprr_post_event])
+        pd.concat([post_event, event_df])
     )
     per_df = rearrange_personnel_columns(pprr)
     per_df = fuse_personnel(per_df, post)

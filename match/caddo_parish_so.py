@@ -87,12 +87,6 @@ if __name__ == "__main__":
     pprr = pd.read_csv(deba.data("clean/pprr_caddo_parish_so_2020.csv"))
     agency = pprr.agency[0]
     post = load_for_agency(agency)
-    cprr_post = pd.read_csv(deba.data("match/cprr_post_2016_2019.csv"))
     post_event = match_pprr_against_post(pprr, post)
-    cprr_post_event = extract_cprr_post_events(pprr, cprr_post)
-
     post_event.to_csv(deba.data("match/post_event_caddo_parish_so.csv"), index=False)
-    cprr_post_event.to_csv(
-        deba.data("match/cprr_post_event_caddo_parish_so.csv"), index=False
-    )
     pprr.to_csv(deba.data("match/pprr_caddo_parish_so_2020.csv"), index=False)

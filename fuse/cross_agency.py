@@ -319,5 +319,6 @@ if __name__ == "__main__":
             personnel, events, constraints, post
         )
         new_person_df = create_person_table(clusters, personnel, personnel_event)
-        new_person_df = new_person_df[new_person_df["uid"].isin(personnel["uid"])]
         new_person_df.to_csv(deba.data("fuse/person.csv"), index=False)
+        
+        
