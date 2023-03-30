@@ -140,7 +140,7 @@ def match_cprr_to_pprr(cprr, pprr):
     )
     decision = .804
     matcher.save_pairs_to_excel(
-        deba.data("match/cprr_post_ohr_personnel.xlsx"), decision
+        deba.data("match_history/cprr_post_ohr_personnel.xlsx"), decision
     )
     matches = matcher.get_index_pairs_within_thresholds(decision)
     match_dict = dict(matches)

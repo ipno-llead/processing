@@ -19,12 +19,12 @@ stages:
   - name: fuse_agency
     ignoredTargets:
       - duplicates.csv
-      - fuse/person.csv
     commonPrerequisites:
       - datavalid.yml
   - name: match_history
-  - name: fuse_history
   - name: fuse
+    ignoredTargets:
+      - fuse/person.csv
   - name: analysis
 targets:
   - fuse/allegation.csv
@@ -33,7 +33,6 @@ targets:
   - fuse/stop_and_search.csv
   - fuse/appeals.csv
   - fuse/event.csv
-  - fuse/person.csv
   - fuse/citizens.csv
   - fuse/agency_reference_list.csv
   - fuse/documents.csv
