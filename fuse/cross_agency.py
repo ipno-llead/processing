@@ -224,11 +224,8 @@ def create_person_table(clusters, personnel, personnel_event):
 
     # join uids with comma
     person_df.loc[:, "uids"] = person_df.uids.str.join(",")
-    
-    person_df = person_df.rename(columns={"uids": "uid"})
-    person_df = person_df.pipe(split_rows_with_multiple_uids)
-    person_df = person_df.drop_duplicates(subset=["canonical_uid", "uid"], keep="first").reset_index()
-    return person_df[["person_id", "canonical_uid", "uid"]]
+    person_df = person_df.drop_duplicates(subset=["canonical_uid", "uids"], keep="first")
+    return person_df[["person_id", "canonical_uid", "uids"]]
 
 
 def entity_resolution(
