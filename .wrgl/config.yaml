@@ -326,6 +326,12 @@ branch:
     file: data/fuse/com_post.csv
     primaryKey:
       - allegation_uid
+  com-east-feliciana-so:
+    remote: origin
+    merge: refs/heads/com-east-feliciana-so
+    file: data/fuse/com_east_feliciana_so.csv
+    primaryKey:
+      - allegation_uid
   event:
     remote: origin
     merge: refs/heads/event
@@ -720,6 +726,12 @@ branch:
     remote: origin
     merge: refs/heads/event-jefferson-davis-so
     file: data/fuse_agency/event_jefferson_davis_so.csv
+    primaryKey:
+      - event_uid
+  event-east-feliciana-so:
+    remote: origin
+    merge: refs/heads/event-east-feliciana-so
+    file: data/fuse_agency/event_east_feliciana_so.csv
     primaryKey:
       - event_uid
   per-abbeville-pd:
@@ -1146,6 +1158,12 @@ branch:
     remote: origin
     merge: refs/heads/per-jefferson-davis-so
     file: data/fuse_agency/per_jefferson_davis_so.csv
+    primaryKey:
+      - uid
+  per-east-feliciana-so:
+    remote: origin
+    merge: refs/heads/per-east-feliciana-so
+    file: data/fuse_agency/per_east_feliciana_so.csv
     primaryKey:
       - uid
   uof-new-orleans-pd:
