@@ -5,7 +5,7 @@ import deba
 
 
 def clean():
-    df = (pd.read_csv(deba.data("raw/east_feliciana_so/cprr_east_feliciana_so_2016_2023_byhand.csv"), encoding='windows-1252')
+    df = (pd.read_csv(deba.data("raw/east_feliciana_so/cprr_east_feliciana_so_2016_2023_byhand.csv"), encoding="ISO-8859-1")
           .pipe(clean_column_names)
           .pipe(set_values, {"agency": "east-feliciana-so"})
           .pipe(gen_uid, ["first_name", "last_name", "agency"])
