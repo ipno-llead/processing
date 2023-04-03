@@ -29,7 +29,7 @@ def match_uid_from_post(cprr, post):
         dfa,
         dfb,
     )
-    decision = 1
+    decision = .88
     matcher.save_pairs_to_excel(
         deba.data("match/east_feliciana_so_2016_2023_v_post_pprr_2020_11_06.xlsx"),
         decision,
