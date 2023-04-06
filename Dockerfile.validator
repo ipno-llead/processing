@@ -1,0 +1,76 @@
+FROM ubuntu:22.04
+
+RUN apt update -y && \
+    apt install -y software-properties-common locales \
+            git cmake build-essential curl libssl-dev \
+            zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev \
+            libreadline-dev libffi-dev libsqlite3-dev wget libbz2-dev
+
+# Set the locale
+RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && \
+    locale-gen
+ENV LANG en_US.UTF-8
+ENV LANGUAGE en_US:en
+ENV LC_ALL en_US.UTF-8
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN add-apt-repository ppa:rmescandon/yq \
+    && add-apt-repository ppa:deadsnakes/ppa \
+    && add-apt-repository ppa:alex-p/tesseract-ocr-devel \
+    && apt update -y \
+    && apt install -y python3.9 python3-pip python3.9-distutils \
+    && apt remove libgit2-dev \
+    yq \
+    && rm -rf /var/lib/apt/lists/*
+
+ARG libgit2_version=1.5.0
+
+# install libgit2
+RUN cd /tmp \
+    && git clone --depth=1 -b libssh2-1.9.0 https://github.com/libssh2/libssh2.git /tmp/libssh2_src \
+    && cd /tmp/libssh2_src \
+    && cmake . -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX=/tmp/libssh2 \
+    && cmake --build . --target install \
+    && cp -r /tmp/libssh2/* /usr/bin \
+    && cp -r /tmp/libssh2/* /usr/local \
+    && ldconfig \
+    && git clone --depth=1 -b v${libgit2_version} https://github.com/libgit2/libgit2.git /tmp/libgit2_src \
+    && cd /tmp/libgit2_src \
+    && cmake . -DBUILD_CLAR=OFF -DCMAKE_BUILD_TYPE=Release -DEMBED_SSH_PATH=/tmp/libssh2_src -DCMAKE_INSTALL_PREFIX=/tmp/libgit2 \
+    && cmake --build . --target install \
+    && cp -r /tmp/libgit2/* /usr/bin \
+    && cp -r /tmp/libgit2/* /usr/local \
+    && ldconfig \
+    && unset LIBGIT2 \
+    && rm -rf /tmp/libssh2_src /tmp/libssh2 /tmp/libgit2_src /tmp/libgit2
+
+# install Make 4.3
+ADD http://ftp.gnu.org/gnu/make/make-4.3.tar.gz /tmp/
+RUN cd /tmp \
+    && tar -xzf make-4.3.tar.gz \
+    && cd make-4.3 \
+    && ./configure --prefix=/usr/local \
+    && make \
+    && make install \
+    && rm -rf /tmp/make-4.3 /tmp/make-4.3.tar.gz
+
+RUN update-alternatives --install /usr/bin/python python /usr/bin/python3.9 1 \
+    && update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.9 1
+
+
+ADD ../requirements.txt /tmp
+
+RUN python -m pip install -r /tmp/requirements.txt
+
+ADD https://github.com/wrgl/wrgl/releases/download/v0.13.7/install.sh /tmp/install_wrgl.sh
+
+RUN chmod +x /tmp/install_wrgl.sh \
+    && /tmp/install_wrgl.sh \
+    && rm /tmp/install_wrgl.sh /tmp/requirements.txt
+
+ADD https://sdk.cloud.google.com /tmp/install_gcloud.sh
+RUN chmod +x /tmp/install_gcloud.sh \
+    && /tmp/install_gcloud.sh --install-dir=/usr/local/gcloud
+ENV PATH $PATH:/usr/local/gcloud/google-cloud-sdk/bin
+
+WORKDIR /ipno-processing
