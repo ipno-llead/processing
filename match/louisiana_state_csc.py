@@ -15,41 +15,27 @@ from lib.date import combine_date_columns
 
 
 def match_lprr_and_pprr(lprr, pprr):
-    dfa = (
-        lprr[["uid", "first_name", "last_name"]]
-        .drop_duplicates()
-        .set_index("uid", drop=True)
-    )
-    dfa = dfa.fillna(value={"first_name": "", "last_name": ""})
-    dfa.loc[:, "fc"] = dfa.apply(
-        lambda row: "".join(sorted([row.first_name[:1], row.last_name[:1]])),
-        axis=1,
-        result_type="reduce",
-    )
+    dfa = lprr[["uid", "first_name", "last_name"]]
+    dfa.loc[:, "fc"] = dfa.first_name.fillna("").map(lambda x: x[:1])
+    dfa.loc[:, "lc"] = dfa.last_name.fillna("").map(lambda x: x[:1])
+    dfa = dfa.drop_duplicates(subset=["uid"]).set_index("uid")
 
-    dfb = (
-        pprr[["uid", "first_name", "last_name"]]
-        .drop_duplicates()
-        .set_index("uid", drop=True)
-    )
-    dfb = dfb.fillna(value={"first_name": "", "last_name": ""})
-    dfb.loc[:, "fc"] = dfb.apply(
-        lambda row: "".join(sorted([row.first_name[:1], row.last_name[:1]])),
-        axis=1,
-        result_type="reduce",
-    )
+    dfb = pprr[["uid", "first_name", "last_name"]]
+    dfb.loc[:, "fc"] = dfb.first_name.fillna("").map(lambda x: x[:1])
+    dfb.loc[:, "lc"] = dfb.last_name.fillna("").map(lambda x: x[:1])
+    dfb = dfb.drop_duplicates(subset=["uid"]).set_index("uid")
 
     matcher = ThresholdMatcher(
-        ColumnsIndex("fc"),
+        ColumnsIndex(["fc", "lc"]),
         {
             "first_name": JaroWinklerSimilarity(),
             "last_name": JaroWinklerSimilarity(),
         },
         dfa,
         dfb,
-        variator=Swap("first_name", "last_name"),
     )
     decision = 0.969
+
     matcher.save_pairs_to_excel(
         deba.data("match/louisiana_state_csc_lprr_1991_2020_v_csd_pprr_2021.xlsx"),
         decision,
