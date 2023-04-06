@@ -83,7 +83,7 @@ def fuse_events(lprr, pprr, pprr_term, settlements):
 
 
 if __name__ == "__main__":
-    lprr = pd.read_csv(deba.data("match/lprr_louisiana_state_csc_1991_2020.csv"))
+    lprr = pd.read_csv(deba.data("clean/lprr_louisiana_state_csc_1991_2020.csv"))
     pprr = pd.read_csv(deba.data("clean/pprr_demo_louisiana_csd_2021.csv"))
     pprr_term = pd.read_csv(deba.data("clean/pprr_term_louisiana_csd_2021.csv"))
     post_event = pd.read_csv(
