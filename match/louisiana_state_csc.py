@@ -210,15 +210,15 @@ if __name__ == "__main__":
     cprr20 = pd.read_csv(deba.data("clean/cprr_louisiana_state_pd_2020.csv"))
     agency = pprr_term.agency[0]
     post = load_for_agency(agency)
-    pprr_term = match_pprr_demo_and_term(pprr_demo, pprr_term)
+    # pprr_term = match_pprr_demo_and_term(pprr_demo, pprr_term)
     # lprr = match_lprr_and_pprr(lprr, pprr_demo)
-    post_events = extract_post_events(pprr_demo, post)
+    # post_events = extract_post_events(pprr_demo, post)
     # cprr19 = match_cprr_19_to_pprr(cprr19, pprr_demo)
     # cprr20 = match_cprr_20_to_pprr(cprr20, pprr_demo)
     # lprr.to_csv(deba.data("match/lprr_louisiana_state_csc_1991_2020.csv"), index=False)
-    post_events.to_csv(
-        deba.data("match/post_event_louisiana_state_police_2020.csv"), index=False
-    )
-    pprr_term.to_csv(deba.data("match/pprr_term_louisiana_csd_2021.csv"), index=False)
+    # post_events.to_csv(
+    #     deba.data("match/post_event_louisiana_state_police_2020.csv"), index=False
+    # )
+    # pprr_term.to_csv(deba.data("match/pprr_term_louisiana_csd_2021.csv"), index=False)
     # cprr19.to_csv(deba.data("match/cprr_louisiana_state_pd_2019.csv"), index=False)
     # cprr20.to_csv(deba.data("match/cprr_louisiana_state_pd_2020.csv"), index=False)

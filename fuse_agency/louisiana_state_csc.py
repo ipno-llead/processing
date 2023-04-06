@@ -86,9 +86,6 @@ if __name__ == "__main__":
     lprr = pd.read_csv(deba.data("clean/lprr_louisiana_state_csc_1991_2020.csv"))
     pprr = pd.read_csv(deba.data("clean/pprr_demo_louisiana_csd_2021.csv"))
     pprr_term = pd.read_csv(deba.data("clean/pprr_term_louisiana_csd_2021.csv"))
-    post_event = pd.read_csv(
-        deba.data("match/post_event_louisiana_state_police_2020.csv")
-    )
     settlements = pd.read_csv(
         deba.data("clean/settlements_louisiana_state_pd_2015_2020.csv")
     )
@@ -98,9 +95,7 @@ if __name__ == "__main__":
     post = load_for_agency(agency)
     per_df = fuse_personnel(pprr, pprr_term, lprr, post)
     per_df = per_df[~((per_df.last_name.fillna("") == ""))]
-    event_df = rearrange_event_columns(
-        pd.concat([post_event, fuse_events(lprr, pprr, pprr_term, settlements)])
-    )
+    event_df = rearrange_event_columns(fuse_events(lprr, pprr, pprr_term, settlements))
     settlements = rearrange_settlement_columns(settlements)
     app_df = rearrange_appeal_hearing_columns(lprr)
     # cprr = rearrange_allegation_columns(pd.concat([cprr19, cprr20], axis=0))
