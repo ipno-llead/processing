@@ -6,6 +6,25 @@ on:
 jobs:
   process-data:
     runs-on: cdi-runner
+    # Service containers to run with `container-job`
+    services:
+      # Label used to access the service container
+      postgres:
+        # Docker Hub image
+        image: postgres:13.1
+        # Provide the password for postgres
+        env:
+          POSTGRES_USER: ipno
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DB: ipno
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
     steps:
       - uses: actions/checkout@v3
       - uses: jwalton/gh-find-current-pr@v1
@@ -34,6 +53,36 @@ jobs:
           make WRGL_FLAGS="--wrgl-dir /runner/_work/data/.wrgl" GSUTIL="$(which gsutil)"
         env:
           OCR_ENSURE_COMPLETE: "true"
+      - name: Retrieve BE schema
+        run: |
+          echo $BE_SCHEMA_URL
+          token=$(curl -X POST $BE_SCHEMA_URL/token/ -H "Content-Type: application/json" -d '{"email": "'"$BE_SCHEMA_USER"'", "password": "'"$BE_SCHEMA_PASSWORD"'"}' | jq '.access' -r)
+          curl -X GET $BE_SCHEMA_URL/schemas/validate/ -H "Authorization: Bearer $token" -o be_schema.sql
+        env:
+          BE_SCHEMA_USER: ${{ secrets.BE_SCHEMA_USER }}
+          BE_SCHEMA_PASSWORD: ${{ secrets.BE_SCHEMA_PASSWORD }}
+          BE_SCHEMA_URL: ${{ vars.BE_SCHEMA_URL }}
+      - name: Replace unnecessary SQL query and DB fields in DB schema
+        run: |
+          sed -i 's/^SELECT pg_catalog\.set_config('\''search_path'\'', '\'''\'', false);//g' be_schema.sql
+          sed -i 's/^\s*created_at/-- created_at/g' be_schema.sql
+          sed -i 's/^\s*updated_at/-- updated_at/g' be_schema.sql
+          sed -i 's/^\s*aliases/-- aliases/g' be_schema.sql
+          sed -i 's/^\s*is_name_changed/-- is_name_changed/g' be_schema.sql
+          sed -i 's/^\s*be_/-- be_/g' be_schema.sql
+      - name: Execute data validator
+        run: python data-validator/data_validator.py
+        env:
+          # The hostname used to communicate with the PostgreSQL service container
+          POSTGRES_HOST: localhost
+          # The default PostgreSQL port
+          POSTGRES_PORT: 5432
+          POSTGRES_DB: ipno
+          POSTGRES_USER: ipno
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}
+          DATA_DIR: ${{ vars.DATA_DIR }}
       - name: commit changes in transaction
         id: transaction
         run: |
