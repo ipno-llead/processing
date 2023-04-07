@@ -15,41 +15,27 @@ from lib.date import combine_date_columns
 
 
 def match_lprr_and_pprr(lprr, pprr):
-    dfa = (
-        lprr[["uid", "first_name", "last_name"]]
-        .drop_duplicates()
-        .set_index("uid", drop=True)
-    )
-    dfa = dfa.fillna(value={"first_name": "", "last_name": ""})
-    dfa.loc[:, "fc"] = dfa.apply(
-        lambda row: "".join(sorted([row.first_name[:1], row.last_name[:1]])),
-        axis=1,
-        result_type="reduce",
-    )
+    dfa = lprr[["uid", "first_name", "last_name"]]
+    dfa.loc[:, "fc"] = dfa.first_name.fillna("").map(lambda x: x[:1])
+    dfa.loc[:, "lc"] = dfa.last_name.fillna("").map(lambda x: x[:1])
+    dfa = dfa.drop_duplicates(subset=["uid"]).set_index("uid")
 
-    dfb = (
-        pprr[["uid", "first_name", "last_name"]]
-        .drop_duplicates()
-        .set_index("uid", drop=True)
-    )
-    dfb = dfb.fillna(value={"first_name": "", "last_name": ""})
-    dfb.loc[:, "fc"] = dfb.apply(
-        lambda row: "".join(sorted([row.first_name[:1], row.last_name[:1]])),
-        axis=1,
-        result_type="reduce",
-    )
+    dfb = pprr[["uid", "first_name", "last_name"]]
+    dfb.loc[:, "fc"] = dfb.first_name.fillna("").map(lambda x: x[:1])
+    dfb.loc[:, "lc"] = dfb.last_name.fillna("").map(lambda x: x[:1])
+    dfb = dfb.drop_duplicates(subset=["uid"]).set_index("uid")
 
     matcher = ThresholdMatcher(
-        ColumnsIndex("fc"),
+        ColumnsIndex(["fc", "lc"]),
         {
             "first_name": JaroWinklerSimilarity(),
             "last_name": JaroWinklerSimilarity(),
         },
         dfa,
         dfb,
-        variator=Swap("first_name", "last_name"),
     )
     decision = 0.969
+
     matcher.save_pairs_to_excel(
         deba.data("match/louisiana_state_csc_lprr_1991_2020_v_csd_pprr_2021.xlsx"),
         decision,
@@ -224,15 +210,15 @@ if __name__ == "__main__":
     cprr20 = pd.read_csv(deba.data("clean/cprr_louisiana_state_pd_2020.csv"))
     agency = pprr_term.agency[0]
     post = load_for_agency(agency)
-    pprr_term = match_pprr_demo_and_term(pprr_demo, pprr_term)
-    lprr = match_lprr_and_pprr(lprr, pprr_demo)
-    post_events = extract_post_events(pprr_demo, post)
+    # pprr_term = match_pprr_demo_and_term(pprr_demo, pprr_term)
+    # lprr = match_lprr_and_pprr(lprr, pprr_demo)
+    # post_events = extract_post_events(pprr_demo, post)
     # cprr19 = match_cprr_19_to_pprr(cprr19, pprr_demo)
     # cprr20 = match_cprr_20_to_pprr(cprr20, pprr_demo)
-    lprr.to_csv(deba.data("match/lprr_louisiana_state_csc_1991_2020.csv"), index=False)
-    post_events.to_csv(
-        deba.data("match/post_event_louisiana_state_police_2020.csv"), index=False
-    )
-    pprr_term.to_csv(deba.data("match/pprr_term_louisiana_csd_2021.csv"), index=False)
+    # lprr.to_csv(deba.data("match/lprr_louisiana_state_csc_1991_2020.csv"), index=False)
+    # post_events.to_csv(
+    #     deba.data("match/post_event_louisiana_state_police_2020.csv"), index=False
+    # )
+    # pprr_term.to_csv(deba.data("match/pprr_term_louisiana_csd_2021.csv"), index=False)
     # cprr19.to_csv(deba.data("match/cprr_louisiana_state_pd_2019.csv"), index=False)
     # cprr20.to_csv(deba.data("match/cprr_louisiana_state_pd_2020.csv"), index=False)
