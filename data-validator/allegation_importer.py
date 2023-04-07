@@ -1,25 +1,6 @@
 import os
 import pandas as pd
 from slack_sdk import WebClient
-# from wrgl import Repository
-
-
-# def __retrieve_complaint_frm_wrgl_data():
-#     repo = Repository("https://wrgl.llead.co/", None)
-
-#     original_commit = repo.get_branch("allegation")
-
-#     columns = original_commit.table.columns
-#     if not set(COMPLAINT_COLS).issubset(set(columns)):
-#         raise Exception('BE complaint columns are not recognized in the current commit')
-
-#     all_rows = list(repo.get_blocks("heads/allegation"))
-#     df = pd.DataFrame(all_rows)
-#     df.columns = df.iloc[0]
-#     df = df.iloc[1:].reset_index(drop=True)
-
-#     df = df.loc[:, COMPLAINT_COLS]
-#     df.to_csv('complaint.csv', index=False)
 
 
 def __build_complaints_relationship(db_con):

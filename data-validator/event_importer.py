@@ -1,25 +1,6 @@
 import os
 import pandas as pd
 from slack_sdk import WebClient
-# from wrgl import Repository
-
-
-# def __retrieve_event_frm_wrgl_data():
-#     repo = Repository("https://wrgl.llead.co/", None)
-
-#     original_commit = repo.get_branch("event")
-
-#     columns = original_commit.table.columns
-#     if not set(EVENT_COLS).issubset(set(columns)):
-#         raise Exception('BE event columns are not recognized in the current commit')
-
-#     all_rows = list(repo.get_blocks("heads/event"))
-#     df = pd.DataFrame(all_rows)
-#     df.columns = df.iloc[0]
-#     df = df.iloc[1:].reset_index(drop=True)
-
-#     df = df.loc[:, EVENT_COLS]
-#     df.to_csv('events.csv', index=False)
 
 
 def __build_event_rel(db_con, event_df, event_cols):
