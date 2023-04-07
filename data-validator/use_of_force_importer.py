@@ -1,24 +1,6 @@
 import os
 import pandas as pd
 from slack_sdk import WebClient
-# from wrgl import Repository
-
-
-# def __retrieve_uof_frm_wrgl_data(branch=None):
-#     repo = Repository("https://wrgl.llead.co/", None)
-
-#     original_commit = repo.get_branch("use-of-force")
-
-#     columns = original_commit.table.columns
-#     if not set(UOF_COLS).issubset(set(columns)):
-#         raise Exception('BE use-of-force columns are not recognized in the current commit')
-
-#     all_rows = list(repo.get_blocks("heads/use-of-force"))
-#     df = pd.DataFrame(all_rows)
-#     df.columns = df.iloc[0]
-#     df = df.iloc[1:].reset_index(drop=True)
-
-#     df.to_csv('uof.csv', index=False)
 
 
 def __build_uof_rel(db_con, uof_df, uof_cols):

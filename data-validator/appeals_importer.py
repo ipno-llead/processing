@@ -1,24 +1,6 @@
 import os
 import pandas as pd
 from slack_sdk import WebClient
-# from wrgl import Repository
-
-
-# def __retrieve_appeal_frm_wrgl_data(branch=None):
-#     repo = Repository("https://wrgl.llead.co/", None)
-
-#     original_commit = repo.get_branch("appeal-hearing")
-
-#     columns = original_commit.table.columns
-#     if not set(APPEAL_COLS).issubset(set(columns)):
-#         raise Exception('BE appeal columns are not recognized in the current commit')
-
-#     all_rows = list(repo.get_blocks("heads/appeal-hearing"))
-#     df = pd.DataFrame(all_rows)
-#     df.columns = df.iloc[0]
-#     df = df.iloc[1:].reset_index(drop=True)
-
-#     df.to_csv('appeals.csv', index=False)
 
 
 def __build_appeal_rel(db_con, appeals_df, appeals_cols):
