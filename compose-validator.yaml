@@ -1,0 +1,35 @@
+version: "3"
+
+services:
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: ipno
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ipno
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "ipno"]
+      interval: 5s
+      retries: 5
+
+  validator:
+    build:
+      context: .
+      dockerfile: Dockerfile.validator
+    image: data-validator-img
+    environment:
+      SLACK_BOT_TOKEN: slack_token
+      SLACK_CHANNEL: slack_channel
+      POSTGRES_HOST: db
+      POSTGRES_DB: ipno
+      POSTGRES_USER: ipno
+      POSTGRES_PASSWORD: postgres
+      DATA_DIR: /ipno-processing/fuse
+    command: python /ipno-processing/data-validator/data_validator.py
+    volumes:
+      - /path/to/workspace/:/ipno-processing
+    depends_on:
+      db:
+        condition: service_healthy
