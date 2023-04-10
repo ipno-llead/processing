@@ -19,7 +19,7 @@ if __name__ == "__main__":
     coaccusals["coaccusal"] = "1"
     coaccusals = coaccusals[["allegation_uid", "coaccusal"]]
     
-    allegation_df = pd.merge(allegation_df, coaccusals, on="allegation_uid")
+    allegation_df = pd.merge(allegation_df, coaccusals, on="allegation_uid", how="outer")
 
     event_df = event_df[event_df["uid"].isin(per_df["uid"])]
     uof_df = uof_df[uof_df["uid"].isin(per_df["uid"])]
