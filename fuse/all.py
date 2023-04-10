@@ -23,9 +23,9 @@ if __name__ == "__main__":
     allegation_df = allegation_df[allegation_df["uid"].isin(per_df["uid"])]
     brady_df = brady_df[brady_df["uid"].isin(per_df["uid"])]
     post = post[post["uid"].isin(per_df["uid"])]
-    coaccusals = coaccusals[["allegation_uid", "coccusal"]]
+    coaccusals = coaccusals[["allegation_uid", "coaccusal"]]
     
-    allegation_df = pd.merge(allegation_df, coaccusals, on="allegation_uiod")
+    allegation_df = pd.merge(allegation_df, coaccusals, on="allegation_uid")
     
     uof_df.to_csv(deba.data("fuse/use_of_force.csv"), index=False)
     sas_df.to_csv(deba.data("fuse/stop_and_search.csv"), index=False)
