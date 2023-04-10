@@ -16,6 +16,11 @@ if __name__ == "__main__":
     per_df = pd.read_csv(deba.data("match_history/personnel.csv"))
     coaccusals = pd.read_csv(deba.data("analysis/coaccusals.csv"))
 
+    coaccusals["coaccusal"] = "1"
+    coaccusals = coaccusals[["allegation_uid", "coaccusal"]]
+    
+    allegation_df = pd.merge(allegation_df, coaccusals, on="allegation_uid")
+
     event_df = event_df[event_df["uid"].isin(per_df["uid"])]
     uof_df = uof_df[uof_df["uid"].isin(per_df["uid"])]
     sas_df = sas_df[sas_df["uid"].isin(per_df["uid"])]
@@ -23,11 +28,7 @@ if __name__ == "__main__":
     allegation_df = allegation_df[allegation_df["uid"].isin(per_df["uid"])]
     brady_df = brady_df[brady_df["uid"].isin(per_df["uid"])]
     post = post[post["uid"].isin(per_df["uid"])]
-    coaccusals["coaccusal"] = "1"
-    coaccusals = coaccusals[["allegation_uid", "coaccusal"]]
-    
-    allegation_df = pd.merge(allegation_df, coaccusals, on="allegation_uid")
-    
+
     uof_df.to_csv(deba.data("fuse/use_of_force.csv"), index=False)
     sas_df.to_csv(deba.data("fuse/stop_and_search.csv"), index=False)
     appeals_df.to_csv(deba.data("fuse/appeals.csv"), index=False)
