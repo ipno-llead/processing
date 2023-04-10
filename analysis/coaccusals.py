@@ -57,7 +57,6 @@ def reformat_clusters(df):
     clusters = pd.merge(clusters, df, on=["uid", "tracking_id"])
     clusters = clusters[clusters.duplicated(subset=["tracking_id"], keep=False)]
     clusters = clusters[~((clusters.tracking_id.fillna("") == ""))].drop_duplicates(subset=["allegation_uid"])
-    clusters["coaccusal"] = "1"
     return clusters
 
 
