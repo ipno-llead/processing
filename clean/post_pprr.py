@@ -137,7 +137,6 @@ def clean():
         "last_pc_12_qualification_date",
     ]
     df.loc[:, "data_production_year"] = "2020"
-    df = df.dropna(0, "all", subset=["first_name"])
     df = (
         df.pipe(clean_agency)
         .pipe(standardize_desc_cols, ["employment_status"])
@@ -165,7 +164,7 @@ def clean():
         )
         .pipe(standardize_desc_cols, ["agency"])
     )
-    return df
+    return df[~((df.last_name.fillna("") == "" ))]
 
 
 if __name__ == "__main__":
