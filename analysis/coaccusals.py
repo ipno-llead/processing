@@ -56,11 +56,13 @@ def reformat_clusters(df):
 
     clusters = pd.merge(clusters, df, on=["uid", "tracking_id"])
     clusters = clusters[clusters.duplicated(subset=["tracking_id"], keep=False)]
-    return clusters[~((clusters.tracking_id.fillna("") == ""))].drop_duplicates(subset=["allegation_uid"])
+    clusters = clusters[~((clusters.tracking_id.fillna("") == ""))].drop_duplicates(subset=["allegation_uid"])
+    clusters["coaccusal"] = "1"
+    return clusters
 
 
 if __name__ == "__main__":
-    df = pd.read_csv(deba.data("fuse/allegation.csv"))
+    df = pd.read_csv(deba.data("fuse_agency/allegation.csv"))
     gen_clusters = create_clusters(df)
     clusters = reformat_clusters(df)
     clusters = rearrange_coaccusal_columns(clusters)
