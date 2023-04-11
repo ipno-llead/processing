@@ -1292,12 +1292,6 @@ branch:
     file: data/fuse/citizens.csv
     primaryKey:
       - citizen_uid
-  coaccusals:
-    remote: origin
-    merge: refs/heads/coaccusals
-    file: data/analysis/coaccusals.csv
-    primaryKey:
-      - uid
   agency-reference-list:
     remote: origin
     merge: refs/heads/agency-reference-list
