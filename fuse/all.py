@@ -16,10 +16,11 @@ if __name__ == "__main__":
     per_df = pd.read_csv(deba.data("match_history/personnel.csv"))
     coaccusals = pd.read_csv(deba.data("analysis/coaccusals.csv"))
 
-    coaccusals["coaccusal"] = "1"
+    coaccusals["coaccusal"] = "True"
     coaccusals = coaccusals[["allegation_uid", "coaccusal"]]
     
     allegation_df = pd.merge(allegation_df, coaccusals, on="allegation_uid", how="outer")
+    allegation_df.loc[:, "coaccusal"] = allegation_df.coaccusal.str.replace(r"^$", "False", regex=True)
 
     event_df = event_df[event_df["uid"].isin(per_df["uid"])]
     uof_df = uof_df[uof_df["uid"].isin(per_df["uid"])]
