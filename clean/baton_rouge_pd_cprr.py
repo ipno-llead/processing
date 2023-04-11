@@ -170,7 +170,7 @@ def realign_18():
 
 def parse_complaint_18(df):
     complaint = df.complaint.str.replace(
-        r"^(\d+\:\d+) (.+) (\d+)", r"\1@@\2@@\3"
+        r"^(\d+\:\d+) (.+) (\d+)", r"\1@@\2@@\3", regex=True
     ).str.split("@@", expand=True)
     complaint.columns = ["rule_code", "rule_paragraph", "paragraph_code"]
     df = pd.concat([df, complaint], axis=1)
@@ -186,9 +186,7 @@ def parse_complaint_18(df):
 
 
 def parse_officer_name_18(df):
-    dep = df.officer_name.str.replace(
-        r"^(.+), (PC?\d+) (.+)$", r"\1 # \2 # \3"
-    ).str.split(" # ", expand=True)
+    dep = df.officer_name.str.replace(r"^(.+)\.?, (PC?\d+) (.+)$", r"\1 # \2 # \3", regex=True).str.split(" # ", expand=True)
     dep.columns = ["name", "department_code", "department_desc"]
     dep.loc[:, "name"] = dep["name"].str.replace(r"\.", "").str.strip().str.lower()
 
@@ -197,7 +195,7 @@ def parse_officer_name_18(df):
         .str.lower()
         .str.replace(r"\s+", " ")
         .str.replace(
-            r"^(\w+(?: (?:iii?|iv|v|jr|sr))?) (\w+)(?: (\w+|n\/a))?$", r"\1 # \2 # \3"
+            r"^(\w+(?: (?:iii?|iv|v|jr|sr))?) (\w+)(?: (\w+|n\/a))?$", r"\1 # \2 # \3", regex=True
         )
         .str.split(" # ", expand=True)
     )

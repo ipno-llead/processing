@@ -23,25 +23,25 @@ def fuse_events(pprr, cprr16, cprr18, cprr19):
     builder.extract_events(
         cprr16,
         {
-            events.COMPLAINT_RECEIVE: {"prefix": "receive"},
-            events.INVESTIGATION_COMPLETE: {"prefix": "investigation_complete"},
-            events.COMPLAINT_INCIDENT: {"prefix": "occur"},
+            events.COMPLAINT_RECEIVE: {"prefix": "receive", "parse_date": True},
+            events.INVESTIGATION_COMPLETE: {"prefix": "investigation_complete", "parse_date": True},
+            events.COMPLAINT_INCIDENT: {"prefix": "occur", "parse_date": True},
         },
         ["uid", "allegation_uid"],
     )
     builder.extract_events(
         cprr18,
         {
-            events.COMPLAINT_RECEIVE: {"prefix": "receive"},
-            events.COMPLAINT_INCIDENT: {"prefix": "occur"},
+            events.COMPLAINT_RECEIVE: {"prefix": "receive", "parse_date": True},
+            events.COMPLAINT_INCIDENT: {"prefix": "occur", "parse_date": True},
         },
         ["uid", "allegation_uid"],
     )
     builder.extract_events(
         cprr19,
         {
-            events.COMPLAINT_RECEIVE: {"prefix": "receive"},
-            events.COMPLAINT_INCIDENT: {"prefix": "occur"},
+            events.COMPLAINT_RECEIVE: {"prefix": "receive", "parse_date": True},
+            events.COMPLAINT_INCIDENT: {"prefix": "occur", "parse_date": True},
         },
         ["uid", "allegation_uid"],
     )

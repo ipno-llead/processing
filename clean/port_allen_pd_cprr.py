@@ -170,7 +170,6 @@ def clean19():
         .pipe(standardize_rank_desc)
         .pipe(clean_occur_time)
         .pipe(clean_occur_date)
-        .pipe(clean_dates, ["receive_date", "occur_date"])
         .pipe(split_rows_by_allegations)
         .pipe(clean_badge_no)
         .pipe(clean_allegations)
@@ -223,7 +222,6 @@ def clean18():
             }
         )
         .dropna(how="all")
-        .pipe(clean_dates, ["receive_date", "occur_date"])
         .pipe(clean_occur_time)
         .pipe(combine_appeal_and_action_columns)
         .pipe(combine_rule_code_and_violation_18)
@@ -266,9 +264,6 @@ def clean16():
         .drop(columns=["department", "shift"])
         .pipe(float_to_int_str, ["paragraph_code"])
         .pipe(combine_allegation_code_and_violation)
-        .pipe(
-            clean_dates, ["receive_date", "occur_date", "investigation_complete_date"]
-        )
         .pipe(clean_occur_time)
         .pipe(assign_agency)
         .pipe(assign_prod_year, "2016")
@@ -291,7 +286,7 @@ def clean16():
         gen_uid, ["complainant_type", "allegation_uid", "agency"], "citizen_uid"
     )
     df = df.drop(columns=["complainant_type"])
-    return df, citizen_df
+    return df
 
 
 if __name__ == "__main__":
