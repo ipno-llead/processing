@@ -8,12 +8,18 @@ import re
 
 
 def split_rows_with_name(df):
-    for idx, row in df[df.full_name.fillna("").str.contains(" & ")].iterrows():
-        names = row.full_name.split(" & ")
-        df.loc[idx, "full_name"] = names[0]
-        row = row.copy()
-        row.loc["full_name"] = names[1]
-        df = df.append(row)
+    df = (
+        df.drop("full_name", axis=1)
+        .join(
+            df["full_name"]
+            .str.split("&", expand=True)
+            .stack()
+            .reset_index(level=1, drop=True)
+            .rename("full_name"),
+            how="outer",
+        )
+        .reset_index(drop=True)
+    )
     return df
 
 
@@ -209,20 +215,23 @@ def drop_rows_with_allegation_disposition_action_all_empty(df):
 
 
 def clean_completion_date(df):
-    df.completion_date = (
+    df.loc[:, "investigation_complete_date"]= (
         df.completion_date.str.lower()
         .str.strip()
         .fillna("")
         .str.replace(r"^8/1/200$", "8/1/2020", regex=True)
+        .str.replace(r"\/\/", "/", regex=True)
     )
     df = df.loc[~df.index.duplicated(keep="first")]
-    return df
+    return df.drop(columns=["completion_date"])
 
 
 def discard_impossible_dates(df):
-    df.loc[df.completion_year > "2021", "completion_year"] = ""
-    df.loc[df.completion_year > "2021", "completion_month"] = ""
-    df.loc[df.completion_year > "2021", "completion_day"] = ""
+    dates = df.investigation_complete_date.str.extract(r"(\w{4})$")
+
+    df.loc[:, "investigation_complete_year"] = dates[0]
+    df.loc[df.investigation_complete_year > "2021", "completion_day"] = ""
+
     return df
 
 
@@ -350,8 +359,6 @@ def clean21():
         .pipe(clean_completion_date)
         .pipe(float_to_int_str, ["level"])
         .pipe(drop_rows_with_allegation_disposition_action_all_empty)
-        .pipe(clean_dates, ["completion_date"], expand=True)
-        .pipe(clean_dates, ["receive_date"], expand=False)
         .pipe(clean_names, ["first_name", "last_name", "rank_desc"])
         .pipe(discard_impossible_dates)
         .pipe(set_values, {"agency": "tangipahoa-so", "data_production_year": "2021"})

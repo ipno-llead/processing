@@ -124,6 +124,7 @@ def extract_citizen(uof):
             "citizen_sex",
             "citizen_age",
             "citizen_uid",
+            "agency",
             ],
         ]
     )

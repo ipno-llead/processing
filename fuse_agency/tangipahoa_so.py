@@ -12,7 +12,13 @@ def fuse_events(cprr21, post):
         cprr21,
         {
             events.INVESTIGATION_COMPLETE: {
-                "prefix": "completion",
+                "prefix": "investigation_complete",
+                "parse_date": True,
+                "keep": ["uid", "agency", "allegation_uid"],
+            },
+            events.COMPLAINT_RECEIVE: {
+                "prefix": "receive",
+                "parse_date": True,
                 "keep": ["uid", "agency", "allegation_uid"],
             },
         },
