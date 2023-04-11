@@ -149,6 +149,13 @@ def create_tracking_id_og_col(df):
     return df
 
 
+def clean_receive_and_occur_dates(df):
+    df.loc[:, "receive_date"] = df.receive_date.str.replace(r"(\w{2})$", r"20\1", regex=True)
+    df.loc[:, "occur_date"] = df.occur_date.str.replace(r"(\w{2})$", r"20\1", regex=True).str.replace(r"(.+)\n(.+)", "", regex=True)
+    return df 
+
+
+
 def clean19():
     df = pd.read_csv(deba.data("raw/port_allen_pd/port_allen_cprr_2019.csv"))
     df = clean_column_names(df)
@@ -170,7 +177,6 @@ def clean19():
         .pipe(standardize_rank_desc)
         .pipe(clean_occur_time)
         .pipe(clean_occur_date)
-        .pipe(clean_dates, ["receive_date", "occur_date"])
         .pipe(split_rows_by_allegations)
         .pipe(clean_badge_no)
         .pipe(clean_allegations)
@@ -185,6 +191,7 @@ def clean19():
         )
         .pipe(create_tracking_id_og_col)
         .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
+        .pipe(clean_receive_and_occur_dates)
     )
     return df
 
@@ -223,7 +230,6 @@ def clean18():
             }
         )
         .dropna(how="all")
-        .pipe(clean_dates, ["receive_date", "occur_date"])
         .pipe(clean_occur_time)
         .pipe(combine_appeal_and_action_columns)
         .pipe(combine_rule_code_and_violation_18)
@@ -266,9 +272,6 @@ def clean16():
         .drop(columns=["department", "shift"])
         .pipe(float_to_int_str, ["paragraph_code"])
         .pipe(combine_allegation_code_and_violation)
-        .pipe(
-            clean_dates, ["receive_date", "occur_date", "investigation_complete_date"]
-        )
         .pipe(clean_occur_time)
         .pipe(assign_agency)
         .pipe(assign_prod_year, "2016")

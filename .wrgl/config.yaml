@@ -1184,6 +1184,12 @@ branch:
     file: data/fuse_agency/uof_terrebonne_so.csv
     primaryKey:
       - uof_uid
+  uof-lafayette-so:
+    remote: origin
+    merge: refs/heads/uof-lafayette-so
+    file: data/fuse_agency/uof_lafayette_so.csv
+    primaryKey:
+      - uof_uid
   pclaims-new-orleans-pd:
     remote: origin
     merge: refs/heads/pclaims-new-orleans-pd

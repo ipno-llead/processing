@@ -737,7 +737,7 @@ def clean_allegation_desc(df):
         .str.replace(r"chane(.+)", "", regex=True)
         .str.replace(r"\bposs\b", "possession", regex=True)
         .str.replace("waas", "was", regex=False)
-        .str.replace(r"{", "\\", regex=True)
+        .str.replace(r"{", "\/\/", regex=True)
         .str.replace("}", "/", regex=False)
         .str.replace("mulieutenantiple", "multiple", regex=False)
         .str.replace("didn�t", "didnt", regex=False)

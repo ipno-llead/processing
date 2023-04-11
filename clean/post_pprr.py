@@ -124,6 +124,12 @@ def replace_impossible_dates(df):
     return df
 
 
+def fix_date_format(df):
+    df.loc[:, "level_1_cert_date"] = df.level_1_cert_date.astype(str).str.replace(r"(\w+)\/(\w+)\/(\w+)", r"\3-\1-\2", regex=True)
+    df.loc[:, "last_pc_12_qualification_date"] = df.last_pc_12_qualification_date.astype(str).str.replace(r"(\w+)\/(\w+)\/(\w+)", r"\3-\1-\2", regex=True)
+    return df 
+
+
 def clean():
     df = pd.read_csv(deba.data("raw/post_council/post_pprr_11-6-2020.csv"))
     df = clean_column_names(df)
@@ -141,12 +147,8 @@ def clean():
         df.pipe(clean_agency)
         .pipe(standardize_desc_cols, ["employment_status"])
         .pipe(clean_dates, ["hire_date"])
+        .pipe(fix_date_format)
         .pipe(replace_impossible_dates)
-        .pipe(
-            clean_dates,
-            ["level_1_cert_date", "last_pc_12_qualification_date"],
-            expand=False,
-        )
         .pipe(clean_names, ["first_name", "last_name"])
         .pipe(
             gen_uid,

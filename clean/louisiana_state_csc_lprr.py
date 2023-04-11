@@ -23,26 +23,35 @@ def standardize_appealed(df):
 
 
 def split_row_with_multiple_appellant(df):
-    indices_to_remove = list()
-    for idx, row in df.loc[
-        df.appellant.str.contains("/") | df.appellant.str.contains("-")
-    ].iterrows():
-        if "/" in row.appellant:
-            names = row.appellant.strip().split("/")
-        elif "-" in row.appellant:
-            names = row.appellant.strip().split("-")
-        indices_to_remove.append(idx)
-        for name in names:
-            row.appellant = name
-            df = df.append(row, ignore_index=True)
-    df = df.drop(index=indices_to_remove)
+    df = ( df.drop("appellant", axis=1)
+        .join(
+            df["appellant"]
+            .str.split("/", expand=True)
+            .stack()
+            .reset_index(level=1, drop=True)
+            .rename("appellant"),
+            how="outer",
+        )
+        .reset_index(drop=True)
+    )
+    df = ( df.drop("appellant", axis=1)
+        .join(
+            df["appellant"]
+            .str.split("-", expand=True)
+            .stack()
+            .reset_index(level=1, drop=True)
+            .rename("appellant"),
+            how="outer",
+        )
+        .reset_index(drop=True)
+    )
     df.loc[:, "appellant"] = (
         df.appellant.str.replace(r"^Matte$", r"John Matte")
         .str.replace(r"^Perry$", r"Jesse Perry")
         .str.replace(r"^Cook$", r"Louis Cook")
         .str.replace(r"^William$", r"Kenneth Williams")
     )
-    return df.reset_index(drop=True)
+    return df
 
 
 def split_appellant_column(df):
@@ -90,21 +99,19 @@ def assign_additional_appellant_names(df):
 
 
 def split_rows_with_multiple_docket_no(df):
-    df.loc[:, "docket_no"] = df.docket_no.str.strip().str.replace(r"- ", "-")
-
-    # split rows with 2 docket numbers
-    indices_to_remove = []
-    for idx, row in df.loc[df.docket_no.str.contains(r" ")].iterrows():
-        docket_nos = row.docket_no.split(" ")
-        filed_dates = row.filed_date.split(" ")
-        for i, docket_no in enumerate(docket_nos):
-            row.docket_no = docket_no
-            row.filed_date = filed_dates[i]
-            df = df.append(row, ignore_index=True)
-        indices_to_remove.append(idx)
-    df = df.drop(index=indices_to_remove)
-
-    return df.reset_index(drop=True)
+    df.loc[:, "docket_no"] = df.docket_no.str.replace(r"- ", "-", regex=False)
+    df = ( df.drop("docket_no", axis=1)
+        .join(
+            df["docket_no"]
+            .str.split("-", expand=True)
+            .stack()
+            .reset_index(level=1, drop=True)
+            .rename("docket_no"),
+            how="outer",
+        )
+        .reset_index(drop=True)
+    )
+    return df
 
 
 def correct_docket_no(df):
@@ -173,6 +180,11 @@ def create_tracking_id_og_col(df):
     return df
 
 
+def clean_rows_w_multiple_dates(df):
+    df.loc[:, "filed_date"] = df.filed_date.str.replace(r"1/16/09 7/20/09", "", regex=True)
+    return df 
+
+
 def clean():
     df = pd.read_csv(
         deba.data("raw/louisiana_state_csc/louisianastate_csc_lprr_1991-2020.csv")
@@ -194,6 +206,7 @@ def clean():
         .pipe(split_appellant_column)
         .pipe(split_rows_with_multiple_docket_no)
         .pipe(assign_additional_appellant_names)
+        .pipe(clean_rows_w_multiple_dates)
         .pipe(clean_dates, ["filed_date", "appeal_disposition_date"])
         .pipe(correct_docket_no)
         .pipe(clean_appeal_disposition)
