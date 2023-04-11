@@ -20,7 +20,7 @@ if __name__ == "__main__":
     coaccusals = coaccusals[["allegation_uid", "coaccusal"]]
     
     allegation_df = pd.merge(allegation_df, coaccusals, on="allegation_uid", how="outer")
-    allegation_df.loc[:, "coaccusal"] = allegation_df.coaccusal.str.replace(r"^$", "False", regex=True)
+    allegation_df.loc[:, "coaccusal"] = allegation_df.coaccusal.fillna("").str.replace(r"^$", "False", regex=True)
 
     event_df = event_df[event_df["uid"].isin(per_df["uid"])]
     uof_df = uof_df[uof_df["uid"].isin(per_df["uid"])]
