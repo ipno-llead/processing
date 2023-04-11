@@ -149,6 +149,13 @@ def create_tracking_id_og_col(df):
     return df
 
 
+def clean_receive_and_occur_dates(df):
+    df.loc[:, "receive_date"] = df.receive_date.str.replace(r"(\w{2})$", r"20\1", regex=True)
+    df.loc[:, "occur_date"] = df.occur_date.str.replace(r"(\w{2})$", r"20\1", regex=True).str.replace(r"(.+)\n(.+)", "", regex=True)
+    return df 
+
+
+
 def clean19():
     df = pd.read_csv(deba.data("raw/port_allen_pd/port_allen_cprr_2019.csv"))
     df = clean_column_names(df)
@@ -184,6 +191,7 @@ def clean19():
         )
         .pipe(create_tracking_id_og_col)
         .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
+        .pipe(clean_receive_and_occur_dates)
     )
     return df
 
@@ -286,7 +294,7 @@ def clean16():
         gen_uid, ["complainant_type", "allegation_uid", "agency"], "citizen_uid"
     )
     df = df.drop(columns=["complainant_type"])
-    return df
+    return df, citizen_df
 
 
 if __name__ == "__main__":

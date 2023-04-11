@@ -39,13 +39,11 @@ def assign_department_desc(df):
 
 
 def extract_occur_date(df):
-    df.loc[:, "occur_year"] = df.occur_raw_date.fillna("").str.replace(
-        r".+(\d{4})$", r"\1"
-    )
-    dates = df.occur_raw_date.str.extract(r"^(\d+)\/(\d+)\/\d{4}$")
+    dates = df.occur_raw_date.str.extract(r"^(\d+)\/(\d+)\/(\d{4})$")
     df.loc[:, "occur_month"] = dates[0]
     df.loc[:, "occur_day"] = dates[1]
-    return df
+    df.loc[:, "occur_year"] = dates[2]
+    return df.drop(columns=["occur_raw_date"])
 
 
 def assign_agency(df):
