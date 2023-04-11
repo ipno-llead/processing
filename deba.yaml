@@ -22,10 +22,10 @@ stages:
     commonPrerequisites:
       - datavalid.yml
   - name: match_history
+  - name: analysis
   - name: fuse
     ignoredTargets:
       - fuse/person.csv
-  - name: analysis
 targets:
   - fuse/allegation.csv
   - fuse/personnel.csv

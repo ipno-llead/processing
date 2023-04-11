@@ -27,7 +27,7 @@ def fuse_events(post, cprr):
     builder.extract_events(
         cprr,
         {
-            events.OFFICER_LEVEL_1_CERT: {
+            events.OFFICER_POST_DECERTIFICATION: {
                 "prefix": "decertification",
                 "parse_date": True,
                 "keep": ["uid", "agency", "allegation_uid"],

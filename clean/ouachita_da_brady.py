@@ -13,7 +13,7 @@ def extract_disposition(df):
 
 def extract_charging_agency(df):
     agency = df.charges.str.extract(r"(federal department of justice)")
-    df.loc[:, "charging_agency"] = agency[0]
+    df.loc[:, "charging_agency"] = agency[0].str.replace(r"\s+", "-", regex=True)
     return df
 
 
