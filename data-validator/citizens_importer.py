@@ -6,7 +6,7 @@ from slack_sdk import WebClient
 def __build_citizen_rel(db_con, citizens_df, citizens_cols):
     client = WebClient(os.environ.get('SLACK_BOT_TOKEN'))
 
-    print('Building relationship between agency and citizens')
+    print('Building citizens_agency relationship')
     agency_df = pd.read_sql(
         'SELECT id, agency_slug FROM departments_department',
         con=db_con
@@ -35,7 +35,7 @@ def __build_citizen_rel(db_con, citizens_df, citizens_cols):
 
         raise Exception('Cannot map agency to citizen')
 
-    print('Build relationship between complaints and citizens')
+    print('Building citizens_complaints relationship')
     complaints_df = pd.read_sql(
         'SELECT id, allegation_uid FROM complaints_complaint',
         con=db_con
@@ -44,7 +44,7 @@ def __build_citizen_rel(db_con, citizens_df, citizens_cols):
 
     result = pd.merge(result, complaints_df, how='left', on='allegation_uid')
 
-    print('Build relationship between uof and citizens')
+    print('Building citizens_uof relationship')
     uof_df = pd.read_sql(
         'SELECT id, uof_uid FROM use_of_forces_useofforce',
         con=db_con

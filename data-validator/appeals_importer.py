@@ -6,7 +6,7 @@ from slack_sdk import WebClient
 def __build_appeal_rel(db_con, appeals_df, appeals_cols):
     client = WebClient(os.environ.get('SLACK_BOT_TOKEN'))
 
-    print('Check integrity between officers\' agency and appeal agency')
+    print('Building appeals_officers relationship')
     officers_df = pd.read_sql(
         'SELECT id, uid, agency FROM officers_officer',
         con=db_con
@@ -28,6 +28,8 @@ def __build_appeal_rel(db_con, appeals_df, appeals_cols):
         )
 
         raise Exception('Cannot map officer to appeal')
+
+    print('Building appeals_agency relationship')
 
     aor_df['agency_slug'] = aor_df.apply(
         lambda x: x['officer_agency_slug'] if pd.isnull(x['agency']) \

@@ -6,7 +6,7 @@ from slack_sdk import WebClient
 def __build_event_rel(db_con, event_df, event_cols):
     client = WebClient(os.environ.get('SLACK_BOT_TOKEN'))
 
-    print('Building relationship between officers and events')
+    print('Building events_officers relationship')
     officers_df = pd.read_sql(
         'SELECT id, uid, agency FROM officers_officer',
         con=db_con
@@ -128,13 +128,23 @@ def __build_event_rel(db_con, event_df, event_cols):
 
         raise Exception('There are discrepancy between agency of officers and events')
 
+    print('Building events_brady relationship')
+    brady_df = pd.read_sql(
+        'SELECT id, brady_uid FROM brady_brady',
+        con=db_con
+    )
+    brady_df.columns = ['brady_id', 'brady_uid']
+
     result = pd.merge(event_df, officers_df, how='left', on='uid')
     result = pd.merge(result, agency_df, how='left', on='agency')
     result = pd.merge(result, appeal_df, how='left', on='appeal_uid')
     result = pd.merge(result, uof_df, how='left', on='uof_uid')
+    result = pd.merge(result, brady_df, how='left', on='brady_uid')
 
     result = result.loc[:,
-        event_cols + ['officer_id', 'department_id', 'appeal_id', 'use_of_force_id']
+        event_cols + [
+            'officer_id', 'department_id', 'appeal_id', 'use_of_force_id', 'brady_id'
+        ]
     ]
 
     result = result.astype({
@@ -144,7 +154,8 @@ def __build_event_rel(db_con, event_df, event_cols):
         'officer_id': pd.Int64Dtype(),
         'department_id': pd.Int64Dtype(),
         'appeal_id': pd.Int64Dtype(),
-        'use_of_force_id': pd.Int64Dtype()
+        'use_of_force_id': pd.Int64Dtype(),
+        'brady_id': pd.Int64Dtype()
     })
     result.to_csv('events.csv', index=False)
 
@@ -156,7 +167,12 @@ def run(db_con, event_df, event_cols):
     cursor.copy_expert(
         sql=f"""
             COPY officers_event(
-                {', '.join(event_cols + ['officer_id', 'department_id', 'appeal_id', 'use_of_force_id'])}
+                {', '.join(
+                    event_cols + [
+                        'officer_id', 'department_id', 'appeal_id',
+                        'use_of_force_id', 'brady_id'
+                    ]
+                )}
             ) FROM stdin WITH CSV HEADER
             DELIMITER as ','
         """,

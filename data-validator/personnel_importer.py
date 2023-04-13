@@ -6,28 +6,12 @@ from slack_sdk import WebClient
 def __build__officer_rel(db_con, officer_df, officer_cols):
     client = WebClient(os.environ.get('SLACK_BOT_TOKEN'))
 
+    print('Building officers_agency relationship')
     agency_df = pd.read_sql(
         'SELECT id, agency_slug FROM departments_department',
         db_con
     )
     agency_df.columns = ['department_id', 'agency']
-
-    print('Check for duplicated records')
-    check_dup_officers = officer_df[officer_df.duplicated(['uid', 'agency'])]
-    if len(check_dup_officers) > 0:
-        check_dup_officers.to_csv(
-            'duplicated_officers.csv',
-            index=False
-        )
-
-        client.files_upload(
-            channels=os.environ.get('SLACK_CHANNEL'),
-            title='Duplicated officers',
-            file="./duplicated_officers.csv",
-            initial_comment='The following file provides a list of duplicated personnels:',
-        )
-
-        raise Exception('There are duplicated records in personnel')
 
     result = pd.merge(officer_df, agency_df, how='left', on='agency')
 
