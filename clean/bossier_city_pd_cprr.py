@@ -1,7 +1,7 @@
 import deba
 import pandas as pd
-from lib.columns import clean_column_names
-from lib.clean import clean_dates
+from lib.columns import clean_column_names, set_values
+from lib.clean import clean_dates, strip_leading_comma
 from lib.rows import duplicate_row
 import re
 from lib.uid import gen_uid
@@ -268,6 +268,134 @@ def assign_agency(df):
 def create_tracking_id_og_col(df):
     df.loc[:, "tracking_id_og"] = df.tracking_id
     return df
+
+
+def extract_receive_date(df):
+    dates = df.date.str.extract(r"(\w{1,2}\/(\w{1,2}\/\w{4}))")
+
+    df.loc[:, "receive_date"] = dates[0]
+    return df.drop(columns=["date"])
+
+def extract_tracking_id(df):
+    id = df.iad_number.str.replace(r"(1|I)A-", "", regex=True).str.extract(r"(\w{1,2}-\w{1,3})")
+    
+    df.loc[:, "tracking_id_og"] = id[0]
+    return df.drop(columns=["iad_number"])
+
+def split_rows_with_multiple_officers(df):
+    df.loc[:, "officer"] = (df.officer
+                            .str.replace(r":", ";", regex=False)
+                            .str.replace(r"^Stewart Jamie Easterling, J$", "", regex=True)
+                            .str.replace(r"^McGee Turner. Wheatty Provost$", "", regex=True)
+                            .str.replace(r"^Kutz Harvey Roberts$", "", regex=True)
+                            .str.replace(r"^(Unknown Officers|unk|Un?known|Communications|Patrol\, Detectives|UNKNOWN)$","", regex=True)
+                            .str.replace(r"^(\w+)\. (\w+)$", r"\1, \2", regex=True)
+                            .str.replace(r"^Warren, Thomerson Sanford$", "", regex=True)
+                            .str.replace(r"^(\w{1})\.? (\w+)$", r"\2, \1")
+                            .str.replace(r"^(\w+) (\w{1})\.$", r"\1, \2", regex=True)
+                            .str.replace(r"(\w{1})\.$", r"\1", regex=True)
+                            .str.replace(r"(\w+)\. (\w{1})$", r"\1, \2", regex=True)
+                            .str.replace(r"(.+)?Sgt(.+)?", r"Sgt \1 \2", regex=True)
+                            .str.replace(r"(\w+)\.(\w{1})", r"\1, \2", regex=True)
+                            
+    )
+
+    df.loc[:, "other_officers"] = (df.other_officers
+                                   .str.replace(r"(\w+) (\w{1}) \b", r"\1 \2;", regex=True)
+                                   .str.replace(r"^(\w+)\, (\w+)\, (\w+)\, (\w+)\, (\w+)\, (\w+)$", r"\1; \2; \3; \4; \5; \6", regex=True)
+                                   .str.replace(r"^(\w{1})\. (\w+)\, (\w{1})\. (\w+)$", r"\1. \2; \3. \4", regex=True)
+                                   .str.replace(r"^(\w+)\, (\w{1})\.?\, (\w+)\, (\w{1})$", r"\1 \2; \3 \4", regex=True)
+                                   .str.replace(r"(\w{1})\. (\w+)$", r"\2, \1", regex=True)
+                                   .str.replace(r"(\/|:|\.)", ";", regex=True)
+                                   .str.replace(r"^(bcpd|jail personal)", "", regex=True)
+                                   .str.replace(r"^Res ofcs Ball and Boing", "Ball; Boing", regex=True)
+                                   .str.replace(r"^Sproies E Freeman K WhenDey$", "", regex=True)
+                                   .str.replace(r"^Wood.S nan,Merriott$", "", regex=True)
+                                   .str.replace(r"^(\w+) (\w{1}) (\w+) (\w{1}) (\w+) (\w{1})$", r"\1, \2; \3, \4; \5, \6", regex=True)
+                                   .str.replace(r"^(\w+)\, (\w{1}) (\w+)\, (\w{1}) (\w+) (\w{1})$", r"\1, \2; \3, \4; \5, \6", regex=True)
+                                   .str.replace(r"(Unknown Others|SCIU|HUMPHREY, CHEATWOOD COBB|Unknown)", "", regex=True)
+                                   .str.replace(r"^McGee, Faktor, Sproles$", "", regex=True)
+                                   .str.replace(r"^(\w{1})\. (\w+)\, (\w{1})\.(\w+)\, (\w{1}) (\w+)", r"\2, \1; \4, \3; \6, \5", regex=True)
+                                   .str.replace(r"^(wamp THANTS, PROOU o. Calla|wamp THANTS, PROOU Calla, o)$", "", regex=True)
+                                   .str.replace(r"^(LIDDELL BRICE, BOOKER|S; DURR|ENGI|DSI)$", "", regex=True)
+                                   .str.replace(r"^(PROVOST SWAN C|HAMM BLOUNT NELSON)$", "", regex=True)
+                                   .str.replace(r"(.+)?Sgt(.+)?", r"Sgt \1, \2", regex=True)
+                                   .str.replace(r"^Sgt Roberts, Mitchell, Rambo, , ; Johnson, M$", "", regex=True)
+                                   .str.replace(r"^Hardesty, McDonald, Barclay$", "Hardesty; McDonald; Barclay", regex=True)
+                                   .str.replace(r"^MarC, r$", "", regex=True)
+
+                                  
+    )
+    df = (
+        df.drop("officer", axis=1)
+        .join(
+            df["officer"]
+            .str.split(";", expand=True)
+            .stack()
+            .reset_index(level=1, drop=True)
+            .rename("officer"),
+            how="outer",
+        )
+        .reset_index(drop=True)
+    )
+    df = (
+        df.drop("other_officers", axis=1)
+        .join(
+            df["other_officers"]
+            .str.split(";", expand=True)
+            .stack()
+            .reset_index(level=1, drop=True)
+            .rename("other_officers"),
+            how="outer",
+        )
+        .reset_index(drop=True)
+    )
+    dfa = df.copy()
+    dfa = dfa.drop(columns=["other_officers"])
+
+    dfb = df.copy()
+    dfb = dfb.drop(columns=["officer"]).rename(columns={"other_officers": "officer"})
+
+    concat_df = pd.concat([dfa, dfb])
+    return concat_df
+
+
+def split_names(df):
+    df.loc[:, "officer"] = (df.officer
+                            .str.replace(r"^(\w+)\, (\w+)\, (\w+)$", "", regex=True)
+                            .str.replace(r"(CID|BCPD)", "", regex=True)
+                            .str.replace(r"^ (\w+)", r"\1", regex=True)
+                            .str.replace(r"^(Aguirre\, G Estees|McWhiney\, Jones Kelly|CamMike\, p|KerrDarren\, y)$", "", regex=True)
+                            .str.replace(r"^(NELSON NUNNERY, N|SWAN WELLS, WOOD|HAMMERSLA|SOUTER, CULVER NELSON BRYANT)$", "", regex=True)
+                            .str.replace(r"^(ENGL, HAUGEN|ProvosLiddell, t|Sepulvado Taylor, Payne)$", "", regex=True)
+                            .str.replace(r"^SgGray, t$", "Sgt Gray", regex=True)
+                            .str.replace(r"^(Culver, Fuller, Sepulvado, Cole, Yetman)$", "", regex=True)
+                            .str.replace(r"^(Thompson, 2| \$)$", "", regex=True)
+                            .str.replace(r"^(\w+)\,(\w{1})$", r"\1, \2", regex=True)
+                            .str.replace(r"V\, BROWN", "BROWN, V", regex=True)
+                            .str.replace(r"^(\w{1})$", "", regex=True)
+                            .str.replace(r"^CRU$", "", regex=True)
+    )
+    names = df.officer.str.lower().str.strip().str.extract(r"(sgt|pco)? ?(\w+)\,? ?(.+)?$")
+
+    df.loc[:, "rank_desc"] = names[0]
+    df.loc[:, "last_name"] = names[1].fillna("")
+    df.loc[:, "first_name"] = names[2].fillna("")
+    return df 
+
+def clean10():
+    df = (pd.read_csv(deba.data("raw/bossier_city_pd/bossier_city_pd_cprr_2010_2020.csv"))
+          .pipe(clean_column_names)
+          .drop(columns=["classification", "comp_name", "comp_phone"])
+          .pipe(strip_leading_comma)
+          .pipe(extract_receive_date)
+          .pipe(extract_tracking_id)
+          .pipe(split_rows_with_multiple_officers)
+          .pipe(split_names)
+          .pipe(set_values,  {"agency": "bossier-city-pd"} )
+          .pipe(gen_uid, ["tracking_id_og", "agency"], "tracking_id")
+    )
+    return df 
 
 
 def clean():
