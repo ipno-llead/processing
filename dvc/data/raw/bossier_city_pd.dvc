@@ -1,6 +1,6 @@
 wdir: ../../../data/raw
 outs:
-- md5: 2678c16ebd2228657427b7a5ca2f1239.dir
-  size: 114605
-  nfiles: 3
+- md5: 77b9dfeb8809a82afeb8b72d77a049b0.dir
+  size: 288533
+  nfiles: 4
   path: bossier_city_pd
