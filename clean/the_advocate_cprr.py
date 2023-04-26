@@ -80,8 +80,8 @@ def assign_names(df):
     df.loc[df.name == "Boyd, David Tyler", "middle_name"] = "tyler"
     df.loc[df.name == "Boyd, David Tyler", "last_name"] = "boyd"
 
-    df.loc[df.name == "[Bahm, Brett](https://www.documentcloud.org/documents/23783741-st-tammany-washington-parish-police-convictions?responsive=1&title=1)", "first_name"] = "brad"
-    df.loc[df.name == "[Bahm, Brett](https://www.documentcloud.org/documents/23783741-st-tammany-washington-parish-police-convictions?responsive=1&title=1)", "last_name"] = "core"
+    df.loc[df.name == "[Bahm, Brett](https://www.documentcloud.org/documents/23783741-st-tammany-washington-parish-police-convictions?responsive=1&title=1)", "first_name"] = "brett"
+    df.loc[df.name == "[Bahm, Brett](https://www.documentcloud.org/documents/23783741-st-tammany-washington-parish-police-convictions?responsive=1&title=1)", "last_name"] = "bahm"
     
     df.loc[df.name == "[Gary, Elijah](https://www.documentcloud.org/documents/23783718-plaquemines-parish-police-convictions?responsive=1&title=1)", "first_name"] = "gary"
     df.loc[df.name == "[Gary, Elijah](https://www.documentcloud.org/documents/23783718-plaquemines-parish-police-convictions?responsive=1&title=1)", "last_name"] = "elijah"
