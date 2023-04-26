@@ -79,7 +79,7 @@ def clean_demo():
         .pipe(clean_sexes, ["sex"])
         .pipe(standardize_desc_cols, ["rank_desc", "department_desc"])
         .pipe(clean_names, ["first_name", "last_name", "middle_name"])
-        .pipe(gen_uid, ["agency", "first_name", "last_name"])
+        .pipe(gen_uid, ["agency", "first_name", "last_name", "middle_name", "race"])
         .sort_values(["uid", "salary_date", "salary"], na_position="first")
         .drop_duplicates(["uid", "salary_date"], keep="last")
     )
