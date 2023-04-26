@@ -15,6 +15,16 @@ if __name__ == "__main__":
     event_df = pd.read_csv(deba.data("match_history/event.csv"))
     per_df = pd.read_csv(deba.data("match_history/personnel.csv"))
     coaccusals = pd.read_csv(deba.data("analysis/coaccusals.csv"))
+    cprr_advocate = pd.read_csv(deba.data("match_history/com_the_advocate.csv"))
+    per_advocate = pd.read_csv(deba.data("match_history/per_the_advocate.csv"))
+    event_advocate = pd.read_csv(deba.data("match_history/event_the_advocate.csv"))
+
+    per_df = pd.concat([per_df, per_advocate], axis=0)
+    per_df = per_df.drop_duplicates(subset=["uid"])
+    allegation_df = pd.concat([allegation_df, cprr_advocate], axis=0)
+    allegation_df = allegation_df.drop_duplicates(subset=["uid", "allegation_uid"])
+    event_df = pd.concat([event_df, event_advocate], axis=0)
+    event_df = event_df.drop_duplicates(subset=["uid", "event_uid"])
 
     coaccusals["coaccusal"] = "True"
     coaccusals = coaccusals[["allegation_uid", "coaccusal"]]
