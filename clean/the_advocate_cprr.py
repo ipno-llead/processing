@@ -85,6 +85,8 @@ def assign_names(df):
     
     df.loc[df.name == "[Gary, Elijah](https://www.documentcloud.org/documents/23783718-plaquemines-parish-police-convictions?responsive=1&title=1)", "first_name"] = "gary"
     df.loc[df.name == "[Gary, Elijah](https://www.documentcloud.org/documents/23783718-plaquemines-parish-police-convictions?responsive=1&title=1)", "last_name"] = "elijah"
+
+    df = df[~((df.agency == "marksville-city-marshal"))]
     return df.drop(columns=["name"])
 
 

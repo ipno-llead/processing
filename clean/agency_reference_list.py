@@ -36,6 +36,7 @@ def add_federal_dept_of_justice(df):
     return df 
 
 def add_marksville(df):
+    # create a PR for this on its own and re-introduce in adv_cprr
     dfa = pd.DataFrame({"agency_slug": "marksville-city-marshal", "agency_name": "Marksville City Marshal", "location": "31.127949248698542, -92.065875748721"}, index=[596])
     df = pd.concat([df, dfa])
     return df 
@@ -51,7 +52,7 @@ def clean():
         .pipe(add_probation_parola)
         .pipe(add_hammond_marshal)
         .pipe(add_federal_dept_of_justice)
-        .pipe(add_marksville)
+        # .pipe(add_marksville)
     )
     return df
 
