@@ -1,0 +1,6 @@
+wdir: ../../../data/raw
+outs:
+- md5: 3af0a292f9f4ac39e5d12be7960df2c3.dir
+  size: 27171
+  nfiles: 1
+  path: the_advocate
