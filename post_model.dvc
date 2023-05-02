@@ -1,0 +1,6 @@
+wdir: data
+outs:
+- md5: 0c82410a59441166c67bd28721b94f2d.dir
+  size: 4025075
+  nfiles: 11
+  path: post.model

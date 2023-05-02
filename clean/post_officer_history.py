@@ -75,7 +75,7 @@ def clean_agency_pre_split(df):
     agencies = df.agency.str.extract(r"(.+(time|retired|reserve|deceased).+)")
 
     df.loc[:, "agency"] = agencies[0]
-    return df
+    return df[~((df.agency.fillna("") == ""))]
 
 
 def split_agency(df):
@@ -385,7 +385,7 @@ def clean():
     dfd = pd.read_csv(deba.data("ner/post_officer_history_reports_2022_rotated.csv"))
     dfe = pd.read_csv(deba.data("ner/post_officer_history_reports_2023.csv"))
     df = (
-        pd.concat([dfa, dfb, dfc, dfd, dfe], axis=0, ignore_index=True)
+        pd.concat([dfa, dfb, dfc, dfd, dfe])
         .pipe(drop_rows_missing_names)
         .rename(
             columns={
