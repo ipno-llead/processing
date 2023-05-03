@@ -54,8 +54,9 @@ def split_names(df):
     return df.drop(columns=["employees_involved"])[~(df.last_name.fillna("") == "")]
 
 
-def strip_ammounts(df):
-    df.loc[:, "settlement_amount"] = df.settlement_amount.str.replace(r"(\$|\,|\.)", "", regex=True)
+def strip_amounts(df):
+    df.loc[:, "settlement_amount"] = df.settlement_amount.str.replace(r"(\$|\,|\..+)", "", regex=True)
+
     return df 
 
 
@@ -78,7 +79,7 @@ def clean():
         .pipe(strip_special_char)
         .pipe(split_rows_with_multiple_officers)
         .pipe(split_names)
-        .pipe(strip_ammounts)
+        .pipe(strip_amounts)
         .pipe(standardize_desc_cols, ["claim_status", "settlement_amount"])
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(gen_uid, ["settlement_amount", "uid"], "settlement_uid")
@@ -97,7 +98,7 @@ def clean_15():
        .pipe(clean_column_names)
        .drop(columns=["acct_name"])
        .pipe(fix_dates_15)
-       .pipe(strip_ammounts)
+       .pipe(strip_amounts)
        .rename(columns={"employee_involved": "employees_involved"})
        .pipe(split_rows_with_multiple_officers)
        .pipe(split_names)
@@ -110,7 +111,7 @@ def clean_15():
 
 
 def concat(dfa, dfb):
-    df = pd.concat([dfa, dfb])
+    df = pd.concat([dfa, dfb], axis=0)
     return df
 
 if __name__ == "__main__":
