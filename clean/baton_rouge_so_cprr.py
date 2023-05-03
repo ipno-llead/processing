@@ -513,7 +513,7 @@ def clean18():
     )
 
     df = df.drop(columns=["complainant_type"])
-    return df, citizen_df
+    return df
 
 
 def clean20():
