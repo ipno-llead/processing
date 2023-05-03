@@ -54,6 +54,11 @@ def split_names(df):
     return df.drop(columns=["employees_involved"])[~(df.last_name.fillna("") == "")]
 
 
+def strip_ammounts(df):
+    df.loc[:, "settlement_amount"] = df.settlement_amount.str.replace(r"(\$|\,|\.)", "", regex=True)
+    return df 
+
+
 def clean():
     df = (
         pd.read_csv(
@@ -73,15 +78,45 @@ def clean():
         .pipe(strip_special_char)
         .pipe(split_rows_with_multiple_officers)
         .pipe(split_names)
+        .pipe(strip_ammounts)
         .pipe(standardize_desc_cols, ["claim_status", "settlement_amount"])
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
-        .pipe(gen_uid, ["settlement_amount", "check_date"], "settlement_uid")
+        .pipe(gen_uid, ["settlement_amount", "uid"], "settlement_uid")
     )
     return df
 
 
+def fix_dates_15(df):
+    df.loc[:, "check_date"] = df.year_paid.astype(str).str.replace(r"\.(.+)", "", regex=True).str.replace(r"(\w{4})", r"12/31/\1", regex=True)
+    return df.drop(columns=["year_paid"])
+
+
+
+def clean_15():
+    df = (pd.read_csv(deba.data("raw/louisiana_state_pd/louisiana_state_pd_settlements_2015_2019.csv"))
+       .pipe(clean_column_names)
+       .drop(columns=["acct_name"])
+       .pipe(fix_dates_15)
+       .pipe(strip_ammounts)
+       .rename(columns={"employee_involved": "employees_involved"})
+       .pipe(split_rows_with_multiple_officers)
+       .pipe(split_names)
+       .pipe(standardize_desc_cols, ["claim_status", "settlement_amount"])
+       .pipe(set_values, {"agency": "louisiana-state-pd"})
+       .pipe(gen_uid, ["first_name", "last_name", "agency"])
+       .pipe(gen_uid, ["settlement_amount", "check_date", "uid"], "settlement_uid")
+    )
+    return df 
+
+
+def concat(dfa, dfb):
+    df = pd.concat([dfa, dfb])
+    return df
+
 if __name__ == "__main__":
     df = clean()
+    df_15 = clean_15()
+    df = concat(df, df_15)
     df.to_csv(
         deba.data("clean/settlements_louisiana_state_pd_2015_2020.csv"), index=False
     )
