@@ -87,7 +87,7 @@ if __name__ == "__main__":
     pprr = pd.read_csv(deba.data("clean/pprr_demo_louisiana_csd_2021.csv"))
     pprr_term = pd.read_csv(deba.data("clean/pprr_term_louisiana_csd_2021.csv"))
     settlements = pd.read_csv(
-        deba.data("clean/settlements_louisiana_state_pd_2015_2020.csv")
+        deba.data("match/settlements_louisiana_state_pd_2015_2020.csv")
     )
     # cprr19 = pd.read_csv(deba.data("match/cprr_louisiana_state_pd_2019.csv"))
     # cprr20 = pd.read_csv(deba.data("match/cprr_louisiana_state_pd_2020.csv"))
