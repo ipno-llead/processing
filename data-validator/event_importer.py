@@ -192,7 +192,7 @@ def run(db_con, event_df, event_cols):
         client.files_upload(
             channels=os.environ.get('SLACK_CHANNEL'),
             title="event",
-            file="./original_event.csv",
+            file="./events.csv",
             initial_comment="The following file is the reconstructed event.csv in the current validation error:",
         )
         print(e)
