@@ -164,20 +164,40 @@ def run(db_con, event_df, event_cols):
     __build_event_rel(db_con, event_df, event_cols)
 
     cursor = db_con.cursor()
-    cursor.copy_expert(
-        sql=f"""
-            COPY officers_event(
-                {', '.join(
-                    event_cols + [
-                        'officer_id', 'department_id', 'appeal_id',
-                        'use_of_force_id', 'brady_id'
-                    ]
-                )}
-            ) FROM stdin WITH CSV HEADER
-            DELIMITER as ','
-        """,
-        file=open('events.csv', 'r'),
-    )
+
+    try:
+        cursor.copy_expert(
+            sql=f"""
+                COPY officers_event(
+                    {', '.join(
+                        event_cols + [
+                            'officer_id', 'department_id', 'appeal_id',
+                            'use_of_force_id', 'brady_id'
+                        ]
+                    )}
+                ) FROM stdin WITH CSV HEADER
+                DELIMITER as ','
+            """,
+            file=open('events.csv', 'r'),
+        )
+    except Exception as e:
+        client = WebClient(os.environ.get('SLACK_BOT_TOKEN'))
+        event_df.to_csv('original_event.csv', index=False)
+        client.files_upload(
+            channels=os.environ.get('SLACK_CHANNEL'),
+            title="event",
+            file="./original_event.csv",
+            initial_comment="The following file is the original of event.csv in the current validation error:",
+        )
+        client.files_upload(
+            channels=os.environ.get('SLACK_CHANNEL'),
+            title="event",
+            file="./original_event.csv",
+            initial_comment="The following file is the reconstructed event.csv in the current validation error:",
+        )
+        print(e)
+        raise e
+
     db_con.commit()
     cursor.close()
 
