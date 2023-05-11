@@ -374,6 +374,7 @@ if __name__ == "__main__":
     per_df = fuse_personnel()
     ensure_uid_unique(per_df, "uid")
     event_df = fuse_event()
+    ensure_uid_unique(event_df, "event_uid")
     allegation_df = fuse_allegation()
     ensure_uid_unique(allegation_df, "allegation_uid")
     uof_df = fuse_use_of_force()
