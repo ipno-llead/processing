@@ -6,7 +6,7 @@ from slack_sdk import WebClient
 def __build_person_rel(db_con, person_df, person_cols):
     client = WebClient(os.environ.get('SLACK_BOT_TOKEN'))
 
-    print('Build canonical_officer rel')
+    print('Building canonical_officer relationship')
     officer_df = pd.read_sql('SELECT id, uid FROM officers_officer', con=db_con)
     officer_df.columns = ['canonical_officer_id', 'canonical_uid']
 
