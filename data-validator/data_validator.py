@@ -14,7 +14,7 @@ BE_SCHEMA = {
    ],
    'allegation': [
       'uid', 'tracking_id', 'allegation_uid', 'allegation',
-      'disposition', 'action', 'agency', 'allegation_desc'
+      'disposition', 'action', 'agency', 'allegation_desc', 'coaccusal'
    ],
    'appeals': [
       'appeal_uid', 'uid', 'charging_supervisor', 'appeal_disposition',
@@ -29,11 +29,16 @@ BE_SCHEMA = {
       'citizen_arrested', 'citizen_hospitalized', 'citizen_injured', 'citizen_age',
       'citizen_race', 'citizen_sex', 'agency'
    ],
+   'brady': [
+      'brady_uid', 'uid', 'disposition', 'action', 'allegation_desc',
+      'tracking_id_og', 'source_agency', 'charging_agency', 'agency'
+   ],
    'event': [
       'event_uid', 'kind', 'year', 'month', 'day', 'time', 'raw_date', 'uid',
       'allegation_uid', 'appeal_uid', 'uof_uid', 'agency', 'badge_no',
       'department_code', 'department_desc', 'division_desc', 'rank_code',
-      'rank_desc', 'salary', 'overtime_annual_total', 'salary_freq', 'left_reason'
+      'rank_desc', 'salary', 'overtime_annual_total', 'salary_freq', 'left_reason',
+      'brady_uid'
    ],
    'person': [
       'person_id', 'canonical_uid', 'uids'

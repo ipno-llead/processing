@@ -6,6 +6,7 @@ from slack_sdk import WebClient
 def __build__officer_rel(db_con, officer_df, officer_cols):
     client = WebClient(os.environ.get('SLACK_BOT_TOKEN'))
 
+    print('Building officers_agency relationship')
     agency_df = pd.read_sql(
         'SELECT id, agency_slug FROM departments_department',
         db_con
