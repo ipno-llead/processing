@@ -1,7 +1,7 @@
 import deba
 import pandas as pd
 from lib.columns import clean_column_names, set_values
-from lib.clean import clean_dates, strip_leading_comma
+from lib.clean import clean_dates, strip_leading_comma, standardize_desc_cols
 from lib.rows import duplicate_row
 import re
 from lib.uid import gen_uid
@@ -381,69 +381,155 @@ def split_names(df):
     df.loc[:, "rank_desc"] = names[0]
     df.loc[:, "last_name"] = names[1].fillna("")
     df.loc[:, "first_name"] = names[2].fillna("")
-    return df 
+    return df.drop(columns=["officer"])
 
-def clean10():
-    df = (pd.read_csv(deba.data("raw/bossier_city_pd/bossier_city_pd_cprr_2010_2020.csv"))
-          .pipe(clean_column_names)
-          .drop(columns=["classification", "comp_name", "comp_phone"])
-          .pipe(strip_leading_comma)
-          .pipe(extract_receive_date)
-          .pipe(extract_tracking_id)
-          .pipe(split_rows_with_multiple_officers)
-          .pipe(split_names)
-          .pipe(set_values,  {"agency": "bossier-city-pd"} )
-          .pipe(gen_uid, ["tracking_id_og", "agency"], "tracking_id")
+
+def clean_allegation10(df):
+    df.loc[:, "allegation"] = (df.type_complaint
+                               .str.lower()
+                               .str.strip()
+                               .str.replace(r"no pc\b", "professional conduct", regex=True)
+                               .str.replace(r"^(code conduct code conduct|code conduct|code to conduct)$", "code of conduct", regex=True)
+                               .str.replace(r"^(code conduct dereliction duty|dereliction duty code conduct)$", "code of conduct; dereliction of duty", regex=True)
+                               .str.replace(r"rudenes s", "rudeness", regex=False)
+                               .str.replace(r"violatioin", "violation", regex=False)
+                               .str.replace(r"(derelictio n|dereli ction)$", "dereliction of duty", regex=True)
+                               .str.replace(r"^(dereliction duty|derefiction duty|deriliction of duty|deleriction of duty)$", "dereliction of duty", regex=True)
+                               .str.replace(r"haras sment", "harrassment", regex=False)
+                               .str.replace(r"^rudeness rudeness$", "rudeness", regex=True)
+                               .str.replace(r"rude\. unprofessional", "rudeness; unprofessional", regex=True)
+                               .str.replace(r"^dereliction$", "dereliction of duty", regex=True)
+                               .str.replace(r"know & comply", "know and comply", regex=False)
+                               .str.replace(r"unprofession nal", "unprofessionnal", regex=False)
+                               .str.replace(r"(derelict on|derelicton|derelection)$", "dereliction of duty", regex=True)
+                               .str.replace(r"^veh pursuit$", "vehicle pursuit", regex=True)
+                               .str.replace(r"rud eness$", "rudeness", regex=True)
+                               .str.replace(r"^dereliction of duty towing policy$", "dereliction of duty; towing policy", regex=True)
+                               .str.replace(r"rude\, illegal detention", "rude-illegal detention", regex=True)
+                               .str.replace(r"(false arrest\/excessive force|false arrest\/exessive force|"
+                                            r"excessive force\/ false arrest|false arrest\, excessive forc)", "false arrest-excessive force", regex=True)
+                               .str.replace(r"^(excessive force\/dereliction of duty)$", "excessive force; dereliction of duty", regex=True)
+                               .str.replace(r"(.+)\/(.+)", r"\1; \2", regex=True)
+                               .str.replace(r"^dereliction;(.+)", r"dereliction of duty; \1", regex=True)
+                               .str.replace(r"in-custody", "in custody", regex=False)
+                               .str.replace(r"rude\, professional conduct", "rudeness;professional conduct", regex=True)
+                               .str.replace(r"(.+);\s+(.+)", r"\1;\2", regex=True)
+                               .str.replace(r"illegal stop and search\, professional conduct for ticket", 
+                                            "illegal stop and search; professional conduct for ticket", regex=True)
+                                .str.replace(r"standard of conduct", "standards of conduct", regex=True)
+                                .str.replace(r"unprofessionnal", "unprofessional", regex=False)
+                                .str.replace(r"excessive force\, mve", "excessive force;mve violation", regex=True)
+                                .str.replace(r"rude;", "rudeness;", regex=False)
+                                .str.replace(r"^rude$", "rudeness", regex=True)
+                                .str.replace(r"false arrest\, rudeness", "false arrest-rudeness", regex=True)
+                                .str.replace(r"incustody", "in custody", regex=False)
+                                .str.replace(r"^mve policy$", "mve violation", regex=True)
+                                
+    )
+    return df[~(df.allegation.fillna("") == "")].drop(columns=["type_complaint"])
+
+
+def split_rows_with_multiple_allegations_10(df):
+    df = (
+        df.drop("allegation", axis=1)
+        .join(
+            df["allegation"]
+            .str.split("-", expand=True)
+            .stack()
+            .reset_index(level=1, drop=True)
+            .rename("allegation"),
+            how="outer",
+        )
+        .reset_index(drop=True)
+    )
+    return df
+
+
+def extract_disposition(df):
+    dis = df.disposition.str.lower().str.strip().str.extract(r"^(not sustained|sustained|unfounded|exonerated)$")
+
+    df.loc[:, "disposition"] = dis[0]
+    return df
+
+
+def extract_action(df):
+    action = (df.action_taken
+              .str.lower()
+              .str.strip()
+              .str.extract(r"^(termination|letter of reprimand|"
+                           r"verbal counsel|resigned|1 day without pay"
+                           r"|lor|ofc resigned|officer resigned"
+                           r"|demotion|officer retired|1 day suspension|counseled|resigned"
+                           r"3 day suspension|(\w{1,2}) days? suspension)$")) 
+    df.loc[:, "action"] = (action[0]
+                           .str.replace(r"^lor$", "letter of reprimand", regex=True)
+                           .str.replace(r"^(\w{1,2}) days? suspension", r"\1-day suspension", regex=True)
+                           .str.replace(r"^(\w+) resigned", r"resigned", regex=True)
+                           .str.replace(r"(\w+) retired", "retired", regex=True)
+    )
+    return df.drop(columns=["action_taken"])
+
+
+def clean_investigator_10(df):
+    investigators = (df.investigator
+                     .str.lower()
+                     .str.strip()
+                     .str.replace(r"^(na|none|declined investigation|declined|\/)$", "", regex=True)
+                     .str.extract(r"^(sgt|lt|capt|chief)?\.? ?(?:(\w+\.?) )? ?(\w+)$")
+    )
+    df.loc[:, "investigator_rank_desc"] = (investigators[0]
+                                           .str.replace(r"sgt", "sergeant", regex=False)
+                                           .str.replace(r"lt", "lieutenant", regex=False)
+                                           .str.replace(r"capt", "captain", regex=False)
+    )
+    df.loc[:, "investigator_first_name"] = investigators[1].str.replace(r"(^j[32m]|\.)", "", regex=True)
+    df.loc[:, "investigator_last_name"] = investigators[2]
+    return df.drop(columns=["investigator"])
+
+
+def fix_dates(df):
+    df.loc[:, "investigation_start_date"] = (df.investigation_start_date
+                                             .str.replace(r"(\w{2})$", r"20\1", regex=True)
+                                             .str.replace(r"(.+)\s+(.+)", "", regex=True)
+                                             .str.replace(r"^00\/(.+)", "", regex=True)
+    )
+    df.loc[:, "investigation_complete_date"] = (df.investigation_complete_date
+                                                .str.replace(r"(\w{2})$", r"20\1", regex=True)
+                                                .str.replace(r"(.+)\s+(.+)", "", regex=True)
+                                                .str.replace(r"^00\/(.+)", "", regex=True)
+                                                .str.replace(r"^0$", "", regex=True)
     )
     return df 
 
 
 def clean():
-    df = (
-        pd.read_csv(deba.data("raw/bossier_city_pd/bossier_city_pd_cprr_2020.csv"))
-        .pipe(clean_column_names)
-        .rename(
-            columns={
-                "assigned": "investigation_start_date",
-                "date_returned": "investigation_complete_date",
-            }
-        )
-        .pipe(extract_receive_date)
-        .pipe(clean_tracking_id)
-        .pipe(clean_complaint_type)
-        .pipe(clean_allegations)
-        .pipe(split_rows_with_multiple_allegations)
-        .pipe(combine_officer_and_other_officer_columns)
-        .pipe(split_rows_with_multiple_officers_and_split_names)
-        .pipe(extract_and_clean_disposition)
-        .pipe(clean_actions)
-        .pipe(clean_investigating_supervisor)
-        .pipe(clean_allegation_desc)
-        .pipe(assign_dispositions)
-        .pipe(assign_action)
-        .pipe(assign_agency)
-        .pipe(gen_uid, ["first_name", "last_name", "agency"])
-        .pipe(
-            gen_uid,
-            ["uid", "allegation", "disposition", "tracking_id", "action"],
-            "allegation_uid",
-        )
-        .pipe(
-            clean_dates,
-            ["receive_date", "investigation_complete_date", "investigation_start_date"],
-        )
-        .pipe(create_tracking_id_og_col)
-        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
+    df = (pd.read_csv(deba.data("raw/bossier_city_pd/bossier_city_pd_cprr_2010_2020.csv"))
+          .pipe(clean_column_names)
+          .drop(columns=["classification", "comp_name", "comp_phone"])
+          .rename(columns={"synopsis": "allegation_desc", "date_assigned": "investigation_start_date", 
+                           "date_returned": "investigation_complete_date"})
+          .pipe(strip_leading_comma)
+          .pipe(extract_receive_date)
+          .pipe(extract_tracking_id)
+          .pipe(split_rows_with_multiple_officers)
+          .pipe(split_names)
+          .pipe(clean_allegation10)
+          .pipe(split_rows_with_multiple_allegations_10)
+          .pipe(extract_disposition)
+          .pipe(extract_action)
+          .pipe(clean_investigator_10)
+          .pipe(fix_dates)
+          .pipe(clean_dates, ["receive_date", "investigation_start_date", "investigation_complete_date"])
+          .pipe(standardize_desc_cols, ["allegation_desc"])
+          .pipe(set_values,  {"agency": "bossier-city-pd"} )
+          .pipe(gen_uid, ["tracking_id_og", "agency"], "tracking_id")
+          .pipe(gen_uid, ["first_name", "last_name", "agency"])
+          .pipe(gen_uid, ["allegation", "allegation_desc", "disposition", "uid"], "allegation_uid")
+          .pipe(gen_uid, ["investigator_first_name", "investigator_last_name", "agency"], "investigator_uid")
     )
-    citizen_df = df[["complainant_type", "allegation_uid", "agency"]]
-    citizen_df = citizen_df.pipe(
-        gen_uid, ["complainant_type", "allegation_uid", "agency"], "citizen_uid"
-    )
-    df = df.drop(columns=["complainant_type"])
-    return df, citizen_df
+    return df 
 
 
 if __name__ == "__main__":
-    df, citizen_df = clean()
-    df.to_csv(deba.data("clean/cprr_bossier_city_pd_2020.csv"), index=False)
-    citizen_df.to_csv(deba.data("clean/cprr_cit_bossier_city_pd_2020.csv"), index=False)
+    df = clean()
+    df.to_csv(deba.data("clean/cprr_bossier_city_pd_2010_2021.csv"), index=False)
