@@ -527,7 +527,7 @@ def clean():
           .pipe(gen_uid, ["allegation", "allegation_desc", "disposition", "uid", "receive_day", "investigation_complete_day"], "allegation_uid")
           .pipe(gen_uid, ["investigator_first_name", "investigator_last_name", "agency"], "investigator_uid")
     )
-    return df
+    return df.drop_duplicates(subset=["allegation_uid"])
 
 
 if __name__ == "__main__":
