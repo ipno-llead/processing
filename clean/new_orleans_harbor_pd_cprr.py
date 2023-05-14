@@ -18,7 +18,7 @@ def realign() -> pd.DataFrame:
     df = (
         df.set_index("Unnamed: 0")
         .transpose()
-        .dropna(1, how="all")
+        .dropna(axis=1, how="all")
         .reset_index(drop=True)
     )
     df = clean_column_names(df)
@@ -84,7 +84,6 @@ def create_tracking_id_og_col(df):
 def clean():
     df = (
         realign()
-        .drop(columns=["e_the_recommended_discipline"])
         .rename(
             columns={
                 "1_name": "full_name",

@@ -6,7 +6,7 @@ from slack_sdk import WebClient
 def __build_uof_rel(db_con, uof_df, uof_cols):
     client = WebClient(os.environ.get('SLACK_BOT_TOKEN'))
 
-    print('Check integrity between officers\' agency and uof agency')
+    print('Building uof_officers relationship')
     officers_df = pd.read_sql(
         'SELECT id, uid, agency FROM officers_officer',
         con=db_con
@@ -28,6 +28,8 @@ def __build_uof_rel(db_con, uof_df, uof_cols):
         )
 
         raise Exception('Cannot map officer to uof')
+
+    print('Building uof_agency relationship')
 
     uofor_df['agency_slug'] = uofor_df.apply(
         lambda x: x['officer_agency_slug'] if pd.isnull(x['agency']) \

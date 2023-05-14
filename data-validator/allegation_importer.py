@@ -122,7 +122,7 @@ def run(db_con, allegation_df, allegation_cols):
             FROM stdin WITH CSV HEADER
             DELIMITER as ','
         """,
-        file=open('complaints.csv','r'),
+        file=open('complaints.csv', 'r'),
     )
 
     db_con.commit()

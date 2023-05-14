@@ -115,6 +115,7 @@ def clean_dates(df: pd.DataFrame, cols: list[str], expand: bool = True) -> pd.Da
             .str.strip()
             .str.replace(r"//", r"/", regex=False)
             .str.replace(r"'", "", regex=False)
+            .str.replace(r"(w+):(\w+):(\w+)", "", regex=True)
             .map(clean_date)
         )
         if expand:
