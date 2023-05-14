@@ -524,7 +524,7 @@ def clean():
           .pipe(set_values,  {"agency": "bossier-city-pd"} )
           .pipe(gen_uid, ["tracking_id_og", "agency"], "tracking_id")
           .pipe(gen_uid, ["first_name", "last_name", "agency"])
-          .pipe(gen_uid, ["allegation", "allegation_desc", "disposition", "uid", "receive_date", "investigation_complete_date"], "allegation_uid")
+          .pipe(gen_uid, ["allegation", "allegation_desc", "disposition", "uid", "receive_day", "investigation_complete_day"], "allegation_uid")
           .pipe(gen_uid, ["investigator_first_name", "investigator_last_name", "agency"], "investigator_uid")
     )
     return df
