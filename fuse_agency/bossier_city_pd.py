@@ -69,7 +69,7 @@ if __name__ == "__main__":
     agency = pprr.agency[0]
     post = load_for_agency(agency)
     post_event = pd.read_csv(deba.data("match/post_event_bossier_city_pd.csv"))
-    cprr = pd.read_csv(deba.data("match/cprr_bossier_city_pd_2020.csv"))
+    cprr = pd.read_csv(deba.data("match/cprr_bossier_city_pd_2010_2020.csv"))
     citizen_df = pd.read_csv(deba.data("clean/cprr_cit_bossier_city_pd_2020.csv"))
     per_df = fuse_personnel(pprr, cprr, post)
     com_df = rearrange_allegation_columns(cprr)

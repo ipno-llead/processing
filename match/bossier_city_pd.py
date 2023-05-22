@@ -71,7 +71,7 @@ def match_cprr_with_pprr(cprr, pprr):
         dfa,
         dfb,
     )
-    decision = 0.81
+    decision = 0.9
     matcher.save_pairs_to_excel(
         deba.data(
             "match/cprr_bossier_city_pd_2020_2014_v_pprr_bossier_city_pd_2009_2020.xlsx"
@@ -86,7 +86,7 @@ def match_cprr_with_pprr(cprr, pprr):
 
 
 if __name__ == "__main__":
-    cprr = pd.read_csv(deba.data("clean/cprr_bossier_city_pd_2020.csv"))
+    cprr = pd.read_csv(deba.data("clean/cprr_bossier_city_pd_2010_2021.csv"))
     pprr = pd.read_csv(deba.data("clean/pprr_bossier_city_pd_2000_2019.csv"))
     agency = cprr.agency[0]
     post = load_for_agency(agency)
@@ -94,4 +94,4 @@ if __name__ == "__main__":
     cprr = match_cprr_with_pprr(cprr, pprr)
     post_event = extract_post_events(pprr, post)
     post_event.to_csv(deba.data("match/post_event_bossier_city_pd.csv"), index=False)
-    cprr.to_csv(deba.data("match/cprr_bossier_city_pd_2020.csv"), index=False)
+    cprr.to_csv(deba.data("match/cprr_bossier_city_pd_2010_2020.csv"), index=False)
