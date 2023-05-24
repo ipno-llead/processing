@@ -29,7 +29,7 @@ def fuse_iapro(dfa, dfb):
 
 def fuse_events(
     pprr, pprr_csd, cprr, uof, award, lprr, pclaims20, pclaims21, pprr_separations,
-    iapro,
+    iapro, cprr_venezia
 ):
     builder = events.Builder()
     builder.extract_events(
@@ -318,6 +318,21 @@ def fuse_events(
         },
         ["uid", "allegation_uid"],
     )
+    builder.extract_events(
+        cprr_venezia,
+        {
+            events.COMPLAINT_INCIDENT: {
+                "prefix": "incident",
+                "parse_date": True,
+                "keep": [
+                    "uid",
+                    "agency",
+                    "allegation_uid",
+                ],
+            },
+        },
+        ["uid", "allegation_uid"],
+    )
     return builder.to_frame()
 
 
@@ -355,6 +370,7 @@ if __name__ == "__main__":
     )
     sas_citizens = pd.read_csv(deba.data("clean/sas_cit_new_orleans_pd_2010_2021.csv"))
     pr_citizens = pd.read_csv(deba.data("clean/pr_cit_new_orleans_pd_2010_2022.csv"))
+    cprr_venezia = pd.read_csv(deba.data("clean/cprr_new_orleans_pd_venezia.csv"))
     personnel = fuse_personnel(
         pprr,
         lprr,
@@ -366,6 +382,7 @@ if __name__ == "__main__":
         cprr,
         post,
         iapro,
+        cprr_venezia,
     )
     events_df = fuse_events(
         pprr,
@@ -377,7 +394,8 @@ if __name__ == "__main__":
         pclaims20,
         pclaims21,
         pprr_separations,
-        iapro
+        iapro,
+        cprr_venezia
     )
     events_df = rearrange_event_columns(
         pd.concat([post_event, events_df])
@@ -386,7 +404,7 @@ if __name__ == "__main__":
     lprr_df = rearrange_appeal_hearing_columns(lprr)
     uof_df = rearrange_use_of_force(uof)
     pclaims_df = rearrange_property_claims_columns(pd.concat([pclaims20, pclaims21]))
-    com = pd.concat([cprr, iapro], axis=0).drop_duplicates(subset=["allegation_uid"], keep="last")
+    com = pd.concat([cprr, iapro, cprr_venezia], axis=0).drop_duplicates(subset=["allegation_uid"], keep="last")
     com = rearrange_allegation_columns(com)
     settlements = rearrange_settlement_columns(nopd_settlements)
     pr = rearrange_police_report_columns(pr)
