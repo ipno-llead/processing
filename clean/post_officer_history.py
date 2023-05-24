@@ -378,6 +378,11 @@ def filter_agencies(df):
     return df
 
 
+def dillmann():
+    df = pd.read_csv(deba.data("raw/new_orleans_pd/dillmann_john.csv"))
+    return df 
+
+
 def clean():
     dfa = pd.read_csv(deba.data("ner/advocate_post_officer_history_reports.csv"))
     dfb = pd.read_csv(deba.data("ner/post_officer_history_reports.csv"))
