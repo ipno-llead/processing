@@ -377,6 +377,19 @@ def filter_agencies(df):
     df = df[df.agency.isin(agencies)]
     return df
 
+def assign_history_id(df):
+    df["history_id"] = 100000
+    df["switched_job"] = True
+    return df 
+
+def dillmann():
+    df = (pd.read_csv(deba.data("raw/new_orleans_pd/dillmann_john.csv"))
+          .pipe(gen_uid, ["first_name", "last_name", "agency"])
+          .pipe(clean_dates, ["hire_date", "left_date"])
+          .pipe(assign_history_id)
+          )
+    return df 
+
 
 def clean():
     dfa = pd.read_csv(deba.data("ner/advocate_post_officer_history_reports.csv"))
@@ -420,6 +433,12 @@ def clean():
     return df
 
 
+def concat_dfs(dfa, dfb):
+    df = pd.concat([dfa, dfb], axis=0)
+    return df 
+
 if __name__ == "__main__":
-    df = clean()
+    dfa = clean()
+    dfb = dillmann()
+    df = concat_dfs(dfa, dfb)
     df.to_csv(deba.data("clean/post_officer_history.csv"), index=False)
