@@ -434,7 +434,7 @@ def clean():
 
 
 def concat_dfs(dfa, dfb):
-    df = pd.concat([dfa, dfb])
+    df = pd.concat([dfa, dfb], axis=0)
     return df 
 
 if __name__ == "__main__":
