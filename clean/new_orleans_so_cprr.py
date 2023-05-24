@@ -1564,6 +1564,11 @@ def clean20():
     return df
 
 
+def clean22():
+    df = pd.read_csv(deba.data("raw/new_orleans_so/new_orleans_so_cprr_2022.csv"), encoding="cp1252")
+    return df 
+
+
 if __name__ == "__main__":
     df19 = clean19()
     df20 = clean20()
