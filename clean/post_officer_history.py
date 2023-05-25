@@ -442,3 +442,4 @@ if __name__ == "__main__":
     dfb = dillmann()
     df = concat_dfs(dfa, dfb)
     df.to_csv(deba.data("clean/post_officer_history.csv"), index=False)
+    dfb.to_csv(deba.data("clean/new_orleans_pd_cprr_dillmann.csv"), index=False)

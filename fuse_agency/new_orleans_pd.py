@@ -371,6 +371,7 @@ if __name__ == "__main__":
     sas_citizens = pd.read_csv(deba.data("clean/sas_cit_new_orleans_pd_2010_2021.csv"))
     pr_citizens = pd.read_csv(deba.data("clean/pr_cit_new_orleans_pd_2010_2022.csv"))
     cprr_venezia = pd.read_csv(deba.data("clean/cprr_new_orleans_pd_venezia.csv"))
+    cprr_dillmann = pd.read_csv(deba.data("clean/new_orleans_pd_cprr_dillmann.csv"))
     personnel = fuse_personnel(
         pprr,
         lprr,
@@ -383,6 +384,7 @@ if __name__ == "__main__":
         post,
         iapro,
         cprr_venezia,
+        cprr_dillmann
     )
     events_df = fuse_events(
         pprr,

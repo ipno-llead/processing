@@ -1564,6 +1564,32 @@ def clean20():
     return df
 
 
+def clean_location(df):
+    df.loc[:, "location"] = (df.location_or_facility
+                             .str.lower()
+                             .str.strip()
+                             .str.replace(r"ipc", "intake and processing center", regex=False)
+                             .str.replace(r"intake&", "intake and", regex=False)
+                             .str.replace(r"^intake and processing \"intake and processing center\"$", "intake and processing center", regex=True)
+    )
+    return df.drop(columns=["location_or_facility"])
+
+def clean22():
+    df = (pd.read_csv(deba.data("raw/new_orleans_so/new_orleans_so_cprr_2022.csv"), encoding="cp1252")
+          .pipe(clean_column_names)
+          .rename(columns={"date_iad_received": "receive_date",
+                            "case_number": "tracking_id_og", 
+                            "dm_authored_by": "reprimand_authorized_by",
+                            "intial_action": "initial_action"})
+          .drop(columns=["method_of_transmission"])
+          .pipe(clean_location)
+          .pipe(standardize_desc_cols, ["tracking_id_og"])
+          .pipe(set_values, {"agency": "new-orleans-so"})
+          .pipe(gen_uid, ["agency", "tracking_id_og"], "tracking_id")
+    )
+    return df 
+
+
 if __name__ == "__main__":
     df19 = clean19()
     df20 = clean20()
