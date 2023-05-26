@@ -655,6 +655,8 @@ def clean_allegations_20(df):
         .str.replace("posession", "possession", regex=False)
         .str.replace(r"/$", "", regex=True)
         .str.replace(r"  +", "", regex=True)
+        .str.replace(r"-$", "", regex=True)
+        .str.replace(r"(\w+)- (\w+)", r"\1-\2", regex=True)
     )
     return df.drop(columns=["charges"])
 
@@ -1045,6 +1047,8 @@ def clean_rank_desc_21(df):
         .str.replace(r" dionne bowers", "", regex=True)
         .str.replace(r"captaim", "captain", regex=True)
         .str.replace(r"srgeant", "sergeant", regex=True)
+        .str.replace(r"mr\.", "", regex=True)
+        .str.replace(r"^reserve\/ deputy", "deputy", regex=True)
     )
     return df.drop(columns=["job_title"])
 
@@ -1055,6 +1059,7 @@ def clean_employee_id_21(df):
         .str.strip()
         .str.lower()
         .str.replace(r"n\/a", "", regex=True)
+        .str.replace(r"\.", "", regex=True)
     )
     return df.drop(columns=["emp_no"])
 
@@ -1565,7 +1570,7 @@ def clean20():
 
 
 def clean_location(df):
-    df.loc[:, "location"] = (df.location_or_facility
+    df.loc[:, "incident_location"] = (df.location_or_facility
                              .str.lower()
                              .str.strip()
                              .str.replace(r"ipc", "intake and processing center", regex=False)
@@ -1574,17 +1579,71 @@ def clean_location(df):
     )
     return df.drop(columns=["location_or_facility"])
 
+
+def clean_start_dates(df):
+    dates = df.date_started.str.extract(r"(\w+\/\w+\/\w+)")
+    df.loc[:, "investigation_start_date"] = dates[0]
+
+    hearing = df.date_of_hearing.str.extract(r"(\w+\/\w+\/\w+)")
+    df.loc[:, "board_hearing_date"] = hearing[0]
+
+    suspension = df.suspension_date.str.extract(r"(\w+\/\w+\/\w+)")
+    df.loc[:, "suspension_start_date"] = suspension[0]
+
+    return_date = df.return_to_duty_date.astype(str).str.extract(r"(\w+\/\w+\/\w+)")
+    df.loc[:, "suspension_end_date"] = return_date[0]
+    return df.drop(columns=["date_started", "date_of_hearing", "suspension_date", "return_to_duty_date"])
+
+
+def extract_action(df):
+    actions = (df.terminated_resigned
+               .str.lower()
+               .str.strip()
+               .str.extract(r"(RUI|resigned under investigation|terminated|suspended|suspension|"
+                            r"counseled|dm-1|letter of reprimand)")
+    )
+    df.loc[:, "action"] = actions[0].str.replace(r"suspension", "suspended", regex=False)
+    return df.drop(columns=["terminated_resigned"])
+
+
 def clean22():
     df = (pd.read_csv(deba.data("raw/new_orleans_so/new_orleans_so_cprr_2022.csv"), encoding="cp1252")
           .pipe(clean_column_names)
           .rename(columns={"date_iad_received": "receive_date",
                             "case_number": "tracking_id_og", 
                             "dm_authored_by": "reprimand_authorized_by",
-                            "intial_action": "initial_action"})
-          .drop(columns=["method_of_transmission"])
+                            "intial_action": "initial_action", 
+                            "related_item_number": "item_number",
+                            "admin_violation": "charges", "type_of_hearing": "hearing_type",
+                            "active_inactive": "status", 
+                            "summary": "allegation_desc"})
+          .drop(columns=["method_of_transmission", 
+                         "assigned_agent", 
+                         "agent_number",
+                         "referred_by_list_employee", 
+                         "disposition_hearing", 
+                         "of_cases"])
           .pipe(clean_location)
-          .pipe(standardize_desc_cols, ["tracking_id_og"])
+          .pipe(clean_employee_id_21)
+          .pipe(clean_rank_desc_21)
+          .pipe(clean_allegations_20)
+          .pipe(clean_start_dates)
+          .pipe(extract_action)
+          .pipe(clean_allegation_desc)
+          .pipe(split_name_20)
+          .pipe(standardize_desc_cols, ["tracking_id_og", "rank_desc",
+                                         "allegation", 
+                                         "status", "item_number", "inmate_grievance",
+                                         "hearing_type"])
           .pipe(set_values, {"agency": "new-orleans-so"})
+          .pipe(
+            gen_uid, ["agency", "first_name", "last_name"]
+         )
+          .pipe(
+            gen_uid,
+            ["tracking_id_og", "allegation", "action", "employee_id"],
+            "allegation_uid",
+           )
           .pipe(gen_uid, ["agency", "tracking_id_og"], "tracking_id")
     )
     return df 
@@ -1594,6 +1653,8 @@ if __name__ == "__main__":
     df19 = clean19()
     df20 = clean20()
     df21 = clean21()
+    df22 = clean22()
     df19.to_csv(deba.data("clean/cprr_new_orleans_so_2019.csv"), index=False)
     df20.to_csv(deba.data("clean/cprr_new_orleans_so_2020.csv"), index=False)
     df21.to_csv(deba.data("clean/cprr_new_orleans_so_2021.csv"), index=False)
+    df22.to_csv(deba.data("clean/cprr_new_orleans_so_2022.csv"), index=False)
