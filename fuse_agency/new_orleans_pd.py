@@ -29,7 +29,7 @@ def fuse_iapro(dfa, dfb):
 
 def fuse_events(
     pprr, pprr_csd, cprr, uof, award, lprr, pclaims20, pclaims21, pprr_separations,
-    iapro, cprr_venezia
+    iapro, cprr_venezia, cprr_dillmann
 ):
     builder = events.Builder()
     builder.extract_events(
@@ -333,6 +333,26 @@ def fuse_events(
         },
         ["uid", "allegation_uid"],
     )
+    builder.extract_events(
+        cprr_dillmann,
+        {
+            events.OFFICER_HIRE: {
+                "prefix": "hire",
+                "keep": [
+                    "uid",
+                    "agency",
+                ],
+            },
+            events.OFFICER_LEFT: {
+                "prefix": "left",
+                "keep": [
+                    "uid",
+                    "agency",
+                ],
+            },
+        },
+        ["uid"],
+    )
     return builder.to_frame()
 
 
@@ -397,7 +417,8 @@ if __name__ == "__main__":
         pclaims21,
         pprr_separations,
         iapro,
-        cprr_venezia
+        cprr_venezia,
+        cprr_dillmann
     )
     events_df = rearrange_event_columns(
         pd.concat([post_event, events_df])
