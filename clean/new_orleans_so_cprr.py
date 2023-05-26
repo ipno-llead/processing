@@ -1581,6 +1581,9 @@ def clean_location(df):
 
 
 def clean_start_dates(df):
+    receive = df.receive_date.str.extract(r"(\w+\/\w+\/\w{4})")
+    df.loc[:, "receive_date"] = receive[0]
+
     dates = df.date_started.str.extract(r"(\w+\/\w+\/\w+)")
     df.loc[:, "investigation_start_date"] = dates[0]
 
@@ -1605,6 +1608,13 @@ def extract_action(df):
     df.loc[:, "action"] = actions[0].str.replace(r"suspension", "suspended", regex=False)
     return df.drop(columns=["terminated_resigned"])
 
+def clean_receive_dates(df):
+    df.loc[:, "receive_date"] = (df.receive_date
+                                 .str.replace(r"\`", "", regex=True)
+                                 .str.replace(r"20222", "2022", regex=False)
+
+    )
+    return df 
 
 def clean22():
     df = (pd.read_csv(deba.data("raw/new_orleans_so/new_orleans_so_cprr_2022.csv"), encoding="cp1252")
@@ -1627,10 +1637,10 @@ def clean22():
           .pipe(clean_employee_id_21)
           .pipe(clean_rank_desc_21)
           .pipe(clean_allegations_20)
-          .pipe(clean_start_dates)
           .pipe(extract_action)
           .pipe(clean_allegation_desc)
           .pipe(split_name_20)
+          .pipe(clean_start_dates)
           .pipe(standardize_desc_cols, ["tracking_id_og", "rank_desc",
                                          "allegation", 
                                          "status", "item_number", "inmate_grievance",
