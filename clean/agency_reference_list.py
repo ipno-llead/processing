@@ -102,7 +102,6 @@ def add_washington_constable(df):
     return df 
 
 def fix_agency_name(df):
-    df.loc[:, "agency_slug"] = df.agency_slug.str.replace(r"^6th-judicial-court$", "6th-judicial-district-court", regex=True)
     df.loc[:, "agency_name"] = df.agency_name.str.replace(r"^6th Judicial Court$", "6th Judicial District Court", regex=True)
     return df 
 
