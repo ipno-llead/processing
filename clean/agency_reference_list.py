@@ -101,8 +101,13 @@ def add_washington_constable(df):
     df = pd.concat([df, dfa])
     return df 
 
+def add_6th_judicial_court(df):
+    dfa = pd.DataFrame({"agency_slug": "6th-judicial-district-court", "agency_name": "6th Judicial District Court", "location": "32.8044064878668, -91.170624448896"}, index=[610])
+    df = pd.concat([df, dfa])
+    return df 
+
 def fix_agency_name(df):
-    df.loc[:, "agency_name"] = df.agency_name.str.replace(r"^6th Judicial Court$", "6th Judicial District Court", regex=True)
+    df.loc[:, "agency_name"] = df.agency_name.str.replace(r"^6th Judicial Court$", "6th Judicial Court", regex=True)
     return df 
 
 def clean():
@@ -128,6 +133,7 @@ def clean():
         .pipe(add_morgan_city_marshal)
         .pipe(add_washington_constable)
         .pipe(fix_agency_name)
+        .pipe(add_6th_judicial_court)
     )
     return df
 
