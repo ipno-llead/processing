@@ -97,7 +97,7 @@ def add_gov_imm(df):
     return df 
 
 def add_washington_constable(df):
-    dfa = pd.DataFrame({"agency_slug": "washington-constable", "agency_name": "United States Immigration and Naturalization Service", "location": "30.81930055392451, -89.8421300467456"}, index=[609])
+    dfa = pd.DataFrame({"agency_slug": "washington-constable", "agency_name": "Washington Parish Constable", "location": "30.81930055392451, -89.8421300467456"}, index=[609])
     df = pd.concat([df, dfa])
     return df 
 
