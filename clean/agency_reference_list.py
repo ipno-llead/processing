@@ -81,7 +81,7 @@ def add_newellton_pd(df):
     df = pd.concat([df, dfa])
     return df 
 
-def add_newellton_pd(df):
+def add_st_tam_con(df):
     dfa = pd.DataFrame({"agency_slug": "st-tammany-constable-5th-ward", "agency_name": "St. Tammany 5th Ward Constable", "location": "30.401123740088057, -90.03775876894412"}, index=[606])
     df = pd.concat([df, dfa])
     return df 
@@ -119,6 +119,14 @@ def clean():
         .pipe(add_chitimacha)
         .pipe(add_csx_railroad)
         .pipe(add_fort_polk)
+        .pipe(add_gov_imm)
+        .pipe(add_gov_sec)
+        .pipe(add_newellton_pd)
+        .pipe(add_st_tam_con)
+        .pipe(add_hammond_marshal)
+        .pipe(add_louisiana_licensing_board)
+        .pipe(add_morgan_city_marshal)
+        .pipe(add_washington_constable)
         .pipe(fix_agency_name)
     )
     return df
