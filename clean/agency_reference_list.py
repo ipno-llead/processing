@@ -81,7 +81,7 @@ def add_newellton_pd(df):
     df = pd.concat([df, dfa])
     return df 
 
-def add_newellton_pd(df):
+def add_st_tam_con(df):
     dfa = pd.DataFrame({"agency_slug": "st-tammany-constable-5th-ward", "agency_name": "St. Tammany 5th Ward Constable", "location": "30.401123740088057, -90.03775876894412"}, index=[606])
     df = pd.concat([df, dfa])
     return df 
@@ -97,12 +97,17 @@ def add_gov_imm(df):
     return df 
 
 def add_washington_constable(df):
-    dfa = pd.DataFrame({"agency_slug": "washington-constable", "agency_name": "United States Immigration and Naturalization Service", "location": "30.81930055392451, -89.8421300467456"}, index=[609])
+    dfa = pd.DataFrame({"agency_slug": "washington-constable", "agency_name": "Washington Parish Constable", "location": "30.81930055392451, -89.8421300467456"}, index=[609])
+    df = pd.concat([df, dfa])
+    return df 
+
+def add_6th_judicial_court(df):
+    dfa = pd.DataFrame({"agency_slug": "6th-judicial-district-court", "agency_name": "6th Judicial District Court", "location": "32.8044064878668, -91.170624448896"}, index=[610])
     df = pd.concat([df, dfa])
     return df 
 
 def fix_agency_name(df):
-    df.loc[:, "agency_name"] = df.agency_name.str.replace(r"^6th Judicial Court$", "6th Judicial District Court", regex=True)
+    df.loc[:, "agency_name"] = df.agency_name.str.replace(r"^6th Judicial Court$", "6th Judicial Court", regex=True)
     return df 
 
 def clean():
@@ -119,7 +124,16 @@ def clean():
         .pipe(add_chitimacha)
         .pipe(add_csx_railroad)
         .pipe(add_fort_polk)
+        .pipe(add_gov_imm)
+        .pipe(add_gov_sec)
+        .pipe(add_newellton_pd)
+        .pipe(add_st_tam_con)
+        .pipe(add_hammond_marshal)
+        .pipe(add_louisiana_licensing_board)
+        .pipe(add_morgan_city_marshal)
+        .pipe(add_washington_constable)
         .pipe(fix_agency_name)
+        .pipe(add_6th_judicial_court)
     )
     return df
 
