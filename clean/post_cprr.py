@@ -154,6 +154,7 @@ def clean23():
         .pipe(filter_agencies)
         .pipe(assign_date)
         .pipe(clean_allegations)
+        .pipe(assign_action)
         .pipe(standardize_desc_cols, ["agency"])
         .pipe(split_name)
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
@@ -177,10 +178,16 @@ def clean20():
     return df
 
 
+def concat_dfs(dfa, dfb):
+    df = pd.concat([dfa, dfb], axis=0)
+    return df 
+
 if __name__ == "__main__":
     df = clean20()
     df23 = clean23()
+    df = concat_dfs(df, df23)
     df.to_csv(deba.data("clean/cprr_post_2016_2019.csv"), index=False)
     df23.to_csv(
         deba.data("clean/cprr_post_decertifications_4_18_2023.csv"), index=False
     )
+    df.to_csv(deba.data("clean/cprr_post_decertifications_2016_2023.csv"), index=False)
