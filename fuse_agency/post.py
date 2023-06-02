@@ -9,7 +9,7 @@ from lib.columns import (
 from lib import events
 
 
-def fuse_events(post, cprr, cprr23):
+def fuse_events(post, cprr):
     builder = events.Builder()
     builder.extract_events(
         post,
