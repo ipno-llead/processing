@@ -525,6 +525,8 @@ schemas:
         no_na: true
       - name: agency
       - name: left_reason
+      - name: hire_date
+      - name: left_date
   settlement:
     columns:
       - name: settlement_uid
