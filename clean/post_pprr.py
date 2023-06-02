@@ -113,8 +113,16 @@ def clean_agency(df):
         .str.replace(r"^natchitoches$", "natchitoches-so", regex=True)
         .str.replace(r"4th-da", "morehouse-da", regex=False)
         .str.replace(r"^juvenile-services-br$", "juvenile-services-bureau", regex=True)
+        .str.replace(
+            r"^alcoholic-beverage-control-ebr$",
+            "east-baton-rouge-office-of-alcohol-beverage-control",
+            regex=True,
+        )
+        .str.replace(r"culture\,-rec-tourism", "culture-recreation-tourism", regex=True)
+        .str.replace(r"hammond-marshal", "hammond-city-marshal", regex=True)
+        .str.replace(r"^unknown$", "", regex=True)
     )
-    return df
+    return df[~((df.agency.fillna("") == ""))]
 
 
 def replace_impossible_dates(df):
@@ -125,12 +133,77 @@ def replace_impossible_dates(df):
 
 
 def fix_date_format(df):
-    df.loc[:, "level_1_cert_date"] = df.level_1_cert_date.astype(str).str.replace(r"(\w+)\/(\w+)\/(\w+)", r"\3-\1-\2", regex=True)
-    df.loc[:, "last_pc_12_qualification_date"] = df.last_pc_12_qualification_date.astype(str).str.replace(r"(\w+)\/(\w+)\/(\w+)", r"\3-\1-\2", regex=True)
-    return df 
+    df.loc[:, "level_1_cert_date"] = df.level_1_cert_date.astype(str).str.replace(
+        r"(\w+)\/(\w+)\/(\w+)", r"\3-\1-\2", regex=True
+    )
+    df.loc[
+        :, "last_pc_12_qualification_date"
+    ] = df.last_pc_12_qualification_date.astype(str).str.replace(
+        r"(\w+)\/(\w+)\/(\w+)", r"\3-\1-\2", regex=True
+    )
+    return df
 
 
-def clean():
+def filter_agencies(df):
+    agencies = pd.read_csv(deba.data("clean/agency_reference_list.csv"))
+    agencies = agencies.agency_slug.tolist()
+    df = df[df.agency.isin(agencies)]
+    return df
+
+
+def remove_test(df):
+    df.loc[:, "last_name"] = df.last_name.str.replace(r"test2", "", regex=False)
+    df.loc[:, "first_name"] = df.first_name.str.replace(r"officer", "", regex=False)
+    return df[~((df.first_name == "") & (df.last_name == ""))]
+
+
+def clean_hire_dates(df):
+    df.loc[:, "hire_date"] = df.hire_date.fillna("").str.replace(
+        r"(.+)\/1900", "", regex=True
+    )
+    return df[~((df.hire_date == ""))]
+
+
+def clean_lvl_1_cert(df):
+    df.loc[:, "level_1_cert_date"] = df.level_1_cert_date.str.replace(
+        r"(\w{4})-(\w+)-(\w+)", r"\2/\3/\1", regex=True
+    )
+    return df
+
+
+def clean23():
+    df = (
+        pd.read_csv(
+            deba.data("raw/post_council/post_pprr_4_26_2023.csv"), encoding="cp1252"
+        )
+        .pipe(clean_column_names)
+        .rename(
+            columns={
+                "lastname": "last_name",
+                "firstname": "first_name",
+                "agency_name": "agency",
+            }
+        )
+        .pipe(clean_agency)
+        .pipe(filter_agencies)
+        .pipe(replace_impossible_dates)
+        .pipe(clean_names, ["first_name", "last_name"])
+        .pipe(standardize_desc_cols, ["employment_status"])
+        .pipe(remove_test)
+        .pipe(clean_hire_dates)
+        .pipe(
+            gen_uid,
+            [
+                "agency",
+                "last_name",
+                "first_name",
+            ],
+        )
+    )
+    return df
+
+
+def clean20():
     df = pd.read_csv(deba.data("raw/post_council/post_pprr_11-6-2020.csv"))
     df = clean_column_names(df)
     df.columns = [
@@ -166,9 +239,11 @@ def clean():
         )
         .pipe(standardize_desc_cols, ["agency"])
     )
-    return df[~((df.last_name.fillna("") == "" ))]
+    return df[~((df.last_name.fillna("") == ""))]
 
 
 if __name__ == "__main__":
-    df = clean()
-    df.to_csv(deba.data("clean/pprr_post_2020_11_06.csv"), index=False)
+    df20 = clean20()
+    df23 = clean23()
+    df20.to_csv(deba.data("clean/pprr_post_2020_11_06.csv"), index=False)
+    df23.to_csv(deba.data("clean/pprr_post_4_26_2023.csv"), index=False)

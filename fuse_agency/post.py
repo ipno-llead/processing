@@ -1,7 +1,11 @@
 import pandas as pd
 import deba
 from lib.personnel import fuse_personnel
-from lib.columns import rearrange_event_columns, rearrange_allegation_columns, rearrange_personnel_columns
+from lib.columns import (
+    rearrange_event_columns,
+    rearrange_allegation_columns,
+    rearrange_personnel_columns,
+)
 from lib import events
 
 
@@ -40,7 +44,7 @@ def fuse_events(post, cprr):
 
 if __name__ == "__main__":
     post = pd.read_csv(deba.data("clean/pprr_post_2020_11_06.csv"))
-    cprr = pd.read_csv(deba.data("match/cprr_post_2016_2019.csv"))
+    cprr = pd.read_csv(deba.data("clean/cprr_post_decertifications_2016_2023.csv"))
     event_df = fuse_events(post, cprr)
     event_df = rearrange_event_columns(event_df)
     per_df = fuse_personnel(post, cprr)
