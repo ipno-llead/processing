@@ -46,7 +46,7 @@ def clean():
         .pipe(standardize_desc_cols, ["allegation", "action", "disposition"])
         .pipe(set_values, {"agency": "louisiana-state-pd"})
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
-        .pipe(gen_uid, ["allegation", "action", "uid"])
+        .pipe(gen_uid, ["allegation", "action", "uid"], "allegation_uid")
         .pipe(gen_uid, ["tracking_id_og", "agency"], "tracking_id")
     )
     return df
