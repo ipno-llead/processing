@@ -12,7 +12,7 @@ from lib.post import load_for_agency
 import pandas as pd
 
 
-def fuse_events(lprr, pprr, pprr_term, settlements):
+def fuse_events(lprr, pprr, pprr_term, settlements, cprr):
     builder = events.Builder()
     builder.extract_events(
         lprr,
@@ -79,6 +79,48 @@ def fuse_events(lprr, pprr, pprr_term, settlements):
         },
         ["uid", "settlement_uid"],
     )
+    builder.extract_events(
+        cprr,
+        {
+            events.COMPLAINT_INCIDENT: {
+                "prefix": "incident",
+                "parse_date": True,
+                "keep": [
+                    "uid",
+                    "allegation_uid",
+                    "agency",
+                ],
+            },
+            events.COMPLAINT_RECEIVE: {
+                "prefix": "receive",
+                "parse_date": True,
+                "keep": [
+                    "uid",
+                    "allegation_uid",
+                    "agency",
+                ],
+            },
+            events.OFFICER_LEFT: {
+                "prefix": "termination",
+                "parse_date": True,
+                "keep": [
+                    "uid",
+                    "allegation_uid",
+                    "agency",
+                ],
+            },
+            events.OFFICER_LEFT: {
+                "prefix": "separation",
+                "parse_date": True,
+                "keep": [
+                    "uid",
+                    "allegation_uid",
+                    "agency",
+                ],
+            },
+        },
+        ["uid", "allegation_uid"],
+    )
     return builder.to_frame()
 
 
@@ -89,23 +131,22 @@ if __name__ == "__main__":
     settlements = pd.read_csv(
         deba.data("match/settlements_louisiana_state_pd_2015_2020.csv")
     )
-    # cprr19 = pd.read_csv(deba.data("match/cprr_louisiana_state_pd_2019.csv"))
-    # cprr20 = pd.read_csv(deba.data("match/cprr_louisiana_state_pd_2020.csv"))
+    cprr = pd.read_csv(deba.data("match/cprr_louisiana_state_pd_2019_2020.csv"))
     agency = pprr.agency[0]
     post = load_for_agency(agency)
-    per_df = fuse_personnel(pprr, pprr_term, lprr, post)
+    per_df = fuse_personnel(pprr, pprr_term, lprr, post, cprr)
     per_df = per_df[~((per_df.last_name.fillna("") == ""))]
-    event_df = rearrange_event_columns(fuse_events(lprr, pprr, pprr_term, settlements))
+    event_df = rearrange_event_columns(
+        fuse_events(lprr, pprr, pprr_term, settlements, cprr)
+    )
     settlements = rearrange_settlement_columns(settlements)
     app_df = rearrange_appeal_hearing_columns(lprr)
-    # cprr = rearrange_allegation_columns(pd.concat([cprr19, cprr20], axis=0))
-    # lsp_docs = rearrange_docs_columns(cprr19)
+    cprr = rearrange_allegation_columns(cprr)
     per_df.to_csv(deba.data("fuse_agency/per_louisiana_state_pd.csv"), index=False)
     event_df.to_csv(deba.data("fuse_agency/event_louisiana_state_pd.csv"), index=False)
     app_df.to_csv(deba.data("fuse_agency/app_louisiana_state_pd.csv"), index=False)
     settlements.to_csv(
         deba.data("fuse_agency/settlements_louisiana_state_pd.csv"), index=False
     )
-    # cprr.to_csv(deba.data("fuse_agency/com_louisiana_state_pd.csv"), index=False)
+    cprr.to_csv(deba.data("fuse_agency/com_louisiana_state_pd.csv"), index=False)
     post.to_csv(deba.data("fuse_agency/post_louisiana_state_pd.csv"), index=False)
-    # lsp_docs.to_csv(deba.data("fuse_agency/docs_louisiana_state_pd.csv"), index=False)
