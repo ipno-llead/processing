@@ -377,6 +377,10 @@ def filter_agencies(df):
     df = df[df.agency.isin(agencies)]
     return df
 
+def post():
+    df = pd.read_csv(deba.data("raw/post_council/pprr_post_officer_history.csv"))
+    return df 
+
 
 def clean():
     dfa = pd.read_csv(deba.data("ner/advocate_post_officer_history_reports.csv"))
