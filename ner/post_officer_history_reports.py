@@ -46,7 +46,7 @@ if __name__ == "__main__":
     pdfs_23 = read_pdfs_23()
     pdfs_22_rotated = read_pdfs_22_rotated()
     training = training_data()
-    ner = train_spacy_model(pdfs_23, training)
+    # ner = train_spacy_model(pdfs_23, training)
     # model = ner.to_disk(
     #     ("data/post.model")
     # )

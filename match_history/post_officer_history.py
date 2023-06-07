@@ -60,10 +60,6 @@ def post_agency_is_per_agency_subset(personnel, post):
     return post
 
 
-def drop_rows_missing_hire_dates(df):
-    return df[~((df.hire_date.fillna("") == ""))]
-
-
 def drop_rows_missing_agency(df):
     return df[~((df.agency.fillna("") == ""))]
 

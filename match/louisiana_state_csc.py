@@ -221,3 +221,4 @@ if __name__ == "__main__":
     )
     pprr_term.to_csv(deba.data("match/pprr_term_louisiana_csd_2021.csv"), index=False)
     cprr.to_csv(deba.data("match/cprr_louisiana_state_pd_2019_2020.csv"), index=False)
+    settlements.to_csv(deba.data("match/settlements_louisiana_state_pd_2015_2020.csv"))
