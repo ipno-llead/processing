@@ -417,6 +417,11 @@ def clean():
         )
         .pipe(clean_parsed_dates)
     )
+    post = pd.read_csv(
+        deba.data("raw/post_council/pprr_post_officer_history.csv")
+    ).pipe(clean_dates, ["hire_date"])
+
+    df = pd.concat([df, post], axis=0)
     return df
 
 

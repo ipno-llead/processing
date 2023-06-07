@@ -60,10 +60,6 @@ def post_agency_is_per_agency_subset(personnel, post):
     return post
 
 
-def drop_rows_missing_hire_dates(df):
-    return df[~((df.hire_date.fillna("") == ""))]
-
-
 def drop_rows_missing_agency(df):
     return df[~((df.agency.fillna("") == ""))]
 
@@ -156,7 +152,7 @@ if __name__ == "__main__":
 
     post = post_agency_is_per_agency_subset(per_pre_post, post)
     post = match_post_to_personnel(post, per_pre_post)
-    post = post.pipe(drop_rows_missing_hire_dates).pipe(drop_rows_missing_agency)
+    post = post.pipe(drop_rows_missing_agency).drop_duplicates(subset=["uid"])
     post_events = fuse_events(post)
     
     event_df = pd.concat([post_events, events_pre_post], axis=0).drop_duplicates(subset=["event_uid"], keep="last")
