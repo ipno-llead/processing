@@ -323,19 +323,19 @@ branch:
   com-post:
     remote: origin
     merge: refs/heads/com-post
-    file: data/fuse/com_post.csv
+    file: data/fuse_agency/com_post.csv
     primaryKey:
       - allegation_uid
   com-east-feliciana-so:
     remote: origin
     merge: refs/heads/com-east-feliciana-so
-    file: data/fuse/com_east_feliciana_so.csv
+    file: data/fuse_agency/com_east_feliciana_so.csv
     primaryKey:
       - allegation_uid
   com-lasalle-so:
     remote: origin
     merge: refs/heads/com-lasalle-so
-    file: data/fuse/com_lasalle_so.csv
+    file: data/fuse_agency/com_lasalle_so.csv
     primaryKey:
       - allegation_uid
   event:
