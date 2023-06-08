@@ -6,7 +6,7 @@ from lib.uid import gen_uid
 
 def clean():
     df = (
-        pd.read_csv(deba.data("raw/lasalle_so/lasalle_so_cprr_2018_2022.csv"))
+        pd.read_csv(deba.data("raw/lasalle_so/lasalle_so_cprr_2022.csv"))
         .pipe(clean_column_names)
         .pipe(set_values, {"agency": "lasalle-so"})
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
