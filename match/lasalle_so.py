@@ -22,7 +22,7 @@ def match_cprr_and_post(cprr, post):
         dfa,
         dfb,
     )
-    decision = 0.903
+    decision = 0.9
     matcher.save_pairs_to_excel(
         deba.data("match/cprr_lasalleso_2018_2021_v_post_2020_11_06.xlsx"),
         decision,
@@ -35,8 +35,8 @@ def match_cprr_and_post(cprr, post):
 
 
 if __name__ == "__main__":
-    cprr = pd.read_csv(deba.data("clean/cprr_lasalle_so_2018_2022.csv"))
+    cprr = pd.read_csv(deba.data("clean/cprr_lasalle_so_2022.csv"))
     post = pd.read_csv(deba.data("clean/pprr_post_4_26_2023.csv"))
     post = post[post.agency.isin(["lasalle-so"])]
     cprr = match_cprr_and_post(cprr, post)
-    cprr.to_csv(deba.data("match/cprr_lasalle_so_2018_2022.csv"), index=False)
+    cprr.to_csv(deba.data("match/cprr_lasalle_so_2022.csv"), index=False)

@@ -21,4 +21,4 @@ def clean():
 
 if __name__ == "__main__":
     df = clean()
-    df.to_csv(deba.data("clean/cprr_lasalle_so_2018_2022.csv"), index=False)
+    df.to_csv(deba.data("clean/cprr_lasalle_so_2022.csv"), index=False)

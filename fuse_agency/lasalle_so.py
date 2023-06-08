@@ -54,7 +54,7 @@ def fuse_events(cprr, post):
 
 
 if __name__ == "__main__":
-    cprr = pd.read_csv(deba.data("match/cprr_lasalle_so_2018_2022.csv"))
+    cprr = pd.read_csv(deba.data("match/cprr_lasalle_so_2022.csv"))
     post = pd.read_csv(deba.data("clean/pprr_post_4_26_2023.csv"))
     post = post[post.agency.isin(["lasalle-so"])]
     per = fuse_personnel(cprr, post)
