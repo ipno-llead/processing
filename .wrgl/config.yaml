@@ -332,6 +332,12 @@ branch:
     file: data/fuse/com_east_feliciana_so.csv
     primaryKey:
       - allegation_uid
+  com-lasalle-so:
+    remote: origin
+    merge: refs/heads/com-lasalle-so
+    file: data/fuse/com_lasalle_so.csv
+    primaryKey:
+      - allegation_uid
   event:
     remote: origin
     merge: refs/heads/event
@@ -732,6 +738,12 @@ branch:
     remote: origin
     merge: refs/heads/event-east-feliciana-so
     file: data/fuse_agency/event_east_feliciana_so.csv
+    primaryKey:
+      - event_uid
+  event-lasalle-so:
+    remote: origin
+    merge: refs/heads/event-lasalle-so
+    file: data/fuse_agency/event_lasalle_so.csv
     primaryKey:
       - event_uid
   per-abbeville-pd:
@@ -1164,6 +1176,12 @@ branch:
     remote: origin
     merge: refs/heads/per-east-feliciana-so
     file: data/fuse_agency/per_east_feliciana_so.csv
+    primaryKey:
+      - uid
+  per-lasalle-so:
+    remote: origin
+    merge: refs/heads/per-lasalle-so
+    file: data/fuse_agency/per_lasalle_so.csv
     primaryKey:
       - uid
   uof-new-orleans-pd:
