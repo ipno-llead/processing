@@ -374,6 +374,14 @@ def filter_agencies(df):
     return df
 
 
+def split_dates(df):
+    dates = df.hire_date.str.extract(r"(\w+)\/(\w+)\/(\w+)")
+    df.loc[:, "hire_month"] = dates[0]
+    df.loc[:, "hire_day"] = dates[1]
+    df.loc[:, "hire_year"] = dates[2]
+    return df
+
+
 def clean():
     dfa = pd.read_csv(deba.data("ner/advocate_post_officer_history_reports.csv"))
     dfb = pd.read_csv(deba.data("ner/post_officer_history_reports.csv"))
@@ -434,7 +442,7 @@ def clean():
     )
     post = (
         pd.read_csv(deba.data("raw/post_council/pprr_post_officer_history.csv"))
-        .pipe(clean_dates, ["hire_date"])
+        .pipe(split_dates)
         .pipe(names_to_title_case, ["first_name", "last_name"])
     )
 

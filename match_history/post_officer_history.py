@@ -38,7 +38,7 @@ def match_post_to_personnel(post, personnel):
         dfa,
         dfb,
     )
-    decision = .804
+    decision = 0.804
     matcher.save_pairs_to_excel(
         deba.data("match/cprr_post_ohr_personnel.xlsx"), decision
     )
@@ -58,6 +58,10 @@ def post_agency_is_per_agency_subset(personnel, post):
             "Agency not in Personnel DF: %s" % missing_agency["agency"].tolist()
         )
     return post
+
+
+def drop_rows_missing_hire_date(df):
+    return df[~((df.hire_date.fillna("") == ""))]
 
 
 def drop_rows_missing_agency(df):
@@ -114,7 +118,7 @@ def deduplicate_personnel(personnel):
 
 
 def match_cprr_to_pprr(cprr, pprr):
-    dfa =  cprr[["uid", "first_name", "last_name", "middle_name", "agency"]]
+    dfa = cprr[["uid", "first_name", "last_name", "middle_name", "agency"]]
     dfa = dfa.drop_duplicates(subset=["uid"]).set_index("uid")
     dfa.loc[:, "fc"] = dfa.first_name.fillna("").map(lambda x: x[:1])
     dfa.loc[:, "lc"] = dfa.last_name.fillna("").map(lambda x: x[:1])
@@ -134,7 +138,7 @@ def match_cprr_to_pprr(cprr, pprr):
         dfa,
         dfb,
     )
-    decision = .804
+    decision = 0.804
     matcher.save_pairs_to_excel(
         deba.data("match_history/cprr_post_ohr_personnel.xlsx"), decision
     )
@@ -152,13 +156,19 @@ if __name__ == "__main__":
 
     post = post_agency_is_per_agency_subset(per_pre_post, post)
     post = match_post_to_personnel(post, per_pre_post)
-    post = post.pipe(drop_rows_missing_agency).drop_duplicates(subset=["uid"])
+    post = (
+        post.pipe(drop_rows_missing_hire_date)
+        .pipe(drop_rows_missing_agency)
+        .drop_duplicates(subset=["uid"])
+    )
     post_events = fuse_events(post)
-    
-    event_df = pd.concat([post_events, events_pre_post], axis=0).drop_duplicates(subset=["event_uid"], keep="last")
+
+    event_df = pd.concat([post_events, events_pre_post], axis=0).drop_duplicates(
+        subset=["event_uid"], keep="last"
+    )
     event_df = rearrange_event_columns(event_df)
     event_df = event_df[~((event_df.agency.fillna("") == ""))]
-    
+
     per_df = fuse_personnel(per_pre_post, post)
     per_df = rearrange_personnel_columns(per_df)
     per_df = per_df[~((per_df.last_name.fillna("") == ""))]
