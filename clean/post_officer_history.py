@@ -53,11 +53,7 @@ def generate_history_id(df):
     stacked_agency_df = stacked_agency_sr.reset_index().iloc[:, [0, 2]]
     stacked_agency_df.columns = ["history_id", "agency"]
 
-    names_df = df[
-        [
-            "officer_name",
-        ]
-    ].reset_index()
+    names_df = df[["officer_name", "history_2"]].reset_index()
     names_df = names_df.rename(columns={"index": "history_id"})
 
     stacked_agency_df = stacked_agency_df.merge(names_df, on="history_id", how="right")
@@ -393,7 +389,26 @@ def clean():
             }
         )
         .pipe(clean_sexes, ["sex"])
+        .pipe(
+            gen_uid,
+            [
+                "officer_name",
+                "agency",
+                "agency_1",
+                "agency_2",
+                "agency_3",
+                "agency_4",
+                "agency_5",
+                "agency_6",
+                "agency_7",
+                "agency_8",
+                "agency_9",
+            ],
+            "history_2",
+        )
         .pipe(generate_history_id)
+        .drop(columns=["history_id"])
+        .rename(columns={"history_2": "history_id"})
         .pipe(split_names)
         .pipe(clean_agency_pre_split)
         .pipe(split_agency)
@@ -417,9 +432,11 @@ def clean():
         )
         .pipe(clean_parsed_dates)
     )
-    post = pd.read_csv(
-        deba.data("raw/post_council/pprr_post_officer_history.csv")
-    ).pipe(clean_dates, ["hire_date"])
+    post = (
+        pd.read_csv(deba.data("raw/post_council/pprr_post_officer_history.csv"))
+        .pipe(clean_dates, ["hire_date"])
+        .pipe(names_to_title_case, ["first_name", "last_name"])
+    )
 
     df = pd.concat([df, post], axis=0)
     return df
