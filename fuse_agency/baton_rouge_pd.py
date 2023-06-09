@@ -132,7 +132,7 @@ def fuse_events(csd_pprr_17, csd_pprr_19, cprr_18, cprr_21, cprr_09, settlements
 if __name__ == "__main__":
     csd_pprr_17 = pd.read_csv(deba.data("match/pprr_baton_rouge_csd_2017.csv"))
     csd_pprr_19 = pd.read_csv(deba.data("match/pprr_baton_rouge_csd_2019.csv"))
-    post_event = pd.read_csv(deba.data("match/event_post_baton_rouge_pd.csv"))
+    # post_event = pd.read_csv(deba.data("match/event_post_baton_rouge_pd.csv"))
     cprr_18 = pd.read_csv(deba.data("match/cprr_baton_rouge_pd_2018.csv"))
     cprr_21 = pd.read_csv(deba.data("match/cprr_baton_rouge_pd_2021.csv"))
     pprr = pd.read_csv(deba.data("match/pprr_baton_rouge_pd_2021.csv"))
@@ -161,7 +161,7 @@ if __name__ == "__main__":
     events_df = fuse_events(
         csd_pprr_17, csd_pprr_19, cprr_18, cprr_21, cprr_09, settlements
     )
-    events_df = rearrange_event_columns(pd.concat([post_event, events_df]))
+    events_df = rearrange_event_columns(events_df)
     complaint_df = rearrange_allegation_columns(pd.concat([cprr_18, cprr_21, cprr_09], axis=0))
     settlement_df = rearrange_settlement_columns(settlements)
 

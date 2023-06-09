@@ -45,7 +45,7 @@ def extract_events_from_post(
                     events.OFFICER_LEVEL_1_CERT,
                     ["uid"],
                     raw_date_str=row.level_1_cert_date,
-                    strptime_format="%m/%d/%Y",
+                    strptime_format="%Y-%m-%d",
                     agency=agency,
                     uid=pprr_uid,
                 )
@@ -54,7 +54,7 @@ def extract_events_from_post(
                     events.OFFICER_PC_12_QUALIFICATION,
                     ["uid"],
                     raw_date_str=row.last_pc_12_qualification_date,
-                    strptime_format="%m/%d/%Y",
+                    strptime_format="%Y-%m-%d",
                     agency=agency,
                     uid=pprr_uid,
                 )
