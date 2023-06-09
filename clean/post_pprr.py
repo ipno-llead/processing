@@ -177,7 +177,8 @@ def split_hire_dates(df):
     df.loc[:, "hire_month"] = dates[0]
     df.loc[:, "hire_day"] = dates[1]
     df.loc[:, "hire_year"] = dates[2]
-    return df 
+    return df
+
 
 def clean23():
     df = (
@@ -215,7 +216,7 @@ def clean23():
             subset=["hire_year", "hire_month", "hire_day", "uid"], keep="first"
         )
         .pipe(standardize_desc_cols, ["agency"])
-        )
+    )
     return df
 
 
@@ -261,6 +262,7 @@ def concat_dfs(dfa, dfb):
     dfa_uids = [x for x in dfa["uid"]]
     dfb = dfb[~(dfb.uid.isin(dfa_uids))]
     return dfa, dfb
+
 
 if __name__ == "__main__":
     df20 = clean20()
