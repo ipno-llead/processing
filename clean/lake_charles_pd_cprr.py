@@ -267,6 +267,7 @@ def clean_disposition_20(df):
 
 
 def split_rows_with_multiple_officers_20(df):
+    df.loc[:, "name"] = df.name.str.replace(r"(\w+)\, (\w+)", r"\1/\2", regex=True)
     i = 0
     for idx in df[df.name.str.contains(r"/|,")].index:
         s = df.loc[idx + i, "name"]
@@ -649,6 +650,10 @@ def create_tracking_id_og_col(df):
     df.loc[:, "tracking_id_og"] = df.tracking_id
     return df
 
+def drop_rows_missing_dis(df):
+    df.loc[:, "disposition"] = df.disposition.str.replace(r"^$", "nan", regex=True)
+    return df[~((df.disposition == "nan"))]
+
 
 def clean_20():
     df = pd.read_csv(deba.data("raw/lake_charles_pd/lake_charles_pd_cprr_2020.csv"))
@@ -656,12 +661,9 @@ def clean_20():
         df.pipe(clean_column_names)
         .rename(columns={"date_of_investigation": "investigation_start_date"})
         .pipe(clean_allegations_20)
+        .pipe(split_rows_with_multiple_officers_20)
         .pipe(split_rows_with_multiple_allegations_20)
         .pipe(clean_action_20)
-        .pipe(consolidate_action_and_disposition_20)
-        .pipe(clean_disposition_20)
-        .pipe(split_rows_with_multiple_officers_20)
-        .pipe(drop_rows_missing_disp_allegations_and_action_20)
         .pipe(assign_empty_first_name_column_20)
         .pipe(assign_first_names_from_post_20)
         .pipe(assign_agency)
