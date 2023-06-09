@@ -213,7 +213,7 @@ def clean():
         .pipe(assign_agency)
         .rename(columns={"docket_no": "tracking_id"})
         .pipe(clean_names, ["first_name", "middle_name", "last_name"])
-        .pipe(gen_uid, ["agency", "first_name", "middle_name", "last_name"])
+        .pipe(gen_uid, ["agency", "first_name", "last_name"])
         .pipe(gen_uid, ["agency", "tracking_id", "uid"], "appeal_uid")
         .pipe(assign_charging_supervisor)
         .pipe(create_tracking_id_og_col)
