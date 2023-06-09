@@ -1,0 +1,6 @@
+wdir: ../../../data/raw
+outs:
+- md5: e2c195f55b3f2e75f5d68a8297944e4f.dir
+  size: 12290
+  nfiles: 2
+  path: lasalle_so

@@ -171,6 +171,15 @@ def clean_lvl_1_cert(df):
     return df
 
 
+def split_hire_dates(df):
+    dates = df.hire_date.str.extract(r"(\w+)\/(\w+)\/(\w+)")
+
+    df.loc[:, "hire_month"] = dates[0]
+    df.loc[:, "hire_day"] = dates[1]
+    df.loc[:, "hire_year"] = dates[2]
+    return df
+
+
 def clean23():
     df = (
         pd.read_csv(
@@ -191,14 +200,22 @@ def clean23():
         .pipe(standardize_desc_cols, ["employment_status"])
         .pipe(remove_test)
         .pipe(clean_hire_dates)
+        .pipe(split_hire_dates)
         .pipe(
             gen_uid,
             [
                 "agency",
                 "last_name",
                 "first_name",
+                "hire_year",
+                "hire_month",
+                "hire_day",
             ],
         )
+        .drop_duplicates(
+            subset=["hire_year", "hire_month", "hire_day", "uid"], keep="first"
+        )
+        .pipe(standardize_desc_cols, ["agency"])
     )
     return df
 
@@ -242,8 +259,15 @@ def clean20():
     return df[~((df.last_name.fillna("") == ""))]
 
 
+def concat_dfs(dfa, dfb):
+    dfa_uids = [x for x in dfa["uid"]]
+    dfb = dfb[~(dfb.uid.isin(dfa_uids))]
+    return dfa, dfb
+
+
 if __name__ == "__main__":
     df20 = clean20()
     df23 = clean23()
+    df20, df23 = concat_dfs(df20, df23)
     df20.to_csv(deba.data("clean/pprr_post_2020_11_06.csv"), index=False)
     df23.to_csv(deba.data("clean/pprr_post_4_26_2023.csv"), index=False)
