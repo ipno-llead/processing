@@ -251,15 +251,15 @@ if __name__ == "__main__":
     cprr09 = match_pd_cprr_2009_v_pprr(cprr09, pprr)
     agency = cprr21.agency[0]
     post = load_for_agency(agency)
-    # post_event = match_pprr_against_post(pprr, post)
+    post_event = match_pprr_against_post(pprr, post)
     settlements = match_settlements_v_pprr(settlements, pprr)
-    # assert post_event[post_event.duplicated(subset=["event_uid"])].shape[0] == 0
+    assert post_event[post_event.duplicated(subset=["event_uid"])].shape[0] == 0
 
     csd17.to_csv(deba.data("match/pprr_baton_rouge_csd_2017.csv"), index=False)
     csd19.to_csv(deba.data("match/pprr_baton_rouge_csd_2019.csv"), index=False)
     cprr18.to_csv(deba.data("match/cprr_baton_rouge_pd_2018.csv"), index=False)
     cprr21.to_csv(deba.data("match/cprr_baton_rouge_pd_2021.csv"), index=False)
-    # post_event.to_csv(deba.data("match/event_post_baton_rouge_pd.csv"), index=False)
+    post_event.to_csv(deba.data("match/event_post_baton_rouge_pd.csv"), index=False)
     pprr.to_csv(deba.data("match/pprr_baton_rouge_pd_2021.csv"), index=False)
     cprr09.to_csv(deba.data("match/cprr_baton_rouge_pd_2004_2009.csv"), index=False)
     settlements.to_csv(

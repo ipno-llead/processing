@@ -237,6 +237,7 @@ def clean20():
         df.pipe(clean_agency)
         .pipe(standardize_desc_cols, ["employment_status"])
         .pipe(clean_dates, ["hire_date"])
+        .pipe(fix_date_format)
         .pipe(replace_impossible_dates)
         .pipe(clean_names, ["first_name", "last_name"])
         .pipe(
