@@ -258,13 +258,13 @@ def clean20():
 
 
 def concat_dfs(dfa, dfb):
-    dfb_uids = [x for x in dfb["uid"]]
-    dfa = dfa[~(dfa.uid.isin(dfb_uids))]
+    dfa_uids = [x for x in dfa["uid"]]
+    dfb = dfb[~(dfb.uid.isin(dfa_uids))]
     return dfa, dfb
 
 if __name__ == "__main__":
     df20 = clean20()
     df23 = clean23()
     df20, df23 = concat_dfs(df20, df23)
-    df23.to_csv(deba.data("clean/pprr_post_2020_11_06.csv"), index=False)
+    df20.to_csv(deba.data("clean/pprr_post_2020_11_06.csv"), index=False)
     df23.to_csv(deba.data("clean/pprr_post_4_26_2023.csv"), index=False)
