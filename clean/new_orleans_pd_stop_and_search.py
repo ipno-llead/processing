@@ -405,7 +405,7 @@ def clean():
         )
         .pipe(set_values, {"agency": "new-orleans-pd"})
         .pipe(clean_names, ["first_name", "last_name"])
-        .pipe(gen_uid, ["first_name", "last_name", "agendy"])
+        .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(create_tracking_id_og_col)
         .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
         .pipe(
