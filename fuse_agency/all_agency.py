@@ -229,7 +229,7 @@ def fuse_allegation():
                 pd.read_csv(deba.data("fuse_agency/com_jefferson_davis_so.csv")),
                 pd.read_csv(deba.data("fuse_agency/com_post.csv")),
                 pd.read_csv(deba.data("fuse_agency/com_east_feliciana_so.csv")),
-                 pd.read_csv(deba.data("fuse_agency/com_lasalle_so.csv")),
+                pd.read_csv(deba.data("fuse_agency/com_lasalle_so.csv")),
             ]
         )
     ).sort_values(["agency", "tracking_id"], ignore_index=True)
