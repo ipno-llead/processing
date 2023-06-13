@@ -1328,7 +1328,7 @@ def clean21():
         )
         .pipe(set_values, {"agency": "new-orleans-so"})
         .pipe(
-            gen_uid, ["agency", "first_name", "middle_name", "last_name", "employee_id"]
+            gen_uid, ["first_name", "last_name", "agency"]
         )
         .pipe(
             gen_uid,
@@ -1440,7 +1440,7 @@ def clean19():
         )
         .pipe(
             gen_uid,
-            ["agency", "employee_id", "first_name", "last_name", "middle_name"],
+            ["first_name", "last_name", "agency"],
         )
         .pipe(gen_uid, ["agency", "tracking_id", "uid"], "allegation_uid")
         .pipe(
@@ -1531,7 +1531,7 @@ def clean20():
         .pipe(float_to_int_str, ["employee_id"])
         .pipe(set_values, {"agency": "new-orleans-so"})
         .pipe(
-            gen_uid, ["agency", "first_name", "middle_name", "last_name", "employee_id"]
+            gen_uid, ["first_name", "last_name", "agency"]
         )
         .pipe(
             gen_uid,
@@ -1647,7 +1647,7 @@ def clean22():
                                          "hearing_type"])
           .pipe(set_values, {"agency": "new-orleans-so"})
           .pipe(
-            gen_uid, ["agency", "first_name", "last_name"]
+            gen_uid, ["first_name", "last_name", "agency"]
          )
           .pipe(
             gen_uid,

@@ -8,6 +8,7 @@ from lib.clean import (
     clean_dates,
 )
 from lib.columns import set_values
+import numpy as np
 
 
 def drop_rows_missing_names(df):
@@ -35,30 +36,40 @@ def split_names(df):
 
 
 def generate_history_id(df):
-    stacked_agency_sr = df[
-        [
-            "agency",
-            "agency_1",
-            "agency_2",
-            "agency_3",
-            "agency_4",
-            "agency_5",
-            "agency_6",
-            "agency_7",
-            "agency_8",
-            "agency_9",
-        ]
-    ].stack()
+    # create a copy of the dataframe to avoid modifying the original one
+    df_copy = df.copy()
 
-    stacked_agency_df = stacked_agency_sr.reset_index().iloc[:, [0, 2]]
-    stacked_agency_df.columns = ["history_id", "agency"]
+    # generate a unique id for each distinct officer
+    df_copy['history_id'] = pd.factorize(df_copy['officer_name'])[0]
 
-    names_df = df[["officer_name", "history_2"]].reset_index()
-    names_df = names_df.rename(columns={"index": "history_id"})
+    # Convert each 'agency' column into a list, if it's not already
+    for column in ["agency", "agency_1", "agency_2", "agency_3", "agency_4", 
+                   "agency_5", "agency_6", "agency_7", "agency_8", "agency_9"]:
+        df_copy[column] = df_copy[column].apply(lambda x: x if isinstance(x, list) else [x])
 
-    stacked_agency_df = stacked_agency_df.merge(names_df, on="history_id", how="right")
+    # merge all 'agency' columns into one
+    df_copy['agency_all'] = df_copy[["agency", "agency_1", "agency_2", "agency_3", "agency_4", 
+                                     "agency_5", "agency_6", "agency_7", "agency_8", "agency_9"]].values.tolist()
 
-    return stacked_agency_df[~((stacked_agency_df.agency.fillna("") == ""))]
+    # explode the 'agency_all' column to create a new row for each agency
+    df_copy = df_copy.explode('agency_all')
+
+    # drop the rows where 'agency_all' is [nan]
+    df_copy = df_copy[df_copy.agency_all.apply(lambda x: x != [np.nan])]
+
+    df_copy['agency_all'] = df_copy['agency_all'].apply(lambda x: ', '.join(x))
+
+
+    # remove the 'agency' columns as they're not needed
+    df_copy = df_copy.drop(columns=["agency", "agency_1", "agency_2", "agency_3", "agency_4", 
+                                    "agency_5", "agency_6", "agency_7", "agency_8", "agency_9"])
+
+    # rename 'agency_all' to 'agency'
+    df_copy = df_copy.rename(columns={'agency_all': 'agency'})
+
+    df_copy = pd.DataFrame(df_copy)
+
+    return df_copy
 
 
 def clean_agency_pre_split(df):
@@ -305,33 +316,6 @@ def clean_agency_2(df):
     return df
 
 
-def clean_parsed_dates(df):
-    df.loc[:, "left_date"] = (
-        df.left_date.str.replace(r"16\/2016", r"1/6/2016", regex=True)
-        .str.replace(r"(\w+)\/(\w+)\/(\w+)\/(\w+)", "", regex=True)
-        .str.replace(r"^(\w{2})\/(\w{4})$", "", regex=True)
-        .str.replace(r"^$", "", regex=True)
-    )
-    df.loc[:, "hire_date"] = df.hire_date.str.replace(
-        r"^(\w{2})\/(\w{4})$", "", regex=True
-    )
-    hire_dates = df.hire_date.str.extract(r"^(\w{1,2})\/(\w{1,2})\/(\w{4})")
-
-    df.loc[:, "hire_month"] = hire_dates[0]
-    df.loc[:, "hire_day"] = hire_dates[1]
-    df.loc[:, "hire_year"] = hire_dates[2]
-
-    left_dates = df.left_date.str.extract(r"^(\w{1,2})\/(\w{1,2})\/(\w{4})")
-    df.loc[:, "left_month"] = left_dates[0]
-    df.loc[:, "left_day"] = left_dates[1]
-    df.loc[:, "left_year"] = left_dates[2]
-
-    df = df[~((df.hire_month.fillna("") == ""))]
-    df = df[~((df.hire_day.fillna("") == ""))]
-    df = df[~((df.hire_year.fillna("") == ""))]
-    return df
-
-
 def clean_employment_status(df):
     df.loc[:, "employment_status"] = (
         df.employment_status.str.replace(r" (\w+)", r"\1", regex=True)
@@ -382,6 +366,34 @@ def split_dates(df):
     return df
 
 
+def clean_parsed_dates(df):
+    df.loc[:, "left_date"] = (
+        df.left_date.str.replace(r"16\/2016", r"1/6/2016", regex=True)
+        .str.replace(r"(\w+)\/(\w+)\/(\w+)\/(\w+)", "", regex=True)
+        .str.replace(r"^(\w{2})\/(\w{4})$", "", regex=True)
+        .str.replace(r"^$", "", regex=True)
+    )
+    df.loc[:, "hire_date"] = df.hire_date.str.replace(
+        r"^(\w{2})\/(\w{4})$", "", regex=True
+    )
+    hire_dates = df.hire_date.str.extract(r"^(\w{1,2})\/(\w{1,2})\/(\w{4})")
+
+    df.loc[:, "hire_month"] = hire_dates[0]
+    df.loc[:, "hire_day"] = hire_dates[1]
+    df.loc[:, "hire_year"] = hire_dates[2]
+
+    left_dates = df.left_date.str.extract(r"^(\w{1,2})\/(\w{1,2})\/(\w{4})")
+    df.loc[:, "left_month"] = left_dates[0]
+    df.loc[:, "left_day"] = left_dates[1]
+    df.loc[:, "left_year"] = left_dates[2]
+
+    df = df[~((df.hire_month.fillna("") == ""))]
+    df = df[~((df.hire_day.fillna("") == ""))]
+    df = df[~((df.hire_year.fillna("") == ""))]
+    return df
+
+
+
 def clean():
     dfa = pd.read_csv(deba.data("ner/advocate_post_officer_history_reports.csv"))
     dfb = pd.read_csv(deba.data("ner/post_officer_history_reports.csv"))
@@ -396,27 +408,10 @@ def clean():
                 "officer_sex": "sex",
             }
         )
+        .drop(columns=['filesha1', 'pageno', 'paragraphs', 'ocr_status', 'md5',
+       'filepath', 'fileid', 'filetype', 'file_category'])
         .pipe(clean_sexes, ["sex"])
-        .pipe(
-            gen_uid,
-            [
-                "officer_name",
-                "agency",
-                "agency_1",
-                "agency_2",
-                "agency_3",
-                "agency_4",
-                "agency_5",
-                "agency_6",
-                "agency_7",
-                "agency_8",
-                "agency_9",
-            ],
-            "history_2",
-        )
         .pipe(generate_history_id)
-        .drop(columns=["history_id"])
-        .rename(columns={"history_2": "history_id"})
         .pipe(split_names)
         .pipe(clean_agency_pre_split)
         .pipe(split_agency)
