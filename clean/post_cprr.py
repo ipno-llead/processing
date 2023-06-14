@@ -163,30 +163,38 @@ def clean23():
     return df
 
 
+def search(df):
+    df = df[df.first_name == "alvin"]
+    return df 
+
+
 def clean20():
     df = (
         pd.read_csv(deba.data("raw/post_council/post_decertifications_2016_2019.csv"))
         .pipe(clean_column_names)
         .rename(columns={"date": "decertification_date"})
         .pipe(split_name)
+        .pipe(clean_agency)
         .pipe(clean_allegations)
         .pipe(assign_action)
-        .pipe(clean_agency)
+
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(gen_uid, ["uid", "allegation", "decertification_date"], "allegation_uid")
+        .pipe(search)
     )
     return df
 
 
 def concat_dfs(dfa, dfb):
-    df = pd.concat([dfa, dfb], axis=0)
+    df = pd.concat([dfa, dfb])
+    df = df.drop_duplicates(subset=["uid"])
     return df 
 
 if __name__ == "__main__":
-    df = clean20()
+    df20 = clean20()
     df23 = clean23()
-    df = concat_dfs(df, df23)
-    df.to_csv(deba.data("clean/cprr_post_2016_2019.csv"), index=False)
+    df = concat_dfs(df20, df23)
+    df20.to_csv(deba.data("clean/cprr_post_2016_2019.csv"), index=False)
     df23.to_csv(
         deba.data("clean/cprr_post_decertifications_4_18_2023.csv"), index=False
     )
