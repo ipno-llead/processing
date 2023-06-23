@@ -341,6 +341,7 @@ def clean_uof():
                 "officer_gender": "sex",
                 "officer_age": "age",
                 "officer_years_of_service": "years_of_service",
+                "tracking_id": "tracking_id_og",
             }
         )
         .pipe(clean_weather_condition)
@@ -375,7 +376,7 @@ def clean_uof():
             "uof_uid",
         )
         .pipe(create_tracking_id_og_col)
-        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
+        .pipe(gen_uid, ["tracking_id_og", "agency"], "tracking_id")
     )
     dfb = dfa[
         [
@@ -425,7 +426,6 @@ def clean_uof():
         ]
     )
     df = pd.merge(dfa, dfb, on="uof_uid")
-    df = df.pipe(gen_uid, ["uid", "uof_uid"], "uof_uid")
     return df
 
 
@@ -619,8 +619,8 @@ def concat_dfs(uof, uof22, uof_citizen, uof_citizen_22):
     uof = pd.concat([uof, uof22], axis=0)
     uof_citizen = pd.concat([uof_citizen, uof_citizen_22], axis=0)
 
-    uof = uof.drop_duplicates(subset=["uof_uid"])
-    uof_citizen = uof_citizen.drop_duplicates(subset=["uof_uid"])
+    uof = uof.drop_duplicates(subset=["uid", "uof_uid"])
+    uof_citizen = uof_citizen.drop_duplicates(subset=["citizen_uid", "uof_uid"])
     return uof, uof_citizen
 
 

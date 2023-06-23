@@ -365,6 +365,7 @@ if __name__ == "__main__":
     post = load_for_agency(agency)
     pprr_csd = pd.read_csv(deba.data("match/pprr_new_orleans_csd_2014.csv"))
     uof = pd.read_csv(deba.data("match/uof_new_orleans_pd_2016_2022.csv"))
+    uof = uof.drop_duplicates(subset=["uof_uid"])
     uof_citizen = pd.read_csv(
         deba.data("clean/uof_citizens_new_orleans_pd_2016_2022.csv")
     )
