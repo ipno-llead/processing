@@ -426,7 +426,6 @@ def clean_uof():
         ]
     )
     df = pd.merge(dfa, dfb, on="uof_uid")
-    df = df.drop_duplicates(subset=["uid", "uof_uid"])
     return df
 
 
@@ -620,8 +619,8 @@ def concat_dfs(uof, uof22, uof_citizen, uof_citizen_22):
     uof = pd.concat([uof, uof22], axis=0)
     uof_citizen = pd.concat([uof_citizen, uof_citizen_22], axis=0)
 
-    uof = uof.drop_duplicates(subset=["uof_uid"])
-    uof_citizen = uof_citizen.drop_duplicates(subset=["uof_uid"])
+    uof = uof.drop_duplicates(subset=["uid", "uof_uid"])
+    uof_citizen = uof_citizen.drop_duplicates(subset=["citizen_uid", "uof_uid"])
     return uof, uof_citizen
 
 
