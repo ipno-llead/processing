@@ -129,7 +129,6 @@ def split_names(df):
         .str.replace(r"PAULANDREW", "PAUL ANDREW", regex=False)
         .str.strip()
         .str.extract(r"(\w+(?:'\w+)?),? ?(\w+)(?: (\w+-?\w+?))?")
-    
     )
 
     df.loc[:, "last_name"] = names[0].fillna("")
@@ -137,12 +136,20 @@ def split_names(df):
     df.loc[:, "middle_name"] = names[2].fillna("")
     df = df[df.agency.fillna("").str.contains("/")]
 
-    df.loc[(df.first_name == "E") & (df.last_name == "SANCLEMENT"), "first_name"] = "Anny"
-    df.loc[(df.first_name == "S") & (df.last_name == "BARNES-LOVE"), "first_name"] = "Kanesha"
+    df.loc[
+        (df.first_name == "E") & (df.last_name == "SANCLEMENT"), "first_name"
+    ] = "Anny"
+    df.loc[
+        (df.first_name == "S") & (df.last_name == "BARNES-LOVE"), "first_name"
+    ] = "Kanesha"
     df.loc[(df.first_name == "LE") & (df.last_name == "HALL"), "first_name"] = "Lecour"
     df.loc[(df.first_name == "CLAIR") & (df.last_name == "ST"), "first_name"] = "Brian"
-    df.loc[(df.first_name == "Brian") & (df.last_name == "ST"), "last_name"] = "St. Clair"
-    df.loc[(df.first_name == "ANNY") & (df.middle_name == "LORENA"), "last_name"] = "Sanclemente-Haynes"
+    df.loc[
+        (df.first_name == "Brian") & (df.last_name == "ST"), "last_name"
+    ] = "St. Clair"
+    df.loc[
+        (df.first_name == "ANNY") & (df.middle_name == "LORENA"), "last_name"
+    ] = "Sanclemente-Haynes"
     return df.pipe(names_to_title_case, ["first_name", "middle_name", "last_name"])[
         ~((df.first_name == "") & (df.last_name == ""))
     ].drop(columns=["officer_name"])
@@ -153,32 +160,67 @@ def generate_history_id(df):
     df_copy = df.copy()
 
     # generate a unique id for each distinct officer
-    df_copy['history_id'] = pd.factorize(df_copy['officer_name'])[0]
+    df_copy["history_id"] = pd.factorize(df_copy["officer_name"])[0]
 
     # Convert each 'agency' column into a list, if it's not already
-    for column in ["agency", "agency_1", "agency_2", "agency_3", "agency_4", 
-                   "agency_5", "agency_6", "agency_7", "agency_8", "agency_9"]:
-        df_copy[column] = df_copy[column].apply(lambda x: x if isinstance(x, list) else [x])
+    for column in [
+        "agency",
+        "agency_1",
+        "agency_2",
+        "agency_3",
+        "agency_4",
+        "agency_5",
+        "agency_6",
+        "agency_7",
+        "agency_8",
+        "agency_9",
+    ]:
+        df_copy[column] = df_copy[column].apply(
+            lambda x: x if isinstance(x, list) else [x]
+        )
 
     # merge all 'agency' columns into one
-    df_copy['agency_all'] = df_copy[["agency", "agency_1", "agency_2", "agency_3", "agency_4", 
-                                     "agency_5", "agency_6", "agency_7", "agency_8", "agency_9"]].values.tolist()
+    df_copy["agency_all"] = df_copy[
+        [
+            "agency",
+            "agency_1",
+            "agency_2",
+            "agency_3",
+            "agency_4",
+            "agency_5",
+            "agency_6",
+            "agency_7",
+            "agency_8",
+            "agency_9",
+        ]
+    ].values.tolist()
 
     # explode the 'agency_all' column to create a new row for each agency
-    df_copy = df_copy.explode('agency_all')
+    df_copy = df_copy.explode("agency_all")
 
     # drop the rows where 'agency_all' is [nan]
     df_copy = df_copy[df_copy.agency_all.apply(lambda x: x != [np.nan])]
 
-    df_copy['agency_all'] = df_copy['agency_all'].apply(lambda x: ', '.join(x))
-
+    df_copy["agency_all"] = df_copy["agency_all"].apply(lambda x: ", ".join(x))
 
     # remove the 'agency' columns as they're not needed
-    df_copy = df_copy.drop(columns=["agency", "agency_1", "agency_2", "agency_3", "agency_4", 
-                                    "agency_5", "agency_6", "agency_7", "agency_8", "agency_9"])
+    df_copy = df_copy.drop(
+        columns=[
+            "agency",
+            "agency_1",
+            "agency_2",
+            "agency_3",
+            "agency_4",
+            "agency_5",
+            "agency_6",
+            "agency_7",
+            "agency_8",
+            "agency_9",
+        ]
+    )
 
     # rename 'agency_all' to 'agency'
-    df_copy = df_copy.rename(columns={'agency_all': 'agency'})
+    df_copy = df_copy.rename(columns={"agency_all": "agency"})
 
     df_copy = pd.DataFrame(df_copy)
 
@@ -506,6 +548,15 @@ def clean_parsed_dates(df):
     return df
 
 
+def extract_hire_dates_pprr(df):
+    hire_dates = df.hire_date.str.extract(r"^(\w{1,2})\/(\w{1,2})\/(\w{4})")
+
+    df.loc[:, "hire_month"] = hire_dates[0]
+    df.loc[:, "hire_day"] = hire_dates[1]
+    df.loc[:, "hire_year"] = hire_dates[2]
+    return df
+
+
 def clean():
     dfa = pd.read_csv(deba.data("ner/advocate_post_officer_history_reports.csv"))
     dfb = pd.read_csv(deba.data("ner/post_officer_history_reports.csv"))
@@ -520,8 +571,19 @@ def clean():
                 "officer_sex": "sex",
             }
         )
-        .drop(columns=['filesha1', 'pageno', 'paragraphs', 'ocr_status', 'md5',
-       'filepath', 'fileid', 'filetype', 'file_category'])
+        .drop(
+            columns=[
+                "filesha1",
+                "pageno",
+                "paragraphs",
+                "ocr_status",
+                "md5",
+                "filepath",
+                "fileid",
+                "filetype",
+                "file_category",
+            ]
+        )
         .pipe(clean_sexes, ["sex"])
         .pipe(generate_history_id)
         .pipe(split_names)
@@ -550,6 +612,22 @@ def clean():
     return df
 
 
+def pprr_post():
+    df = (
+        pd.read_csv(deba.data("raw/post_council/pprr_post_2023_v_post_2020.csv"))
+        .pipe(standardize_desc_cols, ["hire_date"])
+        .pipe(extract_hire_dates_pprr)
+    )
+    return df
+
+
+def concat_dfs(dfa, dfb):
+    df = pd.concat([dfa, dfb])
+    return df
+
+
 if __name__ == "__main__":
-    df = clean()
+    dfa = clean()
+    dfb = pprr_post()
+    df = concat_dfs(dfa, dfb)
     df.to_csv(deba.data("clean/post_officer_history.csv"), index=False)
