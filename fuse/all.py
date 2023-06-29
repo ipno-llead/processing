@@ -40,7 +40,6 @@ if __name__ == "__main__":
     appeals_df = appeals_df[appeals_df["uid"].isin(per_df["uid"])]
     allegation_df = allegation_df[allegation_df["uid"].isin(per_df["uid"])]
     brady_df = brady_df[brady_df["uid"].isin(per_df["uid"])]
-    per_df = per_df[per_df["uid"].isin(event_df["uid"])]
  
 
     uof_df.to_csv(deba.data("fuse/use_of_force.csv"), index=False)
