@@ -67,10 +67,14 @@ def read_constraints():
     return pd.DataFrame.from_records(records)
 
 
-def read_post():
-    post = pd.read_csv(deba.data("match/post_officer_history.csv"))
+def create_person_table():
+    post = pd.read_csv(deba.data("match_history/post_officer_history.csv"))
     post = post.drop_duplicates(subset=["uid"])
     print("read post officer history file (%d rows)" % post.shape[0])
+    post = [["history_id", "uid"]]
+    post["canonical_uid"] = post["uid"]
+
+    post = post.rename(columns={"history_id": "person_id", "uid": "uids"})
     return post
 
 
@@ -280,42 +284,7 @@ def entity_resolution(
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="Match officer profiles cross-agency to produce person table"
-    )
-    parser.add_argument(
-        "person_csv",
-        type=pathlib.Path,
-        metavar="PERSON_CSV",
-        help="The previous person data",
-    )
-    parser.add_argument(
-        "--new-person-csv",
-        type=pathlib.Path,
-        metavar="NEW_PERSON_CSV",
-        default=None,
-        help="The current person data (specifying this skip the clustering)",
-    )
-    args = parser.parse_args()
-
-    old_person_df = pd.read_csv(args.person_csv)
-    if args.new_person_csv is not None:
-        new_person_df = pd.read_csv(args.new_person_csv)
-        person_df = entity_resolution(
-            old_person=old_person_df, new_person=new_person_df
-        )
-        person_df.to_csv(deba.data("fuse/person.csv"), index=False)
-    else:
-        personnel = pd.read_csv(deba.data("fuse/personnel.csv"))
-        print("read personnel file (%d x %d)" % personnel.shape)
-        events = pd.read_csv(deba.data("fuse/event.csv"))
-        print("read events file (%d x %d)" % events.shape)
-        constraints = read_constraints()
-        post = read_post()
-        clusters, personnel_event = cross_match_officers_between_agencies(
-            personnel, events, constraints, post
-        )
-        new_person_df = create_person_table(clusters, personnel, personnel_event)
-        new_person_df.to_csv(deba.data("fuse/person.csv"), index=False)
+    new_person_df = create_person_table()
+    new_person_df.to_csv(deba.data("fuse/person.csv"), index=False)
         
         
