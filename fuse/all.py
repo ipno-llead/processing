@@ -40,12 +40,6 @@ if __name__ == "__main__":
     appeals_df = appeals_df[appeals_df["uid"].isin(per_df["uid"])]
     allegation_df = allegation_df[allegation_df["uid"].isin(per_df["uid"])]
     brady_df = brady_df[brady_df["uid"].isin(per_df["uid"])]
-
-    person_df = post.copy()
-    person_df = person_df[["history_id", "uid"]]
-    person_df["canonical_uid"] = person_df["uid"]
-
-    person_df = person_df.rename(columns={"history_id": "person_id", "uid": "uids"})
  
 
     uof_df.to_csv(deba.data("fuse/use_of_force.csv"), index=False)
@@ -59,4 +53,3 @@ if __name__ == "__main__":
     documents.to_csv(deba.data("fuse/documents.csv"), index=False)
     event_df.to_csv(deba.data("fuse/event.csv"), index=False)
     per_df.to_csv(deba.data("fuse/personnel.csv"), index=False)
-    person_df.to_csv(deba.data("fuse/person.csv"), index=False)

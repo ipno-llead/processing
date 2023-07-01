@@ -527,6 +527,7 @@ schemas:
       - name: left_reason
       - name: hire_date
       - name: left_date
+      - name: switched_job
   settlement:
     columns:
       - name: settlement_uid
