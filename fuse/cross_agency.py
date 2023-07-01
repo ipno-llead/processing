@@ -21,10 +21,6 @@ import deba
 
 from lib.date import combine_date_columns
 
-common_names = [
-    "Michael Smith",
-]
-
 
 def discard_rows(
     events: pd.DataFrame, bool_index: pd.Series, desc: str, reset_index: bool = False
@@ -68,13 +64,13 @@ def read_constraints():
 
 
 def read_post():
-    post = pd.read_csv(deba.data("match/post_officer_history.csv"))
+    post = pd.read_csv(deba.data("match_history/post_officer_history.csv"))
     post = post.drop_duplicates(subset=["uid"])
     print("read post officer history file (%d rows)" % post.shape[0])
     return post
 
 
-def cross_match_officers_between_agencies(personnel, events, constraints, post):
+def cross_match_officers_between_agencies(personnel, events, constraints):
     events = discard_rows(
         events, events.uid.notna(), "events with empty uid column", reset_index=True
     )
@@ -112,15 +108,6 @@ def cross_match_officers_between_agencies(personnel, events, constraints, post):
         per, per.agency != "", "officers not linked to any event", reset_index=True
     )
 
-    per = pd.concat([per, post], axis=0)
-
-    per = discard_rows(
-        per, per.switched_job.fillna(True), "officers who have not switched jobs"
-    )
-    per = per.drop(columns=["switched_job"]).drop_duplicates(
-        subset=["uid"], keep="last"
-    )
-
     per = per.set_index("uid")
     per = per.join(constraints)
 
@@ -135,37 +122,36 @@ def cross_match_officers_between_agencies(personnel, events, constraints, post):
     # concatenate first name and last name to get a series of full names
     full_names = per.first_name.str.cat(per.last_name, sep=" ")
     # filter down the full names to only those that are common
-    common_names_sr = full_names[full_names.isin(common_names)]
+    # common_names_sr = pd.Series([x for x in full_names])
 
     excel_path = deba.data("match_history/cross_agency_officers.xlsx")
     matcher = ThresholdMatcher(
-        index=MultiIndex(
-            [
-                # or if they are in the same attract constraint
-                ColumnsIndex("attract_id", ignore_key_error=True),
-                # or if they are in the same history constraingt
-                ColumnsIndex("history_id", ignore_key_error=True),
-            ]
-        ),
-        scorer=MaxScorer(
-            [
-                # but if two officers belong to the same attract constraint then give them the highest score regardless
-                AbsoluteScorer("attract_id", 1, ignore_key_error=True),
-                AbsoluteScorer("history_id", 1, ignore_key_error=True),
-            ]
-        ),
+        index=MultiIndex([
+            ColumnsIndex(['fc', 'lc']),
+        ]),
+        scorer=MaxScorer([
+            AlterScorer(
+                # calculate similarity score (0-1) based on name similarity
+                scorer=SimSumScorer({
+                    'first_name': JaroWinklerSimilarity(),
+                    'last_name': JaroWinklerSimilarity(),
+                }),
+                # but for pairs that have the same name and their name is common
+                values=full_names,
+                # give a penalty of -.2 which is enough to eliminate them
+                alter=lambda score: score - .2,
+            ),
+        ]),
         dfa=per,
         filters=[
             # don't match officers who belong in the same agency
-            DissimilarFilter("agency"),
-            # don't match officers who are in the same repell constraint
-            DissimilarFilter("repell_id", ignore_key_error=True),
+            DissimilarFilter('agency'),
             # don't match officers who appear in overlapping time ranges
-            NonOverlappingFilter("min_timestamp", "max_timestamp"),
+            NonOverlappingFilter('min_timestamp', 'max_timestamp')
         ],
         show_progress=True,
     )
-    decision = 0.98
+    decision = 1
     with Spinner("saving matched clusters to Excel file"):
         matcher.save_clusters_to_excel(excel_path, decision, lower_bound=decision)
     clusters = matcher.get_index_clusters_within_thresholds(decision)
@@ -190,7 +176,7 @@ def split_rows_with_multiple_uids(df):
     return df
 
 
-def create_person_table(clusters, personnel, personnel_event):
+def create_person_table(clusters, personnel, personnel_event, post):
     # add back unmatched officers into clusters list
     matched_uids = frozenset().union(*[s for s in clusters])
 
@@ -225,6 +211,13 @@ def create_person_table(clusters, personnel, personnel_event):
     # join uids with comma
     person_df.loc[:, "uids"] = person_df.uids.str.join(",")
     person_df = person_df.drop_duplicates(subset=["canonical_uid", "uids"], keep="first")
+
+    post = post[["history_id", "uid"]]
+    post["canonical_uid"] = post["uid"]
+
+    post = post.rename(columns={"history_id": "person_id", "uid": "uids"})
+
+    person_df = pd.concat([post, person_df])
     return person_df[["person_id", "canonical_uid", "uids"]]
 
 
@@ -313,9 +306,9 @@ if __name__ == "__main__":
         constraints = read_constraints()
         post = read_post()
         clusters, personnel_event = cross_match_officers_between_agencies(
-            personnel, events, constraints, post
+            personnel, events, constraints
         )
-        new_person_df = create_person_table(clusters, personnel, personnel_event)
+        new_person_df = create_person_table(clusters, personnel, personnel_event, post)
         new_person_df.to_csv(deba.data("fuse/person.csv"), index=False)
         
         
