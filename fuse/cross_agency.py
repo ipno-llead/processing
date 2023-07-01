@@ -70,7 +70,7 @@ def read_post():
     return post
 
 
-def cross_match_officers_between_agencies(personnel, events, constraints, post):
+def cross_match_officers_between_agencies(personnel, events, constraints):
     events = discard_rows(
         events, events.uid.notna(), "events with empty uid column", reset_index=True
     )
@@ -108,15 +108,6 @@ def cross_match_officers_between_agencies(personnel, events, constraints, post):
         per, per.agency != "", "officers not linked to any event", reset_index=True
     )
 
-    per = pd.concat([per, post], axis=0)
-
-    per = discard_rows(
-        per, per.switched_job.fillna(True), "officers who have not switched jobs"
-    )
-    per = per.drop(columns=["switched_job"]).drop_duplicates(
-        subset=["uid"], keep="last"
-    )
-
     per = per.set_index("uid")
     per = per.join(constraints)
 
@@ -131,14 +122,12 @@ def cross_match_officers_between_agencies(personnel, events, constraints, post):
     # concatenate first name and last name to get a series of full names
     full_names = per.first_name.str.cat(per.last_name, sep=" ")
     # filter down the full names to only those that are common
-    common_names_sr = pd.Series([x for x in full_names])
+    # common_names_sr = pd.Series([x for x in full_names])
 
     excel_path = deba.data("match_history/cross_agency_officers.xlsx")
     matcher = ThresholdMatcher(
         index=MultiIndex([
             ColumnsIndex(['fc', 'lc']),
-            # or if they are in the same attract constraint
-            ColumnsIndex('history_id', ignore_key_error=True),
         ]),
         scorer=MaxScorer([
             AlterScorer(
@@ -148,12 +137,10 @@ def cross_match_officers_between_agencies(personnel, events, constraints, post):
                     'last_name': JaroWinklerSimilarity(),
                 }),
                 # but for pairs that have the same name and their name is common
-                values=common_names_sr,
+                values=full_names,
                 # give a penalty of -.2 which is enough to eliminate them
                 alter=lambda score: score - .2,
             ),
-            # but if two officers belong to the same attract constraint then give them the highest score regardless
-            AbsoluteScorer('history_id', 1, ignore_key_error=True),
         ]),
         dfa=per,
         filters=[
@@ -189,7 +176,7 @@ def split_rows_with_multiple_uids(df):
     return df
 
 
-def create_person_table(clusters, personnel, personnel_event):
+def create_person_table(clusters, personnel, personnel_event, post):
     # add back unmatched officers into clusters list
     matched_uids = frozenset().union(*[s for s in clusters])
 
@@ -319,7 +306,7 @@ if __name__ == "__main__":
         constraints = read_constraints()
         post = read_post()
         clusters, personnel_event = cross_match_officers_between_agencies(
-            personnel, events, constraints, post
+            personnel, events, constraints
         )
         new_person_df = create_person_table(clusters, personnel, personnel_event, post)
         new_person_df.to_csv(deba.data("fuse/person.csv"), index=False)
