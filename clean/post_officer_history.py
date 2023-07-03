@@ -557,6 +557,11 @@ def extract_hire_dates_pprr(df):
     return df
 
 
+def clean_hire_dates_concat(df):
+    df.loc[:, "hire_date"] = df.hire_date.str.replace(r"^nan/nan/nan$", "", regex=True)
+    return df[~((df.hire_date.fillna("") == ""))]
+
+
 def clean():
     dfa = pd.read_csv(deba.data("ner/advocate_post_officer_history_reports.csv"))
     dfb = pd.read_csv(deba.data("ner/post_officer_history_reports.csv"))
@@ -623,6 +628,7 @@ def pprr_post():
 
 def concat_dfs(dfa, dfb):
     df = pd.concat([dfa, dfb])
+    df = df.pipe(clean_hire_dates_concat)
     return df
 
 
