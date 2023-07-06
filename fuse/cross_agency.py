@@ -95,8 +95,8 @@ def cross_match_officers_between_agencies(personnel, events, constraints):
         "officers without either first name or last name",
         reset_index=True,
     )
-    per.loc[:, "fc"] = per.first_name.map(lambda x: x[:1])
-    per.loc[:, "lc"] = per.last_name.map(lambda x: x[:1])
+    per.loc[:, "fc"] = per.first_name.map(lambda x: x[:5])
+    per.loc[:, "lc"] = per.last_name.map(lambda x: x[:5])
     agency_dict = (
         events.loc[:, ["uid", "agency"]]
         .drop_duplicates()
