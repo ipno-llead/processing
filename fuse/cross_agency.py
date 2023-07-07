@@ -212,12 +212,16 @@ def create_person_table(clusters, personnel, personnel_event, post):
     person_df.loc[:, "uids"] = person_df.uids.str.join(",")
     person_df = person_df.drop_duplicates(subset=["canonical_uid", "uids"], keep="first")
 
-    post = post[["history_id", "uid"]]
-    post["canonical_uid"] = post["uid"]
+    post_df = post[["history_id", "uid"]]
+    post_df["canonical_uid"] = post_df["uid"]
 
-    post = post.rename(columns={"history_id": "person_id", "uid": "uids"})
+    post_df = post_df.rename(columns={"history_id": "person_id", "uid": "uids"})
 
-    person_df = pd.concat([post, person_df])
+    person_df = pd.concat([post_df, person_df])
+
+    post_uids = [x for x in post["history_id"]]
+
+    person_df = person_df[person_df.person_id.isin(post_uids)]
     return person_df[["person_id", "canonical_uid", "uids"]]
 
 
