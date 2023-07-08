@@ -628,7 +628,7 @@ def pprr_post():
 
 def concat_dfs(dfa, dfb):
     df = pd.concat([dfa, dfb])
-    df = df.pipe(clean_hire_dates_concat)
+    df = df.pipe(clean_hire_dates_concat).pipe(check_for_duplicate_uids)
     return df
 
 

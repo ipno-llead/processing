@@ -210,14 +210,14 @@ def create_person_table(clusters, personnel, personnel_event, post):
 
     # join uids with comma
     person_df.loc[:, "uids"] = person_df.uids.str.join(",")
+
+    post_df = post[["history_id", "uid"]]
+    post_df["canonical_uid"] = post_df["uid"]
+
+    post_df = post_df.rename(columns={"history_id": "person_id", "uid": "uids"})
+
+    person_df = pd.concat([post_df, person_df],axis=0)
     person_df = person_df.drop_duplicates(subset=["canonical_uid", "uids"], keep="first")
-
-    post = post[["history_id", "uid"]]
-    post["canonical_uid"] = post["uid"]
-
-    post = post.rename(columns={"history_id": "person_id", "uid": "uids"})
-
-    person_df = pd.concat([post, person_df])
     return person_df[["person_id", "canonical_uid", "uids"]]
 
 
