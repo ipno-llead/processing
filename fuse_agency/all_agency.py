@@ -406,7 +406,6 @@ if __name__ == "__main__":
 
     post_event_df = pd.read_csv(deba.data("fuse_agency/event_post.csv"))
     missing_agency_df = find_event_agency_if_missing_from_post(event_df, post_event_df)
-    post_event_df = post_event_df[~post_event_df["agency"].isin(event_df["agency"])]
     event_df = pd.concat([event_df, post_event_df], ignore_index=True)
     event_df.to_csv(deba.data("fuse_agency/event_pre_post.csv"), index=False)
     property_claims_df.to_csv(deba.data("fuse_agency/property_claims.csv"), index=False)
