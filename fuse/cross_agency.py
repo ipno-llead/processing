@@ -126,28 +126,34 @@ def cross_match_officers_between_agencies(personnel, events, constraints):
 
     excel_path = deba.data("match_history/cross_agency_officers.xlsx")
     matcher = ThresholdMatcher(
-        index=MultiIndex([
-            ColumnsIndex(['fc', 'lc']),
-        ]),
-        scorer=MaxScorer([
-            AlterScorer(
-                # calculate similarity score (0-1) based on name similarity
-                scorer=SimSumScorer({
-                    'first_name': JaroWinklerSimilarity(),
-                    'last_name': JaroWinklerSimilarity(),
-                }),
-                # but for pairs that have the same name and their name is common
-                values=full_names,
-                # give a penalty of -.2 which is enough to eliminate them
-                alter=lambda score: score - .2,
-            ),
-        ]),
+        index=MultiIndex(
+            [
+                ColumnsIndex(["fc", "lc"]),
+            ]
+        ),
+        scorer=MaxScorer(
+            [
+                AlterScorer(
+                    # calculate similarity score (0-1) based on name similarity
+                    scorer=SimSumScorer(
+                        {
+                            "first_name": JaroWinklerSimilarity(),
+                            "last_name": JaroWinklerSimilarity(),
+                        }
+                    ),
+                    # but for pairs that have the same name and their name is common
+                    values=full_names,
+                    # give a penalty of -.2 which is enough to eliminate them
+                    alter=lambda score: score - 0.2,
+                ),
+            ]
+        ),
         dfa=per,
         filters=[
             # don't match officers who belong in the same agency
-            DissimilarFilter('agency'),
+            DissimilarFilter("agency"),
             # don't match officers who appear in overlapping time ranges
-            NonOverlappingFilter('min_timestamp', 'max_timestamp')
+            NonOverlappingFilter("min_timestamp", "max_timestamp"),
         ],
         show_progress=True,
     )
@@ -173,6 +179,19 @@ def split_rows_with_multiple_uids(df):
         )
         .reset_index(drop=True)
     )
+    return df
+
+
+def check_for_duplicate_uids(df):
+    uids = df.groupby(["uids"])["person_id"].agg(list).reset_index()
+
+    for row in uids["person_id"]:
+        unique = all(element == row[0] for element in row)
+        if unique:
+            continue
+        else:
+            raise ValueError("uid found in multiple history ids")
+
     return df
 
 
@@ -208,7 +227,6 @@ def create_person_table(clusters, personnel, personnel_event, post):
         .drop_duplicates(subset=["person_id"], keep="first")
     )
 
-    # join uids with comma
     person_df.loc[:, "uids"] = person_df.uids.str.join(",")
 
     post_df = post[["history_id", "uid"]]
@@ -216,8 +234,10 @@ def create_person_table(clusters, personnel, personnel_event, post):
 
     post_df = post_df.rename(columns={"history_id": "person_id", "uid": "uids"})
 
-    person_df = pd.concat([post_df, person_df],axis=0)
-    person_df = person_df.drop_duplicates(subset=["canonical_uid", "uids"], keep="first")
+    person_df = pd.concat([post_df, person_df], axis=0)
+    person_df = person_df.drop_duplicates(
+        subset=["canonical_uid", "uids"], keep="first"
+    )
     return person_df[["person_id", "canonical_uid", "uids"]]
 
 
@@ -309,6 +329,5 @@ if __name__ == "__main__":
             personnel, events, constraints
         )
         new_person_df = create_person_table(clusters, personnel, personnel_event, post)
+        new_person_df = new_person_df.pipe(check_for_duplicate_uids)
         new_person_df.to_csv(deba.data("fuse/person.csv"), index=False)
-        
-        
