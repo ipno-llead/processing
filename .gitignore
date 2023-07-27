@@ -24,3 +24,6 @@ build
 *.log
 
 db.txt
+
+dvc-env/
+*.json

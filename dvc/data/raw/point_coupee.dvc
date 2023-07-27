@@ -1,0 +1,6 @@
+wdir: ../../../data/raw
+outs:
+- md5: 14f559b59dc1d20893a00d79bca37d88.dir
+  size: 555
+  nfiles: 1
+  path: point_coupee
