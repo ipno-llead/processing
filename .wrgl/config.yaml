@@ -338,6 +338,12 @@ branch:
     file: data/fuse_agency/com_lasalle_so.csv
     primaryKey:
       - allegation_uid
+  com-point-coupee-so:
+    remote: origin
+    merge: refs/heads/com-point-coupee-so
+    file: data/fuse_agency/com_point_coupee_so.csv
+    primaryKey:
+      - allegation_uid
   event:
     remote: origin
     merge: refs/heads/event
@@ -744,6 +750,12 @@ branch:
     remote: origin
     merge: refs/heads/event-lasalle-so
     file: data/fuse_agency/event_lasalle_so.csv
+    primaryKey:
+      - event_uid
+  event-point-coupee-so:
+    remote: origin
+    merge: refs/heads/event-point-coupee-so
+    file: data/fuse_agency/event_point_coupee_so.csv
     primaryKey:
       - event_uid
   per-abbeville-pd:
@@ -1182,6 +1194,12 @@ branch:
     remote: origin
     merge: refs/heads/per-lasalle-so
     file: data/fuse_agency/per_lasalle_so.csv
+    primaryKey:
+      - uid
+  per-point-coupee-so:
+    remote: origin
+    merge: refs/heads/per-point-coupee-so
+    file: data/fuse_agency/per_point_coupee_so.csv
     primaryKey:
       - uid
   uof-new-orleans-pd:
