@@ -88,6 +88,7 @@ def split_citizen_rows(df):
 def clean_tracking_id(df):
     df.loc[:, "tracking_id"] = (
         df.tracking_id.str.lower().str.strip().str.replace(r"^20", "ftn20", regex=True)
+        .str.replace(r"^asi ?", "ftn", regex=True)
     )
     return df
 
@@ -316,6 +317,11 @@ def clean_citizen_cols(df):
     return df
 
 
+def clean_tracking_id_og(df):
+    df.loc[:, "tracking_id_og"] = df.tracking_id_og.str.replace(r"(.+)2022", "ftn2022", regex=True)
+    return df 
+
+
 def clean_uof():
     dfa = (
         pd.read_csv(deba.data("raw/new_orleans_pd/new_orleans_pd_uof_2016_2021.csv"))
@@ -539,6 +545,7 @@ def clean_uof_22():
                            "reason_for_using_force": "use_of_force_reason", 
                            "officer_employee_was_injured_y_n": "officer_injured",
                            "occurred_date": "uof_occur_date"})
+          .pipe(clean_tracking_id_og)
           .pipe(clean_department_desc_22)
           .pipe(clean_disposition)
           .pipe(clean_use_of_force_description)
