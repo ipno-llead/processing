@@ -93,6 +93,7 @@ def fuse_personnel():
                 pd.read_csv(deba.data("fuse_agency/per_east_feliciana_so.csv")),
                 pd.read_csv(deba.data("fuse_agency/per_lasalle_so.csv")),
                 pd.read_csv(deba.data("fuse_agency/per_point_coupee_so.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_richland_so.csv")),
             ]
         )
     ).sort_values("uid", ignore_index=True)
@@ -171,6 +172,7 @@ def fuse_event():
                 pd.read_csv(deba.data("fuse_agency/event_east_feliciana_so.csv")),
                 pd.read_csv(deba.data("fuse_agency/event_lasalle_so.csv")),
                 pd.read_csv(deba.data("fuse_agency/event_point_coupee_so.csv")),
+                pd.read_csv(deba.data("fuse_agency/event_richland_so.csv")),
             ]
         )
     ).sort_values(["agency", "event_uid"], ignore_index=True)
@@ -233,6 +235,7 @@ def fuse_allegation():
                 pd.read_csv(deba.data("fuse_agency/com_east_feliciana_so.csv")),
                 pd.read_csv(deba.data("fuse_agency/com_lasalle_so.csv")),
                 pd.read_csv(deba.data("fuse_agency/com_point_coupee_so.csv")),
+                pd.read_csv(deba.data("fuse_agency/com_richland_so.csv")),
             ]
         )
     ).sort_values(["agency", "tracking_id"], ignore_index=True)

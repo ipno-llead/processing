@@ -1,0 +1,6 @@
+wdir: ../../../data/raw
+outs:
+- md5: 49c16f11f629be76ca524ac7971b46a1.dir
+  size: 1573
+  nfiles: 1
+  path: richland_so

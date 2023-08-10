@@ -344,6 +344,12 @@ branch:
     file: data/fuse_agency/com_point_coupee_so.csv
     primaryKey:
       - allegation_uid
+  com-richland-so:
+    remote: origin
+    merge: refs/heads/com-richland-so
+    file: data/fuse_agency/com_richland_so.csv
+    primaryKey:
+      - allegation_uid
   event:
     remote: origin
     merge: refs/heads/event
@@ -758,6 +764,12 @@ branch:
     file: data/fuse_agency/event_point_coupee_so.csv
     primaryKey:
       - event_uid
+  event-richland-so:
+    remote: origin
+    merge: refs/heads/event-richland-so
+    file: data/fuse_agency/event_richland_so.csv
+    primaryKey:
+      - event_uid
   per-abbeville-pd:
     remote: origin
     merge: refs/heads/per-abbeville-pd
@@ -1050,6 +1062,12 @@ branch:
     remote: origin
     merge: refs/heads/per-benton-pd
     file: data/fuse_agency/per_benton_pd.csv
+    primaryKey:
+      - uid
+  per-richland-so:
+    remote: origin
+    merge: refs/heads/per-richland-so
+    file: data/fuse_agency/per_richland_so.csv
     primaryKey:
       - uid
   brady-baton-rouge-da:
