@@ -20,6 +20,7 @@ from datavalid.spinner import Spinner
 import deba
 
 from lib.date import combine_date_columns
+from lib.uid import gen_uid
 
 
 def discard_rows(
@@ -64,7 +65,7 @@ def read_constraints():
 
 
 def read_post():
-    post = pd.read_csv(deba.data("match_history/post_officer_history.csv"))
+    post = pd.read_csv(deba.data("fuse/post_officer_history.csv"))
     post = post.drop_duplicates(subset=["uid"])
     print("read post officer history file (%d rows)" % post.shape[0])
     return post
@@ -182,16 +183,28 @@ def split_rows_with_multiple_uids(df):
     return df
 
 
-def check_for_duplicate_uids(df):
-    uids = df.groupby(["uids"])["person_id"].agg(list).reset_index()
+def check_for_duplicate_uids(df, csv_path="duplicates.csv"):
+    # Identify uids that are associated with multiple person_ids
+    duplicate_uids = df.groupby("uids")["person_id"].nunique()
+    duplicate_uids = duplicate_uids[duplicate_uids > 1].index.tolist()
 
-    for row in uids["person_id"]:
-        unique = all(element == row[0] for element in row)
-        if unique:
-            continue
-        else:
-            raise ValueError("uid found in multiple history ids")
+    if duplicate_uids:
+        print(
+            "Warning: The following uids are associated with more than one person_id:"
+        )
+        print(duplicate_uids)
 
+        # Convert to DataFrame and write to CSV
+        duplicate_uids_df = pd.DataFrame(duplicate_uids, columns=["uids"])
+        duplicate_uids_df.to_csv(csv_path, index=False)
+        print(f"Duplicate uids have been written to {csv_path}")
+
+        # For each duplicate UID, keep only the first person_id's rows and remove others
+        for uid in duplicate_uids:
+            person_ids_with_duplicate = df[df["uids"] == uid]["person_id"].unique()
+            # Keep the first person_id and remove others
+            for person_id in person_ids_with_duplicate[1:]:
+                df = df[~((df["person_id"] == person_id) & (df["uids"] == uid))]
     return df
 
 
@@ -224,20 +237,31 @@ def create_person_table(clusters, personnel, personnel_event, post):
         .sort_values(
             ["person_id", "max_timestamp", "agency"], ascending=[True, False, True]
         )
-        .drop_duplicates(subset=["person_id"], keep="first")
     )
 
     person_df.loc[:, "uids"] = person_df.uids.str.join(",")
 
-    post_df = post[["history_id", "uid"]]
+    post_df = post[["history_id", "uid", "agency"]]
     post_df["canonical_uid"] = post_df["uid"]
 
     post_df = post_df.rename(columns={"history_id": "person_id", "uid": "uids"})
 
-    person_df = pd.concat([post_df, person_df], axis=0)
-    person_df = person_df.drop_duplicates(
-        subset=["canonical_uid", "uids"], keep="first"
-    )
+    person_df = pd.concat([post_df, person_df])
+
+    missing_uids_sr = personnel[~(personnel["uid"].isin(person_df["uids"]))]
+
+    missing_uids_hc = [x for x in missing_uids_sr["uid"]]
+
+    if missing_uids_hc:
+        missing_df = pd.DataFrame(
+            {
+                "person_id": missing_uids_hc,
+                "canonical_uid": missing_uids_hc,
+                "uids": missing_uids_hc,
+            }
+        )
+        missing_df = missing_df.pipe(gen_uid, ["person_id"], "person_id")
+        person_df = pd.concat([person_df, missing_df])
     return person_df[["person_id", "canonical_uid", "uids"]]
 
 
@@ -329,5 +353,5 @@ if __name__ == "__main__":
             personnel, events, constraints
         )
         new_person_df = create_person_table(clusters, personnel, personnel_event, post)
-        new_person_df = new_person_df.pipe(check_for_duplicate_uids)
+        new_person_df = check_for_duplicate_uids(new_person_df)
         new_person_df.to_csv(deba.data("fuse/person.csv"), index=False)
