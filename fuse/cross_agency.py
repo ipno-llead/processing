@@ -183,7 +183,7 @@ def split_rows_with_multiple_uids(df):
     return df
 
 
-def check_for_duplicate_uids(df, personnel, csv_path="duplicates.csv"):
+def check_for_duplicate_uids(df, csv_path="duplicates.csv"):
     # Identify uids that are associated with multiple person_ids
     duplicate_uids = df.groupby("uids")["person_id"].nunique()
     duplicate_uids = duplicate_uids[duplicate_uids > 1].index.tolist()
@@ -205,21 +205,6 @@ def check_for_duplicate_uids(df, personnel, csv_path="duplicates.csv"):
             # Keep the first person_id and remove others
             for person_id in person_ids_with_duplicate[1:]:
                 df = df[~((df["person_id"] == person_id) & (df["uids"] == uid))]
-    
-    missing_uids_sr = personnel[~(personnel["uid"].isin(df["uids"]))]
-
-    missing_uids_hc = [x for x in missing_uids_sr["uid"]]
-
-    if missing_uids_hc:
-        missing_df = pd.DataFrame(
-            {
-                "person_id": missing_uids_hc,
-                "canonical_uid": missing_uids_hc,
-                "uids": missing_uids_hc,
-            }
-        )
-        missing_df = missing_df.pipe(gen_uid, ["person_id"], "person_id")
-        df = pd.concat([df, missing_df])
     return df
 
 
@@ -262,6 +247,21 @@ def create_person_table(clusters, personnel, personnel_event, post):
     post_df = post_df.rename(columns={"history_id": "person_id", "uid": "uids"})
 
     person_df = pd.concat([post_df, person_df])
+
+    missing_uids_sr = personnel[~(personnel["uid"].isin(person_df["uids"]))]
+
+    missing_uids_hc = [x for x in missing_uids_sr["uid"]]
+
+    if missing_uids_hc:
+        missing_df = pd.DataFrame(
+            {
+                "person_id": missing_uids_hc,
+                "canonical_uid": missing_uids_hc,
+                "uids": missing_uids_hc,
+            }
+        )
+        missing_df = missing_df.pipe(gen_uid, ["person_id"], "person_id")
+        person_df = pd.concat([person_df, missing_df])
     return person_df[["person_id", "canonical_uid", "uids"]]
 
 
@@ -353,5 +353,5 @@ if __name__ == "__main__":
             personnel, events, constraints
         )
         new_person_df = create_person_table(clusters, personnel, personnel_event, post)
-        new_person_df = check_for_duplicate_uids(new_person_df, personnel)
+        new_person_df = check_for_duplicate_uids(new_person_df)
         new_person_df.to_csv(deba.data("fuse/person.csv"), index=False)
