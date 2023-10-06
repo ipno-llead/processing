@@ -8,7 +8,7 @@ def clean():
     df = (
         pd.read_csv(deba.data("raw/lockport_pd/lockport_pd_cprr_2021_byhand.csv"))
         .pipe(clean_column_names)
-        .rename(columns={"notification_date": "termination_date"})\
+        .rename(columns={"notification_date": "termination_date"})
         .pipe(set_values, {"agency": "lockport-pd"})
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(

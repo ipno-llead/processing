@@ -23,7 +23,8 @@ def standardize_appealed(df):
 
 
 def split_row_with_multiple_appellant(df):
-    df = ( df.drop("appellant", axis=1)
+    df = (
+        df.drop("appellant", axis=1)
         .join(
             df["appellant"]
             .str.split("/", expand=True)
@@ -34,7 +35,8 @@ def split_row_with_multiple_appellant(df):
         )
         .reset_index(drop=True)
     )
-    df = ( df.drop("appellant", axis=1)
+    df = (
+        df.drop("appellant", axis=1)
         .join(
             df["appellant"]
             .str.split("-", expand=True)
@@ -100,7 +102,8 @@ def assign_additional_appellant_names(df):
 
 def split_rows_with_multiple_docket_no(df):
     df.loc[:, "docket_no"] = df.docket_no.str.replace(r"- ", "-", regex=False)
-    df = ( df.drop("docket_no", axis=1)
+    df = (
+        df.drop("docket_no", axis=1)
         .join(
             df["docket_no"]
             .str.split("-", expand=True)
@@ -181,8 +184,10 @@ def create_tracking_id_og_col(df):
 
 
 def clean_rows_w_multiple_dates(df):
-    df.loc[:, "filed_date"] = df.filed_date.str.replace(r"1/16/09 7/20/09", "", regex=True)
-    return df 
+    df.loc[:, "filed_date"] = df.filed_date.str.replace(
+        r"1/16/09 7/20/09", "", regex=True
+    )
+    return df
 
 
 def clean():

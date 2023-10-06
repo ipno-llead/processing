@@ -187,7 +187,9 @@ def parse_complaint_18(df):
 
 
 def parse_officer_name_18(df):
-    dep = df.officer_name.str.replace(r"^(.+)\.?, (PC?\d+) (.+)$", r"\1 # \2 # \3", regex=True).str.split(" # ", expand=True)
+    dep = df.officer_name.str.replace(
+        r"^(.+)\.?, (PC?\d+) (.+)$", r"\1 # \2 # \3", regex=True
+    ).str.split(" # ", expand=True)
     dep.columns = ["name", "department_code", "department_desc"]
     dep.loc[:, "name"] = dep["name"].str.replace(r"\.", "").str.strip().str.lower()
 
@@ -196,7 +198,9 @@ def parse_officer_name_18(df):
         .str.lower()
         .str.replace(r"\s+", " ")
         .str.replace(
-            r"^(\w+(?: (?:iii?|iv|v|jr|sr))?) (\w+)(?: (\w+|n\/a))?$", r"\1 # \2 # \3", regex=True
+            r"^(\w+(?: (?:iii?|iv|v|jr|sr))?) (\w+)(?: (\w+|n\/a))?$",
+            r"\1 # \2 # \3",
+            regex=True,
         )
         .str.split(" # ", expand=True)
     )
@@ -570,16 +574,24 @@ def clean_disposition_21(df):
 
 
 def consolidate_action_and_disposition_21(df):
-    df.loc[:, "disposition"] = (df.disposition
-                                .str.lower()
-                                .str.strip()
-                                .str.replace(r"(\*|\,|\w+\/\w+\/\w+|referred|referral|\(|; coo \(\w+\/\w+\))", "", regex=True)
-                                .str.replace(r"^\/", "", regex=True)
-                                .str.replace(r"office invest$", "office investigation", regex=True)
-                                .str.replace(r"(.+)sustained\)?$", "sustained", regex=True) 
-                                .str.replace(r"(nan|brpd)", "", regex=True)
-                                .str.replace(r"to (capt dunn|cib|capt a lee|to capt bloom by payne check with up  and\s+)", "", regex=True)
-                                .str.replace(r"sustained (.+)", "sustained", regex=True)
+    df.loc[:, "disposition"] = (
+        df.disposition.str.lower()
+        .str.strip()
+        .str.replace(
+            r"(\*|\,|\w+\/\w+\/\w+|referred|referral|\(|; coo \(\w+\/\w+\))",
+            "",
+            regex=True,
+        )
+        .str.replace(r"^\/", "", regex=True)
+        .str.replace(r"office invest$", "office investigation", regex=True)
+        .str.replace(r"(.+)sustained\)?$", "sustained", regex=True)
+        .str.replace(r"(nan|brpd)", "", regex=True)
+        .str.replace(
+            r"to (capt dunn|cib|capt a lee|to capt bloom by payne check with up  and\s+)",
+            "",
+            regex=True,
+        )
+        .str.replace(r"sustained (.+)", "sustained", regex=True)
     )
     # df.loc[:, "disposition"] = (
     #     df.disposition.str.cat(df.action, sep="|")
@@ -729,8 +741,16 @@ def clean_action_21(df):
         .str.replace(r"\bletterof\b ", "letter of ", regex=True)
         .str.replace(r"a \/letter", "letter", regex=True)
         .str.replace(r"(60-day\/|60-day$)", "60-day suspension", regex=True)
-        .str.replace(r"10-da suspensionletter of reprimandletterof caution", "10-day suspension/letter of reprimand/letter of caution", regex=False)
-        .str.replace(r"letter of reprimand8-hour driving school", "letter of reprimand/8-hour driving school", regex=False)
+        .str.replace(
+            r"10-da suspensionletter of reprimandletterof caution",
+            "10-day suspension/letter of reprimand/letter of caution",
+            regex=False,
+        )
+        .str.replace(
+            r"letter of reprimand8-hour driving school",
+            "letter of reprimand/8-hour driving school",
+            regex=False,
+        )
         .str.replace(r"90daysuspension", "90-day suspension", regex=False)
         .str.replace(r"1year suspension", "1-year", regex=False)
         .str.replace(r"suspensionextra", "suspension extra", regex=False)
@@ -1052,55 +1072,57 @@ def create_tracking_id_og_col(df):
     df.loc[:, "tracking_id_og"] = df.tracking_id
     return df
 
+
 def clean_receive_and_occur_date(df):
     df.loc[:, "receive_date"] = df.receive_date.str.replace(r"(\.|\-)", "", regex=True)
-    df.loc[:, "occur_date"] = (df.occur_date
-                               .str.replace(r"^(\.|\-)$", "", regex=True)
-                               .str.replace(r"[10]1?-?20[1013]", "", regex=True)
-                               .str.replace(r"^(0|13)$", "", regex=True)
-                               .str.replace(r"^(\w{2})-(\w{4})$", "", regex=True)
-                               .str.replace(r"(\w{4})-(\w{2})-(\w{2})", r"\2/\3/\1", regex=True)
-                               .str.replace(r"^-(\w{2})$", "", regex=True)
-                               .str.replace(r"(\w{2})(\w{1})\/(\w{1})\/(\w{4})", r"\1/\2\3/\4", regex=True)
-                               .str.replace(r"(\w{4}) \.$", r"\1", regex=True)
-                               .str.replace(r"^(\w{4})-(\w{2})$", "", regex=True)
+    df.loc[:, "occur_date"] = (
+        df.occur_date.str.replace(r"^(\.|\-)$", "", regex=True)
+        .str.replace(r"[10]1?-?20[1013]", "", regex=True)
+        .str.replace(r"^(0|13)$", "", regex=True)
+        .str.replace(r"^(\w{2})-(\w{4})$", "", regex=True)
+        .str.replace(r"(\w{4})-(\w{2})-(\w{2})", r"\2/\3/\1", regex=True)
+        .str.replace(r"^-(\w{2})$", "", regex=True)
+        .str.replace(r"(\w{2})(\w{1})\/(\w{1})\/(\w{4})", r"\1/\2\3/\4", regex=True)
+        .str.replace(r"(\w{4}) \.$", r"\1", regex=True)
+        .str.replace(r"^(\w{4})-(\w{2})$", "", regex=True)
     )
-    return df 
+    return df
+
 
 def clean_dis_18(df):
-    df.loc[:, "disposition"] = (df.disposition
-                                .str.replace(r"(-|\.)", "", regex=True)
-                                .str.replace(r"admin review", "administrative review", regex=False)
-    )
-    return df 
+    df.loc[:, "disposition"] = df.disposition.str.replace(
+        r"(-|\.)", "", regex=True
+    ).str.replace(r"admin review", "administrative review", regex=False)
+    return df
 
 
 def clean_allegation_18(df):
-    df.loc[:, "allegation"] = (df.allegation
-                               .str.lower()
-                               .str.strip()
-                               .str.replace(r"- -", "-", regex=False)
-                               .str.replace(r"(\/|-)$", "", regex=True)
-                               .str.replace(r"\((\w+)- (\w+)\)", r"(\1-\2)", regex=True)
-                               .str.replace(r"^(\w{1})\.(\w{1,3})", r"\1:\2", regex=True)
-                               .str.replace(r"comp\/submission", "completion/submission", regex=True)
-                               .str.replace(r"- (\w{1}):(\w{2})$", "", regex=True)
-                               .str.replace(r"- (\w{1,2})", r"\1", regex=True)
-                               .str.replace(r"equipment in 18", "equipment 18", regex=False)
+    df.loc[:, "allegation"] = (
+        df.allegation.str.lower()
+        .str.strip()
+        .str.replace(r"- -", "-", regex=False)
+        .str.replace(r"(\/|-)$", "", regex=True)
+        .str.replace(r"\((\w+)- (\w+)\)", r"(\1-\2)", regex=True)
+        .str.replace(r"^(\w{1})\.(\w{1,3})", r"\1:\2", regex=True)
+        .str.replace(r"comp\/submission", "completion/submission", regex=True)
+        .str.replace(r"- (\w{1}):(\w{2})$", "", regex=True)
+        .str.replace(r"- (\w{1,2})", r"\1", regex=True)
+        .str.replace(r"equipment in 18", "equipment 18", regex=False)
     )
-    return df 
+    return df
 
 
 def clean_18():
-    df = (pd.read_csv(deba.data("raw/baton_rouge_pd/cprr_baton_rouge_pd_2018.csv"))
-          .pipe(strip_leading_commas)
-          .pipe(clean_column_names)
-          .rename(
+    df = (
+        pd.read_csv(deba.data("raw/baton_rouge_pd/cprr_baton_rouge_pd_2018.csv"))
+        .pipe(strip_leading_commas)
+        .pipe(clean_column_names)
+        .rename(
             columns={
                 "status": "investigation_status",
                 "received": "receive_date",
-                }
-            )
+            }
+        )
         .pipe(parse_officer_name_18)
         .pipe(parse_complaint_18)
         .pipe(
@@ -1124,7 +1146,7 @@ def clean_18():
         .pipe(clean_allegation_18)
         .pipe(assign_agency)
         .pipe(assign_prod_year, "2020")
-        .pipe(gen_uid, ["agency", "first_name", "middle_name", "last_name"])
+        .pipe(gen_uid, ["agency", "first_name", "last_name"])
         .pipe(
             gen_uid,
             ["agency", "tracking_id", "uid", "action", "allegation"],
@@ -1348,7 +1370,7 @@ def clean09():
             ],
         )
         .pipe(set_values, {"agency": "baton-rouge-pd"})
-        .pipe(gen_uid, ["first_name", "last_name", "middle_name", "agency"])
+        .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(
             gen_uid,
             [
@@ -1366,6 +1388,16 @@ def clean09():
         )
         .drop_duplicates(subset=["allegation_uid"])
     )
+    return df
+
+
+def concat():
+    dfa = pd.read_csv(deba.data("clean/cprr_baton_rouge_pd_2004_2009.csv"))
+    dfb = pd.read_csv(deba.data("clean/cprr_baton_rouge_pd_2018.csv"))
+    dfc = pd.read_csv(deba.data("clean/cprr_baton_rouge_pd_2021.csv"))
+
+    df = pd.concat([dfa, dfb, dfc])
+    df = df.to_csv("baton_rouge.csv")
     return df
 
 

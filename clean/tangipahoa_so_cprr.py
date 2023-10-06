@@ -215,7 +215,7 @@ def drop_rows_with_allegation_disposition_action_all_empty(df):
 
 
 def clean_completion_date(df):
-    df.loc[:, "investigation_complete_date"]= (
+    df.loc[:, "investigation_complete_date"] = (
         df.completion_date.str.lower()
         .str.strip()
         .fillna("")
