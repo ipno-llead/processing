@@ -44,6 +44,8 @@ if __name__ == "__main__":
     allegation_df = allegation_df[allegation_df["uid"].isin(per_df["uid"])]
     brady_df = brady_df[brady_df["uid"].isin(per_df["uid"])]
 
+    per_df['uid'] = per_df['uid'].replace("5311da2323508727ee758ab04ec15364", "f235785072dce6e0dcf9c7583227e8fa")
+
     uof_df.to_csv(deba.data("fuse/use_of_force.csv"), index=False)
     sas_df.to_csv(deba.data("fuse/stop_and_search.csv"), index=False)
     appeals_df.to_csv(deba.data("fuse/appeals.csv"), index=False)
