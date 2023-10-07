@@ -45,6 +45,7 @@ if __name__ == "__main__":
     brady_df = brady_df[brady_df["uid"].isin(per_df["uid"])]
 
     per_df['uid'] = per_df['uid'].replace("5311da2323508727ee758ab04ec15364", "f235785072dce6e0dcf9c7583227e8fa")
+    per_df['uid'] = per_df['uid'].replace("c6a004f31bf71a5adf3430f95159d5eb", "986c705ff824c66fa0d50152f9285040")
 
     uof_df.to_csv(deba.data("fuse/use_of_force.csv"), index=False)
     sas_df.to_csv(deba.data("fuse/stop_and_search.csv"), index=False)
