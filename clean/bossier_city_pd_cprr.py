@@ -276,55 +276,88 @@ def extract_receive_date(df):
     df.loc[:, "receive_date"] = dates[0]
     return df.drop(columns=["date"])
 
+
 def extract_tracking_id(df):
-    id = df.iad_number.str.replace(r"(1|I)A-", "", regex=True).str.extract(r"(\w{1,2}-\w{1,3})")
-    
+    id = df.iad_number.str.replace(r"(1|I)A-", "", regex=True).str.extract(
+        r"(\w{1,2}-\w{1,3})"
+    )
+
     df.loc[:, "tracking_id_og"] = id[0]
     return df.drop(columns=["iad_number"])
 
+
 def split_rows_with_multiple_officers(df):
-    df.loc[:, "officer"] = (df.officer
-                            .str.replace(r":", ";", regex=False)
-                            .str.replace(r"^Stewart Jamie Easterling, J$", "", regex=True)
-                            .str.replace(r"^McGee Turner. Wheatty Provost$", "", regex=True)
-                            .str.replace(r"^Kutz Harvey Roberts$", "", regex=True)
-                            .str.replace(r"^(Unknown Officers|unk|Un?known|Communications|Patrol\, Detectives|UNKNOWN)$","", regex=True)
-                            .str.replace(r"^(\w+)\. (\w+)$", r"\1, \2", regex=True)
-                            .str.replace(r"^Warren, Thomerson Sanford$", "", regex=True)
-                            .str.replace(r"^(\w{1})\.? (\w+)$", r"\2, \1")
-                            .str.replace(r"^(\w+) (\w{1})\.$", r"\1, \2", regex=True)
-                            .str.replace(r"(\w{1})\.$", r"\1", regex=True)
-                            .str.replace(r"(\w+)\. (\w{1})$", r"\1, \2", regex=True)
-                            .str.replace(r"(.+)?Sgt(.+)?", r"Sgt \1 \2", regex=True)
-                            .str.replace(r"(\w+)\.(\w{1})", r"\1, \2", regex=True)
-                            
+    df.loc[:, "officer"] = (
+        df.officer.str.replace(r":", ";", regex=False)
+        .str.replace(r"^Stewart Jamie Easterling, J$", "", regex=True)
+        .str.replace(r"^McGee Turner. Wheatty Provost$", "", regex=True)
+        .str.replace(r"^Kutz Harvey Roberts$", "", regex=True)
+        .str.replace(
+            r"^(Unknown Officers|unk|Un?known|Communications|Patrol\, Detectives|UNKNOWN)$",
+            "",
+            regex=True,
+        )
+        .str.replace(r"^(\w+)\. (\w+)$", r"\1, \2", regex=True)
+        .str.replace(r"^Warren, Thomerson Sanford$", "", regex=True)
+        .str.replace(r"^(\w{1})\.? (\w+)$", r"\2, \1")
+        .str.replace(r"^(\w+) (\w{1})\.$", r"\1, \2", regex=True)
+        .str.replace(r"(\w{1})\.$", r"\1", regex=True)
+        .str.replace(r"(\w+)\. (\w{1})$", r"\1, \2", regex=True)
+        .str.replace(r"(.+)?Sgt(.+)?", r"Sgt \1 \2", regex=True)
+        .str.replace(r"(\w+)\.(\w{1})", r"\1, \2", regex=True)
     )
 
-    df.loc[:, "other_officers"] = (df.other_officers
-                                   .str.replace(r"(\w+) (\w{1}) \b", r"\1 \2;", regex=True)
-                                   .str.replace(r"^(\w+)\, (\w+)\, (\w+)\, (\w+)\, (\w+)\, (\w+)$", r"\1; \2; \3; \4; \5; \6", regex=True)
-                                   .str.replace(r"^(\w{1})\. (\w+)\, (\w{1})\. (\w+)$", r"\1. \2; \3. \4", regex=True)
-                                   .str.replace(r"^(\w+)\, (\w{1})\.?\, (\w+)\, (\w{1})$", r"\1 \2; \3 \4", regex=True)
-                                   .str.replace(r"(\w{1})\. (\w+)$", r"\2, \1", regex=True)
-                                   .str.replace(r"(\/|:|\.)", ";", regex=True)
-                                   .str.replace(r"^(bcpd|jail personal)", "", regex=True)
-                                   .str.replace(r"^Res ofcs Ball and Boing", "Ball; Boing", regex=True)
-                                   .str.replace(r"^Sproies E Freeman K WhenDey$", "", regex=True)
-                                   .str.replace(r"^Wood.S nan,Merriott$", "", regex=True)
-                                   .str.replace(r"^(\w+) (\w{1}) (\w+) (\w{1}) (\w+) (\w{1})$", r"\1, \2; \3, \4; \5, \6", regex=True)
-                                   .str.replace(r"^(\w+)\, (\w{1}) (\w+)\, (\w{1}) (\w+) (\w{1})$", r"\1, \2; \3, \4; \5, \6", regex=True)
-                                   .str.replace(r"(Unknown Others|SCIU|HUMPHREY, CHEATWOOD COBB|Unknown)", "", regex=True)
-                                   .str.replace(r"^McGee, Faktor, Sproles$", "", regex=True)
-                                   .str.replace(r"^(\w{1})\. (\w+)\, (\w{1})\.(\w+)\, (\w{1}) (\w+)", r"\2, \1; \4, \3; \6, \5", regex=True)
-                                   .str.replace(r"^(wamp THANTS, PROOU o. Calla|wamp THANTS, PROOU Calla, o)$", "", regex=True)
-                                   .str.replace(r"^(LIDDELL BRICE, BOOKER|S; DURR|ENGI|DSI)$", "", regex=True)
-                                   .str.replace(r"^(PROVOST SWAN C|HAMM BLOUNT NELSON)$", "", regex=True)
-                                   .str.replace(r"(.+)?Sgt(.+)?", r"Sgt \1, \2", regex=True)
-                                   .str.replace(r"^Sgt Roberts, Mitchell, Rambo, , ; Johnson, M$", "", regex=True)
-                                   .str.replace(r"^Hardesty, McDonald, Barclay$", "Hardesty; McDonald; Barclay", regex=True)
-                                   .str.replace(r"^MarC, r$", "", regex=True)
-
-                                  
+    df.loc[:, "other_officers"] = (
+        df.other_officers.str.replace(r"(\w+) (\w{1}) \b", r"\1 \2;", regex=True)
+        .str.replace(
+            r"^(\w+)\, (\w+)\, (\w+)\, (\w+)\, (\w+)\, (\w+)$",
+            r"\1; \2; \3; \4; \5; \6",
+            regex=True,
+        )
+        .str.replace(
+            r"^(\w{1})\. (\w+)\, (\w{1})\. (\w+)$", r"\1. \2; \3. \4", regex=True
+        )
+        .str.replace(
+            r"^(\w+)\, (\w{1})\.?\, (\w+)\, (\w{1})$", r"\1 \2; \3 \4", regex=True
+        )
+        .str.replace(r"(\w{1})\. (\w+)$", r"\2, \1", regex=True)
+        .str.replace(r"(\/|:|\.)", ";", regex=True)
+        .str.replace(r"^(bcpd|jail personal)", "", regex=True)
+        .str.replace(r"^Res ofcs Ball and Boing", "Ball; Boing", regex=True)
+        .str.replace(r"^Sproies E Freeman K WhenDey$", "", regex=True)
+        .str.replace(r"^Wood.S nan,Merriott$", "", regex=True)
+        .str.replace(
+            r"^(\w+) (\w{1}) (\w+) (\w{1}) (\w+) (\w{1})$",
+            r"\1, \2; \3, \4; \5, \6",
+            regex=True,
+        )
+        .str.replace(
+            r"^(\w+)\, (\w{1}) (\w+)\, (\w{1}) (\w+) (\w{1})$",
+            r"\1, \2; \3, \4; \5, \6",
+            regex=True,
+        )
+        .str.replace(
+            r"(Unknown Others|SCIU|HUMPHREY, CHEATWOOD COBB|Unknown)", "", regex=True
+        )
+        .str.replace(r"^McGee, Faktor, Sproles$", "", regex=True)
+        .str.replace(
+            r"^(\w{1})\. (\w+)\, (\w{1})\.(\w+)\, (\w{1}) (\w+)",
+            r"\2, \1; \4, \3; \6, \5",
+            regex=True,
+        )
+        .str.replace(
+            r"^(wamp THANTS, PROOU o. Calla|wamp THANTS, PROOU Calla, o)$",
+            "",
+            regex=True,
+        )
+        .str.replace(r"^(LIDDELL BRICE, BOOKER|S; DURR|ENGI|DSI)$", "", regex=True)
+        .str.replace(r"^(PROVOST SWAN C|HAMM BLOUNT NELSON)$", "", regex=True)
+        .str.replace(r"(.+)?Sgt(.+)?", r"Sgt \1, \2", regex=True)
+        .str.replace(r"^Sgt Roberts, Mitchell, Rambo, , ; Johnson, M$", "", regex=True)
+        .str.replace(
+            r"^Hardesty, McDonald, Barclay$", "Hardesty; McDonald; Barclay", regex=True
+        )
+        .str.replace(r"^MarC, r$", "", regex=True)
     )
     df = (
         df.drop("officer", axis=1)
@@ -361,22 +394,34 @@ def split_rows_with_multiple_officers(df):
 
 
 def split_names(df):
-    df.loc[:, "officer"] = (df.officer
-                            .str.replace(r"^(\w+)\, (\w+)\, (\w+)$", "", regex=True)
-                            .str.replace(r"(CID|BCPD)", "", regex=True)
-                            .str.replace(r"^ (\w+)", r"\1", regex=True)
-                            .str.replace(r"^(Aguirre\, G Estees|McWhiney\, Jones Kelly|CamMike\, p|KerrDarren\, y)$", "", regex=True)
-                            .str.replace(r"^(NELSON NUNNERY, N|SWAN WELLS, WOOD|HAMMERSLA|SOUTER, CULVER NELSON BRYANT)$", "", regex=True)
-                            .str.replace(r"^(ENGL, HAUGEN|ProvosLiddell, t|Sepulvado Taylor, Payne)$", "", regex=True)
-                            .str.replace(r"^SgGray, t$", "Sgt Gray", regex=True)
-                            .str.replace(r"^(Culver, Fuller, Sepulvado, Cole, Yetman)$", "", regex=True)
-                            .str.replace(r"^(Thompson, 2| \$)$", "", regex=True)
-                            .str.replace(r"^(\w+)\,(\w{1})$", r"\1, \2", regex=True)
-                            .str.replace(r"V\, BROWN", "BROWN, V", regex=True)
-                            .str.replace(r"^(\w{1})$", "", regex=True)
-                            .str.replace(r"^CRU$", "", regex=True)
+    df.loc[:, "officer"] = (
+        df.officer.str.replace(r"^(\w+)\, (\w+)\, (\w+)$", "", regex=True)
+        .str.replace(r"(CID|BCPD)", "", regex=True)
+        .str.replace(r"^ (\w+)", r"\1", regex=True)
+        .str.replace(
+            r"^(Aguirre\, G Estees|McWhiney\, Jones Kelly|CamMike\, p|KerrDarren\, y)$",
+            "",
+            regex=True,
+        )
+        .str.replace(
+            r"^(NELSON NUNNERY, N|SWAN WELLS, WOOD|HAMMERSLA|SOUTER, CULVER NELSON BRYANT)$",
+            "",
+            regex=True,
+        )
+        .str.replace(
+            r"^(ENGL, HAUGEN|ProvosLiddell, t|Sepulvado Taylor, Payne)$", "", regex=True
+        )
+        .str.replace(r"^SgGray, t$", "Sgt Gray", regex=True)
+        .str.replace(r"^(Culver, Fuller, Sepulvado, Cole, Yetman)$", "", regex=True)
+        .str.replace(r"^(Thompson, 2| \$)$", "", regex=True)
+        .str.replace(r"^(\w+)\,(\w{1})$", r"\1, \2", regex=True)
+        .str.replace(r"V\, BROWN", "BROWN, V", regex=True)
+        .str.replace(r"^(\w{1})$", "", regex=True)
+        .str.replace(r"^CRU$", "", regex=True)
     )
-    names = df.officer.str.lower().str.strip().str.extract(r"(sgt|pco)? ?(\w+)\,? ?(.+)?$")
+    names = (
+        df.officer.str.lower().str.strip().str.extract(r"(sgt|pco)? ?(\w+)\,? ?(.+)?$")
+    )
 
     df.loc[:, "rank_desc"] = names[0]
     df.loc[:, "last_name"] = names[1].fillna("")
@@ -385,46 +430,78 @@ def split_names(df):
 
 
 def clean_allegation10(df):
-    df.loc[:, "allegation"] = (df.type_complaint
-                               .str.lower()
-                               .str.strip()
-                               .str.replace(r"no pc\b", "professional conduct", regex=True)
-                               .str.replace(r"^(code conduct code conduct|code conduct|code to conduct)$", "code of conduct", regex=True)
-                               .str.replace(r"^(code conduct dereliction duty|dereliction duty code conduct)$", "code of conduct; dereliction of duty", regex=True)
-                               .str.replace(r"rudenes s", "rudeness", regex=False)
-                               .str.replace(r"violatioin", "violation", regex=False)
-                               .str.replace(r"(derelictio n|dereli ction)$", "dereliction of duty", regex=True)
-                               .str.replace(r"^(dereliction duty|derefiction duty|deriliction of duty|deleriction of duty)$", "dereliction of duty", regex=True)
-                               .str.replace(r"haras sment", "harrassment", regex=False)
-                               .str.replace(r"^rudeness rudeness$", "rudeness", regex=True)
-                               .str.replace(r"rude\. unprofessional", "rudeness; unprofessional", regex=True)
-                               .str.replace(r"^dereliction$", "dereliction of duty", regex=True)
-                               .str.replace(r"know & comply", "know and comply", regex=False)
-                               .str.replace(r"unprofession nal", "unprofessionnal", regex=False)
-                               .str.replace(r"(derelict on|derelicton|derelection)$", "dereliction of duty", regex=True)
-                               .str.replace(r"^veh pursuit$", "vehicle pursuit", regex=True)
-                               .str.replace(r"rud eness$", "rudeness", regex=True)
-                               .str.replace(r"^dereliction of duty towing policy$", "dereliction of duty; towing policy", regex=True)
-                               .str.replace(r"rude\, illegal detention", "rude-illegal detention", regex=True)
-                               .str.replace(r"(false arrest\/excessive force|false arrest\/exessive force|"
-                                            r"excessive force\/ false arrest|false arrest\, excessive forc)", "false arrest-excessive force", regex=True)
-                               .str.replace(r"^(excessive force\/dereliction of duty)$", "excessive force; dereliction of duty", regex=True)
-                               .str.replace(r"(.+)\/(.+)", r"\1; \2", regex=True)
-                               .str.replace(r"^dereliction;(.+)", r"dereliction of duty; \1", regex=True)
-                               .str.replace(r"in-custody", "in custody", regex=False)
-                               .str.replace(r"rude\, professional conduct", "rudeness;professional conduct", regex=True)
-                               .str.replace(r"(.+);\s+(.+)", r"\1;\2", regex=True)
-                               .str.replace(r"illegal stop and search\, professional conduct for ticket", 
-                                            "illegal stop and search; professional conduct for ticket", regex=True)
-                                .str.replace(r"standard of conduct", "standards of conduct", regex=True)
-                                .str.replace(r"unprofessionnal", "unprofessional", regex=False)
-                                .str.replace(r"excessive force\, mve", "excessive force;mve violation", regex=True)
-                                .str.replace(r"rude;", "rudeness;", regex=False)
-                                .str.replace(r"^rude$", "rudeness", regex=True)
-                                .str.replace(r"false arrest\, rudeness", "false arrest-rudeness", regex=True)
-                                .str.replace(r"incustody", "in custody", regex=False)
-                                .str.replace(r"^mve policy$", "mve violation", regex=True)
-                                
+    df.loc[:, "allegation"] = (
+        df.type_complaint.str.lower()
+        .str.strip()
+        .str.replace(r"no pc\b", "professional conduct", regex=True)
+        .str.replace(
+            r"^(code conduct code conduct|code conduct|code to conduct)$",
+            "code of conduct",
+            regex=True,
+        )
+        .str.replace(
+            r"^(code conduct dereliction duty|dereliction duty code conduct)$",
+            "code of conduct; dereliction of duty",
+            regex=True,
+        )
+        .str.replace(r"rudenes s", "rudeness", regex=False)
+        .str.replace(r"violatioin", "violation", regex=False)
+        .str.replace(r"(derelictio n|dereli ction)$", "dereliction of duty", regex=True)
+        .str.replace(
+            r"^(dereliction duty|derefiction duty|deriliction of duty|deleriction of duty)$",
+            "dereliction of duty",
+            regex=True,
+        )
+        .str.replace(r"haras sment", "harrassment", regex=False)
+        .str.replace(r"^rudeness rudeness$", "rudeness", regex=True)
+        .str.replace(r"rude\. unprofessional", "rudeness; unprofessional", regex=True)
+        .str.replace(r"^dereliction$", "dereliction of duty", regex=True)
+        .str.replace(r"know & comply", "know and comply", regex=False)
+        .str.replace(r"unprofession nal", "unprofessionnal", regex=False)
+        .str.replace(
+            r"(derelict on|derelicton|derelection)$", "dereliction of duty", regex=True
+        )
+        .str.replace(r"^veh pursuit$", "vehicle pursuit", regex=True)
+        .str.replace(r"rud eness$", "rudeness", regex=True)
+        .str.replace(
+            r"^dereliction of duty towing policy$",
+            "dereliction of duty; towing policy",
+            regex=True,
+        )
+        .str.replace(r"rude\, illegal detention", "rude-illegal detention", regex=True)
+        .str.replace(
+            r"(false arrest\/excessive force|false arrest\/exessive force|"
+            r"excessive force\/ false arrest|false arrest\, excessive forc)",
+            "false arrest-excessive force",
+            regex=True,
+        )
+        .str.replace(
+            r"^(excessive force\/dereliction of duty)$",
+            "excessive force; dereliction of duty",
+            regex=True,
+        )
+        .str.replace(r"(.+)\/(.+)", r"\1; \2", regex=True)
+        .str.replace(r"^dereliction;(.+)", r"dereliction of duty; \1", regex=True)
+        .str.replace(r"in-custody", "in custody", regex=False)
+        .str.replace(
+            r"rude\, professional conduct", "rudeness;professional conduct", regex=True
+        )
+        .str.replace(r"(.+);\s+(.+)", r"\1;\2", regex=True)
+        .str.replace(
+            r"illegal stop and search\, professional conduct for ticket",
+            "illegal stop and search; professional conduct for ticket",
+            regex=True,
+        )
+        .str.replace(r"standard of conduct", "standards of conduct", regex=True)
+        .str.replace(r"unprofessionnal", "unprofessional", regex=False)
+        .str.replace(
+            r"excessive force\, mve", "excessive force;mve violation", regex=True
+        )
+        .str.replace(r"rude;", "rudeness;", regex=False)
+        .str.replace(r"^rude$", "rudeness", regex=True)
+        .str.replace(r"false arrest\, rudeness", "false arrest-rudeness", regex=True)
+        .str.replace(r"incustody", "in custody", regex=False)
+        .str.replace(r"^mve policy$", "mve violation", regex=True)
     )
     return df[~(df.allegation.fillna("") == "")].drop(columns=["type_complaint"])
 
@@ -446,86 +523,121 @@ def split_rows_with_multiple_allegations_10(df):
 
 
 def extract_disposition(df):
-    dis = df.disposition.str.lower().str.strip().str.extract(r"^(not sustained|sustained|unfounded|exonerated)$")
+    dis = (
+        df.disposition.str.lower()
+        .str.strip()
+        .str.extract(r"^(not sustained|sustained|unfounded|exonerated)$")
+    )
 
     df.loc[:, "disposition"] = dis[0]
     return df
 
 
 def extract_action(df):
-    action = (df.action_taken
-              .str.lower()
-              .str.strip()
-              .str.extract(r"^(termination|letter of reprimand|"
-                           r"verbal counsel|resigned|1 day without pay"
-                           r"|lor|ofc resigned|officer resigned"
-                           r"|demotion|officer retired|1 day suspension|counseled|resigned"
-                           r"3 day suspension|(\w{1,2}) days? suspension)$")) 
-    df.loc[:, "action"] = (action[0]
-                           .str.replace(r"^lor$", "letter of reprimand", regex=True)
-                           .str.replace(r"^(\w{1,2}) days? suspension", r"\1-day suspension", regex=True)
-                           .str.replace(r"^(\w+) resigned", r"resigned", regex=True)
-                           .str.replace(r"(\w+) retired", "retired", regex=True)
+    action = (
+        df.action_taken.str.lower()
+        .str.strip()
+        .str.extract(
+            r"^(termination|letter of reprimand|"
+            r"verbal counsel|resigned|1 day without pay"
+            r"|lor|ofc resigned|officer resigned"
+            r"|demotion|officer retired|1 day suspension|counseled|resigned"
+            r"3 day suspension|(\w{1,2}) days? suspension)$"
+        )
+    )
+    df.loc[:, "action"] = (
+        action[0]
+        .str.replace(r"^lor$", "letter of reprimand", regex=True)
+        .str.replace(r"^(\w{1,2}) days? suspension", r"\1-day suspension", regex=True)
+        .str.replace(r"^(\w+) resigned", r"resigned", regex=True)
+        .str.replace(r"(\w+) retired", "retired", regex=True)
     )
     return df.drop(columns=["action_taken"])
 
 
 def clean_investigator_10(df):
-    investigators = (df.investigator
-                     .str.lower()
-                     .str.strip()
-                     .str.replace(r"^(na|none|declined investigation|declined|\/)$", "", regex=True)
-                     .str.extract(r"^(sgt|lt|capt|chief)?\.? ?(?:(\w+\.?) )? ?(\w+)$")
+    investigators = (
+        df.investigator.str.lower()
+        .str.strip()
+        .str.replace(r"^(na|none|declined investigation|declined|\/)$", "", regex=True)
+        .str.extract(r"^(sgt|lt|capt|chief)?\.? ?(?:(\w+\.?) )? ?(\w+)$")
     )
-    df.loc[:, "investigator_rank_desc"] = (investigators[0]
-                                           .str.replace(r"sgt", "sergeant", regex=False)
-                                           .str.replace(r"lt", "lieutenant", regex=False)
-                                           .str.replace(r"capt", "captain", regex=False)
+    df.loc[:, "investigator_rank_desc"] = (
+        investigators[0]
+        .str.replace(r"sgt", "sergeant", regex=False)
+        .str.replace(r"lt", "lieutenant", regex=False)
+        .str.replace(r"capt", "captain", regex=False)
     )
-    df.loc[:, "investigator_first_name"] = investigators[1].str.replace(r"(^j[32m]|\.)", "", regex=True)
+    df.loc[:, "investigator_first_name"] = investigators[1].str.replace(
+        r"(^j[32m]|\.)", "", regex=True
+    )
     df.loc[:, "investigator_last_name"] = investigators[2]
     return df.drop(columns=["investigator"])
 
 
 def fix_dates(df):
-    df.loc[:, "investigation_start_date"] = (df.investigation_start_date
-                                             .str.replace(r"(\w{2})$", r"20\1", regex=True)
-                                             .str.replace(r"(.+)\s+(.+)", "", regex=True)
-                                             .str.replace(r"^00\/(.+)", "", regex=True)
+    df.loc[:, "investigation_start_date"] = (
+        df.investigation_start_date.str.replace(r"(\w{2})$", r"20\1", regex=True)
+        .str.replace(r"(.+)\s+(.+)", "", regex=True)
+        .str.replace(r"^00\/(.+)", "", regex=True)
     )
-    df.loc[:, "investigation_complete_date"] = (df.investigation_complete_date
-                                                .str.replace(r"(\w{2})$", r"20\1", regex=True)
-                                                .str.replace(r"(.+)\s+(.+)", "", regex=True)
-                                                .str.replace(r"^00\/(.+)", "", regex=True)
-                                                .str.replace(r"^0$", "", regex=True)
+    df.loc[:, "investigation_complete_date"] = (
+        df.investigation_complete_date.str.replace(r"(\w{2})$", r"20\1", regex=True)
+        .str.replace(r"(.+)\s+(.+)", "", regex=True)
+        .str.replace(r"^00\/(.+)", "", regex=True)
+        .str.replace(r"^0$", "", regex=True)
     )
-    return df 
+    return df
 
 
 def clean():
-    df = (pd.read_csv(deba.data("raw/bossier_city_pd/bossier_city_pd_cprr_2010_2020.csv"))
-          .pipe(clean_column_names)
-          .drop(columns=["classification", "comp_name", "comp_phone"])
-          .rename(columns={"synopsis": "allegation_desc", "date_assigned": "investigation_start_date", 
-                           "date_returned": "investigation_complete_date"})
-          .pipe(strip_leading_comma)
-          .pipe(extract_receive_date)
-          .pipe(extract_tracking_id)
-          .pipe(split_rows_with_multiple_officers)
-          .pipe(split_names)
-          .pipe(clean_allegation10)
-          .pipe(split_rows_with_multiple_allegations_10)
-          .pipe(extract_disposition)
-          .pipe(extract_action)
-          .pipe(clean_investigator_10)
-          .pipe(fix_dates)
-          .pipe(clean_dates, ["receive_date", "investigation_start_date", "investigation_complete_date"])
-          .pipe(standardize_desc_cols, ["allegation_desc"])
-          .pipe(set_values,  {"agency": "bossier-city-pd"} )
-          .pipe(gen_uid, ["tracking_id_og", "agency"], "tracking_id")
-          .pipe(gen_uid, ["first_name", "last_name", "agency"])
-          .pipe(gen_uid, ["allegation", "allegation_desc", "disposition", "uid", "receive_day", "investigation_complete_day"], "allegation_uid")
-          .pipe(gen_uid, ["investigator_first_name", "investigator_last_name", "agency"], "investigator_uid")
+    df = (
+        pd.read_csv(deba.data("raw/bossier_city_pd/bossier_city_pd_cprr_2010_2020.csv"))
+        .pipe(clean_column_names)
+        .drop(columns=["classification", "comp_name", "comp_phone"])
+        .rename(
+            columns={
+                "synopsis": "allegation_desc",
+                "date_assigned": "investigation_start_date",
+                "date_returned": "investigation_complete_date",
+            }
+        )
+        .pipe(strip_leading_comma)
+        .pipe(extract_receive_date)
+        .pipe(extract_tracking_id)
+        .pipe(split_rows_with_multiple_officers)
+        .pipe(split_names)
+        .pipe(clean_allegation10)
+        .pipe(split_rows_with_multiple_allegations_10)
+        .pipe(extract_disposition)
+        .pipe(extract_action)
+        .pipe(clean_investigator_10)
+        .pipe(fix_dates)
+        .pipe(
+            clean_dates,
+            ["receive_date", "investigation_start_date", "investigation_complete_date"],
+        )
+        .pipe(standardize_desc_cols, ["allegation_desc"])
+        .pipe(set_values, {"agency": "bossier-city-pd"})
+        .pipe(gen_uid, ["tracking_id_og", "agency"], "tracking_id")
+        .pipe(gen_uid, ["first_name", "last_name", "agency"])
+        .pipe(
+            gen_uid,
+            [
+                "allegation",
+                "allegation_desc",
+                "disposition",
+                "uid",
+                "receive_day",
+                "investigation_complete_day",
+            ],
+            "allegation_uid",
+        )
+        .pipe(
+            gen_uid,
+            ["investigator_first_name", "investigator_last_name", "agency"],
+            "investigator_uid",
+        )
     )
     return df.drop_duplicates(subset=["allegation_uid"])
 

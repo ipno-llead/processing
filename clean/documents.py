@@ -4,7 +4,7 @@ import deba
 
 def clean():
     df = pd.read_csv(deba.data("raw/documents/documents.csv"))
-    return df 
+    return df
 
 
 if __name__ == "__main__":

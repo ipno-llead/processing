@@ -150,10 +150,13 @@ def create_tracking_id_og_col(df):
 
 
 def clean_receive_and_occur_dates(df):
-    df.loc[:, "receive_date"] = df.receive_date.str.replace(r"(\w{2})$", r"20\1", regex=True)
-    df.loc[:, "occur_date"] = df.occur_date.str.replace(r"(\w{2})$", r"20\1", regex=True).str.replace(r"(.+)\n(.+)", "", regex=True)
-    return df 
-
+    df.loc[:, "receive_date"] = df.receive_date.str.replace(
+        r"(\w{2})$", r"20\1", regex=True
+    )
+    df.loc[:, "occur_date"] = df.occur_date.str.replace(
+        r"(\w{2})$", r"20\1", regex=True
+    ).str.replace(r"(.+)\n(.+)", "", regex=True)
+    return df
 
 
 def clean19():
