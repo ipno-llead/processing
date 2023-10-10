@@ -13,7 +13,11 @@ def clean():
         .pipe(standardize_desc_cols, ["allegation", "disposition"])
         .pipe(set_values, {"agency": "richland-so"})
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
-        .pipe(gen_uid, ["uid", "allegation", "investigation_start_date", "disposition"], "allegation_uid")
+        .pipe(
+            gen_uid,
+            ["uid", "allegation", "investigation_start_date", "disposition"],
+            "allegation_uid",
+        )
     )
     return df
 

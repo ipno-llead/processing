@@ -24,9 +24,13 @@ def standardize_employment_status(df):
 
 
 def fix_typo(df):
-    df.loc[:, "rank_desc"] = df.rank_desc.str.lower().str.strip().str.replace(r"^t ", "").str.replace(
-        r"offtcer", "officer"
-    ).str.replace(r" ?o?f? ?police", "", regex=True)
+    df.loc[:, "rank_desc"] = (
+        df.rank_desc.str.lower()
+        .str.strip()
+        .str.replace(r"^t ", "")
+        .str.replace(r"offtcer", "officer")
+        .str.replace(r" ?o?f? ?police", "", regex=True)
+    )
     return df
 
 

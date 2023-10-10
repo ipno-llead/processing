@@ -123,7 +123,7 @@ def clean_investigator(df):
 def create_tracking_id_og_col(df):
     df.loc[:, "tracking_id_og"] = df.tracking_id
     return df
-    
+
 
 def clean():
     df = (

@@ -8,7 +8,8 @@ from lib.uid import gen_uid
 def clean():
     df = (
         pd.read_csv(
-            deba.data("raw/jefferson_davis_so/jefferson_davis_so_2013_2022_byhand.csv"), encoding="ISO-8859-1"
+            deba.data("raw/jefferson_davis_so/jefferson_davis_so_2013_2022_byhand.csv"),
+            encoding="ISO-8859-1",
         )
         .pipe(clean_column_names)
         .pipe(standardize_desc_cols, ["allegation", "allegation_desc"])
