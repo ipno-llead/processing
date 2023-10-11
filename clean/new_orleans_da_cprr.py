@@ -180,8 +180,8 @@ def clean_work_shift(df):
 
 
 def clean_allegation_sub_desc(df):
-    df.loc[:, "allegation_sub_desc"] = (
-        df.allegation_sub_desc.str.lower()
+    df.loc[:, "allegation_desc"] = (
+        df.allegation_desc.str.lower()
         .str.strip()
         .fillna("")
         .str.replace(r"(.+)\((\w+)\)", r"\1 (\2)", regex=True)
@@ -211,7 +211,7 @@ def clean():
                 "date_complaint_received_by_nopd_pib": "receive_date",
                 "date_complaint_investigation_complete": "investigation_complete_date",
                 "working_status_of_complainant": "employment_status",
-                "relevant_policy": "allegation_sub_desc",
+                "relevant_policy": "allegation_desc",
                 "officer_firstname": "first_name",
                 "officer_lastname": "last_name",
                 "officer_race_ethnicity": "race",
@@ -256,7 +256,7 @@ def clean():
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(
             gen_uid,
-            ["allegation", "allegation_sub_desc", "disposition", "tracking_id", "uid"],
+            ["allegation", "tracking_id", "uid"],
             "allegation_uid",
         )
         .drop(

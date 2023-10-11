@@ -433,7 +433,7 @@ def clean():
         .pipe(gen_uid, ["tracking_id_og", "agency"], "tracking_id")
         .pipe(
             gen_uid,
-            ["agency", "tracking_id", "officer_primary_key", "allegation"],
+            ["tracking_id", "officer_primary_key", "allegation"],
             "allegation_uid",
         )
         .pipe(
