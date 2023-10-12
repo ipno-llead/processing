@@ -65,7 +65,7 @@ def clean():
         .pipe(split_names)
         .pipe(clean_names, ["last_name", "first_name", "middle_name"])
         .pipe(set_values, {"data_production_year": "2021", "agency": "baton-rouge-pd"})
-        .pipe(gen_uid, ["agency", "first_name", "last_name"])
+        .pipe(gen_uid, ["agency", "first_name", "middle_name", "last_name"])
     )
 
 

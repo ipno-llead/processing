@@ -1146,7 +1146,7 @@ def clean_18():
         .pipe(clean_allegation_18)
         .pipe(assign_agency)
         .pipe(assign_prod_year, "2020")
-        .pipe(gen_uid, ["agency", "first_name", "last_name"])
+        .pipe(gen_uid, ["agency", "first_name", "middle_name", "last_name"])
         .pipe(
             gen_uid,
             ["agency", "tracking_id", "uid", "action", "allegation"],
@@ -1370,7 +1370,7 @@ def clean09():
             ],
         )
         .pipe(set_values, {"agency": "baton-rouge-pd"})
-        .pipe(gen_uid, ["first_name", "last_name", "agency"])
+        .pipe(gen_uid, ["first_name", "last_name", "middle_name", "agency"])
         .pipe(
             gen_uid,
             [
