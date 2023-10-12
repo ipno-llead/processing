@@ -532,6 +532,7 @@ def drop_rows_missing_dates(df):
     df = df[~((df.investigation_complete_date.fillna("") == ""))]
     return df
 
+
 def clean20():
     df = (
         pd.read_csv(deba.data("raw/rayne_pd/rayne_pd_cprr_2019_2020.csv"))
@@ -637,7 +638,7 @@ def clean13():
                 "action",
                 "uid",
                 "receive_date",
-                "investigation_complete_date"
+                "investigation_complete_date",
             ],
             "allegation_uid",
         )

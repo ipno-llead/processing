@@ -317,10 +317,10 @@ def clean_investigating_department(df):
 
 
 def clean_disposition(df):
-    df.loc[:, "disposition"] = (df.disposition.str.lower()
-                                              .str.replace(r"nfim", "no further investigation merited", regex=False)
+    df.loc[:, "disposition"] = df.disposition.str.lower().str.replace(
+        r"nfim", "no further investigation merited", regex=False
     )
-    return df 
+    return df
 
 
 def clean():
@@ -433,7 +433,7 @@ def clean():
         .pipe(gen_uid, ["tracking_id_og", "agency"], "tracking_id")
         .pipe(
             gen_uid,
-            ["agency", "tracking_id", "officer_primary_key", "allegation"],
+            ["tracking_id", "officer_primary_key", "allegation"],
             "allegation_uid",
         )
         .pipe(

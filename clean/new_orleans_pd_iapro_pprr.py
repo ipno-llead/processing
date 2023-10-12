@@ -196,9 +196,7 @@ def clean():
         .pipe(clean_department_desc)
         .pipe(assign_agency)
         .pipe(clean_names, ["first_name", "last_name"])
-        .pipe(
-            gen_uid, ["first_name", "last_name", "agency"]
-        )
+        .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(strip_time_from_dates, ["hire_date", "left_date", "dept_date"])
         .pipe(clean_dates, ["hire_date", "left_date", "dept_date"])
         .pipe(clean_names, ["first_name", "middle_name", "last_name"])

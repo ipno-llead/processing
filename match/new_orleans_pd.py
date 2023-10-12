@@ -520,6 +520,39 @@ def match_pprr_iapro_to_pprr(pprr_iapro, pprr):
     return pprr_iapro
 
 
+def match_cprr23_to_pprr(cprr, pprr):
+    dfa = cprr[["uid", "first_name", "last_name"]]
+    dfa.loc[:, "fc"] = dfa.first_name.fillna("").map(lambda x: x[:1])
+    dfa.loc[:, "lc"] = dfa.last_name.fillna("").map(lambda x: x[:1])
+    dfa = dfa.drop_duplicates(subset=["uid"]).set_index("uid")
+
+    dfb = pprr[["uid", "first_name", "last_name"]]
+    dfb.loc[:, "fc"] = dfb.first_name.fillna("").map(lambda x: x[:1])
+    dfb.loc[:, "lc"] = dfb.last_name.fillna("").map(lambda x: x[:1])
+    dfb = dfb.drop_duplicates(subset=["uid"]).set_index("uid")
+
+    matcher = ThresholdMatcher(
+        ColumnsIndex(["fc", "lc"]),
+        {
+            "first_name": JaroWinklerSimilarity(),
+            "last_name": JaroWinklerSimilarity(),
+        },
+        dfa,
+        dfb,
+        show_progress=True,
+    )
+    decision = 0.772
+
+    matcher.save_pairs_to_excel(
+        deba.data("match/pprr_cprr_v_pprr_new_orleans_pd_2020.xlsx"),
+        decision,
+    )
+    matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
+    match_dict = dict(matches)
+
+    cprr.loc[:, "uid"] = cprr.uid.map(lambda x: match_dict.get(x, x))
+    return cprr
+
 if __name__ == "__main__":
     pprr_iapro = pd.read_csv(deba.data("clean/pprr_new_orleans_pd_1946_2018.csv"))
     pprr = pd.read_csv(deba.data("clean/pprr_new_orleans_pd_2020.csv"))
@@ -537,6 +570,8 @@ if __name__ == "__main__":
         deba.data("clean/pprr_seps_new_orleans_pd_2018_2022.csv")
     )
     pr = pd.read_csv(deba.data("clean/pr_new_orleans_pd_2010_2022.csv"))
+    cprr23 = pd.read_csv(deba.data("clean/cprr_new_orleans_pd_2021_2023.csv"))
+    cprr23 = match_cprr23_to_pprr(cprr, pprr)
     pr = deduplicate_pr_officers(pr)
     pprr_iapro = deduplicate_pprr_iapro(pprr_iapro)
     pprr_iapro = match_pprr_iapro_to_pprr(pprr_iapro, pprr)
@@ -572,3 +607,4 @@ if __name__ == "__main__":
     # )
     pr.to_csv(deba.data("match/pr_new_orleans_pd_2010_2022.csv"))
     pprr_iapro.to_csv(deba.data("match/pprr_new_orleans_pd_1946_2018.csv"), index=False)
+    cprr23.to_csv(deba.data("match/cprr_new_orleans_pd_2021_2023.csv"), index=False)
