@@ -56,8 +56,8 @@ def clean():
         .pipe(clean_column_names)
         .rename(
             columns={
-                "rank": "rank_desc",
                 "badge": "badge_no",
+                "rank": "rank_desc",
             }
         )
         .pipe(replace_rank)

@@ -1106,8 +1106,8 @@ def clean_18():
         .pipe(
             standardize_desc_cols,
             [
-                "department_desc",
                 "action",
+                "department_desc",
                 "disposition",
                 "rule_violation",
                 "paragraph_violation",

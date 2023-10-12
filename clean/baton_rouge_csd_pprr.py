@@ -155,8 +155,8 @@ def clean_19():
     df = (
         df[
             [
-                "year",
                 "last_name",
+                "year",
                 "first_name",
                 "middle_init",
                 "pay_location_code",
