@@ -215,9 +215,19 @@ def clean():
         ]
     ]
     dfb = df[["uof_uid", "citizen_age", "citizen_sex", "citizen_race", "agency"]]
-    dfb = dfb.pipe(gen_uid, ["uof_uid", "citizen_age", "citizen_sex", "citizen_race", "agency"], "citizen_uid")
-    
-    df = df.drop(columns=["citizen_age", "citizen_sex", "citizen_race",])
+    dfb = dfb.pipe(
+        gen_uid,
+        ["uof_uid", "citizen_age", "citizen_sex", "citizen_race", "agency"],
+        "citizen_uid",
+    )
+
+    df = df.drop(
+        columns=[
+            "citizen_age",
+            "citizen_sex",
+            "citizen_race",
+        ]
+    )
     return dfa, dfb
 
 

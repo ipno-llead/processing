@@ -301,33 +301,81 @@ def create_tracking_id_og_col(df):
 
 
 def split_names22(df):
-    names = df.officer_name.str.lower().str.strip().str.extract(r"^(\w+-?\w+?) ?(\w{1})?\.? (.+)")
+    names = (
+        df.officer_name.str.lower()
+        .str.strip()
+        .str.extract(r"^(\w+-?\w+?) ?(\w{1})?\.? (.+)")
+    )
 
-    df.loc[:, 'first_name'] = names[0]
+    df.loc[:, "first_name"] = names[0]
     df.loc[:, "middle_name"] = names[1]
     df.loc[:, "last_name"] = names[2]
     return df.drop(columns=["officer_name"])
 
 
 def extract_action_cols(df):
-    stop_results = df.actionstaken.str.lower().str.strip().str.extract(r"(stop results: \w+ ?\w+? \w+?;?s?t?o?p? ?r?e?s?u?l?t?s?:? ?\w+? ?\w+? ?\w+?);(subject)")
-    sub_type = df.actionstaken.str.lower().str.strip().str.extract(r"(subject type: \w+ ?\w+? ?\w+?)")
-    search_occ = df.actionstaken.str.lower().str.strip().str.extract(r"(search occurred: \w+)")
-    evidence_seized = df.actionstaken.str.lower().str.strip().str.extract(r"(evidence seized: \w+)")
-    legal_basis = df.actionstaken.str.lower().str.strip().str.extract(r"(legal basises: \w+ ?\w+ ?\w+?);(consent)")
-    consent = df.actionstaken.str.lower().str.strip().str.extract(r"(consent form completed: \w+)")
-    strip = df.actionstaken.str.lower().str.strip().str.extract(r"(stripbody cavity search: \w+ ?\w+?)")
+    stop_results = (
+        df.actionstaken.str.lower()
+        .str.strip()
+        .str.extract(
+            r"(stop results: \w+ ?\w+? \w+?;?s?t?o?p? ?r?e?s?u?l?t?s?:? ?\w+? ?\w+? ?\w+?);(subject)"
+        )
+    )
+    sub_type = (
+        df.actionstaken.str.lower()
+        .str.strip()
+        .str.extract(r"(subject type: \w+ ?\w+? ?\w+?)")
+    )
+    search_occ = (
+        df.actionstaken.str.lower().str.strip().str.extract(r"(search occurred: \w+)")
+    )
+    evidence_seized = (
+        df.actionstaken.str.lower().str.strip().str.extract(r"(evidence seized: \w+)")
+    )
+    legal_basis = (
+        df.actionstaken.str.lower()
+        .str.strip()
+        .str.extract(r"(legal basises: \w+ ?\w+ ?\w+?);(consent)")
+    )
+    consent = (
+        df.actionstaken.str.lower()
+        .str.strip()
+        .str.extract(r"(consent form completed: \w+)")
+    )
+    strip = (
+        df.actionstaken.str.lower()
+        .str.strip()
+        .str.extract(r"(stripbody cavity search: \w+ ?\w+?)")
+    )
 
-    df.loc[:, "stop_results"] = stop_results[0].str.replace(r"^(stop)(.+);.+", r"\2", regex=True).str.replace(r"^ ?results.+", "", regex=True)\
-                                               .str.replace(r"stop results: ", "", regex=False)
-    
-    df.loc[:, "citizen_type"] = sub_type[0].str.replace(r"subject type: ", "", regex=False)
-    df.loc[:, "search_occurred"] = search_occ[0].str.replace(r"search occurred: ", "", regex=False)
-    df.loc[:, "evidence_seized"] = evidence_seized[0].str.replace(r"evidence seized: ", "", regex=False)
-    df.loc[:, "legal_basis"] = legal_basis[0].str.replace(r"legal basises: ", "", regex=False)
-    df.loc[::, "consent_to_search"] = consent[0].str.replace(r"n$", "no", regex=True).str.replace(r"consent form completed: ", "", regex=False)
-    df.loc[:, "strip_body_cavity_search"] = strip[0].str.replace(r"stripbody cavity search: ", "", regex=False)
-    return df.drop(columns=["actionstaken"]) 
+    df.loc[:, "stop_results"] = (
+        stop_results[0]
+        .str.replace(r"^(stop)(.+);.+", r"\2", regex=True)
+        .str.replace(r"^ ?results.+", "", regex=True)
+        .str.replace(r"stop results: ", "", regex=False)
+    )
+
+    df.loc[:, "citizen_type"] = sub_type[0].str.replace(
+        r"subject type: ", "", regex=False
+    )
+    df.loc[:, "search_occurred"] = search_occ[0].str.replace(
+        r"search occurred: ", "", regex=False
+    )
+    df.loc[:, "evidence_seized"] = evidence_seized[0].str.replace(
+        r"evidence seized: ", "", regex=False
+    )
+    df.loc[:, "legal_basis"] = legal_basis[0].str.replace(
+        r"legal basises: ", "", regex=False
+    )
+    df.loc[::, "consent_to_search"] = (
+        consent[0]
+        .str.replace(r"n$", "no", regex=True)
+        .str.replace(r"consent form completed: ", "", regex=False)
+    )
+    df.loc[:, "strip_body_cavity_search"] = strip[0].str.replace(
+        r"stripbody cavity search: ", "", regex=False
+    )
+    return df.drop(columns=["actionstaken"])
 
 
 def clean():
@@ -470,52 +518,96 @@ def clean():
 def concat_dfs(df):
     df = df.rename(columns={"23_2141_officersnames_id": "officernames_id"})
     dfa = df.copy()
-    dfa = dfa.drop(columns=["officer2name", "officer2badgenumber"]).rename(columns={"officer1name": "officer_name", "officer1badgenumber": "officer_badgenumber"})
+    dfa = dfa.drop(columns=["officer2name", "officer2badgenumber"]).rename(
+        columns={
+            "officer1name": "officer_name",
+            "officer1badgenumber": "officer_badgenumber",
+        }
+    )
 
     dfb = df.copy()
-    dfb = dfb.drop(columns=["officer1name", "officer1badgenumber"]).rename(columns={"officer2name": "officer_name", "officer2badgenumber": "officer_badgenumber"})
-    
+    dfb = dfb.drop(columns=["officer1name", "officer1badgenumber"]).rename(
+        columns={
+            "officer2name": "officer_name",
+            "officer2badgenumber": "officer_badgenumber",
+        }
+    )
+
     df = pd.concat([dfa, dfb])
     return df
 
 
 def clean23():
-    df = (pd.read_csv(deba.data("raw/new_orleans_pd/new_orleans_pd_sas_2021_2023.csv"))
-          .pipe(clean_column_names)
-          .pipe(concat_dfs)
-          .drop(columns=["blockadd", "subjectage", "subjectheight", "subjectweight", "lastmodifieddatetime", "officernames_id"])
-          .rename(columns={"23_2141_officersnames_fieldinterviewid": "stop_and_search_interview_id_2", 
-                           "stop_and_search__field_interviews_2023_03_06_id": "stop_and_search_interview_id",
-                           "stop_and_search__field_interviews_2023_03_06_fieldinterviewid": "tracking_id_og",
-                           "nopd_item": "item_number", "officerassignment": "assigned_district",
-                           "stopdescription": "stop_reason",
-                           "vehicleyear": "vehicle_year",
-                           "vehiclemake": "vehicle_make",
-                           "vehiclemodel": "vehicle_model",
-                           "vehiclestyle": "vehicle_style",
-                           "vehiclecolor": "vehicle_color",
-                           "carnumber": "vehicle_number",
-                           "subjectid": "citizen_id",
-                           "subjectrace": "citizen_race", 
-                           "subjectgender": "citizen_sex",
-                           "subjecthasphotoid": "citizen_has_photo_id",
-                           "subjecteyecolor": "citizen_eye_color",
-                           "subjecthaircolor": "citizen_hair_color",
-                           "subjectdriverlicstate": "citizen_driver_license_state",
-                           "zip": "zip_code", "officer_badgenumber": "badge_number"})
-          .pipe(float_to_int_str, ["vehicle_year", "zip_code",  "citizen_id", "badge_number"])
-          .pipe(clean_races, ["citizen_race"])
-          .pipe(clean_sexes, ["citizen_sex"])
-          .pipe(split_names22)
-          .pipe(clean_names, ["first_name", "middle_name", "last_name"])
-          .pipe(extract_action_cols)
-          .pipe(standardize_desc_cols, ["item_number", "assigned_district", "stop_reason", "vehicle_year", "vehicle_make", "vehicle_model", "vehicle_style", "vehicle_color",
-                                        "vehicle_number", "citizen_id",  
-                                        "citizen_has_photo_id", "citizen_eye_color", "citizen_hair_color", 
-                                        "citizen_driver_license_state", "zip_code"])
-          .pipe(set_values, {"agency": "new-orleans-pd"})
-          .pipe(gen_uid, ["first_name", "last_name", "agency"])
-          .pipe(gen_uid, ["agency", "tracking_id_og"], "tracking_id")
+    df = (
+        pd.read_csv(deba.data("raw/new_orleans_pd/new_orleans_pd_sas_2021_2023.csv"))
+        .pipe(clean_column_names)
+        .pipe(concat_dfs)
+        .drop(
+            columns=[
+                "blockadd",
+                "subjectage",
+                "subjectheight",
+                "subjectweight",
+                "lastmodifieddatetime",
+                "officernames_id",
+            ]
+        )
+        .rename(
+            columns={
+                "23_2141_officersnames_fieldinterviewid": "stop_and_search_interview_id_2",
+                "stop_and_search__field_interviews_2023_03_06_id": "stop_and_search_interview_id",
+                "stop_and_search__field_interviews_2023_03_06_fieldinterviewid": "tracking_id_og",
+                "nopd_item": "item_number",
+                "officerassignment": "assigned_district",
+                "stopdescription": "stop_reason",
+                "vehicleyear": "vehicle_year",
+                "vehiclemake": "vehicle_make",
+                "vehiclemodel": "vehicle_model",
+                "vehiclestyle": "vehicle_style",
+                "vehiclecolor": "vehicle_color",
+                "carnumber": "vehicle_number",
+                "subjectid": "citizen_id",
+                "subjectrace": "citizen_race",
+                "subjectgender": "citizen_sex",
+                "subjecthasphotoid": "citizen_has_photo_id",
+                "subjecteyecolor": "citizen_eye_color",
+                "subjecthaircolor": "citizen_hair_color",
+                "subjectdriverlicstate": "citizen_driver_license_state",
+                "zip": "zip_code",
+                "officer_badgenumber": "badge_number",
+            }
+        )
+        .pipe(
+            float_to_int_str, ["vehicle_year", "zip_code", "citizen_id", "badge_number"]
+        )
+        .pipe(clean_races, ["citizen_race"])
+        .pipe(clean_sexes, ["citizen_sex"])
+        .pipe(split_names22)
+        .pipe(clean_names, ["first_name", "middle_name", "last_name"])
+        .pipe(extract_action_cols)
+        .pipe(
+            standardize_desc_cols,
+            [
+                "item_number",
+                "assigned_district",
+                "stop_reason",
+                "vehicle_year",
+                "vehicle_make",
+                "vehicle_model",
+                "vehicle_style",
+                "vehicle_color",
+                "vehicle_number",
+                "citizen_id",
+                "citizen_has_photo_id",
+                "citizen_eye_color",
+                "citizen_hair_color",
+                "citizen_driver_license_state",
+                "zip_code",
+            ],
+        )
+        .pipe(set_values, {"agency": "new-orleans-pd"})
+        .pipe(gen_uid, ["first_name", "last_name", "agency"])
+        .pipe(gen_uid, ["agency", "tracking_id_og"], "tracking_id")
         .pipe(
             gen_uid,
             [
@@ -574,14 +666,17 @@ def clean23():
 
 
 def concat_output(off_dfa, off_dfb, cit_dfa, cit_dfb):
-    df = pd.concat([off_dfa, off_dfb],  axis=0)
+    df = pd.concat([off_dfa, off_dfb], axis=0)
     citizen_df = pd.concat([cit_dfa, cit_dfb], axis=0)
     return df, citizen_df
 
 
 if __name__ == "__main__":
     df10, citizen_df10 = clean()
-    df23, citizen_df23, = clean23()
+    (
+        df23,
+        citizen_df23,
+    ) = clean23()
     df, citizen_df = concat_output(df10, df23, citizen_df10, citizen_df23)
     df.to_csv(deba.data("clean/sas_new_orleans_pd_2010_2023.csv"), index=False)
     citizen_df.to_csv(

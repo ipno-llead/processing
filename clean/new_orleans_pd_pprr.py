@@ -35,9 +35,7 @@ def split_names_overtime(df):
     df.loc[:, "last_name"] = names[0]
     df.loc[:, "first_name"] = names[1]
     df.loc[:, "middle_name"] = names[2]
-    return df.drop(columns=["name"])[
-        ~((df.overtime_annual_total.fillna("") == ""))
-    ]
+    return df.drop(columns=["name"])[~((df.overtime_annual_total.fillna("") == ""))]
 
 
 def clean_department_desc(df):
@@ -100,7 +98,9 @@ def drop_rows_missing_names(df):
 
 
 def clean_overtime(df):
-    df.loc[:, "overtime_annual_total"] = df.overtime_annual_total.str.replace(r"\,", "", regex=True).astype(float)
+    df.loc[:, "overtime_annual_total"] = df.overtime_annual_total.str.replace(
+        r"\,", "", regex=True
+    ).astype(float)
     return df
 
 

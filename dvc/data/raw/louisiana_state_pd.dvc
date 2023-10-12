@@ -1,6 +1,6 @@
 wdir: ../../../data/raw
 outs:
-- md5: cc04de50012534ded1b7618c3a949bd9.dir
-  size: 463994
-  nfiles: 7
+- md5: 90be868947dfccb9f91b5db7d6ec90d5.dir
+  size: 476356
+  nfiles: 8
   path: louisiana_state_pd

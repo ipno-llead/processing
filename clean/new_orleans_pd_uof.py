@@ -87,7 +87,9 @@ def split_citizen_rows(df):
 
 def clean_tracking_id(df):
     df.loc[:, "tracking_id"] = (
-        df.tracking_id.str.lower().str.strip().str.replace(r"^20", "ftn20", regex=True)
+        df.tracking_id.str.lower()
+        .str.strip()
+        .str.replace(r"^20", "ftn20", regex=True)
         .str.replace(r"^asi ?", "ftn", regex=True)
     )
     return df
@@ -194,7 +196,11 @@ def clean_disposition(df):
         .str.strip()
         .fillna("")
         .str.replace(r"uof", "use of force", regex=False)
-        .str.replace(r"member\'s (.+)", "actions were in violation of new orleans pd policy", regex=True)
+        .str.replace(
+            r"member\'s (.+)",
+            "actions were in violation of new orleans pd policy",
+            regex=True,
+        )
     )
     return df
 
@@ -277,7 +283,7 @@ def clean_citizen_arrest_charges(df):
 
 
 def clean_citizen_age(df):
-    df.loc[:, 'citizen_age'] = df.citizen_age.str.extract('(\d+)', expand=False)
+    df.loc[:, "citizen_age"] = df.citizen_age.str.extract("(\d+)", expand=False)
     return df
 
 
@@ -290,36 +296,55 @@ def extract_use_of_force_level(df):
     levels = df.use_of_force_description.str.extract(r"^(l[1234])")
     df.loc[:, "use_of_force_level"] = levels[0]
 
-    df.loc[:, "use_of_force_description"] = (df.use_of_force_description.str.replace(r"^(l[1234]) ?-? ?", "", regex=True)
+    df.loc[:, "use_of_force_description"] = df.use_of_force_description.str.replace(
+        r"^(l[1234]) ?-? ?", "", regex=True
     )
-    return df 
+    return df
 
 
 def clean_citizen_cols(df):
     injured = df.citizen_injured.str.lower().str.strip().str.extract(r"(no|yes)")
     df.loc[:, "citizen_injured"] = injured[0]
 
-    hospitalized = df.citizen_hospitalized.str.lower().str.strip().str.extract(r"(no|yes)")
+    hospitalized = (
+        df.citizen_hospitalized.str.lower().str.strip().str.extract(r"(no|yes)")
+    )
     df.loc[:, "citizen_hospitalized"] = hospitalized[0]
 
-    df.loc[:, "citizen_influencing_factors"] = (df.citizen_influencing_factors.str.lower().str.strip()
-                                                  .str.replace(r"^((\w{1,4})|(.+ feet .+))$", "", regex=True)
-                                                )
+    df.loc[:, "citizen_influencing_factors"] = (
+        df.citizen_influencing_factors.str.lower()
+        .str.strip()
+        .str.replace(r"^((\w{1,4})|(.+ feet .+))$", "", regex=True)
+    )
 
-    distance = df.citizen_distance_from_officer.str.lower().str.strip().str.extract(r"(.+ feet .+)")
+    distance = (
+        df.citizen_distance_from_officer.str.lower()
+        .str.strip()
+        .str.extract(r"(.+ feet .+)")
+    )
     df.loc[:, "citizen_distance_from_officer"] = distance[0]
 
-    build = df.citizen_build.str.lower().str.strip().str.extract(r"(small|medium|large|xlarge)")
+    build = (
+        df.citizen_build.str.lower()
+        .str.strip()
+        .str.extract(r"(small|medium|large|xlarge)")
+    )
 
     df.loc[:, "citizen_build"] = build[0]
 
-    df.loc[:, "citizen_height"] = df.citizen_height.str.lower().str.strip().str.replace(r"(yes|no)", "", regex=True)
+    df.loc[:, "citizen_height"] = (
+        df.citizen_height.str.lower()
+        .str.strip()
+        .str.replace(r"(yes|no)", "", regex=True)
+    )
     return df
 
 
 def clean_tracking_id_og(df):
-    df.loc[:, "tracking_id_og"] = df.tracking_id_og.str.replace(r"(.+)2022", "ftn2022", regex=True)
-    return df 
+    df.loc[:, "tracking_id_og"] = df.tracking_id_og.str.replace(
+        r"(.+)2022", "ftn2022", regex=True
+    )
+    return df
 
 
 def clean_uof():
@@ -516,107 +541,148 @@ def strip_col_prefix(df):
 
 
 def clean_department_desc_22(df):
-    df.loc[:, "department_desc"] = df.bureau.str.lower().str.strip().str.replace(r"^(\w+) - ", "", regex=True)
+    df.loc[:, "department_desc"] = (
+        df.bureau.str.lower().str.strip().str.replace(r"^(\w+) - ", "", regex=True)
+    )
     return df.drop(columns=["bureau"])
 
 
 def clean_uof_22():
-    df = (pd.read_csv(deba.data("raw/new_orleans_pd/new_orleans_pd_uof_2022.csv"))
-          .pipe(clean_column_names)
-          .pipe(strip_col_prefix)
-          .drop(columns=["fd_discharge_type"])
-          .rename(columns={"pib_control_number": "tracking_id_og", 
-                           "division_assignment": "division", 
-                           "unit_assignment": "unit",
-                           "light_conditions": "light_condition", 
-                           "type_of_force_used": "use_of_force_description",
-                           "citizen_condition_injury": "citizen_injury_description",
-                           "effective_y_n": "use_of_force_effective", 
-                           "gender": "sex",
-                           "citizen_s_distance_from_officer_employee": "citizen_distance_from_officer",
-                           "cit_gender": "citizen_sex", 
-                           "cit_race": "citizen_race", 
-                           "citizen_s_build": "citizen_build", 
-                           "citizen_s_height": "citizen_height",
-                           "citizen_was_injured_y_n": "citizen_injured", 
-                           "citizen_went_to_hospital_y_n": "citizen_hospitalized",
-                           "citizen_was_arrested_y_n": "citizen_arrested", 
-                           "cit_charge": "citizen_influencing_factors", 
-                           "reason_for_using_force": "use_of_force_reason", 
-                           "officer_employee_was_injured_y_n": "officer_injured",
-                           "occurred_date": "uof_occur_date"})
-          .pipe(clean_tracking_id_og)
-          .pipe(clean_department_desc_22)
-          .pipe(clean_disposition)
-          .pipe(clean_use_of_force_description)
-          .pipe(clean_names, ["first_name", "last_name"])
-          .pipe(clean_sexes, ["sex", "citizen_sex"])
-          .pipe(clean_races, ["race", "citizen_race"])
-          .pipe(clean_dates, ["hire_date", "uof_occur_date"])
-          .pipe(standardize_desc_cols, ["division", "unit", "shift_hours", "status", 
-                                        "service_rendered", "light_condition", "weather_condition",
-                                        "citizen_injury_description", "use_of_force_effective",
-                                        "citizen_distance_from_officer", "citizen_build", "citizen_height",
-                                        "officer_injured", "tracking_id_og", "working_status",
-                                        "citizen_influencing_factors", "use_of_force_reason", 
-                                        "citizen_arrested", "citizen_hospitalized", "citizen_injured",
-                                        "citizen_hospitalized"])
-          .pipe(extract_use_of_force_level)
-          .pipe(set_values, {"agency": "new-orleans-pd"})
-          .pipe(gen_uid, ["tracking_id_og", "agency"], "tracking_id")
-          .pipe(gen_uid, ["first_name", "last_name", "agency"])
-          .pipe(gen_uid, ["use_of_force_level", "use_of_force_description", "use_of_force_reason", 
-                          "uid", "use_of_force_effective", "tracking_id", "use_of_force_effective",
-                          'status', 'disposition', 'service_rendered', 'light_condition',
-                          'weather_condition', 'division', 'unit', 'working_status', 'shift_hours', "citizen_influencing_factors"], "uof_uid")
-    )
-    return df 
-
-
-def extract_citizen_22(uof):
     df = (
-        uof.loc[
-            :,
+        pd.read_csv(deba.data("raw/new_orleans_pd/new_orleans_pd_uof_2022.csv"))
+        .pipe(clean_column_names)
+        .pipe(strip_col_prefix)
+        .drop(columns=["fd_discharge_type"])
+        .rename(
+            columns={
+                "pib_control_number": "tracking_id_og",
+                "division_assignment": "division",
+                "unit_assignment": "unit",
+                "light_conditions": "light_condition",
+                "type_of_force_used": "use_of_force_description",
+                "citizen_condition_injury": "citizen_injury_description",
+                "effective_y_n": "use_of_force_effective",
+                "gender": "sex",
+                "citizen_s_distance_from_officer_employee": "citizen_distance_from_officer",
+                "cit_gender": "citizen_sex",
+                "cit_race": "citizen_race",
+                "citizen_s_build": "citizen_build",
+                "citizen_s_height": "citizen_height",
+                "citizen_was_injured_y_n": "citizen_injured",
+                "citizen_went_to_hospital_y_n": "citizen_hospitalized",
+                "citizen_was_arrested_y_n": "citizen_arrested",
+                "cit_charge": "citizen_influencing_factors",
+                "reason_for_using_force": "use_of_force_reason",
+                "officer_employee_was_injured_y_n": "officer_injured",
+                "occurred_date": "uof_occur_date",
+            }
+        )
+        .pipe(clean_tracking_id_og)
+        .pipe(clean_department_desc_22)
+        .pipe(clean_disposition)
+        .pipe(clean_use_of_force_description)
+        .pipe(clean_names, ["first_name", "last_name"])
+        .pipe(clean_sexes, ["sex", "citizen_sex"])
+        .pipe(clean_races, ["race", "citizen_race"])
+        .pipe(clean_dates, ["hire_date", "uof_occur_date"])
+        .pipe(
+            standardize_desc_cols,
             [
-                "citizen_race",
-                "citizen_sex",
-                "citizen_hospitalized",
-                "citizen_injured",
-                "citizen_influencing_factors",
+                "division",
+                "unit",
+                "shift_hours",
+                "status",
+                "service_rendered",
+                "light_condition",
+                "weather_condition",
+                "citizen_injury_description",
+                "use_of_force_effective",
                 "citizen_distance_from_officer",
                 "citizen_build",
                 "citizen_height",
+                "officer_injured",
+                "tracking_id_og",
+                "working_status",
+                "citizen_influencing_factors",
+                "use_of_force_reason",
                 "citizen_arrested",
-                "agency",
-                "uof_uid",
+                "citizen_hospitalized",
+                "citizen_injured",
+                "citizen_hospitalized",
             ],
-        ]
+        )
+        .pipe(extract_use_of_force_level)
+        .pipe(set_values, {"agency": "new-orleans-pd"})
+        .pipe(gen_uid, ["tracking_id_og", "agency"], "tracking_id")
+        .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(
             gen_uid,
             [
-                "citizen_hospitalized",
-                "citizen_injured",
-                "citizen_distance_from_officer",
-                "citizen_arrested",
+                "use_of_force_level",
+                "use_of_force_description",
+                "use_of_force_reason",
+                "uid",
+                "use_of_force_effective",
+                "tracking_id",
+                "use_of_force_effective",
+                "status",
+                "disposition",
+                "service_rendered",
+                "light_condition",
+                "weather_condition",
+                "division",
+                "unit",
+                "working_status",
+                "shift_hours",
                 "citizen_influencing_factors",
-                "citizen_build",
-                "citizen_height",
-                "agency",
             ],
-            "citizen_uid",
+            "uof_uid",
         )
+    )
+    return df
+
+
+def extract_citizen_22(uof):
+    df = uof.loc[
+        :,
+        [
+            "citizen_race",
+            "citizen_sex",
+            "citizen_hospitalized",
+            "citizen_injured",
+            "citizen_influencing_factors",
+            "citizen_distance_from_officer",
+            "citizen_build",
+            "citizen_height",
+            "citizen_arrested",
+            "agency",
+            "uof_uid",
+        ],
+    ].pipe(
+        gen_uid,
+        [
+            "citizen_hospitalized",
+            "citizen_injured",
+            "citizen_distance_from_officer",
+            "citizen_arrested",
+            "citizen_influencing_factors",
+            "citizen_build",
+            "citizen_height",
+            "agency",
+        ],
+        "citizen_uid",
     )
     uof = uof.drop(
         columns=[
-                "citizen_race",
-                "citizen_sex",
-                "citizen_hospitalized",
-                "citizen_injured",
-                "citizen_influencing_factors",
-                "citizen_distance_from_officer",
-                "citizen_build",
-                "citizen_height",
-                "citizen_arrested",
+            "citizen_race",
+            "citizen_sex",
+            "citizen_hospitalized",
+            "citizen_injured",
+            "citizen_influencing_factors",
+            "citizen_distance_from_officer",
+            "citizen_build",
+            "citizen_height",
+            "citizen_arrested",
         ]
     )
     return df, uof

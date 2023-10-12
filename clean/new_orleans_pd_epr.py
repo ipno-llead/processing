@@ -73,7 +73,6 @@ def join_names(df):
 
 
 def clean():
-
     dfa = (
         pd.read_csv(
             deba.data("raw/new_orleans_pd/new_orleans_pd_epr_2010_2022.csv"),

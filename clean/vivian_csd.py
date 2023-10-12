@@ -22,10 +22,14 @@ def assign_agency(df):
     df.loc[:, "data_production_year"] = 2021
     return df
 
+
 def clean_rank_desc(df):
-    df.loc[:, "rank_desc"] = df.job_title.str.lower().str.strip()\
+    df.loc[:, "rank_desc"] = (
+        df.job_title.str.lower()
+        .str.strip()
         .str.replace(r" ?o?f? ?police", "", regex=True)
-    return df 
+    )
+    return df
 
 
 def clean():

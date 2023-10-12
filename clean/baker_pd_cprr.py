@@ -168,7 +168,6 @@ def clean20():
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(gen_uid, ["uid", "disposition", "allegation"], "allegation_uid")
         .drop_duplicates(subset=["allegation_uid"])
-
     )
     return df
 
@@ -188,9 +187,8 @@ def clean17():
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(gen_uid, ["uid", "allegation", "disposition"], "allegation_uid")
         .drop_duplicates(subset=["allegation_uid"])
-
     )
-  
+
     return df
 
 
