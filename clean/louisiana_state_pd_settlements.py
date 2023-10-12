@@ -55,9 +55,11 @@ def split_names(df):
 
 
 def strip_amounts(df):
-    df.loc[:, "settlement_amount"] = df.settlement_amount.str.replace(r"(\$|\,|\..+)", "", regex=True)
+    df.loc[:, "settlement_amount"] = df.settlement_amount.str.replace(
+        r"(\$|\,|\..+)", "", regex=True
+    )
 
-    return df 
+    return df
 
 
 def clean():
@@ -88,31 +90,40 @@ def clean():
 
 
 def fix_dates_15(df):
-    df.loc[:, "check_date"] = df.year_paid.astype(str).str.replace(r"\.(.+)", "", regex=True).str.replace(r"(\w{4})", r"12/31/\1", regex=True)
+    df.loc[:, "check_date"] = (
+        df.year_paid.astype(str)
+        .str.replace(r"\.(.+)", "", regex=True)
+        .str.replace(r"(\w{4})", r"12/31/\1", regex=True)
+    )
     return df.drop(columns=["year_paid"])
 
 
-
 def clean_15():
-    df = (pd.read_csv(deba.data("raw/louisiana_state_pd/louisiana_state_pd_settlements_2015_2019.csv"))
-       .pipe(clean_column_names)
-       .drop(columns=["acct_name"])
-       .pipe(fix_dates_15)
-       .pipe(strip_amounts)
-       .rename(columns={"employee_involved": "employees_involved"})
-       .pipe(split_rows_with_multiple_officers)
-       .pipe(split_names)
-       .pipe(standardize_desc_cols, ["claim_status", "settlement_amount"])
-       .pipe(set_values, {"agency": "louisiana-state-pd"})
-       .pipe(gen_uid, ["first_name", "last_name", "agency"])
-       .pipe(gen_uid, ["settlement_amount", "check_date", "uid"], "settlement_uid")
+    df = (
+        pd.read_csv(
+            deba.data(
+                "raw/louisiana_state_pd/louisiana_state_pd_settlements_2015_2019.csv"
+            )
+        )
+        .pipe(clean_column_names)
+        .drop(columns=["acct_name"])
+        .pipe(fix_dates_15)
+        .pipe(strip_amounts)
+        .rename(columns={"employee_involved": "employees_involved"})
+        .pipe(split_rows_with_multiple_officers)
+        .pipe(split_names)
+        .pipe(standardize_desc_cols, ["claim_status", "settlement_amount"])
+        .pipe(set_values, {"agency": "louisiana-state-pd"})
+        .pipe(gen_uid, ["first_name", "last_name", "agency"])
+        .pipe(gen_uid, ["settlement_amount", "check_date", "uid"], "settlement_uid")
     )
-    return df 
+    return df
 
 
 def concat(dfa, dfb):
     df = pd.concat([dfa, dfb], axis=0)
     return df
+
 
 if __name__ == "__main__":
     df = clean()

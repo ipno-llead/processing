@@ -23,7 +23,6 @@ def fuse_personnel():
     return rearrange_personnel_columns(
         pd.concat(
             [
-                pd.read_csv(deba.data("fuse_agency/per_baton_rouge_pd.csv")),
                 pd.read_csv(deba.data("fuse_agency/per_baton_rouge_so.csv")),
                 pd.read_csv(deba.data("fuse_agency/per_new_orleans_harbor_pd.csv")),
                 pd.read_csv(deba.data("fuse_agency/per_new_orleans_pd.csv")),
@@ -94,6 +93,7 @@ def fuse_personnel():
                 pd.read_csv(deba.data("fuse_agency/per_lasalle_so.csv")),
                 pd.read_csv(deba.data("fuse_agency/per_point_coupee_so.csv")),
                 pd.read_csv(deba.data("fuse_agency/per_richland_so.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_baton_rouge_pd.csv")),
             ]
         )
     ).sort_values("uid", ignore_index=True)
@@ -103,7 +103,6 @@ def fuse_event():
     return rearrange_event_columns(
         pd.concat(
             [
-                pd.read_csv(deba.data("fuse_agency/event_baton_rouge_pd.csv")),
                 pd.read_csv(deba.data("fuse_agency/event_baton_rouge_so.csv")),
                 pd.read_csv(deba.data("fuse_agency/event_new_orleans_harbor_pd.csv")),
                 pd.read_csv(deba.data("fuse_agency/event_new_orleans_pd.csv")),
@@ -173,6 +172,7 @@ def fuse_event():
                 pd.read_csv(deba.data("fuse_agency/event_lasalle_so.csv")),
                 pd.read_csv(deba.data("fuse_agency/event_point_coupee_so.csv")),
                 pd.read_csv(deba.data("fuse_agency/event_richland_so.csv")),
+                pd.read_csv(deba.data("fuse_agency/event_baton_rouge_pd.csv")),
             ]
         )
     ).sort_values(["agency", "event_uid"], ignore_index=True)
@@ -182,7 +182,6 @@ def fuse_allegation():
     return rearrange_allegation_columns(
         pd.concat(
             [
-                pd.read_csv(deba.data("fuse_agency/com_baton_rouge_pd.csv")),
                 pd.read_csv(deba.data("fuse_agency/com_baton_rouge_so.csv")),
                 pd.read_csv(deba.data("fuse_agency/com_new_orleans_harbor_pd.csv")),
                 pd.read_csv(deba.data("fuse_agency/com_brusly_pd.csv")),
@@ -236,6 +235,7 @@ def fuse_allegation():
                 pd.read_csv(deba.data("fuse_agency/com_lasalle_so.csv")),
                 pd.read_csv(deba.data("fuse_agency/com_point_coupee_so.csv")),
                 pd.read_csv(deba.data("fuse_agency/com_richland_so.csv")),
+                pd.read_csv(deba.data("fuse_agency/com_baton_rouge_pd.csv")),
             ]
         )
     ).sort_values(["agency", "tracking_id"], ignore_index=True)

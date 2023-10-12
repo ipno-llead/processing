@@ -195,7 +195,7 @@ def clean_19():
         .pipe(clean_department_desc)
         .pipe(assign_agency)
         .pipe(clean_names, ["first_name", "last_name", "middle_name"])
-        .pipe(gen_uid, ["agency", "employee_id"])
+           .pipe(gen_uid, ["agency", "employee_id"])
         .pipe(assign_rank_year_and_pay_year)
     )
     return df

@@ -4,17 +4,21 @@ from lib.columns import clean_column_names, set_values
 from lib.clean import standardize_desc_cols, clean_names
 from lib.uid import gen_uid
 
+
 def clean_agency(df):
-    df.loc[:, "agency"] = df.agency.str.replace(r"orleans-so", "new-orleans-so", regex=False)
+    df.loc[:, "agency"] = df.agency.str.replace(
+        r"orleans-so", "new-orleans-so", regex=False
+    )
     return df[~((df.agency.fillna("") == ""))]
 
 
 def concat_allegation_cols(df):
-    df.loc[:, "allegation_desc"] = df.allegation.fillna("").str.cat(df.initial_allegation.fillna(""), sep="; ")
+    df.loc[:, "allegation_desc"] = df.allegation.fillna("").str.cat(
+        df.initial_allegation.fillna(""), sep="; "
+    )
 
     df.loc[:, "allegation_desc"] = df.allegation.str.replace(r"; $", "", regex=True)
     return df.drop(columns=["initial_allegation", "allegation"])
-
 
 
 def clean():

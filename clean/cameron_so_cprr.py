@@ -36,13 +36,32 @@ def clean_disposition_19(df):
     )
     return df[~((df.disposition == ""))].drop(columns="outcome_after_investigation")
 
+
 def correct_action_19(df):
-    df.loc[(df.disposition == "terminated") & (df.last_name == "gant"), "action"] = "terminated"
-    df.loc[(df.disposition == "terminated; write up attached") & (df.last_name == "raimer"), "action"] = "terminated"
-    df.loc[(df.disposition == "terminated; write up attached") & (df.last_name == "guillory"), "action"] = "terminated"
-    df.loc[(df.disposition == "terminated; write up attached") & (df.last_name == "nothanel"), "action"] = "terminated"
-    df.loc[(df.disposition == "resigned; criminal charges") & (df.last_name == "nunez"), "action"] = "resigned"
+    df.loc[
+        (df.disposition == "terminated") & (df.last_name == "gant"), "action"
+    ] = "terminated"
+    df.loc[
+        (df.disposition == "terminated; write up attached")
+        & (df.last_name == "raimer"),
+        "action",
+    ] = "terminated"
+    df.loc[
+        (df.disposition == "terminated; write up attached")
+        & (df.last_name == "guillory"),
+        "action",
+    ] = "terminated"
+    df.loc[
+        (df.disposition == "terminated; write up attached")
+        & (df.last_name == "nothanel"),
+        "action",
+    ] = "terminated"
+    df.loc[
+        (df.disposition == "resigned; criminal charges") & (df.last_name == "nunez"),
+        "action",
+    ] = "resigned"
     return df
+
 
 def split_rows_with_multiple_officers_14(df):
     i = 0

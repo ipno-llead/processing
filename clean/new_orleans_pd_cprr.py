@@ -98,11 +98,16 @@ def clean_disposition(df):
     return df
 
 
-def extract_investigation_start_year(df):
-    df.loc[:, "investigation_start_year"] = df.tracking_id_og.str.replace(
+def extract_receive_date(df):
+    df.loc[:, "receive_date"] = df.tracking_id_og.str.replace(
         r"^(\w{4})-(.+)", r"\1", regex=True
     )
+
+    df.loc[:, "receive_date"] = df.receive_date.str.replace(r"(.+)", r"12/31/\1")
     return df
+
+def filter_by_year(df):
+    return df[df['tracking_id_og'].str.startswith(('2021', '2022', '2023'))]
 
 
 def clean():
@@ -122,7 +127,7 @@ def clean():
         .drop(columns=["allegation_number"])
         .pipe(join_allegation_cols)
         .pipe(clean_disposition)
-        .pipe(extract_investigation_start_year)
+        .pipe(extract_receive_date)
         .pipe(set_values, {"agency": "new-orleans-pd"})
         .pipe(
             standardize_desc_cols, ["tracking_id_og", "allegation_desc", "disposition", "complainant_type", "status"]
@@ -130,6 +135,11 @@ def clean():
         .pipe(clean_names, ["first_name", "last_name"])
         .pipe(gen_uid, ["tracking_id_og", "agency"], "tracking_id")
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
-        .pipe(gen_uid, ["uid", "allegation", "allegation_desc", "tracking_id"], "allegation_uid")
+        .pipe(gen_uid, ["uid", "allegation", "tracking_id"], "allegation_uid")
+        .pipe(filter_by_year)
     )
     return df
+
+if __name__ == "__main__":
+    df = clean()
+    df.to_csv(deba.data("clean/cprr_new_orleans_pd_2021_2023.csv"), index=False)
