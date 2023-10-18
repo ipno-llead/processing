@@ -395,7 +395,7 @@ if __name__ == "__main__":
     post_event = pd.read_csv(deba.data("match/post_event_new_orleans_pd.csv"))
     award = pd.read_csv(deba.data("match/award_new_orleans_pd_2016_2021.csv"))
     lprr = pd.read_csv(deba.data("match/lprr_new_orleans_csc_2000_2016.csv"))
-    sas = pd.read_csv(deba.data("match/sas_new_orleans_pd_2010_2021.csv"))
+    sas = pd.read_csv(deba.data("match/sas_new_orleans_pd_2010_2023.csv"))
     pclaims20 = pd.read_csv(deba.data("match/pclaims_new_orleans_pd_2020.csv"))
     pclaims21 = pd.read_csv(deba.data("match/pclaims_new_orleans_pd_2021.csv"))
     pprr_separations = pd.read_csv(
@@ -412,7 +412,7 @@ if __name__ == "__main__":
     cprr_citizens = pd.read_csv(
         deba.data("clean/cprr_cit_new_orleans_da_2016_2020.csv")
     )
-    sas_citizens = pd.read_csv(deba.data("clean/sas_cit_new_orleans_pd_2010_2021.csv"))
+    sas_citizens = pd.read_csv(deba.data("clean/sas_cit_new_orleans_pd_2010_2023.csv"))
     pr_citizens = pd.read_csv(deba.data("clean/pr_cit_new_orleans_pd_2010_2022.csv"))
     cprr_venezia = pd.read_csv(deba.data("clean/cprr_new_orleans_pd_venezia.csv"))
     cprr_dillmann = pd.read_csv(deba.data("clean/cprr_new_orleans_pd_dillmann.csv"))
