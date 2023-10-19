@@ -667,7 +667,10 @@ def clean23():
 
 def concat_output(off_dfa, off_dfb, cit_dfa, cit_dfb):
     df = pd.concat([off_dfa, off_dfb], axis=0)
+    df = df.drop_duplicates(subset=["uid", "stop_and_search_uid"])
     citizen_df = pd.concat([cit_dfa, cit_dfb], axis=0)
+
+    citizen_df = citizen_df.drop_duplicates(subset=["citizen_uid", "stop_and_search_uid"])
     return df, citizen_df
 
 
