@@ -98,6 +98,15 @@ def fix_dates_15(df):
     return df.drop(columns=["year_paid"])
 
 
+def fix_dates_10(df):
+    df.loc[:, "check_date"] = (
+        df.date_paid.astype(str)
+        .str.replace(r"\.(.+)", "", regex=True)
+        .str.replace(r"(\w{4})", r"12/31/\1", regex=True)
+    )
+    return df.drop(columns=["date_paid"])
+
+
 def clean_15():
     df = (
         pd.read_csv(
@@ -120,15 +129,32 @@ def clean_15():
     return df
 
 
-def concat(dfa, dfb):
-    df = pd.concat([dfa, dfb], axis=0)
+def clean_10():
+    df = (pd.read_csv(deba.data("raw/louisiana_state_pd/louisiana_state_pd_settlements_2010-2014-2021-2022.csv"))
+          .pipe(clean_column_names)
+          .rename(columns={"employee_s": "employees_involved"})
+          .drop(columns=["acct_name", "claim_status"])
+          .pipe(fix_dates_10)
+          .pipe(split_rows_with_multiple_officers)
+          .pipe(split_names)
+          .pipe(strip_amounts)
+          .pipe(set_values, {"agency": "louisiana-state-pd"})
+          .pipe(gen_uid, ["first_name", "last_name", "agency"])
+          .pipe(gen_uid, ["settlement_amount", "check_date"], "settlement_uid")
+    )
+    return df 
+
+
+def concat(dfa, dfb, dfc):
+    df = pd.concat([dfa, dfb, dfc], axis=0)
     return df
 
 
 if __name__ == "__main__":
     df = clean()
     df_15 = clean_15()
-    df = concat(df, df_15)
+    df_10 = clean_10()
+    df = concat(df, df_15, df_10)
     df.to_csv(
-        deba.data("clean/settlements_louisiana_state_pd_2015_2020.csv"), index=False
+        deba.data("clean/settlements_louisiana_state_pd_2010_2022.csv"), index=False
     )

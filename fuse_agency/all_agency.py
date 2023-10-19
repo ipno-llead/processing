@@ -353,7 +353,6 @@ def fuse_citizen_dfs():
         pd.concat(
             [
                 pd.read_csv(deba.data("fuse_agency/cit_baton_rouge_so.csv")),
-                pd.read_csv(deba.data("fuse_agency/cit_bossier_city_pd.csv")),
                 pd.read_csv(deba.data("fuse_agency/cit_greenwood_pd.csv")),
                 pd.read_csv(deba.data("fuse_agency/cit_lake_charles_pd.csv")),
                 pd.read_csv(deba.data("fuse_agency/cit_levee_pd.csv")),
