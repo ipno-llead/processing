@@ -35,6 +35,7 @@ jobs:
         shell: "bash --noprofile --norc -x -eo pipefail {0}"
         run: |
           find dvc/data/raw -type f | xargs -I{} sed -iE 's/wdir\: ..\/..\/..\/data\/raw/wdir\: \/runner\/_work\/data\/data\/raw/g' {}
+          rm -rf /runner/_work/data/dvc_cache
           mkdir /runner/_work/data/dvc_cache || true
           dvc cache dir --local /runner/_work/data/dvc_cache
           dvc pull -v -f
