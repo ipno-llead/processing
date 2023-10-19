@@ -350,6 +350,12 @@ branch:
     file: data/fuse_agency/com_richland_so.csv
     primaryKey:
       - allegation_uid
+  com-caddo-so:
+    remote: origin
+    merge: refs/heads/com-caddo-so
+    file: data/fuse_agency/com_caddo_so.csv
+    primaryKey:
+      - allegation_uid
   event:
     remote: origin
     merge: refs/heads/event
