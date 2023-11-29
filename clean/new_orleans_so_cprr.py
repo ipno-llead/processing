@@ -1690,99 +1690,161 @@ def clean22():
 
 
 def clean_complainant(df):
-    df.loc[:, "complainant_type"] = df.victim_complainant.str.lower().str.strip().str.replace(r"(deputy|sergeant|chief|recruit).+", "internal", regex=True).str.replace(r"^(known|inm|civi|criminal|rik).+", "external", regex=True)
+    df.loc[:, "complainant_type"] = (
+        df.victim_complainant.str.lower()
+        .str.strip()
+        .str.replace(r"(deputy|sergeant|chief|recruit).+", "internal", regex=True)
+        .str.replace(r"^(known|inm|civi|criminal|rik).+", "external", regex=True)
+    )
     return df.drop(columns=["victim_complainant"])
 
 
 def clean_dates_18(df):
-    df.loc[:, "incident_date"] = (df.incident_date.str.lower().str.replace(r" late entry", "", regex=True)
-                                  .str.replace(r"(\w+\/\w+\/\w{3})$", "", regex=True)
-
+    df.loc[:, "incident_date"] = (
+        df.incident_date.str.lower()
+        .str.replace(r" late entry", "", regex=True)
+        .str.replace(r"(\w+\/\w+\/\w{3})$", "", regex=True)
     )
 
-    df.loc[:, "investigation_complete_date"] = df.investigation_complete_date.str.lower().str.replace(r"under investigation", "", regex=False)
+    df.loc[
+        :, "investigation_complete_date"
+    ] = df.investigation_complete_date.str.lower().str.replace(
+        r"under investigation", "", regex=False
+    )
 
-    df.loc[:, "board_hearing_date"] = df.board_hearing_date.fillna("").str.lower().str.strip().str.replace(r"^(tbs|out|tba)", "", regex=True)
+    df.loc[:, "board_hearing_date"] = (
+        df.board_hearing_date.fillna("")
+        .str.lower()
+        .str.strip()
+        .str.replace(r"^(tbs|out|tba)", "", regex=True)
+    )
     return df
 
+
 def clean_inmate_grievance(df):
-    df.loc[:, "inmate_grievance"] = df.inmate_grievance.str.lower().str.replace(r"^y$", "yes", regex=True)
-    return df 
+    df.loc[:, "inmate_grievance"] = df.inmate_grievance.str.lower().str.replace(
+        r"^y$", "yes", regex=True
+    )
+    return df
 
 
 def clean_disposition_18(df):
-    df.loc[:, "disposition"] = df.disposition.str.lower().str.replace(r"\n", "", regex=True).str.replace(r"(.+)?non-? ?sustained(.+)?", "", regex=True).str.replace(r"^(\w+)(.+)", "sustained", regex=True)
+    df.loc[:, "disposition"] = (
+        df.disposition.str.lower()
+        .str.replace(r"\n", "", regex=True)
+        .str.replace(r"(.+)?non-? ?sustained(.+)?", "", regex=True)
+        .str.replace(r"^(\w+)(.+)", "sustained", regex=True)
+    )
     return df
 
 
 def split_name_18(df):
-    df.loc[:, "offender_s"] = df.offender_s.str.lower().str.replace(r"civlian(.+)", "", regex=True)
+    df.loc[:, "offender_s"] = df.offender_s.str.lower().str.replace(
+        r"civlian(.+)", "", regex=True
+    )
     names = (
-        df.offender_s.str.lower().str.strip().str.extract(r"^(deputy|major|recruit|captain|lieutenant|lt|sergeant|sgt|nurse)\.? ?(\w+) (.+)$")
+        df.offender_s.str.lower()
+        .str.strip()
+        .str.extract(
+            r"^(deputy|major|recruit|captain|lieutenant|lt|sergeant|sgt|nurse)\.? ?(\w+) (.+)$"
+        )
     )
     df.loc[:, "rank_desc"] = names[0]
     df.loc[:, "first_name"] = names[1]
     df.loc[:, "last_name"] = names[2]
-    return df.drop(columns=["offenfer_s"])
+    return df.drop(columns=["offender_s"])
 
 
 def clean18():
+    dfa = pd.read_csv(
+        deba.data("raw/new_orleans_so/new_orleans_so_cprr_2015.csv")
+    ).pipe(clean_column_names)
 
-    dfa = (pd.read_csv(deba.data("raw/new_orleans_so/new_orleans_so_cprr_2015.csv"))
-          .pipe(clean_column_names)
+    dfa = dfa.rename(
+        columns={
+            "date_of_completion": "investigation_complete_date",
+            "date_of_referral": "investigation_start_date",
+            "date_of_board": "board_hearing_date",
+        }
     )
 
-    dfa = dfa.rename(columns={"date_of_completion": "investigation_complete_date", "date_of_referral": "investigation_start_date", "date_of_board": "board_hearing_date"})
+    dfb = pd.read_csv(
+        deba.data("raw/new_orleans_so/new_orleans_so_cprr_2016.csv"), encoding="cp1252"
+    ).pipe(clean_column_names)
 
-    dfb = (pd.read_csv(deba.data("raw/new_orleans_so/new_orleans_so_cprr_2016.csv"), encoding="cp1252")
-          .pipe(clean_column_names)
+    dfb = dfa.rename(
+        columns={
+            "date_of_completion": "investigation_complete_date",
+            "date_of_referral": "investigation_start_date",
+            "date_of_board": "board_hearing_date",
+        }
     )
 
-    dfb = dfa.rename(columns={"date_of_completion": "investigation_complete_date", "date_of_referral": "investigation_start_date", "date_of_board": "board_hearing_date"})
+    dfc = pd.read_csv(
+        deba.data("raw/new_orleans_so/new_orleans_so_cprr_2017.csv"), encoding="cp1252"
+    ).pipe(clean_column_names)
 
-
-    dfc = (pd.read_csv(deba.data("raw/new_orleans_so/new_orleans_so_cprr_2017.csv"), encoding="cp1252")
-          .pipe(clean_column_names)
+    dfc = dfa.rename(
+        columns={
+            "date_completed": "investigation_complete_date",
+            "date_of_referral": "investigation_start_date",
+            "date_of_board": "board_hearing_date",
+        }
     )
 
-    dfc = dfa.rename(columns={"date_completed": "investigation_complete_date", "date_of_referral": "investigation_start_date",  "date_of_board": "board_hearing_date"})
+    dfd = pd.read_csv(
+        deba.data("raw/new_orleans_so/new_orleans_so_cprr_2018.csv"), encoding="cp1252"
+    ).pipe(clean_column_names)
 
-
-    dfd = (pd.read_csv(deba.data("raw/new_orleans_so/new_orleans_so_cprr_2018.csv"), encoding="cp1252")
-          .pipe(clean_column_names)
+    dfd = dfa.rename(
+        columns={
+            "date_completed": "investigation_complete_date",
+            "date_started": "investigation_start_date",
+            "date_received": "receive_date",
+            "date_of_board": "board_hearing_date",
+        }
     )
 
-    dfd = dfa.rename(columns={"date_completed": "investigation_complete_date", "date_started": "investigation_start_date", "date_received": "receive_date", "date_of_board": "board_hearing_date"})
-
-    dfe = (pd.read_csv(deba.data("raw/new_orleans_so/new_orleans_so_cprr_2018.csv"), encoding="cp1252")
-          .pipe(clean_column_names)
-
+    dfe = pd.read_csv(
+        deba.data("raw/new_orleans_so/new_orleans_so_cprr_2018.csv"), encoding="cp1252"
+    ).pipe(clean_column_names)
+    dfe = dfa.rename(
+        columns={
+            "date_completed": "investigation_complete_date",
+            "date_started": "investigation_start_date",
+            "date_received": "receive_date",
+            "date_of_board": "board_hearing_date",
+        }
     )
-    dfe = dfa.rename(columns={"date_completed": "investigation_complete_date", "date_started": "investigation_start_date", "date_received": "receive_date", "date_of_board": "board_hearing_date"})
-
 
     df = pd.concat([dfa, dfb, dfc, dfd, dfe])
 
-    df = (df
-          .pipe(clean_column_names)
-          .drop(columns=["referred_by", "open_closed"])
-          .rename(columns={"case_number": "tracking_id_og", "related_item_numbers": "item_number", "related_charges": "allegation", "summary": "allegation_desc"})
-          .pipe(standardize_desc_cols, ["allegation", "allegation_desc"])
-          .pipe(clean_complainant)
-          .pipe(set_values, {"agency": "new-orleans-so"})
-          .pipe(clean_dates_18)
-          .pipe(clean_inmate_grievance)
-          .pipe(clean_disposition_18)
-          .pipe(split_name_18)
-         .pipe(gen_uid, ["first_name", "last_name", "agency"])
-         .pipe(
+    df = (
+        df.pipe(clean_column_names)
+        .drop(columns=["referred_by", "open_closed"])
+        .rename(
+            columns={
+                "case_number": "tracking_id_og",
+                "related_item_numbers": "item_number",
+                "related_charges": "allegation",
+                "summary": "allegation_desc",
+            }
+        )
+        .pipe(standardize_desc_cols, ["allegation", "allegation_desc"])
+        .pipe(clean_complainant)
+        .pipe(set_values, {"agency": "new-orleans-so"})
+        .pipe(clean_dates_18)
+        .pipe(clean_inmate_grievance)
+        .pipe(clean_disposition_18)
+        .pipe(split_name_18)
+        .pipe(gen_uid, ["first_name", "last_name", "agency"])
+        .pipe(gen_uid, ["agency", "tracking_id_og"], "tracking_id")
+        .pipe(
             gen_uid,
             ["tracking_id", "allegation"],
             "allegation_uid",
         )
-        .pipe(gen_uid, ["agency", "tracking_id_og"], "tracking_id")
-
-          )
+    )
 
     return df
 
