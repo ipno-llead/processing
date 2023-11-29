@@ -1689,7 +1689,7 @@ def clean22():
     return df
 
 
-def clean_complainant(df):
+def clean_complainant_18(df):
     df.loc[:, "complainant_type"] = (
         df.victim_complainant.str.lower()
         .str.strip()
@@ -1772,11 +1772,18 @@ def clean18():
         deba.data("raw/new_orleans_so/new_orleans_so_cprr_2016.csv"), encoding="cp1252"
     ).pipe(clean_column_names)
 
-    dfb = dfa.rename(
+    dfb = dfb.rename(
         columns={
             "date_of_completion": "investigation_complete_date",
             "date_of_referral": "investigation_start_date",
             "date_of_board": "board_hearing_date",
+            "charge_disposition": "disposition",
+            "job_title": "rank_desc",
+            "terminated_resigned": "action",
+            "related_item_number": "related_item_numbers",
+
+
+
         }
     )
 
@@ -1784,11 +1791,16 @@ def clean18():
         deba.data("raw/new_orleans_so/new_orleans_so_cprr_2017.csv"), encoding="cp1252"
     ).pipe(clean_column_names)
 
-    dfc = dfa.rename(
+    dfc = dfc.rename(
         columns={
             "date_completed": "investigation_complete_date",
             "date_of_referral": "investigation_start_date",
             "date_of_board": "board_hearing_date",
+             "charge_disposition": "disposition",
+            "job_title": "rank_desc",
+            "terminated_resigned": "action",
+
+
         }
     )
 
@@ -1796,42 +1808,60 @@ def clean18():
         deba.data("raw/new_orleans_so/new_orleans_so_cprr_2018.csv"), encoding="cp1252"
     ).pipe(clean_column_names)
 
-    dfd = dfa.rename(
+    dfd = dfd.rename(
         columns={
             "date_completed": "investigation_complete_date",
             "date_started": "investigation_start_date",
             "date_received": "receive_date",
             "date_of_board": "board_hearing_date",
+             "charge_disposition": "disposition",
+            "job_title": "rank_desc",
+            "name_of_accused": "offender_s",
+            "terminated_resigned": "action",
+            "related_item_number": "related_item_numbers",
+
+
+
         }
     )
 
     dfe = pd.read_csv(
         deba.data("raw/new_orleans_so/new_orleans_so_cprr_2018.csv"), encoding="cp1252"
     ).pipe(clean_column_names)
-    dfe = dfa.rename(
+    
+    dfe = dfe.rename(
         columns={
             "date_completed": "investigation_complete_date",
             "date_started": "investigation_start_date",
             "date_received": "receive_date",
             "date_of_board": "board_hearing_date",
+             "charge_disposition": "disposition",
+            "job_title": "rank_desc",
+            "name_of_accused": "offender_s",
+            "terminated_resigned": "action",
+            "related_item_number": "related_item_numbers",
+
         }
     )
 
-    df = pd.concat([dfa, dfb, dfc, dfd, dfe])
+    df = pd.concat([dfa, dfb, dfc, dfd, dfe], axis=0)
 
     df = (
         df.pipe(clean_column_names)
-        .drop(columns=["referred_by", "open_closed"])
+        .drop(columns=["referred_by", "open_closed", "a_i", "number_of_cases", ])
         .rename(
             columns={
                 "case_number": "tracking_id_og",
                 "related_item_numbers": "item_number",
+                "related_item_number": "item_number",
                 "related_charges": "allegation",
-                "summary": "allegation_desc",
-            }
+                "summary": "allegation_desc",  
+                "intial_action": "initial_action"
+  
+    }
         )
-        .pipe(standardize_desc_cols, ["allegation", "allegation_desc"])
-        .pipe(clean_complainant)
+        .pipe(standardize_desc_cols, ["allegation", "allegation_desc", "action"])
+        .pipe(clean_complainant_18)
         .pipe(set_values, {"agency": "new-orleans-so"})
         .pipe(clean_dates_18)
         .pipe(clean_inmate_grievance)
