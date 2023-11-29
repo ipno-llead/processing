@@ -1689,6 +1689,53 @@ def clean22():
     return df
 
 
+def clean_complainant(df):
+    df.loc[:, "complainant_type"] = df.victim_complainant.str.lower().str.strip().str.replace(r"(deputy|sergeant|chief|recruit).+", "internal", regex=True).str.replace(r"^(known|inm|civi|criminal|rik).+", "external", regex=True)
+    return df.drop(columns=["victim_complainant"])
+
+
+def clean18():
+
+    dfa = (pd.read_csv(deba.data("raw/new_orleans_so/new_orleans_so_cprr_2015.csv"))
+          .pipe(clean_column_names)
+    )
+
+    dfa = dfa.rename(columns={"date_of_completion": "investigation_complete_date", "date_of_referral": "investigation_start_date", "board_date": "board_hearing_date"})
+
+    dfb = (pd.read_csv(deba.data("raw/new_orleans_so/new_orleans_so_cprr_2016.csv"), encoding="cp1252")
+          .pipe(clean_column_names)
+    )
+
+    dfb = dfa.rename(columns={"date_of_completion": "investigation_complete_date", "date_of_referral": "investigation_start_date", "date_of_board": "board_hearing_date"})
+
+
+    dfc = (pd.read_csv(deba.data("raw/new_orleans_so/new_orleans_so_cprr_2017.csv"), encoding="cp1252")
+          .pipe(clean_column_names)
+    )
+
+    dfc = dfa.rename(columns={"date_completed": "investigation_complete_date", "date_of_referral": "investigation_start_date"})
+
+
+    dfd = (pd.read_csv(deba.data("raw/new_orleans_so/new_orleans_so_cprr_2018.csv"), encoding="cp1252")
+          .pipe(clean_column_names)
+    )
+
+    dfd = dfa.rename(columns={"date_completed": "investigation_complete_date", "date_started": "investigation_start_date", "date_received": "receive_date", "date_of_board": "board_hearing_date"})
+
+    dfe = (pd.read_csv(deba.data("raw/new_orleans_so/new_orleans_so_cprr_2018.csv"), encoding="cp1252")
+          .pipe(clean_column_names)
+
+    )
+    dfe = dfa.rename(columns={"date_completed": "investigation_complete_date", "date_started": "investigation_start_date", "date_received": "receive_date", "date_of_board": "board_hearing_date"})
+
+
+    df = pd.concat([dfa, dfb, dfc, dfd, dfe])
+
+    df = (df.pipe(clean_column_names).pipe(clean_complainant))
+
+    return df
+
+
 if __name__ == "__main__":
     df19 = clean19()
     df20 = clean20()
