@@ -386,7 +386,43 @@ def match_cprr_22_w_pprr(cprr, pprr):
     return cprr
 
 
+def match_cprr_18_w_pprr(cprr, pprr):
+    dfa = (
+        cprr.loc[cprr.uid.notna(), ["uid", "first_name", "last_name"]]
+        .drop_duplicates(subset=["uid"])
+        .set_index("uid", drop=True)
+    )
+    dfa.loc[:, "fc"] = dfa.first_name.fillna("").map(lambda x: x[:1])
+
+    dfb = (
+        pprr[["uid", "first_name", "last_name"]]
+        .drop_duplicates()
+        .set_index("uid", drop=True)
+    )
+    dfb.loc[:, "fc"] = dfb.first_name.fillna("").map(lambda x: x[:1])
+
+    matcher = ThresholdMatcher(
+        ColumnsIndex("fc"),
+        {
+            "first_name": JaroWinklerSimilarity(),
+            "last_name": JaroWinklerSimilarity(),
+        },
+        dfa,
+        dfb,
+    )
+    decision = 0.931
+    matcher.save_pairs_to_excel(
+        deba.data("match/cprr_orleans_so_2021_v_pprr.xlsx"),
+        decision,
+    )
+    matches = matcher.get_index_pairs_within_thresholds(decision)
+    match_dict = dict(matches)
+
+    cprr.loc[:, "uid"] = cprr.uid.map(lambda x: match_dict.get(x, x))
+    return cprr
+
 if __name__ == "__main__":
+    cprr18 =  pd.read_csv(deba.data("clean/cprr_new_orleans_so_2018.csv"))
     cprr19 = pd.read_csv(deba.data("clean/cprr_new_orleans_so_2019.csv"))
     cprr20 = pd.read_csv(deba.data("clean/cprr_new_orleans_so_2020.csv"))
     cprr21 = pd.read_csv(deba.data("clean/cprr_new_orleans_so_2021.csv"))
@@ -405,7 +441,9 @@ if __name__ == "__main__":
     cprr20 = assign_supervisor_20_uid_from_pprr(cprr20, pprr)
     overtime20 = match_overtime_w_pprr(overtime20, pprr)
     post_events = match_pprr_against_post(pprr, post)
-    cprr22 = match_cprr_21_w_pprr(cprr22, pprr)
+    cprr22 = match_cprr_22_w_pprr(cprr22, pprr)
+    cprr18 = match_cprr_18_w_pprr(cprr18, pprr)
+    cprr18.to_csv(deba.data("match/cprr_new_orleans_so_2018.csv"), index=False)
     cprr19.to_csv(deba.data("match/cprr_new_orleans_so_2019.csv"), index=False)
     cprr20.to_csv(deba.data("match/cprr_new_orleans_so_2020.csv"), index=False)
     cprr21.to_csv(deba.data("match/cprr_new_orleans_so_2021.csv"), index=False)
