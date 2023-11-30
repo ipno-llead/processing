@@ -1701,41 +1701,71 @@ def clean_complainant_18(df):
 
 def clean_dates_18(df):
     df.loc[:, "incident_date"] = (
-        df.incident_date.fillna("").str.lower()
+        df.incident_date.fillna("")
+        .str.lower()
         .str.replace(r" late entry", "", regex=True)
         .str.replace(r"(\w+\/\w+\/\w{3})$", "", regex=True)
     )
 
-    df.loc[
-        :, "investigation_complete_date"
-    ] = df.investigation_complete_date.fillna("").str.lower().str.replace(
-        r"under investigation", "", regex=False
-    ).str.replace(r"^open$", "", regex=True)
+    df.loc[:, "investigation_complete_date"] = (
+        df.investigation_complete_date.fillna("")
+        .str.lower()
+        .str.replace(r"under investigation", "", regex=False)
+        .str.replace(r"^open$", "", regex=True)
+    )
 
-    df.loc[
-        :, "investigation_start_date"
-    ] = df.investigation_start_date.fillna("").str.lower().str.replace(
-        r"(.+)and(.+)", "", regex=True
+    df.loc[:, "investigation_start_date"] = (
+        df.investigation_start_date.fillna("")
+        .str.lower()
+        .str.replace(r"(.+)and(.+)", "", regex=True)
     )
 
     df.loc[:, "board_hearing_date"] = (
         df.board_hearing_date.fillna("")
         .str.lower()
         .str.strip()
-        .str.replace(r"^ ?(tbs|out|tba|has|awa|sick)(.+)?", "", regex=True).str.replace(r"^n$", "", regex=True)
+        .str.replace(r"^ ?(tbs|out|tba|has|awa|sick)(.+)?", "", regex=True)
+        .str.replace(r"^n$", "", regex=True)
     )
 
     df.loc[:, "receive_date"] = df.receive_date.str.replace(r"\/\/", "/", regex=True)
-    df.loc[:, "investigation_start_date"] = df.investigation_start_date.str.replace(r"\/\/", "/", regex=True)
-    df.loc[:, "investigation_complete_date"] = df.investigation_complete_date.str.replace(r"\/\/", "/", regex=True)
-    df.loc[:, "board_hearing_date"] = df.board_hearing_date.str.replace(r"\/\/", "/", regex=True)
+    df.loc[:, "investigation_start_date"] = df.investigation_start_date.str.replace(
+        r"\/\/", "/", regex=True
+    )
+    df.loc[
+        :, "investigation_complete_date"
+    ] = df.investigation_complete_date.str.replace(r"\/\/", "/", regex=True)
+    df.loc[:, "board_hearing_date"] = df.board_hearing_date.str.replace(
+        r"\/\/", "/", regex=True
+    )
 
-    df.loc[:, "receive_date"] = df.receive_date.str.replace(r"(.+)\/(\w{5})$", "", regex=True)
-    df.loc[:, "investigation_start_date"] = df.investigation_start_date.str.replace(r"(.+)\/(\w{5})$", "", regex=True)
-    df.loc[:, "investigation_complete_date"] = df.investigation_complete_date.str.replace(r"(.+)\/(\w{5})$", "", regex=True)
-    df.loc[:, "board_hearing_date"] = df.board_hearing_date.str.replace(r"(.+)\/(\w{5})$", "", regex=True)
+    df.loc[:, "receive_date"] = df.receive_date.str.replace(
+        r"(.+)\/(\w{5})$", "", regex=True
+    )
+    df.loc[:, "investigation_start_date"] = df.investigation_start_date.str.replace(
+        r"(.+)\/(\w{5})$", "", regex=True
+    )
+    df.loc[
+        :, "investigation_complete_date"
+    ] = df.investigation_complete_date.str.replace(r"(.+)\/(\w{5})$", "", regex=True)
+    df.loc[:, "board_hearing_date"] = df.board_hearing_date.str.replace(
+        r"(.+)\/(\w{5})$", "", regex=True
+    )
 
-
+    df.loc[:, "receive_date"] = df.receive_date.str.replace(
+        r"(\w{1,2})\/(\w{1,2}(\w{4})$", r"\1/\2/\3", regex=True
+    )
+    df.loc[:, "investigation_start_date"] = df.investigation_start_date.str.replace(
+        r"(\w{1,2})\/(\w{1,2}(\w{4})$", r"\1/\2/\3", regex=True
+    )
+    df.loc[
+        :, "investigation_complete_date"
+    ] = df.investigation_complete_date.str.replace(
+        r"(\w{1,2})\/(\w{1,2}(\w{4})$", r"\1/\2/\3", regex=True
+    )
+    df.loc[:, "board_hearing_date"] = df.board_hearing_date.str.replace(
+        r"(\w{1,2})\/(\w{1,2}(\w{4})$", r"\1/\2/\3", regex=True
+    )
     return df
 
 
@@ -1799,9 +1829,6 @@ def clean18():
             "job_title": "rank_desc",
             "terminated_resigned": "action",
             "related_item_number": "related_item_numbers",
-
-
-
         }
     )
 
@@ -1814,11 +1841,9 @@ def clean18():
             "date_completed": "investigation_complete_date",
             "date_of_referral": "investigation_start_date",
             "date_of_board": "board_hearing_date",
-             "charge_disposition": "disposition",
+            "charge_disposition": "disposition",
             "job_title": "rank_desc",
             "terminated_resigned": "action",
-
-
         }
     )
 
@@ -1832,33 +1857,29 @@ def clean18():
             "date_started": "investigation_start_date",
             "date_received": "receive_date",
             "date_of_board": "board_hearing_date",
-             "charge_disposition": "disposition",
+            "charge_disposition": "disposition",
             "job_title": "rank_desc",
             "name_of_accused": "offender_s",
             "terminated_resigned": "action",
             "related_item_number": "related_item_numbers",
-
-
-
         }
     )
 
     dfe = pd.read_csv(
         deba.data("raw/new_orleans_so/new_orleans_so_cprr_2018.csv"), encoding="cp1252"
     ).pipe(clean_column_names)
-    
+
     dfe = dfe.rename(
         columns={
             "date_completed": "investigation_complete_date",
             "date_started": "investigation_start_date",
             "date_received": "receive_date",
             "date_of_board": "board_hearing_date",
-             "charge_disposition": "disposition",
+            "charge_disposition": "disposition",
             "job_title": "rank_desc",
             "name_of_accused": "offender_s",
             "terminated_resigned": "action",
             "related_item_number": "related_item_numbers",
-
         }
     )
 
@@ -1866,17 +1887,23 @@ def clean18():
 
     df = (
         df.pipe(clean_column_names)
-        .drop(columns=["referred_by", "open_closed", "a_i", "number_of_cases", ])
+        .drop(
+            columns=[
+                "referred_by",
+                "open_closed",
+                "a_i",
+                "number_of_cases",
+            ]
+        )
         .rename(
             columns={
                 "case_number": "tracking_id_og",
                 "related_item_numbers": "item_number",
                 "related_item_number": "item_number",
                 "related_charges": "allegation",
-                "summary": "allegation_desc",  
-                "intial_action": "initial_action"
-  
-    }
+                "summary": "allegation_desc",
+                "intial_action": "initial_action",
+            }
         )
         .pipe(standardize_desc_cols, ["allegation", "allegation_desc", "action"])
         .pipe(clean_complainant_18)
