@@ -1701,25 +1701,39 @@ def clean_complainant_18(df):
 
 def clean_dates_18(df):
     df.loc[:, "incident_date"] = (
-        df.incident_date.str.lower()
+        df.incident_date.fillna("").str.lower()
         .str.replace(r" late entry", "", regex=True)
         .str.replace(r"(\w+\/\w+\/\w{3})$", "", regex=True)
-    ).str.replace(r"\/\/", "/", regex=True)
+    )
 
     df.loc[
         :, "investigation_complete_date"
-    ] = df.investigation_complete_date.str.lower().str.replace(
+    ] = df.investigation_complete_date.fillna("").str.lower().str.replace(
         r"under investigation", "", regex=False
-    ).str.replace(r"\/\/", "/", regex=True)
+    ).str.replace(r"^open$", "", regex=True)
+
+    df.loc[
+        :, "investigation_start_date"
+    ] = df.investigation_start_date.fillna("").str.lower().str.replace(
+        r"(.+)and(.+)", "", regex=True
+    )
 
     df.loc[:, "board_hearing_date"] = (
         df.board_hearing_date.fillna("")
         .str.lower()
         .str.strip()
-        .str.replace(r"^(tbs|out|tba)", "", regex=True).str.replace(r"\/\/", "/", regex=True)
+        .str.replace(r"^ ?(tbs|out|tba|has|awa|sick)(.+)?", "", regex=True).str.replace(r"^n$", "", regex=True)
     )
 
     df.loc[:, "receive_date"] = df.receive_date.str.replace(r"\/\/", "/", regex=True)
+    df.loc[:, "investigation_start_date"] = df.investigation_start_date.str.replace(r"\/\/", "/", regex=True)
+    df.loc[:, "investigation_complete_date"] = df.investigation_complete_date.str.replace(r"\/\/", "/", regex=True)
+    df.loc[:, "board_hearing_date"] = df.board_hearing_date.str.replace(r"\/\/", "/", regex=True)
+
+    df.loc[:, "receive_date"] = df.receive_date.str.replace(r"(.+)\/(\w{5})$", "", regex=True)
+    df.loc[:, "investigation_start_date"] = df.investigation_start_date.str.replace(r"(.+)\/(\w{5})$", "", regex=True)
+    df.loc[:, "investigation_complete_date"] = df.investigation_complete_date.str.replace(r"(.+)\/(\w{5})$", "", regex=True)
+    df.loc[:, "board_hearing_date"] = df.board_hearing_date.str.replace(r"(.+)\/(\w{5})$", "", regex=True)
 
 
     return df
