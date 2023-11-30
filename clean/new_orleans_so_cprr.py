@@ -1938,6 +1938,7 @@ def clean18():
             ["tracking_id", "allegation"],
             "allegation_uid",
         )
+        .drop_duplicates(subset=["allegation_uid"])
     )
 
     return df
