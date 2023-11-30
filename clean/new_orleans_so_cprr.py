@@ -1757,7 +1757,7 @@ def clean_dates_18(df):
     ).str.replace(r"^ (.+)", r"\1", regex=True).str.replace(r"(.+) $", r"\1", regex=True).str.replace(
         r"(\w{2})(\w{2})\/(\w{4})$", r"\1/\2/\3", regex=True
     ).str.replace(
-        r"\/(\w{1,3})$", r"", regex=True
+        r"(.+)\/(\w{1,3})$", r"", regex=True
     )
     
     df.loc[:, "investigation_start_date"] = df.investigation_start_date.str.replace(
@@ -1765,7 +1765,7 @@ def clean_dates_18(df):
     ).str.replace(r"^ (.+)", r"\1", regex=True).str.replace(r"(.+) $", r"\1", regex=True).str.replace(
         r"(\w{2})(\w{2})\/(\w{4})$", r"\1/\2/\3", regex=True
     ).str.replace(
-        r"\/(\w{1,3})$", r"", regex=True
+        r"(.+)\/(\w{1,3})$", r"", regex=True
     )
    
     df.loc[
@@ -1775,7 +1775,7 @@ def clean_dates_18(df):
     ).str.replace(r"^ (.+)", r"\1", regex=True).str.replace(r"(.+) $", r"\1", regex=True).str.replace(
         r"(\w{2})(\w{2})\/(\w{4})$", r"\1/\2/\3", regex=True
     ).str.replace(
-        r"\/(\w{1,3})$", r"", regex=True
+        r"(.+)\/(\w{1,3})$", r"", regex=True
     )
 
     df.loc[:, "board_hearing_date"] = df.board_hearing_date.str.replace(
@@ -1783,7 +1783,7 @@ def clean_dates_18(df):
     ).str.replace(r"^ (.+)", r"\1", regex=True).str.replace(r"(.+) $", r"\1", regex=True).str.replace(
         r"(\w{2})(\w{2})\/(\w{4})$", r"\1/\2/\3", regex=True
     ).str.replace(
-        r"\/(\w{1,3})$", r"", regex=True
+        r"(.+)\/(\w{1,3})$", r"", regex=True
     )
     return df
 
