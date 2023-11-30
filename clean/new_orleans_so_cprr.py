@@ -1754,18 +1754,19 @@ def clean_dates_18(df):
 
     df.loc[:, "receive_date"] = df.receive_date.str.replace(
         r"(\w{1,2})\/(\w{1,2})(\w{4})$", r"\1/\2/\3", regex=True
-    )
+    ).str.replace(r"^ (.+)", r"\1", regex=True).str.replace(r"(.+) $", r"\1", regex=True)
+    
     df.loc[:, "investigation_start_date"] = df.investigation_start_date.str.replace(
         r"(\w{1,2})\/(\w{1,2})(\w{4})$", r"\1/\2/\3", regex=True
-    )
+    ).str.replace(r"^ (.+)", r"\1", regex=True).str.replace(r"(.+) $", r"\1", regex=True)
     df.loc[
         :, "investigation_complete_date"
     ] = df.investigation_complete_date.str.replace(
         r"(\w{1,2})\/(\w{1,2})(\w{4})$", r"\1/\2/\3", regex=True
-    )
+    ).str.replace(r"^ (.+)", r"\1", regex=True).str.replace(r"(.+) $", r"\1", regex=True)
     df.loc[:, "board_hearing_date"] = df.board_hearing_date.str.replace(
         r"(\w{1,2})\/(\w{1,2})(\w{4})$", r"\1/\2/\3", regex=True
-    )
+    ).str.replace(r"^ (.+)", r"\1", regex=True).str.replace(r"(.+) $", r"\1", regex=True)
     return df
 
 
