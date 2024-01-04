@@ -300,7 +300,7 @@ def fuse_agency_lists():
     ).sort_values("agency_name", ignore_index=True)
 
 
-def match_per_with_post(per, post, events):
+def match_per_with_post(per, post, events, allegation_df, uof_df, sas_df, app_df, brady_df, property_claims_df, settlements, police_reports ):
     dfa = (
         per.loc[per.uid.notna(), ["uid", "first_name", "last_name", "agency"]]
         .drop_duplicates(subset=["uid"])
@@ -346,7 +346,16 @@ def match_per_with_post(per, post, events):
 
     per['uid'] = per['uid'].map(match_dict).fillna(per['uid'])
     events['uid'] = events['uid'].map(match_dict).fillna(events['uid'])
-    return per, post, events
+    allegation_df['uid'] = allegation_df['uid'].map(match_dict).fillna(allegation_df['uid'])
+    uof_df['uid'] = uof_df['uid'].map(match_dict).fillna(uof_df['uid'])
+    sas_df['uid'] = sas_df['uid'].map(match_dict).fillna(sas_df['uid'])
+    app_df['uid'] = app_df['uid'].map(match_dict).fillna(app_df['uid'])
+    brady_df['uid'] = brady_df['uid'].map(match_dict).fillna(brady_df['uid'])
+    property_claims_df['uid'] = property_claims_df['uid'].map(match_dict).fillna(property_claims_df['uid'])
+    settlements['uid'] = settlements['uid'].map(match_dict).fillna(settlements['uid'])
+    police_reports['uid'] = police_reports['uid'].map(match_dict).fillna(police_reports['uid'])
+
+    return per, post, events, allegation_df, uof_df, sas_df, app_df, brady_df, property_claims_df, settlements, police_reports 
 
 
 def read_personnel():
@@ -446,13 +455,8 @@ def fuse_personnel(per_dfs, post):
 
 if __name__ == "__main__":
     events = read_event()
-    per = read_personnel()
-    post = read_post()
-    per_df, post, event_df = match_per_with_post(per, post, events)
-    per_df = fuse_personnel(per_df, post)
 
-    ensure_uid_unique(per_df, "uid")
-    ensure_uid_unique(event_df, "event_uid")
+
     allegation_df = fuse_allegation()
     ensure_uid_unique(allegation_df, "allegation_uid")
     uof_df = fuse_use_of_force()
@@ -467,6 +471,15 @@ if __name__ == "__main__":
     police_reports = fuse_police_reports()
     citizens = fuse_citizen_dfs()
     agencies = fuse_agency_lists()
+
+    per = read_personnel()
+    post = read_post()
+    per_df, post, event_df, allegation_df, uof_df, sas_df, app_df, brady_df, property_claims_df, settlements, police_reports = match_per_with_post(per, post, events, allegation_df, uof_df, sas_df, app_df, brady_df, property_claims_df, settlements, police_reports)
+    per_df = fuse_personnel(per_df, post)
+
+    ensure_uid_unique(per_df, "uid")
+    ensure_uid_unique(event_df, "event_uid")
+
 
     event_df.to_csv("events.csv", index=False)
 
