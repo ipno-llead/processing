@@ -17,89 +17,10 @@ from lib.columns import (
     rearrange_agency_columns
 )
 from lib.uid import ensure_uid_unique
+from datamatch import JaroWinklerSimilarity, ThresholdMatcher, ColumnsIndex, DissimilarFilter
 
 
-def fuse_personnel():
-    return rearrange_personnel_columns(
-        pd.concat(
-            [
-                pd.read_csv(deba.data("fuse_agency/per_baton_rouge_pd.csv")),
-                pd.read_csv(deba.data("fuse_agency/per_baton_rouge_so.csv")),
-                pd.read_csv(deba.data("fuse_agency/per_new_orleans_harbor_pd.csv")),
-                pd.read_csv(deba.data("fuse_agency/per_new_orleans_pd.csv")),
-                pd.read_csv(deba.data("fuse_agency/per_brusly_pd.csv")),
-                pd.read_csv(deba.data("fuse_agency/per_port_allen_pd.csv")),
-                pd.read_csv(deba.data("fuse_agency/per_madisonville_pd.csv")),
-                pd.read_csv(deba.data("fuse_agency/per_greenwood_pd.csv")),
-                pd.read_csv(deba.data("fuse_agency/per_st_tammany_so.csv")),
-                pd.read_csv(deba.data("fuse_agency/per_plaquemines_so.csv")),
-                pd.read_csv(deba.data("fuse_agency/per_louisiana_state_pd.csv")),
-                pd.read_csv(deba.data("fuse_agency/per_caddo_so.csv")),
-                pd.read_csv(deba.data("fuse_agency/per_mandeville_pd.csv")),
-                pd.read_csv(deba.data("fuse_agency/per_levee_pd.csv")),
-                pd.read_csv(deba.data("fuse_agency/per_grand_isle_pd.csv")),
-                pd.read_csv(deba.data("fuse_agency/per_gretna_pd.csv")),
-                pd.read_csv(deba.data("fuse_agency/per_kenner_pd.csv")),
-                pd.read_csv(deba.data("fuse_agency/per_vivian_pd.csv")),
-                pd.read_csv(deba.data("fuse_agency/per_covington_pd.csv")),
-                pd.read_csv(deba.data("fuse_agency/per_slidell_pd.csv")),
-                pd.read_csv(deba.data("fuse_agency/per_new_orleans_so.csv")),
-                pd.read_csv(deba.data("fuse_agency/per_scott_pd.csv")),
-                pd.read_csv(deba.data("fuse_agency/per_shreveport_pd.csv")),
-                pd.read_csv(deba.data("fuse_agency/per_tangipahoa_so.csv")),
-                pd.read_csv(deba.data("fuse_agency/per_ponchatoula_pd.csv")),
-                pd.read_csv(deba.data("fuse_agency/per_lafayette_so.csv")),
-                pd.read_csv(deba.data("fuse_agency/per_lafayette_pd.csv")),
-                pd.read_csv(deba.data("fuse_agency/per_hammond_pd.csv")),
-                pd.read_csv(deba.data("fuse_agency/per_lake_charles_pd.csv")),
-                pd.read_csv(deba.data("fuse_agency/per_sterlington_pd.csv")),
-                pd.read_csv(deba.data("fuse_agency/per_youngsville_pd.csv")),
-                pd.read_csv(deba.data("fuse_agency/per_west_monroe_pd.csv")),
-                pd.read_csv(deba.data("fuse_agency/per_carencro_pd.csv")),
-                pd.read_csv(deba.data("fuse_agency/per_central_csd.csv")),
-                pd.read_csv(deba.data("fuse_agency/per_bossier_city_pd.csv")),
-                pd.read_csv(deba.data("fuse_agency/per_baker_pd.csv")),
-                pd.read_csv(deba.data("fuse_agency/per_houma_pd.csv")),
-                pd.read_csv(deba.data("fuse_agency/per_gonzales_pd.csv")),
-                pd.read_csv(deba.data("fuse_agency/per_denham_springs_pd.csv")),
-                pd.read_csv(deba.data("fuse_agency/per_abbeville_pd.csv")),
-                pd.read_csv(deba.data("fuse_agency/per_washington_so.csv")),
-                pd.read_csv(deba.data("fuse_agency/per_cameron_so.csv")),
-                pd.read_csv(deba.data("fuse_agency/per_maurice_pd.csv")),
-                pd.read_csv(deba.data("fuse_agency/per_terrebonne_so.csv")),
-                pd.read_csv(deba.data("fuse_agency/per_jefferson_so.csv")),
-                pd.read_csv(deba.data("fuse_agency/per_acadia_so.csv")),
-                pd.read_csv(deba.data("fuse_agency/per_post.csv")),
-                pd.read_csv(deba.data("fuse_agency/per_erath_pd.csv")),
-                pd.read_csv(deba.data("fuse_agency/per_st_landry_so.csv")),
-                pd.read_csv(deba.data("fuse_agency/per_benton_pd.csv")),
-                pd.read_csv(deba.data("fuse_agency/per_eunice_pd.csv")),
-                pd.read_csv(deba.data("fuse_agency/per_rayne_pd.csv")),
-                pd.read_csv(deba.data("fuse_agency/per_st_john_so.csv")),
-                pd.read_csv(deba.data("fuse_agency/per_lafourche_so.csv")),
-                pd.read_csv(deba.data("fuse_agency/per_ascension_so.csv")),
-                pd.read_csv(deba.data("fuse_agency/per_sulphur_pd.csv")),
-                pd.read_csv(deba.data("fuse_agency/per_pineville_pd.csv")),
-                pd.read_csv(deba.data("fuse_agency/per_st_james_so.csv")),
-                pd.read_csv(deba.data("fuse_agency/per_natchitoches_so.csv")),
-                pd.read_csv(deba.data("fuse_agency/per_harahan_pd.csv")),
-                pd.read_csv(deba.data("fuse_agency/per_morehouse_so.csv")),
-                pd.read_csv(deba.data("fuse_agency/per_iberia_so.csv")),
-                pd.read_csv(deba.data("fuse_agency/per_lockport_pd.csv")),
-                pd.read_csv(deba.data("fuse_agency/per_jefferson_davis_so.csv")),
-                pd.read_csv(deba.data("fuse_agency/per_baton_rouge_da.csv")),
-                pd.read_csv(deba.data("fuse_agency/per_ouachita_da.csv")),
-                pd.read_csv(deba.data("fuse_agency/per_morehouse_da.csv")),
-                pd.read_csv(deba.data("fuse_agency/per_east_feliciana_so.csv")),
-                pd.read_csv(deba.data("fuse_agency/per_lasalle_so.csv")),
-                pd.read_csv(deba.data("fuse_agency/per_point_coupee_so.csv")),
-                pd.read_csv(deba.data("fuse_agency/per_richland_so.csv")),
-            ]
-        )
-    ).sort_values("uid", ignore_index=True)
-
-
-def fuse_event():
+def read_event():
     return rearrange_event_columns(
         pd.concat(
             [
@@ -379,10 +300,158 @@ def fuse_agency_lists():
     ).sort_values("agency_name", ignore_index=True)
 
 
+def match_per_with_post(per, post, events):
+    dfa = (
+        per.loc[per.uid.notna(), ["uid", "first_name", "last_name", "agency"]]
+        .drop_duplicates(subset=["uid"])
+    )
+    dfa.loc[:, "dissimilar_filter"] = dfa.uid
+    dfa = dfa.set_index("uid", drop=True)
+    dfa.loc[:, "fc"] = dfa.first_name.fillna("").map(lambda x: x[:5])
+    dfa.loc[:, "lc"] = dfa.last_name.fillna("").map(lambda x: x[:5])
+
+    dfb = (
+        post[["uid", "first_name", "last_name", "agency"]]
+        .drop_duplicates()
+    )
+    dfb.loc[:, "dissimilar_filter"] = dfb.uid
+    dfb = dfb.set_index("uid", drop=True)
+    dfb.loc[:, "fc"] = dfb.first_name.fillna("").map(lambda x: x[:5])
+    dfb.loc[:, "lc"] = dfb.last_name.fillna("").map(lambda x: x[:5])
+
+    matcher = ThresholdMatcher(
+        ColumnsIndex(["fc", "lc", "agency"]),
+        {
+            "first_name": JaroWinklerSimilarity(),
+            "last_name": JaroWinklerSimilarity(),
+        },
+        dfa,
+        dfb,
+        filters=[
+            DissimilarFilter("dissimilar_filter"),
+        ],
+    )
+    decision = .990
+    matcher.save_pairs_to_excel(
+        deba.data("fuse/personnel.xlsx"),
+        decision,
+    )
+    matches = matcher.get_index_pairs_within_thresholds(decision)
+    match_dict = dict(matches)
+    match_list = list(match_dict.items())
+    match_df = pd.DataFrame(match_list, columns=['per', 'post'])
+    match_df.to_csv("match_dict.csv")
+    match_df.set_index('per', inplace=True)
+    match_dict = match_df['post'].to_dict()
+
+    per['uid'] = per['uid'].map(match_dict).fillna(per['uid'])
+    events['uid'] = events['uid'].map(match_dict).fillna(events['uid'])
+    return per, post, events
+
+
+def read_personnel():
+    return rearrange_personnel_columns(
+        pd.concat(
+            [
+                pd.read_csv(deba.data("fuse_agency/per_baton_rouge_pd.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_baton_rouge_so.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_new_orleans_harbor_pd.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_new_orleans_pd.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_brusly_pd.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_port_allen_pd.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_madisonville_pd.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_greenwood_pd.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_st_tammany_so.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_plaquemines_so.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_louisiana_state_pd.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_caddo_so.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_mandeville_pd.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_levee_pd.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_grand_isle_pd.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_gretna_pd.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_kenner_pd.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_vivian_pd.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_covington_pd.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_slidell_pd.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_new_orleans_so.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_scott_pd.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_shreveport_pd.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_tangipahoa_so.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_ponchatoula_pd.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_lafayette_so.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_lafayette_pd.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_hammond_pd.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_lake_charles_pd.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_sterlington_pd.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_youngsville_pd.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_west_monroe_pd.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_carencro_pd.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_central_csd.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_bossier_city_pd.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_baker_pd.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_houma_pd.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_gonzales_pd.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_denham_springs_pd.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_abbeville_pd.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_washington_so.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_cameron_so.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_maurice_pd.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_terrebonne_so.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_jefferson_so.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_acadia_so.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_erath_pd.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_st_landry_so.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_benton_pd.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_eunice_pd.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_rayne_pd.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_st_john_so.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_lafourche_so.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_ascension_so.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_sulphur_pd.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_pineville_pd.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_st_james_so.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_natchitoches_so.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_harahan_pd.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_morehouse_so.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_iberia_so.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_lockport_pd.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_jefferson_davis_so.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_baton_rouge_da.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_ouachita_da.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_morehouse_da.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_east_feliciana_so.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_lasalle_so.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_point_coupee_so.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_richland_so.csv")),
+            ]
+        )
+    ).sort_values("uid", ignore_index=True)
+
+
+def read_post():
+    df = pd.read_csv(deba.data("fuse_agency/per_post.csv"))
+    return df 
+
+
+def fuse_personnel(per_dfs, post):
+    return rearrange_personnel_columns(
+        pd.concat(
+            [
+                per_dfs,
+                post
+            ]
+        )
+    ).sort_values("uid", ignore_index=True)
+
+
 if __name__ == "__main__":
-    per_df = fuse_personnel()
+    events = read_event()
+    per = read_personnel()
+    post = read_post()
+    per_df, post, event_df = match_per_with_post(per, post, events)
+    per_df = fuse_personnel(per_df, post)
+
     ensure_uid_unique(per_df, "uid")
-    event_df = fuse_event()
     ensure_uid_unique(event_df, "event_uid")
     allegation_df = fuse_allegation()
     ensure_uid_unique(allegation_df, "allegation_uid")
@@ -398,6 +467,7 @@ if __name__ == "__main__":
     police_reports = fuse_police_reports()
     citizens = fuse_citizen_dfs()
     agencies = fuse_agency_lists()
+
     event_df.to_csv("events.csv", index=False)
 
     per_df.to_csv(deba.data("fuse_agency/personnel_pre_post.csv"), index=False)
