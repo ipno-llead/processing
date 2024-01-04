@@ -38,6 +38,7 @@ if __name__ == "__main__":
     )
 
     event_df = event_df[event_df["uid"].isin(per_df["uid"])]
+    event_df = event_df.drop_duplicates(subset=["event_uid"])
     uof_df = uof_df[uof_df["uid"].isin(per_df["uid"])]
     sas_df = sas_df[sas_df["uid"].isin(per_df["uid"])]
     appeals_df = appeals_df[appeals_df["uid"].isin(per_df["uid"])]
