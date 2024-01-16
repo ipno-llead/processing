@@ -243,7 +243,7 @@ if __name__ == "__main__":
     )
     pprr = pd.read_csv(deba.data("clean/pprr_baton_rouge_pd_2021.csv"))
     cprr09 = pd.read_csv(deba.data("clean/cprr_baton_rouge_pd_2004_2009.csv"))
-    settlements = pd.read_csv(deba.data("clean/settlements_baton_rouge_pd_2020.csv"))
+    settlements = pd.read_csv(deba.data("clean/settlements_baton_rouge_pd_2020_2022.csv"))
     csd17 = match_csd_and_pd_pprr(csd17, pprr, 2017, 0.88)
     csd19 = match_csd_and_pd_pprr(csd19, pprr, 2019, 0.88)
     cprr18 = match_pd_cprr_2018_v_pprr(cprr18, pprr)

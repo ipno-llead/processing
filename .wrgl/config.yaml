@@ -1274,6 +1274,12 @@ branch:
     file: data/fuse_agency/settlements_baton_rouge_pd.csv
     primaryKey:
       - settlement_uid
+  settlements-baton-rouge-so:
+    remote: origin
+    merge: refs/heads/settlements-baton-rouge-so
+    file: data/fuse_agency/settlements_baton_rouge_so.csv
+    primaryKey:
+      - settlement_uid
   police-report-new-orleans-pd:
     remote: origin
     merge: refs/heads/police-report-new-orleans-pd
