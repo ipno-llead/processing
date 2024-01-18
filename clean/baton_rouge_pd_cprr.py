@@ -1112,6 +1112,80 @@ def clean_allegation_18(df):
     return df
 
 
+def strip_leading_commas23(df):
+    return df.applymap(lambda x: x.lstrip('\'') if isinstance(x, str) else x)
+
+def gen_tracking_id23(df):
+    df.loc[:, "tracking_id"] = df.ia_year.str.cat(df.ia_seq_1, sep="-")
+    return df 
+
+
+def split_names23(df):
+    names = df.officer_name.str.lower().str.extract(r"^(\w+)\, (\w+) (\w{1})")
+    df.loc[:, "first_name"] = names[1]
+    df.loc[:, "last_name"] = names[0]
+    df.loc[:, "middle_name"] = names[2]
+
+    badge_nos = df.officer_name.str.lower().str.extract(r"\b(\w{1,2})\b \bp(\w{4,5})\b (.+)$")
+    df.loc[:, "badge_number"] = badge_nos[1]
+    df.loc[:, "department_desc"] = badge_nos[2]
+
+    df.loc[:, "department_desc"] = (df.department_desc
+                                    .str.replace(r"^cib (.+)", r"criminal investigations bureau - \1", regex=True)
+                                    .str.replace(r"^patrol (.+)", r"patrol - \1", regex=True)
+                                    .str.replace(r"^op (.+)", r"operations - \1", regex=True)
+                                    .str.replace(r"^op$", "operations", regex=True)
+    )
+
+    return df.drop(columns=["officer_name"])
+
+def clean_complaint23(df):
+    df.loc[:, "allegation"] = (df.complaint.str.lower().str.strip().str.replace(r"\((\w+)\)\-(\w+)", r"(\1) - \2", regex=True)
+                               .str.replace(r" -(\w+)", r" - \1", regex=True)
+                               )
+    return df.drop(columns=["complaint"])
+
+def clean_disposition23(df):
+    df.loc[:, "disposition"] = (df.disposition
+                                .str.lower()
+                                .str.strip()
+                                .str.replace(r"^(-|not)$", "", regex=True)
+    )
+
+    return df 
+
+def clean_action23(df):
+    df.loc[:, "action"] = (df.action
+                           .str.lower()
+                           .str.strip()
+                           .str.replace(r"^letter of$", "letter of reprimand", regex=True)
+                           .str.replace(r"^office investigation\/officer resigned$", "resigned", regex=True)
+                           .str.replace(r"suspension & (\w+)", r"suspension; \1", regex=True)
+                           .str.replace(r"^resigned employment(.+)", "resigned", regex=True)
+                           .str.replace(r"^office ?-? ?investigation$", "", regex=True)
+                           .str.replace(r"&", "and", regex=True)
+                           .str.replace(r"^officer ", "", regex=True)
+                           .str.replace(r"^not sustained$", "", regex=True)
+                           .str.replace(r"^(officer?|- |conference worksheet)", "", regex=True)
+                            .str.replace(r"^-$", "", regex=True)
+                            .str.replace(r"^employment prior to loudermill hearing$", "", regex=True)
+    )
+    return df 
+
+def assign_missing_values23(df):
+    df.loc[(df['action'] == 'resigned') & (df['disposition'] == ""), 'disposition'] = 'resigned'
+    df.loc[(df['action'] == 'resigned in lieu of termination') & (df['disposition'] == ""), 'disposition'] = 'resigned in lieu of termination'
+
+    return df 
+
+
+
+def clean_complainant23(df):
+    df.loc[:, "complainant"] = df.complainaint.str.lower().str.replace(r"[b8]rpd", "internal", regex=True)
+    return df.drop(columns=["complainaint"])
+
+
+
 def clean_18():
     df = (
         pd.read_csv(deba.data("raw/baton_rouge_pd/cprr_baton_rouge_pd_2018.csv"))
@@ -1149,11 +1223,12 @@ def clean_18():
         .pipe(gen_uid, ["agency", "first_name", "middle_name", "last_name"])
         .pipe(
             gen_uid,
-            ["agency", "tracking_id", "uid", "action", "allegation"],
+            ["agency", "tracking_id", "action", "allegation", "receive_day", "receive_month", "receive_year", "occur_day", "occur_month", "occur_year"],
             "allegation_uid",
         )
         .pipe(create_tracking_id_og_col)
         .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
+        .drop_duplicates(subset=["allegation_uid", "uid"])
     )
     return df
 
@@ -1331,7 +1406,7 @@ def clean_21():
         )
         .pipe(create_tracking_id_og_col)
         .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
-        .drop_duplicates(subset=["allegation_uid"])
+        .drop_duplicates(subset=["allegation_uid", "uid"])
         .drop(columns=["received"])
     )
     return df.fillna(np.nan)
@@ -1382,11 +1457,56 @@ def clean09():
                 "occur_day",
                 "occur_year",
                 "occur_month",
-                "uid",
+                "receive_day",
+                "receive_month",
+                "receive_year",
             ],
             "allegation_uid",
         )
-        .drop_duplicates(subset=["allegation_uid"])
+        .drop_duplicates(subset=["allegation_uid", "uid"])
+    )
+    return df
+
+
+def clean_dates23(df):
+    df.loc[:, "receive_date"] = df.received.str.replace(r"^-$", "", regex=True)
+    df.loc[:, "occur_date"] = df.occur_date.str.replace(r"^-$" ,"", regex=True)
+    return df.drop(columns=["received"])
+
+def clean23():
+    df = (pd.read_csv(deba.data("raw/baton_rouge_pd/baton_rouge_pd_cprr_2021_2023.csv"))
+          .pipe(clean_column_names)
+          .pipe(strip_leading_commas)
+          .pipe(gen_tracking_id23)
+          .pipe(split_names23)
+          .pipe(clean_complaint23)
+          .pipe(clean_action23)
+          .pipe(clean_disposition23)
+          .pipe(clean_complainant23)
+          .pipe(assign_missing_values23)
+          .pipe(clean_dates23)
+          .pipe(clean_dates, ["receive_date", "occur_date"])
+          .drop(columns=["ia_year", "ia_seq_1", "status"])
+        .pipe(set_values, {"agency": "baton-rouge-pd"})
+        .pipe(gen_uid, ["first_name", "last_name", "middle_name", "agency"])
+        .pipe(
+            gen_uid,
+            [
+                "action",
+                "allegation",
+                "disposition",
+                "receive_day",
+                "receive_month",
+                "receive_year", 
+                "tracking_id",
+                "occur_day",
+                "occur_month", 
+                "occur_year",
+            ],
+            "allegation_uid",
+        )
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
+        .drop_duplicates(subset=["allegation_uid", "uid"])
     )
     return df
 
@@ -1405,6 +1525,8 @@ if __name__ == "__main__":
     df09 = clean09()
     df18 = clean_18()
     df21 = clean_21()
+    df23 = clean23()
     df09.to_csv(deba.data("clean/cprr_baton_rouge_pd_2004_2009.csv"), index=False)
     df18.to_csv(deba.data("clean/cprr_baton_rouge_pd_2018.csv"), index=False)
     df21.to_csv(deba.data("clean/cprr_baton_rouge_pd_2021.csv"), index=False)
+    df23.to_csv(deba.data("clean/cprr_baton_rouge_pd_2023.csv"), index=False)
