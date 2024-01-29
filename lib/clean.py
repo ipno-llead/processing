@@ -630,7 +630,7 @@ def float_to_int_str(
                 .astype(str)
                 .str.replace(r"^0$", "", regex=True)
             )
-        elif df[col].dtype == object:
+        elif df[col].dtype == np.object:
             idx = df[col].map(lambda v: type(v) == float)
             df.loc[idx, col] = (
                 df.loc[idx, col]
