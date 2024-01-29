@@ -1495,13 +1495,6 @@ def clean23():
                 "action",
                 "allegation",
                 "disposition",
-                "receive_day",
-                "receive_month",
-                "receive_year", 
-                "tracking_id",
-                "occur_day",
-                "occur_month", 
-                "occur_year",
             ],
             "allegation_uid",
         )
@@ -1511,13 +1504,26 @@ def clean23():
     return df
 
 
-def concat():
-    dfa = pd.read_csv(deba.data("clean/cprr_baton_rouge_pd_2004_2009.csv"))
-    dfb = pd.read_csv(deba.data("clean/cprr_baton_rouge_pd_2018.csv"))
-    dfc = pd.read_csv(deba.data("clean/cprr_baton_rouge_pd_2021.csv"))
-
-    df = pd.concat([dfa, dfb, dfc])
-    df = df.to_csv("baton_rouge.csv")
+def concat(dfa, dfb, dfc, dfd):
+    df = pd.concat([dfa, dfb, dfc, dfd])
+    # df = df.pipe(gen_uid, [                "action",
+    #             "allegation",
+    #             "disposition",
+    #             "receive_day",
+    #             "receive_month",
+    #             "receive_year", 
+    #             "tracking_id",
+    #             "occur_day",
+    #             "occur_month", 
+    #             "occur_year", "allegation_desc", "investigation_year", "badge_number"], "allegation_uid")
+    df = df.drop_duplicates(
+            subset=["uid", "tracking_id", "allegation", "disposition", "action", "occur_day", "occur_month", "occur_year", "receive_day", "receive_month", "receive_year"],
+            keep="first",
+        )
+    # df = df.drop_duplicates(
+    #         subset=["uid", "allegation_uid",], keep=False)
+    # df.loc[:, "allegation_uid"] = df.allegation_uid.str.replace(r"f7cb446cacbc77d2c2954ffa0f1c1310", "", regex=True)
+    # df = df[~((df.allegation_uid == ""))]
     return df
 
 
@@ -1526,7 +1532,5 @@ if __name__ == "__main__":
     df18 = clean_18()
     df21 = clean_21()
     df23 = clean23()
-    df09.to_csv(deba.data("clean/cprr_baton_rouge_pd_2004_2009.csv"), index=False)
-    df18.to_csv(deba.data("clean/cprr_baton_rouge_pd_2018.csv"), index=False)
-    df21.to_csv(deba.data("clean/cprr_baton_rouge_pd_2021.csv"), index=False)
-    df23.to_csv(deba.data("clean/cprr_baton_rouge_pd_2023.csv"), index=False)
+    df = concat(df09, df18, df21, df23)
+    df.to_csv(deba.data("clean/cprr_baton_rouge_pd_2004_2023.csv"), index=False)

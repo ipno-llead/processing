@@ -11,7 +11,7 @@ from lib import events
 from lib.post import load_for_agency
 
 
-def fuse_events(csd_pprr_17, csd_pprr_19, cprr_18, cprr_21, cprr_09, settlements, cprr23):
+def fuse_events(csd_pprr_17, csd_pprr_19, cprr, settlements):
     builder = events.Builder()
 
     builder.extract_events(
@@ -56,35 +56,7 @@ def fuse_events(csd_pprr_17, csd_pprr_19, cprr_18, cprr_21, cprr_09, settlements
         ["uid"],
     )
     builder.extract_events(
-        cprr_18,
-        {
-            events.COMPLAINT_RECEIVE: {
-                "prefix": "receive",
-                "keep": ["uid", "agency", "allegation_uid"],
-            },
-            events.COMPLAINT_INCIDENT: {
-                "prefix": "occur",
-                "keep": ["uid", "agency", "allegation_uid"],
-            },
-        },
-        ["uid", "allegation_uid"],
-    )
-    builder.extract_events(
-        cprr_21,
-        {
-            events.COMPLAINT_RECEIVE: {
-                "prefix": "receive",
-                "keep": ["uid", "agency", "allegation_uid"],
-            },
-            events.COMPLAINT_INCIDENT: {
-                "prefix": "occur",
-                "keep": ["uid", "agency", "allegation_uid"],
-            },
-        },
-        ["uid", "allegation_uid"],
-    )
-    builder.extract_events(
-        cprr_09,
+        cprr,
         {
             events.COMPLAINT_RECEIVE: {
                 "prefix": "receive",
@@ -126,20 +98,6 @@ def fuse_events(csd_pprr_17, csd_pprr_19, cprr_18, cprr_21, cprr_09, settlements
         },
         ["uid", "settlement_uid"],
     )
-    builder.extract_events(
-        cprr23,
-        {
-            events.COMPLAINT_RECEIVE: {
-                "prefix": "receive",
-                "keep": ["uid", "agency", "allegation_uid"],
-            },
-            events.COMPLAINT_INCIDENT: {
-                "prefix": "occur",
-                "keep": ["uid", "agency", "allegation_uid"],
-            },
-        },
-        ["uid", "allegation_uid"],
-    )
     return builder.to_frame()
 
 
@@ -147,13 +105,14 @@ if __name__ == "__main__":
     csd_pprr_17 = pd.read_csv(deba.data("match/pprr_baton_rouge_csd_2017.csv"))
     csd_pprr_19 = pd.read_csv(deba.data("match/pprr_baton_rouge_csd_2019.csv"))
     post_event = pd.read_csv(deba.data("match/event_post_baton_rouge_pd.csv"))
-    cprr_18 = pd.read_csv(deba.data("match/cprr_baton_rouge_pd_2018.csv"))
-    cprr_21 = pd.read_csv(deba.data("match/cprr_baton_rouge_pd_2021.csv"))
+    # cprr_09 = pd.read_csv(deba.data("match/cprr_baton_rouge_pd_2004_2009.csv"))
+    # cprr_18 = pd.read_csv(deba.data("match/cprr_baton_rouge_pd_2018.csv"))
+    # cprr_21 = pd.read_csv(deba.data("match/cprr_baton_rouge_pd_2021.csv"))
     pprr = pd.read_csv(deba.data("match/pprr_baton_rouge_pd_2021.csv"))
-    cprr23 = pd.read_csv(deba.data("match/cprr_baton_rouge_pd_2023.csv"))
+    cprr = pd.read_csv(deba.data("match/cprr_baton_rouge_pd_2004_2023.csv"))
+    cprr = cprr.drop_duplicates(subset=["uid", "allegation_uid"], keep=False)
     agency = pprr.agency[0]
     post = load_for_agency(agency)
-    cprr_09 = pd.read_csv(deba.data("match/cprr_baton_rouge_pd_2004_2009.csv"))
     settlements = pd.read_csv(deba.data("match/settlements_baton_rouge_pd_2020.csv"))
 
     # limit csd data to just officers found in PD roster
@@ -167,18 +126,15 @@ if __name__ == "__main__":
         pprr,
         csd_pprr_17.drop_duplicates(subset="uid", keep="last"),
         csd_pprr_19.drop_duplicates(subset="uid", keep="last"),
-        cprr_18,
-        cprr_21,
-        cprr_09,
+        cprr,
         post,
-        cprr23, 
     )
 
     events_df = fuse_events(
-        csd_pprr_17, csd_pprr_19, cprr_18, cprr_21, cprr_09, settlements, cprr23, 
+        csd_pprr_17, csd_pprr_19, cprr, settlements, 
     )
     events_df = rearrange_event_columns(pd.concat([post_event, events_df]))
-    complaint_df = rearrange_allegation_columns(pd.concat([cprr_18, cprr_21, cprr_09, cprr23], axis=0))
+    complaint_df = rearrange_allegation_columns(pd.concat([cprr], axis=0))
     settlement_df = rearrange_settlement_columns(settlements)
 
     personnel_df.to_csv(deba.data("fuse_agency/per_baton_rouge_pd.csv"), index=False)
