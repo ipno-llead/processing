@@ -31,6 +31,12 @@ jobs:
         id: findPr
         with:
           state: open
+      - name: Diagnose disk usage
+        run: |
+          echo "Disk usage (top-level):"
+          du -sh /runner/_work/* | sort -hr
+          echo "Disk usage (DVC cache):"
+          du -sh /runner/_work/data/dvc_cache/* | sort -hr
       - name: dvc pull
         shell: "bash --noprofile --norc -x -eo pipefail {0}"
         run: |
