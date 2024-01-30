@@ -196,12 +196,11 @@ def clean23():
         .pipe(clean_agency)
         .pipe(filter_agencies)
         .pipe(replace_impossible_dates)
+        .pipe(clean_names, ["first_name", "last_name"])
         .pipe(standardize_desc_cols, ["employment_status"])
         .pipe(remove_test)
-        .pipe(fix_date_format)
         .pipe(clean_hire_dates)
         .pipe(split_hire_dates)
-        .pipe(clean_names, ["first_name", "last_name", "agency"])
         .pipe(
             gen_uid,
             [
@@ -237,10 +236,10 @@ def clean20():
     df = (
         df.pipe(clean_agency)
         .pipe(standardize_desc_cols, ["employment_status"])
+        .pipe(clean_dates, ["hire_date"])
         .pipe(fix_date_format)
         .pipe(replace_impossible_dates)
-        .pipe(split_hire_dates)
-        .pipe(clean_names, ["first_name", "last_name", "agency"])
+        .pipe(clean_names, ["first_name", "last_name"])
         .pipe(
             gen_uid,
             [
@@ -263,13 +262,12 @@ def clean20():
 def concat_dfs(dfa, dfb):
     dfa_uids = [x for x in dfa["uid"]]
     dfb = dfb[~(dfb.uid.isin(dfa_uids))]
-
-    df = pd.concat([dfa, dfb])
-    return df
+    return dfa, dfb
 
 
 if __name__ == "__main__":
     df20 = clean20()
     df23 = clean23()
-    df = concat_dfs(df20, df23)
-    df.to_csv(deba.data("clean/pprr_post_4_26_2023.csv"), index=False)
+    df20, df23 = concat_dfs(df20, df23)
+    df20.to_csv(deba.data("clean/pprr_post_2020_11_06.csv"), index=False)
+    df23.to_csv(deba.data("clean/pprr_post_4_26_2023.csv"), index=False)
