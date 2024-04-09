@@ -1,0 +1,89 @@
+name: Upload CSV to Google Cloud
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: cdi-runner
+    env:
+      FOLDER_NAME: data-${{ github.run_id }}-${{ github.run_attempt }}
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: setup-gcloud
+      uses: 'google-github-actions/auth@v2'
+      with:
+        credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
+
+    # We could also consider changing the output of the data processing process,
+    # in a way that the needed files for back-end are group into their own folder
+    # so that we can upload the whole folder to the cloud storage
+    - id: 'upload-file-agency'
+      uses: 'google-github-actions/upload-cloud-storage@v2'
+      with:
+        path: '${{ vars.DATA_DIR }}/agency_reference_list.csv'
+        destination: '${{ vars.DATA_BUCKET }}/${{ env.FOLDER_NAME }}'
+
+    - id: 'upload-file-personnel'
+      uses: 'google-github-actions/upload-cloud-storage@v2'
+      with:
+        path: '${{ vars.DATA_DIR }}/personnel.csv'
+        destination: '${{ vars.DATA_BUCKET }}/${{ env.FOLDER_NAME }}'
+
+    - id: 'upload-file-allegation'
+      uses: 'google-github-actions/upload-cloud-storage@v2'
+      with:
+        path: '${{ vars.DATA_DIR }}/allegation.csv'
+        destination: '${{ vars.DATA_BUCKET }}/${{ env.FOLDER_NAME }}'
+
+    - id: 'upload-file-data_brady'
+      uses: 'google-github-actions/upload-cloud-storage@v2'
+      with:
+        path: '${{ vars.DATA_DIR }}/brady.csv'
+        destination: '${{ vars.DATA_BUCKET }}/${{ env.FOLDER_NAME }}'
+
+    - id: 'upload-file-data_use-of-force'
+      uses: 'google-github-actions/upload-cloud-storage@v2'
+      with:
+        path: '${{ vars.DATA_DIR }}/use_of_force.csv'
+        destination: '${{ vars.DATA_BUCKET }}/${{ env.FOLDER_NAME }}'
+
+    - id: 'upload-file-data_citizens'
+      uses: 'google-github-actions/upload-cloud-storage@v2'
+      with:
+        path: '${{ vars.DATA_DIR }}/citizens.csv'
+        destination: '${{ vars.DATA_BUCKET }}/${{ env.FOLDER_NAME }}'
+
+    - id: 'upload-file-data_appeals'
+      uses: 'google-github-actions/upload-cloud-storage@v2'
+      with:
+        path: '${{ vars.DATA_DIR }}/appeals.csv'
+        destination: '${{ vars.DATA_BUCKET }}/${{ env.FOLDER_NAME }}'
+
+    - id: 'upload-file-data_event'
+      uses: 'google-github-actions/upload-cloud-storage@v2'
+      with:
+        path: '${{ vars.DATA_DIR }}/event.csv'
+        destination: '${{ vars.DATA_BUCKET }}/${{ env.FOLDER_NAME }}'
+
+    - id: 'upload-file-data_documents'
+      uses: 'google-github-actions/upload-cloud-storage@v2'
+      with:
+        path: '${{ vars.DATA_DIR }}/documents.csv'
+        destination: '${{ vars.DATA_BUCKET }}/${{ env.FOLDER_NAME }}'
+
+    - id: 'upload-file-data_post-officer-history'
+      uses: 'google-github-actions/upload-cloud-storage@v2'
+      with:
+        path: '${{ vars.DATA_DIR }}/post_officer_history.csv'
+        destination: '${{ vars.DATA_BUCKET }}/${{ env.FOLDER_NAME }}'
+
+    - id: 'upload-file-data_person'
+      uses: 'google-github-actions/upload-cloud-storage@v2'
+      with:
+        path: '${{ vars.DATA_DIR }}/person.csv'
+        destination: '${{ vars.DATA_BUCKET }}/${{ env.FOLDER_NAME }}'
