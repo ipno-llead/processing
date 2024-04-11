@@ -91,7 +91,7 @@ jobs:
         curl -X POST -H "Content-Type: application/json" \
                     -H "X-Api-Key: ${{ secrets.IPNO_API_KEY }}" \
                     -d '{"folder_name": "${{ env.FOLDER_NAME }}"}' \
-                    https://api-staging.llead.co/api/data/import
+                    https://api-staging.llead.co/api/data/import/
 
     # - name: 'Trigger Backend production data import'
     #   id: 'trigger-backend-production'
@@ -99,4 +99,4 @@ jobs:
     #     curl -X POST -H "Content-Type: application/json" \
     #                 -H "X-Api-Key: ${{ secrets.IPNO_API_KEY }}" \
     #                 -d '{"folder_name": "${{ env.FOLDER_NAME }}"}' \
-    #                 https://api.llead.co/api/data/import
+    #                 https://api.llead.co/api/data/import/
