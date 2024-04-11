@@ -85,24 +85,18 @@ jobs:
         path: '${{ vars.DATA_DIR }}/person.csv'
         destination: '${{ vars.DATA_BUCKET }}/${{ env.FOLDER_NAME }}'
 
-  trigger_backend_staging_data_import:
-    needs: upload_csv_to_google_cloud
-    runs-on: cdi-runner
-    steps:
-      - name: 'Trigger Backend staging data import'
-        run: |
-          curl -X POST -H "Content-Type: application/json" \
-                      -H "X-Api-Key: ${{ secrets.IPNO_API_KEY }}" \
-                      -d '{"folder_name": "${{ env.FOLDER_NAME }}"}' \
-                      https://api-staging.llead.co/api/data/import
+    - name: 'Trigger Backend staging data import'
+      id: 'trigger-backend-staging'
+      run: |
+        curl -X POST -H "Content-Type: application/json" \
+                    -H "X-Api-Key: ${{ secrets.IPNO_API_KEY }}" \
+                    -d '{"folder_name": "${{ env.FOLDER_NAME }}"}' \
+                    https://api-staging.llead.co/api/data/import
 
-#   trigger_backend_production_data_import:
-#     needs: upload_csv_to_google_cloud
-#     runs-on: cdi-runner
-#     steps:
-#       - name: 'Trigger Backend production data import'
-#         run: |
-#           curl -X POST -H "Content-Type: application/json" \
-#                       -H "X-Api-Key: ${{ secrets.IPNO_API_KEY }}" \
-#                       -d '{"folder_name": "${{ env.FOLDER_NAME }}"}' \
-#                       https://api.llead.co/api/data/import
+    # - name: 'Trigger Backend production data import'
+    #   id: 'trigger-backend-production'
+    #   run: |
+    #     curl -X POST -H "Content-Type: application/json" \
+    #                 -H "X-Api-Key: ${{ secrets.IPNO_API_KEY }}" \
+    #                 -d '{"folder_name": "${{ env.FOLDER_NAME }}"}' \
+    #                 https://api.llead.co/api/data/import
