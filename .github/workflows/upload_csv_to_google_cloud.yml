@@ -1,6 +1,11 @@
 name: Upload CSV to Google Cloud
 
-on: [push]
+on:
+  pull_request:
+    branches:
+      - main
+    types: [closed]
+
 
 jobs:
   upload_csv_to_google_cloud:
@@ -93,10 +98,10 @@ jobs:
                     -d '{"folder_name": "${{ env.FOLDER_NAME }}"}' \
                     https://api-staging.llead.co/api/data/import/
 
-    # - name: 'Trigger Backend production data import'
-    #   id: 'trigger-backend-production'
-    #   run: |
-    #     curl -X POST -H "Content-Type: application/json" \
-    #                 -H "X-Api-Key: ${{ secrets.IPNO_API_KEY }}" \
-    #                 -d '{"folder_name": "${{ env.FOLDER_NAME }}"}' \
-    #                 https://api.llead.co/api/data/import/
+    - name: 'Trigger Backend production data import'
+      id: 'trigger-backend-production'
+      run: |
+        curl -X POST -H "Content-Type: application/json" \
+                    -H "X-Api-Key: ${{ secrets.IPNO_API_KEY }}" \
+                    -d '{"folder_name": "${{ env.FOLDER_NAME }}"}' \
+                    https://api.llead.co/api/data/import/
