@@ -29,66 +29,77 @@ jobs:
       with:
         path: '${{ vars.DATA_DIR }}/agency_reference_list.csv'
         destination: '${{ vars.DATA_BUCKET }}/${{ env.FOLDER_NAME }}'
+        process_gcloudignore: false
 
     - id: 'upload-file-personnel'
       uses: 'google-github-actions/upload-cloud-storage@v2'
       with:
         path: '${{ vars.DATA_DIR }}/personnel.csv'
         destination: '${{ vars.DATA_BUCKET }}/${{ env.FOLDER_NAME }}'
+        process_gcloudignore: false
 
     - id: 'upload-file-allegation'
       uses: 'google-github-actions/upload-cloud-storage@v2'
       with:
         path: '${{ vars.DATA_DIR }}/allegation.csv'
         destination: '${{ vars.DATA_BUCKET }}/${{ env.FOLDER_NAME }}'
+        process_gcloudignore: false
 
     - id: 'upload-file-data_brady'
       uses: 'google-github-actions/upload-cloud-storage@v2'
       with:
         path: '${{ vars.DATA_DIR }}/brady.csv'
         destination: '${{ vars.DATA_BUCKET }}/${{ env.FOLDER_NAME }}'
+        process_gcloudignore: false
 
     - id: 'upload-file-data_use-of-force'
       uses: 'google-github-actions/upload-cloud-storage@v2'
       with:
         path: '${{ vars.DATA_DIR }}/use_of_force.csv'
         destination: '${{ vars.DATA_BUCKET }}/${{ env.FOLDER_NAME }}'
+        process_gcloudignore: false
 
     - id: 'upload-file-data_citizens'
       uses: 'google-github-actions/upload-cloud-storage@v2'
       with:
         path: '${{ vars.DATA_DIR }}/citizens.csv'
         destination: '${{ vars.DATA_BUCKET }}/${{ env.FOLDER_NAME }}'
+        process_gcloudignore: false
 
     - id: 'upload-file-data_appeals'
       uses: 'google-github-actions/upload-cloud-storage@v2'
       with:
         path: '${{ vars.DATA_DIR }}/appeals.csv'
         destination: '${{ vars.DATA_BUCKET }}/${{ env.FOLDER_NAME }}'
+        process_gcloudignore: false
 
     - id: 'upload-file-data_event'
       uses: 'google-github-actions/upload-cloud-storage@v2'
       with:
         path: '${{ vars.DATA_DIR }}/event.csv'
         destination: '${{ vars.DATA_BUCKET }}/${{ env.FOLDER_NAME }}'
+        process_gcloudignore: false
 
     - id: 'upload-file-data_documents'
       uses: 'google-github-actions/upload-cloud-storage@v2'
       with:
         path: '${{ vars.DATA_DIR }}/documents.csv'
         destination: '${{ vars.DATA_BUCKET }}/${{ env.FOLDER_NAME }}'
+        process_gcloudignore: false
 
     - id: 'upload-file-data_post-officer-history'
       uses: 'google-github-actions/upload-cloud-storage@v2'
       with:
         path: '${{ vars.DATA_DIR }}/post_officer_history.csv'
         destination: '${{ vars.DATA_BUCKET }}/${{ env.FOLDER_NAME }}'
+        process_gcloudignore: false
 
     - id: 'upload-file-data_person'
       uses: 'google-github-actions/upload-cloud-storage@v2'
       with:
         path: '${{ vars.DATA_DIR }}/person.csv'
         destination: '${{ vars.DATA_BUCKET }}/${{ env.FOLDER_NAME }}'
+        process_gcloudignore: false
 
     - name: 'Trigger Backend staging data import'
       id: 'trigger-backend-staging'
