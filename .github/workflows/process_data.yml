@@ -41,12 +41,8 @@ jobs:
           dvc pull -v -f
       - name: wrgl pull
         run: |
-          wrgl config set --global user.email "gh-action@publicdata.works"
-          wrgl config set --global user.name "Github Action"
           mkdir /runner/_work/data/.wrgl || true
           cp .wrgl/config.yaml /runner/_work/data/.wrgl/
-          wrgl init --wrgl-dir /runner/_work/data/.wrgl || true
-          wrgl pull --wrgl-dir /runner/_work/data/.wrgl --all --ignore-non-existent --no-progress
       - name: process data
         run: |
           sed -iE 's/dataDir\: data/dataDir\: \/runner\/_work\/data\/data/g' deba.yaml
@@ -84,31 +80,3 @@ jobs:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
           SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}
           DATA_DIR: ${{ vars.DATA_DIR }}
-      - name: commit changes in transaction
-        id: transaction
-        run: |
-          cd /runner/_work/data
-          echo "${KEYCLOAK_CLIENT_SECRET}" > token.txt
-          wrgl credentials authenticate https://wrgl.llead.co ipno-github token.txt
-          rm token.txt
-          wrgl transaction start | tr -d "[:space:]" > txid.txt
-          export newline=$'\n'
-          wrgl commit --all --txid $(cat txid.txt) "[PR #${PR}: ${PR_TITLE}][1]${newline}${newline}[1]: https://github.com/${GITHUB_REPOSITORY}/pull/${PR}"
-          wrgl transaction push origin $(cat txid.txt) --no-progress && \
-            echo "::set-output name=txid::$(cat txid.txt)" && \
-            echo "::set-output name=txURL::https://hub.wrgl.co/@ipno/r/data/tx/$(cat txid.txt)"
-        env:
-          KEYCLOAK_CLIENT_SECRET: ${{ secrets.KEYCLOAK_CLIENT_SECRET }}
-          PR: ${{ steps.findPr.outputs.pr }}
-          PR_TITLE: ${{ steps.findPr.outputs.title }}
-      - name: Create comment
-        if: ${{ steps.transaction.outputs.txid != 0 }}
-        uses: peter-evans/create-or-update-comment@v2
-        with:
-          issue-number: ${{ steps.findPr.outputs.pr }}
-          body: |
-            Review data changes at [tx/${{ steps.transaction.outputs.txid }}][1]
-
-            When this PR is merged, this transaction will be applied.
-
-            [1]: ${{ steps.transaction.outputs.txURL }}
