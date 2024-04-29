@@ -38,7 +38,7 @@ jobs:
           rm -rf /runner/_work/data/dvc_cache
           mkdir /runner/_work/data/dvc_cache || true
           dvc cache dir --local /runner/_work/data/dvc_cache
-          dvc checkout -v 
+          dvc checkout -v -f
       - name: wrgl pull
         run: |
           wrgl config set --global user.email "gh-action@publicdata.works"
