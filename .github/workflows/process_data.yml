@@ -34,7 +34,7 @@ jobs:
       - name: Clean up disk space
         run: |
           # Remove temporary files
-          rm -rf /tmp/*
+          rm -rf /tmp/runner_*
 
           # Remove old build artifacts
           sudo rm -rf /runner/_work/processing/processing/*
