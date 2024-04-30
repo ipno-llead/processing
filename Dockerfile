@@ -55,6 +55,8 @@ RUN sudo update-alternatives --install /usr/bin/python python /usr/bin/python3.9
 
 ADD requirements.txt /tmp
 
+# RUN sudo apt-get update && sudo apt-get install -y libpq-dev
+
 RUN python -m pip install -r /tmp/requirements.txt
 
 ADD https://github.com/wrgl/wrgl/releases/download/v0.13.7/install.sh /tmp/install_wrgl.sh
@@ -62,6 +64,12 @@ ADD https://github.com/wrgl/wrgl/releases/download/v0.13.7/install.sh /tmp/insta
 RUN sudo chmod +x /tmp/install_wrgl.sh \
     && sudo /tmp/install_wrgl.sh \
     && sudo rm /tmp/install_wrgl.sh /tmp/requirements.txt
+
+# RUN sudo chmod +x /tmp/install_wrgl.sh \
+#     && if [ "$(uname -m)" = "x86_64" ]; then \
+#          sudo /tmp/install_wrgl.sh; \
+#        fi \
+#     && sudo rm /tmp/install_wrgl.sh /tmp/requirements.txt
 
 ADD https://sdk.cloud.google.com /tmp/install_gcloud.sh
 RUN sudo chmod +x /tmp/install_gcloud.sh \
