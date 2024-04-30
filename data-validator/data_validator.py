@@ -72,15 +72,11 @@ def run_validator():
 
    for data, be_cols in BE_SCHEMA.items():
       print(f'======== Importing {data} ========')
-      df = pd.DataFrame()
-      # documents is a special case as it retrieves data from WRGL
-      # so we will just pass a dummy DataFrame
-      if data != 'documents':
-         df = pd.read_csv(os.path.join(os.environ.get('DATA_DIR'), data + '.csv'))
+      df = pd.read_csv(os.path.join(os.environ.get('DATA_DIR'), data + '.csv'))
 
-         columns = df.columns
-         if not set(be_cols).issubset(set(columns)):
-            raise Exception(f'BE {data} columns are not recognized in the current processed file')
+      columns = df.columns
+      if not set(be_cols).issubset(set(columns)):
+         raise Exception(f'BE {data} columns are not recognized in the current processed file')
 
       module = importlib.import_module(f'{data}_importer')
       module.run(conn, df, be_cols)
