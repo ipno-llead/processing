@@ -31,6 +31,10 @@ jobs:
         id: findPr
         with:
           state: open
+      - name: Clean up disk space
+        run: |
+          # Remove temporary files
+          rm -rf /tmp/runner_*
       - name: dvc pull
         shell: "bash --noprofile --norc -x -eo pipefail {0}"
         run: |
@@ -39,10 +43,6 @@ jobs:
           mkdir /runner/_work/data/dvc_cache || true
           dvc cache dir --local /runner/_work/data/dvc_cache
           dvc pull -v -f
-      - name: wrgl pull
-        run: |
-          mkdir /runner/_work/data/.wrgl || true
-          cp .wrgl/config.yaml /runner/_work/data/.wrgl/
       - name: process data
         run: |
           sed -iE 's/dataDir\: data/dataDir\: \/runner\/_work\/data\/data/g' deba.yaml
