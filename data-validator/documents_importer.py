@@ -4,29 +4,6 @@ from slack_sdk import WebClient
 from wrgl import Repository
 
 
-# According to this post https://eastagile.slack.com/archives/C044F7LTASV/p1680028339523139?thread_ts=1679905963.191559&cid=C044F7LTASV
-# documents are not saved to fuse folder or going through the same process
-# of https://github.com/ipno-llead/processing
-# Therefore we need to retrieve it from WRGL
-
-def __retrieve_document_frm_wrgl_data(documents_cols):
-    repo = Repository("https://wrgl.llead.co/", None)
-
-    original_commit = repo.get_branch("documents")
-
-    columns = original_commit.table.columns
-    if not set(documents_cols).issubset(set(columns)):
-        raise Exception('BE documents columns are not recognized in the current commit')
-
-    all_rows = list(repo.get_blocks("heads/documents"))
-    df = pd.DataFrame(all_rows)
-    df.columns = df.iloc[0]
-    df = df.iloc[1:].reset_index(drop=True)
-
-    df = df.loc[:, documents_cols]
-    df.to_csv('documents.csv', index=False)
-
-
 def __build_document_rel(db_con):
     client = WebClient(os.environ.get('SLACK_BOT_TOKEN'))
 
@@ -110,7 +87,7 @@ def __build_document_rel(db_con):
 
 
 def run(db_con, documents_df, documents_cols):
-    __retrieve_document_frm_wrgl_data(documents_cols)
+    __build_document_rel(db_con)
 
     cursor = db_con.cursor()
     cursor.copy_expert(
@@ -123,8 +100,6 @@ def run(db_con, documents_df, documents_cols):
     )
     db_con.commit()
     cursor.close()
-
-    __build_document_rel(db_con)
 
     # Importing documents and officers relationship
     cursor = db_con.cursor()
