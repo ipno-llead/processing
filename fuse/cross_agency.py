@@ -247,6 +247,10 @@ def create_person_table(clusters, personnel, personnel_event, post):
     post_df = post_df.rename(columns={"history_id": "person_id", "uid": "uids"})
 
     person_df = pd.concat([post_df, person_df])
+
+    # Check if canonical_uid in person_df can be mapped to personnel
+    person_df = person_df[person_df["canonical_uid"].isin(personnel["uid"])]
+
     return person_df[["person_id", "canonical_uid", "uids"]]
 
 
