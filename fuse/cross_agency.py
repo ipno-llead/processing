@@ -247,20 +247,6 @@ def create_person_table(clusters, personnel, personnel_event, post):
     post_df = post_df.rename(columns={"history_id": "person_id", "uid": "uids"})
 
     person_df = pd.concat([post_df, person_df])
-
-    missing_uids_sr = personnel[~(personnel["uid"].isin(person_df["uids"]))]
-
-    missing_uids_hc = [x for x in missing_uids_sr["uid"]]
-
-    missing_df = pd.DataFrame(
-            {
-                "person_id": missing_uids_hc,
-                "canonical_uid": missing_uids_hc,
-                "uids": missing_uids_hc,
-            }
-        )
-    missing_df = missing_df.pipe(gen_uid, ["person_id"], "person_id")
-    person_df = pd.concat([person_df, missing_df])
     return person_df[["person_id", "canonical_uid", "uids"]]
 
 
