@@ -19,10 +19,10 @@ schema.md: $(MD5_DIR)/data/datavalid.yml.md5
 	python -m datavalid --dir $(DATA_DIR) --doc $@
 
 include deba.mk
-include wrgl.mk
+# include wrgl.mk
 
-.PHONY: all
-all: deba $(DEBA_DATA_DIR)/fuse/person.csv
+# .PHONY: all
+# all: deba $(DEBA_DATA_DIR)/fuse/person.csv
 
 .PHONY: clean
 clean: cleandeba
