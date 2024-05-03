@@ -3,7 +3,7 @@ import deba
 
 
 def clean():
-    df = pd.read_csv(deba.data("raw/documents/data_documents.csv"))
+    df = pd.read_csv(deba.data("raw/documents/documents_ts.csv"))
     return df
 
 
