@@ -21,8 +21,8 @@ schema.md: $(MD5_DIR)/data/datavalid.yml.md5
 include deba.mk
 # include wrgl.mk
 
-# .PHONY: all
-# all: deba $(DEBA_DATA_DIR)/fuse/person.csv
+.PHONY: all
+all: deba $(DEBA_DATA_DIR)/fuse/person.csv
 
 .PHONY: clean
 clean: cleandeba
