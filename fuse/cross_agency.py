@@ -40,12 +40,12 @@ def discard_rows(
 
 
 def assign_min_col(events: pd.DataFrame, per: pd.DataFrame, col: str):
-    min_dict = events[col].min(level="uid").to_dict()
+    min_dict = events.groupby("uid")[col].min().to_dict()
     per.loc[:, "min_" + col] = per.index.map(lambda x: min_dict.get(x, np.NaN))
 
 
 def assign_max_col(events: pd.DataFrame, per: pd.DataFrame, col: str):
-    max_dict = events[col].max(level="uid").to_dict()
+    max_dict = events.groupby("uid")[col].max().to_dict()
     per.loc[:, "max_" + col] = per.index.map(lambda x: max_dict.get(x, np.NaN))
 
 
@@ -306,41 +306,15 @@ def entity_resolution(
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="Match officer profiles cross-agency to produce person table"
+    personnel = pd.read_csv(deba.data("fuse/personnel.csv"))
+    print("read personnel file (%d x %d)" % personnel.shape)
+    events = pd.read_csv(deba.data("fuse/event.csv"))
+    print("read events file (%d x %d)" % events.shape)
+    constraints = read_constraints()
+    post = read_post()
+    clusters, personnel_event = cross_match_officers_between_agencies(
+        personnel, events, constraints
     )
-    parser.add_argument(
-        "person_csv",
-        type=pathlib.Path,
-        metavar="PERSON_CSV",
-        help="The previous person data",
-    )
-    parser.add_argument(
-        "--new-person-csv",
-        type=pathlib.Path,
-        metavar="NEW_PERSON_CSV",
-        default=None,
-        help="The current person data (specifying this skip the clustering)",
-    )
-    args = parser.parse_args()
-
-    old_person_df = pd.read_csv(args.person_csv)
-    if args.new_person_csv is not None:
-        new_person_df = pd.read_csv(args.new_person_csv)
-        person_df = entity_resolution(
-            old_person=old_person_df, new_person=new_person_df
-        )
-        person_df.to_csv(deba.data("fuse/person.csv"), index=False)
-    else:
-        personnel = pd.read_csv(deba.data("fuse/personnel.csv"))
-        print("read personnel file (%d x %d)" % personnel.shape)
-        events = pd.read_csv(deba.data("fuse/event.csv"))
-        print("read events file (%d x %d)" % events.shape)
-        constraints = read_constraints()
-        post = read_post()
-        clusters, personnel_event = cross_match_officers_between_agencies(
-            personnel, events, constraints
-        )
-        new_person_df = create_person_table(clusters, personnel, personnel_event, post)
-        new_person_df = check_for_duplicate_uids(new_person_df)
-        new_person_df.to_csv(deba.data("fuse/person.csv"), index=False)
+    new_person_df = create_person_table(clusters, personnel, personnel_event, post)
+    new_person_df = check_for_duplicate_uids(new_person_df)
+    new_person_df.to_csv(deba.data("fuse/person.csv"), index=False)

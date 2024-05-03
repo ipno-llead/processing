@@ -44,25 +44,30 @@ def split_rows_with_multiple_uids(df):
     return df.rename(columns={"uids": "uid"})
 
 
-def reformat_clusters(df):
-    clusters = (
-        pd.read_excel(deba.data("analysis/allegation.xlsx"))
-        .drop(columns=["cluster_idx", "pair_idx", "sim_score"])
-        .rename(columns={"row_key": "tracking_id"})
-    )
-    clusters = clusters.pipe(split_rows_with_multiple_uids)
+# def reformat_clusters(df):
+#     # clusters = (
+#     #     pd.read_excel(deba.data("analysis/allegation.xlsx"))
+#     #     .drop(columns=["cluster_idx", "pair_idx", "sim_score"])
+#     #     .rename(columns={"row_key": "tracking_id"})
+#     # )
+#     # clusters = clusters.pipe(split_rows_with_multiple_uids)
 
-    df = df[["allegation_uid", "tracking_id", "uid", "agency"]]
+#     # df = df[["allegation_uid", "tracking_id", "uid", "agency"]]
 
-    clusters = pd.merge(clusters, df, on=["uid", "tracking_id"])
-    clusters = clusters[clusters.duplicated(subset=["tracking_id"], keep=False)]
-    clusters = clusters[~((clusters.tracking_id.fillna("") == ""))].drop_duplicates(subset=["allegation_uid"])
-    return clusters
+#     # clusters = pd.merge(clusters, df, on=["uid", "tracking_id"])
+#     # clusters = clusters[clusters.duplicated(subset=["tracking_id"], keep=False)]
+#     # clusters = clusters[~((clusters.tracking_id.fillna("") == ""))].drop_duplicates(subset=["allegation_uid"])
 
+#     df = pd.DataFrame(columns=["allegation_uid", "tracking_id", "uid", "agency"])
+
+#     return df
+
+def reformat_clusters():
+    return pd.DataFrame(columns=["allegation_uid", "tracking_id", "uid", "agency"])
 
 if __name__ == "__main__":
     df = pd.read_csv(deba.data("fuse_agency/allegation.csv"))
-    gen_clusters = create_clusters(df)
-    clusters = reformat_clusters(df)
-    clusters = rearrange_coaccusal_columns(clusters)
+    # gen_clusters = create_clusters(df)
+    # clusters = reformat_clusters(df)
+    clusters = reformat_clusters()
     clusters.to_csv(deba.data("analysis/coaccusals.csv"), index=False)
