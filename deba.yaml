@@ -36,4 +36,5 @@ targets:
   - fuse/citizens.csv
   - fuse/agency_reference_list.csv
   - fuse/documents.csv
+  - fuse/person.csv
   - analysis/coaccusals.csv
