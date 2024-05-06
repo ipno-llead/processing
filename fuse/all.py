@@ -1,6 +1,69 @@
 import pandas as pd
 import deba
+from fuzzywuzzy import fuzz
+from datamatch import JaroWinklerSimilarity, ThresholdMatcher, ColumnsIndex
+from lib.uid import gen_uid
 
+def extract_names(title):
+    title = title.replace('Appeal hearing: ', '').split(' on ')[0].rstrip('.')
+    if title.startswith('Officer '):
+        title = title[len('Officer '):]
+    
+    name_parts = title.split(',')[0].split()
+    
+    if not name_parts:
+        return None, None, None
+    
+    if len(name_parts) == 2:
+        first_name, last_name = name_parts
+        middle_name = None
+    elif len(name_parts) == 3:
+        first_name, middle_name, last_name = name_parts
+    else:
+        first_name = name_parts[0]
+        last_name = name_parts[-1]
+        middle_name = ' '.join(name_parts[1:-1])
+    
+    return first_name, middle_name, last_name
+
+
+def match_docs_with_personnel(documents, per):
+
+    documents = documents.pipe(gen_uid, ["first_name", "middle_name", "last_name", "agency"])
+    dfa = (
+        documents.loc[documents.uid.notna(), ["uid", "first_name", "middle_name", "last_name", "agency"]]
+        .drop_duplicates(subset=["uid"])
+        .set_index("uid", drop=True)
+    )
+    dfa.loc[:, "fc"] = dfa.first_name.fillna("").map(lambda x: x[:1])
+
+    dfb = (
+        per[["uid", "first_name", "middle_name", "last_name", "agency"]]
+        .drop_duplicates()
+        .set_index("uid", drop=True)
+    )
+    dfb.loc[:, "fc"] = dfb.first_name.fillna("").map(lambda x: x[:1])
+
+    matcher = ThresholdMatcher(
+        ColumnsIndex(["fc", "agency"]),
+        {
+            "first_name": JaroWinklerSimilarity(),
+            "middle_name": JaroWinklerSimilarity(),
+            "last_name": JaroWinklerSimilarity(),
+        },
+        dfa,
+        dfb,
+    )
+    decision = 0.81
+    matcher.save_pairs_to_excel(
+        deba.data("fuse/documents_to_per.xlsx"),
+        decision,
+    )
+    matches = matcher.get_index_pairs_within_thresholds(decision)
+    match_dict = dict(matches)
+
+    documents.loc[:, "matched_uid"] = documents.uid.map(lambda x: match_dict.get(x, x))
+    return documents
 
 if __name__ == "__main__":
     uof_df = pd.read_csv(deba.data("fuse_agency/use_of_force.csv"))
@@ -43,6 +106,9 @@ if __name__ == "__main__":
     appeals_df = appeals_df[appeals_df["uid"].isin(per_df["uid"])]
     allegation_df = allegation_df[allegation_df["uid"].isin(per_df["uid"])]
     brady_df = brady_df[brady_df["uid"].isin(per_df["uid"])]
+
+    documents[['first_name', 'middle_name', 'last_name']] = documents['title'].apply(lambda x: pd.Series(extract_names(x)))
+    documents = match_docs_with_personnel(documents, per_df)
 
     uof_df.to_csv(deba.data("fuse/use_of_force.csv"), index=False)
     sas_df.to_csv(deba.data("fuse/stop_and_search.csv"), index=False)
