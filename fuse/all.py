@@ -2,6 +2,7 @@ import pandas as pd
 import deba
 from datamatch import JaroWinklerSimilarity, ThresholdMatcher, ColumnsIndex
 from lib.uid import gen_uid
+import numpy as np
 
 def extract_names(title):
     title = title.replace('Appeal hearing: ', '').split(' on ')[0].rstrip('.')
@@ -25,9 +26,7 @@ def extract_names(title):
     
     return first_name, middle_name, last_name
 
-
 def match_docs_with_personnel(documents, per):
-
     documents = documents.pipe(gen_uid, ["first_name", "middle_name", "last_name", "agency"])
     dfa = (
         documents.loc[documents.uid.notna(), ["uid", "first_name", "middle_name", "last_name", "agency"]]
@@ -35,33 +34,36 @@ def match_docs_with_personnel(documents, per):
         .set_index("uid", drop=True)
     )
     dfa.loc[:, "fc"] = dfa.first_name.fillna("").map(lambda x: x[:1])
-
     dfb = (
         per[["uid", "first_name", "middle_name", "last_name", "agency"]]
         .drop_duplicates()
         .set_index("uid", drop=True)
     )
     dfb.loc[:, "fc"] = dfb.first_name.fillna("").map(lambda x: x[:1])
-
     matcher = ThresholdMatcher(
-        ColumnsIndex(["fc", "agency"]),
+        ColumnsIndex(["fc"]),
         {
             "first_name": JaroWinklerSimilarity(),
             "middle_name": JaroWinklerSimilarity(),
             "last_name": JaroWinklerSimilarity(),
+            "agency": JaroWinklerSimilarity(),
         },
         dfa,
         dfb,
     )
-    decision = 0.81
+    decision = .70
     matcher.save_pairs_to_excel(
         deba.data("fuse/documents_to_per.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(decision)
     match_dict = dict(matches)
-
-    documents.loc[:, "matched_uid"] = documents.uid.map(lambda x: match_dict.get(x, x))
+    
+    documents["matched_uid"] = documents["uid"].map(lambda x: match_dict.get(x, np.nan))
+    
+    uid_map = documents[documents["matched_uid"].notna()].set_index("uid")["matched_uid"].to_dict()
+    
+    documents["matched_uid"] = documents["uid"].map(uid_map).fillna(documents["matched_uid"])
     return documents
 
 if __name__ == "__main__":
