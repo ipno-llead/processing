@@ -1,6 +1,5 @@
 import pandas as pd
 import deba
-from fuzzywuzzy import fuzz
 from datamatch import JaroWinklerSimilarity, ThresholdMatcher, ColumnsIndex
 from lib.uid import gen_uid
 
