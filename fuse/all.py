@@ -111,6 +111,8 @@ if __name__ == "__main__":
     documents[['first_name', 'middle_name', 'last_name']] = documents['title'].apply(lambda x: pd.Series(extract_names(x)))
     documents = match_docs_with_personnel(documents, per_df)
 
+    documents = documents.drop(columns=['first_name', 'middle_name', 'last_name'])
+
     uof_df.to_csv(deba.data("fuse/use_of_force.csv"), index=False)
     sas_df.to_csv(deba.data("fuse/stop_and_search.csv"), index=False)
     appeals_df.to_csv(deba.data("fuse/appeals.csv"), index=False)
