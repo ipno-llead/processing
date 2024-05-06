@@ -8,18 +8,15 @@ def __build_document_rel(db_con, documents_df):
     client = WebClient(os.environ.get('SLACK_BOT_TOKEN'))
 
     print('Building documents_officers relationship')
-    documents_df = documents_df.loc[:, ['id', 'docid', 'matched_uid', 'agency']]
-    documents_df.columns = ['document_id', 'docid', 'uid', 'agency_slug']
-
     officers_df = pd.read_sql(
         'SELECT id, uid FROM officers_officer',
         con=db_con
     )
     officers_df.columns = ['officer_id', 'uid']
 
-    dor_df = pd.merge(documents_df, officers_df, how='left', on='uid')
+    dor_df = pd.merge(documents_df, officers_df, how='left', left_on='matched_uid', right_on='uid')
 
-    no_officers_in_documents = documents_df['uid'].dropna().unique()
+    no_officers_in_documents = documents_df['matched_uid'].dropna().unique()
     print('Number of officers in WRGL documents', len(no_officers_in_documents))
     diff_officers = set(no_officers_in_documents) - set(officers_df['uid'])
     print('Number of differences in officers', len(diff_officers))
