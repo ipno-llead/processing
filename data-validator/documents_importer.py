@@ -4,14 +4,11 @@ from slack_sdk import WebClient
 from wrgl import Repository
 
 
-def __build_document_rel(db_con):
+def __build_document_rel(db_con, documents_df):
     client = WebClient(os.environ.get('SLACK_BOT_TOKEN'))
 
     print('Building documents_officers relationship')
-    documents_df = pd.read_sql(
-        'SELECT id, docid, matched_uid, agency FROM documents_document',
-        con=db_con
-    )
+    documents_df = documents_df.copy()
     documents_df.columns = ['document_id', 'docid', 'uid', 'agency_slug']
 
     officers_df = pd.read_sql(
@@ -87,7 +84,7 @@ def __build_document_rel(db_con):
 
 
 def run(db_con, documents_df, documents_cols):
-    __build_document_rel(db_con)
+    __build_document_rel(db_con, documents_df)
 
     cursor = db_con.cursor()
     cursor.copy_expert(
