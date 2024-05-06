@@ -8,7 +8,7 @@ def __build_document_rel(db_con, documents_df):
     client = WebClient(os.environ.get('SLACK_BOT_TOKEN'))
 
     print('Building documents_officers relationship')
-    documents_df = documents_df.copy()
+    documents_df = documents_df.loc[:, ['id', 'docid', 'matched_uid', 'agency']]
     documents_df.columns = ['document_id', 'docid', 'uid', 'agency_slug']
 
     officers_df = pd.read_sql(
