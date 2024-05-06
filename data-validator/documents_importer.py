@@ -3,7 +3,6 @@ import pandas as pd
 from slack_sdk import WebClient
 from wrgl import Repository
 
-
 def __build_document_rel(db_con, documents_df):
     client = WebClient(os.environ.get('SLACK_BOT_TOKEN'))
 
@@ -14,9 +13,9 @@ def __build_document_rel(db_con, documents_df):
     )
     officers_df.columns = ['officer_id', 'uid']
 
-    dor_df = pd.merge(documents_df, officers_df, how='left', left_on='matched_uid', right_on='uid')
+    dor_df = pd.merge(documents_df, officers_df, how='left', left_on='uid', right_on='uid')
 
-    no_officers_in_documents = documents_df['matched_uid'].dropna().unique()
+    no_officers_in_documents = documents_df['uid'].dropna().unique()
     print('Number of officers in WRGL documents', len(no_officers_in_documents))
     diff_officers = set(no_officers_in_documents) - set(officers_df['uid'])
     print('Number of differences in officers', len(diff_officers))
@@ -36,9 +35,9 @@ def __build_document_rel(db_con, documents_df):
 
     dor_df.dropna(subset=['officer_id'], inplace=True)
 
-    dor_df = dor_df.loc[:, ['document_id', 'officer_id']]
+    dor_df = dor_df.loc[:, ['docid', 'officer_id']]
     dor_df = dor_df.astype({
-        'document_id': int,
+        'docid': str,
         'officer_id': pd.Int64Dtype(),
     })
     dor_df.to_csv('documents_officers_rel.csv', index=False)
@@ -50,9 +49,9 @@ def __build_document_rel(db_con, documents_df):
     )
     agency_df.columns = ['department_id', 'agency_slug']
 
-    ddr_df = pd.merge(documents_df, agency_df, how='left', on='agency_slug')
+    ddr_df = pd.merge(documents_df, agency_df, how='left', left_on='agency', right_on='agency_slug')
 
-    no_agency_in_documents = documents_df['agency_slug'].dropna().unique()
+    no_agency_in_documents = documents_df['agency'].dropna().unique()
     print('Number of agency in WRGL documents', len(no_agency_in_documents))
     diff_agency = set(no_agency_in_documents) - set(agency_df['agency_slug'])
     print('Number of differences in agency', len(diff_agency))
@@ -72,13 +71,12 @@ def __build_document_rel(db_con, documents_df):
 
     ddr_df.dropna(subset=['department_id'], inplace=True)
 
-    ddr_df = ddr_df.loc[:, ['document_id', 'department_id']]
+    ddr_df = ddr_df.loc[:, ['docid', 'department_id']]
     ddr_df = ddr_df.astype({
-        'document_id': int,
+        'docid': str,
         'department_id': pd.Int64Dtype(),
     })
     ddr_df.to_csv('documents_departments_rel.csv', index=False)
-
 
 def run(db_con, documents_df, documents_cols):
     __build_document_rel(db_con, documents_df)
@@ -100,7 +98,7 @@ def run(db_con, documents_df, documents_cols):
     cursor.copy_expert(
         sql="""
             COPY documents_document_officers(
-                document_id, officer_id
+                docid, officer_id
             ) FROM stdin WITH CSV HEADER
             DELIMITER as ','
         """,
@@ -120,7 +118,7 @@ def run(db_con, documents_df, documents_cols):
     cursor.copy_expert(
         sql="""
             COPY documents_document_departments(
-                document_id, department_id
+                docid, department_id
             ) FROM stdin WITH CSV HEADER
             DELIMITER as ','
         """,
