@@ -73,6 +73,8 @@ def run_validator():
    for data, be_cols in BE_SCHEMA.items():
       print(f'======== Importing {data} ========')
       df = pd.read_csv(os.path.join(os.environ.get('DATA_DIR'), data + '.csv'))
+      print(f'DataFrame for {data}:')
+      print(df.head(5))  # Prints the first 5 rows of the DataFrame
 
       columns = df.columns
       if not set(be_cols).issubset(set(columns)):

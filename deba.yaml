@@ -24,8 +24,7 @@ stages:
   - name: match_history
   - name: analysis
   - name: fuse
-    ignoredTargets:
-      - fuse/person.csv
+
 targets:
   - fuse/allegation.csv
   - fuse/personnel.csv
@@ -37,3 +36,4 @@ targets:
   - fuse/agency_reference_list.csv
   - fuse/documents.csv
   - analysis/coaccusals.csv
+  - fuse/person.csv
