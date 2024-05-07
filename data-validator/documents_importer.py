@@ -13,7 +13,7 @@ def __build_document_rel(db_con, documents_df):
     )
     officers_df.columns = ['officer_id', 'uid']
 
-    dor_df = pd.merge(documents_df, officers_df, how='left', left_on='uid', right_on='uid')
+    dor_df = pd.merge(documents_df, officers_df, how='left', left_on='matched_uid', right_on='uid')
 
     no_officers_in_documents = documents_df['uid'].dropna().unique()
     print('Number of officers in WRGL documents', len(no_officers_in_documents))
