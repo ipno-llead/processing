@@ -13,6 +13,8 @@ def __build_document_rel(db_con, documents_df):
     )
     officers_df.columns = ['officer_id', 'uid']
 
+    documents_df = documents_df[["docid", "matched_uid", "agency"]]
+
     dor_df = pd.merge(documents_df, officers_df, how='left', left_on='matched_uid', right_on='uid')
 
     no_officers_in_documents = documents_df['matched_uid'].dropna().unique()
@@ -78,57 +80,84 @@ def __build_document_rel(db_con, documents_df):
     })
     ddr_df.to_csv('documents_departments_rel.csv', index=False)
 
+
 def run(db_con, documents_df, documents_cols):
+    print("Starting the document relationships build.")
     __build_document_rel(db_con, documents_df)
 
+    print("Starting to copy documents data to the database.")
     cursor = db_con.cursor()
-    cursor.copy_expert(
-        sql=f"""
-            COPY documents_document({', '.join(documents_cols)})
-            FROM stdin WITH CSV HEADER
-            DELIMITER as ','
-        """,
-        file=open('documents.csv', 'r'),
-    )
-    db_con.commit()
-    cursor.close()
+    try:
+        cursor.copy_expert(
+            sql=f"""
+                COPY documents_document({', '.join(documents_cols)})
+                FROM stdin WITH CSV HEADER
+                DELIMITER as ','
+            """,
+            file=open('documents.csv', 'r'),
+        )
+        db_con.commit()
+        print("Documents data successfully copied to the database.")
+    except Exception as e:
+        db_con.rollback()
+        print("Failed to copy documents data to the database:", e)
+    finally:
+        cursor.close()
 
-    # Importing documents and officers relationship
+    print("Starting to copy documents and officers relationship data to the database.")
     cursor = db_con.cursor()
-    cursor.copy_expert(
-        sql="""
-            COPY documents_document_officers(
-                docid, officer_id
-            ) FROM stdin WITH CSV HEADER
-            DELIMITER as ','
-        """,
-        file=open('documents_officers_rel.csv', 'r'),
-    )
-    db_con.commit()
-    cursor.close()
+    try:
+        cursor.copy_expert(
+            sql="""
+                COPY documents_document_officers(
+                    docid, officer_id
+                ) FROM stdin WITH CSV HEADER
+                DELIMITER as ','
+            """,
+            file=open('documents_officers_rel.csv', 'r'),
+        )
+        db_con.commit()
+        print("Documents and officers relationship data successfully copied to the database.")
+    except Exception as e:
+        db_con.rollback()
+        print("Failed to copy documents and officers relationship data to the database:", e)
+    finally:
+        cursor.close()
 
-    count = pd.read_sql(
-        'SELECT COUNT(*) FROM documents_document_officers',
-        con=db_con
-    )
-    print('Number of records in documents_officers rel', count.iloc[0][0])
+    try:
+        count = pd.read_sql(
+            'SELECT COUNT(*) FROM documents_document_officers',
+            con=db_con
+        )
+        print('Number of records in documents_officers relationship:', count.iloc[0][0])
+    except Exception as e:
+        print("Failed to count records in documents_document_officers:", e)
 
-    # Importing documents and agency relationship
+    print("Starting to copy documents and agency relationship data to the database.")
     cursor = db_con.cursor()
-    cursor.copy_expert(
-        sql="""
-            COPY documents_document_departments(
-                docid, department_id
-            ) FROM stdin WITH CSV HEADER
-            DELIMITER as ','
-        """,
-        file=open('documents_departments_rel.csv', 'r'),
-    )
-    db_con.commit()
-    cursor.close()
+    try:
+        cursor.copy_expert(
+            sql="""
+                COPY documents_document_departments(
+                    docid, department_id
+                ) FROM stdin WITH CSV HEADER
+                DELIMITER as ','
+            """,
+            file=open('documents_departments_rel.csv', 'r'),
+        )
+        db_con.commit()
+        print("Documents and agency relationship data successfully copied to the database.")
+    except Exception as e:
+        db_con.rollback()
+        print("Failed to copy documents and agency relationship data to the database:", e)
+    finally:
+        cursor.close()
 
-    count = pd.read_sql(
-        'SELECT COUNT(*) FROM documents_document_departments',
-        con=db_con
-    )
-    print('Number of records in documents_departments rel', count.iloc[0][0])
+    try:
+        count = pd.read_sql(
+            'SELECT COUNT(*) FROM documents_document_departments',
+            con=db_con
+        )
+        print('Number of records in documents_departments relationship:', count.iloc[0][0])
+    except Exception as e:
+        print("Failed to count records in documents_document_departments:", e)
