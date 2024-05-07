@@ -15,7 +15,7 @@ def __build_document_rel(db_con, documents_df):
 
     dor_df = pd.merge(documents_df, officers_df, how='left', left_on='matched_uid', right_on='uid')
 
-    no_officers_in_documents = documents_df['uid'].dropna().unique()
+    no_officers_in_documents = documents_df['matched_uid'].dropna().unique()
     print('Number of officers in WRGL documents', len(no_officers_in_documents))
     diff_officers = set(no_officers_in_documents) - set(officers_df['uid'])
     print('Number of differences in officers', len(diff_officers))
