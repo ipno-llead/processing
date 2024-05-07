@@ -47,7 +47,7 @@ jobs:
         run: |
           sed -iE 's/dataDir\: data/dataDir\: \/runner\/_work\/data\/data/g' deba.yaml
           echo "md5Dir: /runner/_work/data/md5" >> deba.yaml
-          # make WRGL_FLAGS="--wrgl-dir /runner/_work/data/.wrgl" GSUTIL="$(which gsutil)"
+          make WRGL_FLAGS="--wrgl-dir /runner/_work/data/.wrgl" GSUTIL="$(which gsutil)"
         env:
           OCR_ENSURE_COMPLETE: "true"
       - name: Retrieve BE schema
