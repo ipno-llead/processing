@@ -130,6 +130,33 @@ def create_tracking_id_og_col(df):
     return df
 
 
+def test_case():
+    data = {
+    'allegation': ['improper custody of inmate'],
+    'disposition': ['not sustained'],
+    'tracking_id': ['8252058a7aa94a38779fc2f502f068b2'],
+    'action': ['n/a'],
+    'allegation_desc': ['n/a'],
+    'first_name': ['test'],
+    'middle_name': [''],
+    'last_name': ['testing'],
+    'receive_year': [2010],
+    'receive_month': [7],
+    'receive_day': [22],
+    'investigation_complete_year': [2011],
+    'investigation_complete_month': [8],
+    'investigation_complete_day': [2],
+    'agency': ['abbeville-pd'],
+    'uid': ['96d1f577cb8ac70b6d8831dba668ce6b'],
+    'allegation_uid': ['b063838185fc8c00c43c72a19142z9e8'],
+    'tracking_id_og': ['19-001']
+}
+    
+    df = pd.DataFrame(data)
+
+    df
+    return df 
+
 def clean21():
     df = (
         pd.read_csv(deba.data("raw/abbeville_pd/abbeville_pd_cprr_2019_2021.csv"))
@@ -206,5 +233,7 @@ def clean18():
 if __name__ == "__main__":
     df21 = clean21()
     df18 = clean18()
+    test = test_case()
+    df21 = pd.concat([df21, test])
     df21.to_csv(deba.data("clean/cprr_abbeville_pd_2019_2021.csv"), index=False)
     df18.to_csv(deba.data("clean/cprr_abbeville_pd_2015_2018.csv"), index=False)
