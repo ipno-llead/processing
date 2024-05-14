@@ -549,10 +549,50 @@ def assign_allegation_desc(df):
 
 
 def clean_tracking_id(df):
-    df.loc[:, "tracking_id_og"] = df.case.str.replace(
+    df.loc[:, "tracking_id_og"] = df.case.str.lower().str.replace(
         r"(\w{2})-(\w{3})(.+)", r"\1-\2", regex=True
-    ).str.replace(r"na", "", regex=False)
+    ).str.replace(r"na", "", regex=False).str.replace(r"criminal", "", regex=False)
     return df.drop(columns=["case"])
+
+
+def clean_tracking_id_22(df):
+    df.loc[:, "tracking_id_og"] = df["Case #"].str.lower().str.replace(
+        r"(\w{2})-(\w{3})(.+)", r"\1-\2", regex=True
+    ).str.replace(r"na", "", regex=False).str.replace(r"criminal", "", regex=False)
+    return df.drop(columns=["Case #"])
+
+
+def extract_race_sex(df):
+    races = df["Race/Sex Officer"].str.extract(r"^(\w{1})\/")
+    sex = df["Race/Sex Officer"].str.extract(r"\/(\w{1})$")
+
+    df.loc[:, "race"] = races[0].str.lower().str.replace(r"^w$", "white", regex=True).str.lower().str.replace(r"^b$", "black", regex=True)
+    df.loc[:, "sex"] = sex[0].str.lower().str.replace(r"^m$", "male", regex=True).str.lower().str.replace(r"^f$", "female", regex=True)
+
+    complainant_races = df["Race/Sex Complainant"].str.extract(r"^(\w{1})\/")
+    complainant_sex = df["Race/Sex Complainant"].str.extract(r"\/(\w{1})$")
+
+    df.loc[:, "complainant_race"] = complainant_races[0].str.lower().str.replace(r"^w$", "white", regex=True).str.lower().str.replace(r"^b$", "black", regex=True)
+    df.loc[:, "complainant_sex"] = complainant_sex[0].str.lower().str.replace(r"^m$", "male", regex=True).str.lower().str.replace(r"^f$", "female", regex=True)
+
+
+
+    return df.drop(columns=["Race/Sex Officer", "Race/Sex Complainant"])
+
+def extract_name_22(df):
+    names = df.officer.str.lower().str.extract(r"(\w+) (\w+)")
+
+    df.loc[:, "first_name"] = names[0]
+    df.loc[:, "last_name"]= names[1]
+
+    return df.drop(columns=["officer"])
+    
+
+def clean_action_and_allegation(df):
+    df.loc[:, "action"] = df.outcome.str.lower().str.replace(r"\/", "; ", regex=True)
+
+    df.loc[:, "allegation"] = df.allegation.str.lower().str.strip()
+    return df.drop(columns=["outcome"])
 
 
 def clean21():
@@ -643,10 +683,41 @@ def clean10():
     return df
 
 
+def clean22():
+    df = (
+        pd.read_csv(deba.data("raw/lafourche_so/lafourche_so_cprr_2022_2023.csv"))
+        )
+    
+    df.columns = df.columns.str.replace(r"\'", "", regex=True)
+
+    df = df.applymap(lambda x: x.lstrip('\'') if isinstance(x, str) else x)
+
+    df = df.drop(columns=["Complainant"])
+
+
+    df = (df.pipe(set_values, {"agency": "lafourche-so"})
+        )
+
+    df = (df
+          .pipe(clean_tracking_id_22)
+          .pipe(gen_uid, ["agency", "tracking_id_og"], "tracking_id")
+          .pipe(extract_race_sex)
+          .pipe(clean_column_names)
+          .pipe(extract_name_22)
+          .pipe(clean_action_and_allegation)
+          .pipe(gen_uid, ["first_name", "last_name", "agency"])
+    )
+
+
+
+    return df 
+
 if __name__ == "__main__":
     df21 = clean21()
     df15 = clean15()
     df10 = clean10()
+    df22 = clean22()
     df21.to_csv(deba.data("clean/cprr_lafourche_so_2019_2021.csv"), index=False)
     df15.to_csv(deba.data("clean/cprr_lafourche_so_2015_2018.csv"), index=False)
     df10.to_csv(deba.data("clean/cprr_lafourche_so_2010_2014.csv"), index=False)
+    df22.to_csv(deba.data("clean/cprr_lafourche_so_2022_2023.csv"), index=False)
