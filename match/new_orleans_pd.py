@@ -539,7 +539,6 @@ def match_cprr23_to_pprr(cprr, pprr):
         },
         dfa,
         dfb,
-        show_progress=True,
     )
     decision = 0.772
 
