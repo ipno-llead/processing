@@ -5,7 +5,7 @@ from lib.post import load_for_agency, extract_events_from_post
 from lib.clean import canonicalize_officers
 
 
-def deduplicate_cprr19(cprr):
+def deduplicate_cprr(cprr):
     df = cprr[["uid", "first_name", "last_name"]]
     df = df.drop_duplicates(subset=["uid"]).set_index("uid")
     df.loc[:, "fc"] = df.first_name.fillna("").map(lambda x: x[:1])
@@ -27,7 +27,7 @@ def deduplicate_cprr19(cprr):
     return canonicalize_officers(cprr, clusters)
 
 
-def match_cprr_20_and_pprr(cprr, pprr):
+def match_cprr_and_pprr(cprr, pprr):
     dfa = (
         cprr.loc[cprr.uid.notna(), ["uid", "first_name", "last_name"]]
         .drop_duplicates(subset=["uid"])
@@ -127,17 +127,14 @@ def match_pprr_and_post(pprr, post):
 
 
 if __name__ == "__main__":
-    cprr_20 = pd.read_csv(deba.data("clean/cprr_lake_charles_pd_2020.csv"))
-    cprr_19 = pd.read_csv(deba.data("clean/cprr_lake_charles_pd_2014_2019.csv"))
+    cprr = pd.read_csv(deba.data("clean/cprr_lake_charles_pd_2014_2023.csv"))
     pprr = pd.read_csv(deba.data("clean/pprr_lake_charles_pd_2017_2021.csv"))
-    agency = cprr_19.agency[0]
+    agency = cprr.agency[0]
     post = load_for_agency(agency)
-    cprr_19 = deduplicate_cprr19(cprr_19)
-    cprr_20 = match_cprr_20_and_pprr(cprr_20, post)
-    cprr_19 = match_cprr_19_and_pprr(cprr_19, post)
+    cprr = deduplicate_cprr(cprr)
+    cprr = match_cprr_and_pprr(cprr, post)
     post_event = match_pprr_and_post(pprr, post)
-    cprr_20.to_csv(deba.data("match/cprr_lake_charles_pd_2020.csv"), index=False)
-    cprr_19.to_csv(deba.data("match/cprr_lake_charles_pd_2014_2019.csv"), index=False)
+    cprr.to_csv(deba.data("match/cprr_lake_charles_pd_2014_2023.csv"), index=False)
     post_event.to_csv(
         deba.data("match/post_event_lake_charles_2020_11_06.csv"), index=False
     )

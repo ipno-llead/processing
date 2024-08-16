@@ -1,7 +1,7 @@
 import pandas as pd
 import deba
 from lib.clean import float_to_int_str
-from lib.columns import clean_column_names
+from lib.columns import clean_column_names, clean_dates
 from lib.rows import duplicate_row
 from lib.uid import gen_uid
 from lib.standardize import standardize_from_lookup_table
@@ -731,11 +731,153 @@ def clean_19():
     return df, citizen_df
 
 
+def clear_leading_commas(df):
+    for col in df.columns:
+        df = df.apply(lambda col: col.astype(str).str.replace(r"^\'", "", regex=True))
+        return df
+
+
+def clean_allegations21(df):
+    df.loc[:, "complaint_1"] = (
+        df.complaint_1.str.lower()
+        .str.strip()
+        .str.replace(r"unsat perf", "unsatisfactory performance", regex=False)
+        .str.replace(r"cond unbecoming", "conduct unbecoming", regex=False)
+        .str.replace(r"false\/inacc stmnts", "false/inaccurate statements", regex=True)
+        .str.replace(r"^prof ", "professionalism ", regex=True)
+        .str.replace(r"undercover inv", "undercover investigation", regex=False)
+        .str.replace(r"unauth force", "unauthorized force", regex=False)
+        .str.replace(
+            r"use of dept\. property", "use of department property", regex=True
+        )
+        .str.replace(r"^dept ", "department", regex=True)
+        .str.replace(r"emp harass", "employee harassment", regex=False)
+        .str.replace(r"equip", "equipment", regex=False)
+    )
+    df.loc[:, "complaint_2"] = (
+        df.complaint_2.str.lower()
+        .str.strip()
+        .str.replace(r"unsat perf", "unsatisfactory performance", regex=False)
+        .str.replace(r"cond unbecoming", "conduct unbecoming", regex=False)
+        .str.replace(r"false\/inacc stmnts", "false/inaccurate statements", regex=True)
+        .str.replace(r"^prof ", "professionalism ", regex=True)
+        .str.replace(r"undercover inv", "undercover investigation", regex=False)
+        .str.replace(r"unauth force", "unauthorized force", regex=False)
+        .str.replace(
+            r"use of dept\. property", "use of department property", regex=True
+        )
+        .str.replace(r"^dept ", "department", regex=True)
+        .str.replace(r"emp harass", "employee harassment", regex=False)
+        .str.replace(r"equip", "equipment", regex=False)
+    )
+    df.loc[:, "allegation"] = df.complaint_1.str.cat(df.complaint_2, sep="; ")
+
+    df.loc[:, "allegation"] = df.allegation.str.replace(
+        r"; n\/a$", "", regex=True
+    ).str.replace(r"^n\/a$", "", regex=True)
+    return df[~((df.allegation.fillna("") == ""))].drop(
+        columns=["complaint_1", "complaint_2"]
+    )
+
+
+def remove_dates(df):
+    df.loc[:, "investigation_start_date"] = df.investigation_start_date.str.replace(
+        r"^\"$", "", regex=True
+    )
+    return df
+
+
+def split_names21(df):
+    names = df.officer_name.str.extract(r"(.+)\s+(.+)")
+
+    df.loc[:, "first_name"] = (
+        names[0].str.replace(r"\.", "", regex=True).str.lower().str.strip()
+    )
+    df.loc[:, "last_name"] = names[1].str.lower().str.strip()
+    return df.drop(columns=["officer_name"])
+
+
+def clean_dispos_21(df):
+    df.loc[:, "disposition"] = (
+        df.disposition.str.lower()
+        .str.strip()
+        .fillna("")
+        .str.replace(r"^n[sf]\/sust(.+)?", "", regex=True)
+        .str.replace(r"^sust(ained)? ?\/?ns$", "", regex=True)
+        .str.replace(r"n\/a", "", regex=True)
+        .str.replace(r"ns\/unf", "not sustained/unfounded", regex=True)
+        .str.replace(r"unf\/ns", "not sustained/unfounded", regex=True)
+        .str.replace(r"ns\/exon", "not sustained/exonerated", regex=True)
+        .str.replace(r"exon\/unfound", "exonerated/unfounded", regex=True)
+        .str.replace(r"policy failure\/unf", "policy failure/unfouded", regex=True)
+    )
+    return df
+
+
+def clean_action21(df):
+    df.loc[:, "action"] = (
+        df.action.str.lower()
+        .str.strip()
+        .str.replace(r"demotion\/susp", "demotion/suspension", regex=True)
+        .str.replace(r"days?", "day suspension", regex=True)
+        .str.replace(r"(\w+)\((.+)\)", r"\1 (\2)", regex=True)
+        .str.replace(r"(none|n\/a)", "", regex=True)
+        .str.replace(r"(vr|wr|eap)", "", regex=True)
+        .str.replace(r"^\/", "", regex=True)
+        .str.replace(r"\/$", "", regex=True)
+    )
+    return df
+
+
+def clean21():
+    df = pd.read_csv(
+        deba.data("raw/lake_charles_pd/lake-charles-pd-cprr-2021-2023.csv")
+    )
+
+    df = (
+        df.pipe(clean_column_names)
+        .pipe(clear_leading_commas)
+        .drop(columns=["shift", "complainant_s"])
+        .rename(
+            columns={
+                "iad_file": "tracking_id_og",
+                "date": "investigation_start_date",
+                "officer_s_accused": "officer_name",
+                "discipline": "action",
+            }
+        )
+        .pipe(clean_allegations21)
+        .pipe(remove_dates)
+        .pipe(clean_dates, ["investigation_start_date"])
+        .pipe(split_names21)
+        .pipe(clean_dispos_21)
+        .pipe(clean_action21)
+        .pipe(assign_agency)
+        .pipe(gen_uid, ["first_name", "last_name", "agency"])
+        .pipe(
+            gen_uid,
+            [
+                "first_name",
+                "last_name",
+                "tracking_id_og",
+                "allegation",
+                "action",
+            ],
+            "allegation_uid",
+        )
+        .pipe(gen_uid, ["tracking_id_og", "agency"], "tracking_id")
+    )
+    return df
+
+
 if __name__ == "__main__":
     df20 = clean_20()
     df19, citizen_df19 = clean_19()
-    df20.to_csv(deba.data("clean/cprr_lake_charles_pd_2020.csv"), index=False)
-    df19.to_csv(deba.data("clean/cprr_lake_charles_pd_2014_2019.csv"), index=False)
+    df21 = clean21()
+    # df20.to_csv(deba.data("clean/cprr_lake_charles_pd_2020.csv"), index=False)
+    # df19.to_csv(deba.data("clean/cprr_lake_charles_pd_2014_2019.csv"), index=False)
+    df = pd.concat([df20, df21, df20])
+    df.to_csv(deba.data("clean/cprr_lake_charles_pd_2014_2023.csv"), index=False)
     citizen_df19.to_csv(
         deba.data("clean/cprr_cit_lake_charles_pd_2014_2019.csv"), index=False
     )
