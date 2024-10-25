@@ -25,11 +25,33 @@ jobs:
           instance: '${{ secrets.GCP_PROJECT_ID }}:us-central1:${{ secrets.CLOUD_SQL_DATABASE }}'
           port: 5432
 
-      - name: Download csv_urls.json
+      - name: Download and verify csv_urls.json
         run: |
           # Get the folder name using the same pattern as the upload workflow
           FOLDER_NAME="data-${{ github.event.workflow_run.id }}-${{ github.event.workflow_run.run_attempt }}"
+          
+          echo "Checking for csv_urls.json in bucket..."
+          if ! gsutil -q stat "gs://${{ vars.DATA_BUCKET }}/$FOLDER_NAME/csv_urls.json"; then
+            echo "Error: csv_urls.json not found in cloud storage"
+            exit 1
+          fi
+          
+          echo "Downloading csv_urls.json..."
           gsutil cp "gs://${{ vars.DATA_BUCKET }}/$FOLDER_NAME/csv_urls.json" ./csv_urls.json
+          
+          echo "Verifying JSON format..."
+          if ! jq empty csv_urls.json; then
+            echo "Error: Invalid JSON format in csv_urls.json"
+            exit 1
+          fi
+          
+          echo "Verifying JSON content..."
+          URL_COUNT=$(jq 'length' csv_urls.json)
+          echo "Found $URL_COUNT URL entries in csv_urls.json"
+          if [ "$URL_COUNT" -eq "0" ]; then
+            echo "Error: No URLs found in csv_urls.json"
+            exit 1
+          fi
 
       - name: Update Database
         env:
