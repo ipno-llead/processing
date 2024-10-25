@@ -101,6 +101,37 @@ jobs:
         destination: '${{ vars.DATA_BUCKET }}/${{ env.FOLDER_NAME }}'
         process_gcloudignore: false
 
+    # Upload agency-specific input CSVs and save URLs
+    - id: 'upload-agency-csvs'
+      uses: 'google-github-actions/upload-cloud-storage@v2'
+      with:
+        path: '${{ vars.DATA_DIR }}/fuse_agency'
+        destination: '${{ vars.DATA_BUCKET }}/${{ env.FOLDER_NAME }}/fuse_agency'
+        process_gcloudignore: false
+        recursive: true
+
+    - name: 'Generate CSV URLs file'
+      run: |
+        echo "Generating URLs for uploaded files..."
+        echo "{" > csv_urls.json
+        
+        # List all uploaded CSVs and generate their public URLs
+        # Focus on agency-specific CSVs from fuse_agency directory
+        gsutil ls "gs://${{ vars.DATA_BUCKET }}/${{ env.FOLDER_NAME }}/fuse_agency/per_*.csv" | while read -r file; do
+          filename=$(basename "$file")
+          echo "  \"${filename}\": \"https://storage.googleapis.com/${file#gs://}\"," >> csv_urls.json
+        done
+        
+        # Remove trailing comma and close JSON
+        sed -i '$ s/,$//' csv_urls.json
+        echo "}" >> csv_urls.json
+        
+        # Upload the URLs file back to cloud storage
+        gsutil cp csv_urls.json "gs://${{ vars.DATA_BUCKET }}/${{ env.FOLDER_NAME }}/csv_urls.json"
+        
+        # Make the CSV files and URLs file publicly readable
+        gsutil -m acl ch -r -u AllUsers:R "gs://${{ vars.DATA_BUCKET }}/${{ env.FOLDER_NAME }}/fuse_agency/per_*.csv"
+        gsutil acl ch -u AllUsers:R "gs://${{ vars.DATA_BUCKET }}/${{ env.FOLDER_NAME }}/csv_urls.json"
     - name: 'Trigger Backend staging data import'
       id: 'trigger-backend-staging'
       run: |

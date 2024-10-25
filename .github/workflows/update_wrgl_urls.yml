@@ -1,0 +1,100 @@
+name: Update WRGL URLs
+
+on:
+  workflow_run:
+    workflows: ["Upload CSV to Google Cloud"]
+    types:
+      - completed
+
+jobs:
+  update-urls:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      
+      # Set up Cloud SQL Auth proxy
+      - id: 'auth'
+        uses: 'google-github-actions/auth@v1'
+        with:
+          credentials_json: '${{ secrets.GCP_SA_KEY }}'
+          
+      - name: 'Set up Cloud SQL Proxy'
+        uses: 'google-github-actions/setup-cloud-sql-proxy@v1'
+        with:
+          instance: '${{ secrets.GCP_PROJECT_ID }}:us-central1:${{ secrets.CLOUD_SQL_DATABASE }}'
+          port: 5432
+
+      - name: Download csv_urls.json
+        run: |
+          # Get the folder name using the same pattern as the upload workflow
+          FOLDER_NAME="data-${{ github.event.workflow_run.id }}-${{ github.event.workflow_run.run_attempt }}"
+          gsutil cp "gs://${{ vars.DATA_BUCKET }}/$FOLDER_NAME/csv_urls.json" ./csv_urls.json
+
+      - name: Update Database
+        env:
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+        run: |
+          # Install Python and required packages
+          sudo apt-get update && sudo apt-get install -y python3-pip
+          pip install psycopg2-binary
+
+          # Create Python script to update database
+          cat << EOF > update_wrgl.py
+          import psycopg2
+          import os
+          import json
+          import re
+
+          def get_slug_from_filename(filename):
+              # Extract agency name from filename like 'per_new_orleans_pd.csv'
+              match = re.match(r'per_(.+)\.csv', filename)
+              if match:
+                  return match.group(1).replace('_', '-')
+              return None
+
+          def update_wrgl_urls():
+              conn = psycopg2.connect(
+                  dbname=os.environ['POSTGRES_DB'],
+                  user=os.environ['POSTGRES_USER'],
+                  password=os.environ['POSTGRES_PASSWORD'],
+                  host='localhost',
+                  port=5432
+              )
+              
+              try:
+                  with open('csv_urls.json', 'r') as f:
+                      urls = json.load(f)
+                  
+                  with conn.cursor() as cur:
+                      for filename, url in urls.items():
+                          slug = get_slug_from_filename(filename)
+                          if not slug:
+                              print(f"Skipping {filename} - could not determine slug")
+                              continue
+                              
+                          cur.execute("""
+                              UPDATE departments_wrglfile 
+                              SET url = %s, download_url = %s 
+                              WHERE slug = %s
+                              RETURNING id
+                          """, (url, url, slug))
+                          
+                          updated = cur.fetchone()
+                          if updated:
+                              print(f"Updated URLs for {slug}")
+                          else:
+                              print(f"No matching record found for {slug}")
+                      
+                      conn.commit()
+              finally:
+                  conn.close()
+
+          if __name__ == '__main__':
+              update_wrgl_urls()
+          EOF
+
+          # Run the update script
+          python3 update_wrgl.py
