@@ -109,6 +109,7 @@ jobs:
         destination: '${{ vars.DATA_BUCKET }}/${{ env.FOLDER_NAME }}/fuse_agency'
         process_gcloudignore: false
         recursive: true
+
     # Verify files exist before processing
     - name: 'Verify CSV files'
       run: |
@@ -118,9 +119,10 @@ jobs:
           exit 1
         fi
         
-        # List all personnel CSVs to verify they exist
-        echo "Found personnel CSV files:"
-        find /runner/_work/data/data/fuse_agency -name "per_*.csv" -type f -ls
+        # List all agency CSVs to verify they exist
+        echo "Found agency CSV files:"
+        find /runner/_work/data/data/fuse_agency -name "*.csv" -type f -ls
+
     - name: 'Generate CSV URLs file'
       run: |
         echo "Generating URLs for uploaded files..."
@@ -128,9 +130,9 @@ jobs:
         
         # Verify files were uploaded successfully
         echo "Verifying uploaded files in Google Cloud Storage..."
-        UPLOADED_FILES=$(gsutil ls "gs://${{ vars.DATA_BUCKET }}/${{ env.FOLDER_NAME }}/fuse_agency/per_*.csv")
+        UPLOADED_FILES=$(gsutil ls "gs://${{ vars.DATA_BUCKET }}/${{ env.FOLDER_NAME }}/fuse_agency/*.csv")
         if [ -z "$UPLOADED_FILES" ]; then
-          echo "Error: No personnel CSV files found in cloud storage"
+          echo "Error: No agency CSV files found in cloud storage"
           exit 1
         fi
         
@@ -142,7 +144,8 @@ jobs:
         echo "$UPLOADED_FILES" | while read -r file; do
           if [ ! -z "$file" ]; then
             filename=$(basename "$file")
-            echo "Processing $filename..."
+            filetype=${filename%%_*}  # Extract type (per, com, uof, etc.)
+            echo "Processing $filename (type: $filetype)..."
             echo "  \"${filename}\": \"https://storage.googleapis.com/${file#gs://}\"," >> csv_urls.json
           fi
         done
@@ -150,7 +153,7 @@ jobs:
         # Remove trailing comma and close JSON
         sed -i '$ s/,$//' csv_urls.json
         echo "}" >> csv_urls.json
-
+        
         # Verify JSON format
         echo "Verifying JSON format..."
         if ! jq empty csv_urls.json; then
@@ -162,12 +165,12 @@ jobs:
         # Upload the URLs file back to cloud storage
         gsutil cp csv_urls.json "gs://${{ vars.DATA_BUCKET }}/${{ env.FOLDER_NAME }}/csv_urls.json"
         
-        # Make the CSV files and URLs file publicly readable
-        gsutil -m acl ch -r -u AllUsers:R "gs://${{ vars.DATA_BUCKET }}/${{ env.FOLDER_NAME }}/fuse_agency/per_*.csv"
+        # Make all CSV files and URLs file publicly readable
+        gsutil -m acl ch -r -u AllUsers:R "gs://${{ vars.DATA_BUCKET }}/${{ env.FOLDER_NAME }}/fuse_agency/*.csv"
         gsutil acl ch -u AllUsers:R "gs://${{ vars.DATA_BUCKET }}/${{ env.FOLDER_NAME }}/csv_urls.json"
         
         echo "URL generation and permission setting completed successfully"
-        - name: 'Trigger Backend staging data import'
+    - name: 'Trigger Backend staging data import'
       id: 'trigger-backend-staging'
       run: |
         curl -X POST -H "Content-Type: application/json" \
