@@ -134,7 +134,7 @@ def update_wrgl_urls(json_path='csv_urls.json'):
             
     except Exception as e:
         logger.error(f"ERROR: {str(e)}")
-        raise
+        raise e
         
     finally:
         if 'conn' in locals():
