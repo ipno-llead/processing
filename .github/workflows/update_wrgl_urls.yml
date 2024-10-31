@@ -27,19 +27,24 @@ jobs:
 
       - name: Download and verify csv_urls.json
         run: |
+          # Get the folder name using the same pattern as the upload workflow
           FOLDER_NAME="data-${{ github.event.workflow_run.id }}-${{ github.event.workflow_run.run_attempt }}"
+          
           echo "Checking for csv_urls.json in bucket..."
           if ! gsutil -q stat "gs://${{ vars.DATA_BUCKET }}/$FOLDER_NAME/csv_urls.json"; then
             echo "Error: csv_urls.json not found in cloud storage"
             exit 1
           fi
+          
           echo "Downloading csv_urls.json..."
           gsutil cp "gs://${{ vars.DATA_BUCKET }}/$FOLDER_NAME/csv_urls.json" ./csv_urls.json
+          
           echo "Verifying JSON format..."
           if ! jq empty csv_urls.json; then
             echo "Error: Invalid JSON format in csv_urls.json"
             exit 1
           fi
+          
           echo "Verifying JSON content..."
           URL_COUNT=$(jq 'length' csv_urls.json)
           echo "Found $URL_COUNT URL entries in csv_urls.json"
@@ -54,119 +59,9 @@ jobs:
           POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
         run: |
+          # Install Python and required packages
           sudo apt-get update && sudo apt-get install -y python3-pip
           pip install psycopg2-binary
-          cat << 'EOF' > update_wrgl.py
-          import psycopg2
-          import os
-          import json
-          import re
 
-          def get_slug_from_filename(filename):
-              match = re.match(r'[a-z]+_(.+)\.csv', filename)
-              if match:
-                  return match.group(1).replace('_', '-')
-              return None
-
-          def get_file_type(filename):
-              match = re.match(r'([a-z]+)_', filename)
-              if match:
-                  return match.group(1)
-              return None
-
-          def update_wrgl_urls():
-              success_count = 0
-              error_count = 0
-              skipped_count = 0
-              print("Starting database update process...")
-              try:
-                  conn = psycopg2.connect(
-                      dbname=os.environ['POSTGRES_DB'],
-                      user=os.environ['POSTGRES_USER'],
-                      password=os.environ['POSTGRES_PASSWORD'],
-                      host='localhost',
-                      port=5432
-                  )
-                  print("Successfully connected to database")
-                  try:
-                      with open('csv_urls.json', 'r') as f:
-                          urls = json.load(f)
-                      print(f"Loaded {len(urls)} URLs from csv_urls.json")
-                      with conn.cursor() as cur:
-                          all_slugs = set()
-                          cur.execute("SELECT slug FROM departments_wrglfile")
-                          for row in cur.fetchall():
-                              all_slugs.add(row[0])
-                          for filename, url in urls.items():
-                              print(f"\nProcessing {filename}...")
-                              slug = get_slug_from_filename(filename)
-                              file_type = get_file_type(filename)
-                              if not slug or not file_type:
-                                  print(f"ERROR: Could not determine slug or type from filename {filename}")
-                                  error_count += 1
-                                  continue
-                              if slug not in all_slugs:
-                                  print(f"WARNING: No matching record found for slug '{slug}'")
-                                  skipped_count += 1
-                                  continue
-                              try:
-                                  column_mapping = {
-                                      'per': ('url', 'download_url'),
-                                      'com': ('complaint_url', 'complaint_download_url'),
-                                      'uof': ('uof_url', 'uof_download_url'),
-                                      'sas': ('sas_url', 'sas_download_url'),
-                                      'app': ('appeals_url', 'appeals_download_url'),
-                                      'bra': ('brady_url', 'brady_download_url'),
-                                      'doc': ('documents_url', 'documents_download_url')
-                                  }
-                                  if file_type not in column_mapping:
-                                      print(f"WARNING: Unknown file type '{file_type}' for {filename}")
-                                      skipped_count += 1
-                                      continue
-                                  url_column, download_url_column = column_mapping[file_type]
-                                  cur.execute(f"""
-                                      UPDATE departments_wrglfile 
-                                      SET {url_column} = %s, {download_url_column} = %s 
-                                      WHERE slug = %s
-                                      RETURNING id
-                                  """, (url, url, slug))
-                                  updated = cur.fetchone()
-                                  if updated:
-                                      print(f"Successfully updated URLs for {slug}")
-                                      success_count += 1
-                                  else:
-                                      print(f"WARNING: No update performed for {slug}")
-                                      skipped_count += 1
-                              except Exception as e:
-                                  print(f"ERROR: Failed to update {slug}: {str(e)}")
-                                  error_count += 1
-                                  continue
-                          conn.commit()
-                          type_stats = {}
-                          for filename, url in urls.items():
-                              file_type = get_file_type(filename)
-                              if file_type:
-                                  type_stats[file_type] = type_stats.get(file_type, 0) + 1
-                          print("\nUpdate process completed:")
-                          print(f"- Successfully updated: {success_count}")
-                          print(f"- Skipped: {skipped_count}")
-                          print(f"- Errors: {error_count}")
-                          print("\nFiles processed by type:")
-                          for file_type, count in type_stats.items():
-                              print(f"- {file_type}: {count} files")
-                          if error_count > 0:
-                              raise Exception(f"Encountered {error_count} errors during update")
-                  except json.JSONDecodeError as e:
-                      raise Exception(f"Failed to parse csv_urls.json: {str(e)}")
-              except Exception as e:
-                  print(f"ERROR: {str(e)}")
-                  raise
-              finally:
-                  if 'conn' in locals():
-                      conn.close()
-                      print("Database connection closed")
-
-          if __name__ == '__main__':
-              update_wrgl_urls()
-          EOF
-          python3 update_wrgl.py
+          # Run the update script
+          python3 scripts/update_wrgl_urls.py
