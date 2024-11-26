@@ -16,7 +16,21 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: setup-gcloud
+    - name: Set up Google Cloud SDK
+      uses: 'google-github-actions/setup-gcloud@v2'
+      with:
+        version: 'latest'
+        install_components: 'gsutil'
+
+    - name: Verify Google Cloud setup
+      run: |
+        echo "Verifying Google Cloud SDK installation..."
+        gcloud --version
+        echo "Verifying gsutil installation..."
+        which gsutil
+        gsutil --version
+
+    - name: Authenticate with Google Cloud
       uses: 'google-github-actions/auth@v2'
       with:
         credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
