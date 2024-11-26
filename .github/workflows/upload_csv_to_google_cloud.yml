@@ -24,12 +24,13 @@ jobs:
         version: 'latest'
         install_components: 'gsutil'
 
-    - name: Verify Google Cloud setup
+    - name: Install gsutil
       run: |
-        echo "Verifying Google Cloud SDK installation..."
-        gcloud --version
+        echo "Installing gsutil..."
+        curl https://sdk.cloud.google.com | bash -s -- --disable-prompts --install-dir=/usr/local
+        export PATH=$PATH:/usr/local/google-cloud-sdk/bin
         echo "Verifying gsutil installation..."
-        which gsutil || (sudo apt-get update && sudo apt-get install -y google-cloud-sdk-gsutil)
+        which gsutil
         gsutil --version
 
     - name: Authenticate with Google Cloud
