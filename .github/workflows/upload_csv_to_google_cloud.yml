@@ -10,9 +10,11 @@ on:
 jobs:
   upload_csv_to_google_cloud:
     runs-on: cdi-runner
+    permissions:
+      contents: 'read'
+      id-token: 'write'
     env:
       FOLDER_NAME: data-${{ github.run_id }}-${{ github.run_attempt }}
-
     steps:
     - uses: actions/checkout@v4
 
@@ -22,12 +24,13 @@ jobs:
         version: 'latest'
         install_components: 'gsutil'
 
-    - name: Verify Google Cloud setup
+    - name: Install gsutil
       run: |
-        echo "Verifying Google Cloud SDK installation..."
-        gcloud --version
+        echo "Installing gsutil..."
+        curl https://sdk.cloud.google.com | bash -s -- --disable-prompts --install-dir=/usr/local
+        export PATH=$PATH:/usr/local/google-cloud-sdk/bin
         echo "Verifying gsutil installation..."
-        which gsutil || (sudo apt-get update && sudo apt-get install -y google-cloud-sdk-gsutil)
+        which gsutil
         gsutil --version
 
     - name: Authenticate with Google Cloud
@@ -35,6 +38,16 @@ jobs:
       with:
         credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
 
+    - name: 'Set up Cloud SDK'
+      uses: 'google-github-actions/setup-gcloud@v2'
+      with:
+        install_components: 'gsutil'
+        project_id: '${{ env.GOOGLE_CLOUD_PROJECT }}'
+
+    - name: 'Verify Google Cloud setup'
+      run: |
+        gcloud info
+        gsutil version
     # We could also consider changing the output of the data processing process,
     # in a way that the needed files for back-end are group into their own folder
     # so that we can upload the whole folder to the cloud storage
@@ -122,7 +135,7 @@ jobs:
         path: '/runner/_work/data/data/fuse_agency'
         destination: '${{ vars.DATA_BUCKET }}/${{ env.FOLDER_NAME }}/fuse_agency'
         process_gcloudignore: false
-        recursive: true
+        glob: '**/*.csv'
 
     # Verify files exist before processing
     - name: 'Verify CSV files'

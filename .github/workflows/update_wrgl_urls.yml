@@ -20,6 +20,15 @@ jobs:
           version: 'latest'
           install_components: 'gsutil'
 
+      - name: Install gsutil
+        run: |
+          echo "Installing gsutil..."
+          curl https://sdk.cloud.google.com | bash -s -- --disable-prompts --install-dir=/usr/local
+          export PATH=$PATH:/usr/local/google-cloud-sdk/bin
+          echo "Verifying gsutil installation..."
+          which gsutil
+          gsutil --version
+
       - name: Verify environment setup
         run: |
           echo "Verifying Google Cloud SDK installation..."
