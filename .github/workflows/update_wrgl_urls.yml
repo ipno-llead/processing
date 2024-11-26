@@ -13,7 +13,25 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       
-      # Set up Cloud SQL Auth proxy
+      # Set up Google Cloud SDK
+      - name: Set up Google Cloud SDK
+        uses: 'google-github-actions/setup-gcloud@v2'
+        with:
+          version: 'latest'
+          install_components: 'gsutil'
+
+      - name: Verify environment setup
+        run: |
+          echo "Verifying Google Cloud SDK installation..."
+          gcloud --version
+          echo "Verifying gsutil installation..."
+          which gsutil || (sudo apt-get update && sudo apt-get install -y google-cloud-sdk-gsutil)
+          gsutil --version
+          echo "Verifying Python installation..."
+          python3 --version
+          pip3 --version
+
+      # Authenticate with Google Cloud
       - id: 'auth'
         uses: 'google-github-actions/auth@v1'
         with:
@@ -53,15 +71,20 @@ jobs:
             exit 1
           fi
 
+      - name: Install dependencies
+        run: |
+          echo "Installing system dependencies..."
+          sudo apt-get update
+          sudo apt-get install -y python3-pip python3-dev libpq-dev postgresql-client
+          
+          echo "Installing Python packages..."
+          pip install --no-cache-dir psycopg2-binary
+
       - name: Update Database
         env:
           POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
           POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
         run: |
-          # Install Python and required packages
-          sudo apt-get update && sudo apt-get install -y python3-pip
-          pip install psycopg2-binary
-
-          # Run the update script
+          echo "Running database update script..."
           python3 scripts/update_wrgl_urls.py
