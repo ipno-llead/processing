@@ -27,7 +27,7 @@ jobs:
         echo "Verifying Google Cloud SDK installation..."
         gcloud --version
         echo "Verifying gsutil installation..."
-        which gsutil
+        which gsutil || (sudo apt-get update && sudo apt-get install -y google-cloud-sdk-gsutil)
         gsutil --version
 
     - name: Authenticate with Google Cloud
