@@ -101,6 +101,75 @@ jobs:
         destination: '${{ vars.DATA_BUCKET }}/${{ env.FOLDER_NAME }}'
         process_gcloudignore: false
 
+    # Upload agency-specific input CSVs and save URLs
+    - id: 'upload-agency-csvs'
+      uses: 'google-github-actions/upload-cloud-storage@v2'
+      with:
+        path: '/runner/_work/data/data/fuse_agency'
+        destination: '${{ vars.DATA_BUCKET }}/${{ env.FOLDER_NAME }}/fuse_agency'
+        process_gcloudignore: false
+        recursive: true
+
+    # Verify files exist before processing
+    - name: 'Verify CSV files'
+      run: |
+        echo "Verifying CSV files exist..."
+        if [ ! -d "/runner/_work/data/data/fuse_agency" ]; then
+          echo "Error: fuse_agency directory not found"
+          exit 1
+        fi
+        
+        # List all agency CSVs to verify they exist
+        echo "Found agency CSV files:"
+        find /runner/_work/data/data/fuse_agency -name "*.csv" -type f -ls
+
+    - name: 'Generate CSV URLs file'
+      run: |
+        echo "Generating URLs for uploaded files..."
+        echo "{" > csv_urls.json
+        
+        # Verify files were uploaded successfully
+        echo "Verifying uploaded files in Google Cloud Storage..."
+        UPLOADED_FILES=$(gsutil ls "gs://${{ vars.DATA_BUCKET }}/${{ env.FOLDER_NAME }}/fuse_agency/*.csv")
+        if [ -z "$UPLOADED_FILES" ]; then
+          echo "Error: No agency CSV files found in cloud storage"
+          exit 1
+        fi
+        
+        echo "Found the following uploaded files:"
+        echo "$UPLOADED_FILES"
+        
+        # Generate URLs for verified files
+        echo "Generating public URLs..."
+        echo "$UPLOADED_FILES" | while read -r file; do
+          if [ ! -z "$file" ]; then
+            filename=$(basename "$file")
+            filetype=${filename%%_*}  # Extract type (per, com, uof, etc.)
+            echo "Processing $filename (type: $filetype)..."
+            echo "  \"${filename}\": \"https://storage.googleapis.com/${file#gs://}\"," >> csv_urls.json
+          fi
+        done
+        
+        # Remove trailing comma and close JSON
+        sed -i '$ s/,$//' csv_urls.json
+        echo "}" >> csv_urls.json
+        
+        # Verify JSON format
+        echo "Verifying JSON format..."
+        if ! jq empty csv_urls.json; then
+          echo "Error: Invalid JSON format"
+          exit 1
+        fi
+        
+        echo "Uploading URLs file and setting permissions..."
+        # Upload the URLs file back to cloud storage
+        gsutil cp csv_urls.json "gs://${{ vars.DATA_BUCKET }}/${{ env.FOLDER_NAME }}/csv_urls.json"
+        
+        # Make all CSV files and URLs file publicly readable
+        gsutil -m acl ch -r -u AllUsers:R "gs://${{ vars.DATA_BUCKET }}/${{ env.FOLDER_NAME }}/fuse_agency/*.csv"
+        gsutil acl ch -u AllUsers:R "gs://${{ vars.DATA_BUCKET }}/${{ env.FOLDER_NAME }}/csv_urls.json"
+        
+        echo "URL generation and permission setting completed successfully"
     - name: 'Trigger Backend staging data import'
       id: 'trigger-backend-staging'
       run: |

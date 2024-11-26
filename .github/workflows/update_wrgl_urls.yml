@@ -1,0 +1,67 @@
+name: Update WRGL URLs
+
+on:
+  workflow_run:
+    workflows: ["Upload CSV to Google Cloud"]
+    types:
+      - completed
+
+jobs:
+  update-urls:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      
+      # Set up Cloud SQL Auth proxy
+      - id: 'auth'
+        uses: 'google-github-actions/auth@v1'
+        with:
+          credentials_json: '${{ secrets.GCP_SA_KEY }}'
+          
+      - name: 'Set up Cloud SQL Proxy'
+        uses: 'google-github-actions/setup-cloud-sql-proxy@v1'
+        with:
+          instance: '${{ secrets.GCP_PROJECT_ID }}:us-central1:${{ secrets.CLOUD_SQL_DATABASE }}'
+          port: 5432
+
+      - name: Download and verify csv_urls.json
+        run: |
+          # Get the folder name using the same pattern as the upload workflow
+          FOLDER_NAME="data-${{ github.event.workflow_run.id }}-${{ github.event.workflow_run.run_attempt }}"
+          
+          echo "Checking for csv_urls.json in bucket..."
+          if ! gsutil -q stat "gs://${{ vars.DATA_BUCKET }}/$FOLDER_NAME/csv_urls.json"; then
+            echo "Error: csv_urls.json not found in cloud storage"
+            exit 1
+          fi
+          
+          echo "Downloading csv_urls.json..."
+          gsutil cp "gs://${{ vars.DATA_BUCKET }}/$FOLDER_NAME/csv_urls.json" ./csv_urls.json
+          
+          echo "Verifying JSON format..."
+          if ! jq empty csv_urls.json; then
+            echo "Error: Invalid JSON format in csv_urls.json"
+            exit 1
+          fi
+          
+          echo "Verifying JSON content..."
+          URL_COUNT=$(jq 'length' csv_urls.json)
+          echo "Found $URL_COUNT URL entries in csv_urls.json"
+          if [ "$URL_COUNT" -eq "0" ]; then
+            echo "Error: No URLs found in csv_urls.json"
+            exit 1
+          fi
+
+      - name: Update Database
+        env:
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+        run: |
+          # Install Python and required packages
+          sudo apt-get update && sudo apt-get install -y python3-pip
+          pip install psycopg2-binary
+
+          # Run the update script
+          python3 scripts/update_wrgl_urls.py
