@@ -28,3 +28,4 @@ db.txt
 dvc-env/
 *.json
 *.patch
+*.orig
