@@ -73,7 +73,7 @@ def match_brady18_to_post(brady, post):
 
 if __name__ == "__main__":
     pprr = pd.read_csv(deba.data("match/pprr_baton_rouge_pd_2021.csv"))
-    post = pd.read_csv(deba.data("clean/pprr_post_2020_11_06.csv"))
+    post = pd.read_csv(deba.data("clean/pprr_post_4_26_2023.csv"))
     brady21 = pd.read_csv(deba.data("clean/brady_baton_rouge_da_2021.csv"))
     brady18  = pd.read_csv(deba.data("clean/brady_baton_rouge_da_2018.csv"))
     brady21 = match_brady21_to_pprr(brady21, pprr)

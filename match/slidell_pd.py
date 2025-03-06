@@ -36,7 +36,7 @@ def extract_post_events(pprr, post):
 if __name__ == "__main__":
     pprr_csd = pd.read_csv(deba.data("clean/pprr_slidell_csd_2010_2019.csv"))
     agency = pprr_csd.agency[0]
-    post = pd.read_csv(deba.data("clean/pprr_post_2020_11_06.csv"))
+    post = pd.read_csv(deba.data("clean/pprr_post_4_26_2023.csv"))
     post = post.loc[post.agency == agency]
     post_events = extract_post_events(pprr_csd, post)
     post_events.to_csv(deba.data("match/post_event_slidell_pd_2020.csv"), index=False)

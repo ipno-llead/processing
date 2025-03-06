@@ -44,7 +44,7 @@ def extract_post_events(pprr, post):
         dfa,
         dfb,
     )
-    decision = 0.912
+    decision = 0.5
     matcher.save_pairs_to_excel(
         deba.data("match/pprr_jefferson_so_2020_pprr_v_post_11_06_2020.xlsx"),
         decision,
@@ -59,6 +59,6 @@ if __name__ == "__main__":
     agency = pprr.agency[0]
     post = load_for_agency(agency)
     post_events = extract_post_events(pprr, post)
-    pprr = deduplicate_pprr(pprr)
+    # pprr = deduplicate_pprr(pprr)
     post_events.to_csv(deba.data("match/post_event_jefferson_so_2020.csv"), index=False)
     pprr.to_csv(deba.data("match/pprr_jefferson_so_2020.csv"), index=False)
