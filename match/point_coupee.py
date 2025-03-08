@@ -40,7 +40,7 @@ def match_cprr_and_post(cprr, pprr):
 
 if __name__ == "__main__":
     cprr = pd.read_csv(deba.data("clean/cprr_point_coupee_so_2017.csv"))
-    post = pd.read_csv(deba.data("clean/pprr_post_2020_11_06.csv"))
+    post = pd.read_csv(deba.data("clean/pprr_post_4_26_2023.csv"))
     agency = cprr.agency[0]
     post = load_for_agency(agency)
     cprr = match_cprr_and_post(cprr, post)

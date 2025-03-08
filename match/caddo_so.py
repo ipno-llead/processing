@@ -87,4 +87,6 @@ if __name__ == "__main__":
     agency = cprr.agency[0]
     post = load_for_agency(agency)
     cprr = assign_uid_from_post_21(cprr, post)
+    pprr = assign_uid_from_post_21(pprr, post)
     cprr.to_csv(deba.data("match/cprr_caddo_so_2022_2023.csv"), index=False)
+    pprr.to_csv(deba.data("match/pprr_caddo_parish_so_2020.csv"), index=False)
