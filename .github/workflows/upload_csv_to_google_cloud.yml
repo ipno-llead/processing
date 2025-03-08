@@ -6,7 +6,6 @@ on:
       - main
     types: [closed]
 
-
 jobs:
   upload_csv_to_google_cloud:
     runs-on: cdi-runner
@@ -18,36 +17,18 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Set up Google Cloud SDK
-      uses: 'google-github-actions/setup-gcloud@v2'
-      with:
-        version: 'latest'
-        install_components: 'gsutil'
-
-    - name: Install gsutil
-      run: |
-        echo "Installing gsutil..."
-        curl https://sdk.cloud.google.com | bash -s -- --disable-prompts --install-dir=/usr/local
-        export PATH=$PATH:/usr/local/google-cloud-sdk/bin
-        echo "Verifying gsutil installation..."
-        which gsutil
-        gsutil --version
-
+    # Set up Google Cloud authentication - this should handles authentication and installs gcloud CLI
     - name: Authenticate with Google Cloud
       uses: 'google-github-actions/auth@v2'
       with:
         credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
 
-    - name: 'Set up Cloud SDK'
-      uses: 'google-github-actions/setup-gcloud@v2'
-      with:
-        install_components: 'gsutil'
-        project_id: '${{ env.GOOGLE_CLOUD_PROJECT }}'
-
+    # Verify Google Cloud setup
     - name: 'Verify Google Cloud setup'
       run: |
         gcloud info
         gsutil version
+
     # We could also consider changing the output of the data processing process,
     # in a way that the needed files for back-end are group into their own folder
     # so that we can upload the whole folder to the cloud storage
