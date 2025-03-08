@@ -6,19 +6,17 @@ on:
       - main
     types: [closed]
 
+
 jobs:
   upload_csv_to_google_cloud:
     runs-on: cdi-runner
-    permissions:
-      contents: 'read'
-      id-token: 'write'
     env:
       FOLDER_NAME: data-${{ github.run_id }}-${{ github.run_attempt }}
+
     steps:
     - uses: actions/checkout@v4
 
-    # Set up Google Cloud authentication - this should handles authentication and installs gcloud CLI
-    - name: Authenticate with Google Cloud
+    - name: setup-gcloud
       uses: 'google-github-actions/auth@v2'
       with:
         credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
@@ -102,7 +100,7 @@ jobs:
         path: '${{ vars.DATA_DIR }}/person.csv'
         destination: '${{ vars.DATA_BUCKET }}/${{ env.FOLDER_NAME }}'
         process_gcloudignore: false
-
+        
     # Upload agency-specific input CSVs and save URLs
     - id: 'upload-agency-csvs'
       uses: 'google-github-actions/upload-cloud-storage@v2'
@@ -125,30 +123,21 @@ jobs:
         echo "Found agency CSV files:"
         find /runner/_work/data/data/fuse_agency -name "*.csv" -type f -ls
 
+    # Generate CSV URLs file
     - name: 'Generate CSV URLs file'
       run: |
         echo "Generating URLs for uploaded files..."
         echo "{" > csv_urls.json
         
-        # Verify files were uploaded successfully
-        echo "Verifying uploaded files in Google Cloud Storage..."
-        UPLOADED_FILES=$(gsutil ls "gs://${{ vars.DATA_BUCKET }}/${{ env.FOLDER_NAME }}/fuse_agency/*.csv")
-        if [ -z "$UPLOADED_FILES" ]; then
-          echo "Error: No agency CSV files found in cloud storage"
-          exit 1
-        fi
-        
-        echo "Found the following uploaded files:"
-        echo "$UPLOADED_FILES"
-        
-        # Generate URLs for verified files
-        echo "Generating public URLs..."
-        echo "$UPLOADED_FILES" | while read -r file; do
+        # Find all the CSV files locally
+        find /runner/_work/data/data/fuse_agency -name "*.csv" -type f | while read -r file; do
           if [ ! -z "$file" ]; then
             filename=$(basename "$file")
             filetype=${filename%%_*}  # Extract type (per, com, uof, etc.)
             echo "Processing $filename (type: $filetype)..."
-            echo "  \"${filename}\": \"https://storage.googleapis.com/${file#gs://}\"," >> csv_urls.json
+            # Construct the GCS URL directly
+            gs_url="https://storage.googleapis.com/${{ vars.DATA_BUCKET }}/${{ env.FOLDER_NAME }}/fuse_agency/$filename"
+            echo "  \"${filename}\": \"$gs_url\"," >> csv_urls.json
           fi
         done
         
@@ -163,15 +152,16 @@ jobs:
           exit 1
         fi
         
-        echo "Uploading URLs file and setting permissions..."
-        # Upload the URLs file back to cloud storage
-        gsutil cp csv_urls.json "gs://${{ vars.DATA_BUCKET }}/${{ env.FOLDER_NAME }}/csv_urls.json"
-        
-        # Make all CSV files and URLs file publicly readable
-        gsutil -m acl ch -r -u AllUsers:R "gs://${{ vars.DATA_BUCKET }}/${{ env.FOLDER_NAME }}/fuse_agency/*.csv"
-        gsutil acl ch -u AllUsers:R "gs://${{ vars.DATA_BUCKET }}/${{ env.FOLDER_NAME }}/csv_urls.json"
-        
-        echo "URL generation and permission setting completed successfully"
+        echo "URL generation completed successfully"
+
+    # Upload the generated JSON file
+    - id: 'upload-urls-json'
+      uses: 'google-github-actions/upload-cloud-storage@v2'
+      with:
+        path: 'csv_urls.json'
+        destination: '${{ vars.DATA_BUCKET }}/${{ env.FOLDER_NAME }}'
+        process_gcloudignore: false
+
     - name: 'Trigger Backend staging data import'
       id: 'trigger-backend-staging'
       run: |
