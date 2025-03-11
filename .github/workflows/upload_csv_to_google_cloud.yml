@@ -34,7 +34,9 @@ jobs:
       uses: 'google-github-actions/auth@v2'
       with:
         credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
-
+        export_environment_variables: true
+        create_credentials_file: true
+        
     # We could also consider changing the output of the data processing process,
     # in a way that the needed files for back-end are group into their own folder
     # so that we can upload the whole folder to the cloud storage
