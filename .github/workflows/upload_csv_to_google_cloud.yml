@@ -146,7 +146,7 @@ jobs:
         
         # Verify files were uploaded successfully
         echo "Verifying uploaded files in Google Cloud Storage..."
-        UPLOADED_FILES=$(gsutil ls "gs://${{ vars.DATA_BUCKET }}/${{ env.FOLDER_NAME }}/fuse_agency/*.csv")
+        UPLOADED_FILES=$(gsutil ls "gs://${{ vars.DATA_BUCKET }}/${{ env.FOLDER_NAME }}/fuse_agency/fuse_agency/*.csv")
         if [ -z "$UPLOADED_FILES" ]; then
           echo "Error: No agency CSV files found in cloud storage"
           exit 1
@@ -182,7 +182,7 @@ jobs:
         gsutil cp csv_urls.json "gs://${{ vars.DATA_BUCKET }}/${{ env.FOLDER_NAME }}/csv_urls.json"
         
         # Make all CSV files and URLs file publicly readable
-        gsutil -m acl ch -r -u AllUsers:R "gs://${{ vars.DATA_BUCKET }}/${{ env.FOLDER_NAME }}/fuse_agency/*.csv"
+        gsutil -m acl ch -r -u AllUsers:R "gs://${{ vars.DATA_BUCKET }}/${{ env.FOLDER_NAME }}/fuse_agency/fuse_agency/*.csv"
         gsutil acl ch -u AllUsers:R "gs://${{ vars.DATA_BUCKET }}/${{ env.FOLDER_NAME }}/csv_urls.json"
         
         echo "URL generation and permission setting completed successfully"
