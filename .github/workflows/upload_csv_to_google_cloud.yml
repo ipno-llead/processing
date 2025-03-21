@@ -180,11 +180,7 @@ jobs:
         echo "Uploading URLs file and setting permissions..."
         # Upload the URLs file back to cloud storage
         gsutil cp csv_urls.json "gs://${{ vars.DATA_BUCKET }}/${{ env.FOLDER_NAME }}/csv_urls.json"
-        
-        # Make all CSV files and URLs file publicly readable
-        gsutil iam ch -r allUsers:objectViewer gs://${{ vars.DATA_BUCKET }}/${{ env.FOLDER_NAME }}/fuse_agency/fuse_agency/
-        gsutil iam ch allUsers:objectViewer gs://${{ vars.DATA_BUCKET }}/${{ env.FOLDER_NAME }}/csv_urls.json
-                
+
         echo "URL generation and permission setting completed successfully"
     - name: 'Trigger Backend staging data import'
       id: 'trigger-backend-staging'
