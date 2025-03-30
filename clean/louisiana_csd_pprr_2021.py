@@ -24,7 +24,7 @@ def split_names(df):
 
 
 def clean_hire_date(df):
-    df.loc[:, "hire_date"] = df.hire_date.astype(str).replace({"0": np.NaN})
+    df.loc[:, "hire_date"] = df.hire_date.astype(str).replace({"0": np.nan})
     return df
 
 
