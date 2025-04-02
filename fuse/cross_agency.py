@@ -41,12 +41,12 @@ def discard_rows(
 
 def assign_min_col(events: pd.DataFrame, per: pd.DataFrame, col: str):
     min_dict = events.groupby("uid")[col].min().to_dict()
-    per.loc[:, "min_" + col] = per.index.map(lambda x: min_dict.get(x, np.NaN))
+    per.loc[:, "min_" + col] = per.index.map(lambda x: min_dict.get(x, np.nan))
 
 
 def assign_max_col(events: pd.DataFrame, per: pd.DataFrame, col: str):
     max_dict = events.groupby("uid")[col].max().to_dict()
-    per.loc[:, "max_" + col] = per.index.map(lambda x: max_dict.get(x, np.NaN))
+    per.loc[:, "max_" + col] = per.index.map(lambda x: max_dict.get(x, np.nan))
 
 
 def read_constraints():

@@ -667,7 +667,8 @@ def remove_future_dates(
     md = datetime.datetime.strptime(max_date, "%Y-%m-%d")
     for prefix in prefixes:
         cols = [prefix + "_year", prefix + "_month", prefix + "_day"]
-        dates = df[cols].replace({"": np.NaN}).astype(float).astype("Int64")
+        dates = df[cols].replace({"": np.nan}).astype(float).astype("Int64")
+
         for idx, _ in df.loc[
             (dates.iloc[:, 0] > md.year)
             | (
