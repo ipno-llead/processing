@@ -2,7 +2,7 @@ SHELL = /bin/bash
 
 OS := $(shell uname -s)
 DEBA_MD5 := $(if $(findstring Darwin,$(OS)),md5,md5sum)
-PYTHON := python3.12
+PYTHON := python3
 DEBA_DIR := .deba
 DEBA_FILE := deba.yaml
 
