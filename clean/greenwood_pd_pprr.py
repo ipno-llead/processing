@@ -1,73 +1,70 @@
 import deba 
 import pandas as pd
-from lib.columns import clean_column_names
+from lib.columns import clean_column_names, set_values
 from lib.clean import (
     clean_races,
     clean_sexes,
     clean_dates,
     standardize_desc_cols,
     clean_names,
+    clean_dates,
 )
+from lib import salary
 from lib.uid import gen_uid
-from lib.columns import set_values
 
+def assign_agency(df):
+    df["agency"] = "greenwood-pd"
+    return df
 
 def clean_salary(df):
     df["salary"] = (
         df["salary"]
         .astype(str)
         .str.replace(" biweekly", "", regex=False)
-        .str.replace(r"[$?,]", "", regex=True)  # Removes $, ?, and ,
+        .str.replace(r"[$?,]", "", regex=True)
         .str.strip()
-        .replace("", None)  # Convert empty strings to None
+        .replace("", None)
+    ) 
+    df["salary_freq"] = df["salary"].apply(lambda x: salary.BIWEEKLY if pd.notna(x) else None  # Set BIWEEKLY if salary is not blank, otherwise None
     )
-    df["salary"] = pd.to_numeric(df["salary"], errors="coerce")  # Convert to numeric
+    df["salary"] = pd.to_numeric(df["salary"], errors='coerce') 
     return df
 
+
 def clean_badge_number(df):
-    df["badge_number"] = df["badge_number"].replace("?", None)
+    df["badge_number"] = df["badge_number"].replace("?", "")
     df["badge_number"] = pd.to_numeric(df["badge_number"], errors="coerce")
     return df
 
 def split_names(df):
     names = df.name.str.lower().str.strip().fillna("").str.split(" ", expand=True)
-    df.loc[:, "first_name"] = names[0]
-    df.loc[:, "middle_name"] = names[1] if names.shape[1] > 1 else ""
-    df.loc[:, "last_name"] = names[names.shape[1] - 1]  # Last word as last name
-    return df.drop(columns="name")
-
-def clean_dates(df, date_cols):
-    for col in date_cols:
-        df[col] = pd.to_datetime(df[col], errors="coerce")  # Converts invalid dates to NaT
-    return df
+    df["first_name"] = names[0]
+    df["last_name"] = names[names.shape[1] - 1] if names.shape[1] > 1 else ""
+    df = df.drop('name', axis=1)
+    return df 
 
 def clean():
     df = (
-        pd.read_csv(deba.data("raw/greenwood_pd_pprr_1990_2001_byhand.csv"))
+        pd.read_csv(deba.data("raw/greenwood_pd/greenwood_pd_pprr_1990_2001_byhand.csv"))
         .pipe(clean_column_names)
-        .rename(columns={"date_of_hire": "hire_date", "date_of_birth": "dob"})
+        .rename(columns={"date_of_hire": "hire_date", "date_of_birth": "birth_date"})
         .pipe(clean_salary)
         .pipe(clean_badge_number)
-        .pipe(clean_dates, ["hire_date", "dob"])
+        .pipe(clean_dates, ["hire_date", "birth_date"])
         .pipe(standardize_desc_cols, ["race", "gender"])
         .pipe(clean_races, ["race"])
         .pipe(clean_sexes, ["gender"])
         .pipe(split_names)
-        .pipe(clean_names, ["first_name", "middle_name", "last_name"])
-        .pipe(set_values, {"agency": "new-agency"})
-        .pipe(gen_uid, ["first_name", "middle_name", "last_name", "dob"])
-    )
+        .pipe(clean_names, ["first_name", "last_name"])
+        .pipe(assign_agency)
+        .pipe(gen_uid, ["agency", "first_name", "last_name", "birth_year", "birth_month", "birth_day"])
+        )
+    
     return df
+
 
 if __name__ == "__main__":
     df = clean()
-    df.to_csv(deba.data("clean/greenwood_pd_pprr_1990_2001_byhand.csv"), index=False)
+    df.to_csv(deba.data("clean/pprr_greenwood_pd_1990_2001.csv"), index=False)
 
-
-#new try 
-
-import pandas as pd 
-import deba
-
-data = pd.read_csv('raw/greenwood_pd_pprr_1990_2001_byhand.csv')
 
