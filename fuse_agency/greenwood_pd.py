@@ -46,10 +46,28 @@ def fuse_events(cprr, post):
     )
     return builder.to_frame()
 
+def fuse_events(pprr):
+    builder = events.Builder()
+    builder.extract_events(
+        pprr,
+        {
+            events.OFFICER_HIRE: {
+                "prefix": "hire",
+                "keep": ["uid", "agency", "rank_desc", "salary", "salary_freq"],
+            },
+            events.OFFICER_LEFT: {
+                "prefix": "termination",
+                "keep": ["uid", "agency", "rank_desc", "salary", "salary_freq"],
+            },
+        },
+        ["uid"],
+    )
+    return builder.to_frame()
+
 
 if __name__ == "__main__":
     cprr = pd.read_csv(deba.data("clean/cprr_greenwood_pd_2015_2020.csv"))
-    pprr = pd.read_csv(deba.data("clean/pprr_greenwood_pd_1990_2001"))
+    pprr = pd.read_csv(deba.data("match/pprr_greenwood_pd_1990_2001"))
     citizen_df = pd.read_csv(deba.data("clean/cprr_cit_greenwood_pd_2015_2020.csv"))
     agency = cprr.agency[0]
     post = load_for_agency(agency)
