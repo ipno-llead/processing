@@ -49,13 +49,15 @@ def fuse_events(cprr, post):
 
 if __name__ == "__main__":
     cprr = pd.read_csv(deba.data("clean/cprr_greenwood_pd_2015_2020.csv"))
+    pprr = pd.read_csv(deba.data("clean/pprr_greenwood_pd_1990_2001.csv"))
     citizen_df = pd.read_csv(deba.data("clean/cprr_cit_greenwood_pd_2015_2020.csv"))
     agency = cprr.agency[0]
     post = load_for_agency(agency)
     agency = cprr.agency[0]
+    pprr = rearrange_personnel_columns(pprr)
     post = load_for_agency(agency)
     per = rearrange_personnel_columns(post)
-    per = fuse_personnel(per, post)
+    per = fuse_personnel(pprr, post)
     com = rearrange_allegation_columns(cprr)
     event = fuse_events(cprr, post)
     citizen_df = rearrange_citizen_columns(citizen_df)
