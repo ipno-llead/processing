@@ -1,6 +1,6 @@
 import deba 
 import pandas as pd
-from lib.columns import clean_column_names, set_values
+from lib import clean_column_names, set_values
 from lib.clean import (
     clean_races,
     clean_sexes,
