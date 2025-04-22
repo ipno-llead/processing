@@ -13,8 +13,6 @@ def assign_agency(df):
     df["agency"] = "shreveport-pd"
     return df
 
-
-
 def clean_rank(df, cols):
     for col in cols:
         df[col] = (
@@ -23,8 +21,6 @@ def clean_rank(df, cols):
             .str.replace(r"\s+", " ", regex=True)
         )
     return df
-
-
 
 
 def normalize_race_and_sex(df):
@@ -64,13 +60,14 @@ def normalize_race_and_sex(df):
 def split_date_strings(df, date_cols):
     for col in date_cols:
         df[col] = pd.to_datetime(df[col], errors="coerce", format="%m/%d/%Y")
+
         df[f"{col}_year"] = df[col].dt.year
         df[f"{col}_month"] = df[col].dt.month
         df[f"{col}_day"] = df[col].dt.day
-    
+
     df = df.drop(columns=date_cols)
-    
     return df
+
 
 def split_middle_initial(df):
     df["middle_initial"] = df["first_name"].str.extract(r"\b(\w)$")  # last single letter
@@ -83,11 +80,12 @@ def clean():
         pd.read_csv(deba.data("raw/shreveport_pd/shreveport_pd_pprr_1990_2001.csv"))
         .pipe(clean_column_names)
         .rename(columns={"hire_da": "hire_date", "date_separ": "separation_date"})
-        .pipe(standardize_desc_cols, ["race", "sex"])
+        .pipe(lambda df: df[df["race"].isin(["b", "w", "h", "a", "i", "n", "multiraci", "native"])])
         .pipe(normalize_race_and_sex)
+        .pipe(lambda df: (print(df[["race", "sex"]].drop_duplicates()), df)[1])
         .pipe(split_middle_initial)
-        .pipe(clean_races, ["race"])
-        .pipe(clean_sexes, ["sex"])
+        # .pipe(clean_races, ["race"])
+        # .pipe(clean_sexes, ["sex"])
         .pipe(clean_names, ["first_name", "last_name"])
         .pipe(set_values, {"agency": "shreveport_pd"})
         .pipe(gen_uid, ["agency", "first_name", "last_name"])
