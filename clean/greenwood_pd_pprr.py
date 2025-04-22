@@ -7,7 +7,6 @@ from lib.clean import (
     clean_dates,
     standardize_desc_cols,
     clean_names,
-    clean_dates,
 )
 from lib import salary
 from lib.uid import gen_uid
@@ -25,8 +24,7 @@ def clean_salary(df):
         .str.strip()
         .replace("", None)
     ) 
-    df["salary_freq"] = df["salary"].apply(lambda x: salary.BIWEEKLY if pd.notna(x) else None  # Set BIWEEKLY if salary is not blank, otherwise None
-    )
+    df["salary_freq"] = df["salary"].apply(lambda x: salary.BIWEEKLY if pd.notna(x) else None)
     df["salary"] = pd.to_numeric(df["salary"], errors='coerce') 
     return df
 
