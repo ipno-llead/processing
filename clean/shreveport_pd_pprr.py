@@ -25,34 +25,29 @@ def clean_rank(df, cols):
 
 def normalize_race_and_sex(df):
     race_map = {
-        "b": "black",
-        "w": "white",
-        "h": "hispanic",
-        "a": "asian",
-        "i": "native american",
-        "n": "native american",
-        "multiraci": "multiple",
-        "native": "native american",
-        "": None,
+        "b": "black", "w": "white", "h": "hispanic", "a": "asian",
+        "i": "native american", "n": "native american",
+        "multiraci": "mixed", "native": "native american",
+        "black": "black", "white": "white", "asian": "asian", "hispanic": "hispanic",
+        "": None, "nan": None,
     }
 
     sex_map = {
-        "m": "male",
-        "f": "female",
-        "male": "male",
-        "female": "female",
-        "": None,
+        "m": "male", "male": "male",
+        "f": "female", "female": "female",
+        "multiple": None, "": None, "nan": None,
     }
 
-    for col, mapping in [("race", race_map), ("sex", sex_map)]:
-        df[col] = (
-            df[col]
-            .astype(str)
-            .str.lower()
-            .str.strip()
-            .replace(mapping)
-            .replace("", pd.NA)
-        )
+    def clean_and_dedup(value, mapping):
+        tokens = str(value).lower().strip().replace("/", ",").replace(";", ",").split(",")
+        tokens = [t.strip() for t in tokens if t.strip() in mapping]
+        if len(tokens) == 1:
+            return mapping[tokens[0]]
+        else:
+            return pd.NA
+
+    df["race"] = df["race"].apply(lambda x: clean_and_dedup(x, race_map))
+    df["sex"] = df["sex"].apply(lambda x: clean_and_dedup(x, sex_map))
 
     return df
 
@@ -70,7 +65,7 @@ def split_date_strings(df, date_cols):
 
 
 def split_middle_initial(df):
-    df["middle_initial"] = df["first_name"].str.extract(r"\b(\w)$")  # last single letter
+    df["middle_name"] = df["first_name"].str.extract(r"\b(\w)$")  # last single letter
     df["first_name"] = df["first_name"].str.extract(r"^(\w+)")
     return df
 
@@ -79,20 +74,19 @@ def clean():
     df = (
         pd.read_csv(deba.data("raw/shreveport_pd/shreveport_pd_pprr_1990_2001.csv"))
         .pipe(clean_column_names)
-        .rename(columns={"hire_da": "hire_date", "date_separ": "separation_date"})
-        .pipe(lambda df: df[df["race"].isin(["b", "w", "h", "a", "i", "n", "multiraci", "native"])])
+        .rename(columns={"hire_da": "hire_date", "date_separ": "separation_date", "badge": "badge_no"})
+        # .pipe(lambda df: df[df["race"].isin(["b", "w", "h", "a", "i", "n", "multiraci", "native"])])
         .pipe(normalize_race_and_sex)
-        .pipe(lambda df: (print(df[["race", "sex"]].drop_duplicates()), df)[1])
+        #.pipe(lambda df: (print(df[["race", "sex"]].drop_duplicates()), df)[1])
         .pipe(split_middle_initial)
-        # .pipe(clean_races, ["race"])
-        # .pipe(clean_sexes, ["sex"])
+        .pipe(clean_races, ["race"])
+        .pipe(clean_sexes, ["sex"])
         .pipe(clean_names, ["first_name", "last_name"])
         .pipe(set_values, {"agency": "shreveport_pd"})
         .pipe(gen_uid, ["agency", "first_name", "last_name"])
         .pipe(split_date_strings, ["hire_date", "separation_date"])
         .pipe(clean_rank, ["rank"])
     )
-    
     return df
 
 
