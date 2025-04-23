@@ -5,6 +5,7 @@ from lib.clean import (
     clean_races,
     clean_sexes,
     standardize_desc_cols,
+    clean_dates,
     clean_names,
 )
 from lib.uid import gen_uid
@@ -56,10 +57,14 @@ def split_date_strings(df, date_cols):
     for col in date_cols:
         df[col] = pd.to_datetime(df[col], errors="coerce", format="%m/%d/%Y")
 
-        df[f"{col}_year"] = df[col].dt.year
-        df[f"{col}_month"] = df[col].dt.month
-        df[f"{col}_day"] = df[col].dt.day
+        # Strip "_date" from column name to get the base (e.g., "hire", "termination")
+        base = col.replace("_date", "")
 
+        df[f"{base}_year"] = df[col].dt.year
+        df[f"{base}_month"] = df[col].dt.month
+        df[f"{base}_day"] = df[col].dt.day
+
+    # Drop the original full date columns
     df = df.drop(columns=date_cols)
     return df
 
@@ -74,17 +79,17 @@ def clean():
     df = (
         pd.read_csv(deba.data("raw/shreveport_pd/shreveport_pd_pprr_1990_2001.csv"))
         .pipe(clean_column_names)
-        .rename(columns={"hire_da": "hire_date", "date_separ": "separation_date", "badge": "badge_no"})
-        # .pipe(lambda df: df[df["race"].isin(["b", "w", "h", "a", "i", "n", "multiraci", "native"])])
+        .rename(columns={"hire_da": "hire_date", "date_separ": "termination_date", "badge": "badge_no"})
         .pipe(normalize_race_and_sex)
-        #.pipe(lambda df: (print(df[["race", "sex"]].drop_duplicates()), df)[1])
+        #.pipe(assign_agency, ["agency"])
         .pipe(split_middle_initial)
         .pipe(clean_races, ["race"])
         .pipe(clean_sexes, ["sex"])
         .pipe(clean_names, ["first_name", "last_name"])
         .pipe(set_values, {"agency": "shreveport_pd"})
         .pipe(gen_uid, ["agency", "first_name", "last_name"])
-        .pipe(split_date_strings, ["hire_date", "separation_date"])
+        .pipe(split_date_strings, ["hire_date", "termination_date"])
+        #.pipe(clean_dates, ["hire_date", "termination_date"])
         .pipe(clean_rank, ["rank"])
     )
     return df
