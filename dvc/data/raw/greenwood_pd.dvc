@@ -1,6 +1,6 @@
 wdir: ../../../data/raw
 outs:
-- md5: 638c4bb05b18fb3d068ca35c8fc9f211.dir
-  size: 477
-  nfiles: 1
+- md5: d933afc1ee9bd8959b578e4a30ec6dfa.dir
+  size: 718
+  nfiles: 2
   path: greenwood_pd
