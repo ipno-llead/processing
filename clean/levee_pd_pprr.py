@@ -6,6 +6,7 @@ from lib.uid import gen_uid
 
 
 def split_officer_name(df):
+    df["officer"] = df["officer"].str.lower().str.strip()
     df["officer"] = df["officer"].str.strip(" '\"")
     names = df["officer"].str.extract(r"(?P<last_name>[^,]+),\s*(?P<first_name>.+)")
     df["first_name"] = names["first_name"]
@@ -35,7 +36,7 @@ def clean():
         pd.read_csv(deba.data("raw/levee_pd/levee_pd_pprr_1980_2025.csv"))
         .pipe(clean_column_names)
         .drop(columns=['salary'])
-        .rename(columns={"year_of_birth": "birth_date", "gender":"sex", "date_of_hire": "hire_date", "date_of_termination":"termination_date"})
+        .rename(columns={"year_of_birth": "birth_date", "gender":"sex", "date_of_hire": "hire_date", "date_of_termination":"termination_date", "badge_number": "badge_no"})
         .pipe(split_officer_name)
         .pipe(split_date_column, "birth_date")
         .pipe(split_date_column, "hire_date")
@@ -53,6 +54,8 @@ def clean():
             sex=df["sex"].replace({
                 "M": "male",
                 "F": "female",
+                "f": "female",
+                "W": "female",
                 "B": "male",
                 "m": "male",
                 "": pd.NA,
