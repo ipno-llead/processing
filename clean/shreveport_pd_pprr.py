@@ -10,9 +10,6 @@ from lib.clean import (
 )
 from lib.uid import gen_uid
 
-def assign_agency(df):
-    df["agency"] = "shreveport-pd"
-    return df
 
 def clean_rank(df, cols):
     for col in cols:
@@ -81,12 +78,11 @@ def clean():
         .pipe(clean_column_names)
         .rename(columns={"hire_da": "hire_date", "date_separ": "termination_date", "badge": "badge_no"})
         .pipe(normalize_race_and_sex)
-        #.pipe(assign_agency, ["agency"])
         .pipe(split_middle_initial)
         .pipe(clean_races, ["race"])
         .pipe(clean_sexes, ["sex"])
         .pipe(clean_names, ["first_name", "last_name"])
-        .pipe(set_values, {"agency": "shreveport_pd"})
+        .pipe(set_values, {"agency": "shreveport-pd"})
         .pipe(gen_uid, ["agency", "first_name", "last_name"])
         .pipe(split_date_strings, ["hire_date", "termination_date"])
         #.pipe(clean_dates, ["hire_date", "termination_date"])

@@ -1,13 +1,12 @@
 import deba 
 import pandas as pd
-from lib import clean_column_names, set_values
+from lib.columns import clean_column_names 
 from lib.clean import (
     clean_races,
     clean_sexes,
     clean_dates,
     standardize_desc_cols,
     clean_names,
-    clean_dates,
 )
 from lib import salary
 from lib.uid import gen_uid
@@ -25,15 +24,14 @@ def clean_salary(df):
         .str.strip()
         .replace("", None)
     ) 
-    df["salary_freq"] = df["salary"].apply(lambda x: salary.BIWEEKLY if pd.notna(x) else None  # Set BIWEEKLY if salary is not blank, otherwise None
-    )
+    df["salary_freq"] = df["salary"].apply(lambda x: salary.BIWEEKLY if pd.notna(x) else None)
     df["salary"] = pd.to_numeric(df["salary"], errors='coerce') 
     return df
 
 
 def clean_badge_number(df):
-    df["badge_number"] = df["badge_number"].replace("?", "")
-    df["badge_number"] = pd.to_numeric(df["badge_number"], errors="coerce")
+    df["badge_no"] = df["badge_no"].replace("?", "")
+    df["badge_no"] = pd.to_numeric(df["badge_no"], errors="coerce")
     return df
 
 def split_names(df):
@@ -47,7 +45,7 @@ def clean():
     df = (
         pd.read_csv(deba.data("raw/greenwood_pd/greenwood_pd_pprr_1990_2001_byhand.csv"))
         .pipe(clean_column_names)
-        .rename(columns={"date_of_hire": "hire_date", "date_of_birth": "birth_date"})
+        .rename(columns={"date_of_hire": "hire_date", "date_of_birth": "birth_date", "badge_number": "badge_no" })
         .pipe(clean_salary)
         .pipe(clean_badge_number)
         .pipe(clean_dates, ["hire_date", "birth_date"])
@@ -59,7 +57,6 @@ def clean():
         .pipe(assign_agency)
         .pipe(gen_uid, ["agency", "first_name", "last_name", "birth_year", "birth_month", "birth_day"])
         )
-    
     return df
 
 

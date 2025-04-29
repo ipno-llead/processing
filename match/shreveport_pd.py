@@ -79,7 +79,7 @@ def match_pprr_post(pprr, post):
         dfa,
         dfb,
     )
-    decision = 0.903 
+    decision = 0.902
     matcher.save_pairs_to_excel(
         deba.data("match/shreveport_pd_pprr_1999_2001_v_post_pprr_2020_11_06.xlsx"),
         decision,

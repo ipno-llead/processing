@@ -63,7 +63,7 @@ def match_pprr_and_post(pprr, post):
         dfa,
         dfb,
     )
-    decision = 0.96
+    decision = 1.0
     matcher.save_pairs_to_excel(
         deba.data("match/pprr_greenwood_1990_2001_v_post.xlsx"),
         decision,
@@ -73,7 +73,6 @@ def match_pprr_and_post(pprr, post):
 
     pprr.loc[:, "uid"] = pprr.uid.map(lambda x: match_dict.get(x, x))
     return pprr
-
 
 if __name__ == "__main__":
     cprr = pd.read_csv(deba.data("clean/cprr_greenwood_pd_2015_2020.csv"))

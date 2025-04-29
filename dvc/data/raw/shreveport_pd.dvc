@@ -1,6 +1,6 @@
 wdir: ../../../data/raw
 outs:
-- md5: 415266bab7084921f57e599145aa912c.dir
-  size: 117787
-  nfiles: 5
+- md5: 9e8266108c0a9956dc296770a7d4af72.dir
+  size: 245984
+  nfiles: 6
   path: shreveport_pd
