@@ -63,9 +63,9 @@ def match_pprr_and_post(pprr, post):
         dfa,
         dfb,
     )
-    decision = 1
+    decision = 1.0
     matcher.save_pairs_to_excel(
-        deba.data("match/pprr_greenwood_1990_2001_v_post_pprr_2020_11_06.xlsx"),
+        deba.data("match/pprr_greenwood_1990_2001_v_post.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(decision)
@@ -77,10 +77,9 @@ def match_pprr_and_post(pprr, post):
 if __name__ == "__main__":
     cprr = pd.read_csv(deba.data("clean/cprr_greenwood_pd_2015_2020.csv"))
     pprr = pd.read_csv(deba.data("clean/pprr_greenwood_pd_1990_2001.csv"))
-    agency = cprr.agency[0] 
+    agency = cprr.agency[0]
     post = load_for_agency(agency)
     cprr = match_cprr_and_post(cprr, post)
-    cprr.to_csv(deba.data("match/cprr_greenwood_pd_2015_2020.csv"), index=False)
     pprr = match_pprr_and_post(pprr, post)
+    cprr.to_csv(deba.data("match/cprr_greenwood_pd_2015_2020.csv"), index=False)
     pprr.to_csv(deba.data("match/pprr_greenwood_pd_1990_2001.csv"), index=False)
-
