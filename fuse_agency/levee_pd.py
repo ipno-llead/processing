@@ -69,12 +69,11 @@ def fuse_events(cprr, post, pprr):
         ["uid", "agency", "rank", "badge_no"],
     )
     return builder.to_frame()
-    return builder.to_frame()
 
 
 if __name__ == "__main__":
     cprr = pd.read_csv(deba.data("clean/cprr_levee_pd.csv"))
-    pprr = pd.read_csv(deba.data("clean/pprr_levee_pd_1980_2025.csv"))
+    pprr = pd.read_csv(deba.data("match/pprr_levee_pd_1980_2025.csv"))
     citizen_df = pd.read_csv(deba.data("clean/cprr_cit_levee_pd.csv"))
     agency = cprr.agency[0]
     cprr = cprr[~((cprr.uid.fillna("") == ""))]
