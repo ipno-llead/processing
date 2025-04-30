@@ -1,6 +1,6 @@
 wdir: ../../../data/raw
 outs:
-- md5: e19d0271f0fb3525f86f4084b7cc58b5.dir
-  size: 836
-  nfiles: 2
+- md5: fda694c185bb4a1275b7b4161a7383a6.dir
+  size: 2172
+  nfiles: 3
   path: natchitoches_so

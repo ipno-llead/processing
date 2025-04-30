@@ -11,7 +11,6 @@ from lib.clean import (
 from lib.uid import gen_uid
 
 
-
 def clean_rank(df, cols):
     for col in cols:
         df[col] = (
