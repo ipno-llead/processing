@@ -72,6 +72,7 @@ def split_middle_initial(df):
     return df
 
 
+
 def clean():
     df = (
         pd.read_csv(deba.data("raw/shreveport_pd/shreveport_pd_pprr_1990_2001.csv"))
