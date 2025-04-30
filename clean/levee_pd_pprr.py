@@ -31,11 +31,12 @@ def strip_sex_and_race(df):
     df["sex"] = df["sex"].str.strip(" '\"")
     return df
 
-def clean_rank(df): 
-    df["rank"] = df["rank"].str.strip(" '\"")
-    df["rank"] = df["rank"].str.replace(" ", "_")
-    df["rank"] = df["rank"].str.lower()
+def clean_rank_desc(df): 
+    df["rank_desc"] = df["rank_desc"].str.strip(" '\"")
+    df["rank_desc"] = df["rank_desc"].str.replace(" ", "_")
+    df["rank_desc"] = df["rank_desc"].str.lower()
     return df
+
 
 def strip_leading_comma(df):
     df["badge_no"] = df["badge_no"].str.strip(" '\"")
@@ -46,14 +47,14 @@ def clean():
         pd.read_csv(deba.data("raw/levee_pd/levee_pd_pprr_1980_2025.csv"))
         .pipe(clean_column_names)
         .drop(columns=['salary','assignment'])
-        .rename(columns={"year_of_birth": "birth_date", "gender":"sex", "date_of_hire": "hire_date", "date_of_termination":"termination_date", "badge_number": "badge_no"})
+        .rename(columns={"year_of_birth": "birth_date", "gender":"sex", "date_of_hire": "hire_date", "date_of_termination":"termination_date", "badge_number": "badge_no", "rank": "rank_desc"})
         .pipe(split_officer_name)
         .pipe(split_date_column, "birth_date")
         .pipe(split_date_column, "hire_date")
         .pipe(split_date_column, "termination_date")
         .pipe(strip_sex_and_race)
         .pipe(strip_leading_comma)
-        .pipe(clean_rank)
+        .pipe(clean_rank_desc)
         .pipe(lambda df: df.assign(
             race=df["race"].replace({
                 "b": "black",

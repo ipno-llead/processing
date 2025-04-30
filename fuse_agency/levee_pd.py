@@ -78,14 +78,14 @@ def fuse_events(cprr, post_east_jefferson,post_orleans, pprr):
         { 
             events.OFFICER_HIRE: {
                 "prefix": "hire",
-                "keep": ["uid", "agency", "rank", "badge_no"],
+                "keep": ["uid", "agency", "rank_desc", "badge_no"],
             },
             events.OFFICER_LEFT: {
                 "prefix": "termination",
-                "keep": ["uid", "agency", "rank", "badge_no"],
+                "keep": ["uid", "agency", "rank_desc", "badge_no"],
             },
         },
-        ["uid", "agency", "rank", "badge_no"],
+        ["uid", "agency", "rank_desc", "badge_no"],
     )
     return builder.to_frame()
 
