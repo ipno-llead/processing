@@ -65,21 +65,24 @@ def match_pprr_post(pprr, post):
 if __name__ == "__main__":
     cprr = pd.read_csv(deba.data("clean/cprr_levee_pd.csv"))
     pprr = pd.read_csv(deba.data("clean/pprr_levee_pd_1980_2025.csv"))
-    agency = cprr.agency[0] #This would be East Jefferson Levee PD
-    post = load_for_agency(agency) #So this would just be POST for East Jefferson Levee PD
+
+
+    post_east_jefferson = load_for_agency("east-jefferson-levee-pd")
+    post_orleans = load_for_agency("orleans-levee-pd")
+
 
     matched_cprr = pd.concat(
         [
             match_cprr_post(
                 cprr[cprr.agency == "east-jefferson-levee-pd"],
-                post,
+                post_east_jefferson,
                 "east_jefferson",
                 2020,
                 0.89,
             ),
             match_cprr_post(
                 cprr[cprr.agency == "orleans-levee-pd"],
-                post,
+                post_orleans,
                 "orleans",
                 2020,
                 0.9,
@@ -87,5 +90,5 @@ if __name__ == "__main__":
         ]
     )
     matched_cprr.to_csv(deba.data("match/cprr_levee_pd.csv"), index=False)
-    pprr = match_pprr_post(pprr, post)
+    pprr = match_pprr_post(pprr, post_orleans)
     pprr.to_csv(deba.data("match/pprr_levee_pd_1980_2025.csv"), index=False)
