@@ -11,7 +11,7 @@ from lib.clean import (
 from lib.uid import gen_uid
 
 
-def clean_rank(df, cols):
+def clean_rank_desc (df, cols):
     for col in cols:
         df[col] = (
             df[col].str.lower()
@@ -76,7 +76,7 @@ def clean():
     df = (
         pd.read_csv(deba.data("raw/shreveport_pd/shreveport_pd_pprr_1990_2001.csv"))
         .pipe(clean_column_names)
-        .rename(columns={"hire_da": "hire_date", "date_separ": "termination_date", "badge": "badge_no"})
+        .rename(columns={"hire_da": "hire_date", "date_separ": "termination_date", "badge": "badge_no", "rank": "rank_desc"})
         .pipe(normalize_race_and_sex)
         .pipe(split_middle_initial)
         .pipe(clean_races, ["race"])
@@ -86,7 +86,7 @@ def clean():
         .pipe(gen_uid, ["agency", "first_name", "last_name"])
         .pipe(split_date_strings, ["hire_date", "termination_date"])
         #.pipe(clean_dates, ["hire_date", "termination_date"])
-        .pipe(clean_rank, ["rank"])
+        .pipe(clean_rank_desc, ["rank_desc"])
     )
     return df
 
