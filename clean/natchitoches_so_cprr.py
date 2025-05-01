@@ -1,4 +1,5 @@
 import pandas as pd
+import re 
 from lib.clean import clean_dates, standardize_desc_cols, clean_races, clean_sexes
 from lib.columns import clean_column_names, set_values
 from lib.uid import gen_uid
@@ -84,11 +85,87 @@ def clean():
         .pipe(standardize_desc_cols, ["allegation", "investigation_desc"])
         .pipe(set_values, {"agency": "natchitoches-so"})
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
-        .pipe(gen_uid, ["allegation", "disposition", "action"], "allegation_uid")
+        .pipe(gen_uid, ["uid", "receive_year", "allegation", "disposition", "action"], "allegation_uid")
     )
     return df
 
+RANK_MAP = {
+    "dy": "deputy",
+    "det": "detective",
+    "lt": "lieutenant",
+    "sgt": "sergeant",
+    "cpt": "captain",
+    "mjr": "major"
+}
+
+def split_multiple_officers(df):
+    rows = []
+
+    for _, row in df.iterrows():
+        deputy_str = row["deputy_s_name"].strip().lower()
+
+        # Handle organizational/collective entries like "NPSO Task Force"
+        if deputy_str.startswith("npso"):
+            new_row = row.copy()
+            new_row["rank_desc"] = deputy_str  # Full label like "npso task force"
+            new_row["first_name"] = "none"
+            new_row["middle_name"] = "none"
+            new_row["last_name"] = "none"
+            rows.append(new_row)
+            continue
+
+        # Normal individual officers with rank + name
+        officers = re.findall(r"(\w+)\.?\s+([\w'-]+)", deputy_str)
+
+        for rank_abbr, last_name in officers:
+            rank = RANK_MAP.get(rank_abbr.strip("."), rank_abbr.lower())
+            new_row = row.copy()
+            new_row["rank_desc"] = rank
+            new_row["first_name"] = "none"
+            new_row["middle_name"] = "none"
+            new_row["last_name"] = last_name
+            rows.append(new_row)
+
+    return pd.DataFrame(rows).drop(columns=["deputy_s_name"])
+
+
+def split_date_parts(df, column):
+    parsed = pd.to_datetime(df[column], errors="coerce")
+    base = column.replace("_date", "")
+
+    df[f"{base}_year"] = parsed.dt.year
+    df[f"{base}_month"] = parsed.dt.month
+    df[f"{base}_day"] = parsed.dt.day
+
+    return df.drop(columns=[column])
+
+
+
+def clean_25():
+    df_25 = (
+        pd.read_csv(deba.data("raw/natchitoches_so/cprr_natchitoches_so_2022_2025.csv"))
+        .pipe(clean_column_names)
+        .rename(columns={"investigation_notes": "investigation_desc"})
+        .pipe(strip_leading_commas)
+        .pipe(format_dates)
+        .pipe(clean_allegation)
+        .pipe(clean_disposition)
+        .pipe(clean_action)
+        .pipe(split_multiple_officers)
+        #.pipe(clean_split_names)
+        #.pipe(clean_dates, ["receive_date", "disposition_date"])
+        .pipe(split_date_parts, "receive_date")
+        .pipe(split_date_parts, "disposition_date")
+        .pipe(standardize_desc_cols, ["allegation", "investigation_desc"])
+        .pipe(set_values, {"agency": "natchitoches-so"})
+        .pipe(gen_uid, ["first_name", "last_name", "agency"])
+        .pipe(gen_uid, ["uid", "receive_year", "allegation", "disposition", "action"], "allegation_uid")
+        #.pipe(lambda df: print(df.columns) or df)
+    )
+    return df_25
 
 if __name__ == "__main__":
     df = clean()
     df.to_csv(deba.data("clean/cprr_natchitoches_so_2018_21.csv"), index=False)
+    df_25 = clean_25()
+    df_25.to_csv(deba.data("clean/cprr_natchitoches_so_2022_25.csv"), index=False)

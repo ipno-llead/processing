@@ -33,10 +33,38 @@ def match_cprr_post(cprr, post):
     cprr.loc[:, "uid"] = cprr.uid.map(lambda x: match_dict.get(x, x))
     return cprr
 
+def match_cprr_25_post(cprr, post):
+    dfa = cprr[["uid", "agency", "last_name"]].drop_duplicates(subset=["uid"]).set_index("uid")
+
+    dfb = post[["uid", "agency", "last_name"]].drop_duplicates(subset=["uid"]).set_index("uid")
+
+    matcher = ThresholdMatcher(
+        ColumnsIndex("agency", "last_name"),
+        {
+            "agency": JaroWinklerSimilarity(),
+            "last_name": JaroWinklerSimilarity(),
+        },
+        dfa,
+        dfb,
+    )
+    decision = 0.99
+    matcher.save_pairs_to_excel(
+        deba.data("match/cprr_natchitoches_so_2022_2025_v_pprr_post_2020_11_06.xlsx"),
+        decision,
+    )
+    matches = matcher.get_index_pairs_within_thresholds(decision)
+    match_dict = dict(matches)
+
+    cprr.loc[:, "uid"] = cprr.uid.map(lambda x: match_dict.get(x, x))
+    return cprr
+
 
 if __name__ == "__main__":
     cprr = pd.read_csv(deba.data("clean/cprr_natchitoches_so_2018_21.csv"))
+    cprr25 = pd.read_csv(deba.data("clean/cprr_natchitoches_so_2022_25.csv"))
     agency = cprr.agency[0]
     post = load_for_agency(agency)
     cprr = match_cprr_post(cprr, post)
+    cprr25 = match_cprr_25_post(cprr25, post)
     cprr.to_csv(deba.data("match/cprr_natchitoches_so_2018_21.csv"), index=False)
+    cprr25.to_csv(deba.data("match/cprr_natchitoches_so_2022_25.csv"), index=False)
