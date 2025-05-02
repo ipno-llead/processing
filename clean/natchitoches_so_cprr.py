@@ -89,44 +89,43 @@ def clean():
     )
     return df
 
-RANK_MAP = {
-    "dy": "deputy",
-    "det": "detective",
-    "lt": "lieutenant",
-    "sgt": "sergeant",
-    "cpt": "captain",
-    "mjr": "major"
-}
 
 def split_multiple_officers(df):
+    RANK_MAP = {
+        "dy": "deputy",
+        "det": "detective",
+        "lt": "lieutenant",
+        "sgt": "sergeant",
+        "cpt": "captain",
+        "mjr": "major"
+    }
+
     rows = []
 
     for _, row in df.iterrows():
         deputy_str = row["deputy_s_name"].strip().lower()
 
-        # Handle organizational/collective entries like "NPSO Task Force"
-        if deputy_str.startswith("npso"):
-            new_row = row.copy()
-            new_row["rank_desc"] = deputy_str  # Full label like "npso task force"
-            new_row["first_name"] = "none"
-            new_row["middle_name"] = "none"
-            new_row["last_name"] = "none"
-            rows.append(new_row)
+        if "task force" in deputy_str or "npso general" in deputy_str:
             continue
 
-        # Normal individual officers with rank + name
         officers = re.findall(r"(\w+)\.?\s+([\w'-]+)", deputy_str)
 
         for rank_abbr, last_name in officers:
             rank = RANK_MAP.get(rank_abbr.strip("."), rank_abbr.lower())
             new_row = row.copy()
             new_row["rank_desc"] = rank
-            new_row["first_name"] = "none"
-            new_row["middle_name"] = "none"
+            new_row["first_name"] = ""
+            new_row["middle_name"] = ""
             new_row["last_name"] = last_name
             rows.append(new_row)
 
-    return pd.DataFrame(rows).drop(columns=["deputy_s_name"])
+    result = pd.DataFrame(rows)
+
+    for col in ["first_name", "middle_name", "last_name"]:
+        if col in result.columns:
+            result[col] = result[col].fillna("").astype(str)
+
+    return result.drop(columns=["deputy_s_name"])
 
 
 def split_date_parts(df, column):
@@ -152,15 +151,12 @@ def clean_25():
         .pipe(clean_disposition)
         .pipe(clean_action)
         .pipe(split_multiple_officers)
-        #.pipe(clean_split_names)
-        #.pipe(clean_dates, ["receive_date", "disposition_date"])
         .pipe(split_date_parts, "receive_date")
         .pipe(split_date_parts, "disposition_date")
         .pipe(standardize_desc_cols, ["allegation", "investigation_desc"])
         .pipe(set_values, {"agency": "natchitoches-so"})
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(gen_uid, ["uid", "receive_year", "allegation", "disposition", "action"], "allegation_uid")
-        #.pipe(lambda df: print(df.columns) or df)
     )
     return df_25
 

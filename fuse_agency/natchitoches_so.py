@@ -59,8 +59,10 @@ def fuse_events(cprr, cprr25, post):
 
 if __name__ == "__main__":
     cprr = pd.read_csv(deba.data("match/cprr_natchitoches_so_2018_21.csv"))
+    cppr = cprr.fillna("")
     cprr25 = pd.read_csv(deba.data("match/cprr_natchitoches_so_2022_25.csv"))
-    agency = cprr.agency[0]
+    cprr25 = cprr25.fillna("")
+    agency = cprr.agency[0] 
     post = load_for_agency(agency)
     per_df = fuse_personnel(cprr, cprr25, post)
     com_df = rearrange_allegation_columns(pd.concat([cprr, cprr25], ignore_index=True))
