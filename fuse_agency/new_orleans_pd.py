@@ -416,7 +416,7 @@ if __name__ == "__main__":
     pr_citizens = pd.read_csv(deba.data("clean/pr_cit_new_orleans_pd_2010_2022.csv"))
     cprr_venezia = pd.read_csv(deba.data("clean/cprr_new_orleans_pd_venezia.csv"))
     cprr_dillmann = pd.read_csv(deba.data("clean/cprr_new_orleans_pd_dillmann.csv"))
-    cprr_23 = pd.read_csv(deba.data("match/cprr_new_orleans_pd_2021_2023.csv"))
+    cprr_23 = pd.read_csv(deba.data("match/cprr_new_orleans_pd_2021_2025.csv"))
     personnel = fuse_personnel(
         pprr,
         lprr,
