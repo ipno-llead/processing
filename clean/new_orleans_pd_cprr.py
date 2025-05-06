@@ -265,7 +265,7 @@ def clean_disposition_23(df):
     return df.drop(columns=["allegation_finding"]) 
 
 def filter_years_23(df):
-    df = df[df.tracking_id_og.str.contains("(2023|2024)")]
+    df = df[df.tracking_id_og.str.contains("(2023)")] #removed 2024 
     return df
 
 def clean_tracking_id_23(df):
@@ -332,6 +332,42 @@ def clean25():
     )
     return df 
 
+def filter_by_year_2024 (df):
+    return df[df['tracking_id_og'].str.startswith(('2024'))]
+
+def clean24():
+    df_24 = (
+        pd.read_csv(deba.data("raw/new_orleans_pd/new_orleans_pd_cprr_2024_2025.csv"))
+        .pipe(clean_column_names)
+        .rename(
+            columns={
+                "fdi": "tracking_id_og",
+                "incident_type": "complainant_type",
+                "accused_employee_id": "employee_id",
+                "relevant_policy": "allegation_desc"
+            }
+        )
+        .pipe(clean_tracking_id_23)
+        .pipe(strip_leading_commas_23)
+        .pipe(filter_by_year_2024)
+        .pipe(clean_complainant_type)
+        .pipe(clean_names_23)
+        .pipe(clean_disposition_23)
+        .pipe(clean_allegation_23)
+        .pipe(correct_disposition_23)
+        .pipe(
+            standardize_desc_cols, ["tracking_id_og", "investigation_status"]
+        )
+        .pipe(set_values, {"agency": "new-orleans-pd"})
+        .pipe(clean_names, ["first_name", "last_name"])
+        .pipe(gen_uid, ["tracking_id_og", "agency"], "tracking_id")
+        .pipe(gen_uid, ["first_name", "last_name", "agency"])
+        .pipe(gen_uid, ["uid", "allegation", "tracking_id"], "allegation_uid")
+    
+    )
+    return df_24
+
+
 def clean23():
     df = (
         pd.read_csv(deba.data("raw/new_orleans_pd/new_orleans_pd_cprr_2005_2023.csv"))
@@ -370,5 +406,6 @@ if __name__ == "__main__":
     dfa = clean()
     dfb = clean23()
     dfc = clean25()
-    df = pd.concat([dfa, dfb, dfc])
-    df.to_csv(deba.data("clean/cprr_new_orleans_pd_2021_2023.csv"), index=False)
+    dfd = clean24()
+    df = pd.concat([dfa, dfb, dfc,dfd])
+    df.to_csv(deba.data("clean/cprr_new_orleans_pd_2021_2025.csv"), index=False)
