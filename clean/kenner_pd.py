@@ -25,6 +25,7 @@ def split_names(df):
     df = df.loc[(df.name != "unknown") & df.name.notna()]
     # there's already a "Gregory, Jan-Michael" so this row is probably redundant
     df = df.loc[df.name != "gregory, Jan Michael"]
+    df.drop(columns=["name"])
     return df.reset_index(drop=True)
 
 
@@ -264,7 +265,6 @@ if __name__ == "__main__":
     former_long = clean_former_long()
     former_short = clean_former_short()
     combined = combine_pprrs(pprr, former_long, former_short)
-    dedup_combined = combine_dedup_pprrs(combined, pprr_25)
+    pprr_2025_combined = combine_dedup_pprrs(combined, pprr_25)
     combined.to_csv(deba.data("clean/pprr_kenner_pd_2020.csv"), index=False)
-    pprr_25.to_csv(deba.data("clean/pprr_kenner_pd_1990_2001.csv"), index=False)
-    dedup_combined.to_csv(deba.data("clean/pprr_kenner_pd_2025.csv"), index=False)
+    pprr_2025_combined.to_csv(deba.data("clean/pprr_kenner_pd_2025.csv"), index=False)
