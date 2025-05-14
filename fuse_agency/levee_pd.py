@@ -108,7 +108,7 @@ if __name__ == "__main__":
     cprr = pd.read_csv(deba.data("match/cprr_levee_pd.csv"))
     pprr = pd.read_csv(deba.data("match/pprr_levee_pd_1980_2025.csv"))
     citizen_df = pd.read_csv(deba.data("clean/cprr_cit_levee_pd.csv"))
-    uof = pd.read_csv(deba.data("clean/uof_levee_pd_2020_2025.csv"))
+    uof = pd.read_csv(deba.data("match/uof_levee_pd_2020_2025.csv"))
 
     post_east_jefferson = load_for_agency("east-jefferson-levee-pd")
     post_orleans = load_for_agency("orleans-levee-pd")
