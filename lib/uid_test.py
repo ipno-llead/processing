@@ -32,18 +32,25 @@ class UIDTestCase(unittest.TestCase):
         with self.assertRaisesRegex(Exception, r"rows are not unique:"):
             ensure_uid_unique(dfb, ["a"])
 
+import unittest
+import pandas as pd
+from pandas.testing import assert_series_equal
+from datamatch import ThresholdMatcher, JaroWinklerSimilarity, ColumnsIndex
+
 class TestCprrPostUidMatching(unittest.TestCase):
-    def test_common_last_name_uid_unchanged(self):
+    def test_common_last_name_and_missing_first_name_uid_unchanged(self):
         natchitoches_df = pd.DataFrame({
-            "uid": ["u1", "u2", "u3", "u4"],
-            "last_name": ["smith", "johnson", "smith", "lee"],
-            "agency": ["natchitoches-so"] * 4,
+            "uid": ["u1", "u2", "u3", "u4", "u5", "u6"],
+            "first_name": [None, None, "John", "Sarah", None, "Anna"],
+            "last_name": ["smith", "johnson", "smith", "lee", "johnson", "brown"],
+            "agency": ["natchitoches-so"] * 6,
         })
 
         post_df = pd.DataFrame({
-            "uid": ["u1", "u2", "u3", "u4"],
-            "last_name": ["smith", "johnson", "smith", "lee"],
-            "agency": ["natchitoches-so"] * 4,
+            "uid": ["u1", "u2", "u3", "u4", "u5", "u6"],
+            "first_name": [None, None, "John", "Sarah", None, "Anna"],
+            "last_name": ["smith", "johnson", "smith", "lee", "johnson", "brown"],
+            "agency": ["natchitoches-so"] * 6,
         })
 
         common_last_names = (
@@ -52,48 +59,44 @@ class TestCprrPostUidMatching(unittest.TestCase):
             .pipe(lambda x: x[x > 1])
             .index.tolist()
         )
-        uncommon_last_names = (
-            post_df["last_name"]
-            .value_counts()
-            .pipe(lambda x: x[x == 1])
-            .index.tolist()
-        )
 
-        common_last_name_natchitoches_df = natchitoches_df[natchitoches_df["last_name"].isin(common_last_names)]
-        common_last_name_post_df = post_df[post_df["last_name"].isin(common_last_names)]
+        to_match = natchitoches_df[
+            (~natchitoches_df["last_name"].isin(common_last_names)) |
+            (natchitoches_df["first_name"].notna())
+        ]
 
-        common_last_name_natchitoches_df = common_last_name_natchitoches_df.sort_values("uid").reset_index(drop=True)
-        common_last_name_post_df = common_last_name_post_df.sort_values("uid").reset_index(drop=True)
+        post_to_match = post_df[post_df["uid"].isin(to_match["uid"])]
 
-
-        uncommon_last_name_natchitoches_df = natchitoches_df[~natchitoches_df["last_name"].isin(uncommon_last_names)]
-        uncommon_last_name_post_df = post_df[~post_df["last_name"].isin(uncommon_last_names)]
-
-        uncommon_last_name_natchitoches_df = uncommon_last_name_natchitoches_df[["uid", "agency", "last_name"]].drop_duplicates(subset=["uid"]).set_index("uid")
-        uncommon_last_name_post_df = uncommon_last_name_post_df[["uid", "agency", "last_name"]].drop_duplicates(subset=["uid"]).set_index("uid")
+        dfa = to_match[["uid", "agency", "first_name", "last_name"]].drop_duplicates().set_index("uid")
+        dfb = post_to_match[["uid", "agency", "first_name", "last_name"]].drop_duplicates().set_index("uid")
 
         matcher = ThresholdMatcher(
             ColumnsIndex("agency", "last_name"),
             {
                 "agency": JaroWinklerSimilarity(),
                 "last_name": JaroWinklerSimilarity(),
+                "first_name": JaroWinklerSimilarity(),
             },
-            uncommon_last_name_natchitoches_df,
-            uncommon_last_name_post_df,
+            dfa,
+            dfb,
             show_progress=True,
         )
 
-        decision = 0.92
-        matches = matcher.get_index_pairs_within_thresholds(decision)
-
+        matches = matcher.get_index_pairs_within_thresholds(0.92)
         match_dict = dict(matches)
 
-        natchitoches_df_with_matches = natchitoches_df.copy()
+        df_matched = natchitoches_df.copy()
+        df_matched.loc[:, "uid"] = df_matched["uid"].map(lambda x: match_dict.get(x, x))
 
-        natchitoches_df_with_matches.loc[:, "uid"] = natchitoches_df_with_matches["uid"].map(lambda x: match_dict.get(x, x))
+        skip_mask = (natchitoches_df["last_name"].isin(common_last_names)) & (natchitoches_df["first_name"].isna())
+        original_skip_uids = natchitoches_df[skip_mask]["uid"]
+        matched_skip_uids = df_matched[skip_mask]["uid"]
+        assert_series_equal(matched_skip_uids.reset_index(drop=True), original_skip_uids.reset_index(drop=True), check_names=False)
 
-        natchitoches_df = natchitoches_df[natchitoches_df.last_name.isin(common_last_names)]
-        natchitoches_df_with_matches_common_last_names = natchitoches_df_with_matches[natchitoches_df_with_matches.last_name.isin(common_last_names)]
-
-        assert_series_equal(natchitoches_df_with_matches_common_last_names["uid"], natchitoches_df["uid"], check_names=False)
+        matchable_mask = ~skip_mask
+        self.assertNotEqual(
+            list(df_matched[matchable_mask]["uid"]),
+            list(natchitoches_df[matchable_mask]["uid"]),
+            msg="Some matchable UIDs should change"
+        )
 
