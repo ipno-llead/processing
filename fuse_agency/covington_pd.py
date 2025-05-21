@@ -60,7 +60,6 @@ def fuse_events(ah, pprr):
     )
     return builder.to_frame()
 
-
 if __name__ == "__main__":
     post_event = pd.read_csv(deba.data("match/post_event_covington_pd_2020.csv"))
     ah = pd.read_csv(deba.data("clean/actions_history_covington_pd_2021.csv"))
