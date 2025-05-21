@@ -1,5 +1,5 @@
 import pandas as pd
-from lib.clean import clean_dates, clean_names, standardize_desc_cols, clean_salaries
+from lib.clean import clean_dates, clean_names, standardize_desc_cols, clean_salaries, clean_sexes, clean_races
 import deba
 from lib.columns import clean_column_names, set_values
 from lib.uid import gen_uid
@@ -74,6 +74,54 @@ def clean_personnel_2008():
         )
     )
 
+def strip_leading_commas(df):
+    for col in df.columns:
+        df[col] = df[col].apply(
+            lambda x: str(x).strip().lstrip("',") if pd.notnull(x) else x
+        )
+    return df
+
+def split_names(df, columns):
+    col = columns[0]
+    names = df[col].astype(str).str.strip().str.split(" ", n=1, expand=True)
+    df["last_name"] = names[0]
+    df["first_name"] = names[1] if names.shape[1] > 1 else ""
+    df = df.drop(columns=[col]) 
+    return df
+
+
+def clean_pprr_2025():
+    df = (
+        pd.read_csv(deba.data("raw/new_orleans_harbor_pd/new_orleans_harbor_pd_pprr_1990_2025.csv"))
+        .pipe(clean_column_names)
+        .rename(
+            columns={
+                "position_statu": "employment_status",
+                "legal_name": "officer_name",
+                "job_title_description": "rank_desc",
+                "gender_for_insurance_coverage": "sex",
+                "race_description": "race",
+                "annual_salary": "salary",
+            })
+        .pipe(assign_agency, 2025)
+        .pipe(split_names, ["officer_name"])
+        .pipe(clean_names, ["first_name", "last_name"])
+        .pipe(
+            clean_dates, ["hire_date", "birth_date", "termination_date"]
+        )
+        .pipe(
+            standardize_desc_cols,
+            ["rank_desc", "employment_status"]
+        
+        )
+        .pipe(clean_races, ["race"])
+        .pipe(clean_sexes, ["sex"])
+        .pipe(clean_salaries, ["salary"])
+        .pipe(set_values, {"salary_freq": salary.YEARLY})
+        .pipe(strip_leading_commas)
+        .pipe(gen_uid, ["agency", "first_name", "last_name"])
+    )
+    return df 
 
 def clean_personnel_2020():
     df = pd.read_csv(
@@ -127,8 +175,9 @@ def clean_personnel_2020():
 if __name__ == "__main__":
     df20 = clean_personnel_2020()
     df08 = clean_personnel_2008()
-
+    df25 = clean_pprr_2025()
     df20.to_csv(deba.data("clean/pprr_new_orleans_harbor_pd_2020.csv"), index=False)
     df08.to_csv(
         deba.data("clean/pprr_new_orleans_harbor_pd_1991_2008.csv"), index=False
     )
+    df25.to_csv(deba.data("clean/pprr_new_orleans_harbor_pd_1990_2025.csv"), index=False)
