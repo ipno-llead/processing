@@ -57,7 +57,7 @@ def fuse_events(pprr, uof):
 
 if __name__ == "__main__":
     post_event = pd.read_csv(deba.data("match/post_event_kenner_pd_2020.csv"))
-    pprr = pd.read_csv(deba.data("clean/pprr_kenner_pd_2020.csv"))
+    pprr = pd.read_csv(deba.data("clean/pprr_kenner_pd_2025.csv"))
     agency = pprr.agency[0]
     post = load_for_agency(agency)
     uof = pd.read_csv(deba.data("match/uof_kenner_pd_2005_2021.csv"))
