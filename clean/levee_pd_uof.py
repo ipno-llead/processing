@@ -149,11 +149,11 @@ def clean_uof():
         .pipe(
             gen_uid,
             [
-                "uid",
                 "tracking_id_og",
                 "incident_year",
                 "incident_month",
                 "incident_day",
+                "uid", 
             ],
             "uof_uid",
         )
