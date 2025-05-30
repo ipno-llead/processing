@@ -171,7 +171,6 @@ def clean_personnel_2020():
         )
     )
 
-
 if __name__ == "__main__":
     df20 = clean_personnel_2020()
     df08 = clean_personnel_2008()
