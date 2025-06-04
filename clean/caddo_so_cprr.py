@@ -109,6 +109,62 @@ def clean():
     )
     return df 
 
+def split_case_number_and_date(df):
+    split_df = df["tracking_id"].str.extract(r"(?P<tracking_id>IA[0-9\-]+)\s+(?P<receive_date>\d{1,2}/\d{1,2}/\d{4})")
+    df["tracking_id"] = split_df["tracking_id"]
+    df["receive_date"] = split_df["receive_date"]
+    return df
+
+def clean_disposition_25(df):
+    df.loc[:, "disposition"] = (
+        df.final_disposition.str.lower().str.strip()
+        .str.replace(r"^result\/disposition: ?", "", regex=True)
+        .str.replace(r"^closed (-|as) ?", "", regex=True)
+        .str.replace(r"^(disciplinary|corrective|closed)(.+)", "sustained", regex=True)
+        .str.replace(r"no action taken", "", regex=False)
+        .str.replace(r"^; closed -\s*$", "closed", regex=True)
+        .str.replace(r"^; disciplinary action taken\s*$", "disciplinary action taken", regex=True)
+    )
+    return df.drop(columns=["final_disposition"])
+
+def extract_rank_desc_25(df):
+    ranks = df.officer_name.str.extract(r"(\(\w+\))")
+    df.loc[:, "rank_desc"] = (
+        ranks[0]
+        .fillna("")
+        .str.replace(r"(\(|\))", "", regex=True)
+        .str.replace(r"det", "detective", regex=False)
+        .str.replace(r"(ops|adm|na)", "", regex=True)
+    )
+    return df
+
+
+
+def clean_25():
+    df = (
+        pd.read_csv(deba.data("raw/caddo_so/cprr_caddo_so_2015_2019.csv"))
+            .drop(columns=["number"])
+            .pipe(clean_column_names)
+            .pipe(split_case_number_and_date)
+            .pipe(clean_tracking_id)
+            .pipe(clean_allegation)
+            .pipe(clean_action)
+            .pipe(clean_disposition_25)
+            .pipe(split_rows_with_multiple_officers)
+            .pipe(extract_badge_num)
+            .pipe(extract_rank_desc_25)
+            .pipe(split_name)
+            .pipe(split_supervisor_name)
+            .pipe(clean_dates, ["receive_date"])
+            .pipe(set_values, {"agency": "caddo-so"})
+            .pipe(gen_uid, ["first_name", "last_name", "agency"])
+            .pipe(gen_uid, ["tracking_id",'first_name',"allegation"], "allegation_uid")
+            .pipe(gen_uid, ["supervisor_first_name", "supervisor_last_name", "agency"], "supervisor_uid")
+    )
+    return df
+
 if __name__ == "__main__":
     df = clean()
+    df = clean_25()
     df.to_csv(deba.data("clean/cprr_caddo_so_2022_2023.csv"), index=False)
+    df.to_csv(deba.data("clean/cprr_caddo_so_2015_2019.csv"), index=False)
