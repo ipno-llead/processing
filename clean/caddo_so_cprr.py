@@ -165,6 +165,6 @@ def clean_25():
 
 if __name__ == "__main__":
     df = clean()
-    df = clean_25()
+    df25 = clean_25()
     df.to_csv(deba.data("clean/cprr_caddo_so_2022_2023.csv"), index=False)
-    df.to_csv(deba.data("clean/cprr_caddo_so_2015_2019.csv"), index=False)
+    df25.to_csv(deba.data("clean/cprr_caddo_so_2015_2019.csv"), index=False)
