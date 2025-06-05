@@ -12,7 +12,7 @@ from lib.post import load_for_agency
 import pandas as pd
 
 
-def fuse_events(lprr, pprr, pprr_term, settlements, cprr):
+def fuse_events(lprr, pprr, pprr_term, settlements, cprr, cprr22):
     builder = events.Builder()
     builder.extract_events(
         lprr,
@@ -121,6 +121,31 @@ def fuse_events(lprr, pprr, pprr_term, settlements, cprr):
         },
         ["uid", "allegation_uid"],
     )
+    builder.extract_events(
+        cprr22,
+        {
+            events.COMPLAINT_INCIDENT: {
+                "prefix": "incident",
+                "parse_date": True,
+                "keep": [
+                    "uid",
+                    "allegation_uid",
+                    "agency",
+                ],
+            },
+            # There are two termination events in the 2022 data -- do I make a separate col for terminations in the csv? 
+            # events.OFFICER_LEFT: {
+            #     "prefix": "action",
+            #     "parse_date": True,
+            #     "keep": [
+            #         "uid",
+            #         "allegation_uid",
+            #         "agency",
+            #     ],
+            # },
+        },
+        ["uid", "allegation_uid"],
+    )
     return builder.to_frame()
 
 
@@ -132,12 +157,13 @@ if __name__ == "__main__":
         deba.data("match/settlements_louisiana_state_pd_2010_2022.csv")
     )
     cprr = pd.read_csv(deba.data("match/cprr_louisiana_state_pd_2019_2020.csv"))
+    cprr22 = pd.read_csv(deba.data("match/cprr_louisiana_state_pd_2021_2022.csv"))
     post_event = pd.read_csv(deba.data("match/post_event_louisiana_state_police_2020.csv"))
     agency = pprr.agency[0]
     post = load_for_agency(agency)
     per_df = fuse_personnel(pprr, pprr_term, lprr, post, cprr)
     per_df = per_df[~((per_df.last_name.fillna("") == ""))]
-    event_df = rearrange_event_columns(fuse_events(lprr, pprr, pprr_term, settlements, cprr))
+    event_df = rearrange_event_columns(fuse_events(lprr, pprr, pprr_term, settlements, cprr, cprr22))
     post_event = rearrange_event_columns(post_event)
     event_df = pd.concat([event_df, post_event])
     settlements = rearrange_settlement_columns(settlements)
