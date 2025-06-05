@@ -27,6 +27,8 @@ OFFICER_LEFT = "officer_left"
 OFFICER_POST_DECERTIFICATION = (
     "officer_post_decertification"  # officer decertified by POST
 )
+OFFICER_DEMOTION = "officer_demotion" 
+OFFICER_LETTER_OF_REPRIMAND = "officer_letter_of_reprimand" 
 
 COMPLAINT_INCIDENT = "complaint_incident"
 COMPLAINT_RECEIVE = "complaint_receive"
