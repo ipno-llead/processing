@@ -196,8 +196,8 @@ def match_cprr_22_to_pprr(cprr22, pprr):
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
     match_dict = dict(matches)
 
-    cprr.loc[:, "uid"] = cprr.uid.map(lambda x: match_dict.get(x, x))
-    return cprr
+    cprr22.loc[:, "uid"] = cprr22.uid.map(lambda x: match_dict.get(x, x))
+    return cprr22
 
 
 
