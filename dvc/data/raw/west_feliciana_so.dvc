@@ -1,0 +1,6 @@
+wdir: ../../../data/raw
+outs:
+- md5: 4ba93b23a0a687d489229f74f3da4db5.dir
+  size: 944
+  nfiles: 1
+  path: west_feliciana_so
