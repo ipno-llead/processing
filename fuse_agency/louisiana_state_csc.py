@@ -12,7 +12,7 @@ from lib.post import load_for_agency
 import pandas as pd
 
 
-def fuse_events(lprr, pprr, pprr_term, settlements, cprr):
+def fuse_events(lprr, pprr, pprr_term, settlements, cprr, cprr19):
     builder = events.Builder()
     builder.extract_events(
         lprr,
@@ -121,6 +121,48 @@ def fuse_events(lprr, pprr, pprr_term, settlements, cprr):
         },
         ["uid", "allegation_uid"],
     )
+    builder.extract_events(
+        cprr19,
+        {
+            events.COMPLAINT_INCIDENT: {
+                "prefix": "incident",
+                "parse_date": True,
+                "keep": [
+                    "uid",
+                    "allegation_uid",
+                    "agency",
+                ],
+            },
+            events.COMPLAINT_RECEIVE: {
+                "prefix": "receive",
+                "parse_date": True,
+                "keep": [
+                    "uid",
+                    "allegation_uid",
+                    "agency",
+                ],
+            },
+            events.OFFICER_LEFT: {
+                "prefix": "termination",
+                "parse_date": True,
+                "keep": [
+                    "uid",
+                    "allegation_uid",
+                    "agency",
+                ],
+            },
+            events.OFFICER_LEFT: {
+                "prefix": "separation",
+                "parse_date": True,
+                "keep": [
+                    "uid",
+                    "allegation_uid",
+                    "agency",
+                ],
+            },
+        },
+        ["uid", "allegation_uid"],
+    )
     return builder.to_frame()
 
 
@@ -132,6 +174,7 @@ if __name__ == "__main__":
         deba.data("match/settlements_louisiana_state_pd_2010_2022.csv")
     )
     cprr = pd.read_csv(deba.data("match/cprr_louisiana_state_pd_2019_2020.csv"))
+    cprr19 = pd.read_csv(deba.data("match/cprr_louisiana_state_pc_2015_2019.csv"))
     post_event = pd.read_csv(deba.data("match/post_event_louisiana_state_police_2020.csv"))
     agency = pprr.agency[0]
     post = load_for_agency(agency)
