@@ -18,6 +18,7 @@ def clean():
     df = (
         pd.read_csv(deba.data("raw/west_feliciana_so/west_feliciana_so_cprr_2010_2021.csv"))
         .pipe(clean_column_names)
+        .drop(columns=["employment_status_as_of_06_30_2023"])
         .rename(
             columns={
                 "date": "receive_date",
@@ -29,7 +30,7 @@ def clean():
         .pipe(clean_dates, ["receive_date", "incident_date"])
         .pipe(split_officer_names)
         .pipe(clean_names, ["first_name", "last_name"])
-        .pipe(standardize_desc_cols, ["allegation", "disposition", "action", "employment_status_as_of_06_30_2023"])
+        .pipe(standardize_desc_cols, ["allegation", "disposition", "action"])
         .pipe(set_values, {"agency": "west-feliciana-so"})
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
         .pipe(gen_uid, ["allegation", "action", "uid"], "allegation_uid")
