@@ -164,11 +164,11 @@ def clean_pprr():
         ]
     )
 
-# def lowercase_all_strings(df):
-#     for col in df.columns:
-#         if df[col].dtype == "object":
-#             df.loc[:, col] = df[col].str.lower()
-#     return df
+def lowercase_all_strings(df):
+    for col in df.columns:
+        if df[col].dtype == "object":
+            df.loc[:, col] = df[col].str.lower()
+    return df
 
 # def clean_employment_status(df):
 #     df.loc[:, "employment_status"] = (
