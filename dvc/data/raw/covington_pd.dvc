@@ -1,6 +1,6 @@
 wdir: ../../../data/raw
 outs:
-- md5: 5ee90b0ec600359a007deed2b42d8c50.dir
-  size: 88838
-  nfiles: 14
+- md5: 9992cd2fa8ab42f0830b314c8d12f860.dir
+  size: 101670
+  nfiles: 15
   path: covington_pd
