@@ -6,7 +6,7 @@ from lib.personnel import fuse_personnel
 from lib import events
 from lib.post import load_for_agency
 
-def fuse_events(ah, pprr):
+def fuse_events(ah, pprr, pprr_25):
     builder = events.Builder()
 
     # extract events from actions history
@@ -58,6 +58,20 @@ def fuse_events(ah, pprr):
         },
         ["uid"],
     )
+    builder.extract_events(
+        pprr_25,
+        {
+            events.OFFICER_HIRE: {
+                "prefix": "hire",
+                "keep": [
+                    "uid",
+                    "agency",
+                    "rank_desc",
+                ],
+            }
+        },
+        ["uid"],
+    )
     return builder.to_frame()
 
 
@@ -65,11 +79,11 @@ if __name__ == "__main__":
     post_event = pd.read_csv(deba.data("match/post_event_covington_pd_2020.csv"))
     ah = pd.read_csv(deba.data("clean/actions_history_covington_pd_2021.csv"))
     pprr = pd.read_csv(deba.data("clean/pprr_covington_pd_2020.csv"))
-    pprr25 = pd.read_csv(deba.data("clean/pprr_covington_pd_2002_2013.csv"))
+    pprr_25 = pd.read_csv(deba.data("match/pprr_covington_pd_1975_2025.csv"))
     agency = pprr.agency[0]
     post = load_for_agency(agency)
-    events_df = rearrange_event_columns(pd.concat([post_event, fuse_events(ah, pprr)]))
+    events_df = rearrange_event_columns(pd.concat([post_event, fuse_events(ah, pprr, pprr_25)]))
     events_df.to_csv(deba.data("fuse_agency/event_covington_pd.csv"), index=False)
-    per_df = fuse_personnel(ah, pprr, post)
+    per_df = fuse_personnel(ah, pprr, pprr_25, post)
     per_df.to_csv(deba.data("fuse_agency/per_covington_pd.csv"), index=False)
     post.to_csv(deba.data("fuse_agency/post_carencro_pd.csv"), index=False)
