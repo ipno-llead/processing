@@ -1,6 +1,6 @@
 wdir: ../../../data/raw
 outs:
-- md5: fdde889bf2e71367dca864a078330228.dir
-  size: 231557
-  nfiles: 3
+- md5: fdb37aa1bc927e8ae96e51294046a29f.dir
+  size: 233589
+  nfiles: 4
   path: slidell_pd
