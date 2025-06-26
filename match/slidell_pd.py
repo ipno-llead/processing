@@ -67,3 +67,4 @@ if __name__ == "__main__":
     post = post.loc[post.agency == agency]
     post_events = extract_post_events(pprr_csd, post)
     post_events.to_csv(deba.data("match/post_event_slidell_pd_2020.csv"), index=False)
+    cprr.to_csv(deba.data("match/cprr_slidell_pd_2007_2010.csv"), index=False)
