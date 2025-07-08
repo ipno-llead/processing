@@ -1,6 +1,6 @@
 wdir: ../../../data/raw
 outs:
-- md5: 4b7cfbc3d20b031eb1ec538154b92a04.dir
-  size: 55679
-  nfiles: 4
+- md5: 949b63550e9abc82dc22282cb24f1c14.dir
+  size: 127369
+  nfiles: 5
   path: lake_charles_pd

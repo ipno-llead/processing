@@ -174,6 +174,7 @@ def fuse_use_of_force():
                 pd.read_csv(deba.data("fuse_agency/uof_terrebonne_so.csv")),
                 pd.read_csv(deba.data("fuse_agency/uof_lafayette_so.csv")),
                 pd.read_csv(deba.data("fuse_agency/uof_levee_pd.csv")),
+                pd.read_csv(deba.data("fuse_agency/uof_lake_charles_pd.csv")),
             ]
         )
     ).sort_values(["agency", "uof_uid"])
