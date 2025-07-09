@@ -14,7 +14,6 @@ from lib.clean import (
 
 import pandas as pd
 
-# 1. Select base columns to retain
 def select_base_columns(df):
     base_cols = [
         'incident_number', 'date',
@@ -23,38 +22,6 @@ def select_base_columns(df):
     ]
     return df[base_cols + [col for col in df.columns if col not in base_cols]]
 
-# 2. Consolidate force methods and effects
-def consolidate_force_columns(df):
-    force_methods = [
-        ('soft_empty_hand_control', 'soft_empty_hand_control_effect'),
-        ('hard_empty_hand_control', 'hard_empty_hand_control_effect'),
-        ('oc_spray_foam', 'oc_spray_foam_effect'),
-        ('taser', 'taser_effect'),
-        ('impact_weapon', 'impact_weapon_effect'),
-        ('impact_munitions', 'impact_munitions_effect'),
-        ('chemical_munitions', 'chemical_munitions_effect'),
-        ('diversionary_device', 'diversionary_device_effect'),
-        ('firearm_displayed', 'firearm_displayed_effect'),
-        ('firearm_discharged', 'firearm_discharged_effect'),
-        ('canine', 'canine_effect'),
-        ('other_force', 'other_effect'),
-    ]
-
-    def consolidate_row(row):
-        used = []
-        details = {}
-        for method, effect in force_methods:
-            if pd.notna(row.get(method)) and str(row[method]).strip().lower() not in ['no', 'false', '0', 'nan']:
-                used.append(method)
-                details[method] = {
-                    'effect': row.get(effect)
-                }
-        return pd.Series([used, details], index=['force_used', 'force_details'])
-
-    df[['force_used', 'force_details']] = df.apply(consolidate_row, axis=1)
-    return df
-
-# 3. Summarize employee and suspect injuries
 def summarize_injuries(df):
     employee_cols = ['employee_injury_minor', 'employee_injury_serious', 'employee_injury_death']
     suspect_cols = [
@@ -74,17 +41,13 @@ def summarize_injuries(df):
                 )
         return "; ".join(levels) if levels else 'none'
 
-    # Overwrite with cleaned, filtered descriptions
     df['officer_injured'] = df.apply(lambda row: summarize(row, employee_cols), axis=1)
     df['civilian_injured'] = df.apply(lambda row: summarize(row, suspect_cols), axis=1)
 
     return df
 
-
-# 4. Optional: Drop original force and injury columns
 def drop_redundant_columns(df):
     drop_cols = [
-        # Drop force method and effect columns
         'soft_empty_hand_control', 'soft_empty_hand_control_effect', 
         'hard_empty_hand_control', 'hard_empty_hand_control_effect',
         'oc_spray_foam', 'oc_spray_foam_effect', 'taser', 'taser_effect',
@@ -96,11 +59,9 @@ def drop_redundant_columns(df):
         'firearm_discharged', 'firearm_discharged_effect',
         'canine', 'canine_effect', 'canine_bite', 'other_force', 'other_effect',
         'other_force_specified',
-        # Drop injury columns
         'employee_injury_minor', 'employee_injury_serious', 'employee_injury_death',
         'suspect_injury_no_complaint', 'suspect_injury_complaint_non_observed',
         'suspect_injury_minor', 'suspect_injury_serious', 'suspect_injury_death',
-        # Drop other unnecessary details
         'drive_stun', '21_ft_cartridge', '21_ft_cartridges_fired',
         '25_ft_cartridge', '25_ft_cartridges_fired', 'taser_range',
         'darts_penatrated', 'reason_for_no_penatration',
@@ -191,7 +152,7 @@ def clean_civilian_actions(df):
             return action
         action = action.strip().lower()
         if action.startswith("other:"):
-            return action  # leave as-is to retain detail
+            return action  
         return replacements.get(action, action)
 
     df["civilian_actions"] = df["civilian_actions"].apply(standardize_action)
@@ -200,7 +161,7 @@ def clean_civilian_actions(df):
 def clean_use_of_force_description(df):
     def standardize_force(val):
         if not isinstance(val, str):
-            return val  # e.g., None remains None
+            return val 
         parts = [part.strip() for part in val.split("|")]
         return "; ".join(parts)
     
@@ -243,7 +204,6 @@ def clean():
         .drop(columns=["use_of_force", "day_of_the_week", "time", "taser_model"])
         .pipe(select_base_columns)
         .pipe(simplify_use_of_force)
-        # .pipe(consolidate_force_columns)
         .pipe(summarize_injuries)
         .pipe(drop_redundant_columns)
         .rename(
