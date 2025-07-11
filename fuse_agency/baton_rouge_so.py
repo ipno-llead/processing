@@ -1,12 +1,12 @@
 import pandas as pd
 import deba
-from lib.columns import rearrange_allegation_columns, rearrange_citizen_columns
+from lib.columns import rearrange_allegation_columns, rearrange_citizen_columns, rearrange_use_of_force
 from lib.personnel import fuse_personnel
 from lib.post import load_for_agency
 from lib import events
 
 
-def fuse_events(cprr_15, cprr_18, cprr_21, post):
+def fuse_events(cprr_15, cprr_18, cprr_21, post, uof):
     builder = events.Builder()
     builder.extract_events(
         cprr_15,
@@ -74,6 +74,20 @@ def fuse_events(cprr_15, cprr_18, cprr_21, post):
         },
         ["uid"],
     )
+    builder.extract_events(
+        uof,
+        {
+            events.UOF_INCIDENT: {
+                "prefix": "incident",
+                "keep": [
+                    "uid",
+                    "uof_uid",
+                    "agency",
+                ],
+            },
+        },
+        ["uid", "uof_uid"],
+    )
     return builder.to_frame()
 
 
@@ -84,15 +98,18 @@ if __name__ == "__main__":
     citizen_df15 = pd.read_csv(deba.data("clean/cprr_cit_baton_rouge_so_2011_2015.csv"))
     citizen_df18 = pd.read_csv(deba.data("clean/cprr_cit_baton_rouge_so_2018.csv"))
     citizen_df20 = pd.read_csv(deba.data("clean/cprr_cit_baton_rouge_so_2016_2020.csv"))
+    uof = pd.read_csv(deba.data("match/uof_baton_rouge_so_2020.csv"))
     agency = cprr_20.agency[0]
     post = load_for_agency(agency)
-    personnel_df = fuse_personnel(cprr_15, cprr_18, cprr_20, post)
-    event_df = fuse_events(cprr_15, cprr_18, cprr_20, post)
+    personnel_df = fuse_personnel(cprr_15, cprr_18, cprr_20, post, uof)
+    event_df = fuse_events(cprr_15, cprr_18, cprr_20, post, uof)
     complaint_df = rearrange_allegation_columns(pd.concat([cprr_15, cprr_18, cprr_20], axis=0))
     citizen_df = rearrange_citizen_columns(
         pd.concat([citizen_df15, citizen_df18, citizen_df20])
     )
+    uof = rearrange_use_of_force(uof)
     personnel_df.to_csv(deba.data("fuse_agency/per_baton_rouge_so.csv"), index=False)
     event_df.to_csv(deba.data("fuse_agency/event_baton_rouge_so.csv"), index=False)
     complaint_df.to_csv(deba.data("fuse_agency/com_baton_rouge_so.csv"), index=False)
     citizen_df.to_csv(deba.data("fuse_agency/cit_baton_rouge_so.csv"), index=False)
+    uof.to_csv(deba.data("fuse_agency/uof_baton_rouge_so.csv"), index=False)
