@@ -185,23 +185,19 @@ def extract_fields(df: pd.DataFrame) -> pd.DataFrame:
     for entry in col:
         entry = str(entry).strip().strip("'")
 
-        # 1. Case number
         case_number_match = re.search(r"Suit No\.?\s*(.*?)\s+Plaintiff:", entry)
         case_number = case_number_match.group(1) if case_number_match else None
         case_numbers.append(case_number)
 
-        # 2. Case name (from Plaintiff: to Defendant)
         case_name_match = re.search(r"Plaintiff:.*?Defendant", entry)
         case_name = case_name_match.group(0).strip() if case_name_match else None
         case_names.append(case_name)
 
-        # 3. Risk number
         risk_number_match = re.search(r"Risk\s+#:\s*(\S+)", entry)
         raw_risk_number = risk_number_match.group(1) if risk_number_match else None
         risk_number = None if raw_risk_number == "N/A" else raw_risk_number
         risk_numbers.append(risk_number)
 
-        # 4. Defendant last/first name
         defendant_match = re.search(r"VS\s+(.*?)(?:, et al| Defendant)", entry)
         if defendant_match:
             full_defendant = defendant_match.group(1).strip()
@@ -238,7 +234,6 @@ def extract_attorney_and_dates(df: pd.DataFrame) -> pd.DataFrame:
     for entry in col:
         entry = str(entry).strip().strip("'")
 
-        # Skip placeholder
         if "Attorney/Petition Rec." in entry:
             first_names.append(None)
             middle_names.append(None)
@@ -247,8 +242,6 @@ def extract_attorney_and_dates(df: pd.DataFrame) -> pd.DataFrame:
             occur_dates.append(None)
             continue
 
-        # Attorney name: try to match 3-part name (First Middle Last)
-        # Middle can be optional and may end in a period
         attorney_match = re.search(
             r"Attorney:\s+([\w'\-]+)(?:\s+([\w'\-\.]+))?\s+([\w'\-]+)", entry
         )
@@ -259,7 +252,6 @@ def extract_attorney_and_dates(df: pd.DataFrame) -> pd.DataFrame:
         else:
             first_name = middle_name = last_name = None
 
-        # Petition Received
         receive_match = re.search(r"Petition Received:\s+([A-Za-z]{3} \d{2}, \d{4})", entry)
         if receive_match:
             try:
@@ -269,7 +261,6 @@ def extract_attorney_and_dates(df: pd.DataFrame) -> pd.DataFrame:
         else:
             receive_date = None
 
-        # Incident Date
         occur_match = re.search(r"Incident Date:\s+([A-Za-z]{3} \d{2}, \d{4})", entry)
         if occur_match:
             try:
@@ -304,7 +295,6 @@ def extract_settlement_fields(df: pd.DataFrame) -> pd.DataFrame:
     for entry in col:
         entry = str(entry).strip().strip("'")
 
-        # 1. Closed Date
         close_match = re.search(r"Closed Date:\s+\w+,\s+([A-Za-z]+ \d{2}, \d{4})", entry)
         if close_match:
             try:
@@ -315,12 +305,10 @@ def extract_settlement_fields(df: pd.DataFrame) -> pd.DataFrame:
             close_date = ''
         close_dates.append(close_date)
 
-        # 2. Settlement Amount
         amount_match = re.search(r"Amount Awarded:\s+\$([0-9,]+\.\d{2})", entry)
         amount = amount_match.group(1) if amount_match else ''
         settlement_amounts.append(amount)
 
-        # 3. Settlement Description
         desc_match = re.search(r"Description of Payment:\s+(.*)", entry)
         desc = desc_match.group(1).strip() if desc_match else ''
         settlement_descriptions.append(desc)
@@ -341,12 +329,10 @@ def extract_case_disposition(df: pd.DataFrame) -> pd.DataFrame:
     for entry in col:
         entry = str(entry).strip().strip("'")
 
-        # 1. Case Disposition
         reason_match = re.search(r"Reason:\s*(\w+)", entry)
         disposition = reason_match.group(1) if reason_match else None
         dispositions.append(disposition)
 
-        # 2. Disposition Description
         explanation_match = re.search(r"Explanation:\s*(.*)", entry)
         description = explanation_match.group(1).strip() if explanation_match else None
         descriptions.append(description)

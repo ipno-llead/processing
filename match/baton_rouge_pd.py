@@ -183,42 +183,6 @@ def match_pd_cprr_2009_v_pprr(cprr, pprr):
     cprr.loc[:, "uid"] = cprr.uid.map(lambda x: matches.get(x, x))
     return cprr
 
-
-# def match_settlements_v_pprr(settlements, pprr):
-#     dfa = (
-#         settlements[["first_name", "last_name", "uid"]]
-#         .drop_duplicates("uid")
-#         .set_index("uid", drop=True)
-#     )
-#     dfa.loc[:, "fc"] = dfa.first_name.fillna("").map(lambda x: x[:1])
-
-#     dfb = (
-#         pprr[["first_name", "last_name", "uid"]]
-#         .drop_duplicates("uid")
-#         .set_index("uid", drop=True)
-#     )
-#     dfb.loc[:, "fc"] = dfb.first_name.map(lambda x: x[:1])
-
-#     matcher = ThresholdMatcher(
-#         ColumnsIndex(["fc"]),
-#         {
-#             "last_name": JaroWinklerSimilarity(),
-#             "first_name": JaroWinklerSimilarity(),
-#         },
-#         dfa,
-#         dfb,
-#     )
-#     decision = 1
-#     matcher.save_pairs_to_excel(
-#         deba.data("match/baton_rouge_pd_settlements_2020_v_pd_pprr_2021.xlsx"), decision
-#     )
-#     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
-
-#     # cprr takes on uid from pprr whenever there is a match
-#     matches = dict(matches)
-#     settlements.loc[:, "uid"] = settlements.uid.map(lambda x: matches.get(x, x))
-#     return settlements
-
 def match_settlements_v_pprr(settlements, pprr):
     dfa = (
         settlements[["first_name", "last_name", "uid"]]

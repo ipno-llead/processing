@@ -110,17 +110,14 @@ def fuse_events(csd_pprr_17, csd_pprr_19, cprr_18, cprr_21, cprr_09, settlements
         {
             events.CLAIM_RECIEVE: {
                 "prefix": "claim_receive",
-                # "parse_date": True,
                 "keep": ["uid", "agency", "settlement_uid"],
             },
             events.CLAIM_OCCUR: {
                 "prefix": "claim_occur",
-                # "parse_date": True,
                 "keep": ["uid", "agency", "allegation_uid"],
             },
             events.CLAIM_CLOSED: {
                 "prefix": "claim_close",
-                # "parse_date": True,
                 "keep": ["uid", "agency", "settlement_uid"],
             },
         },
