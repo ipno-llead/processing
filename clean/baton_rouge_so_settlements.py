@@ -11,16 +11,13 @@ def expand_and_parse_defendants(df: pd.DataFrame) -> pd.DataFrame:
     def parse_individual(name):
         name = name.strip().strip(',')
 
-        # Handle common ranks — extend as needed
         ranks = ['Sheriff', 'Deputy', 'Detective', 'Warden']
 
-        # Try to detect rank at beginning of string
         words = name.replace(',', '').split()
         rank = ''
         first = ''
         last = ''
 
-        # If first word is a known rank
         if words and words[0] in ranks:
             rank = words[0]
             rest = words[1:]
@@ -30,14 +27,14 @@ def expand_and_parse_defendants(df: pd.DataFrame) -> pd.DataFrame:
             elif len(rest) == 1:
                 last = rest[0]
         else:
-            # No known rank — just parse name
+
             if len(words) == 2:
                 first, last = words
             elif len(words) == 1:
                 last = words[0]
 
         return {'rank_desc': rank, 'first_name': first, 'last_name': last}
-    # Expand the dataframe
+
     expanded_rows = []
     for _, row in df.iterrows():
         defendant_list = str(row['defendants']).split(';')
