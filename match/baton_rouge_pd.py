@@ -183,7 +183,6 @@ def match_pd_cprr_2009_v_pprr(cprr, pprr):
     cprr.loc[:, "uid"] = cprr.uid.map(lambda x: matches.get(x, x))
     return cprr
 
-
 def match_settlements_v_pprr(settlements, pprr):
     dfa = (
         settlements[["first_name", "last_name", "uid"]]
@@ -208,9 +207,9 @@ def match_settlements_v_pprr(settlements, pprr):
         dfa,
         dfb,
     )
-    decision = 1
+    decision = .94
     matcher.save_pairs_to_excel(
-        deba.data("match/baton_rouge_pd_settlements_2020_v_pd_pprr_2021.xlsx"), decision
+        deba.data("match/baton_rouge_pd_settlements_2023_v_pd_pprr_2021.xlsx"), decision
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
 
@@ -243,7 +242,7 @@ if __name__ == "__main__":
     )
     pprr = pd.read_csv(deba.data("clean/pprr_baton_rouge_pd_2021.csv"))
     cprr09 = pd.read_csv(deba.data("clean/cprr_baton_rouge_pd_2004_2009.csv"))
-    settlements = pd.read_csv(deba.data("clean/settlements_baton_rouge_pd_2020.csv"))
+    settlements = pd.read_csv(deba.data("clean/settlements_baton_rouge_pd_2016_2023.csv"))
     csd17 = match_csd_and_pd_pprr(csd17, pprr, 2017, 0.88)
     csd19 = match_csd_and_pd_pprr(csd19, pprr, 2019, 0.88)
     cprr18 = match_pd_cprr_2018_v_pprr(cprr18, pprr)
@@ -263,5 +262,5 @@ if __name__ == "__main__":
     pprr.to_csv(deba.data("match/pprr_baton_rouge_pd_2021.csv"), index=False)
     cprr09.to_csv(deba.data("match/cprr_baton_rouge_pd_2004_2009.csv"), index=False)
     settlements.to_csv(
-        deba.data("match/settlements_baton_rouge_pd_2020.csv"), index=False
+        deba.data("match/settlements_baton_rouge_pd_2016_2023.csv"), index=False
     )

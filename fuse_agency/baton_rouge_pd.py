@@ -110,17 +110,14 @@ def fuse_events(csd_pprr_17, csd_pprr_19, cprr_18, cprr_21, cprr_09, settlements
         {
             events.CLAIM_RECIEVE: {
                 "prefix": "claim_receive",
-                "parse_date": True,
                 "keep": ["uid", "agency", "settlement_uid"],
             },
             events.CLAIM_OCCUR: {
                 "prefix": "claim_occur",
-                "parse_date": True,
                 "keep": ["uid", "agency", "allegation_uid"],
             },
             events.CLAIM_CLOSED: {
                 "prefix": "claim_close",
-                "parse_date": True,
                 "keep": ["uid", "agency", "settlement_uid"],
             },
         },
@@ -139,7 +136,7 @@ if __name__ == "__main__":
     agency = pprr.agency[0]
     post = load_for_agency(agency)
     cprr_09 = pd.read_csv(deba.data("match/cprr_baton_rouge_pd_2004_2009.csv"))
-    settlements = pd.read_csv(deba.data("match/settlements_baton_rouge_pd_2020.csv"))
+    settlements = pd.read_csv(deba.data("match/settlements_baton_rouge_pd_2016_2023.csv"))
 
     # limit csd data to just officers found in PD roster
     csd_pprr_17.loc[:, "agency"] = "baton-rouge-pd"
