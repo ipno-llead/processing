@@ -1576,17 +1576,6 @@ def clean_23():
         .pipe(clean_disposition)
         .pipe(clean_complainant)
         .pipe(clean_empty_values)
-    #     .pipe(clean_investigation_status_21)
-    #     .pipe(float_to_int_str, ["ia_seq", "ia_year"])
-    #     .pipe(assign_tracking_id_21)
-    #     .pipe(clean_complainant_21)
-    #     .pipe(clean_allegations_21)
-    #     .pipe(clean_action_21)
-        # .pipe(parse_officer_name_21)
-        # .pipe(split_name_21)
-        # .pipe(split_department_and_division_desc_21)
-    #     .pipe(clean_disposition_21)
-    #     .pipe(consolidate_action_and_disposition_21)
         .pipe(
             standardize_desc_cols,
             [
