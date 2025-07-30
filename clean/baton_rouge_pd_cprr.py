@@ -1390,6 +1390,238 @@ def clean09():
     )
     return df
 
+def clean_investigation_status_23(df):
+    status_map = {
+        'Administrative Review': 'Administrative Review',
+        'Administrative': 'Administrative Review',
+        'Review': 'Administrative Review',
+        'Office Investigation': 'Office Investigation',
+        'Office': 'Office Investigation',
+        'Referral': 'Referral',
+    }
+    df['investigation_status'] = df['investigation_status'].map(status_map)
+    return df
+
+def split_officer_name(df):
+    def parse_officer(entry):
+        entry = str(entry).strip().replace('.', '').replace(',', ',')  # Normalize punctuation
+        department_code_match = re.search(r'(P\d{3,5})', entry)
+        department_desc_match = re.search(r'(P\d{3,5})\s+(.+)', entry)
+
+        # Default values
+        last_name, first_name, middle_name = '', '', ''
+        department_code = department_code_match.group(1) if department_code_match else ''
+        department_desc = department_desc_match.group(2).strip() if department_desc_match else ''
+
+        # Remove department info for name parsing
+        name_part = re.split(r'P\d{3,5}', entry)[0].strip()
+
+        # Comma-style: LAST, FIRST M
+        if ',' in name_part:
+            parts = [p.strip() for p in name_part.split(',')]
+            if len(parts) >= 2:
+                last_name = parts[0]
+                name_tokens = parts[1].split()
+                if len(name_tokens) >= 1:
+                    first_name = name_tokens[0]
+                if len(name_tokens) >= 2:
+                    middle_name = name_tokens[1][0]
+        else:
+            # No commas: LAST FIRST M format
+            tokens = name_part.split()
+            if len(tokens) >= 1:
+                last_name = tokens[0]
+            if len(tokens) >= 2:
+                first_name = tokens[1]
+            if len(tokens) >= 3:
+                middle_name = tokens[2][0]
+
+        return pd.Series({
+            'first_name': first_name.title(),
+            'last_name': last_name.title(),
+            'middle_name': middle_name.upper(),
+            'department_code': department_code,
+            'department_desc': department_desc
+        })
+
+    df = df.copy()
+    df = df.join(df['officer_name'].apply(parse_officer))
+    return df.drop(columns=['officer_name'])
+
+import re
+import pandas as pd
+
+def clean_action(df):
+    def normalize_action(val):
+        val = str(val).strip().lower()
+
+        # Null or empty
+        if val in ["", "-", "officer", "letter of"]:
+            return ""
+
+        # Letters
+        if "letter of reprimand" in val:
+            return "Letter of Reprimand"
+        if "letter of caution" in val:
+            return "Letter of Caution"
+
+        # Counseling
+        if "counsel" in val or "conference worksheet" in val:
+            return "Counseled"
+
+        # Termination
+        if "terminated" in val:
+            return "Termination"
+
+        # Resigned in lieu
+        if "resigned in lieu" in val:
+            return "Resigned in lieu of termination"
+
+        # Resigned
+        if "resigned" in val:
+            return "Resigned"
+
+        # Retired
+        if "retired" in val:
+            return "Retired"
+
+        # Suspensions
+        match = re.search(r'(\d+)[-\s]?day', val)
+        if match:
+            days = match.group(1)
+            return f"Suspension ({days} days)"
+
+        # 1-day cases without "suspension" keyword
+        if val.strip() in ['1-day', '1 day suspension']:
+            return "Suspension (1 days)"
+
+        # Training
+        if "training" in val or "course" in val:
+            return "Training"
+
+        # Drug/Alcohol program
+        if "rehab" in val or "drug" in val or "random" in val:
+            return "Drug/Alcohol Program"
+
+        # Office Investigation
+        if "office investigation" in val or "office - investigation" in val:
+            return "Office Investigation"
+
+        # Exonerated / Not sustained
+        if "exonerated" in val or "not sustained" in val:
+            return "Exonerated"
+
+        # Loss of unit
+        if "loss of unit" in val:
+            return "Loss of Unit"
+
+        return ""
+
+    df = df.copy()
+    df["action"] = df["action"].apply(normalize_action)
+    return df
+
+def clean_empty_values(df):
+    # Replace NaN, None, or '-' with empty string in all columns
+    return df.replace(to_replace=[np.nan, None, '-'], value='')
+
+def clean_disposition(df):
+    disposition_map = {
+        'Sustained': 'Sustained',
+        'Not Sustained': 'Not Sustained',
+        'Exonerated': 'Exonerated',
+        'Not': '',          # incomplete
+        'nan': '',          # string "nan"
+        '-': '',            # placeholder
+        '': '',             # already empty
+        None: '',           # if None appears
+        pd.NA: '',          # in case pd.NA is used
+        np.nan: '',         # if true NaN
+    }
+
+    df = df.copy()
+    df['disposition'] = df['disposition'].replace(disposition_map)
+    return df
+
+def clean_complainant(df):
+    def normalize(val):
+        val = str(val).strip().upper()
+        return 'BRPD' if val == 'BRPD' else ''
+
+    df = df.copy()
+    df['complainant'] = df['complainant'].apply(normalize)
+    return df
+
+
+def clean_23():
+    df23 = (
+        pd.read_csv(deba.data("raw/baton_rouge_pd/baton_rouge_pd_cprr_2021_2023.csv"))
+        .pipe(clean_column_names)
+        .pipe(strip_leading_commas)
+        .rename(
+            columns={
+                "status": "investigation_status",
+                "ia_seq_1": "ia_seq",
+                "received": "receive_date",
+                "complaint": "allegation",
+                "complainaint": "complainant",
+            }
+        )
+        .pipe(assign_id_num_18)
+        .pipe(clean_investigation_status_23)
+        .pipe(clean_receive_and_occur_date)
+        .pipe(clean_dates, ["receive_date", "occur_date"])
+        .pipe(split_officer_name)
+        .pipe(clean_action)
+        .pipe(clean_disposition)
+        .pipe(clean_complainant)
+        .pipe(clean_empty_values)
+    #     .pipe(clean_investigation_status_21)
+    #     .pipe(float_to_int_str, ["ia_seq", "ia_year"])
+    #     .pipe(assign_tracking_id_21)
+    #     .pipe(clean_complainant_21)
+    #     .pipe(clean_allegations_21)
+    #     .pipe(clean_action_21)
+        # .pipe(parse_officer_name_21)
+        # .pipe(split_name_21)
+        # .pipe(split_department_and_division_desc_21)
+    #     .pipe(clean_disposition_21)
+    #     .pipe(consolidate_action_and_disposition_21)
+        .pipe(
+            standardize_desc_cols,
+            [
+                "allegation",
+                "action",
+                "investigation_status",
+                "complainant",
+                "disposition",
+                "department_code",
+                "department_desc",
+            ],
+        )
+        .pipe(clean_names, ["first_name", "middle_name", "last_name"])
+        .pipe(set_values, {"agency": "baton-rouge-pd"})
+        .pipe(gen_uid, ["first_name", "last_name", "middle_name", "agency"])
+        .pipe(
+            gen_uid,
+            [
+                "action",
+                "allegation",
+                "investigation_status",
+                "disposition",
+                "occur_day",
+                "occur_year",
+                "occur_month",
+                "uid",
+            ],
+            "allegation_uid",
+        )
+        .drop_duplicates(subset=["allegation_uid"])
+    #     .pipe(drop_rows_with_allegations_empty)
+
+    )
+    return df23
+
 
 def concat():
     dfa = pd.read_csv(deba.data("clean/cprr_baton_rouge_pd_2004_2009.csv"))
@@ -1405,6 +1637,8 @@ if __name__ == "__main__":
     df09 = clean09()
     df18 = clean_18()
     df21 = clean_21()
+    df23 = clean_23()
     df09.to_csv(deba.data("clean/cprr_baton_rouge_pd_2004_2009.csv"), index=False)
     df18.to_csv(deba.data("clean/cprr_baton_rouge_pd_2018.csv"), index=False)
     df21.to_csv(deba.data("clean/cprr_baton_rouge_pd_2021.csv"), index=False)
+    df23.to_csv(deba.data("clean/cprr_baton_rouge_pd_2021_2023.csv"), index=False)
