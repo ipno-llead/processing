@@ -60,7 +60,7 @@ AWARD_RECOMMENDED = "award_recommended"
 STOP_AND_SEARCH = "stop_and_search"  # date on which stop and search occured
 
 CLAIM_MADE = "claim_made"
-CLAIM_RECIEVE = "claim_receive"
+CLAIM_RECEIVE = "claim_receive"
 CLAIM_CLOSED = "claim_closed"
 CLAIM_OCCUR = "claim_occur"
 
@@ -106,7 +106,7 @@ event_cat_type = CategoricalDtype(
         STOP_AND_SEARCH,
         DISPOSITION,
         CLAIM_MADE,
-        CLAIM_RECIEVE,
+        CLAIM_RECEIVE,
         CLAIM_CLOSED,
         CLAIM_OCCUR,
         BRADY_LIST,
@@ -349,8 +349,8 @@ class Builder(object):
                     anchor_col = "%s_datetime" % obj["prefix"]
                 else:
                     anchor_col = "%s_year" % obj["prefix"]
-                if row[anchor_col] == "" or pd.isnull(row[anchor_col]):
-                    continue
+                if anchor_col not in row or pd.isnull(row.get(anchor_col)) or row.get(anchor_col) == "":
+                    continue  # Skip rows where anchor is missing/null/blank
                 if "keep" in obj:
                     fields = dict(
                         [(k, v) for k, v in common_fields.items() if k in obj["keep"]]
