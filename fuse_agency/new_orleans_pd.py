@@ -217,7 +217,7 @@ def fuse_events(
                 "prefix": "claim_made",
                 "keep": ["uid", "agency", "property_claim_uid"],
             },
-            events.CLAIM_RECIEVE: {
+            events.CLAIM_RECEIVE: {
                 "prefix": "claim_receive",
                 "keep": ["uid", "agency", "property_claim_uid"],
             },
@@ -240,7 +240,7 @@ def fuse_events(
                 "parse_date": True,
                 "keep": ["uid", "agency", "property_claim_uid"],
             },
-            events.CLAIM_RECIEVE: {
+            events.CLAIM_RECEIVE: {
                 "prefix": "claim_receive",
                 "parse_date": True,
                 "keep": ["uid", "agency", "property_claim_uid"],
