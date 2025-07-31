@@ -61,6 +61,7 @@ STOP_AND_SEARCH = "stop_and_search"  # date on which stop and search occured
 
 CLAIM_MADE = "claim_made"
 CLAIM_RECIEVE = "claim_receive"
+CLAIM_RECEIVE = "claim_receive"  
 CLAIM_CLOSED = "claim_closed"
 CLAIM_OCCUR = "claim_occur"
 
