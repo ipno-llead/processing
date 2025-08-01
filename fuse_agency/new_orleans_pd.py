@@ -32,7 +32,7 @@ def fuse_iapro(dfa, dfb):
 
 def fuse_events(
     pprr, pprr_csd, cprr, uof, award, lprr, pclaims20, pclaims21, pprr_separations,
-    iapro, cprr_venezia, cprr_dillmann, cprr_23
+    iapro, cprr_venezia, cprr_dillmann, cprr_23, pprr_separations_25
 ):
     builder = events.Builder()
     builder.extract_events(
@@ -217,7 +217,7 @@ def fuse_events(
                 "prefix": "claim_made",
                 "keep": ["uid", "agency", "property_claim_uid"],
             },
-            events.CLAIM_RECIEVE: {
+            events.CLAIM_RECEIVE: {
                 "prefix": "claim_receive",
                 "keep": ["uid", "agency", "property_claim_uid"],
             },
@@ -240,7 +240,7 @@ def fuse_events(
                 "parse_date": True,
                 "keep": ["uid", "agency", "property_claim_uid"],
             },
-            events.CLAIM_RECIEVE: {
+            events.CLAIM_RECEIVE: {
                 "prefix": "claim_receive",
                 "parse_date": True,
                 "keep": ["uid", "agency", "property_claim_uid"],
@@ -376,6 +376,22 @@ def fuse_events(
         },
         ["uid", "allegation_uid"],
     )
+    builder.extract_events(
+        pprr_separations_25,
+        {
+            events.OFFICER_LEFT: {
+                "prefix": "left",
+                "keep": [
+                    "uid",
+                    "agency",
+                    "left_reason",
+                    "left_reason_desc",
+                    "years_of_service",
+                ],
+            },
+        },
+        ["uid", "separation_uid"],
+    )
     return builder.to_frame()
 
 
@@ -401,10 +417,10 @@ if __name__ == "__main__":
     pprr_separations = pd.read_csv(
         deba.data("match/pprr_seps_new_orleans_pd_2018_2022.csv")
     )
-
+    pprr_separations_25 = pd.read_csv(deba.data("match/pprr_seps_new_orleans_pd_2022_2025.csv"))
     cprr = pd.read_csv(deba.data("match/cprr_new_orleans_da_2016_2020.csv"))
     cprr = cprr[~((cprr.uid.fillna("") == ""))]
-    # pib = pd.read_csv(deba.data("match/cprr_new_orleans_pib_reports_2014_2020.csv"))
+    ## pib = pd.read_csv(deba.data("match/cprr_new_orleans_pib_reports_2014_2020.csv"))
     nopd_settlements = pd.read_csv(
         deba.data("clean/settlements_new_orleans_pd.csv")
     ).dropna()
@@ -430,7 +446,8 @@ if __name__ == "__main__":
         iapro,
         cprr_venezia,
         cprr_dillmann,
-        cprr_23
+        cprr_23,
+        pprr_separations_25
     )
     events_df = fuse_events(
         pprr,
@@ -445,7 +462,8 @@ if __name__ == "__main__":
         iapro,
         cprr_venezia,
         cprr_dillmann,
-        cprr_23
+        cprr_23,
+        pprr_separations_25
     )
     events_df = rearrange_event_columns(
         pd.concat([post_event, events_df])
