@@ -44,7 +44,7 @@ def fuse_events(post, cprr):
 
 if __name__ == "__main__":
     post = pd.read_csv(deba.data("clean/pprr_post_4_26_2023.csv"))
-    cprr = pd.read_csv(deba.data("clean/cprr_post_decertifications_2016_2023.csv"))
+    cprr = pd.read_csv(deba.data("match/cprr_post_decertifications_2016_2023.csv"))
     event_df = fuse_events(post, cprr)
     event_df = rearrange_event_columns(event_df)
     per_df = fuse_personnel(post, cprr)
