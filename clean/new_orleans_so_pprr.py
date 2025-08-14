@@ -202,6 +202,13 @@ def clean():
     )
     return df
 
+def clean25():
+    df25 = (
+        pd.read_csv(deba.data("raw/new_orleans_so/new_orleans_so_pprr_2025.csv"))
+        .pipe(clean_column_names)
+    )
+    return df25
+
 
 def overtime():
     df = (
@@ -226,8 +233,10 @@ def overtime():
 
 if __name__ == "__main__":
     df = clean()
+    df25 = clean25()
     overtime20 = overtime()
     df.to_csv(deba.data("clean/pprr_new_orleans_so_2021.csv"), index=False)
     overtime20.to_csv(
         deba.data("clean/pprr_overtime_new_orleans_so_2020.csv"), index=False
     )
+    df25.to_csv(deba.data("clean/pprr_new_orleans_so_2025.csv"), index=False)
