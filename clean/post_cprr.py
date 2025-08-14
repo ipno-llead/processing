@@ -241,7 +241,6 @@ def clean_agency_24(df: pd.DataFrame,
         .str.replace(r"-police-department$", "-pd", regex=True)
         .str.replace(r"-sheriff[’']?s-office$", "-so", regex=True)
 
-        # specific canonicalizations
         .str.replace(r"^orleans-constable-1st-city-court$", "orleans-constable", regex=True)
         .str.replace(r"^camerson-so$", "cameron-so", regex=True)
         .str.replace(r"^e\.-baton", "east-baton", regex=True)
@@ -266,27 +265,19 @@ def clean_agency_24(df: pd.DataFrame,
         .str.replace(r"supreme-court-of-la$", "louisiana-supreme-court", regex=True)
         .str.replace(r"^(6th-district-da-office)$", "6th-judicial-district-court", regex=True)
 
-        # a few helpful one-to-ones from your uniques
         .str.replace(r"^post$", "post", regex=True)
         .str.replace(r"^ebrs-o$", "east-baton-rouge-so", regex=True)  # safety
         .str.replace(r"^ouachita-so$", "ouachita-so", regex=True)
         .str.replace(r"^baton-rouge-airport-p\.?d\.?$", "baton-rouge-airport-pd", regex=True)
     )
 
-    # write to output column
     out = df.copy()
     out[out_col] = s
 
-    # optionally filter empty slugs
     if drop_empty:
         out = out[~(out[out_col].fillna("") == "")]
     return out
 
-# usage:
-# df24 = df24.pipe(clean_agency)                         # adds df24['agency_slug']
-# df24 = df24.pipe(clean_agency, drop_empty=False)       # keep empties for review
-# If you prefer to overwrite 'agency' like your legacy function:
-# df24 = df24.assign(agency=df24.pipe(clean_agency)[ 'agency_slug']).drop(columns=['agency_slug'])
 
 def clean24():
     df24 = (
