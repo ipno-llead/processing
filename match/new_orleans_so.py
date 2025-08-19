@@ -421,6 +421,43 @@ def match_cprr_18_w_pprr(cprr, pprr):
     cprr.loc[:, "uid"] = cprr.uid.map(lambda x: match_dict.get(x, x))
     return cprr
 
+def match_pprr_25_against_post(pprr, post):
+    dfa = pprr[["uid", "first_name", "last_name"]]
+    dfa.loc[:, "hire_date"] = combine_date_columns(
+        pprr, "hire_year", "hire_month", "hire_day"
+    )
+    dfa.loc[:, "fc"] = dfa.first_name.fillna("").map(lambda x: x[:1])
+    dfa.loc[:, "lc"] = dfa.last_name.fillna("").map(lambda x: x[:1])
+    dfa = dfa.drop_duplicates(subset=["uid"]).set_index("uid")
+
+    dfb = post[["uid", "first_name", "last_name"]]
+    dfb.loc[:, "hire_date"] = combine_date_columns(
+        post, "hire_year", "hire_month", "hire_day"
+    )
+    dfb.loc[:, "fc"] = dfb.first_name.fillna("").map(lambda x: x[:1])
+    dfb.loc[:, "lc"] = dfb.last_name.fillna("").map(lambda x: x[:1])
+    dfb = dfb.drop_duplicates(subset=["uid"]).set_index("uid")
+
+    matcher = ThresholdMatcher(
+        ColumnsIndex(["fc", "lc"]),
+        {
+            "first_name": JaroWinklerSimilarity(),
+            "last_name": JaroWinklerSimilarity(),
+            "hire_date": DateSimilarity(),
+        },
+        dfa,
+        dfb,
+        show_progress=True,
+    )
+    decision = 0.894
+    matcher.save_pairs_to_excel(
+        deba.data("match/new_orleans_so_pprr_2025_v_post_pprr_2020_11_06.xlsx"),
+        decision,
+    )
+
+    matches = matcher.get_index_pairs_within_thresholds(decision)
+    return extract_events_from_post(post, matches, "new-orleans-so")
+
 if __name__ == "__main__":
     cprr18 =  pd.read_csv(deba.data("clean/cprr_new_orleans_so_2018.csv"))
     cprr19 = pd.read_csv(deba.data("clean/cprr_new_orleans_so_2019.csv"))
@@ -430,6 +467,7 @@ if __name__ == "__main__":
     agency = cprr20.agency[0]
     post = load_for_agency(agency)
     pprr = pd.read_csv(deba.data("clean/pprr_new_orleans_so_2021.csv"))
+    pprr25 = pd.read_csv(deba.data("clean/pprr_new_orleans_so_2025.csv"))
     overtime20 = pd.read_csv(deba.data("clean/pprr_overtime_new_orleans_so_2020.csv"))
     cprr19 = deduplicate_cprr_19_personnel(cprr19)
     cprr20 = deduplicate_cprr_20_personnel(cprr20)
@@ -441,6 +479,7 @@ if __name__ == "__main__":
     cprr20 = assign_supervisor_20_uid_from_pprr(cprr20, pprr)
     overtime20 = match_overtime_w_pprr(overtime20, pprr)
     post_events = match_pprr_against_post(pprr, post)
+    pprr25 = match_pprr_25_against_post(pprr25, post)
     cprr22 = match_cprr_22_w_pprr(cprr22, pprr)
     cprr18 = match_cprr_18_w_pprr(cprr18, pprr)
     cprr18.to_csv(deba.data("match/cprr_new_orleans_so_2018.csv"), index=False)
