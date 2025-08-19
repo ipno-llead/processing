@@ -7,6 +7,9 @@ from lib.clean import (
     standardize_desc_cols,
     clean_dates,
     float_to_int_str,
+    clean_sexes,
+    clean_races,
+    clean_names,
 )
 from lib import salary
 
@@ -202,10 +205,56 @@ def clean():
     )
     return df
 
+def split_name_25(df: pd.DataFrame, col: str = "name") -> pd.DataFrame:
+    """
+    Splits a column of names in the format 'Last, First Middle' 
+    into last_name, first_name, and middle_name.
+    Returns the same DataFrame with 3 new columns.
+    """
+    # Ensure no NaNs
+    df = df.copy()
+    df[col] = df[col].fillna("")
+
+    # Split at comma into Last and the rest
+    split = df[col].str.split(",", n=1, expand=True)
+    df["last_name"] = split[0].str.strip()
+
+    # Now split the rest into first and (optional) middle
+    first_middle = split[1].str.strip().str.split(r"\s+", n=1, expand=True)
+    df["first_name"] = first_middle[0].fillna("")
+    df["middle_name"] = first_middle[1].fillna("")
+
+    return df
+
 def clean25():
     df25 = (
         pd.read_csv(deba.data("raw/new_orleans_so/new_orleans_so_pprr_2025.csv"))
         .pipe(clean_column_names)
+        .drop(columns=["position_id"])
+        .rename(
+            columns={
+                "payroll_name": "name",
+                "gender_for_insurance_coverage": "sex",
+                "race_description": "race",
+                "hire_rehire_date": "hire_date",
+                "rank_code": "rank_desc",
+                "regular_pay_rate_amount": "salary",
+                "position_status": "officer_employment_status"})
+        .pipe(clean_rank)
+        .pipe(clean_dates, ["hire_date", "birth_date"])
+        .pipe(standardize_desc_cols, ["rank_desc", "officer_employment_status"])
+        .pipe(split_name_25, col="name")
+        .drop(columns=["name"])
+        .pipe(clean_sexes, ["sex"])
+        .pipe(clean_races, ["race"])
+        .pipe(clean_names, ["first_name", "last_name", "middle_name"])
+        .pipe(clean_salaries, ["salary"])
+        .pipe(set_values, {"salary_freq": salary.HOURLY})
+        .pipe(assign_agency)
+        .pipe(
+            gen_uid,
+            ["first_name", "middle_name", "last_name", "agency"],
+        )
     )
     return df25
 
