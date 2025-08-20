@@ -5,6 +5,7 @@ from lib.clean import (
     clean_dates,
     names_to_title_case,
     standardize_desc_cols,
+    strip_leading_comma
 )
 from lib.uid import gen_uid
 import pandas as pd
@@ -259,6 +260,38 @@ def clean20():
     )
     return df[~((df.last_name.fillna("") == ""))]
 
+def clean25():
+    df = (pd.read_csv(deba.data("raw/post_council/pprr_post_8_19_2025.csv"))
+    .pipe(clean_column_names)
+    .rename(
+        columns={
+            "agency_name": "agency",
+            "lastname": "last_name",
+            "firstname": "first_name",
+            "employm_ent": "employment_status",
+            "last_pc_12_qualification": "last_pc_12_qualification_date",
+        })
+    .pipe(strip_leading_comma)
+    .pipe(clean_agency)
+    .pipe(filter_agencies)
+    .pipe(split_hire_dates)
+    .pipe(clean_names, ["first_name", "last_name", "agency"])
+    .pipe(standardize_desc_cols, ["employment_status"])
+    .pipe(fix_date_format)
+    .pipe(
+            gen_uid,
+            [
+                "agency",
+                "last_name",
+                "first_name",
+                "hire_year",
+                "hire_month",
+                "hire_day",
+            ],
+        )
+    )
+    return df 
+
 
 def concat_dfs(dfa, dfb):
     dfa_uids = [x for x in dfa["uid"]]
@@ -271,5 +304,7 @@ def concat_dfs(dfa, dfb):
 if __name__ == "__main__":
     df20 = clean20()
     df23 = clean23()
+    df25 = clean25()
     df = concat_dfs(df20, df23)
     df.to_csv(deba.data("clean/pprr_post_4_26_2023.csv"), index=False)
+    df25.to_csv(deba.data("clean/pprr_post_8_19_2025.csv"), index=False)
