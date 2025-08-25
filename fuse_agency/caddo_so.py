@@ -6,7 +6,7 @@ from lib.personnel import fuse_personnel
 from lib.post import load_for_agency
 
 
-def fuse_events(cprr, cprr19, pprr, post):
+def fuse_events(cprr, cprr19, pprr):
     builder = events.Builder()
     builder.extract_events(
         cprr,
@@ -18,26 +18,26 @@ def fuse_events(cprr, cprr19, pprr, post):
         },
         ["uid", "allegation_uid"],
     )
-    builder.extract_events(
-        post,
-        {
-            events.OFFICER_LEVEL_1_CERT: {
-                "prefix": "level_1_cert",
-                "parse_date": "%Y-%m-%d",
-                "keep": ["uid", "agency", "employment_status"],
-            },
-            events.OFFICER_HIRE: {
-                "prefix": "hire",
-                "keep": ["uid", "agency", "employment_status"],
-            },
-            events.OFFICER_PC_12_QUALIFICATION: {
-                "prefix": "last_pc_12_qualification",
-                "parse_date": "%Y-%m-%d",
-                "keep": ["uid", "agency", "employment_status"],
-            },
-        },
-        ["uid"],
-    )
+    # builder.extract_events(
+    #     post,
+    #     {
+    #         events.OFFICER_LEVEL_1_CERT: {
+    #             "prefix": "level_1_cert",
+    #             "parse_date": "%Y-%m-%d",
+    #             "keep": ["uid", "agency", "employment_status"],
+    #         },
+    #         events.OFFICER_HIRE: {
+    #             "prefix": "hire",
+    #             "keep": ["uid", "agency", "employment_status"],
+    #         },
+    #         events.OFFICER_PC_12_QUALIFICATION: {
+    #             "prefix": "last_pc_12_qualification",
+    #             "parse_date": "%Y-%m-%d",
+    #             "keep": ["uid", "agency", "employment_status"],
+    #         },
+    #     },
+    #     ["uid"],
+    # )
     builder.extract_events(
         pprr,
         {
@@ -73,10 +73,10 @@ if __name__ == "__main__":
     pprr = pd.read_csv(deba.data("match/pprr_caddo_parish_so_2020.csv"))
     agency = cprr.agency[0]
     post = load_for_agency(agency)
-    per = fuse_personnel(cprr,cprr19,post,pprr)
+    per = fuse_personnel(cprr,cprr19,pprr)
     combined_cprr = pd.concat([cprr, cprr19])
     com = rearrange_allegation_columns(combined_cprr)
-    event = fuse_events(cprr,cprr19,pprr,post)
+    event = fuse_events(cprr,cprr19,pprr)
     event.to_csv(deba.data("fuse_agency/event_caddo_so.csv"), index=False)
     com.to_csv(deba.data("fuse_agency/com_caddo_so.csv"), index=False)
     per.to_csv(deba.data("fuse_agency/per_caddo_so.csv"), index=False)
