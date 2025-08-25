@@ -44,7 +44,7 @@ def fuse_events(cprr, post):
             },
             events.OFFICER_HIRE: {
                 "prefix": "hire",
-                "parse_date": True,
+                "parse_date": "%Y-%m-%d",
                 "keep": ["uid", "agency"],
             },
         },

@@ -118,11 +118,11 @@ def match_pprr25_with_post(pprr, post):
 
 if __name__ == "__main__":
     cprr = pd.read_csv(deba.data("clean/cprr_post_decertifications_2016_2023.csv"))
-    post = pd.read_csv(deba.data("clean/pprr_post_4_26_2023.csv"))
-    pprr = pd.read_csv(deba.data("clean/pprr_post_8_19_2025.csv"))
+    post = pd.read_csv(deba.data("clean/pprr_post_8_25_2025.csv"))
+    #pprr = pd.read_csv(deba.data("clean/pprr_post_8_19_2025.csv"))
     cprr = match_cprr_with_post(cprr, post)
     cprr23 = match_cprr23_with_post(cprr, post)
     cprr25 = match_cprr25_with_post(cprr, post)
-    pprr25 = match_pprr25_with_post(pprr, post)
+    #pprr25 = match_pprr25_with_post(pprr, post)
     cprr.to_csv(deba.data("match/cprr_post_decertifications_2016_2023.csv"), index=False)
-    pprr25.to_csv(deba.data("match/pprr_post_8_19_2025.csv"), index=False)
+    #pprr25.to_csv(deba.data("match/pprr_post_8_19_2025.csv"), index=False)

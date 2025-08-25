@@ -104,8 +104,9 @@ def clean():
           .pipe(clean_dates, ["receive_date"])
           .pipe(set_values, {"agency": "caddo-so"})
           .pipe(gen_uid, ["first_name", "last_name", "agency"])
-          .pipe(gen_uid, ["tracking_id", "allegation"], "allegation_uid")
+          .pipe(gen_uid, ["tracking_id", "allegation", "receive_year", "receive_month", "receive_day"], "allegation_uid")
           .pipe(gen_uid, ["supervisor_first_name", "supervisor_last_name", "agency"], "supervisor_uid")
+          .drop_duplicates(subset=["allegation_uid"])
     )
     return df 
 
@@ -158,8 +159,9 @@ def clean_25():
             .pipe(clean_dates, ["receive_date"])
             .pipe(set_values, {"agency": "caddo-so"})
             .pipe(gen_uid, ["first_name", "last_name", "agency"])
-            .pipe(gen_uid, ["tracking_id",'first_name',"allegation"], "allegation_uid")
+            .pipe(gen_uid, ["tracking_id",'first_name',"receive_year", "receive_month", "receive_day", "allegation"], "allegation_uid")
             .pipe(gen_uid, ["supervisor_first_name", "supervisor_last_name", "agency"], "supervisor_uid")
+            .drop_duplicates(subset=["allegation_uid"])
     )
     return df
 
