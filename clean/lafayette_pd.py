@@ -9,6 +9,8 @@ from lib.clean import (
     clean_races,
     float_to_int_str,
     clean_dates,
+    standardize_desc_cols,
+    clean_salaries
 )
 from lib.uid import gen_uid
 from lib import salary
@@ -1080,11 +1082,324 @@ def clean_cprr_14():
     )
     return df
 
+import pandas as pd
+import re
+
+import pandas as pd
+import re
+
+def split_names(df: pd.DataFrame, src_col: str = "full_name", drop_src: bool = True) -> pd.DataFrame:
+    df = df.copy()
+
+    # quick normalize to avoid hidden whitespace bugs in column names
+    df.columns = df.columns.str.strip()
+
+    # case/whitespace-insensitive column resolver
+    def _resolve_col(df, target):
+        target_key = target.strip().lower()
+        lookup = {c.strip().lower(): c for c in df.columns}
+        return lookup.get(target_key)
+
+    # if already split, do nothing
+    if {"first_name", "last_name"}.issubset({c.lower() for c in df.columns}):
+        return df
+
+    # resolve source; try exact target then common fallbacks
+    src = _resolve_col(df, src_col)
+    if src is None:
+        for cand in ["name", "employee_name", "officer", "officer_name", "officer_full_name"]:
+            src = _resolve_col(df, cand)
+            if src:
+                break
+    if src is None:
+        raise KeyError(f"split_names: can't find a name column like '{src_col}'. "
+                       f"Columns present: {list(df.columns)}")
+
+    suffixes = {"JR", "SR", "II", "III", "IV"}
+
+    def parse(s):
+        if pd.isna(s):
+            return pd.Series([None, None, None])
+        s = str(s).strip()
+        parts = [p.strip() for p in s.split(",", 1)]
+        if len(parts) == 1:
+            toks = parts[0].split()
+            if not toks:
+                return pd.Series([None, None, None])
+            if len(toks) == 1:
+                return pd.Series([None, None, toks[0]])
+            first = toks[0]
+            middle = toks[1][0].replace(".", "") if len(toks) > 2 else None
+            last = toks[-1]
+            return pd.Series([first, middle, last])
+
+        last, rest = parts
+        # suffix attached to last (e.g., "ANDERSON JR")
+        last_tokens = last.split()
+        if last_tokens and last_tokens[-1].upper().strip(".") in suffixes:
+            last = f"{' '.join(last_tokens[:-1])} {last_tokens[-1].upper().strip('.')}"
+        rest_tokens = rest.split()
+        if not rest_tokens:
+            return pd.Series([None, None, last])
+        # rare: leading suffix after comma
+        if rest_tokens[0].upper().strip(".") in suffixes:
+            last = f"{last} {rest_tokens.pop(0).upper().strip('.')}"
+        # handle "A MATHEW" → first=MATHEW, middle=A
+        if len(rest_tokens) >= 2 and len(re.sub(r"\.", "", rest_tokens[0])) == 1:
+            middle = re.sub(r"\.", "", rest_tokens[0]).upper()
+            first = rest_tokens[1]
+        else:
+            first = rest_tokens[0]
+            middle = None
+            if len(rest_tokens) > 1:
+                tok = re.sub(r"\.", "", rest_tokens[1])
+                if len(tok) == 1:
+                    middle = tok.upper()
+        if middle:
+            middle = middle.replace(".", "")[:1].upper()
+        return pd.Series([first, middle, last])
+
+    df[["first_name", "middle_name", "last_name"]] = df[src].apply(parse)
+    if drop_src:
+        df = df.drop(columns=[src])
+    return df
+
+
+import pandas as pd
+import numpy as np
+
+def standardize_race(df: pd.DataFrame, src_col: str = "race", dest_col: str = "race") -> pd.DataFrame:
+    mapping = {
+        "WHT": "white",
+        "BLK": "black",
+        "AA":  "black",
+        "ASN": "asian",
+        "LAT": "latino",
+        "HIS": "hispanic",
+        "TWO": "two or More Races",
+    }
+
+    def _norm(x):
+        if pd.isna(x):
+            return "Unknown"
+        key = str(x).strip().upper()
+        return mapping.get(key, "Unknown")
+
+    df = df.copy()
+    df[dest_col] = df[src_col].apply(_norm)
+    return df
+
+def clean_rank_desc(df, col="rank_desc"):
+    mapping = {
+        # sworn
+        "chief of police": "chief",
+        "deputy chief of police": "deputy chief",
+        "police major": "major",
+        "police captain": "captain",
+        "police lieutenant": "lieutenant",
+        "police sergeant": "sergeant",
+        "police senior corporal": "senior corporal",
+        "police corporal": "corporal",
+        "police officer": "officer",
+        "differential response officer": "officer",
+
+        # civilian / clerical
+        "school crossing guard": "crossing guard",
+        "janitor": "janitor",
+        "budget analyst": "budget analyst",
+        "receptionist": "receptionist",
+        "maintenance supervisor": "maintenance supervisor",
+        "secretary to police chief": "secretary",
+        "accrediation assistant": "accreditation assistant",
+        "dept rec clerk-level ii": "records clerk",
+        "police dept records clerk": "records clerk",
+        "dept records clerk ii": "records clerk",
+        "police comm officer": "communications officer",
+        "police comm shift supv": "communications supervisor",
+        "police supply officer": "supply officer",
+    }
+
+    df = df.copy()
+    df[col] = (
+        df[col]
+        .str.strip()
+        .str.lower()
+        .map(mapping)
+        .fillna(df[col].str.strip().str.lower())  # fallback: cleaned original
+    )
+    return df
+
+def clean_employment_status(df, col="employment_status"):
+    mapping = {
+        "active full-time": "active",
+        "active part-time": "active",
+        "active retiree": "active",
+        "terminated": "terminated",
+        "retired": "retired",
+        "non paid military leave": "leave",
+        "fire/police classified": "active",  # could also mark as "classified"
+    }
+
+    df = df.copy()
+    df[col] = (
+        df[col]
+        .str.strip()
+        .str.lower()
+        .map(mapping)
+        .fillna(df[col].str.strip().str.lower())  # fallback if new values appear
+    )
+    return df
+
+def clean_pprr_2020():
+    df = (
+        pd.read_csv(deba.data("raw/lafayette_pd/lafayette_pd_pprr_2020.csv"))
+        .pipe(clean_column_names)
+        .rename(columns={"eeo_class": "race", "gender": "sex", "position_description": "rank_desc", "emp_status": "employment_status", "date_hired": "hire_date", "term_date": "termination_date", "base_salary": "salary"})
+        .drop(columns=["department", "overtime", "gross_annual"])
+        .pipe(split_names)
+        .pipe(clean_names, ["first_name", "last_name", "middle_name"])
+        .pipe(standardize_race)
+        .pipe(clean_sexes, ["sex"])
+        .pipe(standardize_desc_cols, ["rank_desc", "employment_status"])
+        .pipe(clean_rank_desc)
+        .pipe(clean_employment_status)
+        .pipe(clean_dates, ["hire_date", "termination_date"])
+        .pipe(clean_salaries, ["salary"])
+        .pipe(
+            set_values,
+            {
+                "salary_freq": salary.YEARLY,
+                "data_production_year": "2025",
+                "agency": "lafayette-pd",
+            },
+        )
+        .pipe(gen_uid, ["agency", "first_name", "last_name"])
+    )
+    return df 
+
+def clean_pprr_2021():
+    df = (
+        pd.read_csv(deba.data("raw/lafayette_pd/lafayette_pd_pprr_2021.csv"))
+        .pipe(clean_column_names)
+        .rename(columns={"eeo_class": "race", "gender": "sex", "position_description": "rank_desc", "emp_status": "employment_status", "date_hired": "hire_date", "term_date": "termination_date", "base_salary": "salary"})
+        .drop(columns=["department", "overtime", "gross_annual"])
+        .pipe(split_names)
+        .pipe(clean_names, ["first_name", "last_name", "middle_name"])
+        .pipe(standardize_race)
+        .pipe(clean_sexes, ["sex"])
+        .pipe(standardize_desc_cols, ["rank_desc", "employment_status"])
+        .pipe(clean_rank_desc)
+        .pipe(clean_employment_status)
+        .pipe(clean_dates, ["hire_date", "termination_date"])
+        .pipe(clean_salaries, ["salary"])
+        .pipe(
+            set_values,
+            {
+                "salary_freq": salary.YEARLY,
+                "data_production_year": "2025",
+                "agency": "lafayette-pd",
+            },
+        )
+        .pipe(gen_uid, ["agency", "first_name", "last_name"])
+    )
+    return df 
+
+def clean_pprr_2022():
+    df = (
+        pd.read_csv(deba.data("raw/lafayette_pd/lafayette_pd_pprr_2022.csv"))
+        .pipe(clean_column_names)
+        .rename(columns={"eeo_class": "race", "gender": "sex", "position_description": "rank_desc", "emp_status": "employment_status", "date_hired": "hire_date", "term_date": "termination_date", "base_salary": "salary"})
+        .drop(columns=["department", "overtime", "gross_annual"])
+        .pipe(split_names)
+        .pipe(clean_names, ["first_name", "last_name", "middle_name"])
+        .pipe(standardize_race)
+        .pipe(clean_sexes, ["sex"])
+        .pipe(standardize_desc_cols, ["rank_desc", "employment_status"])
+        .pipe(clean_rank_desc)
+        .pipe(clean_employment_status)
+        .pipe(clean_dates, ["hire_date", "termination_date"])
+        .pipe(clean_salaries, ["salary"])
+        .pipe(
+            set_values,
+            {
+                "salary_freq": salary.YEARLY,
+                "data_production_year": "2025",
+                "agency": "lafayette-pd",
+            },
+        )
+        .pipe(gen_uid, ["agency", "first_name", "last_name"])
+    )
+    return df 
+
+def clean_pprr_2023():
+    df = (
+        pd.read_csv(deba.data("raw/lafayette_pd/lafayette_pd_pprr_2023.csv"))
+        .pipe(clean_column_names)
+        .rename(columns={"eeo_class": "race", "gender": "sex", "position_description": "rank_desc", "emp_status": "employment_status", "date_hired": "hire_date", "term_date": "termination_date", "base_salary": "salary"})
+        .drop(columns=["department", "overtime", "gross_annual"])
+        .pipe(split_names)
+        .pipe(clean_names, ["first_name", "last_name", "middle_name"])
+        .pipe(standardize_race)
+        .pipe(clean_sexes, ["sex"])
+        .pipe(standardize_desc_cols, ["rank_desc", "employment_status"])
+        .pipe(clean_rank_desc)
+        .pipe(clean_employment_status)
+        .pipe(clean_dates, ["hire_date", "termination_date"])
+        .pipe(clean_salaries, ["salary"])
+        .pipe(
+            set_values,
+            {
+                "salary_freq": salary.YEARLY,
+                "data_production_year": "2025",
+                "agency": "lafayette-pd",
+            },
+        )
+        .pipe(gen_uid, ["agency", "first_name", "last_name"])
+    )
+    return df 
+
+def clean_pprr_2024():
+    df = (
+        pd.read_csv(deba.data("raw/lafayette_pd/lafayette_pd_pprr_2024.csv"))
+        .pipe(clean_column_names)
+        .rename(columns={"eeo_class": "race", "gender": "sex", "position_description": "rank_desc", "emp_status": "employment_status", "date_hired": "hire_date", "term_date": "termination_date", "base_salary": "salary"})
+        .drop(columns=["department", "overtime", "gross_annual"])
+        .pipe(split_names)
+        .pipe(clean_names, ["first_name", "last_name", "middle_name"])
+        .pipe(standardize_race)
+        .pipe(clean_sexes, ["sex"])
+        .pipe(standardize_desc_cols, ["rank_desc", "employment_status"])
+        .pipe(clean_rank_desc)
+        .pipe(clean_employment_status)
+        .pipe(clean_dates, ["hire_date", "termination_date"])
+        .pipe(clean_salaries, ["salary"])
+        .pipe(
+            set_values,
+            {
+                "salary_freq": salary.YEARLY,
+                "data_production_year": "2025",
+                "agency": "lafayette-pd",
+            },
+        )
+        .pipe(gen_uid, ["agency", "first_name", "last_name"])
+    )
+    return df 
 
 if __name__ == "__main__":
     pprr = clean_pprr()
+    pprr20 = clean_pprr_2020()
+    pprr21 = clean_pprr_2021()
+    pprr22 = clean_pprr_2022()
+    pprr23 = clean_pprr_2023()
+    pprr24 = clean_pprr_2024()
     cprr_20 = clean_cprr_20()
     cprr_14 = clean_cprr_14()
     cprr_20.to_csv(deba.data("clean/cprr_lafayette_pd_2015_2020.csv"), index=False)
     cprr_14.to_csv(deba.data("clean/cprr_lafayette_pd_2009_2014.csv"), index=False)
     pprr.to_csv(deba.data("clean/pprr_lafayette_pd_2010_2021.csv"), index=False)
+    pprr20.to_csv(deba.data("clean/pprr_lafayette_pd_2020.csv"), index=False)
+    pprr21.to_csv(deba.data("clean/pprr_lafayette_pd_2021.csv"), index=False)
+    pprr22.to_csv(deba.data("clean/pprr_lafayette_pd_2022.csv"), index=False)
+    pprr23.to_csv(deba.data("clean/pprr_lafayette_pd_2023.csv"), index=False)
+    pprr24.to_csv(deba.data("clean/pprr_lafayette_pd_2024.csv"), index=False)
+    
