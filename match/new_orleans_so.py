@@ -449,9 +449,9 @@ def match_pprr_25_against_post(pprr, post):
         dfb,
         show_progress=True,
     )
-    decision = 0.894
+    decision = 0.80
     matcher.save_pairs_to_excel(
-        deba.data("match/new_orleans_so_pprr_2025_v_post_pprr_2020_11_06.xlsx"),
+        deba.data("match/new_orleans_so_pprr_2025_v_post_pprr_2025_08_25.xlsx"),
         decision,
     )
 
@@ -478,8 +478,10 @@ if __name__ == "__main__":
     cprr19 = assign_supervisor_19_uid_from_pprr(cprr19, pprr)
     cprr20 = assign_supervisor_20_uid_from_pprr(cprr20, pprr)
     overtime20 = match_overtime_w_pprr(overtime20, pprr)
-    post_events = match_pprr_against_post(pprr, post)
-    pprr25 = match_pprr_25_against_post(pprr25, post)
+    post_events_21 = match_pprr_against_post(pprr, post)
+    post_events_25 = match_pprr_25_against_post(pprr25, post)
+    post_events = pd.concat([post_events_21, post_events_25], ignore_index=True)
+    post_events = post_events.drop_duplicates(subset=["event_uid"], keep="first")
     cprr22 = match_cprr_22_w_pprr(cprr22, pprr)
     cprr18 = match_cprr_18_w_pprr(cprr18, pprr)
     cprr18.to_csv(deba.data("match/cprr_new_orleans_so_2018.csv"), index=False)

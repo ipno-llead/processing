@@ -7,7 +7,7 @@ from lib import events
 from lib.post import load_for_agency
 
 
-def fuse_events(cprr19, cprr20, cprr21, pprr, overtime20, cprr22, cprr18):
+def fuse_events(cprr19, cprr20, cprr21, pprr, overtime20, cprr22, cprr18, pprr25):
     builder = events.Builder()
     builder.extract_events(
         cprr19,
@@ -272,6 +272,16 @@ def fuse_events(cprr19, cprr20, cprr21, pprr, overtime20, cprr22, cprr18):
         },
         ["uid", "allegation_uid"],
     )
+    builder.extract_events(
+        pprr25,
+        {
+            events.OFFICER_HIRE: {
+                "prefix": "hire",
+                "keep": ["uid", "agency", "rank_desc"],
+            }
+        },
+        ["uid"],
+    )
     return builder.to_frame()
 
 
@@ -283,11 +293,12 @@ if __name__ == "__main__":
     cprr21 = pd.read_csv(deba.data("match/cprr_new_orleans_so_2021.csv"))
     cprr22 = pd.read_csv(deba.data("match/cprr_new_orleans_so_2022.csv"))
     pprr = pd.read_csv(deba.data("clean/pprr_new_orleans_so_2021.csv"))
+    pprr25 = pd.read_csv(deba.data("clean/pprr_new_orleans_so_2025.csv"))
     overtime20 = pd.read_csv(deba.data("match/pprr_overtime_new_orleans_so_2020.csv"))
     agency = pprr.agency[0]
     post = load_for_agency(agency)
-    personnel_df = fuse_personnel(cprr20, cprr19, cprr21, pprr, post, overtime20, cprr22, cprr18)
-    events_df = fuse_events(cprr19, cprr20, cprr21, pprr, overtime20, cprr22, cprr18)
+    personnel_df = fuse_personnel(cprr20, cprr19, cprr21, pprr, post, overtime20, cprr22, cprr18, pprr25)
+    events_df = fuse_events(cprr19, cprr20, cprr21, pprr, overtime20, cprr22, cprr18, pprr25)
     events_df = rearrange_event_columns(pd.concat([post_events, events_df]))
     complaint_df = rearrange_allegation_columns(pd.concat([cprr19, cprr20, cprr21, cprr22, cprr18], axis=0))
     personnel_df.to_csv(deba.data("fuse_agency/per_new_orleans_so.csv"), index=False)
