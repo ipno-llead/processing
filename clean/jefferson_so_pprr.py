@@ -2,7 +2,7 @@ import deba
 import pandas as pd
 from lib.columns import clean_column_names, set_values
 from lib.uid import gen_uid
-from lib.clean import standardize_from_lookup_table
+from lib.clean import standardize_from_lookup_table, strip_leading_comma, clean_salaries
 
 
 dept_desc_lookup_table = [
@@ -301,6 +301,119 @@ def clean():
     return df
 
 
+def split_name_columns(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Splits 'name' column in format 'Last, First Middle'
+    into lowercase first_name, middle_name, last_name.
+    Drops the original 'name' column.
+    """
+    def split_name(name: str):
+        if pd.isna(name):
+            return pd.Series(["", "", ""])
+        
+        # split into last and the rest
+        if "," in name:
+            last, rest = name.split(",", 1)
+            parts = rest.strip().split()
+            first = parts[0] if len(parts) > 0 else ""
+            middle = " ".join(parts[1:]) if len(parts) > 1 else ""
+        else:
+            # fallback if no comma
+            parts = name.split()
+            first = parts[0] if len(parts) > 0 else ""
+            middle = " ".join(parts[1:-1]) if len(parts) > 2 else ""
+            last = parts[-1] if len(parts) > 1 else ""
+        
+        return pd.Series([first.lower(), middle.lower(), last.lower()])
+
+    df[["first_name", "middle_name", "last_name"]] = df["name"].apply(split_name)
+    return df.drop(columns=["name"])
+
+def split_hire_date(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Extracts hire_year, hire_month, hire_day from 'date_of_hire' regardless of
+    stray characters. Expects a YYYYMMDD somewhere in the cell.
+    Non-matching rows become <NA>. Drops original 'date_of_hire'.
+    """
+    # ensure string
+    s = df["date_of_hire"].astype(str).str.strip()
+
+    # extract strictly YYYY MM DD anywhere in the string
+    parts = s.str.extract(r"(?P<year>\d{4})(?P<month>\d{2})(?P<day>\d{2})")
+
+    # coerce to numbers with nullable Int64
+    df["hire_year"]  = pd.to_numeric(parts["year"], errors="coerce").astype("Int64")
+    df["hire_month"] = pd.to_numeric(parts["month"], errors="coerce").astype("Int64")
+    df["hire_day"]   = pd.to_numeric(parts["day"], errors="coerce").astype("Int64")
+
+    # optional: zero out impossible dates like 0000-00-00 -> <NA>
+    mask_zero = (df["hire_year"] == 0) | (df["hire_month"] == 0) | (df["hire_day"] == 0)
+    df.loc[mask_zero, ["hire_year", "hire_month", "hire_day"]] = pd.NA
+
+    # drop original column
+    return df.drop(columns=["date_of_hire"])
+
+import pandas as pd
+
+def clean_rank_jpso(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Standardize JPSO rank codes to lowercase full words.
+    Known ranks are expanded; uncertain values (CVxx, numbers, 'Civil', blanks, 'LE')
+    are set to <NA>. Rewrites the 'rank' column in-place.
+    """
+    s = df["rank"].astype("string")
+
+    norm = (
+        s.str.strip()
+         .str.upper()
+         .str.replace(".", "", regex=False)  # 'Lt.' -> 'LT'
+    )
+
+    known_map = {
+        "DEP":  "deputy",
+        "SGT":  "sergeant",
+        "LT":   "lieutenant",
+        "DET":  "detective",
+        "CAPT": "captain",
+        "MAJ":  "major",
+        "SHER": "sheriff",
+        "CH":   "chief",
+    }
+
+    out = norm.map(known_map)
+
+    uncertain = (
+        norm.isna()
+        | (norm == "")
+        | norm.str.fullmatch(r"CV\d+")   # CV25, CV41, CV44
+        | norm.str.contains(r"/")        # 248/274
+        | norm.str.fullmatch(r"\d+")     # 121
+        | norm.isin(["CIVIL", "LE"])     # division/ambiguous
+    )
+
+    out = out.mask(uncertain, '')
+
+    df["rank"] = out
+    return df
+
+def clean_25():
+    df = (
+        pd.read_csv(deba.data("raw/jefferson_so/jpso_pprr_2025.csv"))
+        .pipe(clean_column_names)
+        .pipe(strip_leading_comma)
+        .pipe(split_name_columns)
+        .pipe(split_hire_date)
+        .pipe(clean_rank_jpso)
+        .pipe(set_values, {"agency": "jefferson-so", "salary_freq": "annual"})
+        .pipe(
+            gen_uid, ["agency", "first_name", "middle_name", "last_name"]
+        )
+    )
+    return df
+
+
 if __name__ == "__main__":
     df = clean()
+    df25 = clean_25()
     df.to_csv(deba.data("clean/pprr_jefferson_so_2020.csv"), index=False)
+    df25.to_csv(deba.data("clean/pprr_jefferson_so_2025.csv"), index=False)

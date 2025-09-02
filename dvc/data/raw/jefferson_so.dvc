@@ -1,6 +1,6 @@
 wdir: ../../../data/raw
 outs:
-- md5: 0fb5dcf437024b948bf8d1fe1599a38c.dir
-  size: 78680
-  nfiles: 1
+- md5: c93ed0be755b53b2a3e6cd179de52cf6.dir
+  size: 143411
+  nfiles: 2
   path: jefferson_so
