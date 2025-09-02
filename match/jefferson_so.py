@@ -53,12 +53,40 @@ def extract_post_events(pprr, post):
 
     return extract_events_from_post(post, matches, "jefferson-so")
 
+def extract_post_events(pprr25, post):
+    dfa = pprr25[["uid", "first_name", "last_name"]]
+    dfa = dfa.drop_duplicates(subset=["uid"]).set_index("uid")
+    dfa.loc[:, "fc"] = dfa.first_name.fillna("").map(lambda x: x[:1])
+
+    dfb = post[["uid", "first_name", "last_name"]]
+    dfb = dfb.drop_duplicates(subset=["uid"]).set_index("uid")
+    dfb.loc[:, "fc"] = dfb.first_name.fillna("").map(lambda x: x[:1])
+
+    matcher = ThresholdMatcher(
+        ColumnsIndex("fc"),
+        {"first_name": JaroWinklerSimilarity(), "last_name": JaroWinklerSimilarity()},
+        dfa,
+        dfb,
+    )
+    decision = 0.93
+    matcher.save_pairs_to_excel(
+        deba.data("match/pprr_jefferson_so_2025_pprr_v_post_08_25_2025.xlsx"),
+        decision,
+    )
+    matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
+
+    return extract_events_from_post(post, matches, "jefferson-so")
+
 
 if __name__ == "__main__":
     pprr = pd.read_csv(deba.data("clean/pprr_jefferson_so_2020.csv"))
+    pprr25 = pd.read_csv(deba.data("clean/pprr_jefferson_so_2025.csv"))
     agency = pprr.agency[0]
     post = load_for_agency(agency)
-    post_events = extract_post_events(pprr, post)
+    post_events_20 = extract_post_events(pprr, post)
+    post_events_25 = extract_post_events(pprr25, post)
+    post_events = pd.concat([post_events_20, post_events_25]).drop_duplicates()
     # pprr = deduplicate_pprr(pprr)
     post_events.to_csv(deba.data("match/post_event_jefferson_so_2020.csv"), index=False)
     pprr.to_csv(deba.data("match/pprr_jefferson_so_2020.csv"), index=False)
+    pprr25.to_csv(deba.data("match/pprr_jefferson_so_2025.csv"), index=False)
