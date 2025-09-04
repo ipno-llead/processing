@@ -1,12 +1,12 @@
 import pandas as pd
 import deba
-from lib.columns import rearrange_allegation_columns, rearrange_citizen_columns, rearrange_use_of_force, rearrange_settlement_columns
+from lib.columns import rearrange_allegation_columns, rearrange_citizen_columns, rearrange_use_of_force, rearrange_settlement_columns, rearrange_stop_and_search_columns
 from lib.personnel import fuse_personnel
 from lib.post import load_for_agency
 from lib import events
 
 
-def fuse_events(cprr_15, cprr_18, cprr_21, post, uof, settlement):
+def fuse_events(cprr_15, cprr_18, cprr_21, post, uof, settlement,sas):
     builder = events.Builder()
     builder.extract_events(
         cprr_15,
@@ -102,6 +102,20 @@ def fuse_events(cprr_15, cprr_18, cprr_21, post, uof, settlement):
         },
         ["uid", "settlement_uid"],
     )
+    builder.extract_events(
+        sas,        
+        {
+            events.STOP_AND_SEARCH: {
+                'prefix': "stop",
+                "keep": [
+                    "uid",
+                    "stop_and_search_uid",
+                    "agency",
+                ],
+        },
+        },
+        ["uid", "stop_and_search_uid"],
+    )
     return builder.to_frame()
 
 
@@ -114,11 +128,13 @@ if __name__ == "__main__":
     citizen_df20 = pd.read_csv(deba.data("clean/cprr_cit_baton_rouge_so_2016_2020.csv"))
     uof = pd.read_csv(deba.data("match/uof_baton_rouge_so_2020.csv"))
     settlement = pd.read_csv(deba.data("match/settlements_baton_rouge_so_2021_2023.csv"))
+    sas = pd.read_csv(deba.data("match/sas_baton_rouge_so_2023_2025.csv"))
     settlement = rearrange_settlement_columns(settlement)
+    sas = rearrange_stop_and_search_columns(sas)
     agency = cprr_20.agency[0]
     post = load_for_agency(agency)
     personnel_df = fuse_personnel(cprr_15, cprr_18, cprr_20, post, uof)
-    event_df = fuse_events(cprr_15, cprr_18, cprr_20, post, uof, settlement)
+    event_df = fuse_events(cprr_15, cprr_18, cprr_20, post, uof, settlement, sas)
     complaint_df = rearrange_allegation_columns(pd.concat([cprr_15, cprr_18, cprr_20], axis=0))
     citizen_df = rearrange_citizen_columns(
         pd.concat([citizen_df15, citizen_df18, citizen_df20])
@@ -130,3 +146,4 @@ if __name__ == "__main__":
     citizen_df.to_csv(deba.data("fuse_agency/cit_baton_rouge_so.csv"), index=False)
     uof.to_csv(deba.data("fuse_agency/uof_baton_rouge_so.csv"), index=False)
     settlement.to_csv(deba.data("fuse_agency/settlements_baton_rouge_so.csv"), index=False)
+    sas.to_csv(deba.data("fuse_agency/sas_baton_rouge_so.csv"), index=False)
