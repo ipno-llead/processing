@@ -188,6 +188,9 @@ def fuse_stop_and_search():
             [
                 pd.read_csv(
                     deba.data("fuse_agency/sas_new_orleans_pd.csv"),
+                ),
+                pd.read_csv(
+                    deba.data("fuse_agency/sas_baton_rouge_so.csv"),
                 )
             ]
         )
