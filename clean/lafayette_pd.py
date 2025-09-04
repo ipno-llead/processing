@@ -9,6 +9,7 @@ from lib.clean import (
     clean_races,
     float_to_int_str,
     clean_dates,
+    strip_leading_comma
 )
 from lib.uid import gen_uid
 from lib import salary
@@ -1080,11 +1081,876 @@ def clean_cprr_14():
     )
     return df
 
+import re
+
+def clean_tracking_id_25(df: pd.DataFrame, col: str = "tracking_id_og") -> pd.DataFrame:
+    def _clean(val: str) -> str:
+        if pd.isna(val):
+            return val
+        val = str(val).strip().lstrip("'\\").rstrip()
+
+        # remove stray commas, periods, multiple spaces
+        val = re.sub(r"[ ,\.]+", "-", val)
+
+        # fix common OCR/typo errors
+        val = re.sub(r"^5L", "SL", val, flags=re.IGNORECASE)
+        val = re.sub(r"^S1", "SL", val, flags=re.IGNORECASE)
+        val = re.sub(r"^S0", "SO", val, flags=re.IGNORECASE)
+        val = re.sub(r"^A0", "AD", val, flags=re.IGNORECASE)
+        val = re.sub(r"^SC0", "SC", val, flags=re.IGNORECASE)
+        val = re.sub(r"^SLO", "SL0", val, flags=re.IGNORECASE)
+        val = re.sub(r"^SCD", "SC", val, flags=re.IGNORECASE)
+
+        # collapse multiple dashes/spaces
+        val = re.sub(r"[-\s]+", "-", val)
+
+        # all lowercase
+        val = val.lower()
+
+        return val
+
+    df = df.copy()
+    df["tracking_id_og"] = df[col].apply(_clean)
+    return df
+
+def clean_complaint(df: pd.DataFrame, col: str = "complaint") -> pd.DataFrame:
+    def _clean(val: str) -> str:
+        if pd.isna(val):
+            return val
+        val = str(val).strip().lstrip("'").rstrip()
+
+        # normalize spacing and punctuation
+        val = re.sub(r"[\.]+", " ", val)          # remove stray periods
+        val = re.sub(r"\s{2,}", " ", val)         # collapse multiple spaces
+        val = val.strip().lower()
+
+        # standardize common variations / typos
+        replacements = {
+            "prof conduct": "professional conduct",
+            "prof cond": "professional conduct",
+            "prof": "professional conduct",
+            "poot conduct": "professional conduct",
+            "general conduct professional conduct": "professional conduct",
+            "professional conduct and responsibilities": "professional conduct",
+            "professional conduct/insubordination": "professional conduct / insubordination",
+            "professional conduct / insubordination": "professional conduct / insubordination",
+            "professional conduct/owi": "professional conduct / owi",
+            "bwc": "body worn camera",
+            "uof": "use of force",
+            "ois": "officer involved shooting",
+            "o.i.s": "officer involved shooting",
+            "improper search": "improper search",
+            "improper supervision": "improper supervision",
+            "rude and unprof": "rude and unprofessional",
+            "unauthoried absence": "unauthorized absence",
+            "absent w/o approved leave": "unauthorized absence",
+            "left stift e.rly": "left shift early",
+            "left shat early": "left shift early",
+            "misuse of sick leave": "sick leave misuse",
+            "abuse of sick leave": "sick leave misuse",
+            "drug screen policy": "drug screening policy",
+            "cubo": "conduct unbecoming an officer",
+            "payroll fraud": "payroll fraud",
+            "retail theft": "theft",
+            "sexual harassment": "sexual harassment",
+            "left stift e rly": "left shift early",
+        }
+        for k, v in replacements.items():
+            if val == k:
+                val = v
+
+        return val
+
+    df = df.copy()
+    df["allegation"] = df[col].apply(_clean)
+    return df.drop(columns=[col])
+
+def clean_allegation_from_complainant(df: pd.DataFrame, col: str = "complainant") -> pd.DataFrame:
+    def _clean(val: str) -> str:
+        if pd.isna(val):
+            return val
+        val = str(val).strip().lstrip("'").rstrip()
+
+        # drop if it looks like a date
+        if re.match(r"^\d{1,2}/\d{1,2}/\d{4}$", val):
+            return None
+
+        val = val.lower()
+        val = re.sub(r"\s{2,}", " ", val)
+
+        # standardize common variations
+        replacements = {
+            "prof conduct": "professional conduct",
+            "prof. conduct": "professional conduct",
+            "prof. conduct & responsibilities": "professional conduct",
+            "prof conduct/arrest": "professional conduct / arrest",
+            "prof conduct/social media": "professional conduct / social media",
+            "prof conduct/handling of evidence": "professional conduct / handling of evidence",
+            "cubo": "conduct unbecoming an officer",
+            "ois": "officer involved shooting",
+            "response to resistance / use of force": "use of force",
+            "discharge of firearm / use of force": "use of force",
+            "excessive force": "excessive force",
+            "att. to duty": "attention to duty",
+            "attention to duty operation of police vehicles emergency vehicles; exemptions": "attention to duty",
+        }
+        for k, v in replacements.items():
+            if val == k:
+                val = v
+
+        return val
+
+    df = df.copy()
+    df["allegation_desc"] = df[col].apply(_clean)
+    return df.drop(columns=[col])
+
+def clean_disposition_simple(df: pd.DataFrame, col: str = "disposition") -> pd.DataFrame:
+    """
+    Standard text cleaning for disposition values (single output column).
+    - lowercase
+    - strip leading quotes
+    - fix common typos/abbrevs
+    - normalize separators to '; '
+    - normalize suspension forms to: 'suspension (N days)'
+    - trim extra whitespace
+    writes: 'disposition_std'
+    """
+    df = df.copy()
+
+    # compile reusable regex
+    ws_multi = re.compile(r"\s+")
+    leading_quotes = re.compile(r"^'+")
+    paren_names = re.compile(r"\([^)]*\)")  # drops parenthetical name lists, if present
+
+    # pairs of (pattern, replacement) applied in order
+    replacements = [
+        # normalize separators first
+        (r"[|/,]+", ";"),
+        (r";{2,}", ";"),
+        (r"\s*;\s*", "; "),
+
+        # strip obvious noise
+        (r"\b\(all\)\b|\b\(s\)\b", ""),
+        (r"\buse of force\b", "use of force"),  # keep if present
+        (r"\bois\b", "officer involved shooting"),
+        (r"\bjustified uof\b", "justified"),
+        (r"\bexonerated\s+justified(?:\s+use of force)?\b", "exonerated; justified"),
+
+        # findings
+        (r"\bnon[ -]?sustained\b", "not sustained"),
+        (r"\bnot\s*sust\w*\b", "not sustained"),
+        (r"\bsustainet\b|\bsustened\b|\bsustamed\b|\bsastasned\b", "sustained"),
+        (r"\bnet sustained\b|\bout sustained\b|\bout sustand\b", "not sustained"),
+        (r"\bexonerated\b", "exonerated"),
+        (r"\bunfounded\b", "unfounded"),
+        (r"\bpending\b", "pending"),
+        (r"\bjustified\b", "justified"),
+
+        # actions / documents
+        (r"\blor\b|\bl\.?o\.?r\.?\b|\bletter of reprimand\b", "letter of reprimand"),
+        (r"\bloc\b", "letter of counseling"),
+        (r"\bcf\b|\bc\/?f\b", "counseling form"),
+        (r"\bcouns\w*\b|\bcours?il\w*\b", "counseling form"),
+        (r"\bperformance\s*log\b|\bpent\.?\s*log\b|\bpert\.?\s*cog\b|\bperf\.?\s*log\b|\bpent\.?\s*log\b", "performance log"),
+        (r"\bdefic\w*\b", "deficiency"),
+        (r"\bno further action\b", "no further action"),
+        (r"\beap\b", "eap counseling"),
+        (r"\bspecial eval\b", "special evaluation"),
+        (r"\bloss of extra duty\b", "loss of extra duty"),
+        (r"\bdemontion\b", "demotion"),
+
+        # employment outcomes
+        (r"\bterminated\b", "termination"),
+        (r"\btermination\b", "termination"),
+        (r"\bresigned\s*\(in lieu of termination\)\b", "resigned (in lieu of termination)"),
+        (r"\bresigned\s*under investigation\b", "resigned (under investigation)"),
+        (r"\bresigned\b", "resigned"),
+
+        # suspension normalization
+        (r"\bsus\.?\b|\bsuspen\w*\b", "suspension"),
+        (r"\b(\d+)\s*day[s]?\b", r"\1 days"),
+        (r"\b(\d+)\s*days\s*suspension\b", r"suspension (\1 days)"),
+        (r"suspension\s*\((\d+)\s*days?\)", r"suspension (\1 days)"),
+        (r"suspension\s*(\d+)\b", r"suspension (\1 days)"),
+        (r"\b(\d+)\s*days\b(?=.*suspension)", r"\1 days"),  # keep days if suspension elsewhere
+    ]
+
+    def _clean_one(x):
+        if pd.isna(x):
+            return pd.NA
+        s = str(x).lower().strip()
+        s = leading_quotes.sub("", s)
+        s = paren_names.sub("", s)
+
+        # unify separators early to make patterns simpler
+        s = re.sub(r"[–—-]/", ";", s)
+        s = re.sub(r"[–—-]", " - ", s)  # normalize weird dashes to spaces
+
+        # apply replacements
+        for pat, repl in replacements:
+            s = re.sub(pat, repl, s)
+
+        # collapse multiple separators/spaces
+        s = re.sub(r"\s*;\s*", "; ", s)
+        s = re.sub(r";\s*;", "; ", s)
+        s = ws_multi.sub(" ", s).strip(" ;")
+
+        return s or pd.NA
+
+    df["disposition_std"] = df[col].apply(_clean_one)
+    return df
+
+import pandas as pd
+import re
+
+def clean_disposition_inplace(df: pd.DataFrame, col: str = "disposition") -> pd.DataFrame:
+    """
+    Clean and standardize a free-text disposition column IN PLACE.
+    - lowercase
+    - strip leading quotes
+    - normalize separators to '; '
+    - fix common typos/abbreviations
+    - normalize suspension syntax to 'suspension (N days)'
+    - deduplicate tokens while preserving order
+    Returns the modified DataFrame with the SAME `col` updated.
+    """
+    df = df.copy()
+
+    # ordered (pattern -> replacement)
+    replacements = [
+        # normalize separators early
+        (r"[|/,]+", ";"),
+        (r"\s*-\s*", "; "),            # 'sustained - deficiency' -> 'sustained; deficiency'
+        (r";{2,}", ";"),
+        (r"\s*;\s*", "; "),
+
+        # strip common noise
+        (r"^'+", ""),                  # leading quotes
+        (r"\b\(all\)\b|\b\(s\)\b", ""),# "(All)", "(S)"
+        (r"\s+", " "),                 # collapse spaces
+
+        # findings
+        (r"\bnon[ -]?sustained\b", "not sustained"),
+        (r"\bnot\s*sust\w*\b", "not sustained"),
+        (r"\bnet sustained\b|\bout sustained\b|\bout sustand\b", "not sustained"),
+        (r"\bsustainet\b|\bsustened\b|\bsustamed\b|\bsastasned\b", "sustained"),
+        (r"\bexonerated\s+justified(?:\s+use of force)?\b", "exonerated; justified"),
+        (r"\bjustified uof\b", "justified"),
+
+        # actions / docs
+        (r"\blor\b|\bl\.?o\.?r\.?\b|\bletter of reprimand\b", "letter of reprimand"),
+        (r"\bloc\b", "letter of counseling"),
+        (r"\bcf\b|\bc\/?f\b", "counseling form"),
+        (r"\bcouns\w*\b|\bcours?il\w*\b", "counseling form"),
+        (r"\bperformance\s*log\b|\bpent\.?\s*log\b|\bpert\.?\s*cog\b|\bperf\.?\s*log\b", "performance log"),
+        (r"\bdefic\w*\b", "deficiency"),
+        (r"\bno further action\b", "no further action"),
+        (r"\beap\b", "eap counseling"),
+        (r"\bspecial eval\b", "special evaluation"),
+        (r"\bloss of extra duty\b", "loss of extra duty"),
+        (r"\bdemontion\b", "demotion"),
+
+        # employment outcomes
+        (r"\bterminated\b", "termination"),
+        (r"\btermination\b", "termination"),
+        (r"\bresigned\s*\(in lieu of termination\)\b", "resigned (in lieu of termination)"),
+        (r"\bresigned\s*under investigation\b", "resigned (under investigation)"),
+        (r"\bresigned\b", "resigned"),
+
+        # incident shorthand
+        (r"\bois\b", "officer involved shooting"),
+
+        # suspension normalization
+        (r"\bsus\.?\b|\bsuspen\w*\b", "suspension"),
+        (r"\b(\d+)\s*day[s]?\b", r"\1 days"),                     # '14 day' -> '14 days'
+        (r"\b(\d+)\s*days\s*suspension\b", r"suspension (\1 days)"),
+        (r"suspension\s*\((\d+)\s*days?\)", r"suspension (\1 days)"),
+        (r"suspension\s*(\d+)\b", r"suspension (\1 days)"),
+        (r"(\d+)\s*days\b(?=.*suspension)", r"\1 days"),          # keep 'N days' if suspension elsewhere
+    ]
+
+    def _clean_one(x):
+        if pd.isna(x):
+            return pd.NA
+        s = str(x).lower().strip()
+
+        # apply replacements in order
+        for pat, repl in replacements:
+            s = re.sub(pat, repl, s)
+
+        # tidy separators/spaces
+        s = re.sub(r"\s*;\s*", "; ", s)
+        s = re.sub(r";\s*;", "; ", s)
+        s = s.strip(" ;")
+
+        # de-duplicate tokens while preserving order
+        if ";" in s:
+            parts = [p.strip() for p in s.split(";") if p.strip()]
+            seen = set()
+            uniq = []
+            for p in parts:
+                if p not in seen:
+                    seen.add(p)
+                    uniq.append(p)
+            s = "; ".join(uniq)
+
+        return s or pd.NA
+
+    df[col] = df[col].apply(_clean_one)
+    return df
+
+import re
+import pandas as pd
+from datetime import datetime
+
+def clean_and_split_dates(df,
+                          receive_col="receive_date",
+                          complete_col="complete_date",
+                          year_min=2000,
+                          year_max=2035,
+                          zero_pad=False):
+    """
+    Clean two messy date columns and create split Y/M/D columns as *strings*.
+    Invalid/unparseable parts become '' (empty string).
+    Outputs:
+      receive_year, receive_month, receive_day,
+      complete_year, complete_month, complete_day
+    All are pandas 'string' dtype (not Int64).
+    """
+
+    df = df.copy()
+
+    alpha_re = re.compile(r"[A-Za-z]")
+    iso_re   = re.compile(r"^\s*(\d{4})-(\d{2})-(\d{2})\s*$")
+
+    def _parse_one(x):
+        # Return (year_str, month_str, day_str); '' for any invalid date
+        if pd.isna(x):
+            return ("", "", "")
+        s = str(x).strip()
+        if not s:
+            return ("", "", "")
+
+        # ISO 'YYYY-MM-DD'
+        if iso_re.match(s):
+            dt = pd.to_datetime(s, errors="coerce")
+            if pd.notna(dt) and year_min <= dt.year <= year_max:
+                y, m, d = dt.year, dt.month, dt.day
+                return (str(y), str(m), str(d))
+            return ("", "", "")
+
+        # Month-name strings: 'June 3,2022', 'July 7, 2022'
+        if alpha_re.search(s):
+            dt = pd.to_datetime(s, errors="coerce")
+            if pd.notna(dt) and year_min <= dt.year <= year_max:
+                y, m, d = dt.year, dt.month, dt.day
+                return (str(y), str(m), str(d))
+            return ("", "", "")
+
+        # Normalize separators to '/', keep digits + '/'
+        s = re.sub(r"[.\-–—]", "/", s)
+        s = re.sub(r"/{2,}", "/", s).strip("/ ")
+        s = re.sub(r"[^0-9/]", "", s)  # drop letters/garbage like 'eece/5e/e1'
+        s = re.sub(r"/{2,}", "/", s).strip("/ ")
+
+        parts = s.split("/")
+        if len(parts) != 3 or not all(p.isdigit() for p in parts):
+            return ("", "", "")
+
+        mth, day, yr = parts
+
+        # 2-digit year → 2000–year_max (e.g., '03'->2003, '27'->2027). else invalid.
+        if len(yr) == 2:
+            yy = int(yr)
+            cap = year_max - 2000
+            if 0 <= yy <= cap:
+                yr = str(2000 + yy)
+            else:
+                return ("", "", "")
+
+        try:
+            mi, di, yi = int(mth), int(day), int(yr)
+        except ValueError:
+            return ("", "", "")
+
+        # Swap if looks like D/M/Y (first >12 and second ≤12)
+        if mi > 12 and di <= 12:
+            mi, di = di, mi
+
+        # Bounds + calendar validity
+        if not (1 <= mi <= 12 and 1 <= di <= 31 and year_min <= yi <= year_max):
+            return ("", "", "")
+        try:
+            _ = datetime(yi, mi, di)  # raises if invalid date (e.g., Feb 30)
+        except ValueError:
+            return ("", "", "")
+
+        return (str(yi), str(mi), str(di))
+
+    def _post(s):
+        # optional zero-padding
+        if not zero_pad:
+            return s
+        y, m, d = s
+        y = y.zfill(4) if y else ""
+        m = m.zfill(2) if m else ""
+        d = d.zfill(2) if d else ""
+        return (y, m, d)
+
+    def _add_split_cols(src_col, prefix):
+        triplets = df[src_col].apply(lambda v: _post(_parse_one(v)))
+        ys, ms, ds = zip(*triplets)
+        df[f"{prefix}_year"]  = pd.Series(ys, dtype="string")
+        df[f"{prefix}_month"] = pd.Series(ms, dtype="string")
+        df[f"{prefix}_day"]   = pd.Series(ds, dtype="string")
+
+    _add_split_cols(receive_col, "receive")
+    _add_split_cols(complete_col, "complete")
+
+    return df
+
+import pandas as pd
+import re
+
+def clean_investigator(df: pd.DataFrame, col: str = "investigator") -> pd.DataFrame:
+    """
+    Lowercase investigator names and coerce empty-ish values to ''.
+    - Keeps the same column name.
+    - Output dtype: pandas 'string' (not NaN; empty -> '').
+    """
+    df = df.copy()
+
+    compact_empty = {"", "na", "none", "null", "nil", "unknown"}
+
+    def _clean(x):
+        if pd.isna(x):
+            return ""
+        s = str(x).strip()
+        if not s:
+            return ""
+        # treat standalone dashes as empty
+        if re.fullmatch(r"[-–—]+", s):
+            return ""
+        s_low = s.lower()
+        # collapse repeated whitespace
+        s_low = re.sub(r"\s+", " ", s_low).strip()
+        # normalize and check variants like "N.A.", "n/a", "N / A"
+        compact = s_low.replace(".", "").replace("/", "").replace("\\", "").replace(" ", "")
+        if compact in compact_empty:
+            return ""
+        return s_low
+
+    df[col] = df[col].apply(_clean).astype("string")
+    return df
+
+def split_officers_to_rows(df: pd.DataFrame, col: str = "officer") -> pd.DataFrame:
+    """
+    From a messy 'officer' column, produce per-officer rows with:
+      - first_name (lowercase)
+      - last_name  (lowercase)
+    and drop the original officer column.
+
+    Handles:
+      - Ranks/titles (sgt., lt., capt., major, cpl., det., officer, mr/mrs/ms, etc.)
+      - Multiple separators: '/', ',', ';', '&', ' and '
+      - ISO garbage and stray punctuation
+      - Runs of names without separators (pair them: First Last First Last ...)
+      - Initials like 'J. Henry', 'H. Bradford'
+      - Last-name-only tokens -> first_name = '', last_name = token
+
+    If nothing parseable is found for a row, keeps one row with empty first/last.
+    """
+
+    df = df.copy()
+
+    # Patterns & helpers
+    RANK_RE = re.compile(
+        r"^\s*(sgt|sergeant|lt|lieutenant|capt|captain|cpt|major|maj|cpl|corporal|officer|det|detective|mr|mrs|ms|chief)\.?\s+",
+        flags=re.I,
+    )
+    # tokens we consider "unknown" and skip
+    UNKNOWN_RE = re.compile(r"^(unk(?:nown)?|fireman|none|na|n/?a)$", flags=re.I)
+
+    SEP_REPLACER = re.compile(r"\s+(?:and|&)\s+|[;,]|[|]|\\")
+    MULTISPACE = re.compile(r"\s+")
+    DASH_RUN = re.compile(r"[-–—]+")
+
+    def _strip_ranks(s: str) -> str:
+        prev = None
+        # remove rank/titles repeatedly if chained (e.g., "Lt. Sgt. John Doe")
+        while prev != s:
+            prev = s
+            s = RANK_RE.sub("", s)
+        return s
+
+    def _normalize_piece(s: str) -> str:
+        s = s.strip()
+        if not s:
+            return ""
+        s = _strip_ranks(s)
+        s = s.strip(" .,/;-")
+        s = MULTISPACE.sub(" ", s)
+        return s
+
+    def _split_by_separators(s: str):
+        # unify separators to '/'
+        s = SEP_REPLACER.sub(" / ", s)
+        s = DASH_RUN.sub(" ", s)           # long dashes -> space
+        s = MULTISPACE.sub(" ", s)
+        parts = [p.strip() for p in s.split("/") if p.strip()]
+        return parts
+
+    def _pair_run_if_needed(s: str):
+        """
+        If no explicit separators and we have a run like 'First Last First Last ...',
+        pair tokens into names two-by-two.
+        """
+        if "/" in s or "," in s or ";" in s:
+            return None  # will be handled elsewhere
+        tokens = s.split()
+        if len(tokens) < 3:
+            return None
+        # if even token count, assume first/last pairs
+        if len(tokens) % 2 == 0:
+            pairs = []
+            for i in range(0, len(tokens), 2):
+                pairs.append(tokens[i] + " " + tokens[i+1])
+            return pairs
+        # odd token count: pair as much as possible; leave last as last-name-only
+        pairs = []
+        i = 0
+        while i + 1 < len(tokens):
+            pairs.append(tokens[i] + " " + tokens[i+1])
+            i += 2
+        if i < len(tokens):
+            pairs.append(tokens[i])  # last lone token, likely a surname
+        return pairs
+
+    def _parse_name(piece: str):
+        """
+        Return (first, last) in lowercase.
+        Rules:
+          - 1 token -> ('', token)
+          - 2+ tokens -> (first token, last token) [middle dropped]
+        """
+        piece = _normalize_piece(piece)
+        if not piece or UNKNOWN_RE.match(piece):
+            return None
+
+        toks = piece.split()
+        if len(toks) == 1:
+            first, last = "", toks[0]
+        else:
+            first, last = toks[0], toks[-1]
+
+        # normalize case: keep initials like 'J.' but lowercase everything
+        first = first.lower()
+        last = last.lower()
+
+        # cleanup trailing punctuation on initial
+        first = first.strip(".,")
+        last = last.strip(".,")
+        return (first, last)
+
+    def _extract_people(raw: str):
+        if pd.isna(raw):
+            return []
+
+        s = str(raw).strip()
+        if not s:
+            return []
+
+        # normalize obvious separators; then try pairing if none present
+        parts = _split_by_separators(s)
+        if not parts:
+            # maybe it's a run of names without separators
+            paired = _pair_run_if_needed(s)
+            parts = paired if paired else [s]
+
+        # final clean pieces -> parse
+        people = []
+        for p in parts:
+            p = _normalize_piece(p)
+            if not p:
+                continue
+            # a piece might still contain multiple words without separator (e.g., "Will White Chris Beasley")
+            # attempt one more pass: if > 3 words AND even, pair within the piece
+            toks = p.split()
+            if len(toks) >= 4 and len(toks) % 2 == 0:
+                for i in range(0, len(toks), 2):
+                    sub = toks[i] + " " + toks[i+1]
+                    nm = _parse_name(sub)
+                    if nm:
+                        people.append(nm)
+                continue
+            nm = _parse_name(p)
+            if nm:
+                people.append(nm)
+
+        # if nothing parsed, keep one empty person to preserve the row
+        return people if people else [("", "")]
+
+    # Build list column of (first,last) tuples
+    name_lists = df[col].apply(_extract_people)
+
+    # Explode to one row per officer
+    out = df.explode(name_lists.name, ignore_index=True)  # trick to keep index? We'll do directly:
+    # The above line won't work as-is; explode requires a column. So:
+    df["_officers_list"] = name_lists
+    df = df.explode("_officers_list", ignore_index=True)
+
+    # Split tuple into columns
+    df[["first_name", "last_name"]] = pd.DataFrame(
+        df["_officers_list"].tolist(), index=df.index
+    )
+
+    # Ensure string dtype and lowercase (already lower, but enforce)
+    df["first_name"] = df["first_name"].astype("string").fillna("")
+    df["last_name"]  = df["last_name"].astype("string").fillna("")
+
+    # Drop helper + original
+    df = df.drop(columns=[col, "_officers_list"])
+
+    return df
+
+def split_action_from_disposition_25(
+    df: pd.DataFrame,
+    col: str = "disposition",
+    action_col: str = "action",
+    findings: list[str] | None = None,
+) -> pd.DataFrame:
+    """
+    Split disposition into:
+      - disposition (finding only)
+      - action (everything after the finding separator)
+    Keeps empty strings for missing pieces (no NaNs).
+    """
+    if findings is None:
+        findings = ["sustained", "not sustained", "exonerated", "unfounded", "pending", "justified"]
+
+    df = df.copy()
+    s = df[col].astype("string").fillna("").str.strip().str.lower()
+
+    # Light normalization for odd leftovers
+    def _norm(x: str) -> str:
+        x = re.sub(r"\s+", " ", x).strip(" ;.")
+        x = x.replace("non; sustained", "not sustained").replace("non sustained", "not sustained")
+        x = re.sub(r"\bnot not\s*sustained\b", "not sustained", x)
+        x = x.replace("n; a", "")  # n/a
+        # unify separators , | / -> ;
+        x = re.sub(r"[,\|/]+", "; ", x)
+        x = re.sub(r"\s*;\s*", "; ", x).strip(" ;.")
+        return x
+
+    s = s.map(_norm)
+
+    # ^(finding)(optional sep + rest) OR (no finding -> whole string)
+    findings_re = r"^(" + "|".join(map(re.escape, findings)) + r")\b(?:[:\-]|\s*;)?\s*(.*)$"
+    parts = s.str.extract(findings_re)
+
+    disp = parts[0].fillna("")  # the finding
+    act  = parts[1].fillna("")  # the remainder after the finding
+
+    # For rows with no finding matched, action should be the whole value
+    mask_no_find = disp.eq("")
+    act = act.where(~mask_no_find, s)
+
+    # Drop parenthetical name lists from the action and tidy
+    act = act.str.replace(r"\([^)]*\)", "", regex=True).str.strip(" ;.")
+
+    df[col] = disp.astype("string")
+    df[action_col] = act.astype("string")
+    return df
+
+import numpy as np
+
+_ALIASES = {
+    r"\buof\b": "use of force",
+    r"\bbwc\b": "body worn camera",
+    r"\bbody worn cameras\b": "body worn camera",
+    r"\bois\b": "officer involved shooting",
+    r"\bo i s\b": "officer involved shooting",
+    r"\bowi\b": "operating while intoxicated",
+    r"\bprof(?:\.?|essional)?\s*cond(?:uct)?\b": "professional conduct",
+    r"\bcubo\b": "conduct unbecoming an officer",
+}
+
+_SEP_REGEX = re.compile(r"\s*(?:/|,|;|\band\b|\s-\s|\|{2})\s*", flags=re.I)
+
+def _normalize_text(s: str) -> str:
+    s = s.strip().lower()
+    s = re.sub(r"\s+", " ", s)
+    return s.strip(" .;:-")
+
+def _apply_aliases(token: str) -> str:
+    out = token
+    for pat, repl in _ALIASES.items():
+        out = re.sub(pat, repl, out)
+    return re.sub(r"\s+", " ", out).strip(" .;:-")
+
+def _split_tokens(s: str) -> list[str]:
+    return [p.strip() for p in _SEP_REGEX.split(s) if p.strip()]
+
+def combine_allegations(df: pd.DataFrame,
+                        col: str = "allegation",
+                        desc: str = "allegation_desc",
+                        out: str = "allegation") -> pd.DataFrame:
+    """Combine allegation + allegation_desc into one cleaned column."""
+    def merge_row(a, d):
+        a = "" if pd.isna(a) else str(a)
+        d = "" if pd.isna(d) else str(d)
+        both = " ; ".join(x for x in (a, d) if x)
+        if not both:
+            return pd.NA
+        both = _normalize_text(both)
+
+        tokens, seen = [], set()
+        for t in _split_tokens(both):
+            t = _apply_aliases(_normalize_text(t))
+            if t and t not in seen:
+                seen.add(t)
+                tokens.append(t)
+        return "; ".join(tokens) if tokens else pd.NA
+
+    df = df.copy()
+    df[out] = [merge_row(a, d) for a, d in zip(df[col], df[desc])]
+    return df
+
+_RANK_PREFIXES = [
+    (r"^det\.?\s*", "detective "),
+    (r"^lt\.?\s*", "lieutenant "),
+    (r"^sgt\.?\s*", "sergeant "),
+    (r"^capt\.?\s*", "captain "),
+    (r"^cpt\.?\s*", "captain "),
+    (r"^maj\.?\s*", "major "),
+]
+
+# allowed rank vocabulary for extraction (match your prior cleaned outputs)
+_RANK_WORDS = ["detective", "lieutenant", "sergeant", "captain", "major"]
+
+# split tokens on space, keep hyphens/apostrophes/periods within a token
+_NAME_TOKEN = r"[A-Za-z][A-Za-z\-\.'`]*"
+
+def _prep_investigator_series(s: pd.Series) -> pd.Series:
+    s = s.astype("string").fillna("").str.strip().str.lower()
+    # collapse multiple spaces
+    s = s.str.replace(r"\s+", " ", regex=True)
+    # standardize dangles like " , " or " ."
+    s = s.str.strip(" ,.;:-")
+    # expand rank abbreviations at the start
+    for pat, repl in _RANK_PREFIXES:
+        s = s.str.replace(pat, repl, regex=True)
+    return s
+
+def split_investigator(
+    df: pd.DataFrame,
+    col: str = "investigator",
+    out_rank: str = "investigator_rank",
+    out_first: str = "investigator_first_name",
+    out_last: str = "investigator_last_name",
+) -> pd.DataFrame:
+    """
+    Normalize investigator string and split into rank / first / last.
+    Assumes one investigator per row (like prior scripts).
+    Pattern mirrors previous behavior:
+      optional <rank> + optional <first (may include middle/initials)> + <last>
+
+    Returns a copy of df with normalized `col` and the three new columns.
+    """
+    df = df.copy()
+
+    # normalize the main column (lowercase, expand rank prefixes, trim)
+    norm = _prep_investigator_series(df[col] if col in df.columns else pd.Series("", index=df.index))
+
+    # Extract:
+    #   ^(?:(rank) )?(rest_of_name)$
+    # then split rest_of_name into tokens; last token -> last_name; the rest -> first_name
+    ranks_alt = "|".join(map(re.escape, _RANK_WORDS))
+    m = norm.str.extract(fr"^(?:(?P<rank>{ranks_alt})\s+)?(?P<name>.+)$")
+
+    # If no name captured (empty string), make it empty
+    name_series = m["name"].fillna("").str.strip()
+
+    def split_first_last(name: str) -> tuple[str, str]:
+        if not name:
+            return ("", "")
+        # keep tokens that look like name-ish pieces; drop stray punctuation
+        toks = re.findall(_NAME_TOKEN, name)
+        if not toks:
+            return ("", "")
+        if len(toks) == 1:
+            # single token → treat as last name to match older 2-token expectation
+            return ("", toks[0])
+        # more than one token: last token is last name; remaining tokens are first (incl. middle/initials)
+        first = " ".join(toks[:-1])
+        last = toks[-1]
+        return (first, last)
+
+    split = name_series.apply(lambda x: pd.Series(split_first_last(x), index=["first", "last"]))
+
+    # assign outputs
+    df[out_rank] = m["rank"].where(m["rank"].notna(), "")
+    df[out_first] = split["first"]
+    df[out_last]  = split["last"]
+
+    # write back a cleaned investigator string:
+    # "<rank> <first> <last>" but omit empties cleanly
+    def _join_parts(r, f, l):
+        parts = [p for p in [r, f, l] if p]
+        return " ".join(parts) if parts else ""
+
+    df[col] = [
+        _join_parts(r, f, l)
+        for r, f, l in zip(df[out_rank], df[out_first], df[out_last])
+    ]
+
+    # empty strings -> NA for downstream cleanliness
+    for c in (col, out_rank, out_first, out_last):
+        df.loc[df[c].astype("string") == "", c] = pd.NA
+
+    return df
+
+def clean_cprr_25():
+    df = (
+        pd.read_csv(deba.data("raw/lafayette_pd/lafayette_pd_cprr_2020_2025.csv"))
+        .pipe(clean_column_names)
+        .rename(columns={
+            "sld_number": "tracking_id_og",
+            "focus_officer": "officer",
+            "date_received": "receive_date",
+            "date_completed": "complete_date",
+            "assigned_investigator": "investigator",
+        })
+        .pipe(clean_tracking_id_25, "tracking_id_og")
+        .pipe(clean_complaint, "complaint")
+        .pipe(clean_allegation_from_complainant, "complainant")
+        .pipe(clean_disposition_inplace, "disposition")
+        .pipe(strip_leading_comma)
+        .pipe(clean_and_split_dates, "receive_date", "complete_date")
+        .drop(columns=["receive_date", "complete_date"])
+        .pipe(clean_investigator, "investigator")
+        .pipe(split_officers_to_rows, "officer")
+        .pipe(split_action_from_disposition_25, "disposition", "action")
+        .pipe(set_values, {"agency": "lafayette-pd"})
+        .pipe(gen_uid, ["first_name", "last_name", "agency"])
+        .pipe(gen_uid, ["uid", "allegation", "tracking_id_og", "disposition"], "allegation_uid")
+        .pipe(gen_uid, ["tracking_id_og", "agency"], "tracking_id")
+        .pipe(combine_allegations, col="allegation", desc="allegation_desc", out="allegation")
+        .drop(columns=["allegation_desc"])
+        .pipe(split_investigator, col="investigator")
+        .drop(columns=["investigator"])
+        .pipe(clean_names, ["first_name", "last_name", "investigator_first_name", "investigator_last_name"])
+        .pipe(gen_uid,["agency", "investigator_first_name", "investigator_last_name"],"investigator_uid")
+)
+    return df
+
 
 if __name__ == "__main__":
     pprr = clean_pprr()
     cprr_20 = clean_cprr_20()
     cprr_14 = clean_cprr_14()
+    cprr_25 = clean_cprr_25()
+    cprr_25.to_csv(deba.data("clean/cprr_lafayette_pd_2020_2025.csv"), index=False)
     cprr_20.to_csv(deba.data("clean/cprr_lafayette_pd_2015_2020.csv"), index=False)
     cprr_14.to_csv(deba.data("clean/cprr_lafayette_pd_2009_2014.csv"), index=False)
     pprr.to_csv(deba.data("clean/pprr_lafayette_pd_2010_2021.csv"), index=False)
