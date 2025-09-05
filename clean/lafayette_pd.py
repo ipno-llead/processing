@@ -1,5 +1,5 @@
 import pandas as pd
-
+from typing import Optional, List
 from lib.columns import clean_column_names, set_values
 import deba
 from lib.clean import (
@@ -1717,7 +1717,7 @@ def split_action_from_disposition_25(
     df: pd.DataFrame,
     col: str = "disposition",
     action_col: str = "action",
-    findings: list[str] | None = None,
+    findings: Optional[List[str]] = None,
 ) -> pd.DataFrame:
     """
     Split disposition into:
