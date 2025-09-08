@@ -71,6 +71,11 @@ def fuse_events(cprr_25,cprr_20, cprr_14, pprr):
                 "parse_date": True,
                 "keep": ["agency", "uid", "salary", "salary_freq", "rank_desc"],
             },
+            events.OFFICER_LEFT: {
+                "prefix": "termination",
+                "parse_date": True,
+                "keep": ["agency", "uid", "salary", "salary_freq", "rank_desc"],
+            },
         },
         ["uid"],
     )
@@ -81,10 +86,10 @@ if __name__ == "__main__":
     cprr_25 = pd.read_csv(deba.data("match/cprr_lafayette_pd_2020_2025.csv"))
     cprr_20 = pd.read_csv(deba.data("match/cprr_lafayette_pd_2015_2020.csv"))
     cprr_14 = pd.read_csv(deba.data("match/cprr_lafayette_pd_2009_2014.csv"))
-    pprr = pd.read_csv(deba.data("clean/pprr_lafayette_pd_2010_2021.csv"))
+    pprr = pd.read_csv(deba.data("clean/pprr_lafayette_pd_2010_2024.csv"))
     agency = pprr.agency[0]
     post = load_for_agency(agency)
-    post_events = pd.read_csv(deba.data("match/post_event_lafayette_pd_2020.csv"))
+    post_events = pd.read_csv(deba.data("match/post_event_lafayette_pd_2025.csv"))
     events_df = fuse_events(cprr_25, cprr_20, cprr_14, pprr)
     events_df = rearrange_event_columns(pd.concat([post_events, events_df]))
     per = fuse_personnel(
