@@ -372,7 +372,7 @@ def match_cprr_25_officers_with_pprr(cprr, pprr):
     )
     decision = 0.880
     matcher.save_pairs_to_excel(
-        deba.data("match/lafayette_pd_cprr_2020_2025_officers_v_pprr_2010_2021.xlsx"),
+        deba.data("match/lafayette_pd_cprr_2020_2025_officers_v_pprr_2010_2024.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
@@ -409,7 +409,7 @@ def match_cprr_20_officers_with_pprr(cprr, pprr):
     )
     decision = 0.87
     matcher.save_pairs_to_excel(
-        deba.data("match/lafayette_pd_cprr_2015_2020_officers_v_pprr_2010_2021.xlsx"),
+        deba.data("match/lafayette_pd_cprr_2015_2020_officers_v_pprr_2010_2024.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
@@ -447,7 +447,7 @@ def match_cprr_14_officers_with_pprr(cprr, pprr):
     )
     decision = 0.90
     matcher.save_pairs_to_excel(
-        deba.data("match/lafayette_pd_cprr_2009_2014_officers_v_pprr_2010_2021.xlsx"),
+        deba.data("match/lafayette_pd_cprr_2009_2014_officers_v_pprr_2010_2024.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
@@ -492,7 +492,7 @@ def match_cprr_25_investigators_with_pprr(cprr, pprr):
     decision = 0.74
     matcher.save_pairs_to_excel(
         deba.data(
-            "match/lafayette_pd_cprr_2020_2025_investigators_v_pprr_2010_2021.xlsx"
+            "match/lafayette_pd_cprr_2020_2025_investigators_v_pprr_2010_2024.xlsx"
         ),
         decision,
     )
@@ -631,7 +631,7 @@ def extract_post_events(pprr, post):
     )
     decision = 0.94
     matcher.save_pairs_to_excel(
-        deba.data("match/lafayette_pd_pprr_2010_2021_v_post_pprr_2020_11_06.xlsx"),
+        deba.data("match/lafayette_pd_pprr_2010_2024_v_post_pprr_2025_08_25.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
@@ -643,7 +643,7 @@ if __name__ == "__main__":
     cprr_25 = pd.read_csv(deba.data("clean/cprr_lafayette_pd_2020_2025.csv"))
     cprr_20 = pd.read_csv(deba.data("clean/cprr_lafayette_pd_2015_2020.csv"))
     cprr_14 = pd.read_csv(deba.data("clean/cprr_lafayette_pd_2009_2014.csv"))
-    pprr = pd.read_csv(deba.data("clean/pprr_lafayette_pd_2010_2021.csv"))
+    pprr = pd.read_csv(deba.data("clean/pprr_lafayette_pd_2010_2024.csv"))
     agency = pprr.agency[0]
     post = load_for_agency(agency)
     cprr_25 = (
@@ -671,4 +671,4 @@ if __name__ == "__main__":
     cprr_20.to_csv(deba.data("match/cprr_lafayette_pd_2015_2020.csv"), index=False)
     cprr_14.to_csv(deba.data("match/cprr_lafayette_pd_2009_2014.csv"), index=False)
     cprr_25.to_csv(deba.data("match/cprr_lafayette_pd_2020_2025.csv"), index=False)
-    post_events.to_csv(deba.data("match/post_event_lafayette_pd_2020.csv"), index=False)
+    post_events.to_csv(deba.data("match/post_event_lafayette_pd_2025.csv"), index=False)
