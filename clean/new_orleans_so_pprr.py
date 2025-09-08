@@ -7,6 +7,9 @@ from lib.clean import (
     standardize_desc_cols,
     clean_dates,
     float_to_int_str,
+    clean_sexes,
+    clean_races,
+    clean_names,
 )
 from lib import salary
 
@@ -202,6 +205,81 @@ def clean():
     )
     return df
 
+def split_name_25(df: pd.DataFrame, col: str = "name") -> pd.DataFrame:
+    """
+    Splits a column of names in the format 'Last, First Middle' 
+    into last_name, first_name, and middle_name.
+    Returns the same DataFrame with 3 new columns.
+    """
+    # Ensure no NaNs
+    df = df.copy()
+    df[col] = df[col].fillna("")
+
+    # Split at comma into Last and the rest
+    split = df[col].str.split(",", n=1, expand=True)
+    df["last_name"] = split[0].str.strip()
+
+    # Now split the rest into first and (optional) middle
+    first_middle = split[1].str.strip().str.split(r"\s+", n=1, expand=True)
+    df["first_name"] = first_middle[0].fillna("")
+    df["middle_name"] = first_middle[1].fillna("")
+
+    return df
+
+def clean25():
+    df = (
+        pd.read_csv(deba.data("raw/new_orleans_so/new_orleans_so_pprr_2025.csv"))
+        .pipe(clean_column_names)
+        .drop(columns=["position_id"])
+        .rename(
+            columns={
+                "payroll_name": "name",
+                "gender_for_insurance_coverage": "sex",
+                "race_description": "race",
+                "hire_rehire_date": "hire_date",
+                "rank_code": "rank_desc",
+                "regular_pay_rate_amount": "salary",
+                "position_status": "officer_employment_status"})
+        .pipe(clean_rank)
+        .pipe(clean_dates, ["hire_date", "birth_date"])
+        .pipe(standardize_desc_cols, ["rank_desc", "officer_employment_status"])
+        .pipe(split_name_25, col="name")
+        .drop(columns=["name"])
+        .pipe(clean_sexes, ["sex"])
+        .pipe(clean_races, ["race"])
+        .pipe(clean_names, ["first_name", "last_name", "middle_name"])
+        .pipe(clean_salaries, ["salary"])
+        .pipe(set_values, {"salary_freq": salary.HOURLY})
+        .pipe(assign_agency)
+        .pipe(
+            gen_uid,
+            ["first_name", "middle_name", "last_name", "agency"],
+        )
+    )
+    return df
+
+def concat_union_dedup_uid_two(a: pd.DataFrame, b: pd.DataFrame, fill: str = "") -> pd.DataFrame:
+    """
+    Union-columns concat of two frames, fill missing with `fill`,
+    dedupe on uid. Because we concat [a, b] and keep='last',
+    rows from `b` win on conflicts.
+    """
+    cols = sorted(set(a.columns) | set(b.columns))
+    a2, b2 = a.copy(), b.copy()
+    for c in cols:
+        if c not in a2.columns: 
+            a2[c] = fill
+        if c not in b2.columns: 
+            b2[c] = fill
+
+    out = pd.concat(
+        [a2.reindex(columns=cols), b2.reindex(columns=cols)], 
+        ignore_index=True
+    )
+
+    out = out.drop_duplicates(subset=["uid"], keep="last").reset_index(drop=True)
+    return out.fillna("") 
+
 
 def overtime():
     df = (
@@ -226,8 +304,12 @@ def overtime():
 
 if __name__ == "__main__":
     df = clean()
+    df25 = clean25()
     overtime20 = overtime()
     df.to_csv(deba.data("clean/pprr_new_orleans_so_2021.csv"), index=False)
+    df25.to_csv(deba.data("clean/pprr_new_orleans_so_2025.csv"), index=False)
     overtime20.to_csv(
         deba.data("clean/pprr_overtime_new_orleans_so_2020.csv"), index=False
     )
+    pprr_2021_2025 = concat_union_dedup_uid_two(df, df25, fill="")
+    pprr_2021_2025.to_csv(deba.data("clean/pprr_new_orleans_so_2021_2025.csv"), index=False)

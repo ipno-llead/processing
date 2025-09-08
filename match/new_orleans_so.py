@@ -429,7 +429,7 @@ if __name__ == "__main__":
     cprr22 = pd.read_csv(deba.data("clean/cprr_new_orleans_so_2022.csv"))
     agency = cprr20.agency[0]
     post = load_for_agency(agency)
-    pprr = pd.read_csv(deba.data("clean/pprr_new_orleans_so_2021.csv"))
+    pprr = pd.read_csv(deba.data("clean/pprr_new_orleans_so_2021_2025.csv"))
     overtime20 = pd.read_csv(deba.data("clean/pprr_overtime_new_orleans_so_2020.csv"))
     cprr19 = deduplicate_cprr_19_personnel(cprr19)
     cprr20 = deduplicate_cprr_20_personnel(cprr20)
