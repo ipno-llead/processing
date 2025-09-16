@@ -87,7 +87,7 @@ if __name__ == "__main__":
     cprr20 = pd.read_csv(deba.data("match/cprr_lafayette_so_2015_2020.csv"))
     cprr14 = pd.read_csv(deba.data("match/cprr_lafayette_so_2009_2014.csv"))
     cprr08 = pd.read_csv(deba.data("match/cprr_lafayette_so_2006_2008.csv"))
-    award17 = pd.read_csv(deba.data("match/award_lafayette_so_2017.csv"))
+    award17 = pd.read_csv(deba.data("match/award_lafayette_so_2017_2021.csv"))
     uof = pd.read_csv(deba.data("match/uof_lafayette_so_2015_2019.csv"))
     uof_citizens = pd.read_csv(deba.data("clean/uof_citizens_lafayette_so_2015_2019.csv"))
     agency = cprr08.agency[0]
