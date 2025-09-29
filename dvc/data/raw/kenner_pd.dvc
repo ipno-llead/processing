@@ -1,6 +1,6 @@
 wdir: ../../../data/raw
 outs:
-- md5: 3cf0401723ee1fab479128f3577c8cd5.dir
-  size: 107739
-  nfiles: 5
+- md5: 9462a27bb80df1e1dc191d70768a3026.dir
+  size: 130215
+  nfiles: 6
   path: kenner_pd
