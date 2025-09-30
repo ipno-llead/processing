@@ -3,6 +3,7 @@ import deba
 from lib.columns import (
     rearrange_event_columns,
     rearrange_use_of_force,
+    rearrange_citizen_columns
 )
 from lib.personnel import fuse_personnel
 from lib import events
@@ -71,8 +72,10 @@ if __name__ == "__main__":
     post = load_for_agency(agency)
     uof = pd.read_csv(deba.data("match/uof_kenner_pd_2005_2021.csv"))
     uof25 = pd.read_csv(deba.data("match/uof_kenner_pd_2021_2025.csv"))
+    cit25 = pd.read_csv(deba.data("clean/uof_cit_kenner_pd_2021_2025.csv"))
     per = fuse_personnel(pprr, uof, post, uof25)
     uof_df = rearrange_use_of_force(pd.concat([uof, uof25]))
+    citizen_df = rearrange_citizen_columns(cit25)
     events_df = rearrange_event_columns(
         pd.concat([post_event, fuse_events(pprr, uof, uof25)])
     )
@@ -80,3 +83,4 @@ if __name__ == "__main__":
     events_df.to_csv(deba.data("fuse_agency/event_kenner_pd.csv"), index=False)
     uof_df.to_csv(deba.data("fuse_agency/uof_kenner_pd.csv"), index=False)
     post.to_csv(deba.data("fuse_agency/post_kenner_pd.csv"), index=False)
+    citizen_df.to_csv(deba.data("fuse_agency/cit_kenner_pd.csv"), index=False)

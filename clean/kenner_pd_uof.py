@@ -391,6 +391,7 @@ def split_citizen_and_uof(
 
     # dedupe
     citizen_df = citizen_df.drop_duplicates(subset=[uid_col])
+    citizen_df = citizen_df.assign(agency="kenner-pd")
 
     return uof_df, citizen_df
 
