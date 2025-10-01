@@ -384,12 +384,10 @@ def split_citizen_and_uof(
         )
     )
 
-    # drop rows where ALL citizen fields are missing
     if existing_citizen_cols:
         mask_all_missing = citizen_df[existing_citizen_cols].isna().all(axis=1)
         citizen_df = citizen_df.loc[~mask_all_missing].copy()
 
-    # dedupe
     citizen_df = citizen_df.drop_duplicates(subset=[uid_col])
     citizen_df = citizen_df.assign(agency="kenner-pd")
 
