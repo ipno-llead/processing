@@ -199,7 +199,6 @@ def clean():
         .pipe(gen_uid, ["tracking_id_og", "agency"], "tracking_id")
     )
 
-    # Create UOF dataframe with officer and incident information
     uof = df[[
         "tracking_id",
         "tracking_id_og",
@@ -224,7 +223,6 @@ def clean():
         "uof_uid",
     ]].drop_duplicates(subset=["uid", "uof_uid"])
 
-    # Create citizen UOF dataframe
     citizen_uof = df[[
         "uof_uid",
         "citizen_race",
