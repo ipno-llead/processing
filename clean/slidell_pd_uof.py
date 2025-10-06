@@ -68,15 +68,12 @@ def split_officers(df):
     df.loc[:, "officer_names"] = df.officer_names.str.split(";")
     df = df.explode("officer_names").reset_index(drop=True)
 
-    # Clean up officer names
     df.loc[:, "officer_names"] = df.officer_names.str.strip()
 
-    # Parse names in "Last, First Middle" format
     name_parts = df.officer_names.str.extract(r'^([^,]+),\s*(.+)$')
 
     df.loc[:, "last_name"] = name_parts[0].str.strip()
 
-    # Split first and middle names
     first_middle = name_parts[1].str.strip().fillna("")
     first_middle_split = first_middle.str.split(r'\s+', n=1, expand=True)
 
