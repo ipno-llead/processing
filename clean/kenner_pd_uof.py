@@ -342,16 +342,16 @@ def clean_25():
     .pipe(
             gen_uid,
             ["citizen_race", "citizen_sex", "citizen_age"],
-            "uof_citizen_uid",
+            "citizen_uid",
         )
-    .drop_duplicates(subset=["uof_citizen_uid"])
+    .drop_duplicates(subset=["citizen_uid"])
 )
     return df 
 
 def split_citizen_and_uof(
     df,
     uid_col="uof_uid",
-    citizen_uid_col="uof_citizen_uid",
+    citizen_uid_col="citizen_uid",
     citizen_cols=("citizen_race", "citizen_sex", "citizen_age")
 ):
     """
