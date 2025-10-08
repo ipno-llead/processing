@@ -294,6 +294,7 @@ def fuse_citizen_dfs():
                 pd.read_csv(deba.data("fuse_agency/cit_terrebonne_so.csv")),
                 pd.read_csv(deba.data("fuse_agency/cit_washington_so.csv")),
                 pd.read_csv(deba.data("fuse_agency/cit_lafayette_so.csv")),
+                pd.read_csv(deba.data("fuse_agency/cit_kenner_pd.csv")),
             ]
         )
     ).sort_values("agency", ignore_index=True)
