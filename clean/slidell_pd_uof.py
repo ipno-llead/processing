@@ -191,7 +191,7 @@ def clean():
         .pipe(
             gen_uid,
             ["citizen_race", "citizen_sex", "citizen_age"],
-            "uof_citizen_uid",
+            "citizen_uid",
         )
         .pipe(gen_uid, ["tracking_id_og", "agency"], "tracking_id")
     )
@@ -229,11 +229,9 @@ def clean():
         "citizen_armed_with",
         "use_of_force_result",
         "agency",
-        "uof_citizen_uid",
-    ]].drop_duplicates(subset=["uof_citizen_uid"])
-
+        "citizen_uid",
+    ]].drop_duplicates(subset=["citizen_uid"])
     return uof, citizen_uof
-
 
 if __name__ == "__main__":
     uof, citizen_uof = clean()
