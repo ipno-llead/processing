@@ -374,22 +374,22 @@ def split_citizen_and_uof(
 
     # build citizen df
     citizen_df = (
-        df.loc[:, [c for c in cols_for_citizen if c in df.columns]]
-        .assign(
-            # normalize blanks to NaN for easy filtering
-            **{
-                c: df[c].replace(["", " ", "na", "n/a", "NA", "N/A"], pd.NA)
-                for c in existing_citizen_cols
-            }
-        )
+    df.loc[:, [c for c in cols_for_citizen if c in df.columns]]
+    .assign(
+        # normalize blanks to NaN for easy filtering
+        **{
+            c: df[c].replace(["", " ", "na", "n/a", "NA", "N/A"], pd.NA)
+            for c in existing_citizen_cols
+        },
+        agency="kenner-pd"  # Add agency here in the initial assign
     )
+)
 
     if existing_citizen_cols:
         mask_all_missing = citizen_df[existing_citizen_cols].isna().all(axis=1)
         citizen_df = citizen_df.loc[~mask_all_missing].copy()
 
     citizen_df = citizen_df.drop_duplicates(subset=[uid_col])
-    citizen_df = citizen_df.assign(agency="kenner-pd")
 
     return uof_df, citizen_df
 

@@ -72,10 +72,9 @@ if __name__ == "__main__":
     post = load_for_agency(agency)
     uof = pd.read_csv(deba.data("match/uof_kenner_pd_2005_2021.csv"))
     uof25 = pd.read_csv(deba.data("match/uof_kenner_pd_2021_2025.csv"))
-    cit25 = pd.read_csv(deba.data("clean/uof_cit_kenner_pd_2021_2025.csv"))
+    citizen_df = pd.read_csv(deba.data("clean/uof_cit_kenner_pd_2021_2025.csv"))
     per = fuse_personnel(pprr, uof, post, uof25)
     uof_df = rearrange_use_of_force(pd.concat([uof, uof25]))
-    citizen_df = rearrange_citizen_columns(cit25)
     events_df = rearrange_event_columns(
         pd.concat([post_event, fuse_events(pprr, uof, uof25)])
     )
