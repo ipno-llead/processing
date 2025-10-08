@@ -2,7 +2,7 @@ import pandas as pd
 from datamatch import ThresholdMatcher, JaroWinklerSimilarity, ColumnsIndex
 
 import deba
-from lib.post import extract_events_from_post
+from lib.post import extract_events_from_post, load_for_agency
 
 
 def extract_post_events(pprr, post):
@@ -58,13 +58,43 @@ def match_cprr_post(cprr, post):
     cprr.loc[:, "uid"] = cprr.uid.map(lambda x: match_dict.get(x, x))
     return cprr
 
+def match_uof_post(uof, post25):
+    dfa = uof[["uid", "first_name", "last_name"]]
+    dfa = dfa.drop_duplicates().set_index("uid")
+    dfa.loc[:, "fc"] = dfa.first_name.fillna("").map(lambda x: x[:1])
+
+    dfb = post25[["uid", "first_name", "last_name"]]
+    dfb = dfb.drop_duplicates().set_index("uid")
+    dfb.loc[:, "fc"] = dfb.first_name.fillna("").map(lambda x: x[:1])
+
+    matcher = ThresholdMatcher(
+        ColumnsIndex(["fc"]),
+        {"first_name": JaroWinklerSimilarity(), "last_name": JaroWinklerSimilarity()},
+        dfa,
+        dfb,
+    )
+    decision = 0.90
+    matcher.save_pairs_to_excel(
+        deba.data("match/slidell_pd_uof_2021_2025_v_post_pprr_2025_8_25.xlsx"),
+        decision,
+    )
+    matches = matcher.get_index_pairs_within_thresholds(decision)
+    match_dict = dict(matches)
+
+    uof.loc[:, "uid"] = uof.uid.map(lambda x: match_dict.get(x, x))
+    return uof
+
 
 if __name__ == "__main__":
     pprr_csd = pd.read_csv(deba.data("clean/pprr_slidell_csd_2010_2019.csv"))
     cprr = pd.read_csv(deba.data("clean/cprr_slidell_pd_2007_2010.csv"))
+    uof = pd.read_csv(deba.data("clean/uof_slidell_pd_2021_2025.csv"))
     agency = pprr_csd.agency[0]
     post = pd.read_csv(deba.data("clean/pprr_post_4_26_2023.csv"))
     post = post.loc[post.agency == agency]
     post_events = extract_post_events(pprr_csd, post)
+    post_25 = load_for_agency(agency)
+    uof = match_uof_post(uof, post_25)
     post_events.to_csv(deba.data("match/post_event_slidell_pd_2020.csv"), index=False)
     cprr.to_csv(deba.data("match/cprr_slidell_pd_2007_2010.csv"), index=False)
+    uof.to_csv(deba.data("match/uof_slidell_pd_2021_2025.csv"), index=False)

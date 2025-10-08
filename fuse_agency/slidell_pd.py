@@ -1,7 +1,7 @@
 import pandas as pd
 
 import deba
-from lib.columns import rearrange_event_columns, rearrange_allegation_columns
+from lib.columns import rearrange_event_columns, rearrange_allegation_columns, rearrange_use_of_force, rearrange_citizen_columns
 from lib.personnel import fuse_personnel
 from lib import events
 from lib.post import load_for_agency
@@ -45,7 +45,16 @@ def fuse_events(pprr,cprr):
             }
         },
         ["allegation_uid"],
-    )
+    ))
+    builder.extract_events(
+        uof,
+        {
+            events.UOF_INCIDENT: {
+                "prefix": "occurred",
+                "keep": ["agency", "uof_uid", "uid"],
+            }
+        },
+        ["uid", "uof_uid"],
     )
     return builder.to_frame(output_duplicated_events=True)
 
@@ -53,12 +62,18 @@ def fuse_events(pprr,cprr):
 if __name__ == "__main__":
     pprr_csd = pd.read_csv(deba.data("clean/pprr_slidell_csd_2010_2019.csv"))
     cprr = pd.read_csv(deba.data("match/cprr_slidell_pd_2007_2010.csv"))
+    uof = pd.read_csv(deba.data("match/uof_slidell_pd_2021_2025.csv"))
+    cit = pd.read_csv(deba.data("clean/uof_cit_slidell_pd_2021_2025.csv"))
     agency = pprr_csd.agency[0]
     post = load_for_agency(agency)
     post_event = pd.read_csv(deba.data("match/post_event_slidell_pd_2020.csv"))
     events_df = rearrange_event_columns(pd.concat([post_event, fuse_events(pprr_csd, cprr)]))
     per_df = fuse_personnel(pprr_csd, post, cprr)
     com = rearrange_allegation_columns(cprr)
+    uof = rearrange_use_of_force(uof)
+    cit = rearrange_citizen_columns(cit)
+    uof.to_csv(deba.data("fuse_agency/uof_slidell_pd.csv"), index=False)
+    cit.to_csv(deba.data("fuse_agency/cit_slidell_pd.csv"), index=False)
     per_df.to_csv(deba.data("fuse_agency/per_slidell_pd.csv"), index=False)
     events_df.to_csv(deba.data("fuse_agency/event_slidell_pd.csv"), index=False)
     com.to_csv(deba.data("fuse_agency/com_slidell_pd.csv"), index=False)
