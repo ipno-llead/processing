@@ -7,10 +7,21 @@ from lib.personnel import fuse_personnel
 from lib.post import load_for_agency
 
 
-def fuse_events(pprr):
+def fuse_events(pprr, pprr25):
     builder = events.Builder()
     builder.extract_events(
         pprr,
+        {
+            events.OFFICER_HIRE: {
+                "prefix": "hire",
+                "keep": ["uid", "agency", "rank_desc", "salary", "salary_freq"],
+            }
+        },
+        ["uid"],
+    )
+    builder = events.Builder()
+    builder.extract_events(
+        pprr25,
         {
             events.OFFICER_HIRE: {
                 "prefix": "hire",
@@ -24,11 +35,12 @@ def fuse_events(pprr):
 
 if __name__ == "__main__":
     pprr = pd.read_csv(deba.data("clean/pprr_gretna_pd_2018.csv"))
+    pprr25 = pd.read_csv(deba.data("match/pprr_gretna_pd_2021_2025.csv"))
     agency = pprr.agency[0]
     post = load_for_agency(agency)
     post_event = pd.read_csv(deba.data("match/post_event_gretna_pd_2020.csv"))
-    events_df = rearrange_event_columns(pd.concat([post_event, fuse_events(pprr)]))
-    per_df = rearrange_personnel_columns(pprr)
+    events_df = rearrange_event_columns(pd.concat([post_event, fuse_events(pprr, pprr25)]))
+    per_df = rearrange_personnel_columns(pd.concat([pprr, pprr25]))
     per_df = fuse_personnel(per_df, post)
     per_df.to_csv(deba.data("fuse_agency/per_gretna_pd.csv"), index=False)
     events_df.to_csv(deba.data("fuse_agency/event_gretna_pd.csv"), index=False)
