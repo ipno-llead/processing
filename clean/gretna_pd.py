@@ -204,16 +204,12 @@ def combine_and_deduplicate():
         clean_25()
     ]
 
-    # Concatenate all dataframes
     combined = pd.concat(dfs, ignore_index=True)
 
-    # Sort by data_production_year descending so most recent entries come first
     combined = combined.sort_values("data_production_year", ascending=False)
 
-    # Drop duplicates based on uid, keeping the first occurrence (most recent)
     combined = combined.drop_duplicates(subset=["uid"], keep="first")
 
-    # Reset index for clean output
     return combined.reset_index(drop=True)
 
 
