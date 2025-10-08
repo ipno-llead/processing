@@ -342,16 +342,16 @@ def clean_25():
     .pipe(
             gen_uid,
             ["citizen_race", "citizen_sex", "citizen_age"],
-            "uof_citizen_uid",
+            "citizen_uid",
         )
-    .drop_duplicates(subset=["uof_citizen_uid"])
+    .drop_duplicates(subset=["citizen_uid"])
 )
     return df 
 
 def split_citizen_and_uof(
     df,
     uid_col="uof_uid",
-    citizen_uid_col="uof_citizen_uid",
+    citizen_uid_col="citizen_uid",
     citizen_cols=("citizen_race", "citizen_sex", "citizen_age")
 ):
     """
@@ -374,22 +374,21 @@ def split_citizen_and_uof(
 
     # build citizen df
     citizen_df = (
-        df.loc[:, [c for c in cols_for_citizen if c in df.columns]]
-        .assign(
-            # normalize blanks to NaN for easy filtering
-            **{
-                c: df[c].replace(["", " ", "na", "n/a", "NA", "N/A"], pd.NA)
-                for c in existing_citizen_cols
-            }
-        )
+    df.loc[:, [c for c in cols_for_citizen if c in df.columns]]
+    .assign(
+        # normalize blanks to NaN for easy filtering
+        **{
+            c: df[c].replace(["", " ", "na", "n/a", "NA", "N/A"], pd.NA)
+            for c in existing_citizen_cols
+        },
+        agency="kenner-pd"  # Add agency here in the initial assign
     )
+)
 
-    # drop rows where ALL citizen fields are missing
     if existing_citizen_cols:
         mask_all_missing = citizen_df[existing_citizen_cols].isna().all(axis=1)
         citizen_df = citizen_df.loc[~mask_all_missing].copy()
 
-    # dedupe
     citizen_df = citizen_df.drop_duplicates(subset=[uid_col])
 
     return uof_df, citizen_df
