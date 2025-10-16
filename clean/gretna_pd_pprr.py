@@ -192,9 +192,10 @@ def clean_25():
 
 
 def combine_and_deduplicate():
-    """Combine all years 2021-2025 and deduplicate based on uid.
+    """Combine all years 2021-2025 and deduplicate based on uid and hire_date.
 
     When duplicates exist, keeps the most recent entry (highest data_production_year).
+    Deduplicates on both uid alone AND uid+hire_date to prevent duplicate events.
     """
     dfs = [
         clean_21(),
@@ -208,7 +209,15 @@ def combine_and_deduplicate():
 
     combined = combined.sort_values("data_production_year", ascending=False)
 
+    # First deduplicate by uid (keeps most recent data for each officer)
     combined = combined.drop_duplicates(subset=["uid"], keep="first")
+
+    # Then deduplicate by uid + hire_date to prevent duplicate OFFICER_HIRE events
+    # (in case same officer appears in multiple files with same hire date)
+    combined = combined.drop_duplicates(
+        subset=["uid", "hire_year", "hire_month", "hire_day"],
+        keep="first"
+    )
 
     return combined.reset_index(drop=True)
 
