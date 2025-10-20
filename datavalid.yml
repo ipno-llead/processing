@@ -545,6 +545,9 @@ schemas:
       - name: final_judgement_date
       - name: pay_year
       - name: agency
+      - name: claim_month
+      - name: claim_day
+      - name: claim_year
   docs:
     columns:
       - name: docid

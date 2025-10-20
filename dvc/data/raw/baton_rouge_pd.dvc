@@ -1,6 +1,6 @@
 wdir: ../../../data/raw
 outs:
-- md5: 98f4b32d44e22499835fa3a2ddd74ddd.dir
-  size: 937244
-  nfiles: 12
+- md5: db43e133072a769acc7c46cf9928d069.dir
+  size: 1124861
+  nfiles: 14
   path: baton_rouge_pd

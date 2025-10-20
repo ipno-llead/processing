@@ -1,13 +1,10 @@
 import pandas as pd
 
-from lib.columns import clean_column_names, set_values
+from lib.columns import clean_column_names, set_values 
 import deba
 from lib.uid import gen_uid
 from lib import salary
-
-
-from lib.clean import clean_names, standardize_desc_cols, clean_salaries
-
+from lib.clean import clean_names, standardize_desc_cols, clean_salaries, strip_leading_comma, clean_dates
 
 def split_names(df, col, drop=True):
     if col not in df.columns:
@@ -80,7 +77,7 @@ def sum_salaries(df):
 
 
 def clean_pprr_2010_2020(df):
-    return (
+    df = (
         df.pipe(clean_column_names)
         .rename(
             columns={
@@ -103,6 +100,7 @@ def clean_pprr_2010_2020(df):
         .pipe(sum_salaries)
         .pipe(gen_uid, ["agency", "employee_id"])
     )
+    return df 
 
 
 def clean_pprr_2021():
@@ -123,6 +121,8 @@ def clean_pprr_2021():
         .pipe(set_values, {"data_production_year": 2021, "agency": "covington-pd"})
         .pipe(gen_uid, ["agency", "employee_id"])
     )
+
+
 
 
 def clean_pprr():
@@ -164,11 +164,105 @@ def clean_pprr():
         ]
     )
 
+def lowercase_all_strings(df):
+    for col in df.columns:
+        if df[col].dtype == "object":
+            df.loc[:, col] = df[col].str.lower()
+    return df
+
+# def clean_employment_status(df):
+#     df.loc[:, "employment_status"] = (
+#         df["employment_status"]
+#         .str.lower()
+#         .str.replace("sal-ft", "full time", regex=False)
+#         .str.replace("salary", "full time", regex=False)
+#     )
+#     return df
+
+# def rename_salary_freq(df):
+#     df.loc[:, "salary_freq"] = df["salary_freq"].str.lower().replace("y", "yearly")
+#     return df
+
+# def assign_agency_25(df):
+#     df.loc[:, "agency"] = "covington-pd"
+#     return df
+
+# def clean_25():
+#     df = (
+#         pd.read_csv(deba.data("raw/covington_pd/covington_pd_pprr_2002_2013.csv"))
+#         .pipe(clean_column_names)
+#         .rename(
+#             columns={
+#                 "employee_last_name": "last_name",
+#                 "employee_first_name": "first_name",
+#                 "description": "employment_status",
+#                 "frequency": "salary_freq",
+#                 "year": "data_production_year",
+#                 "employee_gross": "salary",
+#             }
+#         )
+#         .drop(columns=["hours"])
+#         .pipe(strip_leading_comma)
+#         .pipe(lowercase_all_strings)
+#         .pipe(clean_employment_status)
+#         .pipe(rename_salary_freq)
+#         .pipe(clean_salaries, ["salary"])
+#         .pipe(assign_agency_25)
+#         .pipe(clean_names, ["first_name", "last_name"])
+#         .pipe(gen_uid, ["agency", "first_name", "last_name",])
+#         .pipe(set_values, {"agency": "covington-pd"})
+#     )
+#     return df
+
+def append_suffix_to_last_name(df):
+
+    df = df.copy()
+    
+    df["suffix"] = (
+        df["suffix"]
+        .str.lower()
+        .str.strip()
+        .str.replace(r"\.", "", regex=True)
+    )
+    
+    df.loc[df["suffix"] != "", "last_name"] = (
+        df["last_name"].str.strip() + " " + df["suffix"]
+    )
+    
+    df = df.drop(columns=["suffix"])
+    
+    return df
+
+
+def clean_pprr_25(): 
+    df = (
+        pd.read_csv(deba.data("raw/covington_pd/covington_pd_pprr_1975_2025.csv"))
+        .pipe(clean_column_names)
+        .rename(
+            columns={
+                "location_description": "department_desc",
+                "job_class_description": "rank_desc",
+                "doh": "hire_date",
+            }
+        )
+        .pipe(strip_leading_comma)
+        .pipe(lowercase_all_strings)
+        .pipe(append_suffix_to_last_name)
+        .pipe(clean_names, ["first_name", "last_name"])
+        .pipe(clean_dates, ["hire_date"])
+        .pipe(standardize_desc_cols, ["department_desc", "rank_desc"])
+        .pipe(set_values, {"agency": "covington-pd"})
+        .pipe(gen_uid, ["agency", "first_name", "last_name", "rank_desc"])
+    )
+    return df 
+
 
 if __name__ == "__main__":
     actions_history = clean_actions_history()
     pprr = clean_pprr()
+    pprr_25 = clean_pprr_25()
     actions_history.to_csv(
         deba.data("clean/actions_history_covington_pd_2021.csv"), index=False
     )
     pprr.to_csv(deba.data("clean/pprr_covington_pd_2020.csv"), index=False)
+    pprr_25.to_csv(deba.data("clean/pprr_covington_pd_1975_2025.csv"), index=False)

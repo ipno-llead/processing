@@ -10,7 +10,7 @@ from lib.personnel import fuse_personnel
 from lib.post import load_for_agency
 
 
-def fuse_events(cprr, post, uof):
+def fuse_events(cprr, post, uof, uof22):
     builder = events.Builder()
     builder.extract_events(
         cprr,
@@ -65,20 +65,39 @@ def fuse_events(cprr, post, uof):
         },
         ["uid", "uof_uid"],
     )
+    builder.extract_events(
+        uof22,
+        {
+            events.UOF_INCIDENT: {
+                "prefix": "occurred",
+                "parse_date": True,
+                "keep": [
+                    "uid",
+                    "uof_uid",
+                    "agency",
+                ],
+            },
+        },
+        ["uid", "uof_uid"],
+    )
     return builder.to_frame()
 
 
 if __name__ == "__main__":
     cprr = pd.read_csv(deba.data("clean/cprr_terrebonne_so_2019_2021.csv"))
     uof = pd.read_csv(deba.data("match/uof_terrebonne_so_2021.csv"))
+    uof22 = pd.read_csv(deba.data("match/uof_terrebonne_so_2022_2024.csv"))
     citizen_df = pd.read_csv(deba.data("clean/uof_cit_terrebonne_so_2021.csv"))
+    citizen_22_df = pd.read_csv(deba.data("clean/uof_cit_terrebonne_so_2022_2024.csv"))
     agency = cprr.agency[0]
     post = load_for_agency(agency)
-    per = fuse_personnel(cprr, post, uof)
+    per = fuse_personnel(cprr, post, uof, uof22)
     com = rearrange_allegation_columns(cprr)
-    event = fuse_events(cprr, post, uof)
-    uof = rearrange_use_of_force(uof)
-    citizen_df = rearrange_citizen_columns(citizen_df)
+    event = fuse_events(cprr, post, uof, uof22)
+    combined_uof = pd.concat([uof, uof22], ignore_index=True)
+    uof = rearrange_use_of_force(combined_uof)
+    combined_cit = pd.concat([citizen_df, citizen_22_df], ignore_index=True)
+    citizen_df = rearrange_citizen_columns(combined_cit)
     event.to_csv(deba.data("fuse_agency/event_terrebonne_so.csv"), index=False)
     com.to_csv(deba.data("fuse_agency/com_terrebonne_so.csv"), index=False)
     per.to_csv(deba.data("fuse_agency/per_terrebonne_so.csv"), index=False)
