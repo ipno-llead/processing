@@ -769,8 +769,9 @@ def clean_21():
         )
         .pipe(gen_uid, ["incident_day", "incident_month", "incident_year", "last_name", "agency"], "tracking_id")
     )
-    return df 
+    return df
 
+#
 
 if __name__ == "__main__":
     df15, citizen_df15 = clean15()
