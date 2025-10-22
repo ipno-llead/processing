@@ -625,11 +625,158 @@ def clean15():
     df = df.drop(columns=["complainant_type"])
     return df, citizen_df
 
+def split_deputy(df):
+    """
+    Splits deputy column into first_name, middle_name, and last_name.
+    Handles formats like:
+    - First Last
+    - First M. Last
+    - First Last, Suffix
+    - First M. Last, Suffix
+    """
+    # Clean and normalize the deputy names
+    df.loc[:, "deputy"] = (
+        df.deputy.str.strip()
+        .str.replace(r"(\w+)\, (\w+)", r"\1 \2", regex=True)  # Remove commas before suffixes
+        .str.replace(r"(\w+) (\w) (\w+)", r"\1 \2. \3", regex=True)  # Add period to middle initials if missing
+    )
+
+    # Extract name parts: first_name, middle_name (optional), last_name, suffix (optional)
+    names = df.deputy.str.extract(r"^(\w+) ?(\w+\.)? ?(\w+) ?(iii|iv|jr\.?|sr\.?)?", flags=0)
+
+    df.loc[:, "first_name"] = names[0]
+    df.loc[:, "middle_name"] = names[1].fillna("").str.replace(r"\.", "", regex=True)
+    df.loc[:, "last_name"] = names[2]
+    df.loc[:, "suffix"] = names[3].fillna("").str.replace(r"\.", "", regex=True)
+
+    # Append suffix to last_name if present
+    df.loc[:, "last_name"] = df.last_name.fillna("").str.cat(
+        df.suffix.fillna(""), sep=" "
+    ).str.strip()
+
+    return df.drop(columns=["deputy", "suffix"])
+
+
+def split_incident_date(df):
+    """
+    Splits incident_date column into incident_month, incident_day, and incident_year.
+    Handles format: M/D/YYYY H:MM (e.g., "9/19/2023 1:00")
+    """
+    # Extract date components (month, day, year) from the datetime string
+    dates = df.incident_date.astype(str).str.extract(r"^(\d{1,2})/(\d{1,2})/(\d{4})")
+
+    df.loc[:, "incident_month"] = dates[0]
+    df.loc[:, "incident_day"] = dates[1]
+    df.loc[:, "incident_year"] = dates[2]
+
+    return df.drop(columns=["incident_date"])
+
+
+def extract_resignation_date(df):
+    """
+    Extracts resignation dates from action column into resign_month, resign_day, resign_year.
+    Handles format: "resigned on Month Day, Year" (e.g., "resigned on November 09, 2022")
+    """
+    # Extract resignation date if present
+    resign_dates = df.action.str.extract(
+        r"resigned on (\w+) (\d{1,2}), (\d{4})", flags=0
+    )
+
+    # Map month names to numbers
+    month_map = {
+        'january': '1', 'february': '2', 'march': '3', 'april': '4',
+        'may': '5', 'june': '6', 'july': '7', 'august': '8',
+        'september': '9', 'october': '10', 'november': '11', 'december': '12'
+    }
+
+    df.loc[:, "resign_month"] = resign_dates[0].str.lower().map(month_map).fillna("")
+    df.loc[:, "resign_day"] = resign_dates[1].fillna("")
+    df.loc[:, "resign_year"] = resign_dates[2].fillna("")
+
+    return df
+
+
+def clean_action_21(df):
+    """
+    Cleans and standardizes action column while preserving detail.
+    """
+    df.loc[:, "action"] = (
+        df.action.str.strip()
+        .str.replace(r"\.$", "", regex=True)  # Remove trailing periods
+        .str.replace(r"^Termination$", "termination", regex=True)
+        .str.replace(r"^Terminated$", "termination", regex=True)
+        .str.replace(r"^Resigned$", "resigned", regex=True)
+        .str.replace(r"Two week", "2-week", regex=False)
+        .str.replace(r"two week", "2-week", regex=False)
+        .str.replace(r"four days", "4-day", regex=False)
+        .str.replace(r"3 day", "3-day", regex=False)
+        .str.replace(r"1 day", "1-day", regex=False)
+        .str.replace(r"\bLt\.", "lieutenant", regex=True)
+        .str.replace(r"\bSgt\.", "sergeant", regex=True)
+        .str.replace(r"\bDeputy\b", "deputy", regex=True)
+        .str.replace(r"\bDeputies\b", "deputies", regex=True)
+        .str.replace(r"exhonorated", "exonerated", regex=False)
+        .str.replace(r"exhonerated", "exonerated", regex=False)
+        .str.replace(r"verbally counseled", "verbal counseling", regex=False)
+        .str.replace(r"Verbal counseling", "verbal counseling", regex=False)
+        .str.replace(r"Warden verbal counseling", "verbal counseling by warden", regex=False)
+        .str.replace(r"voluntarily resigned", "resigned", regex=False)
+        .str.replace(r"resigned on \w+ \d{1,2}, \d{4}", "resigned", regex=True)  # Remove date from resignation text
+        .str.replace(r"lieutenant Williams resigned", "resigned", regex=False)
+        .str.replace(r"deputy was given ", "", regex=False)
+        .str.replace(r"Charges dropped verbal counsel given", "charges dropped/verbal counseling", regex=False)
+        .str.replace(r"Written reprimand", "written reprimand", regex=False)
+        .str.replace(r"Written letter of reprimand", "written reprimand", regex=False)
+        .str.replace(r"Demoted", "demoted", regex=False)
+        .str.replace(r"Suspension", "suspension", regex=False)
+        .str.replace(r" and ", "/", regex=False)  # Replace "and" with "/" for consistency
+        .str.replace(r"reassigned", "transferred", regex=False)
+        .str.replace(r"subsequently arrested", "arrested", regex=False)
+        .str.replace(r"termination/arrested", "termination/subsequently arrested", regex=False)
+        .str.replace(r"additional training", "additional training required", regex=False)
+        .str.replace(r"further training", "additional training required", regex=False)
+        .str.replace(r"(\d)-day", r"\1-day", regex=True)  # Ensure consistent day format
+        .str.replace(r"(\d)-week", r"\1-week", regex=True)  # Ensure consistent week format
+        .str.strip()
+    )
+    return df
+
+
+def clean_21():
+    df = (
+        pd.read_csv(deba.data("raw/baton_rouge_so/baton_rouge_so_cprr_2021_2023.csv"))
+        .pipe(clean_column_names)
+        .pipe(clear_leading_commas15)
+        .rename(
+            columns={
+                "infraction": "allegation",
+                "datetime_infract": "incident_date",
+                "action_taken": "action",
+            }
+        )
+        .pipe(split_deputy)
+        .pipe(clean_names, ["first_name", "last_name", "middle_name"])
+        .pipe(standardize_desc_cols, ['allegation', 'disposition'])
+        .pipe(split_incident_date)
+        .pipe(extract_resignation_date)
+        .pipe(clean_action_21)
+        .pipe(set_values, {"agency": "east-baton-rouge-so"})
+        .pipe(gen_uid, ["first_name", "middle_name", "last_name", "agency"])
+        .pipe(
+            gen_uid,
+            ["uid", "allegation", "disposition", "incident_day"],
+            "allegation_uid",
+        )
+        .pipe(gen_uid, ["incident_day", "incident_month", "incident_year", "last_name", "agency"], "tracking_id")
+    )
+    return df 
+
 
 if __name__ == "__main__":
     df15, citizen_df15 = clean15()
     df18, citizen_df18 = clean18()
     df20, citizen_df20 = clean20()
+    df21 = clean_21()
     citizen_df15.to_csv(
         deba.data("clean/cprr_cit_baton_rouge_so_2011_2015.csv"), index=False
     )
@@ -642,3 +789,4 @@ if __name__ == "__main__":
     df15.to_csv(deba.data("clean/cprr_baton_rouge_so_2011_2015.csv"), index=False)
     df18.to_csv(deba.data("clean/cprr_baton_rouge_so_2018.csv"), index=False)
     df20.to_csv(deba.data("clean/cprr_baton_rouge_so_2016_2020.csv"), index=False)
+    df21.to_csv(deba.data("clean/cprr_baton_rouge_so_2021_2023.csv"), index=False)
