@@ -771,8 +771,6 @@ def clean_21():
     )
     return df
 
-#
-
 if __name__ == "__main__":
     df15, citizen_df15 = clean15()
     df18, citizen_df18 = clean18()
