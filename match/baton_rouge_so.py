@@ -180,10 +180,39 @@ def match_sas_against_post(sas, post):
     sas.loc[:, "uid"] = sas.uid.map(lambda x: match_dict.get(x, x))
     return sas
 
+def match_cprr_21_against_post(cprr, post):
+    dfa = cprr[["uid", "first_name", "last_name"]]
+    dfa.loc[:, "fc"] = dfa.first_name.map(lambda x: x[:1])
+    dfa = dfa.drop_duplicates(subset=["uid"]).set_index("uid")
+
+    dfb = post[["uid", "first_name", "last_name"]]
+    dfb.loc[:, "fc"] = dfb.first_name.map(lambda x: x[:1])
+    dfb = dfb.drop_duplicates(subset=["uid"]).set_index("uid")
+
+    matcher = ThresholdMatcher(
+        ColumnsIndex(["fc"]),
+        {
+            "last_name": JaroWinklerSimilarity(),
+            "first_name": JaroWinklerSimilarity(),
+        },
+        dfa,
+        dfb,
+    )
+    decision = .92
+    matcher.save_pairs_to_excel(
+        deba.data("match/baton_rouge_so_cprr_2021_v_post_pprr_2025_08_25.xlsx"),
+        decision,
+    )
+    matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
+    match_dict = dict(matches)
+    cprr.loc[:, "uid"] = cprr.uid.map(lambda x: match_dict.get(x, x))
+    return cprr
+
 if __name__ == "__main__":
     cprr_15 = pd.read_csv(deba.data("clean/cprr_baton_rouge_so_2011_2015.csv"))
     cprr18 = pd.read_csv(deba.data("clean/cprr_baton_rouge_so_2018.csv"))
     cprr20 = pd.read_csv(deba.data("clean/cprr_baton_rouge_so_2016_2020.csv"))
+    cprr21 = pd.read_csv(deba.data("clean/cprr_baton_rouge_so_2021_2023.csv"))
     uof = pd.read_csv(deba.data("clean/uof_baton_rouge_so_2020.csv"))
     sas = pd.read_csv(deba.data("clean/sas_baton_rouge_so_2023_2025.csv"))
     settlements = pd.read_csv(deba.data("clean/settlements_baton_rouge_so_2021_2023.csv"))
@@ -192,12 +221,14 @@ if __name__ == "__main__":
     cprr_15 = match_cprr_15_against_post(cprr_15, post)
     cprr18 = match_cprr_18_against_post(cprr18, post)
     cprr20 = match_cprr_20_against_post(cprr20, post)
+    cprr21 = match_cprr_21_against_post(cprr21, post)
     uof = match_uof_against_post(uof, post)
     settlements = match_settlements_v_post(settlements, post)
     sas = match_sas_against_post(sas, post)
     cprr_15.to_csv(deba.data("match/cprr_baton_rouge_so_2011_2015.csv"), index=False)
     cprr18.to_csv(deba.data("match/cprr_baton_rouge_so_2018.csv"), index=False)
     cprr20.to_csv(deba.data("match/cprr_baton_rouge_so_2016_2020.csv"), index=False)
+    cprr21.to_csv(deba.data("match/cprr_baton_rouge_so_2021_2023.csv"), index=False)
     uof.to_csv(deba.data("match/uof_baton_rouge_so_2020.csv"), index=False)
     settlements.to_csv(
         deba.data("match/settlements_baton_rouge_so_2021_2023.csv"), index=False
