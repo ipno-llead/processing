@@ -5,6 +5,7 @@ from lib.columns import (
     rearrange_event_columns,
     rearrange_settlement_columns,
     rearrange_docs_columns,
+    rearrange_use_of_force,
 )
 from lib.personnel import fuse_personnel
 from lib import events
@@ -12,7 +13,7 @@ from lib.post import load_for_agency
 import pandas as pd
 
 
-def fuse_events(lprr, pprr, pprr_term, settlements, cprr, cprr22):
+def fuse_events(lprr, pprr, pprr_term, settlements, cprr, cprr22, uof):
     builder = events.Builder()
     builder.extract_events(
         lprr,
@@ -159,6 +160,16 @@ def fuse_events(lprr, pprr, pprr_term, settlements, cprr, cprr22):
         },
         ["uid", "allegation_uid"],
     )
+    builder.extract_events(
+        uof,
+        {
+            events.UOF_INCIDENT: {
+                "prefix": "incident",
+                "keep": ["uid", "uof_uid", "agency"],
+            },
+        },
+        ["uid", "uof_uid"],
+    )
     return builder.to_frame()
 
 #
@@ -173,22 +184,25 @@ if __name__ == "__main__":
     cprr = pd.read_csv(deba.data("match/cprr_louisiana_state_pd_2019_2020.csv"))
     cprr22 = pd.read_csv(deba.data("match/cprr_louisiana_state_pd_2021_2022.csv"))
     post_event = pd.read_csv(deba.data("match/post_event_louisiana_state_police_2020.csv"))
+    uof = pd.read_csv(deba.data("match/uof_louisiana_state_pd_2022.csv"))
     agency = pprr.agency[0]
     post = load_for_agency(agency)
-    per_df = fuse_personnel(pprr, pprr_term, lprr, post, cprr, cprr22)
+    per_df = fuse_personnel(pprr, pprr_term, lprr, post, cprr, cprr22, uof)
     per_df = per_df[~((per_df.last_name.fillna("") == ""))]
-    event_df = rearrange_event_columns(fuse_events(lprr, pprr, pprr_term, settlements, cprr, cprr22))
+    event_df = rearrange_event_columns(fuse_events(lprr, pprr, pprr_term, settlements, cprr, cprr22, uof))
     post_event = rearrange_event_columns(post_event)
     event_df = pd.concat([event_df, post_event])
     settlements = rearrange_settlement_columns(settlements)
     app_df = rearrange_appeal_hearing_columns(lprr)
     combined_cprr = pd.concat([cprr, cprr22])
     com = rearrange_allegation_columns(combined_cprr)
+    uof = rearrange_use_of_force(uof)
     per_df.to_csv(deba.data("fuse_agency/per_louisiana_state_pd.csv"), index=False)
     event_df.to_csv(deba.data("fuse_agency/event_louisiana_state_pd.csv"), index=False)
     app_df.to_csv(deba.data("fuse_agency/app_louisiana_state_pd.csv"), index=False)
     settlements.to_csv(
         deba.data("fuse_agency/settlements_louisiana_state_pd.csv"), index=False
     )
+    uof.to_csv(deba.data("fuse_agency/uof_louisiana_state_pd.csv"), index=False)
     com.to_csv(deba.data("fuse_agency/com_louisiana_state_pd.csv"), index=False)
     post.to_csv(deba.data("fuse_agency/post_louisiana_state_pd.csv"), index=False)

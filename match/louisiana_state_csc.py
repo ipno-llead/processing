@@ -234,8 +234,42 @@ def match_settlements_to_pprr(settlements, pprr):
     settlements.loc[:, "uid"] = settlements.uid.map(lambda x: match_dict.get(x, x))
     return settlements
 
+def match_uof_to_pprr(uof, pprr):
+    dfa = uof[["uid", "first_name", "last_name"]]
+    dfa.loc[:, "fc"] = dfa.first_name.fillna("").map(lambda x: x[:1])
+    dfa.loc[:, "lc"] = dfa.last_name.fillna("").map(lambda x: x[:1])
+    dfa = dfa.drop_duplicates(subset=["uid"]).set_index("uid")
+
+    dfb = pprr[["uid", "first_name", "last_name"]]
+    dfb.loc[:, "fc"] = dfb.first_name.fillna("").map(lambda x: x[:1])
+    dfb.loc[:, "lc"] = dfb.last_name.fillna("").map(lambda x: x[:1])
+    dfb = dfb.drop_duplicates(subset=["uid"]).set_index("uid")
+
+    matcher = ThresholdMatcher(
+        ColumnsIndex(["fc", "lc"]),
+        {
+            "first_name": JaroWinklerSimilarity(),
+            "last_name": JaroWinklerSimilarity(),
+        },
+        dfa,
+        dfb,
+        show_progress=True,
+    )
+    decision = 0.93
+
+    matcher.save_pairs_to_excel(
+        deba.data("match/uof_lsp_2022_v_pprr_lsp.xlsx"),
+        decision,
+    )
+    matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
+    match_dict = dict(matches)
+
+    uof.loc[:, "uid"] = uof.uid.map(lambda x: match_dict.get(x, x))
+    return uof
+
 
 if __name__ == "__main__":
+    uof = pd.read_csv(deba.data("clean/uof_louisiana_state_pd_2022.csv"))
     lprr = pd.read_csv(deba.data("clean/lprr_louisiana_state_csc_1991_2020.csv"))
     pprr_demo = pd.read_csv(deba.data("clean/pprr_demo_louisiana_csd_2021.csv"))
     pprr_term = pd.read_csv(deba.data("clean/pprr_term_louisiana_csd_2021.csv"))
@@ -246,11 +280,13 @@ if __name__ == "__main__":
     )
     agency = pprr_term.agency[0]
     post = load_for_agency(agency)
+    uof = match_uof_to_pprr(uof, pprr_demo)
     settlements = match_settlements_to_pprr(settlements, pprr_demo)
     lprr = match_lprr_and_pprr(lprr, pprr_demo)
     post_events = extract_post_events(pprr_demo, post)
     cprr = match_cprr_to_pprr(cprr, pprr_demo)
     cprr22 = match_cprr_22_to_pprr(cprr22, pprr_demo)
+    uof.to_csv(deba.data("match/uof_louisiana_state_pd_2022.csv"), index=False)
     lprr.to_csv(deba.data("match/lprr_louisiana_state_csc_1991_2020.csv"), index=False)
     post_events.to_csv(
         deba.data("match/post_event_louisiana_state_police_2020.csv"), index=False
