@@ -184,10 +184,10 @@ if __name__ == "__main__":
     cprr = pd.read_csv(deba.data("match/cprr_louisiana_state_pd_2019_2020.csv"))
     cprr22 = pd.read_csv(deba.data("match/cprr_louisiana_state_pd_2021_2022.csv"))
     post_event = pd.read_csv(deba.data("match/post_event_louisiana_state_police_2020.csv"))
-    uof = pd.read_csv(deba.data("match/uof_louisiana_state_pd_2022.csv"))
+    uof = pd.read_csv(deba.data("match/uof_louisiana_state_pd_2022_2024.csv"))
     uof = uof.drop_duplicates(subset=["uof_uid"], keep="first")
     uof_citizen = pd.read_csv(
-        deba.data("clean/uof_cit_louisiana_state_pd_2022.csv")
+        deba.data("clean/uof_cit_louisiana_state_pd_2022_2024.csv")
     )
     agency = pprr.agency[0]
     post = load_for_agency(agency)
