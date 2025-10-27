@@ -263,13 +263,48 @@ def extract_citizen(uof):
 
     return citizen_df, uof
 
+def clean_24():
+    df = (
+        pd.read_csv(
+            deba.data("raw/louisiana_state_pd/lsp_uof_23_24.csv")
+        )
+        .pipe(clean_column_names)
+        .drop(columns=["subject_full_name", "justified_y_n"])
+        .rename(columns={
+                "event_start_date": "incident_date",
+                "ren": "tracking_id_og",
+                "troop": "department_desc",
+                "type_of_force_used_by_officer": "use_of_force_description",
+                "subject_count": "number_of_citizens_involved",
+                "trooper_officer_count": "number_of_officers_involved",
+                "trooper_officer_race": "officer_race",
+                "subject_race": "citizen_race",
+                "type_of_force_used_by_subject": "use_of_force_by_citizen",
+                "of_uses_of_force": "number_of_uses_of_force",
+                 }
+                )
+        .pipe(split_incident_date)
+        .pipe(standardize_desc_cols, ["department_desc", "use_of_force_description", "use_of_force_by_citizen"])
+        .pipe(separate_multiple_citizens)
+        .pipe(separate_multiple_officers)
+        .pipe(clean_names, ["first_name", "middle_name", "last_name"])
+        .pipe(clean_races, ["officer_race", "citizen_race"])
+        .pipe(set_values, {"agency": "louisiana-state-pd"})
+        .pipe(gen_uid, ["first_name", "last_name", "agency"])
+        .pipe(gen_uid, ["tracking_id_og", "agency"], "tracking_id")
+        .pipe(gen_uid, ["tracking_id", "uid", "use_of_force_description", "agency"], "uof_uid")
+        )
+    return df
+
 
 if __name__ == "__main__":
-    uof = clean()
+    uof_22 = clean()
+    uof_24 = clean_24()
+    uof = pd.concat([uof_22, uof_24])
     uof_citizen, uof = extract_citizen(uof)
     uof = uof.drop_duplicates(subset=["uid", "uof_uid"])
     uof_citizen = uof_citizen.drop_duplicates(subset=["citizen_uid", "uof_uid"])
-    uof.to_csv(deba.data("clean/uof_louisiana_state_pd_2022.csv"), index=False)
+    uof.to_csv(deba.data("clean/uof_louisiana_state_pd_2022_2024.csv"), index=False)
     uof_citizen.to_csv(
-        deba.data("clean/uof_cit_louisiana_state_pd_2022.csv"), index=False
+        deba.data("clean/uof_cit_louisiana_state_pd_2022_2024.csv"), index=False
     )

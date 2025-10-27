@@ -258,7 +258,7 @@ def match_uof_to_pprr(uof, pprr):
     decision = 0.93
 
     matcher.save_pairs_to_excel(
-        deba.data("match/uof_lsp_2022_v_pprr_lsp.xlsx"),
+        deba.data("match/uof_lsp_22_24_v_pprr_lsp.xlsx"),
         decision,
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
@@ -269,7 +269,7 @@ def match_uof_to_pprr(uof, pprr):
 
 
 if __name__ == "__main__":
-    uof = pd.read_csv(deba.data("clean/uof_louisiana_state_pd_2022.csv"))
+    uof = pd.read_csv(deba.data("clean/uof_louisiana_state_pd_2022_2024.csv"))
     lprr = pd.read_csv(deba.data("clean/lprr_louisiana_state_csc_1991_2020.csv"))
     pprr_demo = pd.read_csv(deba.data("clean/pprr_demo_louisiana_csd_2021.csv"))
     pprr_term = pd.read_csv(deba.data("clean/pprr_term_louisiana_csd_2021.csv"))
@@ -286,7 +286,7 @@ if __name__ == "__main__":
     post_events = extract_post_events(pprr_demo, post)
     cprr = match_cprr_to_pprr(cprr, pprr_demo)
     cprr22 = match_cprr_22_to_pprr(cprr22, pprr_demo)
-    uof.to_csv(deba.data("match/uof_louisiana_state_pd_2022.csv"), index=False)
+    uof.to_csv(deba.data("match/uof_louisiana_state_pd_2022_2024.csv"), index=False)
     lprr.to_csv(deba.data("match/lprr_louisiana_state_csc_1991_2020.csv"), index=False)
     post_events.to_csv(
         deba.data("match/post_event_louisiana_state_police_2020.csv"), index=False
