@@ -702,7 +702,7 @@ def clean_action_21(df):
     """
     df.loc[:, "action"] = (
         df.action.str.strip()
-        .str.replace(r"\.$", "", regex=True)  # Remove trailing periods
+        .str.replace(r"\.$", "", regex=True)  
         .str.replace(r"^Termination$", "termination", regex=True)
         .str.replace(r"^Terminated$", "termination", regex=True)
         .str.replace(r"^Resigned$", "resigned", regex=True)
@@ -721,7 +721,7 @@ def clean_action_21(df):
         .str.replace(r"Verbal counseling", "verbal counseling", regex=False)
         .str.replace(r"Warden verbal counseling", "verbal counseling by warden", regex=False)
         .str.replace(r"voluntarily resigned", "resigned", regex=False)
-        .str.replace(r"resigned on \w+ \d{1,2}, \d{4}", "resigned", regex=True)  # Remove date from resignation text
+        .str.replace(r"resigned on \w+ \d{1,2}, \d{4}", "resigned", regex=True)
         .str.replace(r"lieutenant Williams resigned", "resigned", regex=False)
         .str.replace(r"deputy was given ", "", regex=False)
         .str.replace(r"Charges dropped verbal counsel given", "charges dropped/verbal counseling", regex=False)
@@ -729,14 +729,14 @@ def clean_action_21(df):
         .str.replace(r"Written letter of reprimand", "written reprimand", regex=False)
         .str.replace(r"Demoted", "demoted", regex=False)
         .str.replace(r"Suspension", "suspension", regex=False)
-        .str.replace(r" and ", "/", regex=False)  # Replace "and" with "/" for consistency
+        .str.replace(r" and ", "/", regex=False)
         .str.replace(r"reassigned", "transferred", regex=False)
         .str.replace(r"subsequently arrested", "arrested", regex=False)
         .str.replace(r"termination/arrested", "termination/subsequently arrested", regex=False)
         .str.replace(r"additional training", "additional training required", regex=False)
         .str.replace(r"further training", "additional training required", regex=False)
-        .str.replace(r"(\d)-day", r"\1-day", regex=True)  # Ensure consistent day format
-        .str.replace(r"(\d)-week", r"\1-week", regex=True)  # Ensure consistent week format
+        .str.replace(r"(\d)-day", r"\1-day", regex=True)
+        .str.replace(r"(\d)-week", r"\1-week", regex=True)
         .str.strip()
     )
     return df
