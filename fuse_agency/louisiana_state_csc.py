@@ -185,6 +185,10 @@ if __name__ == "__main__":
     cprr22 = pd.read_csv(deba.data("match/cprr_louisiana_state_pd_2021_2022.csv"))
     post_event = pd.read_csv(deba.data("match/post_event_louisiana_state_police_2020.csv"))
     uof = pd.read_csv(deba.data("match/uof_louisiana_state_pd_2022.csv"))
+    #uof = uof.drop_duplicates(subset=["uof_uid"])
+    uof_citizen = pd.read_csv(
+        deba.data("clean/uof_cit_louisiana_state_pd_2022.csv")
+    )
     agency = pprr.agency[0]
     post = load_for_agency(agency)
     per_df = fuse_personnel(pprr, pprr_term, lprr, post, cprr, cprr22, uof)
@@ -206,3 +210,6 @@ if __name__ == "__main__":
     uof.to_csv(deba.data("fuse_agency/uof_louisiana_state_pd.csv"), index=False)
     com.to_csv(deba.data("fuse_agency/com_louisiana_state_pd.csv"), index=False)
     post.to_csv(deba.data("fuse_agency/post_louisiana_state_pd.csv"), index=False)
+    uof_citizen.to_csv(
+        deba.data("fuse_agency/cit_louisiana_state_pd.csv.csv"), index=False
+    )
