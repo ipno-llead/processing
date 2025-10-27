@@ -211,5 +211,5 @@ if __name__ == "__main__":
     com.to_csv(deba.data("fuse_agency/com_louisiana_state_pd.csv"), index=False)
     post.to_csv(deba.data("fuse_agency/post_louisiana_state_pd.csv"), index=False)
     uof_citizen.to_csv(
-        deba.data("fuse_agency/cit_louisiana_state_pd.csv.csv"), index=False
+        deba.data("fuse_agency/cit_louisiana_state_pd.csv"), index=False
     )
