@@ -58,7 +58,7 @@ def fuse_events(cprr_15, cprr_18, cprr_20, cprr_21, post, uof, settlement,sas):
         ["uid", "allegation_uid"],
     )
     builder.extract_events(
-        cprr_18,
+        cprr_21,
         {
             events.COMPLAINT_INCIDENT: {
                 "prefix": "incident",
