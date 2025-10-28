@@ -7,8 +7,18 @@ from lib.post import load_for_agency
 from lib import events
 
 
-def fuse_events(cprr, post, pprr):
+def fuse_events(cprr, cprr21, post, pprr):
     builder = events.Builder()
+    builder.extract_events(
+        cprr21,
+        {
+            events.COMPLAINT_RECEIVE: {
+                "prefix": "incident",
+                "keep": ["agency", "allegation_uid", "uid"],
+            }
+        },
+        ["allegation_uid"],
+    )
     builder.extract_events(
         cprr,
         {
@@ -58,14 +68,16 @@ def fuse_events(cprr, post, pprr):
 if __name__ == "__main__":
     cprr = pd.read_csv(deba.data("match/cprr_shreveport_pd_2018_2019.csv"))
     pprr = pd.read_csv(deba.data("match/pprr_shreveport_pd_1990_2001.csv"))
+    cprr21 = pd.read_csv(deba.data("match/cprr_shreveport_pd_2021_2023.csv"))
     agency = cprr.agency[0]
     cprr = cprr[~((cprr.uid.fillna("") == ""))]
     post = load_for_agency(agency)
-    event_df = fuse_events(cprr, post, pprr)
+    event_df = fuse_events(cprr,cprr21, post, pprr)
     event_df = event_df.drop_duplicates(subset=["event_uid"], keep="first")
     #event_df = fuse_events(cprr, post, pprr)
-    per = fuse_personnel(cprr, post, pprr)
-    com = rearrange_allegation_columns(cprr)
+    per = fuse_personnel(cprr, cprr21, post, pprr)
+    cprr25 = pd.concat([cprr, cprr21], ignore_index=True)
+    com = rearrange_allegation_columns(cprr25)
     per.to_csv(deba.data("fuse_agency/per_shreveport_pd.csv"), index=False)
     com.to_csv(deba.data("fuse_agency/com_shreveport_pd.csv"), index=False)
     event_df.to_csv(deba.data("fuse_agency/event_shreveport_pd.csv"), index=False)

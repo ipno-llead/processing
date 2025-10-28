@@ -2,7 +2,7 @@ import pandas as pd
 
 from lib.columns import clean_column_names, set_values
 import deba
-from lib.clean import clean_names
+from lib.clean import clean_names, standardize_desc_cols
 from lib.uid import gen_uid
 
 
@@ -270,6 +270,74 @@ def clean_codebook():
     )
     return df
 
+def split_date_columns(df):
+    """Split date column into incident_month, incident_day, incident_year"""
+    date_parts = df.date.str.split('/', expand=True)
+    df.loc[:, "incident_month"] = date_parts[0]
+    df.loc[:, "incident_day"] = date_parts[1]
+    df.loc[:, "incident_year"] = date_parts[2]
+    df = df.drop(columns=["date"])
+    return df
+
+
+def clean_tracking_id_og(df):
+    """Clean iab_number and rename to tracking_id_og: lowercase, spaces to hyphens, no parentheses"""
+    df.loc[:, "tracking_id_og"] = (
+        df.iab_number.str.replace(r"[()]", "", regex=True)
+        .str.lower()
+        .str.replace(r"\s+", "-", regex=True)
+    )
+    return df.drop(columns=["iab_number"])
+
+
+def split_officer_name(df):
+    """Split officer_name (format: 'last, first') into last_name and first_name columns"""
+    name_parts = df.officer_name.str.split(',', n=1, expand=True)
+    df.loc[:, "last_name"] = name_parts[0].str.strip() if 0 in name_parts.columns else None
+    df.loc[:, "first_name"] = name_parts[1].str.strip() if 1 in name_parts.columns else None
+    return df.drop(columns=["officer_name"])
+
+
+def stack_complaint_types(df):
+    """Stack multiple complaint_type columns into single allegation column, duplicating rows as needed"""
+    # Get all columns except complaint_type columns
+    id_vars = [col for col in df.columns if not col.startswith('complaint_type')]
+
+    # Get all complaint_type columns
+    value_vars = [col for col in df.columns if col.startswith('complaint_type')]
+
+    # Melt the dataframe to stack complaint types
+    df = df.melt(
+        id_vars=id_vars,
+        value_vars=value_vars,
+        value_name='allegation'
+    ).drop(columns=['variable'])
+
+    # Remove rows with no allegation (NaN values)
+    df = df[df.allegation.notna()].reset_index(drop=True)
+
+    return df
+
+
+def clean_21():
+    df = (
+        pd.read_csv(deba.data("raw/shreveport_pd/shreveport_pd_cprr_21_23.csv"))
+        .pipe(clean_column_names)
+        .drop(columns=["page_pair", "complainant_name"])
+        .pipe(split_date_columns)
+        .pipe(clean_tracking_id_og)
+        .pipe(split_officer_name)
+        .pipe(clean_names, ["first_name", "last_name"])
+        .pipe(stack_complaint_types)
+        .pipe(standardize_desc_cols, ["allegation"])
+        .pipe(clean_allegation)
+        .pipe(set_values, {"agency": "shreveport-pd"})
+        .pipe(gen_uid, ["first_name", "last_name", "agency"])
+        .pipe(gen_uid, ["allegation", "tracking_id_og", "uid"], "allegation_uid")
+    )
+    return df 
+
+
 
 if __name__ == "__main__":
     df = pd.concat(
@@ -298,6 +366,8 @@ if __name__ == "__main__":
             ),
         ]
     )
+    df21 = clean_21()
     cb_df = clean_codebook()
     df.to_csv(deba.data("clean/cprr_shreveport_pd_2018_2019.csv"), index=False)
     cb_df.to_csv(deba.data("clean/cprr_codebook_shreveport_pd.csv"), index=False)
+    df21.to_csv(deba.data("clean/cprr_shreveport_pd_2021_2023.csv"), index=False)
