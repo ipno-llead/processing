@@ -6,7 +6,7 @@ from lib.personnel import fuse_personnel
 from lib.post import load_for_agency
 
 
-def fuse_events(cprr, cprr19, pprr, pprr21):
+def fuse_events(cprr, cprr19, cprr21, pprr, pprr21):
     builder = events.Builder()
     builder.extract_events(
         cprr,
@@ -66,6 +66,16 @@ def fuse_events(cprr, cprr19, pprr, pprr21):
         ["uid", "allegation_uid"],
     )
     builder.extract_events(
+        cprr21,
+        {
+            events.COMPLAINT_RECEIVE: {
+                "prefix": "receive",
+                "keep": ["uid", "agency", "allegation_uid"],
+            },
+        },
+        ["uid", "allegation_uid"],
+    )
+    builder.extract_events(
         pprr21,
         {
             events.OFFICER_HIRE: {
@@ -86,14 +96,15 @@ def fuse_events(cprr, cprr19, pprr, pprr21):
 if __name__ == "__main__":
     cprr = pd.read_csv(deba.data("match/cprr_caddo_so_2022_2023.csv"))
     cprr19 = pd.read_csv(deba.data("match/cprr_caddo_so_2015_2019.csv"))
+    cprr21 = pd.read_csv(deba.data("match/cprr_caddo_so_2020_2021.csv"))
     pprr = pd.read_csv(deba.data("match/pprr_caddo_parish_so_2020.csv"))
     pprr21 = pd.read_csv(deba.data("match/pprr_caddo_parish_so_2021.csv"))
     agency = cprr.agency[0]
     post = load_for_agency(agency)
-    per = fuse_personnel(cprr,cprr19,pprr, pprr21)
-    combined_cprr = pd.concat([cprr, cprr19])
+    per = fuse_personnel(cprr,cprr19,cprr21, pprr, pprr21)
+    combined_cprr = pd.concat([cprr, cprr19, cprr21])
     com = rearrange_allegation_columns(combined_cprr)
-    event = fuse_events(cprr,cprr19,pprr, pprr21)
+    event = fuse_events(cprr,cprr19,cprr21, pprr, pprr21)
     event.to_csv(deba.data("fuse_agency/event_caddo_so.csv"), index=False)
     com.to_csv(deba.data("fuse_agency/com_caddo_so.csv"), index=False)
     per.to_csv(deba.data("fuse_agency/per_caddo_so.csv"), index=False)
