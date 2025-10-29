@@ -1,6 +1,6 @@
 from lib.columns import clean_column_names, set_values
 import deba
-from lib.clean import clean_names, clean_salaries, standardize_desc_cols, clean_dates
+from lib.clean import clean_names, clean_salaries, standardize_desc_cols, clean_dates, clean_races, clean_sexes
 from lib.uid import gen_uid, ensure_uid_unique
 from lib import salary
 import pandas as pd
@@ -86,8 +86,60 @@ def clean():
         )
     )
 
+def assign_agency_21(df):
+    df.loc[:, "agency"] = "caddo-so"
+    df.loc[:, "data_production_year"] = 2021
+    return df
+
+
+def deduplicate_race(df):
+    """
+    Remove duplicated race values separated by semicolons.
+    E.g., 'white; white' becomes 'white'
+    """
+    df.loc[:, "race"] = (
+        df.race.str.split(";")
+        .str[0]
+        .str.strip()
+    )
+    return df
+
+
+
+
+def clean21():
+    df = (
+        pd.read_csv(deba.data("raw/caddo_parish_so/caddo_parish_so_pprr_2021.csv"))
+        .pipe(clean_column_names)
+        .rename(
+            columns={
+                "annual": "salary",
+                "title": "rank_desc",
+                "year_of_birth": "birth_date",
+                "department": "department_desc",
+            }
+        )
+        .drop(columns=["commission_number"])
+        .pipe(set_values, {"salary_freq": salary.YEARLY})
+        .pipe(extract_name)
+        .pipe(clean_salaries, ["salary"])
+        .pipe(standardize_desc_cols, ["rank_desc", "department_desc"])
+        .pipe(clean_rank_desc)
+        .pipe(assign_agency_21)
+        .pipe(clean_races, ["race"])
+        .pipe(deduplicate_race)
+        .pipe(clean_sexes, ["sex"])
+        .pipe(clean_dates, ["hire_date"])
+        .pipe(clean_names, ["first_name", "last_name", "middle_name"])
+        .pipe(
+            gen_uid, ["agency", "first_name", "last_name", "middle_name", "rank_desc"]
+        )
+    )
+    return df 
 
 if __name__ == "__main__":
     df = clean()
+    df21 = clean21()
     ensure_uid_unique(df, "uid")
     df.to_csv(deba.data("clean/pprr_caddo_parish_so_2020.csv"), index=False)
+    df21.to_csv(deba.data("clean/pprr_caddo_parish_so_2021.csv"), index=False)
