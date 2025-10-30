@@ -243,6 +243,10 @@ def extract_citizen(uof):
             "use_of_force_by_citizen",
             "agency",
             "uof_uid",
+            "tracking_id",
+            "incident_year",
+            "incident_month",
+            "incident_day",
         ],
     ].pipe(
         gen_uid,
@@ -250,6 +254,8 @@ def extract_citizen(uof):
             "citizen_race",
             "use_of_force_by_citizen",
             "agency",
+            "uof_uid",
+            "tracking_id",
         ],
         "citizen_uid",
     )
