@@ -258,6 +258,7 @@ def fuse_settlements():
                 pd.read_csv(deba.data("fuse_agency/settlements_new_orleans_pd.csv")),
                 pd.read_csv(deba.data("fuse_agency/settlements_louisiana_state_pd.csv")),
                 pd.read_csv(deba.data("fuse_agency/settlements_baton_rouge_pd.csv")),
+                pd.read_csv(deba.data("fuse_agency/settlements_baton_rouge_so.csv")),
             ]
         )
     ).sort_values("settlement_uid", ignore_index=True)
