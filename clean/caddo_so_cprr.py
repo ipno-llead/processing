@@ -165,8 +165,36 @@ def clean_25():
     )
     return df
 
+def clean21():
+    df = (
+        pd.read_csv(deba.data("raw/caddo_so/cprr_caddo_so_2020_2021.csv"))
+            .drop(columns=["number"])
+            .pipe(clean_column_names)
+            .pipe(strip_leading_commas)
+            .pipe(split_case_number_and_date)
+            .pipe(clean_tracking_id)
+            .pipe(clean_allegation)
+            .pipe(clean_action)
+            .pipe(clean_disposition_25)
+            .pipe(split_rows_with_multiple_officers)
+            .pipe(extract_badge_num)
+            .pipe(extract_rank_desc_25)
+            .pipe(split_name)
+            .pipe(split_supervisor_name)
+            .pipe(clean_dates, ["receive_date"])
+            .pipe(set_values, {"agency": "caddo-so"})
+            .pipe(gen_uid, ["first_name", "last_name", "agency"])
+            .pipe(gen_uid, ["tracking_id",'first_name',"receive_year", "receive_month", "receive_day", "allegation"], "allegation_uid")
+            .pipe(gen_uid, ["supervisor_first_name", "supervisor_last_name", "agency"], "supervisor_uid")
+            .drop_duplicates(subset=["allegation_uid"])
+    )
+    df = df.fillna('') 
+    return df
+
 if __name__ == "__main__":
     df = clean()
+    df21 = clean21()
     df25 = clean_25()
     df.to_csv(deba.data("clean/cprr_caddo_so_2022_2023.csv"), index=False)
+    df21.to_csv(deba.data("clean/cprr_caddo_so_2020_2021.csv"), index=False)
     df25.to_csv(deba.data("clean/cprr_caddo_so_2015_2019.csv"), index=False)
