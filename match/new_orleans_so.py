@@ -246,9 +246,9 @@ def match_pprr_against_post(pprr, post):
         dfb,
         show_progress=True,
     )
-    decision = 0.894
+    decision = 0.848
     matcher.save_pairs_to_excel(
-        deba.data("match/new_orleans_so_pprr_2021_v_post_pprr_2020_11_06.xlsx"),
+        deba.data("match/new_orleans_so_pprr_2021_2025_v_post_pprr_2025_8_25.xlsx"),
         decision,
     )
 
@@ -448,5 +448,6 @@ if __name__ == "__main__":
     cprr20.to_csv(deba.data("match/cprr_new_orleans_so_2020.csv"), index=False)
     cprr21.to_csv(deba.data("match/cprr_new_orleans_so_2021.csv"), index=False)
     cprr22.to_csv(deba.data("match/cprr_new_orleans_so_2022.csv"), index=False)
+    pprr.to_csv(deba.data("match/pprr_new_orleans_so_2021_2025.csv"), index=False)
     post_events.to_csv(deba.data("match/post_event_new_orleans_so.csv"), index=False)
     overtime20.to_csv(deba.data("match/pprr_overtime_new_orleans_so_2020.csv"))
