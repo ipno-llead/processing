@@ -315,62 +315,124 @@ def fuse_agency_lists():
     ).sort_values("agency_name", ignore_index=True)
 
 
-def match_per_with_post(per, post, events, allegation_df, uof_df, sas_df, app_df, brady_df, property_claims_df, settlements, police_reports ):
-    dfa = (
-        per.loc[per.uid.notna(), ["uid", "first_name", "last_name", "agency"]]
-        .drop_duplicates(subset=["uid"])
-    )
-    dfa.loc[:, "dissimilar_filter"] = dfa.uid
-    dfa = dfa.set_index("uid", drop=True)
-    dfa.loc[:, "fc"] = dfa.first_name.fillna("").map(lambda x: x[:5])
-    dfa.loc[:, "lc"] = dfa.last_name.fillna("").map(lambda x: x[:5])
-
-    dfb = (
+def consolidate_exact_duplicates(per, post, events, allegation_df, uof_df, sas_df, app_df, brady_df, property_claims_df, settlements, police_reports):
+    """
+    Identifies and consolidates duplicate UIDs based on exact matches of first_name, last_name, and agency.
+    Maps all duplicate UIDs to a single canonical UID while preserving all associated events.
+    """
+    # Combine per and post data to identify all duplicates
+    combined = pd.concat([
+        per[["uid", "first_name", "last_name", "agency"]],
         post[["uid", "first_name", "last_name", "agency"]]
-        .drop_duplicates()
-    )
-    dfb.loc[:, "dissimilar_filter"] = dfb.uid
-    dfb = dfb.set_index("uid", drop=True)
-    dfb.loc[:, "fc"] = dfb.first_name.fillna("").map(lambda x: x[:5])
-    dfb.loc[:, "lc"] = dfb.last_name.fillna("").map(lambda x: x[:5])
+    ]).drop_duplicates()
 
-    matcher = ThresholdMatcher(
-        ColumnsIndex(["fc", "lc", "agency"]),
-        {
-            "first_name": JaroWinklerSimilarity(),
-            "last_name": JaroWinklerSimilarity(),
-        },
-        dfa,
-        dfb,
-        filters=[
-            DissimilarFilter("dissimilar_filter"),
-        ],
-    )
-    decision = .990
-    matcher.save_pairs_to_excel(
-        deba.data("fuse/personnel.xlsx"),
-        decision,
-    )
-    matches = matcher.get_index_pairs_within_thresholds(decision)
-    match_dict = dict(matches)
-    match_list = list(match_dict.items())
-    match_df = pd.DataFrame(match_list, columns=['per', 'post'])
-    match_df.to_csv("match_dict.csv")
-    match_df.set_index('per', inplace=True)
-    match_dict = match_df['post'].to_dict()
+    # Filter to only rows with valid UIDs
+    combined = combined[combined.uid.notna()].copy()
 
-    per['uid'] = per['uid'].map(match_dict).fillna(per['uid'])
-    events['uid'] = events['uid'].map(match_dict).fillna(events['uid'])
-    allegation_df['uid'] = allegation_df['uid'].map(match_dict).fillna(allegation_df['uid'])
-    uof_df['uid'] = uof_df['uid'].map(match_dict).fillna(uof_df['uid'])
-    sas_df['uid'] = sas_df['uid'].map(match_dict).fillna(sas_df['uid'])
-    app_df['uid'] = app_df['uid'].map(match_dict).fillna(app_df['uid'])
-    brady_df['uid'] = brady_df['uid'].map(match_dict).fillna(brady_df['uid'])
-    property_claims_df['uid'] = property_claims_df['uid'].map(match_dict).fillna(property_claims_df['uid'])
-    settlements['uid'] = settlements['uid'].map(match_dict).fillna(settlements['uid'])
-    police_reports['uid'] = police_reports['uid'].map(match_dict).fillna(police_reports['uid'])
+    # Group by exact matches of first_name, last_name, and agency
+    grouped = combined.groupby(["first_name", "last_name", "agency"], dropna=False)
 
-    return per, post, events, allegation_df, uof_df, sas_df, app_df, brady_df, property_claims_df, settlements, police_reports 
+    # Create a mapping from duplicate UIDs to the canonical UID (first UID in each group)
+    duplicate_mapping = {}
+    duplicate_groups = []
+
+    for (first_name, last_name, agency), group in grouped:
+        uids = group['uid'].unique()
+        if len(uids) > 1:
+            # Use the first UID as the canonical UID
+            canonical_uid = uids[0]
+            for uid in uids[1:]:
+                duplicate_mapping[uid] = canonical_uid
+            duplicate_groups.append({
+                'canonical_uid': canonical_uid,
+                'duplicate_uids': list(uids[1:]),
+                'first_name': first_name,
+                'last_name': last_name,
+                'agency': agency,
+                'count': len(uids)
+            })
+
+    # Save duplicate information for review
+    if duplicate_groups:
+        duplicate_df = pd.DataFrame(duplicate_groups)
+        duplicate_df.to_csv("exact_duplicate_uids.csv", index=False)
+        print(f"Found {len(duplicate_groups)} groups of exact duplicates affecting {len(duplicate_mapping)} UIDs")
+    else:
+        print("No exact duplicates found")
+
+    # Apply the mapping to all dataframes
+    if duplicate_mapping:
+        per['uid'] = per['uid'].map(duplicate_mapping).fillna(per['uid'])
+        post['uid'] = post['uid'].map(duplicate_mapping).fillna(post['uid'])
+        events['uid'] = events['uid'].map(duplicate_mapping).fillna(events['uid'])
+        allegation_df['uid'] = allegation_df['uid'].map(duplicate_mapping).fillna(allegation_df['uid'])
+        uof_df['uid'] = uof_df['uid'].map(duplicate_mapping).fillna(uof_df['uid'])
+        sas_df['uid'] = sas_df['uid'].map(duplicate_mapping).fillna(sas_df['uid'])
+        app_df['uid'] = app_df['uid'].map(duplicate_mapping).fillna(app_df['uid'])
+        brady_df['uid'] = brady_df['uid'].map(duplicate_mapping).fillna(brady_df['uid'])
+        property_claims_df['uid'] = property_claims_df['uid'].map(duplicate_mapping).fillna(property_claims_df['uid'])
+        settlements['uid'] = settlements['uid'].map(duplicate_mapping).fillna(settlements['uid'])
+        police_reports['uid'] = police_reports['uid'].map(duplicate_mapping).fillna(police_reports['uid'])
+
+    return per, post, events, allegation_df, uof_df, sas_df, app_df, brady_df, property_claims_df, settlements, police_reports
+
+
+# def match_per_with_post(per, post, events, allegation_df, uof_df, sas_df, app_df, brady_df, property_claims_df, settlements, police_reports ):
+#     dfa = (
+#         per.loc[per.uid.notna(), ["uid", "first_name", "last_name", "agency"]]
+#         .drop_duplicates(subset=["uid"])
+#     )
+#     dfa.loc[:, "dissimilar_filter"] = dfa.uid
+#     dfa = dfa.set_index("uid", drop=True)
+#     dfa.loc[:, "fc"] = dfa.first_name.fillna("").map(lambda x: x[:5])
+#     dfa.loc[:, "lc"] = dfa.last_name.fillna("").map(lambda x: x[:5])
+
+#     dfb = (
+#         post[["uid", "first_name", "last_name", "agency"]]
+#         .drop_duplicates()
+#     )
+#     dfb.loc[:, "dissimilar_filter"] = dfb.uid
+#     dfb = dfb.set_index("uid", drop=True)
+#     dfb.loc[:, "fc"] = dfb.first_name.fillna("").map(lambda x: x[:5])
+#     dfb.loc[:, "lc"] = dfb.last_name.fillna("").map(lambda x: x[:5])
+
+#     matcher = ThresholdMatcher(
+#         ColumnsIndex(["fc", "lc", "agency"]),
+#         {
+#             "first_name": JaroWinklerSimilarity(),
+#             "last_name": JaroWinklerSimilarity(),
+#         },
+#         dfa,
+#         dfb,
+#         filters=[
+#             DissimilarFilter("dissimilar_filter"),
+#         ],
+#     )
+#     decision = .95
+#     matcher.save_pairs_to_excel(
+#         deba.data("fuse/personnel.xlsx"),
+#         decision,
+#     )
+#     matches = matcher.get_index_pairs_within_thresholds(decision)
+#     match_dict = dict(matches)
+#     match_list = list(match_dict.items())
+#     match_df = pd.DataFrame(match_list, columns=['per', 'post'])
+#     match_df.to_csv("match_dict.csv")
+#     match_df.set_index('per', inplace=True)
+#     match_dict = match_df['post'].to_dict()
+
+#     per['uid'] = per['uid'].map(match_dict).fillna(per['uid'])
+#     events['uid'] = events['uid'].map(match_dict).fillna(events['uid'])
+#     allegation_df['uid'] = allegation_df['uid'].map(match_dict).fillna(allegation_df['uid'])
+#     uof_df['uid'] = uof_df['uid'].map(match_dict).fillna(uof_df['uid'])
+#     sas_df['uid'] = sas_df['uid'].map(match_dict).fillna(sas_df['uid'])
+#     app_df['uid'] = app_df['uid'].map(match_dict).fillna(app_df['uid'])
+#     brady_df['uid'] = brady_df['uid'].map(match_dict).fillna(brady_df['uid'])
+#     property_claims_df['uid'] = property_claims_df['uid'].map(match_dict).fillna(property_claims_df['uid'])
+#     settlements['uid'] = settlements['uid'].map(match_dict).fillna(settlements['uid'])
+#     police_reports['uid'] = police_reports['uid'].map(match_dict).fillna(police_reports['uid'])
+
+#     return per, post, events, allegation_df, uof_df, sas_df, app_df, brady_df, property_claims_df, settlements, police_reports 
 
 
 def read_personnel():
@@ -490,7 +552,7 @@ if __name__ == "__main__":
 
     per = read_personnel()
     post = read_post()
-    per_df, post, event_df, allegation_df, uof_df, sas_df, app_df, brady_df, property_claims_df, settlements, police_reports = match_per_with_post(per, post, events, allegation_df, uof_df, sas_df, app_df, brady_df, property_claims_df, settlements, police_reports)
+    per_df, post, event_df, allegation_df, uof_df, sas_df, app_df, brady_df, property_claims_df, settlements, police_reports = consolidate_exact_duplicates(per, post, events, allegation_df, uof_df, sas_df, app_df, brady_df, property_claims_df, settlements, police_reports)
     per_df = fuse_personnel(per_df, post)
 
     ensure_uid_unique(per_df, "uid")
@@ -517,3 +579,4 @@ if __name__ == "__main__":
     police_reports.to_csv(deba.data("fuse_agency/police_reports.csv"), index=False)
     citizens.to_csv(deba.data("fuse_agency/citizens.csv"), index=False)
     agencies.to_csv(deba.data("fuse_agency/agency_reference_list.csv"), index=False)
+
