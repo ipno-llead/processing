@@ -205,7 +205,11 @@ def fuse_events(cprr19, cprr20, cprr21, pprr, overtime20, cprr22, cprr18):
             events.OFFICER_HIRE: {
                 "prefix": "hire",
                 "keep": ["uid", "agency", "rank_desc"],
-            }
+            },
+            events.OFFICER_PAY_EFFECTIVE: {
+                "prefix": "hire",
+                "keep": ["uid", "agency", "salary", "salary_freq"],
+            },
         },
         ["uid"],
     )
