@@ -6,6 +6,7 @@ from lib.columns import (
     rearrange_settlement_columns,
     rearrange_docs_columns,
     rearrange_use_of_force,
+    rearrange_citizen_columns
 )
 from lib.personnel import fuse_personnel
 from lib import events
@@ -201,6 +202,7 @@ if __name__ == "__main__":
     combined_cprr = pd.concat([cprr, cprr22])
     com = rearrange_allegation_columns(combined_cprr)
     uof = rearrange_use_of_force(uof)
+    uof_citizen = rearrange_citizen_columns(uof_citizen)
     per_df.to_csv(deba.data("fuse_agency/per_louisiana_state_pd.csv"), index=False)
     event_df.to_csv(deba.data("fuse_agency/event_louisiana_state_pd.csv"), index=False)
     app_df.to_csv(deba.data("fuse_agency/app_louisiana_state_pd.csv"), index=False)
