@@ -1012,7 +1012,6 @@ if __name__ == "__main__":
     df21 = clean_21()
     df25, citizen_df25 = clean25()
 
-    # Remove duplicates from df25 that already exist in df21
     df25 = remove_duplicates_from_df25(df25, df21)
 
     citizen_df15.to_csv(
