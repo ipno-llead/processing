@@ -453,6 +453,53 @@ def drop_rows_missing_name(df):
     return df[~((df.first_name.fillna("") == ""))]
 
 
+def drop_rows_missing_dates(df, year_col, month_col, day_col):
+    """
+    Drops rows where any of the date components (year, month, day) are missing.
+    This prevents duplicate event_uid generation during event extraction.
+
+    Args:
+        df: DataFrame to filter
+        year_col: Name of the year column
+        month_col: Name of the month column
+        day_col: Name of the day column
+
+    Returns:
+        Filtered DataFrame with complete dates only
+    """
+    initial_count = len(df)
+    df_filtered = df[
+        df[year_col].notna() &
+        df[month_col].notna() &
+        df[day_col].notna()
+    ]
+    removed_count = initial_count - len(df_filtered)
+    if removed_count > 0:
+        print(f"Removed {removed_count} rows with incomplete date information from {year_col}/{month_col}/{day_col}")
+    return df_filtered
+
+
+def fill_na_in_name_cols(df):
+    """
+    Fills NA values in name columns with empty strings and converts to string type.
+    This prevents errors when using .str accessor in subsequent processing.
+
+    Replaces 'nan' string values (created by astype(str) on NaN) with empty strings.
+
+    Args:
+        df: DataFrame to process
+
+    Returns:
+        DataFrame with NA values filled in name columns
+    """
+    name_cols = ['first_name', 'middle_name', 'last_name']
+    for col in name_cols:
+        if col in df.columns:
+            # Fill NaN, convert to string, then replace 'nan' string with empty string
+            df.loc[:, col] = df[col].fillna("").astype(str).str.replace('nan', '', regex=False)
+    return df
+
+
 def create_tracking_id_og_col(df):
     df.loc[:, "tracking_id_og"] = df.tracking_id
     return df
@@ -771,11 +818,203 @@ def clean_21():
     )
     return df
 
+
+def clean_rank_desc25(df):
+    """Clean rank_desc for df25 data (rank already renamed to rank_desc)"""
+    df.loc[:, "rank_desc"] = (
+        df.rank_desc
+        .str.lower()
+        .str.strip()
+        .str.replace(r"lt\.", "lieutenant", regex=True)
+        .str.replace(r"^hr", "human resource", regex=True)
+        .str.replace(r" (2|3|ii)", "", regex=True)
+        .str.replace(r"terminated", "", regex=False)
+    )
+    return df
+
+
+def clean_allegation25(df):
+    """Clean allegation for df25 data (infraction already renamed to allegation)"""
+    df.loc[:, "allegation"] = (
+        df.allegation.str.lower()
+        .str.strip()
+        .str.replace(r"\b(\w{2})\-? (\w{2})\b", r"\1-\2", regex=True)
+        .str.replace(r"\.6", ".06", regex=True)
+        .str.replace(r"performanceo1", "performance 01", regex=False)
+    )
+    return df
+
+
+def clean_action25(df):
+    """Clean action for df25 data (action_taken already renamed to action)"""
+    df.loc[:, "action"] = (
+        df.action.str.lower()
+        .str.strip()
+        .str.replace("suspended for", r"suspended", regex=False)
+        .str.replace(r"one day", "1-day", regex=False)
+        .str.replace(r"five", "5", regex=False)
+        .str.replace(r"(\w+) days? suspension", r"\1-day suspension", regex=True)
+        .str.replace(r"suspended (\w{1,2}) weeks?", r"\1-week suspension", regex=True)
+        .str.replace(r"suspended (\w{1,2}) days?", r"\1-day suspension", regex=True)
+        .str.replace(r"sgt\.?", "sergeant", regex=True)
+        .str.replace(r"lt\.?\b", "lieutenant", regex=True)
+        .str.replace(r"(\w{1,2})\/(\w{1,2})\/(\w{1,4})", r"\1-\2-\3", regex=True)
+        .str.replace(r" ?(\/|\,) ?", r";", regex=True)
+        .str.replace(r"demotion", "demoted", regex=False)
+        .str.replace(r"\.$", "", regex=True)
+        .str.replace(r"col\.?", "colonel", regex=True)
+        .str.replace(r"suspension and (\w+)", r"suspension;\1", regex=True)
+        .str.replace(r"deputy and (\w+)", r"deputy;\1", regex=True)
+        .str.replace(r"demoted and (\w+)", r"demoted;\1", regex=True)
+        .str.replace(r"terminated and (\w+)", r"terminated;\1", regex=True)
+        .str.replace(r"trasferred", "transferred", regex=False)
+        .str.replace(r"\.", "", regex=True)
+        .str.replace(r"\bda\b", "district attorney", regex=True)
+        .str.replace(r"universitvgames for", "university games", regex=False)
+        .str.replace(r"\"", "", regex=True)
+        .str.replace(r"^none$", "", regex=True)
+        .str.replace(r"retrair", "retrain", regex=False)
+        .str.replace(
+            r"^deputy chose to resign instead of submitting to a polygrpah exam$",
+            "resignation in lieu of polygraph exam",
+            regex=True,
+        )
+        .str.replace(r" $", "", regex=True)
+        .str.replace(r"no action taken(.+)?", "", regex=True)
+        .str.replace(r"^unfounded$", "", regex=True)
+        .str.replace(r"suspension loss", "suspension;loss", regex=False)
+        .str.replace(r"^(cadarette was |deputy was )", "", regex=True)
+        .str.replace(
+            r"^terminated;turned over to detectives$",
+            "termination;turned over to detectives",
+            regex=True,
+        )
+    )
+    return df
+
+
+def split_occur_date25(df):
+    """
+    Splits occur_date column into occur_month, occur_day, and occur_year.
+    Handles format: M/D/YYYY H:MM (e.g., "9/19/2023 1:00") and empty strings
+    """
+    # Extract date components (month, day, year) from the datetime string
+    dates = df.occur_date.astype(str).str.extract(r"^(\d{1,2})/(\d{1,2})/(\d{4})")
+
+    df.loc[:, "occur_month"] = dates[0]
+    df.loc[:, "occur_day"] = dates[1]
+    df.loc[:, "occur_year"] = dates[2]
+
+    return df.drop(columns=["occur_date"])
+
+
+def clean25():
+    df = (
+        pd.read_csv(deba.data("raw/baton_rouge_so/ebrso_cprr_21_23.csv"))
+        .pipe(clean_column_names)
+        .pipe(clear_leading_commas15)
+        .rename(
+            columns={
+                "file_num": "tracking_id",
+                "deputy2": "deputy",
+                "badge": "badge_no",
+                "rank": "rank_desc",
+                "date_rank_acquired": "rank_date",
+                "birth_year": "birth_year",
+                "unit_assigned_on_date": "unit_assigned",
+                "infraction": "allegation",
+                "date_time_infraction": "occur_date",
+                "complainant": "complainant",
+                "disposition": "disposition",
+                "action_taken": "action",
+            }
+        )
+        .pipe(clean_and_split_names15)
+        .pipe(fill_na_in_name_cols)
+        .pipe(clean_names, ["first_name", "last_name", "middle_name"])
+        .pipe(clean_rank_desc25)
+        .pipe(clean_department_desc15)
+        .pipe(clean_complainant15)
+        .pipe(clean_allegation25)
+        .pipe(clean_action25)
+        .pipe(split_occur_date25)
+        .pipe(clean_races, ["race"])
+        .pipe(clean_sexes, ["sex"])
+        .pipe(clean_dates, ["rank_date"])
+        .pipe(
+            standardize_desc_cols,
+            ["tracking_id", "badge_no", "birth_year", "disposition"],
+        )
+        .pipe(set_values, {"agency": "east-baton-rouge-so", "data_production_year": "2025"})
+        .pipe(gen_uid, ["first_name", "middle_name", "last_name", "agency"])
+        .pipe(
+            gen_uid,
+            ["uid", "allegation", "disposition", "occur_year", "occur_day"],
+            "allegation_uid",
+        )
+        .pipe(drop_rows_missing_name)
+        .pipe(drop_rows_missing_dates, "occur_year", "occur_month", "occur_day")
+        .pipe(create_tracking_id_og_col)
+        .pipe(gen_uid, ["tracking_id", "agency"], "tracking_id")
+    )
+    citizen_df = df[["complainant_type", "allegation_uid", "agency"]]
+    citizen_df = citizen_df.pipe(
+        gen_uid, ["complainant_type", "allegation_uid", "agency"], "citizen_uid"
+    )
+
+    df = df.drop(columns=["complainant_type"])
+    return df, citizen_df
+
+
+def remove_duplicates_from_df25(df25, df21):
+    """
+    Removes entries from df25 that already exist in df21 based on uid and date.
+    This ensures we don't have duplicate records between the two datasets.
+
+    Checks for duplicates using:
+    1. uid (person identifier)
+    2. occur_year, occur_month, occur_day (incident date)
+
+    If a record in df25 has the same uid AND same incident date as a record in df21,
+    it's considered a duplicate and removed from df25.
+    """
+    # Create a composite key of uid + date for df21
+    # Handle potential NaN values in date fields by converting to string
+    df21_keys = set(
+        df21.uid.astype(str) + "|" +
+        df21.incident_year.astype(str) + "-" +
+        df21.incident_month.astype(str) + "-" +
+        df21.incident_day.astype(str)
+    )
+
+    # Create the same composite key for df25
+    df25_keys = (
+        df25.uid.astype(str) + "|" +
+        df25.occur_year.astype(str) + "-" +
+        df25.occur_month.astype(str) + "-" +
+        df25.occur_day.astype(str)
+    )
+
+    # Filter df25 to only include rows where the composite key is NOT in df21
+    df25_filtered = df25[~df25_keys.isin(df21_keys)]
+
+    # Report on removed duplicates
+    num_removed = len(df25) - len(df25_filtered)
+    if num_removed > 0:
+        print(f"Removed {num_removed} duplicate records from df25 that exist in df21")
+
+    return df25_filtered
+
 if __name__ == "__main__":
     df15, citizen_df15 = clean15()
     df18, citizen_df18 = clean18()
     df20, citizen_df20 = clean20()
     df21 = clean_21()
+    df25, citizen_df25 = clean25()
+
+    # Remove duplicates from df25 that already exist in df21
+    df25 = remove_duplicates_from_df25(df25, df21)
+
     citizen_df15.to_csv(
         deba.data("clean/cprr_cit_baton_rouge_so_2011_2015.csv"), index=False
     )
@@ -785,8 +1024,11 @@ if __name__ == "__main__":
     citizen_df20.to_csv(
         deba.data("clean/cprr_cit_baton_rouge_so_2016_2020.csv"), index=False
     )
+    citizen_df25.to_csv(
+        deba.data("clean/cprr_cit_baton_rouge_so_2024_2025.csv"), index=False
+    )
     df15.to_csv(deba.data("clean/cprr_baton_rouge_so_2011_2015.csv"), index=False)
     df18.to_csv(deba.data("clean/cprr_baton_rouge_so_2018.csv"), index=False)
     df20.to_csv(deba.data("clean/cprr_baton_rouge_so_2016_2020.csv"), index=False)
     df21.to_csv(deba.data("clean/cprr_baton_rouge_so_2021_2023.csv"), index=False)
-#
+    df25.to_csv(deba.data("clean/cprr_baton_rouge_so_2024_2025.csv"), index=False)

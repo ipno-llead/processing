@@ -458,6 +458,9 @@ def names_to_title_case(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
             continue
         df.loc[:, col] = (
             df[col]
+            .fillna("")
+            .astype(str)
+            .str.replace("nan", "", regex=False)
             .str.title()
             .str.replace(
                 r" I(i|ii|v|x)$", lambda m: " I" + m.group(1).upper(), regex=True
