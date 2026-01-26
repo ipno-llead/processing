@@ -634,7 +634,6 @@ def clean_uof_22():
                 "unit",
                 "working_status",
                 "shift_hours",
-                "citizen_influencing_factors",
             ],
             "uof_uid",
         )
