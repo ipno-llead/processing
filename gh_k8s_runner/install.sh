@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-docker build -t ghrunner .
+docker build --platform linux/amd64 -t ghrunner .
 TAG=$(docker images --format '{{.ID}}' ghrunner:latest)
 docker tag ghrunner:latest gcr.io/$1/ghrunner:$TAG
 docker push gcr.io/$1/ghrunner:$TAG
