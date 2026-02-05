@@ -1,6 +1,6 @@
 wdir: ../../../data/raw
 outs:
-- md5: d3e3d468507c4e31caab5a1a7e601b9a.dir
-  size: 364304
-  nfiles: 6
+- md5: 9b6e19b72c964bb9eeb5a59a6861af71.dir
+  size: 17199478
+  nfiles: 7
   path: st_tammany_so
