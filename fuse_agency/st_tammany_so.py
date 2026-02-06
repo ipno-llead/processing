@@ -57,6 +57,7 @@ def fuse_events(pprr, cprr, pprr26, uof25):
                     "uid",
                     "uof_uid",
                     "agency",
+                    "use_of_force_type"
                 ],
             },
         },
