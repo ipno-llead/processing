@@ -44,10 +44,10 @@ def clean_citizen_hospitalized(df):
     return df
 
 
-def clean_citizen_resistance(df):
-    """Standardize citizen resistance types"""
-    df.loc[:, "citizen_resistance"] = (
-        df.citizen_resistance
+def clean_use_of_force_reason(df):
+    """Standardize citizen resistance types (use_of_force_reason)"""
+    df.loc[:, "use_of_force_reason"] = (
+        df.use_of_force_reason
         .str.lower()
         .str.strip()
         .str.replace(r"pushed / shoved", "pushed/shoved", regex=False)
@@ -57,10 +57,10 @@ def clean_citizen_resistance(df):
     return df
 
 
-def clean_use_of_force_type(df):
-    """Clean force type values"""
-    df.loc[:, "use_of_force_type"] = (
-        df.use_of_force_type
+def clean_use_of_force_description(df):
+    """Clean force type values (use_of_force_description)"""
+    df.loc[:, "use_of_force_description"] = (
+        df.use_of_force_description
         .str.lower()
         .str.strip()
         .str.replace(r"o\.c\.", "oc spray", regex=True)
@@ -99,11 +99,11 @@ def clean25():
             "inc_item_no": "item_no",
             "inc_occurred_date": "occurred_date",
             "uof_citizen_condition_injury": "citizen_condition",
-            "uof_citizen_resistance": "citizen_resistance",
+            "uof_citizen_resistance": "use_of_force_reason",
             "uof_citizen_was_arrested_y_n": "citizen_arrested",
             "uof_citizen_was_injured_y_n": "citizen_injured",
             "uof_citizen_went_to_hospital_y_n": "citizen_hospitalized",
-            "uof_type_of_force_used": "use_of_force_type",
+            "uof_type_of_force_used": "use_of_force_description",
             "cit_gender": "citizen_sex",
             "cit_race": "citizen_race",
             "emp_gender": "officer_sex",
@@ -116,8 +116,8 @@ def clean25():
         .pipe(clean_citizen_arrested)
         .pipe(clean_citizen_injured)
         .pipe(clean_citizen_hospitalized)
-        .pipe(clean_citizen_resistance)
-        .pipe(clean_use_of_force_type)
+        .pipe(clean_use_of_force_reason)
+        .pipe(clean_use_of_force_description)
         .pipe(clean_citizen_condition)
         .pipe(clean_names, ["first_name", "last_name"])
         .pipe(clean_sexes, ["citizen_sex", "officer_sex"])
@@ -137,8 +137,8 @@ def clean25():
             [
                 "uid",
                 "tracking_id",
-                "citizen_resistance",
-                "use_of_force_type",
+                "use_of_force_reason",
+                "use_of_force_description",
                 "citizen_race",
                 "citizen_sex",
             ],
@@ -171,8 +171,8 @@ def clean25():
             "item_no",
             "tracking_id",
             "tracking_id_og",
-            "citizen_resistance",
-            "use_of_force_type",
+            "use_of_force_reason",
+            "use_of_force_description",
             "occurred_year",
             "occurred_month",
             "occurred_day",
