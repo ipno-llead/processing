@@ -6,7 +6,7 @@ import pandas as pd
 from lib.post import load_for_agency
 
 
-def fuse_events(pprr, cprr, pprr26, uof25):
+def fuse_events(pprr, cprr, pprr26, uof25, uof24):
     builder = events.Builder()
     builder.extract_events(
         pprr,
@@ -64,6 +64,23 @@ def fuse_events(pprr, cprr, pprr26, uof25):
         },
         ["uid", "uof_uid"],
     )
+    builder.extract_events(
+        uof24,
+        {
+            events.UOF_INCIDENT: {
+                "prefix": "occurred",
+                #"parse_date": True,
+                "keep": [
+                    "uid",
+                    "uof_uid",
+                    "agency",
+                    "use_of_force_description",
+                    "use_of_force_reason",
+                ],
+            },
+        },
+        ["uid", "uof_uid"],
+    )
     return builder.to_frame()
 
 
@@ -73,20 +90,23 @@ if __name__ == "__main__":
     pprr26 = pd.read_csv(deba.data("match/pprr_st_tammany_so_2026.csv"))
     uof25 = pd.read_csv(deba.data("match/uof_st_tammany_so_2025.csv"))
     citizen_df = pd.read_csv(deba.data("clean/uof_cit_st_tammany_so_2025.csv"))
-    #combined_cit = pd.concat([citizen_df, citizen_22_df], ignore_index=True)
-    citizen_df = rearrange_citizen_columns(citizen_df)
+    uof24 = pd.read_csv(deba.data("clean/uof_st_tammany_so_2022_2024.csv"))
+    citizen_24_df = pd.read_csv(deba.data("clean/uof_cit_st_tammany_so_2022_2024.csv"))
+    combined_cit = pd.concat([citizen_df, citizen_24_df], ignore_index=True)
+    citizen_df = rearrange_citizen_columns(combined_cit)
     agency = pprr.agency[0]
     post = load_for_agency(agency)
     post_event = pd.read_csv(deba.data("match/post_event_st_tammany_so_2020.csv"))
-    personnels = fuse_personnel(pprr, cprr, post, pprr26, uof25)
+    personnels = fuse_personnel(pprr, cprr, post, pprr26, uof25, uof24)
     complaints = rearrange_allegation_columns(cprr)
-    uof25 = rearrange_use_of_force(uof25)
-    events_df = fuse_events(pprr, cprr, pprr26, uof25)
+    uof = pd.concat([uof25, uof24], ignore_index=True).drop_duplicates()
+    uof = rearrange_use_of_force(uof)
+    events_df = fuse_events(pprr, cprr, pprr26, uof25, uof24)
     events_df = rearrange_event_columns(pd.concat([post_event, events_df]))
     personnels.to_csv(deba.data("fuse_agency/per_st_tammany_so.csv"), index=False)
     events_df.to_csv(deba.data("fuse_agency/event_st_tammany_so.csv"), index=False)
     complaints.to_csv(deba.data("fuse_agency/com_st_tammany_so.csv"), index=False)
     post.to_csv(deba.data("fuse_agency/post_st_tammany_so.csv"), index=False)
-    uof25.to_csv(deba.data("fuse_agency/uof_st_tammany_so.csv"), index=False)
+    uof.to_csv(deba.data("fuse_agency/uof_st_tammany_so.csv"), index=False)
     citizen_df.to_csv(deba.data("fuse_agency/cit_st_tammany_so.csv"), index=False)
     
