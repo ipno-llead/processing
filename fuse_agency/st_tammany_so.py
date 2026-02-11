@@ -101,7 +101,7 @@ if __name__ == "__main__":
     complaints = rearrange_allegation_columns(cprr)
     uof = pd.concat([uof25, uof24], ignore_index=True).drop_duplicates()
     uof = rearrange_use_of_force(uof)
-    events_df = fuse_events(pprr, cprr, pprr26, uof)
+    events_df = fuse_events(pprr, cprr, pprr26, uof25, uof24)
     events_df = rearrange_event_columns(pd.concat([post_event, events_df]))
     personnels.to_csv(deba.data("fuse_agency/per_st_tammany_so.csv"), index=False)
     events_df.to_csv(deba.data("fuse_agency/event_st_tammany_so.csv"), index=False)
