@@ -218,7 +218,7 @@ def match_settlements_v_pprr(settlements, pprr):
     settlements.loc[:, "uid"] = settlements.uid.map(lambda x: matches.get(x, x))
     return settlements
 
-def match_pd_cprr_2023_v_pprr(cprr, pprr):
+def match_pd_cprr_2025_v_pprr(cprr, pprr):
     dfa = (
         cprr[["first_name", "last_name", "middle_name", "uid"]]
         .drop_duplicates("uid")
@@ -243,9 +243,9 @@ def match_pd_cprr_2023_v_pprr(cprr, pprr):
         dfa,
         dfb,
     )
-    decision = .95
+    decision = .96
     matcher.save_pairs_to_excel(
-        deba.data("match/baton_rouge_pd_cprr_2023_v_pd_pprr_2021.xlsx"), decision
+        deba.data("match/baton_rouge_pd_cprr_2025_v_pd_pprr_2021.xlsx"), decision
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
 
@@ -278,14 +278,14 @@ if __name__ == "__main__":
     )
     pprr = pd.read_csv(deba.data("clean/pprr_baton_rouge_pd_2021.csv"))
     cprr09 = pd.read_csv(deba.data("clean/cprr_baton_rouge_pd_2004_2009.csv"))
-    cprr23 = pd.read_csv(deba.data("clean/cprr_baton_rouge_pd_2021_2023.csv"))
+    cprr25 = pd.read_csv(deba.data("clean/cprr_baton_rouge_pd_2021_2025.csv"))
     settlements = pd.read_csv(deba.data("clean/settlements_baton_rouge_pd_2016_2023.csv"))
     csd17 = match_csd_and_pd_pprr(csd17, pprr, 2017, 0.88)
     csd19 = match_csd_and_pd_pprr(csd19, pprr, 2019, 0.88)
     cprr18 = match_pd_cprr_2018_v_pprr(cprr18, pprr)
     cprr21 = match_pd_cprr_2021_v_pprr(cprr21, pprr)
     cprr09 = match_pd_cprr_2009_v_pprr(cprr09, pprr)
-    cprr23 = match_pd_cprr_2023_v_pprr(cprr23, pprr)
+    cprr25 = match_pd_cprr_2025_v_pprr(cprr25, pprr)
     agency = cprr21.agency[0]
     post = load_for_agency(agency)
     post_event = match_pprr_against_post(pprr, post)
@@ -299,7 +299,7 @@ if __name__ == "__main__":
     post_event.to_csv(deba.data("match/event_post_baton_rouge_pd.csv"), index=False)
     pprr.to_csv(deba.data("match/pprr_baton_rouge_pd_2021.csv"), index=False)
     cprr09.to_csv(deba.data("match/cprr_baton_rouge_pd_2004_2009.csv"), index=False)
-    cprr23.to_csv(deba.data("match/cprr_baton_rouge_pd_2021_2023.csv"), index=False)
+    cprr25.to_csv(deba.data("match/cprr_baton_rouge_pd_2021_2025.csv"), index=False)
     settlements.to_csv(
         deba.data("match/settlements_baton_rouge_pd_2016_2023.csv"), index=False
     )

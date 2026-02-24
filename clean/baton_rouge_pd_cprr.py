@@ -1530,6 +1530,7 @@ def clean_disposition(df):
         'Sustained': 'Sustained',
         'Not Sustained': 'Not Sustained',
         'Exonerated': 'Exonerated',
+        'Office Investigation': '',  # investigation status, not a disposition
         'Not': '',          # incomplete
         'nan': '',          # string "nan"
         '-': '',            # placeholder
@@ -1546,7 +1547,7 @@ def clean_disposition(df):
 def clean_complainant(df):
     def normalize(val):
         val = str(val).strip().upper()
-        return 'BRPD' if val == 'BRPD' else ''
+        return 'baton rouge police department' if val == 'BRPD' else ''
 
     df = df.copy()
     df['complainant'] = df['complainant'].apply(normalize)
@@ -1612,6 +1613,336 @@ def clean_23():
     return df23
 
 
+def clean_dates_22_25(df):
+    for col in ["receive_date", "occur_date"]:
+        df.loc[:, col] = (
+            df[col]
+            .astype(str)
+            .str.strip()
+            .str.replace(r"^-$", "", regex=True)
+            .str.replace(r"^nan$", "", regex=True)
+            .str.replace(r"\. ", "/", regex=True)       # "02/23. 2024" -> "02/23/2024"
+            .str.replace(r"(\d{2}/\d{2}) (\d{4})", r"\1/\2", regex=True)  # "02/02 2024" -> "02/02/2024"
+        )
+    return df
+
+
+def split_officer_name_22_25(df):
+    # Known department keywords used to separate dept desc from name tokens
+    dept_keywords = {
+        "patrol", "cib", "special", "operations", "op", "administration",
+        "chief", "internal", "affairs", "service", "comm", "center",
+        "district", "robbery", "narcotics", "k9", "motorcycles",
+        "lspntf", "community", "policing", "training", "services",
+        "health", "safety", "misdemeanor", "followup", "admin",
+        "technological", "support", "crime", "scene", "street",
+        "crimes", "unit", "major", "assaults", "victims",
+        "investigations", "response", "team", "oo", "ob",
+        "intelligence", "public", "information",
+    }
+    suffix_words = {"jr", "sr", "ii", "iii", "iv", "v"}
+
+    def parse_officer(entry):
+        entry = str(entry).strip()
+        if not entry or entry.lower() == "nan":
+            return pd.Series({
+                "first_name": "", "last_name": "", "middle_name": "",
+                "department_code": "", "department_desc": "",
+            })
+
+        # Fix known OCR errors before parsing
+        entry = entry.replace("$EAN", "SEAN")
+        entry = entry.replace("BEARD.", "BEARD,")
+        entry = entry.replace("MORGAN.", "MORGAN,")
+        # Fix split name: "MCCULL E PC10885 OUGH, ASHLYN" -> use the clean variant if available
+        # Handle "MCCULL E PC10885 OUGH, ASHLYN CIB CIB" specially
+        if re.match(r"^MCCULL\b", entry):
+            entry = re.sub(
+                r"MCCULL\s+E\s+PC10885\s+OUGH,\s+ASHLYN",
+                "MCCULLOUGH, ASHLYN E PC10885",
+                entry,
+            )
+        # Fix "CARBO JR P10677 District NI, JOSEPH M Patrol 5th"
+        if re.match(r"^CARBO JR\b", entry):
+            entry = re.sub(
+                r"CARBO JR P10677 District NI, JOSEPH M Patrol 5th",
+                "CARBONI, JOSEPH M JR P10677 Patrol 5th District",
+                entry,
+            )
+        # Fix "ROBINSO JOANELL District N-WOODARD, K P10337 Patrol 2nd"
+        if "ROBINSO" in entry and "N-WOODARD" in entry:
+            entry = "ROBINSON-WOODARD, JOANELL K P10337 Patrol 2nd District"
+        # Fix "BROWN P10836 I, WILLIE L JR Patrol 4th District"
+        if re.match(r"^BROWN P10836 I,", entry):
+            entry = "BROWN, WILLIE L JR P10836 Patrol 4th District"
+        # Fix "P10639 ROBERTSON, JASON R Patrol 4th District" (P-code at start)
+        if re.match(r"^P\d+\s", entry):
+            entry = re.sub(r"^(PC?\d+)\s+", "", entry) + " " + re.match(r"^(PC?\d+)", entry).group(1)
+        # Fix "JAVIUS, ERMAINE" -> "JAVIUS, JERMAINE" (only when preceded by space/comma)
+        entry = re.sub(r"(?<=[\s,])ERMAINE T P10802", "JERMAINE T P10802", entry)
+        # Fix "LE, RAMBG" -> "LE, RAMBO"
+        entry = entry.replace("RAMBG", "RAMBO")
+        # Fix "MAGEE, JADARRELL" -> keep as-is (could be real name variant)
+        # Fix "Patroi" -> "Patrol"
+        entry = entry.replace("Patroi", "Patrol")
+
+        # 1. Extract department code (P##### or PC#####)
+        dept_code_match = re.search(r"\bPC?\d{3,5}\b", entry)
+        department_code = dept_code_match.group(0) if dept_code_match else ""
+
+        # 2. Remove dept code from string
+        remaining = re.sub(r"\bPC?\d{3,5}\b", " ", entry).strip()
+        remaining = re.sub(r"\s+", " ", remaining)
+
+        # 3. Separate name tokens from department tokens
+        # Split on comma first if present
+        tokens = remaining.replace(",", " , ").split()
+        name_tokens = []
+        dept_tokens = []
+        hit_dept = False
+        comma_idx = tokens.index(",") if "," in tokens else -1
+
+        # Strategy: collect all tokens. Tokens matching dept keywords go to dept.
+        # Remaining tokens are name parts.
+        for i, t in enumerate(tokens):
+            if t == ",":
+                continue
+            if t == "&":
+                dept_tokens.append(t)
+                hit_dept = True
+                continue
+            if t.lower() in dept_keywords:
+                dept_tokens.append(t)
+                hit_dept = True
+            elif t.lower().rstrip(".") in dept_keywords:
+                dept_tokens.append(t)
+                hit_dept = True
+            else:
+                # Check if this is a number (like district number) that belongs to dept
+                if hit_dept and re.match(r"^\d+(st|nd|rd|th)?$", t):
+                    dept_tokens.append(t)
+                else:
+                    name_tokens.append(t)
+                    hit_dept = False
+
+        department_desc = " ".join(dept_tokens).strip()
+
+        # 4. Parse name tokens: expect LAST FIRST MIDDLE [SUFFIX]
+        last_name = ""
+        first_name = ""
+        middle_name = ""
+        suffixes_found = []
+
+        if "," in remaining:
+            # Comma-separated: tokens before comma = last, after = first middle
+            parts = remaining.split(",", 1)
+            before_comma = parts[0].strip()
+            after_comma = parts[1].strip() if len(parts) > 1 else ""
+
+            # Extract last name from before_comma (removing dept keywords)
+            last_tokens = [
+                t for t in before_comma.split()
+                if t.lower() not in dept_keywords
+                and not re.match(r"^\bPC?\d{3,5}\b$", t)
+                and t != "&"
+                and t.lower().rstrip(".") not in dept_keywords
+            ]
+            last_name = " ".join(last_tokens)
+
+            # Extract first/middle from after_comma (removing dept keywords)
+            after_tokens = [
+                t for t in after_comma.split()
+                if t.lower() not in dept_keywords
+                and not re.match(r"^\bPC?\d{3,5}\b$", t)
+                and t != "&"
+                and not re.match(r"^\d+(st|nd|rd|th)?$", t)
+                and t.lower().rstrip(".") not in dept_keywords
+            ]
+            # Separate out suffixes
+            name_parts = []
+            for t in after_tokens:
+                if t.lower().rstrip(".") in suffix_words:
+                    suffixes_found.append(t)
+                else:
+                    name_parts.append(t)
+
+            if len(name_parts) >= 1:
+                first_name = name_parts[0]
+            if len(name_parts) >= 2:
+                middle_name = name_parts[1]
+        else:
+            # No comma: LAST FIRST MIDDLE format
+            clean_name_tokens = []
+            for t in name_tokens:
+                if t.lower().rstrip(".") in suffix_words:
+                    suffixes_found.append(t)
+                else:
+                    clean_name_tokens.append(t)
+            if len(clean_name_tokens) >= 1:
+                last_name = clean_name_tokens[0]
+            if len(clean_name_tokens) >= 2:
+                first_name = clean_name_tokens[1]
+            if len(clean_name_tokens) >= 3:
+                middle_name = clean_name_tokens[2]
+
+        # Append suffix to last name
+        if suffixes_found:
+            last_name = last_name + " " + " ".join(suffixes_found)
+
+        return pd.Series({
+            "first_name": first_name.strip().title(),
+            "last_name": last_name.strip().title(),
+            "middle_name": middle_name.strip().upper() if middle_name else "",
+            "department_code": department_code,
+            "department_desc": department_desc,
+        })
+
+    df = df.copy()
+    parsed = df["officer_name"].apply(parse_officer)
+    df = df.join(parsed)
+    return df.drop(columns=["officer_name"])
+
+
+def clean_action_22_25(df):
+    def normalize_action(val):
+        val = str(val).strip().lower()
+
+        if val in ["", "-", "nan", "officer", "letter of"]:
+            return ""
+
+        # Specific complaint values that leaked into action column
+        if val.startswith("1:") or val.startswith("2:") or val.startswith("3:"):
+            return ""
+
+        if "letter of reprimand" in val:
+            return "letter of reprimand"
+        if "letter of caution" in val:
+            return "letter of caution"
+
+        if "conference worksheet" in val:
+            return "counseled"
+        if "counseled" in val or "verbal counseling" in val:
+            return "counseled"
+
+        if "terminated" in val or "termination" in val:
+            return "termination"
+        if "resigned in lieu" in val or "loudermill" in val:
+            return "resigned in lieu of termination"
+        if "resigned" in val:
+            return "resigned"
+        if "retired" in val:
+            return "retired"
+
+        if "office investigation" in val:
+            return "office investigation"
+
+        if "exonerated" in val:
+            return "exonerated"
+        if "not sustained" in val:
+            return "not sustained"
+
+        # Suspensions
+        match = re.search(r"(\d+)[-\s]?day", val)
+        if match:
+            days = match.group(1)
+            return f"{days}-day suspension"
+
+        if "loss of unit" in val or "lou" in val.split(";"):
+            return "loss of unit"
+
+        # Training / remedial
+        if "training" in val or "class" in val or "remedial" in val or "axon" in val:
+            return "training"
+
+        # Drug/alcohol programs
+        if "rehab" in val or "drug" in val or "random" in val or "alcohol" in val:
+            return "drug/alcohol program"
+
+        # EIS
+        if "eis" in val or "place on eis" in val:
+            return "early intervention"
+
+        # Extra duty
+        if "extra duty" in val:
+            return "no extra duty"
+
+        # Replacement cost
+        if "replacement" in val:
+            return "replacement cost"
+
+        return val.strip()
+
+    df = df.copy()
+    df["action"] = df["action"].apply(normalize_action)
+    return df
+
+
+def clean_22_25():
+    df = (
+        pd.read_csv(deba.data("raw/baton_rouge_pd/brpd_cprr_2022_2025.csv"))
+        .pipe(clean_column_names)
+        .rename(
+            columns={
+                "status": "investigation_status",
+                "ia_seq_1": "ia_seq",
+                "received": "receive_date",
+                "complaint": "allegation",
+            }
+        )
+        .assign(
+            ia_year=lambda x: x.ia_year.astype(str),
+            ia_seq=lambda x: x.ia_seq.astype(str).str.zfill(3),
+        )
+        .pipe(assign_id_num_18)
+        .pipe(clean_investigation_status_23)
+        .pipe(clean_dates_22_25)
+        .pipe(clean_dates, ["receive_date", "occur_date"])
+        .pipe(split_officer_name_22_25)
+        .pipe(clean_action_22_25)
+        .pipe(clean_disposition)
+        .pipe(clean_complainant)
+        .pipe(clean_empty_values)
+        .pipe(
+            standardize_desc_cols,
+            [
+                "allegation",
+                "action",
+                "investigation_status",
+                "complainant",
+                "disposition",
+                "department_code",
+                "department_desc",
+            ],
+        )
+        .pipe(clean_names, ["first_name", "middle_name", "last_name"])
+        .pipe(set_values, {"agency": "baton-rouge-pd"})
+        .pipe(assign_prod_year, "2025")
+        .pipe(gen_uid, ["first_name", "last_name", "middle_name", "agency"])
+        .pipe(
+            gen_uid,
+            [
+                "action",
+                "allegation",
+                "investigation_status",
+                "disposition",
+                "occur_day",
+                "occur_year",
+                "occur_month",
+                "uid",
+            ],
+            "allegation_uid",
+        )
+        .drop_duplicates(subset=["allegation_uid"])
+    )
+    return df
+
+
+def concat_21_25(df23, df22_25):
+    df = pd.concat([df23, df22_25], ignore_index=True)
+    df = df.drop_duplicates(subset=["allegation_uid"], keep="last")
+    return df
+
+
 def concat():
     dfa = pd.read_csv(deba.data("clean/cprr_baton_rouge_pd_2004_2009.csv"))
     dfb = pd.read_csv(deba.data("clean/cprr_baton_rouge_pd_2018.csv"))
@@ -1627,7 +1958,11 @@ if __name__ == "__main__":
     df18 = clean_18()
     df21 = clean_21()
     df23 = clean_23()
+    df22_25 = clean_22_25()
+    df21_25 = concat_21_25(df23, df22_25)
     df09.to_csv(deba.data("clean/cprr_baton_rouge_pd_2004_2009.csv"), index=False)
     df18.to_csv(deba.data("clean/cprr_baton_rouge_pd_2018.csv"), index=False)
     df21.to_csv(deba.data("clean/cprr_baton_rouge_pd_2021.csv"), index=False)
-    df23.to_csv(deba.data("clean/cprr_baton_rouge_pd_2021_2023.csv"), index=False)
+   #df23.to_csv(deba.data("clean/cprr_baton_rouge_pd_2021_2023.csv"), index=False)
+    #df22_25.to_csv(deba.data("clean/cprr_baton_rouge_pd_2022_2025.csv"), index=False)
+    df21_25.to_csv(deba.data("clean/cprr_baton_rouge_pd_2021_2025.csv"), index=False)

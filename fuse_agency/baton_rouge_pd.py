@@ -11,7 +11,7 @@ from lib import events
 from lib.post import load_for_agency
 
 
-def fuse_events(csd_pprr_17, csd_pprr_19, cprr_18, cprr_21, cprr_09, cprr_23, settlements):
+def fuse_events(csd_pprr_17, csd_pprr_19, cprr_18, cprr_21, cprr_09, cprr_25, settlements):
     builder = events.Builder()
 
     builder.extract_events(
@@ -124,7 +124,7 @@ def fuse_events(csd_pprr_17, csd_pprr_19, cprr_18, cprr_21, cprr_09, cprr_23, se
         ["uid", "settlement_uid"],
     )
     builder.extract_events(
-        cprr_23,
+        cprr_25,
         {
             events.COMPLAINT_RECEIVE: {
                 "prefix": "receive",
@@ -150,7 +150,7 @@ if __name__ == "__main__":
     agency = pprr.agency[0]
     post = load_for_agency(agency)
     cprr_09 = pd.read_csv(deba.data("match/cprr_baton_rouge_pd_2004_2009.csv"))
-    cprr_23 = pd.read_csv(deba.data("match/cprr_baton_rouge_pd_2021_2023.csv"))
+    cprr_25 = pd.read_csv(deba.data("match/cprr_baton_rouge_pd_2021_2025.csv"))
     settlements = pd.read_csv(deba.data("match/settlements_baton_rouge_pd_2016_2023.csv"))
     # Ensure anchor column exists and is numeric
     settlements["claim_receive_year"] = pd.to_numeric(settlements["claim_receive_year"], errors="coerce")
@@ -171,15 +171,15 @@ if __name__ == "__main__":
         cprr_18,
         cprr_21,
         cprr_09,
-        cprr_23,
+        cprr_25,
         post,
     )
 
     events_df = fuse_events(
-        csd_pprr_17, csd_pprr_19, cprr_18, cprr_21, cprr_09, settlements, cprr_23,
+        csd_pprr_17, csd_pprr_19, cprr_18, cprr_21, cprr_09, settlements, cprr_25,
     )
     events_df = rearrange_event_columns(pd.concat([post_event, events_df]))
-    complaint_df = rearrange_allegation_columns(pd.concat([cprr_18, cprr_21, cprr_09, cprr_23], axis=0))
+    complaint_df = rearrange_allegation_columns(pd.concat([cprr_18, cprr_21, cprr_09, cprr_25], axis=0))
     settlement_df = rearrange_settlement_columns(settlements)
 
     personnel_df.to_csv(deba.data("fuse_agency/per_baton_rouge_pd.csv"), index=False)
