@@ -549,116 +549,217 @@ def split_department_and_division_desc_21(df):
     return df
 
 
+def extract_disposition_from_action_21(df):
+    """Extract disposition outcomes from the raw Action column.
+
+    The raw 2010-2021 data has two formats:
+    - Format A: Action = "Sustained/Letter of Caution", Disposition = "Admin. Review"
+      (outcome + discipline in Action, hearing type in Disposition)
+    - Format B: Action = allegation code or blank, Disposition = outcome or hearing type
+
+    This function:
+    1. Extracts disposition outcomes (sustained/not sustained/exonerated) from Action
+    2. Moves hearing-type values from Disposition into investigation_status
+    3. Sets Disposition to the extracted outcome
+    """
+    import re
+
+    action_lower = df.action.str.lower().str.strip().fillna("")
+    disp_lower = df.disposition.str.lower().str.strip().fillna("")
+
+    # Ensure investigation_status column exists
+    if "investigation_status" not in df.columns:
+        df["investigation_status"] = ""
+
+    inv_status = df.investigation_status.str.lower().str.strip().fillna("")
+
+    # --- Step 1: Extract disposition outcome from the Action column ---
+    # Match compound Action values like "Sustained/LOC", "Not Sustained", "Exonerated"
+    outcome_from_action = action_lower.str.extract(
+        r"^(sust(?:ained)?\.?|not\s+sust(?:ained)?\.?|exonerated)",
+        expand=False,
+    ).fillna("")
+
+    # Normalize extracted outcomes
+    outcome_from_action = (
+        outcome_from_action
+        .str.replace(r"^sust\.?$", "sustained", regex=True)
+        .str.replace(r"^not\s+sust\.?$", "not sustained", regex=True)
+        .str.replace(r"^sustained$", "sustained", regex=True)
+        .str.replace(r"^not sustained$", "not sustained", regex=True)
+    )
+
+    has_outcome_in_action = outcome_from_action != ""
+
+    # --- Step 2: Classify raw Disposition values ---
+    # Hearing types that should go to investigation_status
+    hearing_type_pattern = (
+        r"^[/\(]?(?:admin\.?\s*,?\s*review|"
+        r"pre-?\s*(?:disc|term)\w*\s*(?:hearing)?|"
+        r"referr\w*(?:\s+to\s+.+)?|"
+        r"office\s+invest?\w*\.?|"
+        r"ofc\.?\s+inv(?:est)?(?:igation)?\.?|"
+        r"referred\b)"
+    )
+    disp_is_hearing_type = disp_lower.str.contains(
+        hearing_type_pattern, regex=True, na=False
+    )
+
+    # Disposition values that are actual outcomes
+    disp_is_outcome = disp_lower.str.contains(
+        r"(?:^|/)(?:sustained|not sustained|exonerated|sust\.?)\b",
+        regex=True, na=False,
+    ) & ~disp_is_hearing_type
+
+    # --- Step 3: Move hearing types from Disposition to investigation_status ---
+    # Only fill investigation_status where it's currently empty
+    inv_is_empty = (inv_status == "") | (inv_status == "nan")
+    should_move = disp_is_hearing_type & inv_is_empty
+
+    # Normalize hearing type values before moving
+    hearing_vals = (
+        disp_lower
+        .str.replace(r"^/", "", regex=True)
+        .str.replace(r"admin\.?\s*,?\s*review", "admin review", regex=True)
+        .str.replace(r"pre-?\s*disc\s*(?:hearing)?", "pre-disciplinary hearing", regex=True)
+        .str.replace(r"pre-?\s*term(?:ination)?\s*(?:hearing)?", "pre-termination hearing", regex=True)
+        .str.replace(r"ofc\.?\s+inv(?:est)?(?:igation)?\.?", "office investigation", regex=True)
+        .str.replace(r"office\s+invest?\.?$", "office investigation", regex=True)
+        .str.replace(r"referral\s+to\s+cib", "referral", regex=True)
+        .str.replace(r"referred\s+to\s+capt.*$", "referral", regex=True)
+        .str.replace(r"referred\s+\d+/\d+/\d+", "referral", regex=True)
+        .str.replace(r"^referred$", "referral", regex=True)
+        .str.replace(r"referral/admin\.?\s*review", "admin review", regex=True)
+    )
+    df.loc[should_move, "investigation_status"] = hearing_vals[should_move]
+
+    # --- Step 4: Set disposition from Action outcome (Format A rows) ---
+    # For rows where Action has an outcome AND Disposition is a hearing type
+    format_a = has_outcome_in_action & disp_is_hearing_type
+    df.loc[format_a, "disposition"] = outcome_from_action[format_a]
+
+    # For rows where Action has an outcome AND Disposition is empty/dash/junk
+    disp_is_empty = (disp_lower == "") | (disp_lower == "-") | (
+        disp_lower == "nan") | (disp_lower == ".") | (disp_lower == "*") | (
+        disp_lower == "- -") | (disp_lower == "brpd")
+    format_a_empty = has_outcome_in_action & disp_is_empty
+    df.loc[format_a_empty, "disposition"] = outcome_from_action[format_a_empty]
+
+    # For rows where Action has an outcome AND Disposition already has the same
+    # outcome (redundant), keep disposition as-is (it's already correct)
+
+    # --- Step 5: Handle compound Disposition values with both hearing type + outcome ---
+    # e.g., "referral/ sustained" -> disposition=sustained, inv_status=referral
+    # e.g., "/sustained (coo) and not sust (shirking)" -> disposition=sustained
+    # e.g., "referred to capt lee/sustained" -> disposition=sustained, inv_status=referral
+    disp_lower2 = df.disposition.str.lower().str.strip().fillna("")
+    inv_status2 = df.investigation_status.str.lower().str.strip().fillna("")
+
+    compound_patterns = [
+        (r"referral/?\s*sustained", "sustained", "referral"),
+        (r"referred to capt\.?\s+\w+.*?/sustained", "sustained", "referral"),
+        (r"referred to capt\.?\s+\w+.*$", "", "referral"),
+        (r"referred \d+/\d+/\d+", "", "referral"),
+        (r"/sustained \(coo\) and not sust(?:ained)? \(shirking\)", "sustained", ""),
+        (r"/confidentiality \(sustained\);?\s*coo \(n/s\)", "sustained", ""),
+        (r"/confidentiality \(sustained\)", "sustained", ""),
+    ]
+    for pattern, disp_val, inv_val in compound_patterns:
+        mask = disp_lower2.str.contains(pattern, regex=True, na=False)
+        if mask.any():
+            if disp_val:
+                df.loc[mask, "disposition"] = disp_val
+            else:
+                df.loc[mask, "disposition"] = ""
+            if inv_val:
+                inv_empty_mask = mask & ((inv_status2 == "") | (inv_status2 == "nan"))
+                df.loc[inv_empty_mask, "investigation_status"] = inv_val
+
+    return df
+
+
 def clean_disposition_21(df):
+    """Clean disposition values.
+
+    By this point, extract_disposition_from_action_21 has already moved hearing
+    types to investigation_status and set disposition to outcomes. This function
+    normalizes the remaining disposition outcome values.
+    """
     df.loc[:, "disposition"] = (
         df.disposition.str.lower()
         .str.strip()
         .fillna("")
-        .str.replace(r"/?admin\.?,?", "admin", regex=True)
         .str.replace(r"\.", "", regex=True)
         .str.replace(r"^/?", "", regex=True)
-        .str.replace(r"pre-? ?disc ?(hearing)?", "pre-disciplinary hearing", regex=True)
         .str.replace(r"sust\.?\b", "sustained", regex=True)
         .str.replace(r"(\w+)- (\w+)", r"\1-\2", regex=True)
         .str.replace(r"(\w+)/ (\w+)", r"\1/\2", regex=True)
-        .str.replace(
-            r"pre-? ?term(ination)? ?(hearing)?", "pre-termination hearing", regex=True
-        )
-        .str.replace(r"\binv\b", "investigation", regex=True)
-        .str.replace(r"\bofc\b", "office", regex=True)
-        .str.replace("referraladmin", "referral/admin", regex=False)
         .str.replace(r"^- ?-?$", "", regex=True)
-        .str.replace("referra)", "referral", regex=False)
+        .str.replace(r"^\*$", "", regex=True)
+        .str.replace(r"^(nan|brpd)$", "", regex=True)
+        .str.replace(r"^\(?admin\.?\s*,?\s*review\)?$", "", regex=True)
+        .str.replace(r"^office\s+inv(?:est)?(?:igation)?\.?$", "", regex=True)
     )
     return df
 
 
 def consolidate_action_and_disposition_21(df):
+    """Clean up remaining disposition/action issues after extraction.
+
+    By this point, extract_disposition_from_action_21 has already:
+    - Extracted disposition outcomes from the Action column
+    - Moved hearing types from Disposition to investigation_status
+
+    This function handles remaining cleanup:
+    - Compound disposition values (e.g. "referral/sustained" -> "sustained")
+    - Hearing types still in disposition -> move to investigation_status
+    - Action values that are actually disposition outcomes -> move to disposition
+    - Discipline actions still in disposition -> move to action
+    """
     disp_lower = df.disposition.str.lower().str.strip().fillna("")
     action_lower = df.action.str.lower().str.strip().fillna("")
 
-    action_pattern = (
-        r"(?:letter of (?:caution|reprimand|instruction)|"
-        r"\d+-?\s*day\s+(?:suspension|loss of unit)|"
-        r"\d+\s+day\s+suspension|"
-        r"conference worksheet|counseled|verbal counseling|"
-        r"terminated|termination|resigned|"
-        r"(?:loc|lor)(?:\b|$)|lor/lou|"
-        r"\d+-?\s*hr\.?\s*(?:driv(?:ing)?\s*(?:school)?)?|"
-        r"driving school|"
-        r"mandatory\s+(?:training|roll\s+call)|"
-        r"roll call training|"
-        r"advanced training|"
-        r"cit training|"
-        r"suspension\s+from\s+rso|"
-        r"demotion|"
-        r"(?:5|10|15|20|21|25|30|60|70|90)-?\s*day|"
-        r"\d+-?\s*month|"
-        r"loss of unit|"
-        r"(?:1|2|3|5)\s+day\s+suspension|"
-        r"suspension\s+rescinded|"
-        r"deferred)"
-    )
+    if "investigation_status" not in df.columns:
+        df["investigation_status"] = ""
+    inv_status = df.investigation_status.str.lower().str.strip().fillna("")
 
-    is_disposition = disp_lower.str.contains(
-        r"^(?:not sustained|sustained|exonerated|"
-        r"admin\.?\s*review|"
+    # --- Move any remaining hearing-type values from disposition to investigation_status ---
+    hearing_type_pattern = (
+        r"^[/\(]?(?:admin\.?\s*,?\s*review|"
         r"pre-?\s*(?:disc|term)\w*\s*(?:hearing)?|"
-        r"office\s+invest\w*|"
-        r"referr\w*|"
-        r"60-?\s*day\s+rule|"
-        r"sust\.?|"
-        r"brpd|nan|-+|\.+|\*)"
-        r"(?:\s|$|/|,)",
-        regex=True,
-        na=False,
-    ) | (disp_lower == "")
-
-    has_action_in_disp = (
-        disp_lower.str.contains(action_pattern, regex=True, na=False) & ~is_disposition
+        r"referr\w*(?:\s+to\s+.+)?|"
+        r"office\s+invest?\w*\.?|"
+        r"ofc\.?\s+inv(?:est)?(?:igation)?\.?|"
+        r"referred\b)"
+        r"$"
     )
-    action_is_empty = (action_lower == "") | (action_lower == "-") | (action_lower == "nan")
+    disp_is_hearing = disp_lower.str.match(hearing_type_pattern, na=False)
+    inv_is_empty = (inv_status == "") | (inv_status == "nan")
 
-    df.loc[has_action_in_disp & action_is_empty, "action"] = df.loc[
-        has_action_in_disp & action_is_empty, "disposition"
-    ]
-
-    has_disp_outcome_in_disp = disp_lower.str.contains(
-        r"\bsust(?:ained)?\.?\b|not\s+sustained|exonerated", regex=True, na=False
+    # Move hearing types to investigation_status where it's empty
+    hearing_vals = (
+        disp_lower
+        .str.replace(r"^/", "", regex=True)
+        .str.replace(r"admin\.?\s*,?\s*review", "admin review", regex=True)
+        .str.replace(r"pre-?\s*disc\s*(?:hearing)?", "pre-disciplinary hearing", regex=True)
+        .str.replace(r"pre-?\s*term(?:ination)?\s*(?:hearing)?", "pre-termination hearing", regex=True)
+        .str.replace(r"ofc\.?\s+inv(?:est)?(?:igation)?\.?", "office investigation", regex=True)
+        .str.replace(r"office\s+invest?\.?$", "office investigation", regex=True)
+        .str.replace(r"referral\s+to\s+cib", "referral", regex=True)
+        .str.replace(r"referred\s+to\s+capt.*$", "referral", regex=True)
+        .str.replace(r"referred\s+\d+/\d+/\d+", "referral", regex=True)
+        .str.replace(r"^referred$", "referral", regex=True)
     )
-    disp_is_action_only = has_action_in_disp & ~has_disp_outcome_in_disp
+    should_move = disp_is_hearing & inv_is_empty
+    df.loc[should_move, "investigation_status"] = hearing_vals[should_move]
+    df.loc[disp_is_hearing, "disposition"] = ""
 
-    df.loc[disp_is_action_only, "disposition"] = ""
-
-    # Move disposition outcomes from action to disposition when action only
-    # contains a disposition value (exonerated, not sustained, office investigation)
-    action_lower2 = df.action.str.lower().str.strip().fillna("")
-    disp_lower2 = df.disposition.str.lower().str.strip().fillna("")
-
-    action_is_disp_outcome = action_lower2.str.match(
-        r"^(exonerated|not sustained|office investigation|"
-        r"not sustained/?exonerated|conference worksheet/?counseled|"
-        r"conference worksheet|dmvr/conference worksheet)$",
-        na=False,
-    )
-    for pattern, disp_val, action_val in [
-        (r"^exonerated$", "exonerated", ""),
-        (r"^not sustained/?exonerated$", "exonerated", ""),
-        (r"^not sustained$", "not sustained", ""),
-        (r"^office investigation$", "office investigation", ""),
-    ]:
-        mask = action_lower2.str.match(pattern, na=False)
-        if mask.any():
-            df.loc[mask, "disposition"] = disp_val
-            df.loc[mask, "action"] = action_val
-
+    # --- Handle compound disposition values ---
     df.loc[:, "disposition"] = (
         df.disposition.str.lower()
         .str.strip()
         .str.replace(r"\*", "", regex=True)
         .str.replace(r"^\/", "", regex=True)
-        .str.replace(r"office invest$", "office investigation", regex=True)
-        .str.replace(r"\(admin review$", "admin review", regex=True)
         .str.replace(r"^(nan|brpd)$", "", regex=True)
         .str.replace(
             r"confidentiality \(sustained\); coo \(n/s\)",
@@ -678,14 +779,79 @@ def consolidate_action_and_disposition_21(df):
         )
         .str.replace("referred to capt lee/sustained", "sustained", regex=False)
         .str.replace("referral/sustained", "sustained", regex=False)
-        .str.replace(r"referred to capt\.? \w+.*$", "referral", regex=True)
-        .str.replace(r"referred \d+/\d+/\d+", "referral", regex=True)
-        .str.replace(r"^referred$", "referral", regex=True)
-        .str.replace("referral to cib", "referral", regex=False)
-        .str.replace("referral/admin review", "admin review", regex=False)
+        .str.replace(r"referred to capt\.? \w+.*$", "", regex=True)
+        .str.replace(r"referred \d+/\d+/\d+", "", regex=True)
+        .str.replace(r"^referred$", "", regex=True)
+        .str.replace("referral to cib", "", regex=False)
+        .str.replace("referral/admin review", "", regex=False)
         .str.replace("sustained,", "sustained", regex=False)
         .str.replace(r"^- ?-?$", "", regex=True)
+        .str.replace(r"^\.$", "", regex=True)
     )
+
+    # --- Move disposition outcomes from action column to disposition ---
+    action_lower2 = df.action.str.lower().str.strip().fillna("")
+    disp_lower2 = df.disposition.str.lower().str.strip().fillna("")
+
+    for pattern, disp_val, action_val in [
+        (r"^exonerated$", "exonerated", ""),
+        (r"^not sustained/?exonerated$", "exonerated", ""),
+        (r"^not sustained$", "not sustained", ""),
+        (r"^office investigation$", "office investigation", ""),
+    ]:
+        mask = action_lower2.str.match(pattern, na=False)
+        if mask.any():
+            df.loc[mask, "disposition"] = disp_val
+            df.loc[mask, "action"] = action_val
+
+    # --- Move discipline actions from disposition to action ---
+    disp_lower3 = df.disposition.str.lower().str.strip().fillna("")
+    action_lower3 = df.action.str.lower().str.strip().fillna("")
+
+    action_pattern = (
+        r"^(?:letter of (?:caution|reprimand|instruction)|"
+        r"\d+-?\s*day\s+(?:suspension|loss of unit)|"
+        r"\d+\s+day\s+suspension|"
+        r"conference worksheet|counseled|verbal counseling|"
+        r"terminated|termination|resigned|"
+        r"(?:loc|lor)(?:\b|$)|lor/lou|"
+        r"\d+-?\s*hr\.?\s*(?:driv(?:ing)?\s*(?:school)?)?|"
+        r"driving school|"
+        r"mandatory\s+(?:training|roll\s+call)|"
+        r"demotion|"
+        r"(?:\d+)-?\s*day|"
+        r"\d+-?\s*month|"
+        r"loss of unit|"
+        r"suspension\s+rescinded|"
+        r"deferred)"
+    )
+    disp_has_action = disp_lower3.str.contains(action_pattern, regex=True, na=False)
+    action_is_empty = (action_lower3 == "") | (action_lower3 == "-") | (action_lower3 == "nan")
+
+    df.loc[disp_has_action & action_is_empty, "action"] = disp_lower3[disp_has_action & action_is_empty]
+    df.loc[disp_has_action & action_is_empty, "disposition"] = ""
+
+    # --- Normalize investigation_status values added from disposition column ---
+    df.loc[:, "investigation_status"] = (
+        df.investigation_status.str.lower()
+        .str.strip()
+        .fillna("")
+        .str.replace(r"^\(", "", regex=True)
+        .str.replace(r"^/$", "", regex=True)
+        .str.replace(r"^\+$", "", regex=True)
+        .str.replace(r"^administrative$", "administrative review", regex=True)
+        .str.replace(r"referral/?\s*sustained", "referral", regex=True)
+        .str.replace(r"admin review", "administrative review", regex=True)
+    )
+
+    # Move office investigation from disposition to investigation_status
+    disp_lower4 = df.disposition.str.lower().str.strip().fillna("")
+    inv_status4 = df.investigation_status.str.lower().str.strip().fillna("")
+    oi_mask = disp_lower4.str.match(r"^office\s+investigation$", na=False)
+    oi_inv_empty = (inv_status4 == "") | (inv_status4 == "nan")
+    df.loc[oi_mask & oi_inv_empty, "investigation_status"] = "office investigation"
+    df.loc[oi_mask, "disposition"] = ""
+
     return df
 
 
@@ -966,11 +1132,6 @@ def clean_disposition09(df):
         .str.replace(r" (\w{1,2}\/\w{2}\/\w{2})", "", regex=True)
         .str.replace(r"officer ", "", regex=False)
         .str.replace(r"(\w+) (\w+)- (\w+)", r"\3-\1 \2", regex=True)
-        .str.replace(
-            r"^off.invest./resigned/in lieu of pre-disc$",
-            "resigned in lieu of pre-disciplinary",
-            regex=True,
-        )
         .str.replace(r"termnation", "termination", regex=False)
         .str.replace("resignation", "resigned", regex=True)
         .str.replace(r"^terminated$", "termination", regex=True)
@@ -979,6 +1140,45 @@ def clean_disposition09(df):
             r"^investigation terminated$", "office investigation", regex=True
         )
     )
+
+    # Move resigned/termination values from disposition to action
+    disp_lower = df.disposition.str.lower().str.strip().fillna("")
+    action_lower = df.action.str.lower().str.strip().fillna("")
+
+    resign_term_patterns = [
+        (r"^off\.?invest\.?/resigned/in lieu of pre-disc$",
+         "resigned in lieu of pre-disciplinary hearing"),
+        (r"^resigned in lieu of termination.*$", "resigned in lieu of termination"),
+        (r"^resigned; investigation terminated$", "resigned"),
+        (r"^resigned$", "resigned"),
+        (r"^termination$", "termination"),
+        (r"^resigned in lieu of pre-disciplinary$",
+         "resigned in lieu of pre-disciplinary hearing"),
+    ]
+    for pattern, action_val in resign_term_patterns:
+        mask = disp_lower.str.match(pattern, na=False)
+        if mask.any():
+            # Only move to action if action is currently empty
+            action_empty = (action_lower == "") | (action_lower == "nan")
+            df.loc[mask & action_empty, "action"] = action_val
+            df.loc[mask, "disposition"] = ""
+
+    # Move pending from disposition to investigation_status
+    pending_mask = disp_lower.str.match(r"^pending$", na=False)
+    if pending_mask.any():
+        inv_status = df.investigation_status.str.lower().str.strip().fillna("")
+        inv_empty = (inv_status == "") | (inv_status == "nan")
+        df.loc[pending_mask & inv_empty, "investigation_status"] = "pending"
+        df.loc[pending_mask, "disposition"] = ""
+
+    # Move office investigation from disposition to investigation_status
+    oi_mask = disp_lower.str.match(r"^office investigation$", na=False)
+    if oi_mask.any():
+        inv_status = df.investigation_status.str.lower().str.strip().fillna("")
+        inv_empty = (inv_status == "") | (inv_status == "nan")
+        df.loc[oi_mask & inv_empty, "investigation_status"] = "office investigation"
+        df.loc[oi_mask, "disposition"] = ""
+
     return df
 
 
@@ -1176,6 +1376,41 @@ def clean_dis_18(df):
     df.loc[:, "disposition"] = df.disposition.str.replace(
         r"(-|\.)", "", regex=True
     ).str.replace(r"admin review", "administrative review", regex=False)
+
+    # Move hearing types from disposition to investigation_status
+    disp_lower = df.disposition.str.lower().str.strip().fillna("")
+    inv_status = df.investigation_status.str.lower().str.strip().fillna("")
+
+    hearing_patterns = {
+        "office investigation": "office investigation",
+        "administrative review": "administrative review",
+    }
+    for val, inv_val in hearing_patterns.items():
+        mask = disp_lower == val
+        if mask.any():
+            inv_empty = (inv_status == "") | (inv_status == "nan")
+            df.loc[mask & inv_empty, "investigation_status"] = inv_val
+            df.loc[mask, "disposition"] = ""
+
+    # Blank action when it's a disposition outcome (no actual disciplinary action taken)
+    action_lower = df.action.str.lower().str.strip().fillna("")
+
+    disposition_outcome_patterns = [
+        (r"^not sustained.*$", "not sustained"),
+        (r"^exonerated$", "exonerated"),
+        (r"^office investigation$", ""),
+        (r"^exonerated[;:] not sustained$", "exonerated"),
+    ]
+    for pattern, disp_val in disposition_outcome_patterns:
+        mask = action_lower.str.match(pattern, na=False)
+        if mask.any():
+            # If disposition is empty, fill it from action
+            disp_lower2 = df.disposition.str.lower().str.strip().fillna("")
+            disp_empty = (disp_lower2 == "") | (disp_lower2 == " ")
+            if disp_val:
+                df.loc[mask & disp_empty, "disposition"] = disp_val
+            df.loc[mask, "action"] = ""
+
     return df
 
 
@@ -1255,6 +1490,7 @@ def clean_21():
         .pipe(clean_receive_and_occur_date)
         .pipe(clean_dates, ["receive_date", "occur_date"])
         .pipe(clean_allegations_21)
+        .pipe(extract_disposition_from_action_21)
         .pipe(clean_action_21)
         .pipe(parse_officer_name_21)
         .pipe(split_name_21)
@@ -1602,7 +1838,7 @@ def clean_disposition(df):
         'Sustained': 'sustained',
         'Not Sustained': 'not sustained',
         'Exonerated': 'exonerated',
-        'Office Investigation': 'office investigation',
+        'Office Investigation': '',
         'Not': '',          # incomplete
         'nan': '',          # string "nan"
         '-': '',            # placeholder
@@ -1613,6 +1849,13 @@ def clean_disposition(df):
     }
 
     df = df.copy()
+
+    # Move Office Investigation to investigation_status before clearing from disposition
+    if 'investigation_status' in df.columns:
+        oi_mask = df['disposition'].str.strip() == 'Office Investigation'
+        inv_empty = df['investigation_status'].fillna('').str.strip().isin(['', 'nan'])
+        df.loc[oi_mask & inv_empty, 'investigation_status'] = 'office investigation'
+
     df['disposition'] = df['disposition'].replace(disposition_map)
     return df
 
