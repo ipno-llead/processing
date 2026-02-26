@@ -98,6 +98,12 @@ def fuse_events(csd_pprr_17, csd_pprr_19, cprr_18, cprr_21, cprr_09, cprr_25, se
                 "prefix": "resignation",
                 "keep": ["uid", "agency", "allegation_uid"],
             },
+        },
+        ["uid", "allegation_uid"],
+    )
+    builder.extract_events(
+        cprr_09,
+        {
             events.OFFICER_LEFT: {
                 "prefix": "termination",
                 "keep": ["uid", "agency", "allegation_uid"],
@@ -176,7 +182,7 @@ if __name__ == "__main__":
     )
 
     events_df = fuse_events(
-        csd_pprr_17, csd_pprr_19, cprr_18, cprr_21, cprr_09, settlements, cprr_25,
+        csd_pprr_17, csd_pprr_19, cprr_18, cprr_21, cprr_09, cprr_25, settlements,
     )
     events_df = rearrange_event_columns(pd.concat([post_event, events_df]))
     complaint_df = rearrange_allegation_columns(pd.concat([cprr_18, cprr_21, cprr_09, cprr_25], axis=0))
