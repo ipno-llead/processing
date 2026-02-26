@@ -174,7 +174,7 @@ def match_pd_cprr_2009_v_pprr(cprr, pprr):
     )
     decision = 1
     matcher.save_pairs_to_excel(
-        deba.data("match/baton_rouge_pd_cprr_2021_v_pd_pprr_2021.xlsx"), decision
+        deba.data("match/baton_rouge_pd_cprr_2009_v_pd_pprr_2021.xlsx"), decision
     )
     matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
 

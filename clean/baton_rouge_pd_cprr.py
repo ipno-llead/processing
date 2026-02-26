@@ -555,7 +555,7 @@ def clean_disposition_21(df):
         .str.strip()
         .fillna("")
         .str.replace(r"/?admin\.?,?", "admin", regex=True)
-        .str.replace(".", "", regex=True)
+        .str.replace(r"\.", "", regex=True)
         .str.replace(r"^/?", "", regex=True)
         .str.replace(r"pre-? ?disc ?(hearing)?", "pre-disciplinary hearing", regex=True)
         .str.replace(r"sust\.?\b", "sustained", regex=True)
@@ -574,43 +574,118 @@ def clean_disposition_21(df):
 
 
 def consolidate_action_and_disposition_21(df):
+    disp_lower = df.disposition.str.lower().str.strip().fillna("")
+    action_lower = df.action.str.lower().str.strip().fillna("")
+
+    action_pattern = (
+        r"(?:letter of (?:caution|reprimand|instruction)|"
+        r"\d+-?\s*day\s+(?:suspension|loss of unit)|"
+        r"\d+\s+day\s+suspension|"
+        r"conference worksheet|counseled|verbal counseling|"
+        r"terminated|termination|resigned|"
+        r"(?:loc|lor)(?:\b|$)|lor/lou|"
+        r"\d+-?\s*hr\.?\s*(?:driv(?:ing)?\s*(?:school)?)?|"
+        r"driving school|"
+        r"mandatory\s+(?:training|roll\s+call)|"
+        r"roll call training|"
+        r"advanced training|"
+        r"cit training|"
+        r"suspension\s+from\s+rso|"
+        r"demotion|"
+        r"(?:5|10|15|20|21|25|30|60|70|90)-?\s*day|"
+        r"\d+-?\s*month|"
+        r"loss of unit|"
+        r"(?:1|2|3|5)\s+day\s+suspension|"
+        r"suspension\s+rescinded|"
+        r"deferred)"
+    )
+
+    is_disposition = disp_lower.str.contains(
+        r"^(?:not sustained|sustained|exonerated|"
+        r"admin\.?\s*review|"
+        r"pre-?\s*(?:disc|term)\w*\s*(?:hearing)?|"
+        r"office\s+invest\w*|"
+        r"referr\w*|"
+        r"60-?\s*day\s+rule|"
+        r"sust\.?|"
+        r"brpd|nan|-+|\.+|\*)"
+        r"(?:\s|$|/|,)",
+        regex=True,
+        na=False,
+    ) | (disp_lower == "")
+
+    has_action_in_disp = (
+        disp_lower.str.contains(action_pattern, regex=True, na=False) & ~is_disposition
+    )
+    action_is_empty = (action_lower == "") | (action_lower == "-") | (action_lower == "nan")
+
+    df.loc[has_action_in_disp & action_is_empty, "action"] = df.loc[
+        has_action_in_disp & action_is_empty, "disposition"
+    ]
+
+    has_disp_outcome_in_disp = disp_lower.str.contains(
+        r"\bsust(?:ained)?\.?\b|not\s+sustained|exonerated", regex=True, na=False
+    )
+    disp_is_action_only = has_action_in_disp & ~has_disp_outcome_in_disp
+
+    df.loc[disp_is_action_only, "disposition"] = ""
+
+    # Move disposition outcomes from action to disposition when action only
+    # contains a disposition value (exonerated, not sustained, office investigation)
+    action_lower2 = df.action.str.lower().str.strip().fillna("")
+    disp_lower2 = df.disposition.str.lower().str.strip().fillna("")
+
+    action_is_disp_outcome = action_lower2.str.match(
+        r"^(exonerated|not sustained|office investigation|"
+        r"not sustained/?exonerated|conference worksheet/?counseled|"
+        r"conference worksheet|dmvr/conference worksheet)$",
+        na=False,
+    )
+    for pattern, disp_val, action_val in [
+        (r"^exonerated$", "exonerated", ""),
+        (r"^not sustained/?exonerated$", "exonerated", ""),
+        (r"^not sustained$", "not sustained", ""),
+        (r"^office investigation$", "office investigation", ""),
+    ]:
+        mask = action_lower2.str.match(pattern, na=False)
+        if mask.any():
+            df.loc[mask, "disposition"] = disp_val
+            df.loc[mask, "action"] = action_val
+
     df.loc[:, "disposition"] = (
         df.disposition.str.lower()
         .str.strip()
-        .str.replace(
-            r"(\*|\,|\w+\/\w+\/\w+|referred|referral|\(|; coo \(\w+\/\w+\))",
-            "",
-            regex=True,
-        )
+        .str.replace(r"\*", "", regex=True)
         .str.replace(r"^\/", "", regex=True)
         .str.replace(r"office invest$", "office investigation", regex=True)
-        .str.replace(r"(.+)sustained\)?$", "sustained", regex=True)
-        .str.replace(r"(nan|brpd)", "", regex=True)
+        .str.replace(r"\(admin review$", "admin review", regex=True)
+        .str.replace(r"^(nan|brpd)$", "", regex=True)
         .str.replace(
-            r"to (capt dunn|cib|capt a lee|to capt bloom by payne check with up  and\s+)",
-            "",
+            r"confidentiality \(sustained\); coo \(n/s\)",
+            "sustained",
             regex=True,
         )
-        .str.replace(r"sustained (.+)", "sustained", regex=True)
+        .str.replace(
+            r"sustained \(coo\) and not sustained \(shirking\)",
+            "sustained",
+            regex=True,
+        )
+        .str.replace(r"; coo \(\w+\/\w+\)", "", regex=True)
+        .str.replace(
+            r"confidentiality \(sustained\)",
+            "sustained",
+            regex=True,
+        )
+        .str.replace("referred to capt lee/sustained", "sustained", regex=False)
+        .str.replace("referral/sustained", "sustained", regex=False)
+        .str.replace(r"referred to capt\.? \w+.*$", "referral", regex=True)
+        .str.replace(r"referred \d+/\d+/\d+", "referral", regex=True)
+        .str.replace(r"^referred$", "referral", regex=True)
+        .str.replace("referral to cib", "referral", regex=False)
+        .str.replace("referral/admin review", "admin review", regex=False)
+        .str.replace("sustained,", "sustained", regex=False)
+        .str.replace(r"^- ?-?$", "", regex=True)
     )
-    # df.loc[:, "disposition"] = (
-    #     df.disposition.str.cat(df.action, sep="|")
-    #     .str.replace(r"^/", "", regex=True)
-    #     .str.replace("loc", "letter of caution", regex=False)
-    #     .str.replace("lor", "letter of reprimand", regex=False)
-    #     .str.replace(r"l\.?o\.?u\.?", "loss of unit", regex=True)
-    #     .str.replace(r" ?sust?(alned)?\.?,?(l?aine?d)?\b", "sustained", regex=True)
-    #     .str.replace(r"hr\.?\b", "hour", regex=True)
-    #     .str.replace(r"(\d+)-? (\w+)", r"\1-\2", regex=True)
-    #     .str.replace(r",|\.", "", regex=True)
-    #     .str.replace(r"\bnotsustained\b", "not sustained", regex=True)
-    #     .str.replace(
-    #         r"^hord/not sustained blust/not sustained$", "not sustained", regex=True
-    #     )
-    #     .str.replace(r"^-$", "", regex=True)
-    # )
-    # df.disposition = df.disposition.str.extract(r"(not sustained|sustained|exonerated|admin review|"
-    #                                             r"pre-disciplinary hearing|pre-termination hearing|office investigation|resigned)")
     return df
 
 
@@ -722,12 +797,11 @@ def clean_action_21(df):
         .str.replace("terminated", "termination", regex=False)
         .str.replace(
             r"/11/09/12| 6/1-13|per capt bloom|young|/ adkins|"
-            r"/ fonte|class|/?conference worksheet/?",
+            r"/ fonte|class",
             "",
             regex=True,
         )
         .str.replace(r"/$", "", regex=True)
-        .str.replace("exonerated", "", regex=False)
         .str.replace(r"5-day w/o pay-", "5-day without pay", regex=True)
         .str.replace(
             "10-day suspensionletter of reprimandletter of caution",
@@ -864,7 +938,9 @@ def extract_disposition09(df):
         .str.replace(r"^sustained(.+)", r"sustained", regex=True)
         .str.replace(r"^not sust\.?(.+)", "not sustained", regex=True)
         .str.extract(
-            r"((.+)?resign(ed|ation)(.+)?|(.+)?terminated(.+)?|^sustained|^not sustained)"
+            r"((.+)?resign(ed|ation)(.+)?|(.+)?terminated(.+)?|"
+            r"^sustained|^not sustained|^pending|^office investigation|^exonerated|"
+            r"^investigation terminated)"
         )
     )
     df.loc[:, "disposition"] = disp[0]
@@ -899,6 +975,9 @@ def clean_disposition09(df):
         .str.replace("resignation", "resigned", regex=True)
         .str.replace(r"^terminated$", "termination", regex=True)
         .str.replace(r"resigned-", "resigned; ", regex=False)
+        .str.replace(
+            r"^investigation terminated$", "office investigation", regex=True
+        )
     )
     return df
 
@@ -961,6 +1040,10 @@ def clean_action09(df):
         .str.replace(r"\; ?$", "", regex=True)
         .str.replace(r"^-$", "", regex=True)
         .str.replace(r"(\w+)- (\w+)", r"\1-\2", regex=True)
+        .str.replace(r"^pending$", "", regex=True)
+        .str.replace(r"^exonerated$", "", regex=True)
+        .str.replace(r"^investigation$", "", regex=True)
+        .str.replace(r"^investigation terminated$", "", regex=True)
     )
     return df
 
@@ -1455,67 +1538,56 @@ def clean_action(df):
     def normalize_action(val):
         val = str(val).strip().lower()
 
-        # Null or empty
-        if val in ["", "-", "officer", "letter of"]:
+        if val in ["", "-", "nan", "officer", "letter of", "office"]:
             return ""
 
-        # Letters
         if "letter of reprimand" in val:
-            return "Letter of Reprimand"
+            return "letter of reprimand"
         if "letter of caution" in val:
-            return "Letter of Caution"
+            return "letter of caution"
 
-        # Counseling
-        if "counsel" in val or "conference worksheet" in val:
-            return "Counseled"
+        if "conference worksheet" in val and "counsel" in val:
+            return "counseled"
+        if "conference worksheet" in val:
+            return "conference worksheet"
+        if "counsel" in val or "verbal counseling" in val:
+            return "counseled"
 
-        # Termination
-        if "terminated" in val:
-            return "Termination"
-
-        # Resigned in lieu
-        if "resigned in lieu" in val:
-            return "Resigned in lieu of termination"
-
-        # Resigned
+        if "terminated" in val or "termination" in val:
+            return "termination"
+        if "resigned in lieu" in val or "loudermill" in val:
+            return "resigned in lieu of termination"
         if "resigned" in val:
-            return "Resigned"
-
-        # Retired
+            return "resigned"
         if "retired" in val:
-            return "Retired"
+            return "retired"
 
-        # Suspensions
         match = re.search(r'(\d+)[-\s]?day', val)
         if match:
             days = match.group(1)
-            return f"Suspension ({days} days)"
+            return f"{days}-day suspension"
 
-        # 1-day cases without "suspension" keyword
         if val.strip() in ['1-day', '1 day suspension']:
-            return "Suspension (1 days)"
+            return "1-day suspension"
 
-        # Training
         if "training" in val or "course" in val:
-            return "Training"
+            return "training"
 
-        # Drug/Alcohol program
         if "rehab" in val or "drug" in val or "random" in val:
-            return "Drug/Alcohol Program"
+            return "drug/alcohol program"
 
-        # Office Investigation
         if "office investigation" in val or "office - investigation" in val:
-            return "Office Investigation"
+            return ""
 
-        # Exonerated / Not sustained
-        if "exonerated" in val or "not sustained" in val:
-            return "Exonerated"
+        if "exonerated" in val:
+            return ""
+        if "not sustained" in val:
+            return ""
 
-        # Loss of unit
         if "loss of unit" in val:
-            return "Loss of Unit"
+            return "loss of unit"
 
-        return ""
+        return val.strip()
 
     df = df.copy()
     df["action"] = df["action"].apply(normalize_action)
@@ -1527,10 +1599,10 @@ def clean_empty_values(df):
 
 def clean_disposition(df):
     disposition_map = {
-        'Sustained': 'Sustained',
-        'Not Sustained': 'Not Sustained',
-        'Exonerated': 'Exonerated',
-        'Office Investigation': '',  # investigation status, not a disposition
+        'Sustained': 'sustained',
+        'Not Sustained': 'not sustained',
+        'Exonerated': 'exonerated',
+        'Office Investigation': 'office investigation',
         'Not': '',          # incomplete
         'nan': '',          # string "nan"
         '-': '',            # placeholder
@@ -1547,7 +1619,9 @@ def clean_disposition(df):
 def clean_complainant(df):
     def normalize(val):
         val = str(val).strip().upper()
-        return 'baton rouge police department' if val == 'BRPD' else ''
+        if val in ('BRPD', '8RPD', 'BPRD'):
+            return 'baton rouge police department'
+        return ''
 
     df = df.copy()
     df['complainant'] = df['complainant'].apply(normalize)
@@ -1834,12 +1908,12 @@ def clean_action_22_25(df):
             return "retired"
 
         if "office investigation" in val:
-            return "office investigation"
+            return ""
 
         if "exonerated" in val:
-            return "exonerated"
+            return ""
         if "not sustained" in val:
-            return "not sustained"
+            return ""
 
         # Suspensions
         match = re.search(r"(\d+)[-\s]?day", val)
