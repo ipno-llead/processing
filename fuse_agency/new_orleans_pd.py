@@ -106,66 +106,68 @@ def fuse_events(
         ["uid"],
         warn_duplications=True,
     )
-    builder.extract_events(
-        cprr,
-        {
-            events.COMPLAINT_RECEIVE: {
-                "prefix": "receive",
-                "keep": [
-                    "uid",
-                    "agency",
-                    "allegation_uid",
-                    "years_of_service",
-                    "unit_desc",
-                    "unit_sub_desc",
-                    "division_desc",
-                    "department_desc",
-                    "employment_status",
-                    "race",
-                    "sex",
-                    "age",
-                    "department_desc",
-                ],
-            },
-            events.INVESTIGATION_COMPLETE: {
-                "prefix": "investigation_complete",
-                "keep": [
-                    "uid",
-                    "agency",
-                    "allegation_uid",
-                    "years_of_service",
-                    "unit_desc",
-                    "unit_sub_desc",
-                    "division_desc",
-                    "department_desc",
-                    "employment_status",
-                    "race",
-                    "sex",
-                    "age",
-                    "department_desc",
-                ],
-            },
-            events.COMPLAINT_INCIDENT: {
-                "prefix": "occur",
-                "keep": [
-                    "uid",
-                    "agency",
-                    "allegation_uid",
-                    "years_of_service",
-                    "unit_desc",
-                    "unit_sub_desc",
-                    "division_desc",
-                    "department_desc",
-                    "employment_status",
-                    "race",
-                    "sex",
-                    "age",
-                    "department_desc",
-                ],
-            },
-        },
-        ["uid", "allegation_uid"],
-    )
+    ## cprr (DA 2016-2020) events commented out: cprr_23 (2005-2025) contains
+    ## identical data and now extracts all three event types below
+    # builder.extract_events(
+    #     cprr,
+    #     {
+    #         events.COMPLAINT_RECEIVE: {
+    #             "prefix": "receive",
+    #             "keep": [
+    #                 "uid",
+    #                 "agency",
+    #                 "allegation_uid",
+    #                 "years_of_service",
+    #                 "unit_desc",
+    #                 "unit_sub_desc",
+    #                 "division_desc",
+    #                 "department_desc",
+    #                 "employment_status",
+    #                 "race",
+    #                 "sex",
+    #                 "age",
+    #                 "department_desc",
+    #             ],
+    #         },
+    #         events.INVESTIGATION_COMPLETE: {
+    #             "prefix": "investigation_complete",
+    #             "keep": [
+    #                 "uid",
+    #                 "agency",
+    #                 "allegation_uid",
+    #                 "years_of_service",
+    #                 "unit_desc",
+    #                 "unit_sub_desc",
+    #                 "division_desc",
+    #                 "department_desc",
+    #                 "employment_status",
+    #                 "race",
+    #                 "sex",
+    #                 "age",
+    #                 "department_desc",
+    #             ],
+    #         },
+    #         events.COMPLAINT_INCIDENT: {
+    #             "prefix": "occur",
+    #             "keep": [
+    #                 "uid",
+    #                 "agency",
+    #                 "allegation_uid",
+    #                 "years_of_service",
+    #                 "unit_desc",
+    #                 "unit_sub_desc",
+    #                 "division_desc",
+    #                 "department_desc",
+    #                 "employment_status",
+    #                 "race",
+    #                 "sex",
+    #                 "age",
+    #                 "department_desc",
+    #             ],
+    #         },
+    #     },
+    #     ["uid", "allegation_uid"],
+    # )
     builder.extract_events(
         uof,
         {
@@ -294,12 +296,19 @@ def fuse_events(
                     "allegation_uid",
                 ],
             },
-                  events.OFFICER_HIRE: {
+        },
+        ["uid", "allegation_uid"],
+    )
+    iapro_per_officer = iapro.drop_duplicates(subset=["uid"], keep="first")
+    builder.extract_events(
+        iapro_per_officer,
+        {
+            events.OFFICER_HIRE: {
                 "prefix": "hire",
                 "keep": [
                     "uid",
                     "agency",
-                    "race", 
+                    "race",
                     "sex",
                     "department_desc",
                     "badge_no",
@@ -311,7 +320,7 @@ def fuse_events(
                 "keep": [
                     "uid",
                     "agency",
-                    "race", 
+                    "race",
                     "sex",
                     "department_desc",
                     "badge_no",
@@ -319,7 +328,7 @@ def fuse_events(
                 ],
             },
         },
-        ["uid", "allegation_uid"],
+        ["uid"],
     )
     builder.extract_events(
         cprr_venezia,
@@ -363,14 +372,57 @@ def fuse_events(
                 "prefix": "receive",
                 "keep": [
                     "uid",
-                    "allegation_uid"
+                    "allegation_uid",
                     "agency",
+                    "years_of_service",
+                    "unit_desc",
+                    "unit_sub_desc",
+                    "division_desc",
+                    "department_desc",
+                    "employment_status",
+                    "race",
+                    "sex",
+                    "age",
                     "employee_id",
                     "allegation",
                     "allegation_desc",
                     "complainant_type",
                     "tracking_id_og",
-                    "tracking_id"
+                    "tracking_id",
+                ],
+            },
+            events.INVESTIGATION_COMPLETE: {
+                "prefix": "investigation_complete",
+                "keep": [
+                    "uid",
+                    "allegation_uid",
+                    "agency",
+                    "years_of_service",
+                    "unit_desc",
+                    "unit_sub_desc",
+                    "division_desc",
+                    "department_desc",
+                    "employment_status",
+                    "race",
+                    "sex",
+                    "age",
+                ],
+            },
+            events.COMPLAINT_INCIDENT: {
+                "prefix": "occur",
+                "keep": [
+                    "uid",
+                    "allegation_uid",
+                    "agency",
+                    "years_of_service",
+                    "unit_desc",
+                    "unit_sub_desc",
+                    "division_desc",
+                    "department_desc",
+                    "employment_status",
+                    "race",
+                    "sex",
+                    "age",
                 ],
             },
         },
