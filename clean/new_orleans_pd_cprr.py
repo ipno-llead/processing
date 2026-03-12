@@ -1,3 +1,6 @@
+import os
+import re
+
 import deba
 from lib.columns import clean_column_names, set_values
 from lib.clean import standardize_desc_cols, clean_names
@@ -107,7 +110,7 @@ def extract_receive_date(df):
     return df
 
 def filter_by_year(df):
-    return df[df['tracking_id_og'].str.startswith(('2021', '2022'))]
+    return df[df['tracking_id_og'].str.startswith(('2019', '2020', '2021', '2022'))]
 
 
 def clean():
@@ -402,10 +405,173 @@ def clean23():
     return df
 
 
+_OFFICER_TITLES = re.compile(
+    r'(?i)\b(?:officer|sergeant|sgt|detective|det|lieutenant|lt|captain|cpt'
+    r'|corporal|cpl|deputy|chief|commander|superintendent|trooper|recruit'
+    r'|technician|dispatcher|agent)\b'
+)
+
+_SA_DV_PATTERN = re.compile(
+    r'(?i)(?:sexual\s*assault|rape|domestic\s*(?:violence|abuse|battery)'
+    r'|molestation|indecent\s*behavior|carnal\s*knowledge)',
+)
+
+_MINOR_PATTERN = re.compile(
+    r'(?i)\b(?:minor|juvenile|child|infant|toddler)\b'
+)
+
+_PROPER_NAME = re.compile(r'\b([A-Z][a-z]{2,})\s+([A-Z][a-z]{2,})\b')
+
+_NAME_STOPWORDS = {
+    'The', 'This', 'That', 'These', 'Those', 'When', 'Where', 'While',
+    'After', 'Before', 'During', 'Since', 'Until', 'About', 'Above',
+    'Below', 'Between', 'Through', 'Under', 'Over', 'Into', 'Upon',
+    'From', 'With', 'Without', 'Against', 'Along', 'Around', 'Behind',
+    'Beyond', 'Toward', 'Within', 'According', 'Also', 'Another',
+    'Because', 'Being', 'Both', 'Could', 'Each', 'Even', 'Every',
+    'First', 'Second', 'Third', 'Other', 'Same', 'Some', 'Such', 'Than',
+    'Their', 'Then', 'There', 'They', 'Very', 'Were', 'What', 'Which',
+    'Would', 'Your', 'Have', 'Just', 'Like', 'Make', 'Many', 'More',
+    'Most', 'Much', 'Only', 'Still', 'Take', 'Time', 'Will', 'Page',
+    'New', 'Orleans', 'Police', 'Department', 'District', 'Officer',
+    'Sergeant', 'Detective', 'Lieutenant', 'Captain', 'Corporal',
+    'Deputy', 'Chief', 'Commander', 'Superintendent', 'Internal',
+    'Affairs', 'Bureau', 'Public', 'Integrity', 'Commission', 'City',
+    'Parish', 'State', 'Street', 'Avenue', 'Road', 'Highway', 'Drive',
+    'Court', 'Place', 'Boulevard', 'Lane', 'Complainant', 'Investigation',
+    'Preliminary', 'Domestic', 'Violence', 'Battery', 'Abuse', 'Sexual',
+    'Assault', 'Simple', 'Aggravated', 'False', 'Imprisonment', 'Special',
+    'Victims', 'Section', 'Unit', 'Division', 'County', 'East', 'West',
+    'North', 'South', 'Central', 'Chapter', 'Paragraph', 'Rule',
+    'Performance', 'Professional', 'Conduct', 'Duty',
+}
+
+
+def redact_gist(text):
+    """Replace sensitive material in gist text with ***."""
+    if not isinstance(text, str):
+        return text
+    # strip PDF pagination artifacts ("Page 106 of 113")
+    text = re.sub(r'\s*Page \d+ of \d+\s*', ' ', text)
+    # strip "GIST OF COMPLAINTS RECEIVED:" headers and "Week of ..." lines
+    text = re.sub(r'\s*GIST OF COMPLAINTS RECEIVED:\s*', ' ', text)
+    text = re.sub(r'\s*WEEKLY COMSTAT\s*', ' ', text)
+    text = re.sub(r'\s*Week of [A-Za-z0-9,\s\-]+(?:\d{4})?\s*', ' ', text)
+    # phone numbers
+    text = re.sub(r'\b\d{3}[-.\s]?\d{3}[-.\s]?\d{4}\b', '***', text)
+    # email addresses
+    text = re.sub(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b', '***', text)
+    # license plate numbers (keep "plate"/"tag" prefix, redact the number)
+    text = re.sub(
+        r'(?i)((?:plate|tag|LP)\s*#?\s*)[A-Z]{2,3}\d{2,4}[A-Z]?\d*',
+        r'\1***', text
+    )
+    # street addresses
+    text = re.sub(
+        r'\b\d{2,5}\s+(?:(?:N|S|E|W)\.?\s+)?'
+        r'(?:[A-Z][a-z]+\s+){1,3}'
+        r'(?:Street|St\.?|Avenue|Ave\.?|Blvd\.?|Boulevard|Drive|Dr\.?'
+        r'|Road|Rd\.?|Lane|Ln\.?|Way|Court|Ct\.?|Place|Pl\.?|Highway|Hwy\.?)\b',
+        '***', text
+    )
+    # full civilian names: Mr./Ms./Mrs./Miss First Last
+    text = re.sub(
+        r'\b(?:Mr|Ms|Mrs|Miss)\.?\s+[A-Z][a-z]+\s+[A-Z][a-z]+',
+        '***', text
+    )
+    # partial civilian names: Mr./Ms./Mrs./Miss Last
+    text = re.sub(
+        r'\b(?:Mr|Ms|Mrs|Miss)\.?\s+[A-Z][a-z]+',
+        '***', text
+    )
+    # age + name of minors (e.g. "13 year old Kyla", "13-year-old son, Shante")
+    text = re.sub(
+        r'(\d{1,2})[\s-]*year[\s-]*old\s*(?:son|daughter|child|boy|girl'
+        r'|male|female)?\s*,?\s*([A-Z][a-z]+)',
+        r'\1-year-old ***', text
+    )
+    # redact non-officer proper names in SA/DV and minor/juvenile gists
+    if _SA_DV_PATTERN.search(text) or _MINOR_PATTERN.search(text):
+        def _redact_name(m):
+            first, last = m.group(1), m.group(2)
+            if first in _NAME_STOPWORDS or last in _NAME_STOPWORDS:
+                return m.group(0)
+            # check if preceded by officer title
+            start = max(0, m.start() - 40)
+            prefix = text[start:m.start()]
+            if _OFFICER_TITLES.search(prefix):
+                return m.group(0)
+            return '***'
+        text = _PROPER_NAME.sub(_redact_name, text)
+    # collapse multiple whitespace/newlines left by removals
+    text = re.sub(r'\n\s*\n', '\n', text)
+    text = re.sub(r'  +', ' ', text)
+    return text.strip()
+
+
+def load_gist():
+    """Load and normalize all gist CSVs into a lookup DataFrame."""
+    gist_dir = deba.data("raw/new_orleans_pd/gist")
+    frames = []
+    for f in os.listdir(gist_dir):
+        if f.endswith('.csv'):
+            g = pd.read_csv(os.path.join(gist_dir, f))
+            g = g.dropna(subset=['tracking_id'])
+            g = g[g['gist'].notna()]
+            frames.append(g)
+    gist = pd.concat(frames, ignore_index=True)
+    gist['gist'] = gist['gist'].apply(redact_gist)
+
+    def norm(tid):
+        tid = str(tid).strip().upper().replace('.', '')
+        tid = re.sub(r'^(\d{4}-\d{3,4})([A-Z])$', r'\1-\2', tid)
+        m = re.match(r'^(\d{4})-(\d{1,3})-([A-Z])$', tid)
+        if m:
+            tid = f'{m.group(1)}-{m.group(2).zfill(4)}-{m.group(3)}'
+        return tid.lower()
+
+    gist['tracking_id_og'] = gist['tracking_id'].apply(norm)
+    gist = gist.drop(columns=['tracking_id']).drop_duplicates(subset=['tracking_id_og'], keep='first')
+    return gist
+
+
+def _redact_names_in_sensitive(text):
+    """Redact non-officer proper names in text that mentions SA/DV or minors."""
+    if not isinstance(text, str):
+        return text
+    if _SA_DV_PATTERN.search(text) or _MINOR_PATTERN.search(text):
+        def _redact_name(m):
+            first, last = m.group(1), m.group(2)
+            if first in _NAME_STOPWORDS or last in _NAME_STOPWORDS:
+                return m.group(0)
+            start = max(0, m.start() - 40)
+            prefix = text[start:m.start()]
+            if _OFFICER_TITLES.search(prefix):
+                return m.group(0)
+            return '***'
+        return _PROPER_NAME.sub(_redact_name, text)
+    return text
+
+
+def join_gist(df, gist):
+    """Append gist text to allegation_desc by tracking_id_og."""
+    df = df.merge(gist[['tracking_id_og', 'gist']], on='tracking_id_og', how='left')
+    mask = df['gist'].notna()
+    df.loc[mask, 'allegation_desc'] = (
+        df.loc[mask, 'allegation_desc'].fillna('').str.strip()
+        + '\n'
+        + df.loc[mask, 'gist'].str.strip()
+    ).str.strip()
+    df['allegation_desc'] = df['allegation_desc'].apply(_redact_names_in_sensitive)
+    return df.drop(columns=['gist'])
+
+
 if __name__ == "__main__":
+    gist = load_gist()
     dfa = clean()
     dfb = clean23()
     dfc = clean25()
     dfd = clean24()
-    df = pd.concat([dfa, dfb, dfc,dfd])
+    df = pd.concat([dfa, dfb, dfc, dfd])
+    df = join_gist(df, gist)
     df.to_csv(deba.data("clean/cprr_new_orleans_pd_2005_2025.csv"), index=False)
