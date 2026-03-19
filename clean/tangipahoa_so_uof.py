@@ -1,3 +1,5 @@
+import re
+
 import pandas as pd
 import deba
 from lib.clean import (
@@ -416,6 +418,371 @@ def clean_years_of_service(df):
     return df.drop(columns=["employee_years_of_service"])
 
 
+def split_race_gender(df, col):
+    """Split combined race/gender codes like 'BM' into citizen_race and citizen_sex.
+
+    Mappings: B=black, W=white, H=hispanic; M=male, F=female.
+    Edge cases: 'Dog', '0', 'WN', empty → left as-is or blank.
+    """
+    val = df[col].str.strip()
+    # Extract single-char race code and single-char gender code
+    parts = val.str.extract(r"^([BWH])([MF])$", flags=re.IGNORECASE)
+    race_map = {"b": "black", "w": "white", "h": "hispanic"}
+    sex_map = {"m": "male", "f": "female"}
+    df.loc[:, "citizen_race"] = (
+        parts[0].str.lower().map(race_map).fillna("")
+    )
+    df.loc[:, "citizen_sex"] = (
+        parts[1].str.lower().map(sex_map).fillna("")
+    )
+    return df.drop(columns=[col])
+
+
+def melt_force_columns(df, force_col_map):
+    """Convert boolean force-type columns into a single text description.
+
+    force_col_map: dict mapping column name -> label, e.g. {"oc": "oc", "jpx": "jpx"}
+    For each row, collects labels where value is '1' or 1, joins with ', '.
+    """
+    force_cols = [c for c in force_col_map if c in df.columns]
+
+    def _row_desc(row):
+        parts = []
+        for col in force_cols:
+            v = str(row[col]).strip()
+            if v == "1":
+                parts.append(force_col_map[col])
+        return ", ".join(parts)
+
+    df.loc[:, "use_of_force_description"] = df.apply(_row_desc, axis=1)
+    return df.drop(columns=force_cols)
+
+
+def split_deputy_name_col(df, col):
+    """Split a single deputy name column into first_name and last_name."""
+    names = df[col].str.extract(r"^(\S+)\s+(.+)$")
+    df.loc[:, "first_name"] = names[0].str.lower().str.strip()
+    df.loc[:, "last_name"] = names[1].str.lower().str.strip()
+    return df.drop(columns=[col])
+
+
+def clean_arrest_col(df, col):
+    """Normalize arrest column to citizen_arrested yes/no."""
+    df.loc[:, "citizen_arrested"] = (
+        df[col].astype(str).str.strip()
+        .replace({"1": "yes", "2": "yes", "0": "no", "": ""})
+    )
+    return df.drop(columns=[col])
+
+
+def clean_treated_hospital(df, treated_col=None, hospital_col=None):
+    """Normalize treated-at-scene and hospital columns into use_of_force_result."""
+    parts = []
+    if treated_col and treated_col in df.columns:
+        parts.append(("treated at scene", treated_col))
+    if hospital_col and hospital_col in df.columns:
+        parts.append(("hospital", hospital_col))
+
+    def _result(row):
+        results = []
+        for label, col in parts:
+            if str(row[col]).strip() == "1":
+                results.append(label)
+        if results:
+            return ", ".join(results)
+        return ""
+
+    if parts:
+        df.loc[:, "use_of_force_result"] = df.apply(_result, axis=1)
+        df = df.drop(columns=[c for _, c in parts])
+    return df
+
+
+def clean_time_military(df, col):
+    """Convert military time like '1146' or '2300' to HH:MM format.
+
+    Values of '0' or empty become ''.
+    """
+    def _fmt(val):
+        val = str(val).strip()
+        if val in ("0", "", "nan"):
+            return ""
+        # Already has colon
+        if ":" in val:
+            return val
+        # Pad to 4 digits
+        val = val.zfill(4)
+        if len(val) == 4 and val.isdigit():
+            return f"{val[:2]}:{val[2:]}"
+        return val
+
+    df.loc[:, "occurred_time"] = df[col].apply(_fmt)
+    return df.drop(columns=[col])
+
+
+def finalize_old_uof(df, year):
+    """Shared finalization for 2014-2019 clean functions.
+
+    Generates UIDs, deduplicates, and splits into UOF + citizen dataframes.
+    Rows without officer names are excluded from UOF but kept in citizen df.
+    """
+    has_name = df.first_name.notna() & df.first_name.str.strip().ne("")
+    df_with_name = df[has_name].copy()
+    df_no_name = df[~has_name].copy()
+
+    df_with_name = (
+        df_with_name.pipe(clean_sexes, ["citizen_sex"])
+        .pipe(clean_races, ["citizen_race"])
+        .pipe(set_values, {"agency": "tangipahoa-so"})
+        .pipe(gen_uid, ["first_name", "last_name", "agency"])
+        .pipe(
+            gen_uid,
+            [
+                "uid",
+                "occurred_date",
+                "use_of_force_description",
+                "citizen_race",
+                "citizen_sex",
+                "citizen_age",
+            ],
+            "uof_uid",
+        )
+    )
+
+    df_with_name = df_with_name.drop_duplicates(subset=["uid", "uof_uid"])
+
+    # Build UOF columns list based on what's available
+    uof_cols = ["use_of_force_description", "occurred_date"]
+    if "occurred_time" in df_with_name.columns:
+        uof_cols.append("occurred_time")
+    if "citizen_arrested" in df_with_name.columns:
+        uof_cols.append("citizen_arrested")
+    if "use_of_force_result" in df_with_name.columns:
+        uof_cols.append("use_of_force_result")
+    uof_cols.extend(["first_name", "last_name", "agency", "uid", "uof_uid"])
+
+    dfa = df_with_name[uof_cols]
+
+    # Citizen df: include citizens from both named and unnamed officer rows
+    cit_named = df_with_name[
+        ["uof_uid", "citizen_age", "citizen_sex", "citizen_race", "agency"]
+    ]
+
+    if len(df_no_name) > 0:
+        df_no_name = (
+            df_no_name.pipe(clean_sexes, ["citizen_sex"])
+            .pipe(clean_races, ["citizen_race"])
+            .pipe(set_values, {"agency": "tangipahoa-so"})
+        )
+        # Generate a placeholder uof_uid from citizen + date info
+        df_no_name.loc[:, "uof_uid"] = (
+            df_no_name[["occurred_date", "citizen_race", "citizen_sex", "citizen_age"]]
+            .astype(str)
+            .agg(", ".join, axis=1)
+            .map(lambda x: __import__("hashlib").md5(x.encode("utf-8")).hexdigest())
+        )
+        cit_no_name = df_no_name[
+            ["uof_uid", "citizen_age", "citizen_sex", "citizen_race", "agency"]
+        ]
+        cit_all = pd.concat([cit_named, cit_no_name], ignore_index=True)
+    else:
+        cit_all = cit_named
+
+    dfb = (
+        cit_all
+        .drop_duplicates(subset=["uof_uid", "citizen_age", "citizen_sex", "citizen_race"])
+        .pipe(
+            gen_uid,
+            ["uof_uid", "citizen_age", "citizen_sex", "citizen_race", "agency"],
+            "citizen_uid",
+        )
+    )
+
+    return dfa, dfb
+
+
+def clean_14():
+    df = (
+        pd.read_csv(deba.data("raw/tangipahoa_so/tangipahoa_so_uof_2014.csv"))
+        .pipe(clean_column_names)
+        .pipe(strip_leading_comma)
+    )
+    df = df.rename(columns={
+        "suspect_race": "citizen_race_raw",
+        "suspect_gender": "citizen_sex_raw",
+        "suspect_age": "citizen_age",
+    })
+    # Race and gender are separate columns in 2014
+    df.loc[:, "citizen_race"] = (
+        df.citizen_race_raw.str.lower().str.strip()
+        .replace({"w": "white", "b": "black", "h": "hispanic", "u": ""})
+    )
+    df.loc[:, "citizen_sex"] = (
+        df.citizen_sex_raw.str.lower().str.strip()
+        .replace({"m": "male", "f": "female"})
+    )
+    df = df.drop(columns=["citizen_race_raw", "citizen_sex_raw"])
+    df.loc[:, "citizen_age"] = df.citizen_age.astype(str).str.strip().replace({"0": ""})
+    df.loc[:, "occurred_date"] = df.date.str.strip()
+    df = df.drop(columns=["date"])
+    df = df.pipe(split_deputy_name_col, "deputy")
+    df = df.pipe(melt_force_columns, {
+        "hand": "hand", "oc": "oc", "jpx": "jpx", "baton": "baton",
+        "display": "display firearm", "other": "other", "k9_bite": "k9 bite",
+    })
+    df = df.pipe(clean_arrest_col, "arrest")
+    df = df.pipe(
+        clean_treated_hospital,
+        treated_col="treated_at_scene",
+        hospital_col="hospital",
+    )
+    return finalize_old_uof(df, 2014)
+
+
+def clean_15():
+    df = (
+        pd.read_csv(deba.data("raw/tangipahoa_so/tangipahoa_so_uof_2015.csv"))
+        .pipe(clean_column_names)
+        .pipe(strip_leading_comma)
+    )
+    # Filter out non-date rows (e.g. "Suspect 2")
+    df = df[~df.date.str.contains(r"[a-zA-Z]", na=True)].reset_index(drop=True)
+    df.loc[:, "citizen_age"] = df.age.astype(str).str.strip().replace({"0": ""})
+    df = df.drop(columns=["age"])
+    df.loc[:, "occurred_date"] = df.date.str.strip()
+    df = df.drop(columns=["date"])
+    df = df.pipe(split_deputy_name_col, "name")
+    df = df.pipe(split_race_gender, "race")
+    df = df.pipe(melt_force_columns, {
+        "no_weapons": "weaponless", "oc": "oc", "jpx": "jpx",
+        "impact_weapon": "impact weapon",
+        "display_firearm": "display firearm",
+        "discharge_firearm": "discharge firearm",
+    })
+    df = df.pipe(clean_arrest_col, "arrest")
+    return finalize_old_uof(df, 2015)
+
+
+def clean_16():
+    df = (
+        pd.read_csv(deba.data("raw/tangipahoa_so/tangipahoa_so_uof_2016.csv"))
+        .pipe(clean_column_names)
+        .pipe(strip_leading_comma)
+    )
+    df.loc[:, "citizen_age"] = (
+        df.suspect_age.astype(str).str.strip().replace({"0": ""})
+    )
+    df = df.drop(columns=["suspect_age"])
+    df.loc[:, "occurred_date"] = df.date.str.strip()
+    df = df.drop(columns=["date"])
+    df = df.pipe(split_deputy_name_col, "deputy_name")
+    df = df.pipe(split_race_gender, "suspect_race")
+    df = df.pipe(melt_force_columns, {
+        "no_weapons": "weaponless", "oc": "oc", "ipx": "ipx",
+        "impact_weapon": "impact weapon",
+        "display_firearm": "display firearm",
+        "discharge_firearm": "discharge firearm",
+        "k9_bite": "k9 bite",
+    })
+    df = df.pipe(clean_arrest_col, "arrest")
+    return finalize_old_uof(df, 2016)
+
+
+def clean_17():
+    df = (
+        pd.read_csv(deba.data("raw/tangipahoa_so/tangipahoa_so_uof_2017.csv"))
+        .pipe(clean_column_names)
+        .pipe(strip_leading_comma)
+    )
+    df.loc[:, "citizen_age"] = (
+        df.suspect_age.astype(str).str.strip().replace({"0": ""})
+    )
+    df = df.drop(columns=["suspect_age"])
+    df.loc[:, "occurred_date"] = df.date.str.strip()
+    df = df.drop(columns=["date"])
+    df = df.pipe(split_deputy_name_col, "name")
+    df = df.pipe(split_race_gender, "suspect_race")
+    df = df.pipe(melt_force_columns, {
+        "no_weapons": "weaponless", "oc": "oc", "ipx": "ipx",
+        "impact_weapon": "impact weapon",
+        "discharge_firearm": "discharge firearm",
+        "display_firearm": "display firearm",
+        "k9_bite": "k9 bite",
+    })
+    df = df.pipe(clean_arrest_col, "arrest_made")
+    df = df.pipe(
+        clean_treated_hospital,
+        treated_col="treated_at_scene",
+        hospital_col="hospital",
+    )
+    if "deputy_injury" in df.columns:
+        df = df.drop(columns=["deputy_injury"])
+    return finalize_old_uof(df, 2017)
+
+
+def clean_18():
+    df = (
+        pd.read_csv(deba.data("raw/tangipahoa_so/tangipahoa_so_uof_2018.csv"))
+        .pipe(clean_column_names)
+        .pipe(strip_leading_comma)
+    )
+    df.loc[:, "citizen_age"] = (
+        df.suspect_age.astype(str).str.strip().replace({"0": ""})
+    )
+    df = df.drop(columns=["suspect_age"])
+    df.loc[:, "occurred_date"] = df.date.str.strip()
+    df = df.drop(columns=["date"])
+    df = df.pipe(clean_time_military, "time")
+    df = df.pipe(split_deputy_name_col, "deputy_name")
+    df = df.pipe(split_race_gender, "suspect_race")
+    df = df.pipe(melt_force_columns, {
+        "weaponless": "weaponless", "oc": "oc", "cle": "cle",
+        "impact_weapon": "impact weapon",
+        "discharge_firearm": "discharge firearm",
+        "display_firearm": "display firearm",
+        "k9_bite": "k9 bite",
+    })
+    df = df.pipe(clean_arrest_col, "arrest")
+    df = df.pipe(
+        clean_treated_hospital,
+        treated_col="treated_at_scene",
+        hospital_col="hospital",
+    )
+    return finalize_old_uof(df, 2018)
+
+
+def clean_19():
+    df = (
+        pd.read_csv(deba.data("raw/tangipahoa_so/tangipahoa_so_uof_2019.csv"))
+        .pipe(clean_column_names)
+        .pipe(strip_leading_comma)
+    )
+    df.loc[:, "citizen_age"] = (
+        df.suspect_age.astype(str).str.strip().replace({"0": "", "00": ""})
+    )
+    df = df.drop(columns=["suspect_age"])
+    df.loc[:, "occurred_date"] = df.date.str.strip()
+    df = df.drop(columns=["date"])
+    df = df.pipe(clean_time_military, "time")
+    df = df.pipe(split_deputy_name_col, "deputy_name")
+    df = df.pipe(split_race_gender, "suspect_race")
+    df = df.pipe(melt_force_columns, {
+        "weaponless": "weaponless", "oc": "oc", "cle": "cle",
+        "baton": "baton",
+        "display_fa": "display firearm",
+        "discharge_fa": "discharge firearm",
+    })
+    df = df.pipe(clean_arrest_col, "arrest_made")
+    df = df.pipe(
+        clean_treated_hospital,
+        treated_col="treated_at_scene",
+        hospital_col="hospital",
+    )
+    if "suspect_injuries" in df.columns:
+        df = df.drop(columns=["suspect_injuries"])
+    return finalize_old_uof(df, 2019)
+
+
 def read_2025_csv():
     """Read 2025 CSV which has first data row baked into headers.
 
@@ -679,10 +1046,40 @@ def clean_25():
 
 
 if __name__ == "__main__":
+    uof_14, citizen_14 = clean_14()
+    uof_15, citizen_15 = clean_15()
+    uof_16, citizen_16 = clean_16()
+    uof_17, citizen_17 = clean_17()
+    uof_18, citizen_18 = clean_18()
+    uof_19, citizen_19 = clean_19()
     uof_24, citizen_24 = clean_24()
     uof_25, citizen_25 = clean_25()
+    uof_14.to_csv(deba.data("clean/uof_tangipahoa_so_2014.csv"), index=False)
+    uof_15.to_csv(deba.data("clean/uof_tangipahoa_so_2015.csv"), index=False)
+    uof_16.to_csv(deba.data("clean/uof_tangipahoa_so_2016.csv"), index=False)
+    uof_17.to_csv(deba.data("clean/uof_tangipahoa_so_2017.csv"), index=False)
+    uof_18.to_csv(deba.data("clean/uof_tangipahoa_so_2018.csv"), index=False)
+    uof_19.to_csv(deba.data("clean/uof_tangipahoa_so_2019.csv"), index=False)
     uof_24.to_csv(deba.data("clean/uof_tangipahoa_so_2024.csv"), index=False)
     uof_25.to_csv(deba.data("clean/uof_tangipahoa_so_2025.csv"), index=False)
+    citizen_14.to_csv(
+        deba.data("clean/uof_cit_tangipahoa_so_2014.csv"), index=False
+    )
+    citizen_15.to_csv(
+        deba.data("clean/uof_cit_tangipahoa_so_2015.csv"), index=False
+    )
+    citizen_16.to_csv(
+        deba.data("clean/uof_cit_tangipahoa_so_2016.csv"), index=False
+    )
+    citizen_17.to_csv(
+        deba.data("clean/uof_cit_tangipahoa_so_2017.csv"), index=False
+    )
+    citizen_18.to_csv(
+        deba.data("clean/uof_cit_tangipahoa_so_2018.csv"), index=False
+    )
+    citizen_19.to_csv(
+        deba.data("clean/uof_cit_tangipahoa_so_2019.csv"), index=False
+    )
     citizen_24.to_csv(
         deba.data("clean/uof_cit_tangipahoa_so_2024.csv"), index=False
     )
