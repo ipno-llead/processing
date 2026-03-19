@@ -559,6 +559,8 @@ def finalize_old_uof(df, year):
         uof_cols.append("citizen_arrested")
     if "use_of_force_result" in df_with_name.columns:
         uof_cols.append("use_of_force_result")
+    if "middle_name" in df_with_name.columns:
+        uof_cols.append("middle_name")
     uof_cols.extend(["first_name", "last_name", "agency", "uid", "uof_uid"])
 
     dfa = df_with_name[uof_cols]
@@ -781,6 +783,283 @@ def clean_19():
     if "suspect_injuries" in df.columns:
         df = df.drop(columns=["suspect_injuries"])
     return finalize_old_uof(df, 2019)
+
+
+def parse_22_23_csv():
+    """Parse the 2022-2023 UOF CSV which has two different layouts mid-file.
+
+    The force column contains JSON-like arrays with commas that break CSV parsing.
+    Also, around row 103 the layout shifts (the empty column between date and time
+    disappears, and address/badge get merged).
+
+    Returns a list of dicts with unified field names.
+    """
+    import csv as csvmod
+
+    path = deba.data("raw/tangipahoa_so/tangipahoa_so_uof_2022_2023.csv")
+    with open(path) as f:
+        reader = csvmod.reader(f)
+        raw_rows = list(reader)
+
+    def strip_tick(s):
+        s = s.strip()
+        if s.startswith("'"):
+            s = s[1:]
+        return s.strip()
+
+    def extract_force(fields):
+        """Reassemble force type from fields split on commas inside JSON array.
+
+        Returns (force_string, remaining_fields).
+        """
+        reassembled = fields[0]
+        idx = 0
+        # Keep joining fields until we find ] or run out
+        while "]" not in reassembled and idx < len(fields) - 1:
+            idx += 1
+            reassembled += "," + fields[idx]
+        # If no ] found (malformed), grab everything up to first empty tick field
+        if "]" not in reassembled:
+            # Fallback: use the reassembled as-is
+            pass
+        remaining = fields[idx + 1 :]
+        # Clean force type
+        force = strip_tick(reassembled)
+        force = re.sub(r'[\[\]""()\u201c\u201d]', "", force)
+        # Handle "PhysicalAction" (no space) -> "Physical Action"
+        force = re.sub(r"([a-z])([A-Z])", r"\1 \2", force)
+        force = force.strip()
+        # Extract known force types by matching against known labels
+        known_types = [
+            "canine deployment", "physical action", "impact weapon",
+            "discharge firearm", "display firearm",
+            "chemical", "firearm", "taser",
+        ]
+        found = []
+        remainder = force.lower()
+        for ft in known_types:
+            if ft in remainder:
+                found.append(ft)
+                remainder = remainder.replace(ft, "", 1).strip()
+        # If nothing matched, fall back to comma/space split
+        if not found:
+            parts = re.split(r"\s*,\s*|\s{2,}", force)
+            found = [p.strip().lower() for p in parts if p.strip()]
+        return ", ".join(found), remaining
+
+    def looks_like_time(val):
+        """Check if a stripped value looks like a time (H:MM, HH:MM, or short number)."""
+        v = strip_tick(val)
+        if not v:
+            return False
+        if re.match(r"^\d{1,2}:\d{2}$", v):
+            return True
+        return False
+
+    def looks_like_date(val):
+        v = strip_tick(val)
+        return bool(re.match(r"^\d{1,2}/\d{1,2}/\d{4}$", v))
+
+    records = []
+    for row_idx, raw in enumerate(raw_rows):
+        if row_idx == 0:
+            continue  # skip header
+
+        force, rest = extract_force(raw)
+
+        if len(rest) < 10:
+            # Malformed row - try to salvage
+            # Pad with empty strings
+            rest = rest + [""] * (13 - len(rest))
+
+        # Detect layout: in early layout, after case/number/date there's an
+        # empty field then time. In late layout, time is right after date.
+        # rest[0] = case_number, rest[1] = tracking_number, rest[2] = date
+        # rest[3] = either empty (early) or time (late)
+        case_num = strip_tick(rest[0])
+        tracking_num = strip_tick(rest[1])
+        date_val = strip_tick(rest[2])
+        field3 = strip_tick(rest[3]) if len(rest) > 3 else ""
+
+        # Determine layout
+        if field3 == "" or (looks_like_date(rest[3]) and not looks_like_time(rest[3])):
+            # Early layout: rest[3] is empty, rest[4] is time
+            layout = "early"
+            time_val = strip_tick(rest[4]) if len(rest) > 4 else ""
+            address = strip_tick(rest[5]) if len(rest) > 5 else ""
+            badge = strip_tick(rest[6]) if len(rest) > 6 else ""
+            division = strip_tick(rest[8]) if len(rest) > 8 else ""
+            officer_name = strip_tick(rest[9]) if len(rest) > 9 else ""
+            medical = strip_tick(rest[10]) if len(rest) > 10 else ""
+            injuries = strip_tick(rest[11]) if len(rest) > 11 else ""
+            officer_race = strip_tick(rest[12]) if len(rest) > 12 else ""
+        else:
+            # Late layout: rest[3] is time, rest[4] is address(+badge)
+            layout = "late"
+            time_val = field3
+            addr_raw = strip_tick(rest[4]) if len(rest) > 4 else ""
+            # Badge may be embedded in address or in rest[6]
+            badge = strip_tick(rest[6]) if len(rest) > 6 else ""
+            division = ""
+            officer_name = strip_tick(rest[7]) if len(rest) > 7 else ""
+            medical = strip_tick(rest[8]) if len(rest) > 8 else ""
+            injuries = strip_tick(rest[9]) if len(rest) > 9 else ""
+            # officer_race is at the end if present
+            officer_race = ""
+            for i in range(len(rest) - 1, 9, -1):
+                v = strip_tick(rest[i])
+                if v and v in ("White", "Black", "Other", "Hispanic"):
+                    officer_race = v
+                    break
+            address = addr_raw
+
+        records.append(
+            {
+                "use_of_force_description": force,
+                "case_number": case_num,
+                "tracking_number": tracking_num,
+                "occurred_date": date_val,
+                "occurred_time": time_val,
+                "address": address,
+                "badge_number": badge,
+                "officer_name": officer_name,
+                "medical_treatment": medical,
+                "injuries_explain": injuries,
+                "officer_race": officer_race,
+            }
+        )
+
+    return pd.DataFrame(records)
+
+
+def clean_22_23():
+    """Clean the 2022-2023 UOF data.
+
+    This dataset has no citizen/suspect demographics, so citizen df will be minimal.
+    """
+    df = parse_22_23_csv()
+
+    # Split officer name into first_name, middle_name, last_name
+    # Handle messy names like "ColbyL. Varnado", "Malcolm) Mayes- Becks"
+    def _split_name(name):
+        if not name or pd.isna(name):
+            return "", "", ""
+        name = str(name).strip()
+        # Remove stray punctuation like ) at start/middle
+        name = re.sub(r"[()]", "", name)
+        # Fix "ColbyL." -> "Colby L.", "TammyL" -> "Tammy L"
+        name = re.sub(r"([a-z])([A-Z])", r"\1 \2", name)
+        # Remove trailing suffixes like ", Sr." for splitting
+        suffix = ""
+        suffix_match = re.search(r",?\s*(sr\.?|jr\.?|ii|iii|iv)$", name, re.IGNORECASE)
+        if suffix_match:
+            suffix = " " + suffix_match.group(0).strip().strip(",").strip()
+            name = name[: suffix_match.start()].strip()
+        parts = name.split()
+        if len(parts) == 0:
+            return "", "", ""
+        if len(parts) == 1:
+            return "", "", parts[0].lower()
+        # Find middle initial: single letter (with optional period) in any position
+        # except first and last when there are 3+ parts
+        middle = ""
+        if len(parts) >= 3:
+            # Check each interior part for single-letter initial
+            for idx in range(1, len(parts)):
+                if re.match(r"^[A-Za-z]\.?$", parts[idx]):
+                    middle = parts[idx].strip(".").lower()
+                    parts = parts[:idx] + parts[idx + 1 :]
+                    break
+        # first word = first_name, rest = last_name
+        first = parts[0].lower().strip(".")
+        last = " ".join(parts[1:]).lower().strip(".")
+        if suffix:
+            last = last + suffix.lower()
+        return first, middle, last
+
+    names = df.officer_name.apply(_split_name)
+    df.loc[:, "first_name"] = [n[0] for n in names]
+    df.loc[:, "middle_name"] = [n[1] for n in names]
+    df.loc[:, "last_name"] = [n[2] for n in names]
+
+    # Handle the merged row (two incidents in one) - row 161 in raw file
+    # tracking_number like "2023013464 2023000122" with two dates
+    merged_mask = df.tracking_number.str.contains(r"\d+\s+\d+", na=False)
+    if merged_mask.any():
+        new_rows = []
+        drop_idx = []
+        for idx in df[merged_mask].index:
+            row = df.loc[idx]
+            tnums = row.tracking_number.split()
+            dates = row.occurred_date.split()
+            times = row.occurred_time.split()
+            names_raw = row.officer_name
+            # Try to split officer names (two names concatenated)
+            name_parts = re.findall(r"[A-Z][a-z]+\s+[A-Z][a-z]+", names_raw)
+
+            for i in range(len(tnums)):
+                new_row = row.copy()
+                new_row["tracking_number"] = tnums[i] if i < len(tnums) else tnums[-1]
+                new_row["occurred_date"] = dates[i] if i < len(dates) else dates[-1]
+                new_row["occurred_time"] = times[i] if i < len(times) else times[-1]
+                if len(name_parts) >= len(tnums):
+                    nm = name_parts[i]
+                    p = nm.split()
+                    new_row["first_name"] = p[0].lower() if p else ""
+                    new_row["last_name"] = " ".join(p[1:]).lower() if len(p) > 1 else ""
+                    new_row["middle_name"] = ""
+                    new_row["officer_name"] = nm
+                # Split force types between officers (already comma-separated)
+                force = row.use_of_force_description
+                force_parts = [p.strip() for p in force.split(",") if p.strip()]
+                if len(force_parts) >= len(tnums):
+                    new_row["use_of_force_description"] = force_parts[i]
+                new_rows.append(new_row)
+            drop_idx.append(idx)
+        df = df.drop(index=drop_idx)
+        df = pd.concat([df, pd.DataFrame(new_rows)], ignore_index=True)
+
+    # Clean medical_treatment into boolean-ish
+    df.loc[:, "officer_injured"] = (
+        df.medical_treatment.str.upper().str.strip()
+        .replace({"TRUE": "yes", "FALSE": "no", "": ""})
+    )
+
+    # Clean occurred_time - normalize formats
+    def _clean_time(val):
+        val = str(val).strip()
+        if not val or val == "nan":
+            return ""
+        if re.match(r"^\d{1,2}:\d{2}$", val):
+            return val
+        if val == "0:00":
+            return ""
+        return val
+
+    df.loc[:, "occurred_time"] = df.occurred_time.apply(_clean_time)
+
+    # No citizen data in this dataset - create empty citizen columns
+    df.loc[:, "citizen_age"] = ""
+    df.loc[:, "citizen_race"] = ""
+    df.loc[:, "citizen_sex"] = ""
+
+    # Drop unnecessary columns
+    df = df.drop(
+        columns=[
+            "officer_name",
+            "case_number",
+            "tracking_number",
+            "badge_number",
+            "address",
+            "medical_treatment",
+            "injuries_explain",
+            "officer_race",
+            "officer_injured",
+        ]
+    )
+
+    # Use finalize_old_uof for UID generation and split
+    return finalize_old_uof(df, "22_23")
 
 
 def read_2025_csv():
@@ -1052,6 +1331,7 @@ if __name__ == "__main__":
     uof_17, citizen_17 = clean_17()
     uof_18, citizen_18 = clean_18()
     uof_19, citizen_19 = clean_19()
+    uof_22_23, citizen_22_23 = clean_22_23()
     uof_24, citizen_24 = clean_24()
     uof_25, citizen_25 = clean_25()
     uof_14.to_csv(deba.data("clean/uof_tangipahoa_so_2014.csv"), index=False)
@@ -1060,6 +1340,9 @@ if __name__ == "__main__":
     uof_17.to_csv(deba.data("clean/uof_tangipahoa_so_2017.csv"), index=False)
     uof_18.to_csv(deba.data("clean/uof_tangipahoa_so_2018.csv"), index=False)
     uof_19.to_csv(deba.data("clean/uof_tangipahoa_so_2019.csv"), index=False)
+    uof_22_23.to_csv(
+        deba.data("clean/uof_tangipahoa_so_2022_2023.csv"), index=False
+    )
     uof_24.to_csv(deba.data("clean/uof_tangipahoa_so_2024.csv"), index=False)
     uof_25.to_csv(deba.data("clean/uof_tangipahoa_so_2025.csv"), index=False)
     citizen_14.to_csv(
@@ -1079,6 +1362,9 @@ if __name__ == "__main__":
     )
     citizen_19.to_csv(
         deba.data("clean/uof_cit_tangipahoa_so_2019.csv"), index=False
+    )
+    citizen_22_23.to_csv(
+        deba.data("clean/uof_cit_tangipahoa_so_2022_2023.csv"), index=False
     )
     citizen_24.to_csv(
         deba.data("clean/uof_cit_tangipahoa_so_2024.csv"), index=False

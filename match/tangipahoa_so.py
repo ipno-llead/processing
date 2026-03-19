@@ -303,6 +303,42 @@ def match_uof_19_post(uof, post):
     return uof
 
 
+def match_uof_22_23_post(uof, post):
+    dfa = (
+        uof.loc[uof.uid.notna(), ["uid", "first_name", "last_name"]]
+        .drop_duplicates(subset=["uid"])
+        .set_index("uid", drop=True)
+    )
+    dfa.loc[:, "fc"] = dfa.first_name.fillna("").map(lambda x: x[:1])
+
+    dfb = (
+        post[["uid", "first_name", "last_name"]]
+        .drop_duplicates()
+        .set_index("uid", drop=True)
+    )
+    dfb.loc[:, "fc"] = dfb.first_name.fillna("").map(lambda x: x[:1])
+
+    matcher = ThresholdMatcher(
+        ColumnsIndex("fc"),
+        {
+            "first_name": JaroWinklerSimilarity(),
+            "last_name": JaroWinklerSimilarity(),
+        },
+        dfa,
+        dfb,
+    )
+    decision = 0.94
+    matcher.save_pairs_to_excel(
+        deba.data("match/uof_tangipahoa_so_2022_2023_v_pprr_post_2020_11_06.xlsx"),
+        decision,
+    )
+    matches = matcher.get_index_pairs_within_thresholds(decision)
+    match_dict = dict(matches)
+
+    uof.loc[:, "uid"] = uof.uid.map(lambda x: match_dict.get(x, x))
+    return uof
+
+
 def match_uof_24_post(uof, post):
     dfa = (
         uof.loc[uof.uid.notna(), ["uid", "first_name", "last_name"]]
@@ -384,6 +420,7 @@ if __name__ == "__main__":
     uof_17 = pd.read_csv(deba.data("clean/uof_tangipahoa_so_2017.csv"))
     uof_18 = pd.read_csv(deba.data("clean/uof_tangipahoa_so_2018.csv"))
     uof_19 = pd.read_csv(deba.data("clean/uof_tangipahoa_so_2019.csv"))
+    uof_22_23 = pd.read_csv(deba.data("clean/uof_tangipahoa_so_2022_2023.csv"))
     uof_24 = pd.read_csv(deba.data("clean/uof_tangipahoa_so_2024.csv"))
     uof_25 = pd.read_csv(deba.data("clean/uof_tangipahoa_so_2025.csv"))
     agency = cprr21.agency[0]
@@ -397,6 +434,7 @@ if __name__ == "__main__":
     uof_17 = match_uof_17_post(uof_17, post)
     uof_18 = match_uof_18_post(uof_18, post)
     uof_19 = match_uof_19_post(uof_19, post)
+    uof_22_23 = match_uof_22_23_post(uof_22_23, post)
     uof_24 = match_uof_24_post(uof_24, post)
     uof_25 = match_uof_25_post(uof_25, post)
     cprr21.to_csv(deba.data("match/cprr_tangipahoa_so_2015_2021.csv"), index=False)
@@ -407,5 +445,6 @@ if __name__ == "__main__":
     uof_17.to_csv(deba.data("match/uof_tangipahoa_so_2017.csv"), index=False)
     uof_18.to_csv(deba.data("match/uof_tangipahoa_so_2018.csv"), index=False)
     uof_19.to_csv(deba.data("match/uof_tangipahoa_so_2019.csv"), index=False)
+    uof_22_23.to_csv(deba.data("match/uof_tangipahoa_so_2022_2023.csv"), index=False)
     uof_24.to_csv(deba.data("match/uof_tangipahoa_so_2024.csv"), index=False)
     uof_25.to_csv(deba.data("match/uof_tangipahoa_so_2025.csv"), index=False)

@@ -1,6 +1,6 @@
 wdir: ../../../data/raw
 outs:
-- md5: 281e5da1ed247b4857daddd94eeca4de.dir
-  size: 126100
-  nfiles: 10
+- md5: 2b86f8db06a0b59647ea7f865266aa67.dir
+  size: 155288
+  nfiles: 11
   path: tangipahoa_so
