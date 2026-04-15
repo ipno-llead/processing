@@ -1,12 +1,16 @@
 import pandas as pd
 
 import deba
-from lib.columns import rearrange_event_columns
+from lib.columns import (
+    rearrange_event_columns,
+    rearrange_use_of_force,
+    rearrange_citizen_columns,
+)
 from lib.personnel import fuse_personnel
 from lib import events
 from lib.post import load_for_agency
 
-def fuse_events(ah, pprr, pprr_25):
+def fuse_events(ah, pprr, pprr_25, uof):
     builder = events.Builder()
 
     # extract events from actions history
@@ -72,6 +76,20 @@ def fuse_events(ah, pprr, pprr_25):
         },
         ["uid"],
     )
+    builder.extract_events(
+        uof,
+        {
+            events.UOF_INCIDENT: {
+                "prefix": "occurred",
+                "keep": [
+                    "uid",
+                    "uof_uid",
+                    "agency",
+                ],
+            },
+        },
+        ["uid", "uof_uid"],
+    )
     return builder.to_frame()
 
 
@@ -80,10 +98,18 @@ if __name__ == "__main__":
     ah = pd.read_csv(deba.data("clean/actions_history_covington_pd_2021.csv"))
     pprr = pd.read_csv(deba.data("clean/pprr_covington_pd_2020.csv"))
     pprr_25 = pd.read_csv(deba.data("match/pprr_covington_pd_1975_2025.csv"))
+    uof = pd.read_csv(deba.data("match/uof_covington_pd_2022_2025.csv"))
+    citizen_df = pd.read_csv(deba.data("clean/uof_cit_covington_pd_2022_2025.csv"))
     agency = pprr.agency[0]
     post = load_for_agency(agency)
-    events_df = rearrange_event_columns(pd.concat([post_event, fuse_events(ah, pprr, pprr_25)]))
+    events_df = rearrange_event_columns(
+        pd.concat([post_event, fuse_events(ah, pprr, pprr_25, uof)])
+    )
     events_df.to_csv(deba.data("fuse_agency/event_covington_pd.csv"), index=False)
-    per_df = fuse_personnel(ah, pprr, pprr_25, post)
+    per_df = fuse_personnel(ah, pprr, pprr_25, post, uof)
     per_df.to_csv(deba.data("fuse_agency/per_covington_pd.csv"), index=False)
+    uof_df = rearrange_use_of_force(uof)
+    uof_df.to_csv(deba.data("fuse_agency/uof_covington_pd.csv"), index=False)
+    citizen_df = rearrange_citizen_columns(citizen_df)
+    citizen_df.to_csv(deba.data("fuse_agency/cit_covington_pd.csv"), index=False)
     post.to_csv(deba.data("fuse_agency/post_carencro_pd.csv"), index=False)
