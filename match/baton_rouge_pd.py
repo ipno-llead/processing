@@ -184,8 +184,11 @@ def match_pd_cprr_2009_v_pprr(cprr, pprr):
     return cprr
 
 def match_settlements_v_pprr(settlements, pprr):
+    # Only match rows that have an identified officer (non-NaN uid).
+    # Rows without a named officer cannot be matched to personnel records.
+    named = settlements[settlements["uid"].notna() & (settlements["uid"] != "")]
     dfa = (
-        settlements[["first_name", "last_name", "uid"]]
+        named[["first_name", "last_name", "uid"]]
         .drop_duplicates("uid")
         .set_index("uid", drop=True)
     )

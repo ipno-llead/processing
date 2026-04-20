@@ -170,15 +170,10 @@ def split_date_payment_col(df):
 #     )
 #     return df
 
-import re
-import pandas as pd
-
 def extract_fields(df: pd.DataFrame) -> pd.DataFrame:
     case_numbers = []
     case_names = []
     risk_numbers = []
-    first_names = []
-    last_names = []
 
     col = df["suit_no_plaintiff_defendant_risk"]
 
@@ -186,38 +181,22 @@ def extract_fields(df: pd.DataFrame) -> pd.DataFrame:
         entry = str(entry).strip().strip("'")
 
         case_number_match = re.search(r"Suit No\.?\s*(.*?)\s+Plaintiff:", entry)
-        case_number = case_number_match.group(1) if case_number_match else None
+        case_number = case_number_match.group(1).strip() if case_number_match else None
         case_numbers.append(case_number)
 
-        case_name_match = re.search(r"Plaintiff:.*?Defendant", entry)
-        case_name = case_name_match.group(0).strip() if case_name_match else None
+        case_name_match = re.search(r"Plaintiff:\s*(.+?)\s+Defendant:", entry)
+        case_name = case_name_match.group(1).strip().rstrip(",") if case_name_match else None
         case_names.append(case_name)
 
         risk_number_match = re.search(r"Risk\s+#:\s*(\S+)", entry)
         raw_risk_number = risk_number_match.group(1) if risk_number_match else None
-        risk_number = None if raw_risk_number == "N/A" else raw_risk_number
-        risk_numbers.append(risk_number)
-
-        defendant_match = re.search(r"VS\s+(.*?)(?:, et al| Defendant)", entry)
-        if defendant_match:
-            full_defendant = defendant_match.group(1).strip()
-            name_parts = full_defendant.split(",")
-            if len(name_parts) == 2:
-                last_name = name_parts[0].strip()
-                first_name = name_parts[1].strip()
-            else:
-                first_name = last_name = None
-        else:
-            first_name = last_name = None
-
-        first_names.append(first_name)
-        last_names.append(last_name)
+        if raw_risk_number in ("N/A", "none", "None"):
+            raw_risk_number = None
+        risk_numbers.append(raw_risk_number)
 
     df = df.copy()
     df["case_number"] = case_numbers
     df["case_name"] = case_names
-    df["first_name"] = first_names
-    df["last_name"] = last_names
     df["risk_number"] = risk_numbers
 
     return df.drop(columns=["suit_no_plaintiff_defendant_risk"])
@@ -243,12 +222,18 @@ def extract_attorney_and_dates(df: pd.DataFrame) -> pd.DataFrame:
             continue
 
         attorney_match = re.search(
-            r"Attorney:\s+([\w'\-]+)(?:\s+([\w'\-\.]+))?\s+([\w'\-]+)", entry
+            r"Attorney:\s+(.+?)\s+Petition Received:", entry
         )
         if attorney_match:
-            first_name = attorney_match.group(1).strip()
-            middle_name = attorney_match.group(2).strip() if attorney_match.group(2) else ""
-            last_name = attorney_match.group(3).strip()
+            name_tokens = attorney_match.group(1).strip().split()
+            if len(name_tokens) == 1:
+                first_name, middle_name, last_name = None, None, name_tokens[0]
+            elif len(name_tokens) == 2:
+                first_name, middle_name, last_name = name_tokens[0], None, name_tokens[1]
+            else:
+                first_name = name_tokens[0]
+                middle_name = " ".join(name_tokens[1:-1])
+                last_name = name_tokens[-1]
         else:
             first_name = middle_name = last_name = None
 
@@ -305,7 +290,7 @@ def extract_settlement_fields(df: pd.DataFrame) -> pd.DataFrame:
             close_date = ''
         close_dates.append(close_date)
 
-        amount_match = re.search(r"Amount Awarded:\s+\$([0-9,]+\.\d{2})", entry)
+        amount_match = re.search(r"Amount Awarded:\s+\$([0-9,]+(?:\.\d{2})?)", entry)
         amount = amount_match.group(1) if amount_match else ''
         settlement_amounts.append(amount)
 
@@ -320,6 +305,263 @@ def extract_settlement_fields(df: pd.DataFrame) -> pd.DataFrame:
 
     return df.drop(columns=["closed_date_amount_awarded_description_of_payment"])
 
+def extract_officers_from_explanation(df: pd.DataFrame) -> pd.DataFrame:
+    """Pull officer names from the explanation text and explode to one row per officer.
+
+    The suit caption defendant is almost always 'City of Baton Rouge, et al', so
+    officers must be mined from 'Explanation:'. Typical patterns:
+        BRPD Shawn Delaney (P594)
+        BRPD officer Eric Kenny (P855)    (case varies)
+        BRPD Corporal Hilton Riley         (rank varies)
+        BRCPD Nathan Davis
+        BRCP Officer Rucker                (last-name only)
+        officer Jody Ledoux                (no agency)
+        BRPD Officers Robert Moruzzi and Jeremy Bourgeois  (multiple)
+        anthony augustine with BRPD        (trailing agency)
+    Rows with no extractable officer are kept with empty name fields.
+    """
+    NOISE = {
+        "officer", "officers", "police", "public", "chief", "sgt", "sergeant",
+        "lieutenant", "lt", "captain", "cpt", "corporal", "cpl", "deputy",
+        "detective", "det", "plaintiff", "defendant", "pl", "def", "ck",
+        "baton", "rouge", "city", "parish", "east", "west", "north", "south",
+        "ms", "mr", "mrs", "dr", "jr", "sr", "the", "a", "an",
+    }
+    # name_word MUST be case-sensitive — names start with capital letter
+    name_word = r"[A-Z][a-z'\-]+"
+    badge_pat = r"(?:\s*\(([A-Z]?\d+)\))?"
+    # Agency/rank use inline (?i:...) groups so they stay case-insensitive
+    # even when the surrounding regex is case-sensitive.
+    agency_i = r"(?i:BRPD|BRCPD|BRCP|BRC|BR\s+Police)"
+    rank_i = (
+        r"(?i:Officers?|Ofc\.?|Corporal|Cpl\.?|Sergeant|Sgt\.?|"
+        r"Lieutenant|Lt\.?|Captain|Cpt\.?|Chief|Detective|Det\.?|Deputy)"
+    )
+
+    # Pattern A: "<agency> [rank] First Last [and First Last] [(badge)]"
+    pat_first_last = re.compile(
+        rf"\b{agency_i}\s+(?:{rank_i}\s+)?"
+        rf"({name_word})\s+({name_word})"
+        rf"(?:\s+and\s+({name_word})\s+({name_word}))?"
+        rf"{badge_pat}"
+    )
+    # Pattern B: "[rank] First Last" without agency
+    pat_rank_first_last = re.compile(
+        rf"\b{rank_i}\s+({name_word})\s+({name_word})"
+        rf"(?:\s+and\s+({name_word})\s+({name_word}))?"
+        rf"{badge_pat}"
+    )
+    # Pattern C: "<agency> [rank] Last" (single-name when agency+rank marker present)
+    pat_single = re.compile(
+        rf"\b{agency_i}\s+{rank_i}\s+({name_word})"
+        rf"{badge_pat}"
+    )
+    # Pattern D: "First Last[,]? with|of <agency>"
+    pat_trailing_agency = re.compile(
+        rf"\b({name_word})\s+({name_word}),?\s+(?:with|of)\s+{agency_i}\b"
+    )
+    # Pattern E: "[preposition] [police]? officer/ofc LastName" — single last-name only
+    # Requires a contextual word before "officer" to reduce false positives.
+    # The captured name must begin with a capital letter, naturally excluding
+    # "Officer was ...", "Officer arrested ...", etc.
+    pat_officer_single = re.compile(
+        rf"(?i:\b(?:by|with|when|from|against|and|,|defendant,?|arresting|that|while)\s+"
+        rf"(?:police\s+)?(?:Officers?|Ofc\.?|Office))\s*,?\s*({name_word})\b"
+    )
+    # Pattern F: "<agency> [employee|vehicle driven by|vehicle operated by] First Last"
+    pat_agency_employee = re.compile(
+        rf"\b{agency_i}\s+(?i:employee,?\s*|vehicle\s+(?:driven|operated)\s+by\s+)"
+        rf"({name_word})\s+({name_word})"
+    )
+    # Pattern G: "First Last (<agency>)" — agency in parens after name
+    pat_paren_agency = re.compile(
+        rf"\b({name_word})\s+({name_word})\s*\(\s*{agency_i}\s*\)"
+    )
+    # Pattern H: "[police]? officer/office/ofc[,] First Last" — comma variant
+    pat_officer_comma = re.compile(
+        rf"(?i:\b(?:police\s+)?(?:Officers?|Office|Ofc\.?))\s*,\s*({name_word})\s+({name_word})"
+    )
+    # Pattern I: Officer/Ofc at sentence start — "Officer Thomas was..." / "Ofc. Dave Davis"
+    # Only catches when followed by capitalized word; NOT preceded by letters (must be start of text or after . or ;)
+    pat_officer_sentence_start = re.compile(
+        rf"(?:^|(?<=[.;\n]))\s*(?i:Officers?|Ofc\.?)\s+({name_word})(?:\s+({name_word}))?"
+    )
+    # Pattern J: "First Last, who works for (Police|<agency>)"
+    pat_works_for = re.compile(
+        rf"\b({name_word})\s+({name_word})\s*,?\s+who\s+works\s+for\s+"
+        rf"(?i:Police|{agency_i})"
+    )
+    # Pattern L: "[rank]. First Last" — rank with period followed by full name (e.g. "Ofc. Dave Davis")
+    pat_rank_dot_name = re.compile(
+        rf"(?i:\b(?:Ofc|Sgt|Lt|Cpl|Cpt|Det)\.)\s+({name_word})\s+({name_word})"
+    )
+
+    # Case-insensitive keyword-within-match test
+    # Ensures the capture string itself contains an agency or rank keyword
+    def has_agency_or_rank(text):
+        return bool(re.search(rf"\b(?:{agency}|{rank})\b", text, re.IGNORECASE))
+
+    def clean_name_pair(first, last):
+        if not first or not last:
+            return None
+        # Case-insensitive noise check
+        if first.lower() in NOISE or last.lower() in NOISE:
+            return None
+        # Names must start with capital in the original explanation
+        if not (first[0].isupper() and last[0].isupper()):
+            return None
+        return (first, last)
+
+    records = []
+    for _, row in df.iterrows():
+        explanation = str(row.get("disposition_desc") or "")
+        officers = []
+        consumed_spans = []
+
+        def overlaps(start, end):
+            return any(not (end <= s or start >= e) for s, e in consumed_spans)
+
+        # Pattern A first (highest signal)
+        for m in pat_first_last.finditer(explanation):
+            if overlaps(m.start(), m.end()):
+                continue
+            pair = clean_name_pair(m.group(1), m.group(2))
+            if pair:
+                officers.append((pair[0], pair[1], m.group(5)))
+                consumed_spans.append((m.start(), m.end()))
+            pair2 = clean_name_pair(m.group(3), m.group(4))
+            if pair2:
+                officers.append((pair2[0], pair2[1], None))
+
+        # Pattern B: rank + first + last (no agency)
+        for m in pat_rank_first_last.finditer(explanation):
+            if overlaps(m.start(), m.end()):
+                continue
+            pair = clean_name_pair(m.group(1), m.group(2))
+            if pair:
+                officers.append((pair[0], pair[1], m.group(5)))
+                consumed_spans.append((m.start(), m.end()))
+            pair2 = clean_name_pair(m.group(3), m.group(4))
+            if pair2:
+                officers.append((pair2[0], pair2[1], None))
+
+        # Pattern C: "<agency> <rank> LastName" (last-name only)
+        for m in pat_single.finditer(explanation):
+            if overlaps(m.start(), m.end()):
+                continue
+            last = m.group(1)
+            if last.lower() in NOISE or not last[0].isupper():
+                continue
+            officers.append((None, last, m.group(2)))
+
+        # Pattern D: "First Last with/of <agency>"
+        for m in pat_trailing_agency.finditer(explanation):
+            if overlaps(m.start(), m.end()):
+                continue
+            pair = clean_name_pair(m.group(1), m.group(2))
+            if pair:
+                officers.append((pair[0], pair[1], None))
+                consumed_spans.append((m.start(), m.end()))
+
+        # Pattern F: "<agency> employee/vehicle driven by First Last"
+        for m in pat_agency_employee.finditer(explanation):
+            if overlaps(m.start(), m.end()):
+                continue
+            pair = clean_name_pair(m.group(1), m.group(2))
+            if pair:
+                officers.append((pair[0], pair[1], None))
+                consumed_spans.append((m.start(), m.end()))
+
+        # Pattern G: "First Last (<agency>)"
+        for m in pat_paren_agency.finditer(explanation):
+            if overlaps(m.start(), m.end()):
+                continue
+            pair = clean_name_pair(m.group(1), m.group(2))
+            if pair:
+                officers.append((pair[0], pair[1], None))
+                consumed_spans.append((m.start(), m.end()))
+
+        # Pattern H: "officer, First Last" or "police officer, First Last"
+        for m in pat_officer_comma.finditer(explanation):
+            if overlaps(m.start(), m.end()):
+                continue
+            pair = clean_name_pair(m.group(1), m.group(2))
+            if pair:
+                officers.append((pair[0], pair[1], None))
+                consumed_spans.append((m.start(), m.end()))
+
+        # Pattern J: "First Last, who works for Police/<agency>"
+        for m in pat_works_for.finditer(explanation):
+            if overlaps(m.start(), m.end()):
+                continue
+            pair = clean_name_pair(m.group(1), m.group(2))
+            if pair:
+                officers.append((pair[0], pair[1], None))
+                consumed_spans.append((m.start(), m.end()))
+
+        # Pattern L: "Ofc./Sgt./Lt. First Last"
+        for m in pat_rank_dot_name.finditer(explanation):
+            if overlaps(m.start(), m.end()):
+                continue
+            pair = clean_name_pair(m.group(1), m.group(2))
+            if pair:
+                officers.append((pair[0], pair[1], None))
+                consumed_spans.append((m.start(), m.end()))
+
+        # Pattern I: "Officer First Last" or "Ofc. Last" at sentence start
+        for m in pat_officer_sentence_start.finditer(explanation):
+            if overlaps(m.start(), m.end()):
+                continue
+            first = m.group(1)
+            last = m.group(2)
+            if last:
+                pair = clean_name_pair(first, last)
+                if pair:
+                    officers.append((pair[0], pair[1], None))
+                    consumed_spans.append((m.start(), m.end()))
+            else:
+                # Single name — treat as last name
+                if first and first[0].isupper() and first.lower() not in NOISE:
+                    officers.append((None, first, None))
+                    consumed_spans.append((m.start(), m.end()))
+
+        # Pattern E: single-name "[prep] officer LastName" (last, no first)
+        # Run AFTER two-name patterns so we don't double-match
+        for m in pat_officer_single.finditer(explanation):
+            if overlaps(m.start(), m.end()):
+                continue
+            last = m.group(1)
+            if last.lower() in NOISE or not last[0].isupper():
+                continue
+            officers.append((None, last, None))
+            consumed_spans.append((m.start(), m.end()))
+
+        # dedupe while preserving order
+        seen = set()
+        unique_officers = []
+        for o in officers:
+            key = (o[0].lower() if o[0] else "", o[1].lower() if o[1] else "")
+            if key not in seen:
+                seen.add(key)
+                unique_officers.append(o)
+
+        if not unique_officers:
+            new_row = row.copy()
+            new_row["first_name"] = ""
+            new_row["last_name"] = ""
+            new_row["badge_number"] = ""
+            records.append(new_row)
+        else:
+            for first, last, badge in unique_officers:
+                new_row = row.copy()
+                new_row["first_name"] = first or ""
+                new_row["last_name"] = last or ""
+                new_row["badge_number"] = badge or ""
+                records.append(new_row)
+
+    return pd.DataFrame(records).reset_index(drop=True)
+
+
 def extract_case_disposition(df: pd.DataFrame) -> pd.DataFrame:
     dispositions = []
     descriptions = []
@@ -329,8 +571,8 @@ def extract_case_disposition(df: pd.DataFrame) -> pd.DataFrame:
     for entry in col:
         entry = str(entry).strip().strip("'")
 
-        reason_match = re.search(r"Reason:\s*(\w+)", entry)
-        disposition = reason_match.group(1) if reason_match else None
+        reason_match = re.search(r"Reason:\s*(.+?)\s+Explanation:", entry)
+        disposition = reason_match.group(1).strip() if reason_match else None
         dispositions.append(disposition)
 
         explanation_match = re.search(r"Explanation:\s*(.*)", entry)
@@ -345,8 +587,11 @@ def extract_case_disposition(df: pd.DataFrame) -> pd.DataFrame:
 
 def fix_first_name(df: pd.DataFrame) -> pd.DataFrame:
     def fix(name):
+        if name is None or (isinstance(name, float) and pd.isna(name)):
+            return ""
         name = str(name).strip().lower()
-
+        if name in ("", "none", "nan"):
+            return ""
         if name == "officer nathan etal":
             return "nathan"
         elif name == "ltd":
@@ -356,7 +601,7 @@ def fix_first_name(df: pd.DataFrame) -> pd.DataFrame:
         elif name == "officer isaac":
             return "isaac"
         else:
-            return name.title() if name else ""
+            return name.title()
 
     df = df.copy()
     df["first_name"] = df["first_name"].apply(fix)
@@ -369,28 +614,41 @@ def remove_commas_from_strings(df: pd.DataFrame) -> pd.DataFrame:
     return df.applymap(lambda x: x.replace(",", "") if isinstance(x, str) else x)
 
 
+def blank_uid_for_missing_officers(df: pd.DataFrame) -> pd.DataFrame:
+    """Blank out `uid` on rows with no officer name so they don't collapse
+    onto a single phantom officer in downstream fuse."""
+    df = df.copy()
+    missing = (df["first_name"].fillna("") == "") & (df["last_name"].fillna("") == "")
+    df.loc[missing, "uid"] = ""
+    return df
+
+
 def clean_16():
     df16 = (
         pd.read_csv(deba.data("raw/baton_rouge_pd/baton_rouge_pd_settlements_2016_2023.csv"))
         .pipe(clean_column_names)
+        .drop_duplicates()
         .pipe(extract_fields)
         .pipe(extract_attorney_and_dates)
         .pipe(extract_settlement_fields)
         .pipe(extract_case_disposition)
+        .pipe(extract_officers_from_explanation)
         .pipe(fix_first_name)
+        .pipe(remove_commas_from_strings)
+        .pipe(strip_double_quotes)
         .pipe(clean_names, ["first_name", "last_name", "attorney_first_name", "attorney_middle_name", "attorney_last_name"])
         .pipe(standardize_desc_cols, ["case_name", "case_number", "risk_number", "settlement_amount", "settlement_amount_desc", "case_disposition", "disposition_desc"])
         .pipe(clean_dates, ["claim_receive_date", "claim_occur_date", "claim_close_date"])
         .pipe(set_values, {"agency": "baton-rouge-pd"})
         .pipe(gen_uid, ["first_name", "last_name", "agency"])
+        .pipe(blank_uid_for_missing_officers)
         .pipe(
             gen_uid,
             ["case_name", "case_number", "risk_number", "settlement_amount", "uid"],
             "settlement_uid",
         )
-
-        .pipe(remove_commas_from_strings)
-        .pipe(strip_double_quotes)
+        .drop_duplicates(subset=["settlement_uid"], keep="first")
+        .reset_index(drop=True)
     )
     return df16
 
