@@ -125,3 +125,5 @@ def clean():
 if __name__ == "__main__":
     uof = clean()
     uof.to_csv(deba.data("clean/uof_baker_pd_2021_2025.csv"), index=False)
+
+#forgot to dvc push
