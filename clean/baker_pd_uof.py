@@ -11,20 +11,12 @@ from lib.uid import gen_uid
 
 
 def read_and_align_columns():
-    rows = []
-    with open(deba.data("raw/baker_pd/baker_pd_uof_2021_2025.csv")) as f:
-        import csv
-
-        reader = csv.reader(f)
-        next(reader)
-        for row in reader:
-            if len(row) == 6:
-                rows.append(row[:5])
-            elif len(row) == 5:
-                rows.append(row)
-            else:
-                rows.append(row[:5])
-    df = pd.DataFrame(rows, columns=["tracking_id", "date", "call_type", "officer", "incident_location"])
+    df = pd.read_csv(
+        deba.data("raw/baker_pd/baker_pd_uof_2021_2025.csv"),
+        header=0,
+    )
+    df = df.iloc[:, :5].fillna("")
+    df.columns = ["tracking_id", "date", "call_type", "officer", "incident_location"]
     return df
 
 
