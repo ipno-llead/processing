@@ -1,6 +1,6 @@
 wdir: ../../../data/raw
 outs:
-- md5: 8379d809d3c6f64fd57cf229ce8f54c5.dir
-  size: 9842
-  nfiles: 4
+- md5: 6e3338447cff4bc395a11eeba596cc90.dir
+  size: 14560
+  nfiles: 5
   path: baker_pd

@@ -1,5 +1,5 @@
 import deba
-from lib.columns import rearrange_allegation_columns, rearrange_event_columns
+from lib.columns import rearrange_allegation_columns, rearrange_event_columns, rearrange_use_of_force
 from lib.personnel import fuse_personnel
 from lib.post import load_for_agency
 import pandas as pd
@@ -7,7 +7,7 @@ from lib import events
 from lib.post import load_for_agency
 
 
-def fuse_events(pprr):
+def fuse_events(pprr, uof):
     builder = events.Builder()
     builder.extract_events(
         pprr,
@@ -23,6 +23,16 @@ def fuse_events(pprr):
         },
         ["uid"],
     )
+    builder.extract_events(
+        uof,
+        {
+            events.UOF_INCIDENT: {
+                "prefix": "occurred",
+                "keep": ["uid", "uof_uid", "agency"],
+            },
+        },
+        ["uid", "uof_uid"],
+    )
     return builder.to_frame()
 
 
@@ -31,13 +41,16 @@ if __name__ == "__main__":
     cprr17 = pd.read_csv(deba.data("match/cprr_baker_pd_2014_2017.csv"))
     pprr = pd.read_csv(deba.data("clean/pprr_baker_pd_2010_2020.csv"))
     post_event = pd.read_csv(deba.data("match/post_event_baker_pd_2020_11_06.csv"))
+    uof = pd.read_csv(deba.data("match/uof_baker_pd_2021_2025.csv"))
     agency = cprr20.agency[0]
     post = load_for_agency(agency)
-    per_df = fuse_personnel(cprr20, pprr, cprr17, post)
+    per_df = fuse_personnel(cprr20, pprr, cprr17, post, uof)
     com_df = rearrange_allegation_columns(pd.concat([cprr20, cprr17], axis=0))
-    event_df = fuse_events(pprr)
+    event_df = fuse_events(pprr, uof)
     event_df = rearrange_event_columns(pd.concat([post_event, event_df]))
+    uof_df = rearrange_use_of_force(uof)
     com_df.to_csv(deba.data("fuse_agency/com_baker_pd.csv"), index=False)
     per_df.to_csv(deba.data("fuse_agency/per_baker_pd.csv"), index=False)
     event_df.to_csv(deba.data("fuse_agency/event_baker_pd.csv"), index=False)
+    uof_df.to_csv(deba.data("fuse_agency/uof_baker_pd.csv"), index=False)
     post.to_csv(deba.data("fuse_agency/post_baker_pd.csv"), index=False)
