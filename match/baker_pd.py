@@ -119,6 +119,42 @@ def match_uof_and_pprr(uof, pprr):
     return uof
 
 
+def match_uof_and_post(uof, post):
+    dfa = (
+        uof.loc[uof.uid.notna(), ["uid", "first_name", "last_name"]]
+        .drop_duplicates(subset=["uid"])
+        .set_index("uid", drop=True)
+    )
+    dfa.loc[:, "fc"] = dfa.first_name.fillna("").map(lambda x: x[:1])
+
+    dfb = (
+        post[["uid", "first_name", "last_name"]]
+        .drop_duplicates(subset=["uid"])
+        .set_index("uid", drop=True)
+    )
+    dfb.loc[:, "fc"] = dfb.first_name.fillna("").map(lambda x: x[:1])
+
+    matcher = ThresholdMatcher(
+        ColumnsIndex("fc"),
+        {
+            "first_name": JaroWinklerSimilarity(),
+            "last_name": JaroWinklerSimilarity(),
+        },
+        dfa,
+        dfb,
+    )
+    decision = .94
+    matcher.save_pairs_to_excel(
+        deba.data("match/uof_baker_pd_2021_2025_v_post_pprr_2020_11_06.xlsx"),
+        decision,
+    )
+    matches = matcher.get_index_pairs_within_thresholds(decision)
+    match_dict = dict(matches)
+
+    uof.loc[:, "uid"] = uof.uid.map(lambda x: match_dict.get(x, x))
+    return uof
+
+
 if __name__ == "__main__":
     cprr20 = pd.read_csv(deba.data("clean/cprr_baker_pd_2018_2020.csv"))
     cprr17 = pd.read_csv(deba.data("clean/cprr_baker_pd_2014_2017.csv"))
@@ -130,6 +166,7 @@ if __name__ == "__main__":
     cprr17 = match_cprr17_and_post(cprr17, post)
     post_event = match_pprr_and_post(pprr, post)
     uof = match_uof_and_pprr(uof, pprr)
+    uof = match_uof_and_post(uof, post)
     cprr20.to_csv(deba.data("match/cprr_baker_pd_2018_2020.csv"), index=False)
     post_event.to_csv(
         deba.data("match/post_event_baker_pd_2020_11_06.csv"), index=False
