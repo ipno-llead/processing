@@ -1,0 +1,6 @@
+wdir: ../../../data/raw
+outs:
+- md5: aad9df7ec8e3d1f04748d88bc3619105.dir
+  size: 13677
+  nfiles: 1
+  path: assumption_so
