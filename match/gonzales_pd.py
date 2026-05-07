@@ -3,6 +3,7 @@ from datamatch import (
     ThresholdMatcher,
     JaroWinklerSimilarity,
     ColumnsIndex,
+    NoopIndex,
     DateSimilarity,
 )
 import deba
@@ -109,15 +110,53 @@ def extract_post_events(pprr, post):
     return extract_events_from_post(post, matches, "gonzales-pd")
 
 
+def match_uof_with_pprr_26(uof, pprr_26):
+    dfa = (
+        uof[["last_name", "uid"]]
+        .drop_duplicates(subset=["uid"])
+        .set_index("uid", drop=True)
+    )
+
+    dfb = (
+        pprr_26[["last_name", "uid"]]
+        .drop_duplicates(subset=["uid"])
+        .set_index("uid", drop=True)
+    )
+
+    matcher = ThresholdMatcher(
+        NoopIndex(),
+        {
+            "last_name": JaroWinklerSimilarity(),
+        },
+        dfa,
+        dfb,
+    )
+    decision = 0.9
+    matcher.save_pairs_to_excel(
+        deba.data("match/gonzales_pd_uof_2023_2026_v_pprr_2026.xlsx"),
+        decision,
+    )
+    matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
+    for uid_a, uid_b in matches:
+        row = pprr_26.loc[pprr_26.uid == uid_b].iloc[0]
+        uof.loc[uof.uid == uid_a, "first_name"] = row.first_name
+        uof.loc[uof.uid == uid_a, "last_name"] = row.last_name
+        uof.loc[uof.uid == uid_a, "uid"] = uid_b
+    return uof
+
+
 if __name__ == "__main__":
     pprr = pd.read_csv(deba.data("clean/pprr_gonzales_pd_2010_2021.csv"))
     pprr_26 = pd.read_csv(deba.data("clean/pprr_gonzales_pd_2026.csv"))
+    uof = pd.read_csv(deba.data("clean/uof_gonzales_pd_2023_2026.csv"))
     agency = pprr.agency[0]
     post = load_for_agency(agency)
     pprr_26 = match_pprr_2026_with_pprr(pprr_26, pprr)
+    uof = match_uof_with_pprr_26(uof, pprr_26)
     post_events = extract_post_events(pprr, post)
     post_events_26 = extract_post_events_2026(pprr_26, post)
     pprr_26.to_csv(deba.data("match/pprr_gonzales_pd_2026.csv"), index=False)
+    uof.to_csv(deba.data("match/uof_gonzales_pd_2023_2026.csv"), index=False)
     post_events.to_csv(
         deba.data("match/post_event_gonzales_pd_2010_2021.csv"), index=False
     )
