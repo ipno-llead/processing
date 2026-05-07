@@ -41,6 +41,18 @@ def clean_race(df):
     return df.drop(columns="race_gender")
 
 
+def split_names(df):
+    names = df.name.str.strip()
+    # extract quoted nicknames into middle_name e.g. "PJ", "Colby"
+    df.loc[:, "middle_name"] = names.str.extract(r'"([^"]+)"', expand=False)
+    # remove quoted nicknames from names before splitting
+    names = names.str.replace(r'\s*"[^"]+"\s*', " ", regex=True).str.strip()
+    parts = names.str.split(" ", n=1)
+    df.loc[:, "first_name"] = parts.str[0]
+    df.loc[:, "last_name"] = parts.str[1]
+    return df.drop(columns="name")
+
+
 def clean():
     df = (
         pd.read_csv(deba.data("raw/gonzales_pd/gonzales_pd_pprr_2010_2021.csv"))
@@ -66,6 +78,24 @@ def clean():
     return df
 
 
+def clean_2026():
+    df = (
+        pd.read_csv(
+            deba.data("raw/gonzales_pd/gonzales_pd_pprr_2026.csv"),
+            header=2,
+        )
+        .pipe(clean_column_names)
+        .dropna(subset=["name"])
+        .pipe(split_names)
+        .pipe(standardize_desc_cols, ["first_name", "middle_name", "last_name"])
+        .pipe(set_values, {"agency": "gonzales-pd"})
+        .pipe(gen_uid, ["agency", "first_name", "last_name"])
+    )
+    return df
+
+
 if __name__ == "__main__":
     df = clean()
     df.to_csv(deba.data("clean/pprr_gonzales_pd_2010_2021.csv"), index=False)
+    df_2026 = clean_2026()
+    df_2026.to_csv(deba.data("clean/pprr_gonzales_pd_2026.csv"), index=False)
