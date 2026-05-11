@@ -109,14 +109,53 @@ def match_cprr_18_with_post(cprr, post):
     return cprr
 
 
+def match_uof_with_post(uof, post):
+    dfa = (
+        uof[["uid", "first_name", "last_name"]]
+        .drop_duplicates(subset=["uid"])
+        .set_index("uid", drop=True)
+    )
+    dfa.loc[:, "fc"] = dfa.first_name.fillna("").map(lambda x: x[:1])
+
+    dfb = (
+        post[["uid", "first_name", "last_name"]]
+        .drop_duplicates(subset=["uid"])
+        .set_index("uid", drop=True)
+    )
+    dfb.loc[:, "fc"] = dfb.first_name.fillna("").map(lambda x: x[:1])
+
+    matcher = ThresholdMatcher(
+        ColumnsIndex("fc"),
+        {
+            "first_name": JaroWinklerSimilarity(),
+            "last_name": JaroWinklerSimilarity(),
+        },
+        dfa,
+        dfb,
+    )
+    decision = 0.93
+    matcher.save_pairs_to_excel(
+        deba.data("match/uof_houma_pd_2020_v_post_pprr_2025_08_25.xlsx"),
+        decision,
+    )
+    matches = matcher.get_index_pairs_within_thresholds(decision)
+    match_dict = dict(matches)
+
+    uof.loc[:, "uid"] = uof.uid.map(lambda x: match_dict.get(x, x))
+    return uof
+
+
 if __name__ == "__main__":
     cprr21 = pd.read_csv(deba.data("clean/cprr_houma_pd_2019_2021.csv"))
     cprr18 = pd.read_csv(deba.data("clean/cprr_houma_pd_2017_2018.csv"))
+    uof = pd.read_csv(deba.data("clean/uof_houma_pd_2020.csv"))
     agency = cprr18.agency[0]
     post = load_for_agency(agency)
     cprr21 = deduplicate_cprr21(cprr21)
     cprr18 = deduplicate_cprr18(cprr18)
     cprr21 = match_cprr_21_with_post(cprr21, post)
     cprr18 = match_cprr_18_with_post(cprr18, post)
+    uof = match_uof_with_post(uof, post)
     cprr21.to_csv(deba.data("match/cprr_houma_pd_2019_2021.csv"), index=False)
     cprr18.to_csv(deba.data("match/cprr_houma_pd_2017_2018.csv"), index=False)
+    uof.to_csv(deba.data("match/uof_houma_pd_2020.csv"), index=False)
