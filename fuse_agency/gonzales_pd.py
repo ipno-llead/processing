@@ -26,6 +26,7 @@ def fuse_events(pprr, uof):
         {
             events.UOF_INCIDENT: {
                 "prefix": "occurred",
+                "parse_date": True,
                 "keep": ["uid", "uof_uid", "agency"],
             },
         },
