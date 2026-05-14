@@ -6,7 +6,7 @@ from lib.columns import rearrange_allegation_columns, rearrange_event_columns, r
 from lib.post import load_for_agency
 
 
-def fuse_events(post, uof):
+def fuse_events(post, uof, cprr21, cprr18):
     builder = events.Builder()
     builder.extract_events(
         post,
@@ -39,6 +39,17 @@ def fuse_events(post, uof):
         },
         ["uid", "uof_uid"],
     )
+    for cprr in [cprr21, cprr18]:
+        builder.extract_events(
+            cprr,
+            {
+                events.COMPLAINT_RECEIVE: {
+                    "prefix": "receive",
+                    "keep": ["uid", "agency", "allegation_uid"],
+                },
+            },
+            ["uid", "allegation_uid"],
+        )
     return builder.to_frame()
 
 
@@ -50,7 +61,7 @@ if __name__ == "__main__":
     post = load_for_agency(agency)
     personnel_df = fuse_personnel(cprr21, cprr18, uof, post)
     allegation_df = rearrange_allegation_columns(pd.concat([cprr21, cprr18], axis=0))
-    event_df = rearrange_event_columns(fuse_events(post, uof))
+    event_df = rearrange_event_columns(fuse_events(post, uof, cprr21, cprr18))
     uof_df = rearrange_use_of_force(uof)
     event_df.to_csv(deba.data("fuse_agency/event_houma_pd.csv"), index=False)
     personnel_df.to_csv(deba.data("fuse_agency/per_houma_pd.csv"), index=False)
