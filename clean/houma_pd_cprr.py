@@ -166,6 +166,13 @@ def create_tracking_id_og_col(df):
     return df
 
 
+def extract_receive_year(df):
+    df.loc[:, "receive_year"] = (
+        df.case_number.str.strip().str.extract(r"^(\d{4})-")[0].astype(int)
+    )
+    return df
+
+
 def clean21():
     df = (
         pd.read_csv(deba.data("raw/houma_pd/houma_pd_cprr_2019_2021.csv"))
@@ -178,6 +185,7 @@ def clean21():
         .pipe(split_and_clean_investigator21)
         .pipe(split_and_clean_names)
         .pipe(standardize_desc_cols, ["tracking_id", "action"])
+        .pipe(extract_receive_year)
         .pipe(set_values, ({"agency": "houma-pd"}))
         .pipe(gen_uid, ["agency", "first_name", "last_name"])
         .pipe(
@@ -204,6 +212,7 @@ def clean18():
         .pipe(extract_action)
         .pipe(clean_disposition)
         .pipe(split_and_clean_investigator18)
+        .pipe(extract_receive_year)
         .pipe(set_values, {"agency": "houma-pd"})
         .pipe(gen_uid, ["agency", "first_name", "last_name"])
         .pipe(
