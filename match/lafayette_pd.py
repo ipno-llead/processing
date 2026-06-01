@@ -611,6 +611,80 @@ def match_cprr_14_investigators_with_pprr(cprr, pprr):
     return cprr
 
 
+def match_uof_officers_with_pprr(uof, pprr):
+    dfa = (
+        uof[["first_name", "last_name", "uid"]]
+        .drop_duplicates(subset=["uid"])
+        .set_index("uid", drop=True)
+    )
+    dfa.loc[:, "fc"] = dfa.first_name.fillna("").map(lambda x: x[:1])
+    dfb = (
+        pprr[["first_name", "last_name", "uid"]]
+        .drop_duplicates()
+        .set_index("uid", drop=True)
+    )
+    dfb.loc[:, "fc"] = dfb.first_name.fillna("").map(lambda x: x[:1])
+
+    matcher = ThresholdMatcher(
+        ColumnsIndex("fc"),
+        {
+            "first_name": JaroWinklerSimilarity(),
+            "last_name": JaroWinklerSimilarity(),
+        },
+        dfa,
+        dfb,
+    )
+    decision = 0.880
+    matcher.save_pairs_to_excel(
+        deba.data("match/lafayette_pd_uof_2024_2026_officers_v_pprr_2010_2024.xlsx"),
+        decision,
+    )
+    matches = matcher.get_index_pairs_within_thresholds(lower_bound=decision)
+
+    for uid_a, uid_b in matches:
+        row = pprr.loc[pprr.uid == uid_b].iloc[0]
+        uof.loc[uof.uid == uid_a, "first_name"] = row.first_name
+        uof.loc[uof.uid == uid_a, "last_name"] = row.last_name
+        uof.loc[uof.uid == uid_a, "uid"] = uid_b
+    return uof
+
+
+def match_uof_officers_with_post(uof, post):
+    dfa = (
+        uof[["uid", "first_name", "last_name"]]
+        .drop_duplicates(subset=["uid"])
+        .set_index("uid", drop=True)
+    )
+    dfa.loc[:, "fc"] = dfa.first_name.fillna("").map(lambda x: x[:1])
+
+    dfb = (
+        post[["uid", "first_name", "last_name"]]
+        .drop_duplicates(subset=["uid"])
+        .set_index("uid", drop=True)
+    )
+    dfb.loc[:, "fc"] = dfb.first_name.fillna("").map(lambda x: x[:1])
+
+    matcher = ThresholdMatcher(
+        ColumnsIndex("fc"),
+        {
+            "first_name": JaroWinklerSimilarity(),
+            "last_name": JaroWinklerSimilarity(),
+        },
+        dfa,
+        dfb,
+    )
+    decision = 0.93
+    matcher.save_pairs_to_excel(
+        deba.data("match/lafayette_pd_uof_2024_2026_v_post_pprr_2025_08_25.xlsx"),
+        decision,
+    )
+    matches = matcher.get_index_pairs_within_thresholds(decision)
+    match_dict = dict(matches)
+
+    uof.loc[:, "uid"] = uof.uid.map(lambda x: match_dict.get(x, x))
+    return uof
+
+
 def extract_post_events(pprr, post):
     dfa = pprr[["first_name", "last_name", "uid"]]
     dfa.loc[:, "fc"] = dfa.first_name.fillna("").map(lambda x: x[:1])
@@ -643,6 +717,7 @@ if __name__ == "__main__":
     cprr_25 = pd.read_csv(deba.data("clean/cprr_lafayette_pd_2020_2025.csv"))
     cprr_20 = pd.read_csv(deba.data("clean/cprr_lafayette_pd_2015_2020.csv"))
     cprr_14 = pd.read_csv(deba.data("clean/cprr_lafayette_pd_2009_2014.csv"))
+    uof = pd.read_csv(deba.data("clean/uof_lafayette_pd_2024_2026.csv"))
     pprr = pd.read_csv(deba.data("clean/pprr_lafayette_pd_2010_2024.csv"))
     agency = pprr.agency[0]
     post = load_for_agency(agency)
@@ -667,8 +742,13 @@ if __name__ == "__main__":
         .pipe(match_cprr_14_investigators_with_pprr, pprr)
         .pipe(combine_investigator_name)
     )
+    uof = (
+        match_uof_officers_with_pprr(uof, pprr)
+        .pipe(match_uof_officers_with_post, post)
+    )
     post_events = extract_post_events(pprr, post)
     cprr_20.to_csv(deba.data("match/cprr_lafayette_pd_2015_2020.csv"), index=False)
     cprr_14.to_csv(deba.data("match/cprr_lafayette_pd_2009_2014.csv"), index=False)
     cprr_25.to_csv(deba.data("match/cprr_lafayette_pd_2020_2025.csv"), index=False)
+    uof.to_csv(deba.data("match/uof_lafayette_pd_2024_2026.csv"), index=False)
     post_events.to_csv(deba.data("match/post_event_lafayette_pd_2025.csv"), index=False)
