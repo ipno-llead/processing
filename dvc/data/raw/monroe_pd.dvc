@@ -1,0 +1,6 @@
+wdir: ../../../data/raw
+outs:
+- md5: 9d3741a6ececeb952683ecfdb9830ecb.dir
+  size: 22541
+  nfiles: 2
+  path: monroe_pd
