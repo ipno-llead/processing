@@ -1,0 +1,6 @@
+wdir: ../../../data/raw
+outs:
+- md5: 4881160c6f3ebf1d031eb7449390a7fe.dir
+  size: 5645
+  nfiles: 2
+  path: vermilion_so
