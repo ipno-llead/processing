@@ -193,6 +193,7 @@ def fuse_use_of_force():
                 pd.read_csv(deba.data("fuse_agency/uof_houma_pd.csv")),
                 pd.read_csv(deba.data("fuse_agency/uof_vermilion_so.csv")),
                 pd.read_csv(deba.data("fuse_agency/uof_monroe_pd.csv")),
+                pd.read_csv(deba.data("fuse_agency/uof_denham_springs_pd.csv")),
             ]
         )
     ).sort_values(["agency", "uof_uid"])
@@ -319,6 +320,7 @@ def fuse_citizen_dfs():
                 pd.read_csv(deba.data("fuse_agency/cit_ponchatoula_pd.csv")),
                 pd.read_csv(deba.data("fuse_agency/cit_covington_pd.csv")),
                 pd.read_csv(deba.data("fuse_agency/cit_vermilion_so.csv")),
+                pd.read_csv(deba.data("fuse_agency/cit_denham_springs_pd.csv")),
             ]
         )
     ).sort_values("agency", ignore_index=True)
