@@ -1,6 +1,6 @@
 wdir: ../../../data/raw
 outs:
-- md5: c8ec391760e0fb47abe1635591e8c3dc.dir
-  size: 4618
-  nfiles: 1
+- md5: 382e050a166d9c659d335e0b57156816.dir
+  size: 11236
+  nfiles: 3
   path: denham_springs_pd
