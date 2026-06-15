@@ -1,6 +1,6 @@
 wdir: ../../../data/raw
 outs:
-- md5: ed7f2d41c6b751b5a306210eef723c19.dir
-  size: 2195
-  nfiles: 1
+- md5: c776f49177b79681e295118efc54a636.dir
+  size: 127728
+  nfiles: 2
   path: st_john_so
