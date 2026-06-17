@@ -98,6 +98,7 @@ def read_event():
                 pd.read_csv(deba.data("fuse_agency/event_assumption_so.csv")),
                 pd.read_csv(deba.data("fuse_agency/event_vermilion_so.csv")),
                 pd.read_csv(deba.data("fuse_agency/event_monroe_pd.csv")),
+                pd.read_csv(deba.data("fuse_agency/event_bossier_so.csv")),
             ]
         )
     ).sort_values(["agency", "event_uid"], ignore_index=True)
@@ -195,6 +196,7 @@ def fuse_use_of_force():
                 pd.read_csv(deba.data("fuse_agency/uof_monroe_pd.csv")),
                 pd.read_csv(deba.data("fuse_agency/uof_denham_springs_pd.csv")),
                 pd.read_csv(deba.data("fuse_agency/uof_st_john_so.csv")),
+                pd.read_csv(deba.data("fuse_agency/uof_bossier_so.csv")),
             ]
         )
     ).sort_values(["agency", "uof_uid"])
@@ -536,6 +538,7 @@ def read_personnel():
                 pd.read_csv(deba.data("fuse_agency/per_assumption_so.csv")),
                 pd.read_csv(deba.data("fuse_agency/per_vermilion_so.csv")),
                 pd.read_csv(deba.data("fuse_agency/per_monroe_pd.csv")),
+                pd.read_csv(deba.data("fuse_agency/per_bossier_so.csv")),
             ]
         )
     ).sort_values("uid", ignore_index=True)
