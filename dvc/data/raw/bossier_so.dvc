@@ -1,0 +1,6 @@
+wdir: ../../../data/raw
+outs:
+- md5: 48d233ee12b0ea0026bea4aeb6ea170c.dir
+  size: 15598
+  nfiles: 1
+  path: bossier_so
